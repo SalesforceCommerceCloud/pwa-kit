@@ -1042,12 +1042,14 @@ describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
     test('renders modal successfully with variant filtering enabled', () => {
         // Basic integration test: Modal renders without errors with filtering logic
         const mockBasket = {
-            bonusDiscountLineItems: [{
-                promotionId: 'test-promo',
-                bonusProducts: [
-                    { productId: '793775370033M' } // Specific variant
-                ]
-            }],
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'test-promo',
+                    bonusProducts: [
+                        {productId: '793775370033M'} // Specific variant
+                    ]
+                }
+            ],
             productItems: []
         }
 
@@ -1055,14 +1057,17 @@ describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
             id: '793775370033',
             name: 'Test Product',
             variants: [
-                { productId: '793775370033M', variationValues: { color: 'turquoise' } },
-                { productId: '793775370033R', variationValues: { color: 'red' } }
+                {productId: '793775370033M', variationValues: {color: 'turquoise'}},
+                {productId: '793775370033R', variationValues: {color: 'red'}}
             ],
             variationAttributes: [
-                { id: 'color', values: [
-                    { value: 'turquoise', name: 'Turquoise' },
-                    { value: 'red', name: 'Red' }
-                ]}
+                {
+                    id: 'color',
+                    values: [
+                        {value: 'turquoise', name: 'Turquoise'},
+                        {value: 'red', name: 'Red'}
+                    ]
+                }
             ]
         }
 
@@ -1087,10 +1092,12 @@ describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
     test('handles edge cases without errors', () => {
         // Edge case test: No bonus products available
         const mockBasket = {
-            bonusDiscountLineItems: [{
-                promotionId: 'different-promo',
-                bonusProducts: []
-            }],
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'different-promo',
+                    bonusProducts: []
+                }
+            ],
             productItems: []
         }
 
@@ -1120,8 +1127,8 @@ describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
 
     test('handles missing bonus data gracefully', () => {
         // Edge case test: No bonusDiscountLineItems
-        const mockBasket = { productItems: [] }
-        const mockProduct = { id: '123', name: 'Test' }
+        const mockBasket = {productItems: []}
+        const mockProduct = {id: '123', name: 'Test'}
 
         useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
         useProductViewModal.mockReturnValue({product: mockProduct, isFetching: false})
@@ -1141,24 +1148,26 @@ describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
     test('filtering logic processes complex variant scenarios', () => {
         // Complex scenario test: Mixed base and variant IDs
         const mockBasket = {
-            bonusDiscountLineItems: [{
-                promotionId: 'test-promo',
-                bonusProducts: [
-                    { productId: '793775370033' },   // Base product
-                    { productId: '793775370033M' },  // Variant
-                    { productId: '793775370033R' }   // Another variant
-                ]
-            }]
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'test-promo',
+                    bonusProducts: [
+                        {productId: '793775370033'}, // Base product
+                        {productId: '793775370033M'}, // Variant
+                        {productId: '793775370033R'} // Another variant
+                    ]
+                }
+            ]
         }
 
         const mockProduct = {
             id: '793775370033',
             variants: [
-                { productId: '793775370033M', variationValues: { color: 'turquoise' } },
-                { productId: '793775370033R', variationValues: { color: 'red' } },
-                { productId: '793775370033B', variationValues: { color: 'blue' } }
+                {productId: '793775370033M', variationValues: {color: 'turquoise'}},
+                {productId: '793775370033R', variationValues: {color: 'red'}},
+                {productId: '793775370033B', variationValues: {color: 'blue'}}
             ],
-            variationAttributes: [{ id: 'color', values: [] }]
+            variationAttributes: [{id: 'color', values: []}]
         }
 
         useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})

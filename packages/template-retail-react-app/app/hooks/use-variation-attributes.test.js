@@ -110,12 +110,12 @@ const MockMultiVariantProduct = {
         {
             productId: '793775370033M',
             orderable: true,
-            variationValues: { color: 'turquoise', size: 'M' }
+            variationValues: {color: 'turquoise', size: 'M'}
         },
         {
             productId: '793775370033R',
             orderable: true,
-            variationValues: { color: 'red', size: 'M' }
+            variationValues: {color: 'red', size: 'M'}
         }
     ],
     variationAttributes: [
@@ -123,16 +123,14 @@ const MockMultiVariantProduct = {
             id: 'color',
             name: 'Color',
             values: [
-                { value: 'turquoise', name: 'Turquoise', orderable: true },
-                { value: 'red', name: 'Red', orderable: true }
+                {value: 'turquoise', name: 'Turquoise', orderable: true},
+                {value: 'red', name: 'Red', orderable: true}
             ]
         },
         {
             id: 'size',
             name: 'Size',
-            values: [
-                { value: 'M', name: 'M', orderable: true }
-            ]
+            values: [{value: 'M', name: 'M', orderable: true}]
         }
     ]
 }
@@ -173,12 +171,12 @@ describe('The useVariationAttributes', () => {
             )
 
             const result = JSON.parse(wrapper.getByTestId('multiVariantAttributes').textContent)
-            const colorAttribute = result.find(attr => attr.id === 'color')
+            const colorAttribute = result.find((attr) => attr.id === 'color')
 
             // Hook level should always show all variants - filtering happens at modal level
             expect(colorAttribute.values).toHaveLength(2)
-            expect(colorAttribute.values.find(v => v.value === 'turquoise')).toBeDefined()
-            expect(colorAttribute.values.find(v => v.value === 'red')).toBeDefined()
+            expect(colorAttribute.values.find((v) => v.value === 'turquoise')).toBeDefined()
+            expect(colorAttribute.values.find((v) => v.value === 'red')).toBeDefined()
         })
 
         test('useVariationAttributes maintains original interface without bonus product parameters', () => {

@@ -44,7 +44,6 @@ const BonusProductViewModal = ({
     product,
     isOpen,
     onClose,
-    bonusDiscountLineItemId,
     promotionId,
     onReturnToSelection,
     ...props
@@ -469,7 +468,6 @@ BonusProductViewModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
     isLoading: PropTypes.bool,
-    bonusDiscountLineItemId: PropTypes.string, // The 'id' from bonusDiscountLineItems
     promotionId: PropTypes.string, // The promotion ID to filter promotions in PromoCallout
     onReturnToSelection: PropTypes.func // Callback to return to SelectBonusProductModal
 }
