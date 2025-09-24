@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - develop
+  # Trigger on pull requests
+  pull_request:
   # Run daily at 11 PM PST (7 AM UTC) to catch any missed syncs
   schedule:
     - cron: '0 7 * * *'
