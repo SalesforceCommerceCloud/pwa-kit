@@ -482,4 +482,3 @@ export const processProductsForBonusCart = (
 
     return productItems
 }
-

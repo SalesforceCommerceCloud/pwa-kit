@@ -57,10 +57,11 @@ export const getBonusProductsForQualifyingItems = (basket, qualifyingItems) => {
 
     return basket.productItems.filter((productItem) => {
         if (!productItem.bonusProductLineItem) return false
-        
-        return qualifyingItems.some((qualifyingItem) => 
-            productItem.qualifyingProductItemId === qualifyingItem.itemId ||
-            productItem.shipmentId === qualifyingItem.shipmentId
+
+        return qualifyingItems.some(
+            (qualifyingItem) =>
+                productItem.qualifyingProductItemId === qualifyingItem.itemId ||
+                productItem.shipmentId === qualifyingItem.shipmentId
         )
     })
 }

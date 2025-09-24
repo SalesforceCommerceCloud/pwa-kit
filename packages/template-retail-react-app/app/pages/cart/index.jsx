@@ -898,7 +898,7 @@ const Cart = () => {
 
             // Remove bonus products before moving qualifying item
             await Promise.all(
-                bonusProductsToMove.map(bonusProduct =>
+                bonusProductsToMove.map((bonusProduct) =>
                     removeItemFromBasketMutation.mutateAsync({
                         parameters: {
                             basketId: basket.basketId,
@@ -916,16 +916,16 @@ const Cart = () => {
             )
 
             if (bonusProductsToMove.length > 0) {
-                const targetShipment = selectedPickup 
+                const targetShipment = selectedPickup
                     ? await findOrCreatePickupShipment(selectedStore)
                     : await findOrCreateDeliveryShipment()
-                
-                const bonusProductsToAdd = bonusProductsToMove.map(bonusProduct => ({
+
+                const bonusProductsToAdd = bonusProductsToMove.map((bonusProduct) => ({
                     productId: bonusProduct.productId,
                     quantity: bonusProduct.quantity,
                     bonusDiscountLineItemId: bonusProduct.bonusDiscountLineItemId,
                     shipmentId: targetShipment?.shipmentId || 'me',
-                    ...(selectedPickup && { inventoryId: selectedStore.inventoryId })
+                    ...(selectedPickup && {inventoryId: selectedStore.inventoryId})
                 }))
 
                 await addItemToNewOrExistingBasket(bonusProductsToAdd)

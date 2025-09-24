@@ -80,7 +80,8 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     useBasketProductsWithPromotions: (...args) => mockUseBasketProductsWithPromotions(...args),
     getPromotionCalloutText: (...args) => mockGetPromotionCalloutText(...args),
     findAllBonusProductItemsToRemove: (...args) => mockFindAllBonusProductItemsToRemove(...args),
-    getBonusProductsForQualifyingItems: (...args) => mockGetBonusProductsForQualifyingItems(...args),
+    getBonusProductsForQualifyingItems: (...args) =>
+        mockGetBonusProductsForQualifyingItems(...args),
     getBonusProductCountsForPromotion: (...args) => mockGetBonusProductCountsForPromotion(...args),
     shouldShowBonusProductSelection: (...args) => mockShouldShowBonusProductSelection(...args)
 }))
