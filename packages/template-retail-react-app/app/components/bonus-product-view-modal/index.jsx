@@ -70,6 +70,17 @@ const BonusProductViewModal = ({
     const {data: basket} = useCurrentBasket()
     const navigate = useNavigation()
 
+    // Extract available bonus product IDs from basket for variant filtering
+    const availableBonusProductIds = useMemo(() => {
+        if (!basket?.bonusDiscountLineItems || !promotionId) return []
+
+        return basket.bonusDiscountLineItems
+            .filter((item) => item.promotionId === promotionId)
+            .flatMap((item) => item.bonusProducts || [])
+            .map((bonusProduct) => bonusProduct.productId)
+            .filter(Boolean)
+    }, [basket, promotionId])
+
     const intl = useIntl()
     const {formatMessage} = intl
     const showToast = useToast()
@@ -327,6 +338,7 @@ const BonusProductViewModal = ({
                             showReviews={true}
                             showVariationAttributes={true}
                             alignItems="stretch"
+                            availableBonusProductIds={availableBonusProductIds}
                             imageGalleryFooter={
                                 onReturnToSelection ? (
                                     <HideOnMobile>{BackToSelectionButton}</HideOnMobile>

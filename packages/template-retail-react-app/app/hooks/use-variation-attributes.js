@@ -94,7 +94,8 @@ export const isVariantValueOrderable = (product, variationParams) => {
 export const useVariationAttributes = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    availableBonusProductIds = []
 ) => {
     const {variationAttributes = []} = product
     const location = useLocation()
@@ -114,6 +115,38 @@ export const useVariationAttributes = (
         })
     }
 
+    // Helper function to check if a variant is available in bonus products
+    const isVariantAvailableInBonus = (params) => {
+        if (!availableBonusProductIds.length) return true // No filtering if no bonus products
+
+        // Check if any available bonus product IDs is the base product ID
+        const hasBaseProductId = availableBonusProductIds.includes(product.id)
+
+        // Check if any available bonus product IDs match variants
+        const hasVariantIds = availableBonusProductIds.some((id) =>
+            product.variants?.some((v) => v.productId === id)
+        )
+
+        // If we have base product ID and no specific variants, show all variants
+        if (hasBaseProductId && !hasVariantIds) {
+            return true
+        }
+
+        // If we have specific variant IDs, check if this variation would create an available variant
+        if (hasVariantIds) {
+            const matchingVariant = product.variants?.find((variant) => {
+                return Object.keys(params).every(
+                    (key) => variant.variationValues?.[key] === params[key]
+                )
+            })
+            return matchingVariant
+                ? availableBonusProductIds.includes(matchingVariant.productId)
+                : false
+        }
+
+        return true // Default to showing all if no specific filtering rules apply
+    }
+
     return useMemo(
         () =>
             variationAttributes.map((variationAttribute) => ({
@@ -124,27 +157,36 @@ export const useVariationAttributes = (
                     )?.name,
                     value: variationParams?.[variationAttribute.id]
                 },
-                values: variationAttribute.values.map((value) => {
-                    const params = {
-                        ...variationParams,
-                        [variationAttribute.id]: value.value
-                    }
+                values: variationAttribute.values
+                    .map((value) => {
+                        const params = {
+                            ...variationParams,
+                            [variationAttribute.id]: value.value
+                        }
 
-                    return {
-                        ...value,
-                        image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref({
-                            pathname: location.pathname,
-                            existingParams,
-                            newParams: params,
-                            productId: product.id,
-                            isProductPartOfSet,
-                            isProductPartOfBundle
-                        }),
-                        orderable: isVariantValueOrderable(product, params)
-                    }
-                })
+                        return {
+                            ...value,
+                            image: getVariantValueSwatch(product, value),
+                            href: buildVariantValueHref({
+                                pathname: location.pathname,
+                                existingParams,
+                                newParams: params,
+                                productId: product.id,
+                                isProductPartOfSet,
+                                isProductPartOfBundle
+                            }),
+                            orderable: isVariantValueOrderable(product, params)
+                        }
+                    })
+                    .filter((value) => {
+                        // Filter out values that would create unavailable bonus product variants
+                        const params = {
+                            ...variationParams,
+                            [variationAttribute.id]: value.value
+                        }
+                        return isVariantAvailableInBonus(params)
+                    })
             })),
-        [location.search, product]
+        [location.search, product, availableBonusProductIds]
     )
 }

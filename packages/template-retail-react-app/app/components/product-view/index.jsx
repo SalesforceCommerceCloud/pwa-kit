@@ -150,7 +150,8 @@ const ProductView = forwardRef(
             showDeliveryOptions = true,
             customButtons = [],
             maxOrderQuantity = null,
-            imageGalleryFooter = null
+            imageGalleryFooter = null,
+            availableBonusProductIds = []
         },
         ref
     ) => {
@@ -183,7 +184,12 @@ const ProductView = forwardRef(
             unfulfillable,
             isSelectedStoreOutOfStock,
             selectedStore
-        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
+        } = useDerivedProduct(
+            product,
+            isProductPartOfSet,
+            isProductPartOfBundle,
+            availableBonusProductIds
+        )
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
@@ -930,7 +936,8 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    alignItems: PropTypes.string
+    alignItems: PropTypes.string,
+    availableBonusProductIds: PropTypes.array
 }
 
 export default ProductView
