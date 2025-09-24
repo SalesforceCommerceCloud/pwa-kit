@@ -47,7 +47,8 @@ import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-s
 import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
-    findAllBonusProductItemsToRemove
+    findAllBonusProductItemsToRemove,
+    getBonusProductsForQualifyingItems
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -72,6 +73,7 @@ import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
+    useShopperBasketsMutationHelper,
     useProducts,
     useShopperCustomersMutation,
     useStores
@@ -125,6 +127,7 @@ const Cart = () => {
         updateShipmentsWithoutMethods,
         getItemsForShipment,
         findOrCreatePickupShipment,
+        findOrCreateDeliveryShipment,
         moveItemsToPickupShipment
     } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
@@ -291,6 +294,7 @@ const Cart = () => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -883,7 +887,6 @@ const Cart = () => {
                 return
             }
 
-            // Get default inventory ID from product data - throw error if not available
             const productData = products?.[productItem.productId]
             const defaultInventoryId = productData?.inventory?.id
 
@@ -891,12 +894,42 @@ const Cart = () => {
                 throw new Error(`No inventory ID found for product ${productItem.productId}`)
             }
 
+            const bonusProductsToMove = getBonusProductsForQualifyingItems(basket, [productItem])
+
+            // Remove bonus products before moving qualifying item
+            await Promise.all(
+                bonusProductsToMove.map(bonusProduct =>
+                    removeItemFromBasketMutation.mutateAsync({
+                        parameters: {
+                            basketId: basket.basketId,
+                            itemId: bonusProduct.itemId
+                        }
+                    })
+                )
+            )
+
             await updateDeliveryOption(
                 productItem,
                 selectedPickup,
                 selectedStore,
                 defaultInventoryId
             )
+
+            if (bonusProductsToMove.length > 0) {
+                const targetShipment = selectedPickup 
+                    ? await findOrCreatePickupShipment(selectedStore)
+                    : await findOrCreateDeliveryShipment()
+                
+                const bonusProductsToAdd = bonusProductsToMove.map(bonusProduct => ({
+                    productId: bonusProduct.productId,
+                    quantity: bonusProduct.quantity,
+                    bonusDiscountLineItemId: bonusProduct.bonusDiscountLineItemId,
+                    shipmentId: targetShipment?.shipmentId || 'me',
+                    ...(selectedPickup && { inventoryId: selectedStore.inventoryId })
+                }))
+
+                await addItemToNewOrExistingBasket(bonusProductsToAdd)
+            }
         } catch (error) {
             console.error('Error changing delivery option:', error)
             showError()

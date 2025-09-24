@@ -69,6 +69,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
 // Mock bonus product utilities
 const mockGetPromotionCalloutText = jest.fn(() => 'Free Gift with Purchase')
 const mockFindAllBonusProductItemsToRemove = jest.fn((basket, product) => [product])
+const mockGetBonusProductsForQualifyingItems = jest.fn(() => [])
 const mockUseBasketProductsWithPromotions = jest.fn()
 const mockGetBonusProductCountsForPromotion = jest.fn(() => ({
     selectedBonusItems: 0,
@@ -79,6 +80,7 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     useBasketProductsWithPromotions: (...args) => mockUseBasketProductsWithPromotions(...args),
     getPromotionCalloutText: (...args) => mockGetPromotionCalloutText(...args),
     findAllBonusProductItemsToRemove: (...args) => mockFindAllBonusProductItemsToRemove(...args),
+    getBonusProductsForQualifyingItems: (...args) => mockGetBonusProductsForQualifyingItems(...args),
     getBonusProductCountsForPromotion: (...args) => mockGetBonusProductCountsForPromotion(...args),
     shouldShowBonusProductSelection: (...args) => mockShouldShowBonusProductSelection(...args)
 }))
