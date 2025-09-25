@@ -1244,13 +1244,89 @@ const Cart = () => {
 
                                                     {/* Render orphaned bonus products (bonus products without bonusDiscountLineItemId) */}
                                                     {(() => {
-                                                        const orphanedBonusProducts = shipmentInfo.categorizedProducts.bonusProducts?.filter(
-                                                            (productItem) =>
-                                                                !productItem.bonusDiscountLineItemId
-                                                        ) || []
-                                                        return orphanedBonusProducts.length > 0 && (
-                                                            <>
-                                                                <BonusProductsTitle bonusItemsCount={orphanedBonusProducts.length} />
+                                                        const orphanedBonusProducts =
+                                                            shipmentInfo.categorizedProducts.bonusProducts?.filter(
+                                                                (productItem) =>
+                                                                    !productItem.bonusDiscountLineItemId
+                                                            ) || []
+                                                        return (
+                                                            orphanedBonusProducts.length > 0 && (
+                                                                <>
+                                                                    <BonusProductsTitle
+                                                                        bonusItemsCount={
+                                                                            orphanedBonusProducts.length
+                                                                        }
+                                                                    />
+                                                                    <ProductItemList
+                                                                        productItems={
+                                                                            orphanedBonusProducts
+                                                                        }
+                                                                        productsByItemId={
+                                                                            productsByItemId
+                                                                        }
+                                                                        isProductsLoading={
+                                                                            isProductsLoading
+                                                                        }
+                                                                        localQuantity={
+                                                                            localQuantity
+                                                                        }
+                                                                        localIsGiftItems={
+                                                                            localIsGiftItems
+                                                                        }
+                                                                        isCartItemLoading={
+                                                                            isCartItemLoading
+                                                                        }
+                                                                        selectedItem={selectedItem}
+                                                                        removingItemIds={
+                                                                            removingItemIds
+                                                                        }
+                                                                        onItemQuantityChange={
+                                                                            handleChangeItemQuantity
+                                                                        }
+                                                                        onRemoveItemClick={
+                                                                            handleRemoveItem
+                                                                        }
+                                                                        renderSecondaryActions={
+                                                                            renderSecondaryActions
+                                                                        }
+                                                                        renderDeliveryActions={(
+                                                                            productItem
+                                                                        ) => {
+                                                                            const productShipmentInfo =
+                                                                                getShipmentInfoForProduct(
+                                                                                    productItem
+                                                                                )
+                                                                            return productShipmentInfo
+                                                                                ? renderDeliveryActions(
+                                                                                      productItem,
+                                                                                      productShipmentInfo
+                                                                                  )
+                                                                                : null
+                                                                        }}
+                                                                    />
+                                                                </>
+                                                            )
+                                                        )
+                                                    })()}
+                                                </Stack>
+                                            )}
+
+                                            {/* Fallback: Orphan Bonus Products (only when using grouped layout and there are unassigned bonus products) */}
+                                            {(() => {
+                                                const orphanedBonusProducts =
+                                                    shipmentInfo.categorizedProducts.bonusProducts.filter(
+                                                        (productItem) =>
+                                                            !productItem.bonusDiscountLineItemId
+                                                    )
+                                                return (
+                                                    groupBonusProductsWithQualifyingProduct &&
+                                                    orphanedBonusProducts.length > 0 && (
+                                                        <>
+                                                            <BonusProductsTitle
+                                                                bonusItemsCount={
+                                                                    orphanedBonusProducts.length
+                                                                }
+                                                            />
                                                             <ProductItemList
                                                                 productItems={orphanedBonusProducts}
                                                                 productsByItemId={productsByItemId}
@@ -1287,53 +1363,7 @@ const Cart = () => {
                                                                 }}
                                                             />
                                                         </>
-                                                        )
-                                                    })()}
-                                                </Stack>
-                                            )}
-
-                                            {/* Fallback: Orphan Bonus Products (only when using grouped layout and there are unassigned bonus products) */}
-                                            {(() => {
-                                                const orphanedBonusProducts = shipmentInfo.categorizedProducts.bonusProducts.filter(
-                                                    (productItem) =>
-                                                        !productItem.bonusDiscountLineItemId
-                                                )
-                                                return groupBonusProductsWithQualifyingProduct &&
-                                                    orphanedBonusProducts.length > 0 && (
-                                                        <>
-                                                            <BonusProductsTitle bonusItemsCount={orphanedBonusProducts.length} />
-                                                            <ProductItemList
-                                                                productItems={orphanedBonusProducts}
-                                                            productsByItemId={productsByItemId}
-                                                            isProductsLoading={isProductsLoading}
-                                                            localQuantity={localQuantity}
-                                                            localIsGiftItems={localIsGiftItems}
-                                                            isCartItemLoading={isCartItemLoading}
-                                                            selectedItem={selectedItem}
-                                                            removingItemIds={removingItemIds}
-                                                            onItemQuantityChange={
-                                                                handleChangeItemQuantity
-                                                            }
-                                                            onRemoveItemClick={handleRemoveItem}
-                                                            renderSecondaryActions={
-                                                                renderSecondaryActions
-                                                            }
-                                                            renderDeliveryActions={(
-                                                                productItem
-                                                            ) => {
-                                                                const productShipmentInfo =
-                                                                    getShipmentInfoForProduct(
-                                                                        productItem
-                                                                    )
-                                                                return productShipmentInfo
-                                                                    ? renderDeliveryActions(
-                                                                          productItem,
-                                                                          productShipmentInfo
-                                                                      )
-                                                                    : null
-                                                            }}
-                                                        />
-                                                    </>
+                                                    )
                                                 )
                                             })()}
                                         </Box>
