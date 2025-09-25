@@ -863,7 +863,9 @@ const Cart = () => {
                 isPickupOrder: false,
                 store: null, // No specific store for combined delivery
                 categorizedProducts: combinedDeliveryProducts,
-                itemsInShipment: combinedDeliveryProducts.regularProducts.length + combinedDeliveryProducts.bonusProducts.length
+                itemsInShipment:
+                    combinedDeliveryProducts.regularProducts.length +
+                    combinedDeliveryProducts.bonusProducts.length
             })
         }
 
@@ -872,12 +874,14 @@ const Cart = () => {
 
     // Get all qualifying products (non-bonus) for bonus product grouping
     const allQualifyingProducts = useMemo(() => {
-        return basket?.productItems?.filter(productItem => !productItem.bonusProductLineItem) || []
+        return (
+            basket?.productItems?.filter((productItem) => !productItem.bonusProductLineItem) || []
+        )
     }, [basket?.productItems])
 
     // Helper function to get shipment info for a product
     const getShipmentInfoForProduct = (productItem) => {
-        const shipment = basket?.shipments?.find(s => s.shipmentId === productItem.shipmentId)
+        const shipment = basket?.shipments?.find((s) => s.shipmentId === productItem.shipmentId)
         if (!shipment) return null
 
         const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
@@ -1050,7 +1054,10 @@ const Cart = () => {
                                             {groupBonusProductsWithQualifyingProduct ? (
                                                 /* Grouped layout: Groups bonus products with their qualifying products */
                                                 <CartProductListWithGroupedBonusProducts
-                                                    nonBonusProducts={shipmentInfo.categorizedProducts.regularProducts}
+                                                    nonBonusProducts={
+                                                        shipmentInfo.categorizedProducts
+                                                            .regularProducts
+                                                    }
                                                     basket={basket}
                                                     productsWithPromotions={productsWithPromotions}
                                                     isPromotionDataLoading={isPromotionDataLoading}
@@ -1076,11 +1083,19 @@ const Cart = () => {
                                                             renderSecondaryActions={
                                                                 renderSecondaryActions
                                                             }
-                                                            renderDeliveryActions={(productItem) => {
-                                                                const productShipmentInfo = getShipmentInfoForProduct(productItem)
-                                                                return productShipmentInfo ? 
-                                                                    renderDeliveryActions(productItem, productShipmentInfo) : 
-                                                                    null
+                                                            renderDeliveryActions={(
+                                                                productItem
+                                                            ) => {
+                                                                const productShipmentInfo =
+                                                                    getShipmentInfoForProduct(
+                                                                        productItem
+                                                                    )
+                                                                return productShipmentInfo
+                                                                    ? renderDeliveryActions(
+                                                                          productItem,
+                                                                          productShipmentInfo
+                                                                      )
+                                                                    : null
                                                             }}
                                                             {...options}
                                                         />
@@ -1139,20 +1154,36 @@ const Cart = () => {
                                                                 key={productItem.itemId}
                                                                 productItems={[productItem]}
                                                                 productsByItemId={productsByItemId}
-                                                                isProductsLoading={isProductsLoading}
+                                                                isProductsLoading={
+                                                                    isProductsLoading
+                                                                }
                                                                 localQuantity={localQuantity}
                                                                 localIsGiftItems={localIsGiftItems}
-                                                                isCartItemLoading={isCartItemLoading}
+                                                                isCartItemLoading={
+                                                                    isCartItemLoading
+                                                                }
                                                                 selectedItem={selectedItem}
                                                                 removingItemIds={removingItemIds}
-                                                                onItemQuantityChange={handleChangeItemQuantity}
+                                                                onItemQuantityChange={
+                                                                    handleChangeItemQuantity
+                                                                }
                                                                 onRemoveItemClick={handleRemoveItem}
-                                                                renderSecondaryActions={renderSecondaryActions}
-                                                                renderDeliveryActions={(productItem) => {
-                                                                    const productShipmentInfo = getShipmentInfoForProduct(productItem)
-                                                                    return productShipmentInfo ? 
-                                                                        renderDeliveryActions(productItem, productShipmentInfo) : 
-                                                                        null
+                                                                renderSecondaryActions={
+                                                                    renderSecondaryActions
+                                                                }
+                                                                renderDeliveryActions={(
+                                                                    productItem
+                                                                ) => {
+                                                                    const productShipmentInfo =
+                                                                        getShipmentInfoForProduct(
+                                                                            productItem
+                                                                        )
+                                                                    return productShipmentInfo
+                                                                        ? renderDeliveryActions(
+                                                                              productItem,
+                                                                              productShipmentInfo
+                                                                          )
+                                                                        : null
                                                                 }}
                                                             />
                                                         )
@@ -1235,11 +1266,19 @@ const Cart = () => {
                                                             renderSecondaryActions={
                                                                 renderSecondaryActions
                                                             }
-                                                            renderDeliveryActions={(productItem) => {
-                                                                const productShipmentInfo = getShipmentInfoForProduct(productItem)
-                                                                return productShipmentInfo ? 
-                                                                    renderDeliveryActions(productItem, productShipmentInfo) : 
-                                                                    null
+                                                            renderDeliveryActions={(
+                                                                productItem
+                                                            ) => {
+                                                                const productShipmentInfo =
+                                                                    getShipmentInfoForProduct(
+                                                                        productItem
+                                                                    )
+                                                                return productShipmentInfo
+                                                                    ? renderDeliveryActions(
+                                                                          productItem,
+                                                                          productShipmentInfo
+                                                                      )
+                                                                    : null
                                                             }}
                                                         />
                                                     </>

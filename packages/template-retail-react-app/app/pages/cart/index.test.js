@@ -372,14 +372,18 @@ describe('Orphaned Bonus Products', function () {
         }
 
         // Mock the API response
-        prependHandlersToServer(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBasketWithOrphanedBonus))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: []}))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithOrphanedBonus
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({data: []})
+            }
+        ])
 
         renderWithProviders(<Cart />)
 
@@ -429,9 +433,7 @@ describe('Orphaned Bonus Products', function () {
         }
 
         // Mock the bonus product utilities to return appropriate values
-        jest.requireMock(
-            '@salesforce/retail-react-app/app/utils/bonus-product'
-        ).useBasketProductsWithPromotions.mockReturnValue({
+        mockUseBasketProductsWithPromotions.mockReturnValue({
             isLoading: false,
             data: {
                 '701644024680M': {
@@ -444,14 +446,18 @@ describe('Orphaned Bonus Products', function () {
             }
         })
 
-        prependHandlersToServer(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBasketWithAutomaticBonus))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: []}))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithAutomaticBonus
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({data: []})
+            }
+        ])
 
         renderWithProviders(<Cart />)
 
@@ -503,9 +509,7 @@ describe('Orphaned Bonus Products', function () {
         }
 
         // Mock the bonus product utilities to return choice promotion data
-        jest.requireMock(
-            '@salesforce/retail-react-app/app/utils/bonus-product'
-        ).useBasketProductsWithPromotions.mockReturnValue({
+        mockUseBasketProductsWithPromotions.mockReturnValue({
             isLoading: false,
             data: {
                 'choice-qualifying-id': {
@@ -518,14 +522,18 @@ describe('Orphaned Bonus Products', function () {
             }
         })
 
-        prependHandlersToServer(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBasketWithChoiceBonus))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: []}))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithChoiceBonus
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({data: []})
+            }
+        ])
 
         renderWithProviders(<Cart />)
 
@@ -593,9 +601,7 @@ describe('Orphaned Bonus Products', function () {
         }
 
         // Mock promotion data for both types
-        jest.requireMock(
-            '@salesforce/retail-react-app/app/utils/bonus-product'
-        ).useBasketProductsWithPromotions.mockReturnValue({
+        mockUseBasketProductsWithPromotions.mockReturnValue({
             isLoading: false,
             data: {
                 'auto-qualifying-id': {
@@ -615,14 +621,18 @@ describe('Orphaned Bonus Products', function () {
             }
         })
 
-        prependHandlersToServer(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBasketWithMixedPromotions))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: []}))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithMixedPromotions
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({data: []})
+            }
+        ])
 
         renderWithProviders(<Cart />)
 
@@ -671,21 +681,23 @@ describe('Orphaned Bonus Products', function () {
         }
 
         // Mock no promotion data
-        jest.requireMock(
-            '@salesforce/retail-react-app/app/utils/bonus-product'
-        ).useBasketProductsWithPromotions.mockReturnValue({
+        mockUseBasketProductsWithPromotions.mockReturnValue({
             isLoading: false,
             data: {}
         })
 
-        prependHandlersToServer(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBasketWithNormalProducts))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: []}))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithNormalProducts
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({data: []})
+            }
+        ])
 
         renderWithProviders(<Cart />)
 
