@@ -210,9 +210,6 @@
   "bonus_product_view_modal.toast.item_added": {
     "defaultMessage": "Bonus item added to cart"
   },
-  "bonus_products_title.title.num_of_items": {
-    "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-  },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"
   },

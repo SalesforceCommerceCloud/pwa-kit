@@ -19,7 +19,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
@@ -1241,48 +1240,6 @@ const Cart = () => {
                                                 </Stack>
                                             )}
 
-                                            {/* Fallback: Orphan Bonus Products (only when using grouped layout and there are unassigned bonus products) */}
-                                            {groupBonusProductsWithQualifyingProduct &&
-                                                shipmentInfo.categorizedProducts.bonusProducts
-                                                    .length > 0 && (
-                                                    <>
-                                                        <BonusProductsTitle />
-                                                        <ProductItemList
-                                                            productItems={
-                                                                shipmentInfo.categorizedProducts
-                                                                    .bonusProducts
-                                                            }
-                                                            productsByItemId={productsByItemId}
-                                                            isProductsLoading={isProductsLoading}
-                                                            localQuantity={localQuantity}
-                                                            localIsGiftItems={localIsGiftItems}
-                                                            isCartItemLoading={isCartItemLoading}
-                                                            selectedItem={selectedItem}
-                                                            removingItemIds={removingItemIds}
-                                                            onItemQuantityChange={
-                                                                handleChangeItemQuantity
-                                                            }
-                                                            onRemoveItemClick={handleRemoveItem}
-                                                            renderSecondaryActions={
-                                                                renderSecondaryActions
-                                                            }
-                                                            renderDeliveryActions={(
-                                                                productItem
-                                                            ) => {
-                                                                const productShipmentInfo =
-                                                                    getShipmentInfoForProduct(
-                                                                        productItem
-                                                                    )
-                                                                return productShipmentInfo
-                                                                    ? renderDeliveryActions(
-                                                                          productItem,
-                                                                          productShipmentInfo
-                                                                      )
-                                                                    : null
-                                                            }}
-                                                        />
-                                                    </>
-                                                )}
                                         </Box>
                                     ))}
                                 </Stack>
