@@ -10,7 +10,6 @@ import {FormattedMessage} from 'react-intl'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const BonusProductsTitle = ({bonusItemsCount = 0}) => {
-
     return (
         <Box layerStyle="cardBordered" p={3}>
             <Text fontWeight="bold">
