@@ -10,6 +10,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 // Chakra Components
 import {
     Box,
+    Button,
     Stack,
     Grid,
     GridItem,
@@ -812,9 +813,11 @@ const Cart = () => {
             // Categorize products into regular and bonus for this shipment
             const categorizedProducts = shipmentProducts.reduce(
                 (acc, productItem) => {
-                    if (productItem.bonusProductLineItem) {
+                    // Only treat as bonus product if it has bonusDiscountLineItemId for grouping
+                    if (productItem.bonusProductLineItem && productItem.bonusDiscountLineItemId) {
                         acc.bonusProducts.push(productItem)
                     } else {
+                        // Treat orphaned bonus products as regular products
                         acc.regularProducts.push(productItem)
                     }
                     return acc
@@ -934,11 +937,9 @@ const Cart = () => {
 
         // Check if this product has bonus products associated with it
         // If it does, hide the delivery group selector
-        const hasBonusProducts = getBonusProductsForSpecificCartItem(
-            basket,
-            productItem,
-            productsWithPromotions
-        ).length > 0
+        const hasBonusProducts =
+            getBonusProductsForSpecificCartItem(basket, productItem, productsWithPromotions)
+                .length > 0
 
         if (hasBonusProducts) {
             return null
