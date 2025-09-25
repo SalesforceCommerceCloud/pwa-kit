@@ -436,3 +436,32 @@ jobs:
           PWA_E2E_USER_EMAIL: e2e.pwa.kit@gmail.com
           PWA_E2E_USER_PASSWORD: hpv_pek-JZK_xkz0wzf
         run: npm run test:e2e:extra_features
+
+  notify-slack-extra-features:
+    needs: [test-extra-features]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GitHub Action data to Slack workflow (Success)
+        id: slack-success
+        if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result == 'success' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "✅ All PWA Kit extra features E2E tests passed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send GitHub Action data to Slack workflow (Failure)
+        id: slack-failure
+        if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result != 'success' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "❌ One or more PWA Kit extra features E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
