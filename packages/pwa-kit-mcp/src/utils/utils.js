@@ -187,6 +187,102 @@ export async function logMCPMessage(message) {
 }
 
 /**
+ * Detects workspace paths automatically based on the current working directory
+ * @returns {Object} Object containing detected absolute paths and configuration
+ */
+export async function detectWorkspacePaths() {
+    const workspaceRoot = process.env.WORKSPACE_FOLDER_PATHS || process.cwd()
+
+    // Common PWA Kit directory patterns to search for
+    const possibleAppDirs = [
+        'app',
+        'packages/template-retail-react-app/app',
+        'packages/template-typescript-minimal/app'
+    ]
+
+    let appDir = null
+    for (const possibleDir of possibleAppDirs) {
+        const fullPath = path.join(workspaceRoot, possibleDir)
+        if (fs.existsSync(fullPath)) {
+            appDir = fullPath
+            break
+        }
+    }
+
+    if (!appDir) {
+        throw new Error(
+            'Could not detect PWA Kit app directory. Please ensure you are in a PWA Kit project.'
+        )
+    }
+
+    // Detect node_modules path
+    let nodeModulesPath = null
+    const possibleNodeModulesPaths = [
+        path.join(workspaceRoot, 'node_modules'),
+        path.join(workspaceRoot, 'packages/template-retail-react-app/node_modules'),
+        path.join(workspaceRoot, 'packages/template-typescript-minimal/node_modules')
+    ]
+
+    for (const possiblePath of possibleNodeModulesPaths) {
+        if (fs.existsSync(possiblePath)) {
+            nodeModulesPath = possiblePath
+            break
+        }
+    }
+
+    if (!nodeModulesPath) {
+        throw new Error('Could not detect node_modules directory.')
+    }
+
+    // Detect components and pages directories
+    const componentsPath = path.join(appDir, 'components')
+    const pagesPath = path.join(appDir, 'pages')
+    const routesPath = path.join(appDir, 'routes.jsx')
+
+    // Verify these directories exist
+    if (!fs.existsSync(componentsPath)) {
+        throw new Error(`Components directory not found at: ${componentsPath}`)
+    }
+    if (!fs.existsSync(pagesPath)) {
+        throw new Error(`Pages directory not found at: ${pagesPath}`)
+    }
+    if (!fs.existsSync(routesPath)) {
+        throw new Error(`Routes file not found at: ${routesPath}`)
+    }
+
+    // Check for ccExtensibility.overridesDir in package.json
+    let hasOverridesDir = false
+    const packageJsonPaths = [
+        path.join(workspaceRoot, 'package.json'),
+        path.join(workspaceRoot, 'packages/template-retail-react-app/package.json'),
+        path.join(workspaceRoot, 'packages/template-typescript-minimal/package.json')
+    ]
+
+    for (const packageJsonPath of packageJsonPaths) {
+        if (fs.existsSync(packageJsonPath)) {
+            try {
+                const packageJson = JSON.parse(await fsPromises.readFile(packageJsonPath, 'utf8'))
+                hasOverridesDir = !!(
+                    packageJson.ccExtensibility && packageJson.ccExtensibility.overridesDir
+                )
+                break
+            } catch (error) {
+                // Continue to next package.json if this one fails to parse
+                continue
+            }
+        }
+    }
+
+    return {
+        nodeModulesPath,
+        componentsPath,
+        pagesPath,
+        routesPath,
+        hasOverridesDir
+    }
+}
+
+/**
  * Returns the import statement for a component
  * @param {string} componentName - The name of the component to import.
  * @param {string} componentDir - The directory of the component to import.

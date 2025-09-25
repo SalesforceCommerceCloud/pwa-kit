@@ -14,7 +14,8 @@ import {
     isLocalSharedUIComponent,
     isBaseComponent,
     isSharedUIBaseComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    detectWorkspacePaths
 } from '../utils'
 import {z} from 'zod'
 
@@ -25,11 +26,6 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         - What is the name of the new page to create? \
         - List the components to include on the page, separated by commas. Component names should be in PascalCase (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
-        - What is the absolute path to your node_modules directory? \
-        - What is the absolute path to your components directory? \
-        - What is the absolute path to your pages directory? \
-        - What is the absolute path to your routes.jsx file? \
-        - Is ccExtensibility.overridesDir set in your package.json? (true/false) \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User has added the ProductView component to the new page. Please ask user: \
@@ -83,42 +79,37 @@ class CreateNewPageTool {
                 ),
             route: z
                 .string()
-                .describe('The URL route for this page (e.g., /new-home, /my-product-view)'),
-            nodeModulesPath: z.string().describe('The absolute path to the node_modules directory'),
-            componentsPath: z.string().describe('The absolute path to the components directory'),
-            pagesPath: z.string().describe('The absolute path to the pages directory'),
-            routesPath: z.string().describe('The absolute path to the routes.jsx file'),
-            hasOverridesDir: z
-                .boolean()
-                .describe('Whether ccExtensibility.overridesDir is set in package.json')
+                .describe('The URL route for this page (e.g., /new-home, /my-product-view)')
         }
         this.unfoundComponents = []
 
         this.handler = async (args) => {
             logMCPMessage(`------- Calling CreateNewPageTool handler`)
-            if (
-                !args ||
-                !args.pageName ||
-                !args.componentList ||
-                !args.route ||
-                !args.nodeModulesPath ||
-                !args.componentsPath ||
-                !args.pagesPath ||
-                !args.routesPath ||
-                args.hasOverridesDir === undefined
-            ) {
+            if (!args || !args.pageName || !args.componentList || !args.route) {
                 return {
                     role: 'system',
                     content: [{type: 'text', text: systemPromptForCreatePage}]
                 }
             }
-            return this.createPage(args.pageName, args.componentList, args.route, {
-                nodeModulesPath: args.nodeModulesPath,
-                componentsPath: args.componentsPath,
-                pagesPath: args.pagesPath,
-                routesPath: args.routesPath,
-                hasOverridesDir: args.hasOverridesDir
-            })
+
+            try {
+                // Automatically detect workspace paths
+                const absolutePaths = await detectWorkspacePaths()
+                logMCPMessage(`Detected workspace paths: ${JSON.stringify(absolutePaths)}`)
+
+                return this.createPage(args.pageName, args.componentList, args.route, absolutePaths)
+            } catch (error) {
+                logMCPMessage(`Error detecting workspace paths: ${error.message}`)
+                return {
+                    role: 'developer',
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Error detecting workspace configuration: ${error.message}`
+                        }
+                    ]
+                }
+            }
         }
     }
 
