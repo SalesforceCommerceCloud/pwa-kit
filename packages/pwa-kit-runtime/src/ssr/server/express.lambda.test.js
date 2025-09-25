@@ -327,9 +327,7 @@ describe('SSRServer Lambda integration', () => {
             event.headers['x-apigateway-event'] = 'apig-event'
 
             // Check to make sure the adapter can handle the event
-            const adapter = new ApiGatewayV1Adapter()
-            adapter.canHandle(event)
-            expect(adapter.canHandle(event)).toBe(true)
+            expect(new ApiGatewayV1Adapter().canHandle(event)).toBe(true)
 
             // AWS API Gateway adapter expects queryStringParameters key to exist within the event
             if (event.queryStringParameters) {
