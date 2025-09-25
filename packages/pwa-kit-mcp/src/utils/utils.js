@@ -187,13 +187,11 @@ export async function logMCPMessage(message) {
 }
 
 /**
- * Detects workspace paths automatically based on the current working directory
- * @returns {Object} Object containing detected absolute paths and configuration
+ * Detects workspace paths based on current working directory
+ * @returns {Object} containing detected absolute paths & configuration
  */
 export async function detectWorkspacePaths() {
     const workspaceRoot = process.env.WORKSPACE_FOLDER_PATHS || process.cwd()
-
-    // Common PWA Kit directory patterns to search for
     const possibleAppDirs = [
         'app',
         'packages/template-retail-react-app/app',
@@ -267,7 +265,6 @@ export async function detectWorkspacePaths() {
                 )
                 break
             } catch (error) {
-                // Continue to next package.json if this one fails to parse
                 continue
             }
         }

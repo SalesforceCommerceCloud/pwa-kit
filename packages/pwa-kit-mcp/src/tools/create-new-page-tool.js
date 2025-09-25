@@ -93,7 +93,6 @@ class CreateNewPageTool {
             }
 
             try {
-                // Automatically detect workspace paths
                 const absolutePaths = await detectWorkspacePaths()
                 logMCPMessage(`Detected workspace paths: ${JSON.stringify(absolutePaths)}`)
 
