@@ -86,10 +86,10 @@ class PwaStorefrontMCPServerHighLevel {
         )
         this.server.tool(
             'run_site_test',
-            'Run site performance or accessibility test for a given site URL (e.g. https://pwa-kit.mobify-storefront.com)',
+            'Run site performance or accessibility test for a given site URL',
             {
                 testType: z.enum(['performance', 'accessibility']).describe('Type of test to run'),
-                siteUrl: z.string().optional().describe('Site URL to test (optional)')
+                siteUrl: z.string().describe('Site URL to test')
             },
             ({testType, siteUrl}) => this.testWithPlaywrightTool.run(testType, siteUrl)
         )
