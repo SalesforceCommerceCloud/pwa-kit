@@ -844,11 +844,12 @@ const Cart = () => {
 
         const result = [...pickupShipments]
 
-        // Combine all delivery shipments into a single group
+        // Combine all delivery shipments into one for display purposes
         if (deliveryShipments.length > 0) {
             const combinedDeliveryProducts = deliveryShipments.reduce(
                 (acc, shipmentData) => {
                     acc.regularProducts.push(...shipmentData.categorizedProducts.regularProducts)
+                    acc.bonusProducts.push(...shipmentData.categorizedProducts.bonusProducts)
                     return acc
                 },
                 {regularProducts: [], bonusProducts: []}
@@ -859,7 +860,7 @@ const Cart = () => {
                 isPickupOrder: false,
                 store: null, // No specific store for combined delivery
                 categorizedProducts: combinedDeliveryProducts,
-                itemsInShipment: combinedDeliveryProducts.regularProducts.length
+                itemsInShipment: combinedDeliveryProducts.regularProducts.length + combinedDeliveryProducts.bonusProducts.length
             })
         }
 
@@ -1208,8 +1209,8 @@ const Cart = () => {
                                                 </Stack>
                                             )}
 
-                                            {/* Fallback: Orphan Bonus Products (only when grouping is disabled) */}
-                                            {!groupBonusProductsWithQualifyingProduct &&
+                                            {/* Fallback: Orphan Bonus Products (only when using grouped layout and there are unassigned bonus products) */}
+                                            {groupBonusProductsWithQualifyingProduct &&
                                                 shipmentInfo.categorizedProducts.bonusProducts
                                                     .length > 0 && (
                                                     <>

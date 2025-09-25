@@ -1414,11 +1414,11 @@ describe('Bonus products', () => {
 
         // Find products by their names
         const regularProduct = screen.getByText('Belted Cardigan With Studs')
-        const bonusProduct = screen.getByText('Free Gift with Purchase')
+        const bonusProducts = screen.getAllByText('Free Gift with Purchase')
 
         expect(regularProduct).toBeInTheDocument()
-        expect(bonusProduct).toBeInTheDocument()
-        expect(within(bonusProduct).queryByTestId('quantity-picker')).not.toBeInTheDocument()
+        expect(bonusProducts).toHaveLength(1) // Should only have one bonus product
+        expect(within(bonusProducts[0]).queryByTestId('quantity-picker')).not.toBeInTheDocument()
     })
 })
 
