@@ -19,6 +19,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
@@ -812,11 +813,11 @@ const Cart = () => {
             // Categorize products into regular and bonus for this shipment
             const categorizedProducts = shipmentProducts.reduce(
                 (acc, productItem) => {
-                    // Only treat as bonus product if it has bonusDiscountLineItemId for grouping
-                    if (productItem.bonusProductLineItem && productItem.bonusDiscountLineItemId) {
+                    // All bonus products go to bonusProducts array (both grouped and orphaned)
+                    if (productItem.bonusProductLineItem) {
                         acc.bonusProducts.push(productItem)
                     } else {
-                        // Treat orphaned bonus products as regular products
+                        // Only non-bonus products go to regular products
                         acc.regularProducts.push(productItem)
                     }
                     return acc
@@ -1146,9 +1147,13 @@ const Cart = () => {
                                                         )
                                                     )}
 
-                                                    {/* Render bonus products from this shipment */}
-                                                    {shipmentInfo.categorizedProducts.bonusProducts?.map(
-                                                        (productItem) => (
+                                                    {/* Render grouped bonus products from this shipment */}
+                                                    {shipmentInfo.categorizedProducts.bonusProducts
+                                                        ?.filter(
+                                                            (productItem) =>
+                                                                productItem.bonusDiscountLineItemId
+                                                        )
+                                                        ?.map((productItem) => (
                                                             <ProductItemList
                                                                 key={productItem.itemId}
                                                                 productItems={[productItem]}
@@ -1185,8 +1190,7 @@ const Cart = () => {
                                                                         : null
                                                                 }}
                                                             />
-                                                        )
-                                                    )}
+                                                        ))}
 
                                                     {/* Render SelectBonusProductsCard for each bonusDiscountLineItem */}
                                                     {basket.bonusDiscountLineItems?.map(
@@ -1237,9 +1241,101 @@ const Cart = () => {
                                                             )
                                                         }
                                                     )}
+
+                                                    {/* Render orphaned bonus products (bonus products without bonusDiscountLineItemId) */}
+                                                    {(() => {
+                                                        const orphanedBonusProducts = shipmentInfo.categorizedProducts.bonusProducts?.filter(
+                                                            (productItem) =>
+                                                                !productItem.bonusDiscountLineItemId
+                                                        ) || []
+                                                        return orphanedBonusProducts.length > 0 && (
+                                                            <>
+                                                                <BonusProductsTitle bonusItemsCount={orphanedBonusProducts.length} />
+                                                            <ProductItemList
+                                                                productItems={orphanedBonusProducts}
+                                                                productsByItemId={productsByItemId}
+                                                                isProductsLoading={
+                                                                    isProductsLoading
+                                                                }
+                                                                localQuantity={localQuantity}
+                                                                localIsGiftItems={localIsGiftItems}
+                                                                isCartItemLoading={
+                                                                    isCartItemLoading
+                                                                }
+                                                                selectedItem={selectedItem}
+                                                                removingItemIds={removingItemIds}
+                                                                onItemQuantityChange={
+                                                                    handleChangeItemQuantity
+                                                                }
+                                                                onRemoveItemClick={handleRemoveItem}
+                                                                renderSecondaryActions={
+                                                                    renderSecondaryActions
+                                                                }
+                                                                renderDeliveryActions={(
+                                                                    productItem
+                                                                ) => {
+                                                                    const productShipmentInfo =
+                                                                        getShipmentInfoForProduct(
+                                                                            productItem
+                                                                        )
+                                                                    return productShipmentInfo
+                                                                        ? renderDeliveryActions(
+                                                                              productItem,
+                                                                              productShipmentInfo
+                                                                          )
+                                                                        : null
+                                                                }}
+                                                            />
+                                                        </>
+                                                        )
+                                                    })()}
                                                 </Stack>
                                             )}
 
+                                            {/* Fallback: Orphan Bonus Products (only when using grouped layout and there are unassigned bonus products) */}
+                                            {(() => {
+                                                const orphanedBonusProducts = shipmentInfo.categorizedProducts.bonusProducts.filter(
+                                                    (productItem) =>
+                                                        !productItem.bonusDiscountLineItemId
+                                                )
+                                                return groupBonusProductsWithQualifyingProduct &&
+                                                    orphanedBonusProducts.length > 0 && (
+                                                        <>
+                                                            <BonusProductsTitle bonusItemsCount={orphanedBonusProducts.length} />
+                                                            <ProductItemList
+                                                                productItems={orphanedBonusProducts}
+                                                            productsByItemId={productsByItemId}
+                                                            isProductsLoading={isProductsLoading}
+                                                            localQuantity={localQuantity}
+                                                            localIsGiftItems={localIsGiftItems}
+                                                            isCartItemLoading={isCartItemLoading}
+                                                            selectedItem={selectedItem}
+                                                            removingItemIds={removingItemIds}
+                                                            onItemQuantityChange={
+                                                                handleChangeItemQuantity
+                                                            }
+                                                            onRemoveItemClick={handleRemoveItem}
+                                                            renderSecondaryActions={
+                                                                renderSecondaryActions
+                                                            }
+                                                            renderDeliveryActions={(
+                                                                productItem
+                                                            ) => {
+                                                                const productShipmentInfo =
+                                                                    getShipmentInfoForProduct(
+                                                                        productItem
+                                                                    )
+                                                                return productShipmentInfo
+                                                                    ? renderDeliveryActions(
+                                                                          productItem,
+                                                                          productShipmentInfo
+                                                                      )
+                                                                    : null
+                                                            }}
+                                                        />
+                                                    </>
+                                                )
+                                            })()}
                                         </Box>
                                     ))}
                                 </Stack>
