@@ -185,8 +185,6 @@ const CartProductListWithGroupedBonusProducts = ({
                     )
                 }
             })}
-
-            {/* Temporarily disabled orphan bonus products for debugging */}
         </Stack>
     )
 }
