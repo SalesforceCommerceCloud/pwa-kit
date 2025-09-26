@@ -11,14 +11,8 @@ module.exports = {
     ...base,
     moduleNameMapper: {
         ...base.moduleNameMapper,
-        '^@h4ad/serverless-adapter/lib/handlers/default$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/handlers/default/index.cjs',
-        '^@h4ad/serverless-adapter/lib/resolvers/callback$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/resolvers/callback/index.cjs',
-        '^@h4ad/serverless-adapter/lib/adapters/aws$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/adapters/aws/index.cjs',
-        '^@h4ad/serverless-adapter/lib/frameworks/express$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/frameworks/express/index.cjs'
+        '^@h4ad/serverless-adapter/lib/(.*)$':
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/$1/index.cjs'
     },
     coverageThreshold: {
         global: {

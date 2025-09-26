@@ -20,15 +20,7 @@ module.exports = {
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
         '^@salesforce/cc-datacloud-typescript$':
-            '<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js',
-        '^@h4ad/serverless-adapter/lib/handlers/default$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/handlers/default/index.cjs',
-        '^@h4ad/serverless-adapter/lib/resolvers/callback$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/resolvers/callback/index.cjs',
-        '^@h4ad/serverless-adapter/lib/adapters/aws$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/adapters/aws/index.cjs',
-        '^@h4ad/serverless-adapter/lib/frameworks/express$':
-            '<rootDir>/../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/frameworks/express/index.cjs'
+            '<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js'
     },
     transformIgnorePatterns: ['/node_modules/(?!@salesforce/cc-datacloud-typescript)'],
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
