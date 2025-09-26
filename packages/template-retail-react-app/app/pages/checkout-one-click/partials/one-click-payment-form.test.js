@@ -111,12 +111,6 @@ describe('PaymentForm Component', () => {
             expect(screen.getByTestId('paypal-icon')).toBeInTheDocument()
         })
 
-        test('displays order total with currency formatting', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD99.99')).toBeInTheDocument()
-        })
-
         test('shows security lock icon with tooltip', () => {
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
 
@@ -351,8 +345,9 @@ describe('PaymentForm Component', () => {
             })
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles basket with null total', () => {
@@ -361,32 +356,36 @@ describe('PaymentForm Component', () => {
             })
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles different currency', () => {
             useCurrency.mockReturnValue({currency: 'EUR'})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('EUR99.99')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles missing basket data', () => {
             useCurrentBasket.mockReturnValue({data: null})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles undefined basket', () => {
             useCurrentBasket.mockReturnValue({data: undefined})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
     })
 

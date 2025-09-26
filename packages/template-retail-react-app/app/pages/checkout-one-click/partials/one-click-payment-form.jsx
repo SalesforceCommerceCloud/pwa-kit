@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -17,10 +17,8 @@ import {
     Text,
     Tooltip
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 
 const PaymentCardSummary = ({payment}) => {
@@ -52,8 +50,6 @@ const PaymentForm = ({
     selectedPaymentMethod
 }) => {
     const {formatMessage} = useIntl()
-    const {data: basket} = useCurrentBasket()
-    const {currency} = useCurrency()
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -69,14 +65,34 @@ const PaymentForm = ({
                             })}
                             name="payment-selection"
                         >
+                            {savedPaymentInstruments?.map((paymentInstrument) => (
+                                <Box
+                                    py={3}
+                                    px={[4, 4, 6]}
+                                    bg="gray.50"
+                                    borderBottom="1px solid"
+                                    borderColor="gray.100"
+                                    key={paymentInstrument.paymentInstrumentId}
+                                >
+                                    <Radio
+                                        value={paymentInstrument.paymentInstrumentId}
+                                        key={paymentInstrument.paymentInstrumentId}
+                                    >
+                                        <PaymentCardSummary payment={paymentInstrument} />
+                                    </Radio>
+                                </Box>
+                            ))}
+
                             <Box
                                 py={3}
                                 px={[4, 4, 6]}
                                 bg="gray.50"
+                                // borderTop="1px solid"
                                 borderBottom="1px solid"
                                 borderColor="gray.100"
                             >
                                 <Radio value="cc">
+                                    {/* <Flex justify="flex-start"> */}
                                     <Flex justify="space-between">
                                         <Stack direction="row" align="center">
                                             <Text fontWeight="bold">
@@ -97,13 +113,6 @@ const PaymentForm = ({
                                                 <LockIcon color="gray.700" boxSize={5} />
                                             </Tooltip>
                                         </Stack>
-                                        <Text fontWeight="bold">
-                                            <FormattedNumber
-                                                value={basket?.orderTotal}
-                                                style="currency"
-                                                currency={currency}
-                                            />
-                                        </Text>
                                     </Flex>
                                 </Radio>
                             </Box>
@@ -117,24 +126,6 @@ const PaymentForm = ({
                                     </Stack>
                                 </Box>
                             </Collapse>
-
-                            {savedPaymentInstruments?.map((paymentInstrument) => (
-                                <Box
-                                    py={3}
-                                    px={[4, 4, 6]}
-                                    bg="gray.50"
-                                    borderBottom="1px solid"
-                                    borderColor="gray.100"
-                                    key={paymentInstrument.paymentInstrumentId}
-                                >
-                                    <Radio
-                                        value={paymentInstrument.paymentInstrumentId}
-                                        key={paymentInstrument.paymentInstrumentId}
-                                    >
-                                        <PaymentCardSummary payment={paymentInstrument} />
-                                    </Radio>
-                                </Box>
-                            ))}
 
                             <Box py={3} px={[4, 4, 6]} bg="gray.50" borderColor="gray.100">
                                 <Radio value="paypal">

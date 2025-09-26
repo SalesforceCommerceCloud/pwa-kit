@@ -6,7 +6,7 @@
  */
 /* eslint-disable react/prop-types */
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -14,6 +14,8 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
+import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
+import {IntlProvider} from 'react-intl'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
@@ -324,15 +326,19 @@ const TestWrapper = ({
     }
 
     return (
-        <Payment
-            paymentMethodForm={mockPaymentMethodForm}
-            billingAddressForm={mockBillingAddressForm}
-            enableUserRegistration={enableUserRegistration}
-            setEnableUserRegistration={setEnableUserRegistration}
-            registeredUserChoseGuest={registeredUserChoseGuest}
-            onPaymentMethodSaved={onPaymentMethodSaved}
-            onSavePreferenceChange={onSavePreferenceChange}
-        />
+        <IntlProvider locale="en-GB">
+            <CurrencyProvider>
+                <Payment
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                    enableUserRegistration={enableUserRegistration}
+                    setEnableUserRegistration={setEnableUserRegistration}
+                    registeredUserChoseGuest={registeredUserChoseGuest}
+                    onPaymentMethodSaved={onPaymentMethodSaved}
+                    onSavePreferenceChange={onSavePreferenceChange}
+                />
+            </CurrencyProvider>
+        </IntlProvider>
     )
 }
 
@@ -370,8 +376,10 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={basketWithPayment} />)
 
-            expect(screen.getAllByText('Visa')).toHaveLength(2) // Shows in both edit and summary sections
-            expect(screen.getAllByText('•••• 1234')).toHaveLength(2) // Shows in both edit and summary sections
+            const summary = screen.getAllByTestId('toggle-card-summary').pop()
+            // Check summary section for applied payment details
+            expect(within(summary).getByText('Visa')).toBeInTheDocument()
+            expect(within(summary).getByText('•••• 1234')).toBeInTheDocument()
         })
 
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
