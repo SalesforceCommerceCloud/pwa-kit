@@ -139,7 +139,7 @@ describe('ShopperAgent Component', () => {
         // Mock useMultiSite hook with proper structure
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'USD'},
-            buildUrl: jest.fn((path) => path)
+            buildUrl: jest.fn(() => '/us/en-US')
         })
 
         // Mock useTheme hook
@@ -239,7 +239,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -263,7 +263,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'initial-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
 
         // Clear mock and change refresh token
@@ -287,7 +287,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'updated-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -310,7 +310,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: null,
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -318,7 +318,7 @@ describe('ShopperAgent Component', () => {
         // Mock useMultiSite to return different currency values
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'USD'},
-            buildUrl: jest.fn((path) => path)
+            buildUrl: jest.fn(() => '/us/en-US')
         })
 
         render(<ShopperAgent {...defaultProps} />)
@@ -337,14 +337,14 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
 
         // Clear mock and change currency to EUR
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'EUR'},
-            buildUrl: jest.fn((path) => path)
+            buildUrl: jest.fn(() => '/us/en-US')
         })
 
         // Re-render with new currency
@@ -364,7 +364,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'EUR',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -372,7 +372,7 @@ describe('ShopperAgent Component', () => {
         // Mock useMultiSite to return different locale values
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'USD'},
-            buildUrl: jest.fn((path) => path)
+            buildUrl: jest.fn(() => '/us/en-US')
         })
 
         render(<ShopperAgent {...defaultProps} />)
@@ -391,14 +391,14 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
 
         // Clear mock and change locale to en-GB
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-GB', preferredCurrency: 'GBP'},
-            buildUrl: jest.fn((path) => path)
+            buildUrl: jest.fn(() => '/us/en-US')
         })
 
         // Re-render with new locale
@@ -418,7 +418,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'GBP',
             Language: 'en_GB',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -449,7 +449,7 @@ describe('ShopperAgent Component', () => {
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
-            DomainUrl: 'https://example.com/current-page'
+            DomainUrl: 'https://example.com/us/en-US'
         })
     })
 
@@ -560,7 +560,7 @@ describe('ShopperAgent Component', () => {
                 RefreshToken: 'test-refresh-token',
                 Currency: 'USD',
                 Language: 'en_US',
-                DomainUrl: 'https://example.com/current-page'
+                DomainUrl: 'https://example.com/us/en-US'
             })
         })
 
@@ -585,7 +585,7 @@ describe('ShopperAgent Component', () => {
                 RefreshToken: 'test-refresh-token',
                 Currency: 'USD',
                 Language: 'en_US',
-                DomainUrl: 'https://example.com/current-page'
+                DomainUrl: 'https://example.com/us/en-US'
             })
         })
 
@@ -596,39 +596,6 @@ describe('ShopperAgent Component', () => {
 
             render(<ShopperAgent {...props} />)
             expect(screen.queryByTestId('shopper-agent')).toBeInTheDocument()
-        })
-
-        test('should handle complex domainUrl with query parameters and fragments', async () => {
-            // Mock complex location data
-            mockUseLocation.mockReturnValue({
-                pathname: '/products/shoes',
-                search: '?color=red&size=10',
-                hash: '#reviews'
-            })
-            mockUseAppOrigin.mockReturnValue('https://test-store.com')
-
-            const props = {
-                ...defaultProps
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // Trigger the onEmbeddedMessagingReady event
-            await act(async () => {
-                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-            })
-
-            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-                SiteId: 'RefArchGlobal',
-                Locale: 'en-US',
-                OrganizationId: 'test-commerce-org-id',
-                UsId: 'test-usid',
-                IsCartMgmtSupported: 'true',
-                RefreshToken: 'test-refresh-token',
-                Currency: 'USD',
-                Language: 'en_US',
-                DomainUrl: 'https://test-store.com/products/shoes'
-            })
         })
     })
 
@@ -985,6 +952,80 @@ describe('ShopperAgent Component', () => {
 
             // Should handle various data types in array
             expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+    })
+
+    describe('Domain URL Event Functionality', () => {
+        beforeEach(() => {
+            // Mock postMessage for iframe communication
+            global.postMessage = jest.fn()
+
+            // Mock document.querySelector for iframe
+            const mockIframe = {
+                src: 'https://test.salesforce.com/iframe',
+                contentWindow: {
+                    postMessage: jest.fn()
+                }
+            }
+            jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('should handle lwc.getDomainUrl event and send domain URL', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // Mock iframe for postMessage
+            const mockIframe = {
+                src: 'https://test.salesforce.com/iframe',
+                contentWindow: {
+                    postMessage: jest.fn()
+                }
+            }
+            jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
+
+            // Simulate MIAW event requesting domain URL
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getDomainUrl'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Verify postMessage was called with domain URL
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                {
+                    type: 'conversational.domainUrl',
+                    payload: {
+                        domainUrl: 'https://example.com/us/en-US'
+                    }
+                },
+                'https://test.salesforce.com'
+            )
+        })
+
+        test('should handle lwc.getDomainUrl event properly when iframe not found', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // Mock querySelector to return null (iframe not found)
+            jest.spyOn(document, 'querySelector').mockReturnValue(null)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getDomainUrl'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle missing iframe gracefully without throwing
+            expect(() => render(<ShopperAgent {...defaultProps} />)).not.toThrow()
         })
     })
 })

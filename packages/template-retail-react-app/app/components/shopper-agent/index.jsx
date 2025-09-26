@@ -259,6 +259,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                             conversationContext
                         })
                     }
+                } else if (event.data.type === 'lwc.getDomainUrl') {
+                    // Handle domain URL request
+                    sendConversationContext('conversational.domainUrl', {
+                        domainUrl
+                    })
                 }
             } catch (error) {
                 console.error('Error handling Miaw event:', error)
@@ -421,7 +426,6 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const {enabled} = commerceAgentConfiguration
 
     // Get current location and app origin for domain URL
-    const location = useLocation()
     const appOrigin = useAppOrigin()
     const {buildUrl} = useMultiSite()
 
@@ -429,7 +433,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const isShopperAgentEnabled = isEnabled(enabled)
 
     // Build the current domain URL
-    const domainUrl = `${appOrigin}${buildUrl(location.pathname)}`
+    const domainUrl = `${appOrigin}${buildUrl('')}`
 
     // Conditional rendering: only render when all conditions are met
     // 1. Agent is enabled and running on client
