@@ -1,4 +1,4 @@
-## v3.13.0-dev (Sep 04, 2025)
+## v3.13.0 (Sep 25, 2025)
 
 ## v3.12.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)

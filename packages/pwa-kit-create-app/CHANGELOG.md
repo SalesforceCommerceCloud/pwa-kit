@@ -1,4 +1,4 @@
-## v3.13.0-dev (Sep 17, 2025)
+## v3.13.0 (Sep 25, 2025)
 - This features introduces enhancements to the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
 
 ## v3.12.0 (Sep 04, 2025)
