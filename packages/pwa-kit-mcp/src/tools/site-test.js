@@ -20,7 +20,7 @@ export class TestWithPlaywrightTool {
                 content: [
                     {
                         type: 'text',
-                        text: 'Missing required argument: siteUrl (full site URL, e.g. https://pwa-kit.mobify-storefront.com)'
+                        text: 'Missing required argument: siteUrl (full site URL)'
                     }
                 ]
             }

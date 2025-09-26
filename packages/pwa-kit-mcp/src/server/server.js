@@ -85,8 +85,8 @@ class PwaStorefrontMCPServerHighLevel {
             DeveloperGuidelinesTool.fn
         )
         this.server.tool(
-            'run_site_test',
-            'Run site performance or accessibility test for a given site URL',
+            'b2c_run_site_test',
+            'Run site or app performance or accessibility test for a given site URL',
             {
                 testType: z.enum(['performance', 'accessibility']).describe('Type of test to run'),
                 siteUrl: z.string().describe('Site URL to test')

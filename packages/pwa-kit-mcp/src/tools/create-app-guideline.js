@@ -69,7 +69,7 @@ If the user requests a project using a **template**:
 `
 
 class CreateAppGuidelinesTool {
-    name = 'create_storefront_app'
+    name = 'b2c_create_storefront_app'
     description = `
     
 Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.

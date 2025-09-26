@@ -10,10 +10,10 @@ import fsp from 'fs/promises'
 import path from 'path'
 
 const description =
-    'Install the @pwa-kit-mcp Cursor rule into the project .cursor/rules folder if missing'
+    'Install the Agent MCP Tool Usage Guidelines for the PWA-Kit Retail React Application into the project'
 
 const InstallAgentRulesTool = {
-    name: 'install_agent_rules',
+    name: 'b2c_install_agent_rules',
     description,
     inputSchema: {
         projectRoot: z.string().describe('Absolute path to the project root'),
@@ -38,7 +38,7 @@ const InstallAgentRulesTool = {
         const isCursor = !!hostAgent && String(hostAgent).toLowerCase() === 'cursor'
         const destDir = isCursor ? path.join(root, '.cursor', 'rules') : root
         const destFile = isCursor
-            ? path.join(destDir, '@pwa-kit-mcp.mdc')
+            ? path.join(destDir, 'pwa-kit-mcp.mdc')
             : path.join(destDir, 'AGENTS.md')
 
         // Resolve source file relative to this tool file

@@ -35,7 +35,7 @@ describe('InstallAgentRulesTool', () => {
 
     it('has correct tool structure', () => {
         expect(InstallAgentRulesTool).toMatchObject({
-            name: 'install_agent_rules',
+            name: 'b2c_install_agent_rules',
             description: expect.any(String),
             inputSchema: expect.any(Object),
             fn: expect.any(Function)
@@ -46,7 +46,7 @@ describe('InstallAgentRulesTool', () => {
         existsSpy.mockImplementation((p) => {
             const s = String(p)
             if (s.includes('ai-instructions') && s.includes('pwa-kit-mcp.mdc')) return true
-            if (s.includes(path.join('.cursor', 'rules', '@pwa-kit-mcp.mdc'))) return false
+            if (s.includes(path.join('.cursor', 'rules', 'pwa-kit-mcp.mdc'))) return false
             return false
         })
         const result = await InstallAgentRulesTool.fn({projectRoot: tmpDir, hostAgent: 'cursor'})
@@ -63,7 +63,7 @@ describe('InstallAgentRulesTool', () => {
         existsSpy.mockImplementation((p) => {
             const s = String(p)
             if (s.includes('ai-instructions') && s.includes('pwa-kit-mcp.mdc')) return true
-            if (s.includes(path.join('.cursor', 'rules', '@pwa-kit-mcp.mdc'))) return true
+            if (s.includes(path.join('.cursor', 'rules', 'pwa-kit-mcp.mdc'))) return true
             return false
         })
         // same contents
@@ -85,7 +85,7 @@ describe('InstallAgentRulesTool', () => {
         existsSpy.mockImplementation((p) => {
             const s = String(p)
             if (s.includes('ai-instructions') && s.includes('pwa-kit-mcp.mdc')) return true
-            if (s.includes(path.join('.cursor', 'rules', '@pwa-kit-mcp.mdc'))) return true
+            if (s.includes(path.join('.cursor', 'rules', 'pwa-kit-mcp.mdc'))) return true
             return false
         })
         readFileSpy.mockResolvedValueOnce('SRC').mockResolvedValueOnce('DEST-DIFFERENT')

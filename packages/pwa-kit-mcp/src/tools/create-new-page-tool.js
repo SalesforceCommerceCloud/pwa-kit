@@ -71,7 +71,7 @@ const systemPromptForUnfoundComponents = (unfoundComponents) =>
 
 class CreateNewPageTool {
     constructor() {
-        this.name = 'create_page'
+        this.name = 'b2c_create_page'
         this.description =
             'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
         this.inputSchema = {
