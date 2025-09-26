@@ -76,7 +76,6 @@ const options = {
 }
 
 const runtime = getRuntime()
-
 /**
  * Tokens are valid for 20 minutes. We store it at the top level scope to reuse
  * it during the lambda invocation. We'll refresh it after 15 minutes.
@@ -320,8 +319,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                         // ✅ Temporary -> Allow localhost for SFP development
-                         'localhost:*',
+                        '*.demandware.net',                    // Production (legacy) + Staging
+                         // Temporary -> Allow custom domain for local SFP development
+                         'mystore-dev.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -332,7 +332,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.dx.commercecloud.salesforce.com',  // Production (newer)
                         '*.demandware.net',                    // Production (legacy) + Staging
                         '*.stripe.com',
-                        '*.paypal.com'
+                        '*.paypal.com',
+                        'mystore-dev.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -347,7 +348,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.site.com',
                           // ✅ Allow frames for SFP development
                         '*.stripe.com',
-                        '*.paypal.com'
+                        '*.paypal.com',
+                        'mystore-dev.com'
                     ]
                 }
             }
@@ -461,7 +463,12 @@ const {handler} = runtime.createHandler(options, (app) => {
             // ✅ Transform relative icon paths to absolute URLs
             // example: https://localhost/on/demandware.static/Sites-Site/-/-/internal/icons/credit_card.svg
             // prod example: zzte-053.dx.commercecloud.salesforce.com instead of localhost
-            const transformedData = transformIconPaths(data, 'localhost')
+            
+            // Transform relative icon paths to absolute URLs using dynamic host
+            const ecomHost = new URL(baseUrl).hostname // Extracts 'zyoe-003.unified.demandware.net'
+                        
+            const transformedData = transformIconPaths(data, ecomHost)
+            //const transformedData = transformIconPaths(data, 'localhost')
         
             res.setHeader('Access-Control-Allow-Origin', '*')
             res.setHeader('Content-Type', 'application/json')
