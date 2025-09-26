@@ -81,7 +81,7 @@ describe('InstallAgentRulesTool', () => {
         })
     })
 
-    it('when existing file differs, returns may be out of date message', async () => {
+    it('when existing file differs, returns instruction to update rule contents', async () => {
         existsSpy.mockImplementation((p) => {
             const s = String(p)
             if (s.includes('ai-instructions') && s.includes('pwa-kit-mcp.mdc')) return true
@@ -91,7 +91,9 @@ describe('InstallAgentRulesTool', () => {
         readFileSpy.mockResolvedValueOnce('SRC').mockResolvedValueOnce('DEST-DIFFERENT')
         const result = await InstallAgentRulesTool.fn({projectRoot: tmpDir, hostAgent: 'cursor'})
         expect(copySpy).not.toHaveBeenCalled()
-        expect(result.content[0].text).toMatch(/may be out of date/i)
+        expect(result.content[0].text).toMatch(
+            /Use the file edit tools to add the following contents/i
+        )
     })
 
     it('for non-cursor host, copies AGENTS.md to project root and does not mkdir rules', async () => {

@@ -71,7 +71,9 @@ const InstallAgentRulesTool = {
                             content: [
                                 {
                                     type: 'text',
-                                    text: `File already exists at ${destFile}, but contents differ; it may be out of date.`
+                                    text: `You are a smart assistant that can use tools when needed.
+Use the file edit tools to add the following contents to this file "${destFile}":
+${srcContent}`
                                 }
                             ]
                         }
