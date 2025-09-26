@@ -13,7 +13,7 @@
         "lint": "lerna run --stream lint",
         "lint:fix": "lerna run lint:fix",
         "start": "npm start --prefix packages/template-retail-react-app",
-       "start:https": "npm run start:https --prefix packages/template-retail-react-app",
+        "start:https": "cross-env NODE_ICU_DATA=node_modules/full-icu DEV_SERVER_PROTOCOL=https DEV_SERVER_SSL_FILE_PATH=./localhost.pem pwa-kit-dev start",
         "pretest": "npm run lint",
         "test:e2e": "npx playwright test --project=chromium --project=mobile-chrome",
         "test:e2e:a11y:slas-public-client": "npx playwright test --project=a11y-mobile-slas-public-client --project=a11y-desktop-slas-public-client",
