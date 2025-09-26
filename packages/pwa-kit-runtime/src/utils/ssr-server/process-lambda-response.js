@@ -15,6 +15,7 @@ export const processLambdaResponse = (response, event) => {
     const correlationId = event.headers?.['x-correlation-id']
 
     let joinedHeaders = getFlattenedHeadersMap(response.multiValueHeaders || {}, ',', true)
+    joinedHeaders['date'] = new Date().toUTCString()
     delete response['multiValueHeaders']
 
     // Add the correlation ID to the response headers if it exists

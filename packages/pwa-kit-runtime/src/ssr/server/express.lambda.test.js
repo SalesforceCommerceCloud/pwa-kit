@@ -363,6 +363,7 @@ describe('SSRServer Lambda integration', () => {
 
                         // We expect a context property to have been set false
                         expect(context.callbackWaitsForEmptyEventLoop).toBe(false)
+                        expect(response.headers['date']).toBeDefined()
 
                         // Check the response
                         testCase.validate(response)
