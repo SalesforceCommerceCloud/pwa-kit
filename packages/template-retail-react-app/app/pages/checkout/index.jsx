@@ -42,11 +42,11 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-express'
 import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
-import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
 
-const Checkout = () => {
+const Checkout = ({setIsPaymentProcessing}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
@@ -76,9 +76,11 @@ const Checkout = () => {
     // SF Payments related hooks and state
     const paymentConfigState = usePaymentConfigManager()
     const {isSFPEnabled, isPaymentsConfigReady, paymentConfigLoading} = paymentConfigState
-    const {submitPaymentSheetOrder, isProcessing} = usePaymentSheetSubmission()
-
-     
+   
+    // Uses React hooks properly by accepting confirmPaymentFunction as a parameter
+    const [confirmPaymentFunction, setConfirmPaymentFunction] = useState(null)
+    const {submitPaymentSheetOrder, isProcessing} = usePaymentSheetSubmission(confirmPaymentFunction)
+    
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
@@ -95,14 +97,15 @@ const Checkout = () => {
 
     const submitOrder = async () => {
         setIsLoading(true)
+        setIsPaymentProcessing(true)
         try {
             // check if SFP is enabled (via the hook)
             let order = null
             if (isSFPEnabled) {
-                console.log('🚀 Processing SFP payment before order creation...')
+                if (!confirmPaymentFunction) {
+                    throw new Error('Payment confirmation function not ready. Please wait for the payment form to load.')
+                }
                 order = await submitPaymentSheetOrder()
-                console.log('✅ Payment processed, now creating order...')
-                console.log(order)
             } else {
                 order = await createOrder({
                     body: {basketId: basket.basketId}
@@ -138,9 +141,12 @@ const Checkout = () => {
                                 </Alert>
                             )}
                         
-                            {/* ✅ Show SFP Express if enabled */}
+                             ✅ Show SFP Express if enabled 
                             {isPaymentsConfigReady && isSFPEnabled && (
-                                <SFPaymentsExpress paymentState={paymentConfigState} />
+                                <SFPaymentsExpress 
+                                paymentState={paymentConfigState}
+                                setIsPaymentProcessing={setIsPaymentProcessing}
+                                 />
                             )}
 
                             <ContactInfo
@@ -161,7 +167,10 @@ const Checkout = () => {
                             
                            {isPaymentsConfigReady ? (
                                 isSFPEnabled ? (
-                                    <SFPaymentsSheet paymentState={paymentConfigState} />
+                                    <SFPaymentsSheet 
+                                    paymentState={paymentConfigState}
+                                    onConfirmFunctionReady={(fn) => setConfirmPaymentFunction(fn)}
+                                    />
                                 ) : (
                                     <Payment />
                                 )
@@ -254,11 +263,14 @@ const Checkout = () => {
 
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    //const {data: basket} = useCurrentBasket()
+    const {data: basket, isLoading: basketLoading, error: basketError} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+
+    const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
 
     const handleRemoveItem = async (product) => {
         await removeItemFromBasketMutation.mutateAsync(
@@ -292,7 +304,8 @@ const CheckoutContainer = () => {
         setIsDeletingUnavailableItem(false)
     }
 
-    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+    // show skeleton until customer and basket are loaded
+    if (!customer || !customer.customerId || (!basket || !basket.basketId) && !isPaymentProcessing) {
         return <CheckoutSkeleton />
     }
 
@@ -300,7 +313,7 @@ const CheckoutContainer = () => {
         <CheckoutProvider>
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-            <Checkout />
+            <Checkout setIsPaymentProcessing={setIsPaymentProcessing} />
             <UnavailableProductConfirmationModal
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}

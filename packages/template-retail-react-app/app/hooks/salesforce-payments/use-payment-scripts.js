@@ -10,9 +10,10 @@ const buildSFPScriptUrl = () => {
        
     const baseUrl = buildStaticResourceBaseUrl()
     const scriptUrl = `${baseUrl}/jscript/sfp/v1/sfp.js`
-    //return metadataUrl               
+    //console.log('scriptUrl', scriptUrl)
+    return scriptUrl               
     //temporary code until sfp chunks load correctly
-    return `https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js`
+    //return `https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js`
 }
 
 const PAYMENT_SCRIPTS = {

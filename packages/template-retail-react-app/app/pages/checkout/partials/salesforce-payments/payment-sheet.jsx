@@ -23,23 +23,17 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
-import {usePaymentProcessing} from '../../../../hooks/salesforce-payments/use-payment-processing'
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
 import PaymentSheetForm from '../../../../components/salesforce-payments/paymentSheetForm'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {useCountryDetection} from '../../../../utils/salesforce-payments/country-detection'
 
-// Module-level storage for paymentSheet
-let paymentSheetInstance = null
-// ✅ ADD this module-level variable declaration
-let confirmPaymentFunction = null
-
-//TODO: need to address the payment method id issue with ECOM
+//TODO: integrate with latest ECOM fix for this
 const paymentMethodIdSFP ="SALESFORCE_PAYMENTS";
 
-export const usePaymentSheetSubmission = () => {
-    const {processPayment, isProcessing} = usePaymentProcessing()
-    
+// separate hook for payment sheet submission, called by parent page
+export const usePaymentSheetSubmission = (confirmPaymentFunction) => {
     // ✅ Add the mutation hook to update the payment instrument
     const {mutateAsync: updatePaymentInstrument} = useShopperOrdersMutation('updatePaymentInstrumentForOrder')
     // ✅ Add the mutation hook to create an order
@@ -48,36 +42,32 @@ export const usePaymentSheetSubmission = () => {
     const {data: basket} = useCurrentBasket()
 
     const {country: detectedCountry} = useCountryDetection()
-    // ✅ Get country directly from address when available
-    const getCountryForPayment = (basket, fallbackCountry) => {
-        return basket?.billingAddress?.countryCode || 
-            basket?.shipments?.[0]?.shippingAddress?.countryCode || 
-            fallbackCountry
-    }
 
-    // ✅ Store order info from API calls
+    // ✅ Store order info from API call before it gets lost after SDK call
     let orderInfoFromAPI = null
    
-    const updateOrderPayment = async (orderNo, paymentInstrumentId, paymentData) => {
+    const updateOrderPayment = async (order, paymentInstrumentId, paymentData) => {
       
         try {
-            // ✅ For Salesforce Payments, provide the minimal required structure
             const paymentInstrumentUpdate = {
+                amount: order.orderTotal,   //TODO this is temporary but needed for now!
                 paymentMethodId: paymentMethodIdSFP,
-                // Note: For Salesforce Payments, you typically don't need paymentCard details
-                // as those are handled by the SFP SDK
             }
 
             const result = await updatePaymentInstrument({
                 parameters: {
-                    orderNo: orderNo,                      // Order number
-                    paymentInstrumentId: paymentInstrumentId  // Payment instrument ID to update
+                    orderNo: order.orderNo,                   
+                    paymentInstrumentId: paymentInstrumentId  
                 },
                 body: paymentInstrumentUpdate
             })
+
             return result
         } catch (error) {
-            console.error('❌ Failed to update payment instrument:', error)
+            logger.error('Failed to update payment instrument', {
+                namespace: 'PaymentSheet.updateOrderPayment',
+                additionalProperties: { error: error.message }  // ✅ Log error details
+            })
             throw error
         }
     }
@@ -90,70 +80,98 @@ export const usePaymentSheetSubmission = () => {
             const order = await createOrder({
                 body: {basketId: basketId}
             })
+
             const orderNo = order.orderNo
 
-            // ✅ Store order info (will be lost after SDK call)??
+            // ✅ Store order info (will be lost after SDK call)
             orderInfoFromAPI = {
                 orderNo: orderNo
             }
 
             // ✅ Get payment instrument ID from the created order
             const paymentInstrument = order.paymentInstruments?.find(pi => 
-                pi.paymentMethodId === "SALESFORCE_PAYMENTS"
+                pi.paymentMethodId === paymentMethodIdSFP
             )
+            
             //now call the payment instrument update API and get the secret and id back
             const result = await updateOrderPayment(
-                orderNo,
+                order,
                 paymentInstrument.paymentInstrumentId,
                 {}
             )
 
-            //TODO read the secret and id from the result
+            // Find the payment instrument that has the paymentReference
+            const paymentInstrumentWithReference = result.paymentInstruments?.find(pi => 
+                pi.paymentReference && pi.paymentMethodId === paymentMethodIdSFP
+            );
+            const paymentReference = paymentInstrumentWithReference?.paymentReference;
+                        
+                        
             return {
-                client_secret: "xx",
-                id: "yy",
-                //customer: paymentResult.payment_info.customer_id
+                client_secret: paymentReference.clientSecret,
+                id: paymentReference.paymentReferenceId,
             }
         } catch (error) {
-            console.error('Payment intent creation failed:', error)
+            logger.error('Payment intent creation failed', {
+                namespace: 'PaymentSheet.createPaymentIntent',
+                additionalProperties: { error: error.message }  // ✅ Log error details
+            })
             throw error
         }
     }
 
     const submitPaymentSheetOrder = async () => {
         if (!confirmPaymentFunction) {
+            logger.error('confirmPaymentFunction is null - payment form not ready', {
+                namespace: 'PaymentSheet.submitPaymentSheetOrder',
+                additionalProperties: { error: error.message }  // ✅ Log error details
+            })
             throw new Error('Payment sheet not ready. Please wait for payment component to load.')
         }
-        
+
         try {
-          
-            // ✅ Checkout-specific logic: get addresses from basket
             const {billing, shipping} = getAddressDetails(basket)
-            // Apply country fallback if needed
             if (!billing.address?.country) {
                 billing.address.country = detectedCountry
             }
 
+            //createPaymentIntent function is a callback passed to the child component PaymentSheetForm
+            //paymentSheetForm calls the SDK and passes down the createPaymentIntent function
+            //SDK finally calls it
             const paymentResult = await confirmPaymentFunction(createPaymentIntent, billing, {})
 
-            // (You'll need to check the exact structure of paymentResult)
             return {
                 paymentResult,
                 orderNo: orderInfoFromAPI?.orderNo,
             }
         } catch (error) {
-            console.error('SFP payment processing failed:', error)
+            logger.error('SFP payment processing failed:', {
+                namespace: 'PaymentSheet.submitPaymentSheetOrder',
+                additionalProperties: { error: error.message } 
+            })
             throw error
         }
     }
     
     return {
         submitPaymentSheetOrder,
-        isProcessing
     }
 }
 
-const SFPaymentsSheet = ({paymentState}) => {
+/*
+    component that renders payment sheet
+    paymentState: state object containing payment config, metadata, and loading status
+    onConfirmFunctionReady: callback function to receive the confirm function from PaymentSheetForm
+    
+    So why are we passing the confirm function from the page?
+    Checkout page needs to trigger payment processing but it has no access to the payment sheet form
+    It calls submitPaymentSheetOrder hook when user clicks Place Order
+    But the submitPaymentSheetOrder hook needs the confirm function to work
+    
+    So the checkout page stores the function in a state variable and passes it to the 
+    SfPaymentsSheet component
+*/
+const SFPaymentsSheet = ({paymentState, onConfirmFunctionReady}) => {  // Add onConfirmFunctionReady
     const {
         paymentConfig,
         metadata,
@@ -161,10 +179,8 @@ const SFPaymentsSheet = ({paymentState}) => {
         isSFPEnabled
     } = paymentState
 
-    const isReady = !paymentConfigLoading && paymentConfig && metadata
-
     const intl = useIntl()
-    
+    const {country: detectedCountry} = useCountryDetection()
     // use the shared SFP instance
     const { sfpInstance, isReady: sfpReady } = useSharedSFPInstance()
 
@@ -185,6 +201,11 @@ const SFPaymentsSheet = ({paymentState}) => {
         defaultValues: {...selectedBillingAddress}
     })
     
+    const paymentRequestInfo = useMemo(() => {
+        return basket ? createPaymentRequestInfo(basket, intl.locale, detectedCountry) : null
+    }, [basket, intl.locale])
+
+    // mutation hooks to add, update, and remove payment instrument from basket
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation('addPaymentInstrumentToBasket')
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation('updateBillingAddressForBasket')
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation('removePaymentInstrumentFromBasket')
@@ -192,7 +213,6 @@ const SFPaymentsSheet = ({paymentState}) => {
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            paymentSheetInstance = null
             setSfpComponentCreated(false)
         }
     }, [])
@@ -226,16 +246,6 @@ const SFPaymentsSheet = ({paymentState}) => {
                 }
             })
         }
-    
-        /*
-            TODO: unless a payment method is already added to ECOM, using anything else throws
-            {
-                "title": "Invalid Payment Method Id",
-                "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-payment-method-id",
-                "detail": "The payment method with ID 'Salesforce Payments' is unknown or can't be applied.",
-                "paymentMethodId": "Salesforce Payments"
-            }
-        */
         const paymentData = {
             "paymentMethodId": paymentMethodIdSFP
         }
@@ -250,26 +260,16 @@ const SFPaymentsSheet = ({paymentState}) => {
         }
     }
     
-    // ✅ Memoize paymentRequestInfo so it doesn't recreate on every render
-    const paymentRequestInfo = useMemo(() => {
-        return basket ? createPaymentRequestInfo(basket, intl.locale) : null
-    }, [basket, intl.locale])
-
-    // ✅ Callback when PaymentSheetForm is ready
-    const handlePaymentSheetReady = (paymentSheet) => {
-        console.log('✅ Payment sheet ready')
-    }
-    
     // ✅ Callback to receive confirm function from PaymentSheetForm
     const handleConfirmMethodReady = useCallback((confirmFunction) => {
-        confirmPaymentFunction = confirmFunction
-    }, [])
+        if (onConfirmFunctionReady) {
+            onConfirmFunctionReady(confirmFunction)
+        }
+    }, [onConfirmFunctionReady])
 
-    const handlePaymentSheetError = (error) => {
-        console.error('❌ Payment sheet error:', error)
-    }
-
-    // ✅ Memoize options object
+    // Memoize objects so their references are stable unless content changes
+    const stablePaymentConfig = React.useMemo(() => paymentConfig, [paymentConfig && JSON.stringify(paymentConfig)]);
+    const stableMetadata = React.useMemo(() => metadata, [metadata && JSON.stringify(metadata)]);
     const paymentSheetOptions = useMemo(() => ({
         elementId: 'salesforce-payments-element',
         locale: intl.locale,
@@ -277,35 +277,63 @@ const SFPaymentsSheet = ({paymentState}) => {
         customTheme: {
             'color-primary': '#007bff'
         },
-        //minHeight: '300px'
     }), [intl.locale])
 
+    // TODO: once the review step is removed as part of 1CC, we can redo the below logic
     return (
         <Box>           
-           {/* ✅ Keep PaymentSheetForm always mounted, control visibility with CSS */}
-           {isReady && sfpReady && sfpInstance && paymentRequestInfo && (
-                <Box
-                    position={step === STEPS.PAYMENT ? "static" : "absolute"}
-                    visibility={step === STEPS.PAYMENT ? "visible" : "hidden"}
-                    height={step === STEPS.PAYMENT ? "auto" : 0}
-                    overflow="hidden"
-                    width="100%"
-                    zIndex={step === STEPS.PAYMENT ? 1 : -1}
-                >
-                    <PaymentSheetForm
-                        sfpInstance={sfpInstance}
-                        paymentConfig={paymentConfig}
-                        metadata={metadata}
-                        paymentRequestInfo={paymentRequestInfo}
-                        options={paymentSheetOptions}
-                        onConfirmMethodReady={handleConfirmMethodReady}
-                        containerProps={{ mb: 4 }}
+        {/* Custom "Payment" title when editing - appears above credit card form */}
+        {step === STEPS.PAYMENT && (
+            <Box
+                bg="white"
+                border="1px solid"
+                borderColor="gray.200"
+                borderTopRadius="md"
+                borderBottom="none"
+                px={6}
+                pt={4}
+                pb={2}
+                mb={0}
+            >
+                <Heading as="h2" fontSize="lg" fontWeight="semibold">
+                    <FormattedMessage
+                        defaultMessage="Payment"
+                        id="checkout_payment.title.payment"
                     />
-                </Box>
-            )}
+                </Heading>
+            </Box>
+        )}
+
+        {/* ✅ Credit card form */}
+        <Box
+            suppressHydrationWarning={true}
+            style={{
+                display: step === STEPS.PAYMENT ? 'block' : 'none'
+            }} 
+            bg="white"
+            border="1px solid"
+            borderColor="gray.200"
+            borderTopRadius={0} // No top radius since title is above
+            borderBottomRadius="0"
+            borderBottom="none"
+            p={6}
+            mb={0}
+        >
+            <PaymentSheetForm
+                sfpInstance={sfpInstance}
+                paymentConfig={stablePaymentConfig}
+                metadata={stableMetadata}
+                paymentRequestInfo={paymentRequestInfo}
+                options={paymentSheetOptions}
+                onConfirmMethodReady={handleConfirmMethodReady}
+                containerProps={{ style: { marginBottom: '16px' } }} 
+            />
+        </Box>
+            
             <ToggleCard
                 id="step-3"
-                title={intl.formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
+                // ✅ Hide title when editing, show when reviewing
+                title={step === STEPS.PAYMENT ? "" : intl.formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
                 editing={step === STEPS.PAYMENT}
                 disabled={appliedPayment == null}
                 onEdit={() => goToStep(STEPS.PAYMENT)}
@@ -317,7 +345,8 @@ const SFPaymentsSheet = ({paymentState}) => {
                 <ToggleCardEdit>
                     <Stack spacing={6}>
                      
-                        <Divider />
+                        {/* Remove or conditionally show divider */}
+                        {step !== STEPS.PAYMENT && <Divider />}
                         
                         <Stack spacing={2}>
                             <Heading as="h3" fontSize="md">

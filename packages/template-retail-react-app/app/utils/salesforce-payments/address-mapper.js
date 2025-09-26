@@ -62,8 +62,8 @@ const mapAddressToSFPFormat = (address, options = {}) => {
 export const getBillingDetails = (basket) => {
     return mapAddressToSFPFormat(basket?.billingAddress, {
         // ✅ Pass additional customer info for billing
-        email: basket?.customerEmail,
-        name: basket?.customerName  // Fallback if billingAddress.fullName is empty
+        email: basket?.customerInfo?.email,
+        name: basket?.billingAddress.fullName // Fallback if billingAddress.fullName is empty
     })
 }
 
@@ -87,4 +87,78 @@ export const getAddressDetails = (basket) => {
         billing: getBillingDetails(basket),
         shipping: getShippingDetails(basket)
     }
+}
+
+// Add this after line 19 and before the existing functions
+
+/**
+ * Splits a full name into first and last name
+ * @param {string} fullName - The full name to split
+ * @returns {Object} Object with firstName and lastName properties
+ */
+export const splitFullName = (fullName) => {
+    if (!fullName || typeof fullName !== 'string') {
+        return { firstName: 'Express', lastName: 'User' }
+    }
+    
+    const nameParts = fullName.trim().split(/\s+/)
+    
+    if (nameParts.length === 0) {
+        return { firstName: 'Express', lastName: 'User' }
+    } else if (nameParts.length === 1) {
+        return { firstName: nameParts[0], lastName: '' }
+    } else {
+        return {
+            firstName: nameParts[0],
+            lastName: nameParts.slice(1).join(' ')
+        }
+    }
+}
+
+
+/**
+ * Maps SFP payment details (from wallet) to Commerce Cloud address format
+ * @param {Object} paymentDetails - Payment details from SFP wallet (Apple Pay, Google Pay, etc.)
+ * @returns {Object} Object with billing and shipping addresses in Commerce Cloud format
+ */
+export const mapWalletToCommerceAddresses = (paymentDetails) => {
+    const result = {}
+    
+    // Map billing address
+    if (paymentDetails?.billingDetails) {
+        const billing = paymentDetails.billingDetails
+        const { firstName, lastName } = splitFullName(billing.name)
+        
+        result.billingAddress = {
+            firstName,
+            lastName,
+            address1: billing.address?.line1 || '',
+            address2: billing.address?.line2 || '',
+            city: billing.address?.city || '',
+            stateCode: billing.address?.state || '',
+            postalCode: billing.address?.postalCode || '',
+            countryCode: billing.address?.country || 'US',
+            phone: billing.phone || '',
+            email: billing.email || ''
+        }
+    }
+    
+    // Map shipping address
+    if (paymentDetails?.shippingDetails) {
+        const shipping = paymentDetails.shippingDetails
+        const { firstName, lastName } = splitFullName(shipping.name)
+        
+        result.shippingAddress = {
+            firstName,
+            lastName,
+            address1: shipping.address?.line1 || '',
+            address2: shipping.address?.line2 || '',
+            city: shipping.address?.city || '',
+            stateCode: shipping.address?.state || '',
+            postalCode: shipping.address?.postalCode || '',
+            countryCode: shipping.address?.country || 'US'
+        }
+    }
+    
+    return result
 }

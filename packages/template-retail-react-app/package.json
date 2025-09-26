@@ -22,7 +22,7 @@
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
-    "start:https": "cross-env NODE_ICU_DATA=node_modules/full-icu DEV_SERVER_PROTOCOL=https DEV_SERVER_SSL_FILE_PATH=../../localhost.pem pwa-kit-dev start",
+    "start:https": "cross-env NODE_ICU_DATA=node_modules/full-icu NODE_TLS_REJECT_UNAUTHORIZED=0 DEV_SERVER_PROTOCOL=https DEV_SERVER_SSL_FILE_PATH=../../localhost.pem pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
     "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
     "tail-logs": "pwa-kit-dev tail-logs",

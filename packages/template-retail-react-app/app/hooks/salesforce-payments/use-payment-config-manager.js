@@ -1,6 +1,5 @@
 // use-payment-config-manager2.js
 import {useState, useEffect} from 'react'
-import {useAccessToken} from '@salesforce/commerce-sdk-react'
 import { usePaymentConfiguration as useSCAPIPaymentConfig } from '@salesforce/commerce-sdk-react'
 import {useQuery} from '@tanstack/react-query'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -25,25 +24,26 @@ export const usePaymentConfigManager = () => {
         }
     })
     
+    // TODO call new API to get Saved Payment Methods as well and have a setter for that. 
+    // Return data in a new state variable
+
+
+    // TODO manual capture flag is removed from the payments config api and being moved to application config
+
     // Payment Metadata
     const { data: metadataData, isLoading: metadataLoading, error: metadataError } = useQuery({
         queryKey: ['payment-metadata'],
         queryFn: async () => {
             try {
                 const config = getConfig()
-                //const response = await fetch(`${config.app.commerceAPI.proxyPath}/payment-metadata`)
                 //TEMP STOP GAP (FIXED SOON)
                 const response = await fetch(`${appOrigin}/api/payment-metadata`)
-                //const response = await fetch('http://localhost:3002/api/payment-metadata')
-                //const response = await fetch('http://localhost:3002/api/payment-metadata')
                 if (!response.ok) {
                     throw new Error('Failed to load payment metadata')
                 }
                 const data = await response.json()
-                console.log('✅ Metadata loaded successfully:', data)
                 return data
             } catch (error) {
-                console.error('❌ Fetch error:', error)
                 throw error
             }
         },

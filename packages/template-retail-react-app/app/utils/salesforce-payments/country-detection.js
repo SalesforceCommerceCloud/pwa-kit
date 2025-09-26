@@ -52,12 +52,15 @@ const useServerCountryDetection = (appOrigin) => {
 const detectCountryCode = (options = {}) => {
     const {site, locale, serverCountry} = options
     
-    // Priority 1: Server-detected country (MRT/CloudFront)
-    if (serverCountry) {
-        return { country: serverCountry, source: 'server-mrt' }
-    }
-    
-    // Priority 2: Browser locale
+   /* Change logic to
+// 1. If billing address country code is available → use it
+// 2. Else if shipping address country code is available → use it
+// 3. Else if user-selected country override exists → use it
+// 4. Else if browser locale country code is available → use it
+// 5. Else if IP geolocation country is available and trusted → use it
+// 6. Else return null (no country)
+   */
+    // Priority 1: Browser locale
     if (typeof window !== 'undefined') {
         const browserLocale = navigator.language || navigator.languages?.[0]
         if (browserLocale) {
@@ -68,7 +71,7 @@ const detectCountryCode = (options = {}) => {
         }
     }
     
-    // Priority 3: Site's current locale (e.g., 'en-US' -> 'US')
+    // Priority 2: Site's current locale (e.g., 'en-US' -> 'US')
     if (locale?.id) {
         const localeCountry = locale.id.split('-')[1]
         if (localeCountry && localeCountry.length === 2) {
@@ -76,6 +79,11 @@ const detectCountryCode = (options = {}) => {
         }
     }
     
+    // Priority 3: Server-detected country (MRT/CloudFront)
+    if (serverCountry) {
+        return { country: serverCountry, source: 'server-mrt' }
+    }
+
     // Priority 4: Site's default locale (e.g., 'en-GB' -> 'GB')
     if (site?.l10n?.defaultLocale) {
         const defaultCountry = site.l10n.defaultLocale.split('-')[1]
@@ -84,8 +92,8 @@ const detectCountryCode = (options = {}) => {
         }
     }
     
-    // Priority 5: Final fallback
-    return { country: 'US', source: 'hardcoded-fallback' }
+    // Priority 5: Final fallback (don't pass anything?)
+    return { country: '', source: 'hardcoded-fallback' }
 }
 
 /**
