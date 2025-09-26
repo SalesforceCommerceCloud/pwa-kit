@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
-    Button,
     Checkbox,
     Heading,
     Stack,
@@ -347,7 +346,7 @@ const Payment = ({
                             </Box>
 
                             <Stack spacing={6}>
-                                {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
+                                {isApplyingSavedPayment ? null : (
                                     <PaymentForm
                                         form={paymentMethodForm}
                                         onSubmit={onSubmit}
@@ -363,30 +362,6 @@ const Payment = ({
                                             />
                                         )}
                                     </PaymentForm>
-                                ) : (
-                                    <Stack spacing={3}>
-                                        <Heading as="h3" fontSize="md">
-                                            <FormattedMessage
-                                                defaultMessage="Credit Card"
-                                                id="checkout_payment.heading.credit_card"
-                                            />
-                                        </Heading>
-                                        <Stack direction="row" spacing={4}>
-                                            <PaymentCardSummary payment={appliedPayment} />
-                                            {/* Added for this ticket - Button - 11 lines */}
-                                            <Button
-                                                variant="link"
-                                                size="sm"
-                                                colorScheme="red"
-                                                onClick={onPaymentRemoval}
-                                            >
-                                                <FormattedMessage
-                                                    defaultMessage="Remove"
-                                                    id="checkout_payment.action.remove"
-                                                />
-                                            </Button>
-                                        </Stack>
-                                    </Stack>
                                 )}
 
                                 <Divider borderColor="gray.100" />
