@@ -2883,6 +2883,20 @@
       "value": "Password Reset Success"
     }
   ],
+  "payment_selection.button.view_all": [
+    {
+      "type": 0,
+      "value": "View All ("
+    },
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " more)"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,

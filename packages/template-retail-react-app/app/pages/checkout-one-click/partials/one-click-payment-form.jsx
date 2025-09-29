@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -20,6 +20,8 @@ import {
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+
+const INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS = 3
 
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
@@ -50,6 +52,22 @@ const PaymentForm = ({
     selectedPaymentMethod
 }) => {
     const {formatMessage} = useIntl()
+    const [showAllPaymentInstruments, setShowAllPaymentInstruments] = useState(false)
+
+    const savedCount = savedPaymentInstruments?.length || 0
+    const totalItems = savedCount + 2 // saved + credit card + paypal
+    const n = showAllPaymentInstruments ? totalItems : INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
+
+    const displayedSavedCount = Math.min(savedCount, n)
+    const displayedSavedPaymentInstruments =
+        savedPaymentInstruments?.slice(0, displayedSavedCount) || []
+
+    const showCreditCard = n > displayedSavedCount
+    const displayedAfterCC = displayedSavedCount + (showCreditCard ? 1 : 0)
+    const showPaypal = n > displayedAfterCC
+
+    const showViewAllButton =
+        totalItems > INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS && !showAllPaymentInstruments
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -65,7 +83,7 @@ const PaymentForm = ({
                             })}
                             name="payment-selection"
                         >
-                            {savedPaymentInstruments?.map((paymentInstrument) => (
+                            {displayedSavedPaymentInstruments?.map((paymentInstrument) => (
                                 <Box
                                     py={3}
                                     px={[4, 4, 6]}
@@ -83,57 +101,84 @@ const PaymentForm = ({
                                 </Box>
                             ))}
 
-                            <Box
-                                py={3}
-                                px={[4, 4, 6]}
-                                bg="gray.50"
-                                borderBottom="1px solid"
-                                borderColor="gray.100"
-                            >
-                                <Radio value="cc">
-                                    <Flex justify="space-between">
-                                        <Stack direction="row" align="center">
-                                            <Text fontWeight="bold">
-                                                <FormattedMessage
-                                                    defaultMessage="Credit Card"
-                                                    id="payment_selection.heading.credit_card"
-                                                />
-                                            </Text>
-                                            <Tooltip
-                                                hasArrow
-                                                placement="top"
-                                                label={formatMessage({
-                                                    defaultMessage:
-                                                        'This is a secure SSL encrypted payment.',
-                                                    id: 'payment_selection.tooltip.secure_payment'
-                                                })}
-                                            >
-                                                <LockIcon color="gray.700" boxSize={5} />
-                                            </Tooltip>
-                                        </Stack>
-                                    </Flex>
-                                </Radio>
-                            </Box>
-                            <Collapse in={selectedPaymentMethod === 'cc'} animateOpacity>
-                                <Box p={[4, 4, 6]} borderBottom="1px solid" borderColor="gray.100">
-                                    <Stack spacing={6}>
-                                        <Stack spacing={6}>
-                                            <CreditCardFields form={form} />
-                                        </Stack>
-                                        {children && <Box pt={2}>{children}</Box>}
-                                    </Stack>
-                                </Box>
-                            </Collapse>
-
-                            <Box py={3} px={[4, 4, 6]} bg="gray.50" borderColor="gray.100">
-                                <Radio value="paypal">
-                                    <Box py="2px">
-                                        <PaypalIcon width="auto" height="20px" />
+                            {showCreditCard && (
+                                <>
+                                    <Box
+                                        py={3}
+                                        px={[4, 4, 6]}
+                                        bg="gray.50"
+                                        borderBottom="1px solid"
+                                        borderColor="gray.100"
+                                    >
+                                        <Radio value="cc">
+                                            <Flex justify="space-between">
+                                                <Stack direction="row" align="center">
+                                                    <Text fontWeight="bold">
+                                                        <FormattedMessage
+                                                            defaultMessage="Credit Card"
+                                                            id="payment_selection.heading.credit_card"
+                                                        />
+                                                    </Text>
+                                                    <Tooltip
+                                                        hasArrow
+                                                        placement="top"
+                                                        label={formatMessage({
+                                                            defaultMessage:
+                                                                'This is a secure SSL encrypted payment.',
+                                                            id: 'payment_selection.tooltip.secure_payment'
+                                                        })}
+                                                    >
+                                                        <LockIcon color="gray.700" boxSize={5} />
+                                                    </Tooltip>
+                                                </Stack>
+                                            </Flex>
+                                        </Radio>
                                     </Box>
-                                </Radio>
-                            </Box>
+                                    <Collapse in={selectedPaymentMethod === 'cc'} animateOpacity>
+                                        <Box
+                                            p={[4, 4, 6]}
+                                            borderBottom="1px solid"
+                                            borderColor="gray.100"
+                                        >
+                                            <Stack spacing={6}>
+                                                <Stack spacing={6}>
+                                                    <CreditCardFields form={form} />
+                                                </Stack>
+                                                {children && <Box pt={2}>{children}</Box>}
+                                            </Stack>
+                                        </Box>
+                                    </Collapse>
+                                </>
+                            )}
+
+                            {showPaypal && (
+                                <Box py={3} px={[4, 4, 6]} bg="gray.50" borderColor="gray.100">
+                                    <Radio value="paypal">
+                                        <Box py="2px">
+                                            <PaypalIcon width="auto" height="20px" />
+                                        </Box>
+                                    </Radio>
+                                </Box>
+                            )}
                         </RadioGroup>
                     </Box>
+                    {showViewAllButton && savedCount > 0 && (
+                        <Box py={3} px={[4, 4, 6]}>
+                            <button
+                                type="button"
+                                data-testid="view-all-saved-payments"
+                                onClick={() => setShowAllPaymentInstruments(true)}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="View All ({count} more)"
+                                    id="payment_selection.button.view_all"
+                                    values={{
+                                        count: Math.max(totalItems - n, 0)
+                                    }}
+                                />
+                            </button>
+                        </Box>
+                    )}
                 </Stack>
             </Stack>
         </form>

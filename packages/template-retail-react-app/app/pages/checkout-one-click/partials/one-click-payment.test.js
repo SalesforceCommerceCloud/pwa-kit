@@ -457,7 +457,7 @@ describe('Payment Component', () => {
             const user = userEvent.setup()
             const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
             const mockPaymentMethodForm = {
-                handleSubmit: jest.fn((callback) => (e) => {
+                handleSubmit: jest.fn(() => (e) => {
                     e?.preventDefault?.()
                     // Simulate form validation failure
                     throw new Error('Form validation failed')

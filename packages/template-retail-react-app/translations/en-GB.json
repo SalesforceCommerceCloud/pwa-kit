@@ -1233,6 +1233,9 @@
   "password_reset_success.toast": {
     "defaultMessage": "Password Reset Success"
   },
+  "payment_selection.button.view_all": {
+    "defaultMessage": "View All ({count} more)"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },
