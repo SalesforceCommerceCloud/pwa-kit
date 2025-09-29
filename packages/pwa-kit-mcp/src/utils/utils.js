@@ -191,6 +191,49 @@ export async function logMCPMessage(message) {
  * @returns {Object} containing detected absolute paths & configuration
  */
 export async function detectWorkspacePaths() {
+    // Primary approach: Use PWA_STOREFRONT_APP_PATH
+    const appPath = process.env.PWA_STOREFRONT_APP_PATH
+
+    if (appPath) {
+        // Verify the provided app path exists
+        try {
+            await fsPromises.access(appPath)
+        } catch (error) {
+            throw new Error(`PWA_STOREFRONT_APP_PATH does not exist: ${appPath}`)
+        }
+
+        // Build paths relative to the provided app directory
+        const pagesPath = path.join(appPath, 'pages')
+        const componentsPath = path.join(appPath, 'components')
+        const routesPath = path.join(appPath, 'routes.jsx')
+
+        // Node modules is typically one level up from the app directory
+        const nodeModulesPath = path.join(appPath, '..', 'node_modules')
+
+        // Check if overrides directory exists (for ccExtensibility.overridesDir)
+        const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
+
+        // Verify essential directories exist
+        if (!fs.existsSync(pagesPath)) {
+            throw new Error(`Pages directory not found at: ${pagesPath}`)
+        }
+        if (!fs.existsSync(componentsPath)) {
+            throw new Error(`Components directory not found at: ${componentsPath}`)
+        }
+        if (!fs.existsSync(routesPath)) {
+            throw new Error(`Routes file not found at: ${routesPath}`)
+        }
+
+        return {
+            pagesPath,
+            componentsPath,
+            routesPath,
+            nodeModulesPath,
+            hasOverridesDir
+        }
+    }
+
+    // Fallback approach: Detect monorepo structure
     const workspaceRoot = process.env.WORKSPACE_FOLDER_PATHS || process.cwd()
     const possibleAppDirs = [
         'app',
@@ -209,7 +252,7 @@ export async function detectWorkspacePaths() {
 
     if (!appDir) {
         throw new Error(
-            'Could not detect PWA Kit app directory. Please ensure you are in a PWA Kit project.'
+            'Could not detect PWA Kit app directory. Please ensure you are in a PWA Kit project or set PWA_STOREFRONT_APP_PATH environment variable.'
         )
     }
 
