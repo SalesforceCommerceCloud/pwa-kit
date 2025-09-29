@@ -24,7 +24,19 @@ const PaymentSheetForm = ({
     customTheme = {},
   } = options
 
-  
+  // build the return url based on base url
+  const buildReturnUrl = (additionalParams = {}) => {
+    const baseUrl = window.location.origin
+    const returnUrl = new URL('/checkout/payment-redirect', baseUrl)
+
+    // Add any additional parameters you want to pass
+    // todo:  what else to pass?
+    Object.entries(additionalParams).forEach(([key, value]) => {
+      returnUrl.searchParams.set(key, value)
+    })
+    
+    return returnUrl.toString()
+  }
   /*
     Input Parameters:
     createPaymentIntent: Function that creates payment intent and returns client secret
@@ -131,7 +143,8 @@ const PaymentSheetForm = ({
             },
             // TODO: add returnUrl, showSaveForFutureUsageCheckbox, savedPaymentMethods, enforceSavedPaymentMethod, showSaveAsDefaultCheckbox, maximumInitialPaymentMethods
             options: {
-                useManualCapture: !paymentConfig.card_capture_automatic
+                useManualCapture: !paymentConfig.card_capture_automatic,
+                returnUrl: buildReturnUrl()
             },
         }
         /*

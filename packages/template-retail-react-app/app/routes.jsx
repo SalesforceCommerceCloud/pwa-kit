@@ -42,6 +42,7 @@ const Checkout = loadable(() => import('./pages/checkout'), {
     fallback
 })
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const PaymentRedirect = loadable(() => import('./pages/checkout/partials/salesforce-payments/payment-redirect'), {fallback})
 const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
@@ -99,6 +100,10 @@ export const routes = [
     {
         path: '/checkout/confirmation/:orderNo',
         component: CheckoutConfirmation
+    },
+    {
+        path: '/checkout/payment-redirect',
+        component: PaymentRedirect
     },
     {
         path: '/callback',
