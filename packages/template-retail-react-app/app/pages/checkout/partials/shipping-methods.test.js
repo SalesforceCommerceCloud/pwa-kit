@@ -12,7 +12,11 @@ import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/par
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {useShippingMethodsForShipment, useProducts} from '@salesforce/commerce-sdk-react'
+import {
+    useShippingMethodsForShipment,
+    useProducts,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 
 // Mock the hooks
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
@@ -25,6 +29,7 @@ const mockUseCurrentBasket = useCurrentBasket
 const mockUseCurrency = useCurrency
 const mockUseShippingMethodsForShipment = useShippingMethodsForShipment
 const mockUseProducts = useProducts
+const mockUseShopperBasketsMutation = useShopperBasketsMutation
 
 // Mock data
 const mockBasket = {
@@ -169,6 +174,7 @@ describe('ShippingMethods', () => {
             data: mockProductsMap,
             isLoading: false
         })
+        mockUseShopperBasketsMutation.mockReturnValue(jest.fn().mockResolvedValue({}))
     })
 
     afterEach(() => {
@@ -536,6 +542,162 @@ describe('ShippingMethods', () => {
             })
 
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
+        })
+    })
+
+    describe('auto-submit functionality', () => {
+        test('should auto-submit default shipping method when available', async () => {
+            const basketWithoutMethods = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        ...mockBasket.shipments[0],
+                        shippingMethod: null
+                    }
+                ]
+            }
+
+            const mockShippingMethods = {
+                defaultShippingMethodId: 'default-shipping-method',
+                applicableShippingMethods: [
+                    {
+                        id: 'default-shipping-method',
+                        name: 'Default Shipping'
+                    }
+                ]
+            }
+
+            const mockMutateAsync = jest.fn().mockResolvedValue({})
+            mockUseShopperBasketsMutation.mockReturnValue({
+                updateShippingMethod: {mutateAsync: mockMutateAsync}
+            })
+
+            // after auto-submit, step should advance to PAYMENT (summary mode)
+            mockUseCheckout.mockReturnValue({
+                step: 'PAYMENT',
+                STEPS: {SHIPPING_OPTIONS: 'SHIPPING_OPTIONS', PAYMENT: 'PAYMENT'},
+                goToStep: jest.fn(),
+                goToNextStep: jest.fn()
+            })
+
+            mockUseCurrentBasket.mockReturnValue({
+                data: basketWithoutMethods,
+                derivedData: {
+                    totalShippingCost: 5.99,
+                    isMissingShippingMethod: false
+                },
+                isLoading: false
+            })
+
+            mockUseShippingMethodsForShipment.mockReturnValue({
+                data: mockShippingMethods,
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMethods />)
+
+            // component is in SUMMARY mode (collapsed) after auto-submit
+            expect(screen.getByRole('button', {name: 'Edit Shipping Options'})).toBeInTheDocument()
+            expect(
+                screen.queryByRole('radio', {name: 'Default Shipping $5.99'})
+            ).not.toBeInTheDocument()
+            expect(
+                screen.queryByRole('button', {name: 'Continue to Payment'})
+            ).not.toBeInTheDocument()
+        })
+
+        test('should not auto-submit if shipment already has a method', async () => {
+            // Mock basket that already has a shipping method
+            const basketWithMethod = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        ...mockBasket.shipments[0],
+                        shippingMethod: {
+                            id: 'existing-method',
+                            name: 'Existing Shipping'
+                        }
+                    }
+                ]
+            }
+
+            const mockUpdateShippingMethod = jest.fn().mockResolvedValue({})
+            mockUpdateShippingMethod.mutateAsync = jest.fn().mockResolvedValue({})
+
+            // Mock the mutation hook
+            mockUseShopperBasketsMutation.mockReturnValue(mockUpdateShippingMethod)
+
+            mockUseCurrentBasket.mockReturnValue({
+                data: basketWithMethod,
+                derivedData: {totalShippingCost: 0},
+                isLoading: false
+            })
+
+            mockUseShippingMethodsForShipment.mockReturnValue({
+                data: {
+                    defaultShippingMethodId: 'default-method',
+                    applicableShippingMethods: []
+                },
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMethods />)
+
+            // no auto-submit happens
+            await waitFor(() => {
+                expect(mockUpdateShippingMethod).not.toHaveBeenCalled()
+            })
+        })
+
+        test('should not auto-submit if user has manually selected a different method', async () => {
+            const basketWithoutMethods = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        ...mockBasket.shipments[0],
+                        shippingMethod: null
+                    }
+                ]
+            }
+
+            // Mock shipping methods with default
+            const mockShippingMethods = {
+                defaultShippingMethodId: 'default-method',
+                applicableShippingMethods: [
+                    {
+                        id: 'default-method',
+                        name: 'Default Shipping'
+                    },
+                    {
+                        id: 'user-selected-method',
+                        name: 'User Selected Shipping'
+                    }
+                ]
+            }
+
+            const mockUpdateShippingMethod = jest.fn().mockResolvedValue({})
+            mockUpdateShippingMethod.mutateAsync = jest.fn().mockResolvedValue({})
+
+            // Mock the mutation hook
+            mockUseShopperBasketsMutation.mockReturnValue(mockUpdateShippingMethod)
+
+            mockUseCurrentBasket.mockReturnValue({
+                data: basketWithoutMethods,
+                derivedData: {totalShippingCost: 0},
+                isLoading: false
+            })
+
+            mockUseShippingMethodsForShipment.mockReturnValue({
+                data: mockShippingMethods,
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMethods />)
+
+            // no auto-submit happens because the form would have user-selected-method, not default-method)
+            await waitFor(() => {
+                expect(mockUpdateShippingMethod).not.toHaveBeenCalled()
+            })
         })
     })
 })

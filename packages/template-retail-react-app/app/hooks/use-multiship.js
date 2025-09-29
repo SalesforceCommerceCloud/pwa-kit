@@ -10,7 +10,10 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
-import {getShippingAddressForStore} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    cleanAddressForOrder,
+    getShippingAddressForStore
+} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
@@ -350,7 +353,12 @@ export const useMultiship = (basket) => {
             return false
         }
 
-        const storeInfo = {id: storeId, inventoryId: inventoryId}
+        const storeInfo = {
+            ...cleanAddressForOrder(sourceShipment.shippingAddress),
+            name: sourceShipment.shippingAddress.firstName,
+            id: storeId,
+            inventoryId: inventoryId
+        }
 
         await updateDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
         await updateItemsToPickupShipment(itemsToMove, DEFAULT_SHIPMENT_ID, inventoryId)

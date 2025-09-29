@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
+import {useLocation} from 'react-router-dom'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -12,6 +13,7 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 
 const onClient = typeof window !== 'undefined'
 
@@ -137,10 +139,11 @@ const isEnabled = (enabled) => {
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
  * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
  * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
+ * @param {string} props.domainUrl - The domain URL of the current page
  * @returns {null} This component doesn't render any visible UI, only manages the messaging service
  *
  * @example
- * <ShopperAgentWindow commerceAgentConfiguration={config} />
+ * <ShopperAgentWindow commerceAgentConfiguration={config} domainUrl="https://example.com/current-page" />
  *
  * @since 3.12.0
  * @see {@link useScript} - For script loading functionality
@@ -149,12 +152,12 @@ const isEnabled = (enabled) => {
  * @see {@link useRefreshToken} - For authentication token
  * @see {@link useUsid} - For user session identifier
  */
-const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
+const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     // Theme hook for z-index management
     const theme = useTheme()
 
     // Multi-site hook for locale and currency information
-    const {locale} = useMultiSite()
+    const {locale, buildUrl} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
@@ -288,7 +291,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
                 IsCartMgmtSupported: 'true',
                 RefreshToken: refreshToken,
                 Currency: locale.preferredCurrency,
-                Language: sfLanguage
+                Language: sfLanguage,
+                DomainUrl: domainUrl
             })
         }
 
@@ -328,7 +332,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         commerceOrgId,
         usid,
         theme.zIndices.sticky,
-        refreshToken
+        refreshToken,
+        domainUrl
     ])
 
     // Load the embedded messaging script asynchronously
@@ -367,7 +372,16 @@ ShopperAgentWindow.propTypes = {
      * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
      * @property {string[]} [conversationContext] - Conversation context data array
      */
-    commerceAgentConfiguration: PropTypes.object.isRequired
+    commerceAgentConfiguration: PropTypes.object.isRequired,
+
+    /**
+     * The domain URL of the current page, used as context for the embedded messaging.
+     * This provides the chat agent with information about the current page location.
+     *
+     * @type {string}
+     * @required
+     */
+    domainUrl: PropTypes.string.isRequired
 }
 
 /**
@@ -406,8 +420,16 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Extract enabled state from configuration
     const {enabled} = commerceAgentConfiguration
 
+    // Get current location and app origin for domain URL
+    const location = useLocation()
+    const appOrigin = useAppOrigin()
+    const {buildUrl} = useMultiSite()
+
     // Check if agent is enabled and running on client side
     const isShopperAgentEnabled = isEnabled(enabled)
+
+    // Build the current domain URL
+    const domainUrl = `${appOrigin}${buildUrl(location.pathname)}`
 
     // Conditional rendering: only render when all conditions are met
     // 1. Agent is enabled and running on client
@@ -417,7 +439,10 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
         basketDoneLoading &&
         validateCommerceAgentSettings(commerceAgentConfiguration) ? (
         <div data-testid="shopper-agent">
-            <ShopperAgentWindow commerceAgentConfiguration={commerceAgentConfiguration} />
+            <ShopperAgentWindow
+                commerceAgentConfiguration={commerceAgentConfiguration}
+                domainUrl={domainUrl}
+            />
         </div>
     ) : null
 }

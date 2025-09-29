@@ -42,6 +42,12 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useLocation} from 'react-router-dom'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 
 const onClient = typeof window !== 'undefined'
 
@@ -106,6 +112,15 @@ const formatSuggestions = (searchSuggestions) => {
  */
 const Search = (props) => {
     const config = getConfig()
+
+    // Add new hooks for chat functionality
+    const {locale, siteId, commerceOrgId, buildUrl} = useMultiSite()
+    const {usid} = useUsid()
+    const refreshToken = useRefreshToken()
+    const location = useLocation()
+    const appOrigin = useAppOrigin()
+    const sfLanguage = normalizeLocaleToSalesforce(locale.id)
+
     const askAgentOnSearchEnabled = useMemo(() => {
         const {enabled, askAgentOnSearch} = getCommerceAgentConfig()
         return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
@@ -183,6 +198,26 @@ const Search = (props) => {
         setIsOpen(false)
     }
 
+    // Function to set pre-chat fields only when launching a new chat session
+    const setPrechatFieldsForNewSession = () => {
+        // Only set pre-chat fields if this is a new chat launch (not already launched)
+        if (!miawChatRef.current.newChatLaunched) {
+            if (window.embeddedservice_bootstrap?.prechatAPI) {
+                window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+                    SiteId: siteId,
+                    Locale: locale.id,
+                    OrganizationId: commerceOrgId,
+                    UsId: usid,
+                    IsCartMgmtSupported: 'true',
+                    RefreshToken: refreshToken,
+                    Currency: locale.preferredCurrency,
+                    Language: sfLanguage,
+                    DomainUrl: `${appOrigin}${buildUrl(location.pathname)}`
+                })
+            }
+        }
+    }
+
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
             if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
@@ -209,6 +244,9 @@ const Search = (props) => {
         }
     }, [])
     const launchChat = () => {
+        // Set pre-chat fields only for new sessions
+        setPrechatFieldsForNewSession()
+
         if (window.embeddedservice_bootstrap?.settings) {
             window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
             window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false

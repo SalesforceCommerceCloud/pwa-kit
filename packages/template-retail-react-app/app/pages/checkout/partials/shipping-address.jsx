@@ -71,6 +71,10 @@ export default function ShippingAddress() {
     const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
+    // Check if there are multiple product items to show option to ship to multiple addresses
+    const productItemsCount = basket?.productItems?.length || 0
+    const hasMultipleProductItems = productItemsCount > 1
+
     // Check if there are multiple delivery shipments (multi-shipping was used)
     const deliveryShipments =
         basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
@@ -216,13 +220,15 @@ export default function ShippingAddress() {
                           })
                 }
                 editAction={
-                    multishipEnabled
+                    multishipEnabled && hasMultipleProductItems
                         ? isMultiShipping
                             ? formatMessage(shipToOneAddressLabel)
                             : formatMessage(deliverToMultipleAddressesLabel)
                         : null
                 }
-                onEditActionClick={multishipEnabled ? handleToggleShippingMode : null}
+                onEditActionClick={
+                    multishipEnabled && hasMultipleProductItems ? handleToggleShippingMode : null
+                }
             >
                 <ToggleCardEdit>
                     {!isMultiShipping ? (

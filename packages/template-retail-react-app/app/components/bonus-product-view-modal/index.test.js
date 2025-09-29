@@ -1019,3 +1019,170 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
         })
     })
 })
+
+describe('BonusProductViewModal - Variant Filtering Integration Tests', () => {
+    const mockOnClose = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Setup default working mocks that don't conflict with our tests
+        useShopperBasketsMutationHelper.mockReturnValue({
+            addItemToNewOrExistingBasket: jest.fn()
+        })
+
+        useBonusProductCounts.mockReturnValue({
+            finalSelectedBonusItems: 1,
+            finalMaxBonusItems: 3
+        })
+
+        getRemainingAvailableBonusProductsForProduct.mockReturnValue(2)
+    })
+
+    test('renders modal successfully with variant filtering enabled', () => {
+        // Basic integration test: Modal renders without errors with filtering logic
+        const mockBasket = {
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'test-promo',
+                    bonusProducts: [
+                        {productId: '793775370033M'} // Specific variant
+                    ]
+                }
+            ],
+            productItems: []
+        }
+
+        const mockProduct = {
+            id: '793775370033',
+            name: 'Test Product',
+            variants: [
+                {productId: '793775370033M', variationValues: {color: 'turquoise'}},
+                {productId: '793775370033R', variationValues: {color: 'red'}}
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {value: 'turquoise', name: 'Turquoise'},
+                        {value: 'red', name: 'Red'}
+                    ]
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+        useProductViewModal.mockReturnValue({product: mockProduct, isFetching: false})
+
+        expect(() => {
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProduct}
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    promotionId="test-promo"
+                />
+            )
+        }).not.toThrow()
+
+        // Verify modal renders
+        expect(screen.getByTestId('bonus-product-view-modal')).toBeInTheDocument()
+    })
+
+    test('handles edge cases without errors', () => {
+        // Edge case test: No bonus products available
+        const mockBasket = {
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'different-promo',
+                    bonusProducts: []
+                }
+            ],
+            productItems: []
+        }
+
+        const mockProduct = {
+            id: '793775370033',
+            name: 'Test Product',
+            variants: [],
+            variationAttributes: []
+        }
+
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+        useProductViewModal.mockReturnValue({product: mockProduct, isFetching: false})
+
+        expect(() => {
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProduct}
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    promotionId="test-promo"
+                />
+            )
+        }).not.toThrow()
+
+        expect(screen.getByTestId('bonus-product-view-modal')).toBeInTheDocument()
+    })
+
+    test('handles missing bonus data gracefully', () => {
+        // Edge case test: No bonusDiscountLineItems
+        const mockBasket = {productItems: []}
+        const mockProduct = {id: '123', name: 'Test'}
+
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+        useProductViewModal.mockReturnValue({product: mockProduct, isFetching: false})
+
+        expect(() => {
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProduct}
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    promotionId="test-promo"
+                />
+            )
+        }).not.toThrow()
+    })
+
+    test('filtering logic processes complex variant scenarios', () => {
+        // Complex scenario test: Mixed base and variant IDs
+        const mockBasket = {
+            bonusDiscountLineItems: [
+                {
+                    promotionId: 'test-promo',
+                    bonusProducts: [
+                        {productId: '793775370033'}, // Base product
+                        {productId: '793775370033M'}, // Variant
+                        {productId: '793775370033R'} // Another variant
+                    ]
+                }
+            ]
+        }
+
+        const mockProduct = {
+            id: '793775370033',
+            variants: [
+                {productId: '793775370033M', variationValues: {color: 'turquoise'}},
+                {productId: '793775370033R', variationValues: {color: 'red'}},
+                {productId: '793775370033B', variationValues: {color: 'blue'}}
+            ],
+            variationAttributes: [{id: 'color', values: []}]
+        }
+
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+        useProductViewModal.mockReturnValue({product: mockProduct, isFetching: false})
+
+        // Should handle complex filtering without errors
+        expect(() => {
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProduct}
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    promotionId="test-promo"
+                />
+            )
+        }).not.toThrow()
+    })
+})
