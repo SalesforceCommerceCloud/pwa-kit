@@ -14,7 +14,8 @@ import {
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
-    InstallAgentRulesTool
+    InstallAgentRulesTool,
+    CustomApiTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
@@ -111,6 +112,12 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            CustomApiTool.name,
+            CustomApiTool.description,
+            CustomApiTool.inputSchema,
+            CustomApiTool.fn
         )
     }
 
