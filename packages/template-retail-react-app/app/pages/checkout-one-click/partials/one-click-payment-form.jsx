@@ -87,12 +87,10 @@ const PaymentForm = ({
                                 py={3}
                                 px={[4, 4, 6]}
                                 bg="gray.50"
-                                // borderTop="1px solid"
                                 borderBottom="1px solid"
                                 borderColor="gray.100"
                             >
                                 <Radio value="cc">
-                                    {/* <Flex justify="flex-start"> */}
                                     <Flex justify="space-between">
                                         <Stack direction="row" align="center">
                                             <Text fontWeight="bold">

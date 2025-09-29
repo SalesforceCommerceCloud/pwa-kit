@@ -282,6 +282,27 @@ const Payment = ({
         }
     })
 
+    const handleEditPayment = async () => {
+        if (appliedPayment) {
+            // Pre-select the applied saved payment in the radio list if present
+            const savedId = appliedPayment?.customerPaymentInstrumentId
+            if (savedId) {
+                onSelectedPaymentMethodChange(savedId)
+            } else if (customer?.paymentInstruments?.length > 0) {
+                // Default to first saved method if any; otherwise leave current selection
+                onSelectedPaymentMethodChange(customer.paymentInstruments[0].paymentInstrumentId)
+            }
+            try {
+                await onPaymentRemoval()
+                // Ensure basket reflects removal before rendering form
+                await currentBasketQuery.refetch()
+            } catch (_e) {
+                // Ignore, user can still attempt to change method
+            }
+        }
+        goToStep(STEPS.PAYMENT)
+    }
+
     const billingAddressAriaLabel = defineMessage({
         defaultMessage: 'Billing Address Form',
         id: 'checkout_payment.label.billing_address_form'
@@ -302,28 +323,7 @@ const Payment = ({
                     billingAddressForm.formState.isSubmitting
                 }
                 disabled={appliedPayment == null}
-                onEdit={async () => {
-                    if (appliedPayment) {
-                        // Pre-select the applied saved payment in the radio list if present
-                        const savedId = appliedPayment?.customerPaymentInstrumentId
-                        if (savedId) {
-                            onSelectedPaymentMethodChange(savedId)
-                        } else if (customer?.paymentInstruments?.length > 0) {
-                            // Default to first saved method if any; otherwise leave current selection
-                            onSelectedPaymentMethodChange(
-                                customer.paymentInstruments[0].paymentInstrumentId
-                            )
-                        }
-                        try {
-                            await onPaymentRemoval()
-                            // Ensure basket reflects removal before rendering form
-                            await currentBasketQuery.refetch()
-                        } catch (_e) {
-                            // Ignore, user can still attempt to change method
-                        }
-                    }
-                    goToStep(STEPS.PAYMENT)
-                }}
+                onEdit={handleEditPayment}
                 editLabel={formatMessage({
                     defaultMessage: 'Edit Payment Info',
                     id: 'toggle_card.action.editPaymentInfo'
