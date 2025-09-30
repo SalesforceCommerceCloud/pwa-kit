@@ -69,7 +69,7 @@ const Payment = ({
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
         appliedPayment?.customerPaymentInstrumentId || 'cc'
     )
-    const [forceEditing, setForceEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -285,6 +285,7 @@ const Payment = ({
             setSelectedPaymentMethod('cc')
         } catch (e) {
             showError()
+            throw e
         }
     }
 
@@ -299,7 +300,7 @@ const Payment = ({
         } catch (error) {
             showError()
         } finally {
-            setForceEditing(false)
+            setIsEditing(false)
         }
     })
 
@@ -318,10 +319,18 @@ const Payment = ({
                 // Ensure basket reflects removal before rendering form
                 await currentBasketQuery.refetch()
             } catch (_e) {
-                // Ignore, user can still attempt to change method
+                // Removal failed: inform user and do NOT enter edit mode
+                showError(
+                    formatMessage({
+                        defaultMessage:
+                            'Could not remove the applied payment. Please try again or use the current payment to place your order.',
+                        id: 'checkout_payment.error.cannot_remove_applied_payment'
+                    })
+                )
+                return
             }
         }
-        setForceEditing(true)
+        setIsEditing(true)
         goToStep(STEPS.PAYMENT)
     }
 
@@ -339,7 +348,7 @@ const Payment = ({
                     defaultMessage: 'Payment',
                     id: 'checkout_payment.title.payment'
                 })}
-                editing={forceEditing || step === STEPS.PAYMENT}
+                editing={isEditing || step === STEPS.PAYMENT}
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
                     billingAddressForm.formState.isSubmitting ||
