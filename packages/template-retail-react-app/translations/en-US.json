@@ -415,6 +415,9 @@
   "checkout_payment.button.review_order": {
     "defaultMessage": "Review Order"
   },
+  "checkout_payment.error.cannot_remove_applied_payment": {
+    "defaultMessage": "Could not remove the applied payment. Please try again or use the current payment to place your order."
+  },
   "checkout_payment.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
