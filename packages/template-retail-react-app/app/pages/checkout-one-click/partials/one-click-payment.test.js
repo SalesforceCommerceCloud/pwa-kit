@@ -6,7 +6,7 @@
  */
 /* eslint-disable react/prop-types */
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -14,6 +14,8 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
+import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
+import {IntlProvider} from 'react-intl'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
@@ -159,29 +161,35 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
 
 // Mock ToggleCard components
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
-    const ToggleCard = ({children, title, editing, onEdit, editLabel, ...props}) => (
-        <div {...props}>
-            <div data-testid="toggle-card-title">{title}</div>
-            {editing && (
-                <div data-testid="toggle-card-edit">
-                    {children}
-                    <button type="submit">Review Order</button>
-                </div>
-            )}
-            {!editing && (
-                <div data-testid="toggle-card-summary">
-                    <button onClick={onEdit}>{editLabel}</button>
-                    {children}
-                </div>
-            )}
-        </div>
-    )
+    const ToggleCardEdit = ({children}) => children
+    const ToggleCardSummary = ({children}) => children
 
-    const ToggleCardEdit = ({children}) => <div data-testid="toggle-card-edit">{children}</div>
-
-    const ToggleCardSummary = ({children}) => (
-        <div data-testid="toggle-card-summary">{children}</div>
-    )
+    const ToggleCard = ({children, title, editing, onEdit, editLabel, ...props}) => {
+        const toArray = (c) => (Array.isArray(c) ? c : [c])
+        const arr = toArray(children).filter(Boolean)
+        const editEl = arr.find((c) => c && c.type === ToggleCardEdit)
+        const summaryEl = arr.find((c) => c && c.type === ToggleCardSummary)
+        const editContent = editEl ? editEl.props.children : null
+        const summaryContent = summaryEl ? summaryEl.props.children : null
+        return (
+            <div {...props}>
+                <div data-testid="toggle-card-title">{title}</div>
+                {editing ? (
+                    <div data-testid="toggle-card-edit">
+                        {editContent}
+                        <button type="submit">Review Order</button>
+                    </div>
+                ) : (
+                    <div data-testid="toggle-card-summary">
+                        <button onClick={onEdit} aria-label={editLabel}>
+                            {editLabel}
+                        </button>
+                        {summaryContent}
+                    </div>
+                )}
+            </div>
+        )
+    }
 
     return {
         ToggleCard,
@@ -229,6 +237,8 @@ const mockCustomer = {
     paymentInstruments: mockPaymentInstruments
 }
 
+const mockToastFn = jest.fn()
+
 const TestWrapper = ({
     basketData = mockBasket,
     customerData = mockCustomer,
@@ -237,19 +247,21 @@ const TestWrapper = ({
     setEnableUserRegistration = jest.fn(),
     onPaymentMethodSaved = jest.fn(),
     onSavePreferenceChange = jest.fn(),
-    registeredUserChoseGuest = false
+    registeredUserChoseGuest = false,
+    removePaymentShouldFail = false,
+    initialStep = 4
 }) => {
     // Mock hooks
     useCurrentCustomer.mockReturnValue({data: customerData})
-    useCurrentBasket.mockReturnValue({data: basketData})
+    useCurrentBasket.mockReturnValue({data: basketData, refetch: jest.fn().mockResolvedValue({})})
     useCustomerType.mockReturnValue({
         isRegistered,
         isGuest: !isRegistered
     })
-    useToast.mockReturnValue(jest.fn())
+    useToast.mockReturnValue(mockToastFn)
 
     const mockCheckout = {
-        step: 4,
+        step: initialStep,
         STEPS: {
             CONTACT_INFO: 0,
             PICKUP_ADDRESS: 1,
@@ -266,7 +278,9 @@ const TestWrapper = ({
     // Mock mutations
     const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
     const mockUpdateBillingAddress = jest.fn().mockResolvedValue({})
-    const mockRemovePaymentInstrument = jest.fn().mockResolvedValue({})
+    const mockRemovePaymentInstrument = removePaymentShouldFail
+        ? jest.fn().mockRejectedValue(new Error('remove failed'))
+        : jest.fn().mockResolvedValue({})
 
     useShopperBasketsMutation.mockImplementation((mutationType) => {
         switch (mutationType) {
@@ -324,15 +338,19 @@ const TestWrapper = ({
     }
 
     return (
-        <Payment
-            paymentMethodForm={mockPaymentMethodForm}
-            billingAddressForm={mockBillingAddressForm}
-            enableUserRegistration={enableUserRegistration}
-            setEnableUserRegistration={setEnableUserRegistration}
-            registeredUserChoseGuest={registeredUserChoseGuest}
-            onPaymentMethodSaved={onPaymentMethodSaved}
-            onSavePreferenceChange={onSavePreferenceChange}
-        />
+        <IntlProvider locale="en-GB">
+            <CurrencyProvider>
+                <Payment
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                    enableUserRegistration={enableUserRegistration}
+                    setEnableUserRegistration={setEnableUserRegistration}
+                    registeredUserChoseGuest={registeredUserChoseGuest}
+                    onPaymentMethodSaved={onPaymentMethodSaved}
+                    onSavePreferenceChange={onSavePreferenceChange}
+                />
+            </CurrencyProvider>
+        </IntlProvider>
     )
 }
 
@@ -368,10 +386,12 @@ describe('Payment Component', () => {
                 paymentInstruments: [mockPaymentInstruments[0]]
             }
 
-            render(<TestWrapper basketData={basketWithPayment} />)
+            render(<TestWrapper basketData={basketWithPayment} initialStep={5} />)
 
-            expect(screen.getAllByText('Visa')).toHaveLength(2) // Shows in both edit and summary sections
-            expect(screen.getAllByText('•••• 1234')).toHaveLength(2) // Shows in both edit and summary sections
+            const summary = screen.getAllByTestId('toggle-card-summary').pop()
+            // Check summary section for applied payment details
+            expect(within(summary).getByText('Visa')).toBeInTheDocument()
+            expect(within(summary).getByText('•••• 1234')).toBeInTheDocument()
         })
 
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
@@ -517,6 +537,44 @@ describe('Payment Component', () => {
             await waitFor(() => {
                 expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
             })
+        })
+    })
+
+    describe('Error Handling', () => {
+        test('shows error and does not enter edit mode if removing applied payment fails', async () => {
+            const user = userEvent.setup()
+
+            // Mock customer as registered with a payment instrument
+            useCustomerType.mockReturnValue({isGuest: false, isRegistered: true})
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            // Make removal fail for this test
+            // Render starting at REVIEW_ORDER so summary is visible and edit is available
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    removePaymentShouldFail={true}
+                    initialStep={5}
+                />
+            )
+
+            // Click Edit Payment Info
+            const summary = screen.getAllByTestId('toggle-card-summary').pop()
+            const editButton = within(summary).getByRole('button', {
+                name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
+            })
+            await user.click(editButton)
+
+            // Assert error toast shown
+            await waitFor(() => expect(mockToastFn).toHaveBeenCalled())
+
+            // Should remain in summary (not enter edit mode)
+            // Because we render starting at REVIEW_ORDER, summary should persist
+            // and edit region should not be present.
+            expect(screen.queryByTestId('toggle-card-edit')).not.toBeInTheDocument()
         })
     })
 

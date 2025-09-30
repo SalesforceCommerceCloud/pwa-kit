@@ -2195,6 +2195,20 @@
       "value": "]"
     }
   ],
+  "checkout_payment.error.cannot_remove_applied_payment": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿŭŭŀḓ ƞǿǿŧ řḗḗḿǿǿṽḗḗ ŧħḗḗ ȧȧƥƥŀīḗḗḓ ƥȧȧẏḿḗḗƞŧ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř ŭŭşḗḗ ŧħḗḗ ƈŭŭřřḗḗƞŧ ƥȧȧẏḿḗḗƞŧ ŧǿǿ ƥŀȧȧƈḗḗ ẏǿǿŭŭř ǿǿřḓḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_payment.heading.billing_address": [
     {
       "type": 0,

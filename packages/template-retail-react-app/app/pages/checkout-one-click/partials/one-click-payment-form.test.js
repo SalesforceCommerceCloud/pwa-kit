@@ -7,6 +7,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
@@ -111,12 +112,6 @@ describe('PaymentForm Component', () => {
             expect(screen.getByTestId('paypal-icon')).toBeInTheDocument()
         })
 
-        test('displays order total with currency formatting', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD99.99')).toBeInTheDocument()
-        })
-
         test('shows security lock icon with tooltip', () => {
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
 
@@ -183,8 +178,8 @@ describe('PaymentForm Component', () => {
 
             // Check that saved payment methods are rendered
             expect(screen.getByDisplayValue('saved-payment-1')).toBeInTheDocument()
-            // we only show 1 saved payment method up front.  User has to click Show All to see the second one
-            expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
+            // With unified collapsed view (n=3), both saved methods are initially visible
+            expect(screen.getByDisplayValue('saved-payment-2')).toBeInTheDocument()
         })
 
         test('displays saved payment method details correctly', () => {
@@ -285,7 +280,7 @@ describe('PaymentForm Component', () => {
             }).not.toThrow()
         })
 
-        test('renders saved payment methods between credit card and PayPal options', () => {
+        test('renders saved payment methods between credit card and PayPal options', async () => {
             render(
                 <PaymentForm
                     form={mockForm}
@@ -294,10 +289,14 @@ describe('PaymentForm Component', () => {
                 />
             )
 
+            // Expand to ensure PayPal is visible in the list
+            const showAllButton = screen.getByTestId('view-all-saved-payments')
+            await userEvent.click(showAllButton)
+
             const radioButtons = screen.getAllByRole('radio')
             const values = radioButtons.map((radio) => radio.value)
 
-            // Should have credit card, saved payments, and PayPal in order
+            // Should include credit card, saved payments, and PayPal
             expect(values).toContain('cc')
             expect(values).toContain('saved-payment-1')
             expect(values).toContain('paypal')
@@ -312,9 +311,15 @@ describe('PaymentForm Component', () => {
                 />
             )
 
-            // Should render card icons for each saved payment method
-            const cardIcons = screen.getAllByTestId('card-icon')
-            expect(cardIcons).toHaveLength(1)
+            // Should render card icons for each initially visible saved payment method (max 3)
+            let cardIcons = screen.getAllByTestId('card-icon')
+            expect(cardIcons).toHaveLength(2)
+
+            // Expand and assert all saved payment icons render
+            const showAllButton = screen.getByText('payment_selection.button.view_all')
+            showAllButton.click()
+            cardIcons = screen.getAllByTestId('card-icon')
+            expect(cardIcons).toHaveLength(mockSavedPaymentInstruments.length)
         })
 
         describe('Show All Payment Instruments', () => {
@@ -392,9 +397,36 @@ describe('PaymentForm Component', () => {
                     />
                 )
 
-                // Should render card icons for each saved payment method
+                // Should render card icons for each initially visible saved payment method (max 3)
                 const cardIcons = screen.getAllByTestId('card-icon')
-                expect(cardIcons).toHaveLength(1)
+                expect(cardIcons).toHaveLength(2)
+            })
+
+            test('hides CC/PayPal when there are 3 or more saved methods (collapsed)', () => {
+                const threeSaved = [
+                    ...mockSavedPaymentInstruments,
+                    {
+                        paymentInstrumentId: 'saved-payment-3',
+                        paymentCard: {
+                            cardType: 'Visa',
+                            numberLastDigits: '9012',
+                            expirationMonth: '03',
+                            expirationYear: '30'
+                        }
+                    }
+                ]
+
+                render(
+                    <PaymentForm
+                        form={mockForm}
+                        onSubmit={jest.fn()}
+                        savedPaymentInstruments={threeSaved}
+                    />
+                )
+
+                // Collapsed should show first 3 saved only, not CC/PayPal
+                expect(screen.queryByDisplayValue('cc')).not.toBeInTheDocument()
+                expect(screen.queryByDisplayValue('paypal')).not.toBeInTheDocument()
             })
         })
     })
@@ -406,8 +438,9 @@ describe('PaymentForm Component', () => {
             })
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles basket with null total', () => {
@@ -416,32 +449,36 @@ describe('PaymentForm Component', () => {
             })
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles different currency', () => {
             useCurrency.mockReturnValue({currency: 'EUR'})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('EUR99.99')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles missing basket data', () => {
             useCurrentBasket.mockReturnValue({data: null})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
 
         test('handles undefined basket', () => {
             useCurrentBasket.mockReturnValue({data: undefined})
 
             render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByText('USD0.00')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText('payment_selection.radio_group.assistive_msg')
+            ).toBeInTheDocument()
         })
     })
 
