@@ -10,34 +10,9 @@
       "snippet": "// Imports: {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'\nconst logout = useAuthHelper(AuthHelpers.Logout)\n\nconst handleSignOut = async () => {\n    await logout.mutateAsync()\n    // optionally navigate('/login')\n}"
     },
     {
-      "name": "useCustomerId",
-      "summary": "Hook that returns the customer ID.",
-      "snippet": "// Imports: {useCustomerId} from '@salesforce/commerce-sdk-react'\nconst customerId = useCustomerId()\n// use customerId in subsequent hooks or API calls"
-    },
-    {
-      "name": "useCustomerType",
-      "summary": "A hook to return customer auth type.",
-      "snippet": "// Imports: {useCustomerType} from '@salesforce/commerce-sdk-react'\nconst {isRegistered} = useCustomerType()\n// conditionally render UI based on registration"
-    },
-    {
-      "name": "useDNT",
-      "summary": "if the consent tracking form should be rendered",
-      "snippet": "// Imports: {useDNT} from '@salesforce/commerce-sdk-react'\nconst {selectedDnt, updateDNT} = useDNT()\n\n// Update preference\nconst setDoNotTrack = (value) => updateDNT(value)"
-    },
-    {
       "name": "useLocalStorage",
       "summary": "Hook for local storage.",
       "snippet": "// Imports: {useState, useEffect} from 'react'\n// Persist a value in localStorage without relying on a custom hook\nconst [value, setValue] = useState(() => {\n    if (typeof window === 'undefined') return null\n    try {\n        const stored = window.localStorage.getItem('my-key')\n        return stored ? JSON.parse(stored) : null\n    } catch {\n        return null\n    }\n})\n\nuseEffect(() => {\n    if (typeof window === 'undefined') return\n    try {\n        window.localStorage.setItem('my-key', JSON.stringify(value))\n    } catch {\n        // ignore write errors\n    }\n}, [value])"
-    },
-    {
-      "name": "useQuery",
-      "summary": "Hook for query.",
-      "snippet": "// Imports: {useQuery} from 'react-query'\nconst {data, isLoading, isError, error} = useQuery({\n    queryKey: ['example', 'data'],\n    queryFn: () => fetch('/api/example').then((r) => r.json())\n})"
-    },
-    {
-      "name": "useUsid",
-      "summary": "Hook that returns the usid associated with the current access token.",
-      "snippet": "// Imports: {useUsid} from '@salesforce/commerce-sdk-react'\nconst {usid} = useUsid()\n// use usid in downstream hooks (e.g., shopper context)"
     },
     {
       "name": "useShippingMethodsForShipment",
