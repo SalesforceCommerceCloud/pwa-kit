@@ -7,6 +7,7 @@
 import createNewPageTool from './create-new-page-tool.js'
 import fs from 'fs/promises'
 import * as utils from '../utils/utils.js'
+import * as hooksTool from './hooks-recommendation-tool.js'
 
 describe('CreateNewPageTool', () => {
     const originalEnv = process.env
@@ -31,7 +32,7 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({})
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain(
-            'Please ask the user for the following information one at a time'
+            'Please answer the following questions one at a time:'
         )
     })
 
@@ -46,6 +47,7 @@ describe('CreateNewPageTool', () => {
             pageName: 'Test',
             componentList: ['Foo'],
             route: '/test',
+            useCase: 'test',
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('assistant')
@@ -59,6 +61,7 @@ describe('CreateNewPageTool', () => {
             pageName: 'Test',
             componentList: ['Foo'],
             route: '/test',
+            useCase: 'test',
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('developer')
@@ -87,6 +90,7 @@ describe('CreateNewPageTool', () => {
             pageName: 'Test',
             componentList: ['MissingComponent'],
             route: '/test',
+            useCase: 'test',
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('assistant')
@@ -104,6 +108,7 @@ describe('CreateNewPageTool', () => {
             pageName: 'Test',
             componentList: ['ProductView'],
             route: '/test',
+            useCase: 'test',
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('assistant')
@@ -217,6 +222,7 @@ describe('CreateNewPageTool', () => {
             pageName: 'Test',
             componentList: ['ImageSpliter'],
             route: '/test',
+            useCase: 'testing missing component',
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('assistant')
@@ -366,5 +372,121 @@ describe('updateRoutes route insertion', () => {
         expect(newRouteIndex).toBeGreaterThan(-1)
         expect(existingRouteIndex).toBeGreaterThan(-1)
         expect(newRouteIndex).toBeLessThan(existingRouteIndex)
+    })
+})
+
+describe('CreateNewPageTool - Hooks Recommendation', () => {
+    const mockAbsolutePaths = {
+        nodeModulesPath: '/mock/node_modules',
+        componentsPath: '/mock/app/components',
+        pagesPath: '/mock/app/pages',
+        routesPath: '/mock/app/routes.jsx',
+        hasOverridesDir: false
+    }
+    const mockCatalog = [
+        {
+            name: 'useProduct',
+            summary: 'Fetches a single product.',
+            snippet: "import {useProduct} from '@salesforce/commerce-sdk-react'\nconst {data: product} = useProduct({parameters: {id: '123'}})"
+        },
+        {
+            name: 'useCategory',
+            summary: 'Fetches a category.',
+            snippet: "import {useCategory} from '@salesforce/commerce-sdk-react'\nconst {data: category} = useCategory({parameters: {id: 'cat'}})"
+        },
+        {
+            name: 'useCurrency',
+            summary: 'Gets the current currency.',
+            snippet: "import {useCurrency} from '@salesforce/commerce-sdk-react'\nconst {currency} = useCurrency()"
+        }
+    ]
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+    it('includes hooks recommendation in the response when useCase is provided', async () => {
+        jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
+        jest.spyOn(fs, 'mkdir').mockResolvedValue()
+        jest.spyOn(fs, 'writeFile').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(hooksTool, 'recommendHooksForUseCase').mockResolvedValue({
+            recommendations: `Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.\n\nUse case: \"product list\"\n\nHook Catalog:\n${JSON.stringify(mockCatalog, null, 2)}`
+        })
+        const result = await createNewPageTool.handler({
+            pageName: 'Test',
+            componentList: ['Foo'],
+            route: '/test',
+            useCase: 'product list',
+            ...mockAbsolutePaths
+        })
+        expect(result.role).toBe('assistant')
+        expect(result.content[0].text).toMatch(/recommend the top 3 most relevant hooks/i)
+        expect(result.content[0].text).toMatch(/Hook Catalog:/i)
+        expect(result.content[0].text).toMatch(/product list/i)
+    })
+    it('includes an error message if the catalog cannot be read', async () => {
+        jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
+        jest.spyOn(fs, 'mkdir').mockResolvedValue()
+        jest.spyOn(fs, 'writeFile').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(hooksTool, 'recommendHooksForUseCase').mockResolvedValue({
+            error: 'Failed to read hook catalog: File not found'
+        })
+        const result = await createNewPageTool.handler({
+            pageName: 'Test',
+            componentList: ['Foo'],
+            route: '/test',
+            useCase: 'product list',
+            ...mockAbsolutePaths
+        })
+        expect(result.content[0].text).toMatch(/Unable to get hook recommendations/i)
+        expect(result.content[0].text).toMatch(/Failed to read hook catalog/i)
+    })
+    it('does not include hooks recommendation if useCase is missing', async () => {
+        jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
+        jest.spyOn(fs, 'mkdir').mockResolvedValue()
+        jest.spyOn(fs, 'writeFile').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
+        const result = await createNewPageTool.handler({
+            pageName: 'Test',
+            componentList: ['Foo'],
+            route: '/test',
+            ...mockAbsolutePaths
+        })
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toMatch(/What is the main use case or purpose for this page/i)
+    })
+    it('includes hook names, summaries, and code snippets after page creation', async () => {
+        jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
+        jest.spyOn(fs, 'mkdir').mockResolvedValue()
+        jest.spyOn(fs, 'writeFile').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(hooksTool, 'recommendHooksForUseCase').mockResolvedValue({
+            recommendations: [
+                '**useProduct**\nFetches a single product.\n\n```js\nimport {useProduct} from \'@salesforce/commerce-sdk-react\'\nconst {data: product} = useProduct({parameters: {id: \'123\'}})\n```',
+                '**useCategory**\nFetches a category.\n\n```js\nimport {useCategory} from \'@salesforce/commerce-sdk-react\'\nconst {data: category} = useCategory({parameters: {id: \'cat\'}})\n```',
+                '**useCurrency**\nGets the current currency.\n\n```js\nimport {useCurrency} from \'@salesforce/commerce-sdk-react\'\nconst {currency} = useCurrency()\n```'
+            ].join('\n')
+        })
+        const result = await createNewPageTool.handler({
+            pageName: 'Test',
+            componentList: ['Foo'],
+            route: '/test',
+            useCase: 'product list',
+            ...mockAbsolutePaths
+        })
+        expect(result.role).toBe('assistant')
+        expect(result.content[0].text).toContain('**useProduct**')
+        expect(result.content[0].text).toContain('Fetches a single product.')
+        expect(result.content[0].text).toContain('import {useProduct}')
+        expect(result.content[0].text).toContain('**useCategory**')
+        expect(result.content[0].text).toContain('Fetches a category.')
+        expect(result.content[0].text).toContain('import {useCategory}')
+        expect(result.content[0].text).toContain('**useCurrency**')
+        expect(result.content[0].text).toContain('Gets the current currency.')
+        expect(result.content[0].text).toContain('import {useCurrency}')
     })
 })
