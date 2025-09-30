@@ -325,3 +325,99 @@ describe('logMCPMessage', () => {
         expect(exists).toBe(false)
     })
 })
+
+describe('detectWorkspacePaths', () => {
+    const originalEnv = process.env.PWA_STOREFRONT_APP_PATH
+    const tempDir = path.join(__dirname, 'temp-test-app')
+
+    beforeEach(async () => {
+        // clean up any existing temp dir
+        try {
+            await fs.promises.rm(tempDir, {recursive: true, force: true})
+        } catch (e) {
+            // dir doesn't exist
+        }
+    })
+
+    afterEach(async () => {
+        if (originalEnv) {
+            process.env.PWA_STOREFRONT_APP_PATH = originalEnv
+        } else {
+            delete process.env.PWA_STOREFRONT_APP_PATH
+        }
+
+        // clean up temp dir
+        try {
+            await fs.promises.rm(tempDir, {recursive: true, force: true})
+        } catch (e) {
+            // directory doesn't exist
+        }
+    })
+
+    it('should throw error when PWA_STOREFRONT_APP_PATH is not set', async () => {
+        delete process.env.PWA_STOREFRONT_APP_PATH
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            'PWA_STOREFRONT_APP_PATH environment variable is not set. Please check your MCP configuration.'
+        )
+    })
+
+    it('should throw error when PWA_STOREFRONT_APP_PATH does not exist', async () => {
+        process.env.PWA_STOREFRONT_APP_PATH = '/nonexistent/path/app'
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            'PWA_STOREFRONT_APP_PATH does not exist: /nonexistent/path/app'
+        )
+    })
+
+    it('should throw error when pages directory is missing', async () => {
+        // create temp app structure without pages dir
+        await fs.promises.mkdir(tempDir, {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
+        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
+        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
+
+        process.env.PWA_STOREFRONT_APP_PATH = tempDir
+        const utils = await import('./utils')
+
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            `Pages directory not found at: ${path.join(tempDir, 'pages')}`
+        )
+    })
+
+    it('should return correct paths when all directories exist', async () => {
+        // create complete temp app structure
+        await fs.promises.mkdir(tempDir, {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
+        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
+        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
+
+        process.env.PWA_STOREFRONT_APP_PATH = tempDir
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+
+        expect(result).toEqual({
+            pagesPath: path.join(tempDir, 'pages'),
+            componentsPath: path.join(tempDir, 'components'),
+            routesPath: path.join(tempDir, 'routes.jsx'),
+            nodeModulesPath: path.join(tempDir, '..', 'node_modules'),
+            hasOverridesDir: fs.existsSync(path.join(tempDir, '..', 'overrides'))
+        })
+    })
+
+    it('should detect hasOverridesDir when overrides directory exists', async () => {
+        // create complete temp app structure with overrides
+        await fs.promises.mkdir(tempDir, {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
+        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
+        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
+        await fs.promises.mkdir(path.join(tempDir, '..', 'overrides'), {recursive: true})
+
+        process.env.PWA_STOREFRONT_APP_PATH = tempDir
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+        expect(result.hasOverridesDir).toBe(true)
+    })
+})
