@@ -387,17 +387,20 @@ describe('CreateNewPageTool - Hooks Recommendation', () => {
         {
             name: 'useProduct',
             summary: 'Fetches a single product.',
-            snippet: "import {useProduct} from '@salesforce/commerce-sdk-react'\nconst {data: product} = useProduct({parameters: {id: '123'}})"
+            snippet:
+                "import {useProduct} from '@salesforce/commerce-sdk-react'\nconst {data: product} = useProduct({parameters: {id: '123'}})"
         },
         {
             name: 'useCategory',
             summary: 'Fetches a category.',
-            snippet: "import {useCategory} from '@salesforce/commerce-sdk-react'\nconst {data: category} = useCategory({parameters: {id: 'cat'}})"
+            snippet:
+                "import {useCategory} from '@salesforce/commerce-sdk-react'\nconst {data: category} = useCategory({parameters: {id: 'cat'}})"
         },
         {
             name: 'useCurrency',
             summary: 'Gets the current currency.',
-            snippet: "import {useCurrency} from '@salesforce/commerce-sdk-react'\nconst {currency} = useCurrency()"
+            snippet:
+                "import {useCurrency} from '@salesforce/commerce-sdk-react'\nconst {currency} = useCurrency()"
         }
     ]
     afterEach(() => {
@@ -410,7 +413,11 @@ describe('CreateNewPageTool - Hooks Recommendation', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(hooksTool, 'recommendHooksForUseCase').mockResolvedValue({
-            recommendations: `Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.\n\nUse case: \"product list\"\n\nHook Catalog:\n${JSON.stringify(mockCatalog, null, 2)}`
+            recommendations: `Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.\n\nUse case: "product list"\n\nHook Catalog:\n${JSON.stringify(
+                mockCatalog,
+                null,
+                2
+            )}`
         })
         const result = await createNewPageTool.handler({
             pageName: 'Test',
@@ -456,7 +463,9 @@ describe('CreateNewPageTool - Hooks Recommendation', () => {
             ...mockAbsolutePaths
         })
         expect(result.role).toBe('system')
-        expect(result.content[0].text).toMatch(/What is the main use case or purpose for this page/i)
+        expect(result.content[0].text).toMatch(
+            /What is the main use case or purpose for this page/i
+        )
     })
     it('includes hook names, summaries, and code snippets after page creation', async () => {
         jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
@@ -466,9 +475,9 @@ describe('CreateNewPageTool - Hooks Recommendation', () => {
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(hooksTool, 'recommendHooksForUseCase').mockResolvedValue({
             recommendations: [
-                '**useProduct**\nFetches a single product.\n\n```js\nimport {useProduct} from \'@salesforce/commerce-sdk-react\'\nconst {data: product} = useProduct({parameters: {id: \'123\'}})\n```',
-                '**useCategory**\nFetches a category.\n\n```js\nimport {useCategory} from \'@salesforce/commerce-sdk-react\'\nconst {data: category} = useCategory({parameters: {id: \'cat\'}})\n```',
-                '**useCurrency**\nGets the current currency.\n\n```js\nimport {useCurrency} from \'@salesforce/commerce-sdk-react\'\nconst {currency} = useCurrency()\n```'
+                "**useProduct**\nFetches a single product.\n\n```js\nimport {useProduct} from '@salesforce/commerce-sdk-react'\nconst {data: product} = useProduct({parameters: {id: '123'}})\n```",
+                "**useCategory**\nFetches a category.\n\n```js\nimport {useCategory} from '@salesforce/commerce-sdk-react'\nconst {data: category} = useCategory({parameters: {id: 'cat'}})\n```",
+                "**useCurrency**\nGets the current currency.\n\n```js\nimport {useCurrency} from '@salesforce/commerce-sdk-react'\nconst {currency} = useCurrency()\n```"
             ].join('\n')
         })
         const result = await createNewPageTool.handler({
