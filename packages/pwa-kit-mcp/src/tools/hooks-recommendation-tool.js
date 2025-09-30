@@ -17,7 +17,7 @@ import path from 'path'
 export async function recommendHooksForUseCase(useCase, catalogPath) {
     try {
         const resolvedCatalogPath =
-            catalogPath || path.resolve(__dirname, '../utils/hook-catalog.json')
+            catalogPath || path.resolve(__dirname, '../data/hook-catalog.json')
         const catalogRaw = await fs.readFile(resolvedCatalogPath, 'utf8')
         const catalog = JSON.parse(catalogRaw)
         const recommendations = `
