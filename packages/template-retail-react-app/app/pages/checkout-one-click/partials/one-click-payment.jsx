@@ -72,8 +72,9 @@ const Payment = ({
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-        appliedPayment?.paymentMethodId || 'cc'
+        appliedPayment?.customerPaymentInstrumentId || 'cc'
     )
+    const [isEditing, setIsEditing] = useState(false)
 
     const activeBasketIdRef = useRef(null)
 
