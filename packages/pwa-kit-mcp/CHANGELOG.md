@@ -1,3 +1,6 @@
+## v0.4.0-dev (Sep 30, 2025)
+- Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359)
+
 ## v0.4.0-dev (Sep 26, 2025)
 
 ## v0.3.0 (Sep 25, 2025)
