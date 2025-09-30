@@ -8,10 +8,11 @@ import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase} from '../utils'
+import {recommendHooksForUseCase} from './hooks-recommendation-tool.js'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
-Please ask the user for the following, one at a time:
+Please answer the following, one at a time:
 1. What is the name of the new component?
 2. What is the main purpose of this component? Please reply with exactly one of the following options:
    - Display a single Product
@@ -20,6 +21,7 @@ Please ask the user for the following, one at a time:
 **Do not** assume answers. Collect all answers before proceeding.
 Once the answers are provided, execute the createComponent tool with the collected information as input parameters.
 `
+const systemPromptForUseCase = `What is the main use case or purpose for this component? (Describe briefly what the component should do)`
 
 const systemPromptForCustomComponent = `
 You have chosen a custom purpose for your component.
@@ -58,7 +60,11 @@ class CreateNewComponentTool {
             location: z
                 .string()
                 .describe('The location of the component to create')
-                .default(process.env.PWA_STOREFRONT_APP_PATH)
+                .default(process.env.PWA_STOREFRONT_APP_PATH),
+            useCase: z
+                .string()
+                .optional()
+                .describe('The main use case or purpose for this component')
         }
         this.handler = async (args) => {
             if (!args || !args.componentName || !args.purpose || !args.location) {
@@ -67,17 +73,31 @@ class CreateNewComponentTool {
                     content: [{type: 'text', text: systemPrompt}]
                 }
             }
+            if (!args.useCase) {
+                return {
+                    role: 'system',
+                    content: [{type: 'text', text: systemPromptForUseCase}]
+                }
+            }
             const normalizedPurpose = args.purpose.trim().toLowerCase()
             const isSingleProduct = normalizedPurpose === 'display a single product'
             const isProductList = normalizedPurpose === 'display a list of products'
 
             if (isSingleProduct) {
-                // Proceed with standard component creation
-                return this.createComponent(args.componentName, args.location, 'singleProduct')
+                return this.createComponent(
+                    args.componentName,
+                    args.location,
+                    'singleProduct',
+                    args.useCase
+                )
             } else if (isProductList) {
-                return this.createComponent(args.componentName, args.location, 'productList')
+                return this.createComponent(
+                    args.componentName,
+                    args.location,
+                    'productList',
+                    args.useCase
+                )
             } else {
-                // Custom purpose: let Cursor take over and ask clarifying questions
                 return {
                     role: 'system',
                     content: [{type: 'text', text: systemPromptForCustomComponent}]
@@ -86,12 +106,23 @@ class CreateNewComponentTool {
         }
     }
 
-    async createComponent(componentName, location, entityType) {
+    async createComponent(componentName, location, entityType, useCase) {
         try {
             const result = await this.generateComponentFiles(componentName, location, entityType)
+            let messages = [result]
+            // --- Hook Recommendation ---
+            if (useCase) {
+                const hooksResult = await recommendHooksForUseCase(useCase)
+                if (hooksResult && hooksResult.recommendations) {
+                    messages.push(hooksResult.recommendations)
+                } else if (hooksResult && hooksResult.error) {
+                    messages.push(`\nUnable to get hook recommendations: ${hooksResult.error}`)
+                }
+            }
+            // --- End Hook Recommendation ---
             return {
                 role: 'system',
-                content: [{type: 'text', text: result}]
+                content: [{type: 'text', text: messages.join('\n')}]
             }
         } catch (error) {
             return {

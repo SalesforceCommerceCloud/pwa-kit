@@ -6,7 +6,7 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
-import hooksRecommendationTool from './hooks-recommendation-tool.js'
+import {recommendHooksForUseCase} from './hooks-recommendation-tool.js'
 import {
     toKebabCase,
     toPascalCase,
@@ -18,7 +18,7 @@ import {
 } from '../utils/index.js'
 import {z} from 'zod'
 
-const systemPromptForCreatePage = `Please ask the user for the following information one at a time:
+const systemPromptForCreatePage = `Please answer the following questions one at a time:
 - What is the name of the new page to create?
 - List the components to include on the page, separated by commas. Component names should be in PascalCase (e.g., Image, ProductView)
 - What is the URL route for this page? (e.g., /new-home, /my-products)
@@ -27,8 +27,8 @@ const systemPromptForCreatePage = `Please ask the user for the following informa
 - What is the absolute path to your pages directory?
 - What is the absolute path to your routes.jsx file?
 - Is ccExtensibility.overridesDir set in your package.json? (true/false)
-
-Collect answers to these questions, then call the tool with the collected information as input parameters.`
+`
+const systemPromptForUseCase = `What is the main use case or purpose for this page? (Describe briefly what the page should do)`
 
 const systemPromptForProductHook = `The ProductView component was added to the new page. Ask the user: "To make it work, would you like to add the useProduct hook to your page?"
 
@@ -77,7 +77,8 @@ class CreateNewPageTool {
             routesPath: z.string().describe('The absolute path to the routes.jsx file'),
             hasOverridesDir: z
                 .boolean()
-                .describe('Whether ccExtensibility.overridesDir is set in package.json')
+                .describe('Whether ccExtensibility.overridesDir is set in package.json'),
+            useCase: z.string().optional().describe('The main use case or purpose for this page')
         }
         this.unfoundComponents = []
 
@@ -98,17 +99,29 @@ class CreateNewPageTool {
                     content: [{type: 'text', text: systemPromptForCreatePage}]
                 }
             }
-            return this.createPage(args.pageName, args.componentList, args.route, {
-                nodeModulesPath: args.nodeModulesPath,
-                componentsPath: args.componentsPath,
-                pagesPath: args.pagesPath,
-                routesPath: args.routesPath,
-                hasOverridesDir: args.hasOverridesDir
-            })
+            if (!args.useCase) {
+                return {
+                    role: 'system',
+                    content: [{type: 'text', text: systemPromptForUseCase}]
+                }
+            }
+            return this.createPage(
+                args.pageName,
+                args.componentList,
+                args.route,
+                {
+                    nodeModulesPath: args.nodeModulesPath,
+                    componentsPath: args.componentsPath,
+                    pagesPath: args.pagesPath,
+                    routesPath: args.routesPath,
+                    hasOverridesDir: args.hasOverridesDir
+                },
+                args.useCase
+            )
         }
     }
 
-    async createPage(pageName, componentList, route, absolutePaths) {
+    async createPage(pageName, componentList, route, absolutePaths, useCase) {
         this.unfoundComponents = []
 
         try {
@@ -147,22 +160,16 @@ class CreateNewPageTool {
             if (this.unfoundComponents.length > 0) {
                 messages.push(systemPromptForUnfoundComponents(this.unfoundComponents))
             }
-            // Suggest relevant hooks using the hooks recommendation tool
-            try {
-                const hooksResult = await hooksRecommendationTool.handler({
-                    pageName,
-                    componentList,
-                    useCase: `page creation for ${pageName}`,
-                    hooksPath: null // Let the tool auto-detect the path
-                })
-                if (hooksResult?.content?.[0]?.text) {
-                    messages.push('\n' + hooksResult.content[0].text)
+            // --- Hook Recommendation ---
+            if (useCase) {
+                const hooksResult = await recommendHooksForUseCase(useCase)
+                if (hooksResult && hooksResult.recommendations) {
+                    messages.push(hooksResult.recommendations)
+                } else if (hooksResult && hooksResult.error) {
+                    messages.push(`\nUnable to get hook recommendations: ${hooksResult.error}`)
                 }
-            } catch (error) {
-                messages.push(
-                    '\nUnable to get hook recommendations. You can ask for specific hook suggestions later.'
-                )
             }
+            // --- End Hook Recommendation ---
             return {role: 'assistant', content: [{type: 'text', text: messages.join('\n')}]}
         } catch (error) {
             return {
