@@ -191,133 +191,49 @@ export async function logMCPMessage(message) {
  * @returns {Object} containing detected absolute paths & configuration
  */
 export async function detectWorkspacePaths() {
-    // Primary approach: Use PWA_STOREFRONT_APP_PATH
+    // Use PWA_STOREFRONT_APP_PATH (always provided by MCP configuration)
     const appPath = process.env.PWA_STOREFRONT_APP_PATH
 
-    if (appPath) {
-        // Verify the provided app path exists
-        try {
-            await fsPromises.access(appPath)
-        } catch (error) {
-            throw new Error(`PWA_STOREFRONT_APP_PATH does not exist: ${appPath}`)
-        }
-
-        // Build paths relative to the provided app directory
-        const pagesPath = path.join(appPath, 'pages')
-        const componentsPath = path.join(appPath, 'components')
-        const routesPath = path.join(appPath, 'routes.jsx')
-
-        // Node modules is typically one level up from the app directory
-        const nodeModulesPath = path.join(appPath, '..', 'node_modules')
-
-        // Check if overrides directory exists (for ccExtensibility.overridesDir)
-        const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
-
-        // Verify essential directories exist
-        if (!fs.existsSync(pagesPath)) {
-            throw new Error(`Pages directory not found at: ${pagesPath}`)
-        }
-        if (!fs.existsSync(componentsPath)) {
-            throw new Error(`Components directory not found at: ${componentsPath}`)
-        }
-        if (!fs.existsSync(routesPath)) {
-            throw new Error(`Routes file not found at: ${routesPath}`)
-        }
-
-        return {
-            pagesPath,
-            componentsPath,
-            routesPath,
-            nodeModulesPath,
-            hasOverridesDir
-        }
-    }
-
-    // Fallback approach: Detect monorepo structure
-    const workspaceRoot = process.env.WORKSPACE_FOLDER_PATHS || process.cwd()
-    const possibleAppDirs = [
-        'app',
-        'packages/template-retail-react-app/app',
-        'packages/template-typescript-minimal/app'
-    ]
-
-    let appDir = null
-    for (const possibleDir of possibleAppDirs) {
-        const fullPath = path.join(workspaceRoot, possibleDir)
-        if (fs.existsSync(fullPath)) {
-            appDir = fullPath
-            break
-        }
-    }
-
-    if (!appDir) {
+    if (!appPath) {
         throw new Error(
-            'Could not detect PWA Kit app directory. Please ensure you are in a PWA Kit project or set PWA_STOREFRONT_APP_PATH environment variable.'
+            'PWA_STOREFRONT_APP_PATH environment variable is not set. Please check your MCP configuration.'
         )
     }
 
-    // Detect node_modules path
-    let nodeModulesPath = null
-    const possibleNodeModulesPaths = [
-        path.join(workspaceRoot, 'node_modules'),
-        path.join(workspaceRoot, 'packages/template-retail-react-app/node_modules'),
-        path.join(workspaceRoot, 'packages/template-typescript-minimal/node_modules')
-    ]
-
-    for (const possiblePath of possibleNodeModulesPaths) {
-        if (fs.existsSync(possiblePath)) {
-            nodeModulesPath = possiblePath
-            break
-        }
+    // Verify the provided app path exists
+    try {
+        await fsPromises.access(appPath)
+    } catch (error) {
+        throw new Error(`PWA_STOREFRONT_APP_PATH does not exist: ${appPath}`)
     }
 
-    if (!nodeModulesPath) {
-        throw new Error('Could not detect node_modules directory.')
-    }
+    // Build paths relative to the provided app directory
+    const pagesPath = path.join(appPath, 'pages')
+    const componentsPath = path.join(appPath, 'components')
+    const routesPath = path.join(appPath, 'routes.jsx')
 
-    // Detect components and pages directories
-    const componentsPath = path.join(appDir, 'components')
-    const pagesPath = path.join(appDir, 'pages')
-    const routesPath = path.join(appDir, 'routes.jsx')
+    // Node modules is typically one level up from the app directory
+    const nodeModulesPath = path.join(appPath, '..', 'node_modules')
 
-    // Verify these directories exist
-    if (!fs.existsSync(componentsPath)) {
-        throw new Error(`Components directory not found at: ${componentsPath}`)
-    }
+    // Check if overrides directory exists (for ccExtensibility.overridesDir)
+    const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
+
+    // Verify essential directories exist
     if (!fs.existsSync(pagesPath)) {
         throw new Error(`Pages directory not found at: ${pagesPath}`)
+    }
+    if (!fs.existsSync(componentsPath)) {
+        throw new Error(`Components directory not found at: ${componentsPath}`)
     }
     if (!fs.existsSync(routesPath)) {
         throw new Error(`Routes file not found at: ${routesPath}`)
     }
 
-    // Check for ccExtensibility.overridesDir in package.json
-    let hasOverridesDir = false
-    const packageJsonPaths = [
-        path.join(workspaceRoot, 'package.json'),
-        path.join(workspaceRoot, 'packages/template-retail-react-app/package.json'),
-        path.join(workspaceRoot, 'packages/template-typescript-minimal/package.json')
-    ]
-
-    for (const packageJsonPath of packageJsonPaths) {
-        if (fs.existsSync(packageJsonPath)) {
-            try {
-                const packageJson = JSON.parse(await fsPromises.readFile(packageJsonPath, 'utf8'))
-                hasOverridesDir = !!(
-                    packageJson.ccExtensibility && packageJson.ccExtensibility.overridesDir
-                )
-                break
-            } catch (error) {
-                continue
-            }
-        }
-    }
-
     return {
-        nodeModulesPath,
-        componentsPath,
         pagesPath,
+        componentsPath,
         routesPath,
+        nodeModulesPath,
         hasOverridesDir
     }
 }
