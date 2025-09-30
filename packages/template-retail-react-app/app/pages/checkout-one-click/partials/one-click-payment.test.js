@@ -161,11 +161,12 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
 
 // Mock ToggleCard components
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
-    const ToggleCardEdit = ({children}) => <>{children}</>
-    const ToggleCardSummary = ({children}) => <>{children}</>
+    const ToggleCardEdit = ({children}) => children
+    const ToggleCardSummary = ({children}) => children
 
     const ToggleCard = ({children, title, editing, onEdit, editLabel, ...props}) => {
-        const arr = React.Children.toArray(children)
+        const toArray = (c) => (Array.isArray(c) ? c : [c])
+        const arr = toArray(children).filter(Boolean)
         const editEl = arr.find((c) => c && c.type === ToggleCardEdit)
         const summaryEl = arr.find((c) => c && c.type === ToggleCardSummary)
         const editContent = editEl ? editEl.props.children : null
