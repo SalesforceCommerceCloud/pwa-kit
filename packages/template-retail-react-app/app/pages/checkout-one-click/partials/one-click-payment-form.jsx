@@ -56,15 +56,17 @@ const PaymentForm = ({
 
     const savedCount = savedPaymentInstruments?.length || 0
     const totalItems = savedCount + 2 // saved + credit card + paypal
-    const n = showAllPaymentInstruments ? totalItems : INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
+    const viewCount = showAllPaymentInstruments
+        ? totalItems
+        : INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
 
-    const displayedSavedCount = Math.min(savedCount, n)
+    const displayedSavedCount = Math.min(savedCount, viewCount)
     const displayedSavedPaymentInstruments =
         savedPaymentInstruments?.slice(0, displayedSavedCount) || []
 
-    const showCreditCard = n > displayedSavedCount
+    const showCreditCard = viewCount > displayedSavedCount
     const displayedAfterCC = displayedSavedCount + (showCreditCard ? 1 : 0)
-    const showPaypal = n > displayedAfterCC
+    const showPaypal = viewCount > displayedAfterCC
 
     const showViewAllButton =
         totalItems > INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS && !showAllPaymentInstruments
@@ -173,7 +175,7 @@ const PaymentForm = ({
                                     defaultMessage="View All ({count} more)"
                                     id="payment_selection.button.view_all"
                                     values={{
-                                        count: Math.max(totalItems - n, 0)
+                                        count: Math.max(totalItems - viewCount, 0)
                                     }}
                                 />
                             </button>

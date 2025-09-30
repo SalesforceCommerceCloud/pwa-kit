@@ -161,7 +161,6 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
 
 // Mock ToggleCard components
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
-    const React = require('react')
     const ToggleCardEdit = ({children}) => <>{children}</>
     const ToggleCardSummary = ({children}) => <>{children}</>
 
@@ -181,7 +180,9 @@ jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
                     </div>
                 ) : (
                     <div data-testid="toggle-card-summary">
-                        <button onClick={onEdit} aria-label={editLabel}>{editLabel}</button>
+                        <button onClick={onEdit} aria-label={editLabel}>
+                            {editLabel}
+                        </button>
                         {summaryContent}
                     </div>
                 )}
@@ -561,7 +562,9 @@ describe('Payment Component', () => {
 
             // Click Edit Payment Info
             const summary = screen.getAllByTestId('toggle-card-summary').pop()
-            const editButton = within(summary).getByRole('button', {name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i})
+            const editButton = within(summary).getByRole('button', {
+                name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
+            })
             await user.click(editButton)
 
             // Assert error toast shown
