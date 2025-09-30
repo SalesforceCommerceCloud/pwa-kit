@@ -25,6 +25,7 @@ export {
 export {
     getQualifyingProductIdForBonusItem,
     getBonusProductsInCartForProduct,
+    getBonusProductsForSpecificCartItem,
     getQualifyingProductForBonusProductInCart,
     findAllBonusProductItemsToRemove
 } from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -40,7 +41,10 @@ export {
 export {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
 
 // Re-export business logic utilities
-export {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
+export {
+    shouldShowBonusProductSelection,
+    isAutomaticPromotion
+} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
 // Re-export React hooks
 export {

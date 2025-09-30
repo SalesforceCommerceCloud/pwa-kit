@@ -12,7 +12,10 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
-import {getShippingAddressForStore} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    getShippingAddressForStore,
+    cleanAddressForOrder
+} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 // Mock dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -45,7 +48,8 @@ jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/utils/address-utils', () => ({
-    getShippingAddressForStore: jest.fn()
+    getShippingAddressForStore: jest.fn(),
+    cleanAddressForOrder: jest.fn()
 }))
 
 describe('useMultiship', () => {
@@ -150,6 +154,16 @@ describe('useMultiship', () => {
         mockGetDefaultShippingMethodId.mockReturnValue('default-shipping-method')
         mockGetPickupShippingMethodId.mockReturnValue('pickup-shipping-method')
         mockGetShippingAddressForStore.mockReturnValue({
+            address1: 'Test Store Address',
+            city: 'Test City',
+            countryCode: 'US',
+            postalCode: '12345',
+            stateCode: 'CA',
+            firstName: 'Test Store',
+            lastName: 'pickup',
+            phone: '555-0123'
+        })
+        cleanAddressForOrder.mockReturnValue({
             address1: 'Test Store Address',
             city: 'Test City',
             countryCode: 'US',
@@ -570,7 +584,17 @@ describe('useMultiship', () => {
                     {
                         shipmentId: 'pickup-shipment',
                         shippingMethod: {id: 'pickup-shipping-method', c_storePickupEnabled: true},
-                        c_fromStoreId: 'store-1'
+                        c_fromStoreId: 'store-1',
+                        shippingAddress: {
+                            address1: 'Test Store Address',
+                            city: 'Test City',
+                            countryCode: 'US',
+                            postalCode: '12345',
+                            stateCode: 'CA',
+                            firstName: 'Test Store',
+                            lastName: 'pickup',
+                            phone: '555-0123'
+                        }
                     }
                 ],
                 productItems: [
@@ -598,7 +622,19 @@ describe('useMultiship', () => {
                 basketWithEmptyMe,
                 'me',
                 true,
-                {id: 'store-1', inventoryId: 'inventory-1'}
+                {
+                    address1: 'Test Store Address',
+                    city: 'Test City',
+                    countryCode: 'US',
+                    postalCode: '12345',
+                    stateCode: 'CA',
+                    firstName: 'Test Store',
+                    lastName: 'pickup',
+                    phone: '555-0123',
+                    name: 'Test Store',
+                    id: 'store-1',
+                    inventoryId: 'inventory-1'
+                }
             )
             expect(mockUpdateItemsToPickupShipment).toHaveBeenCalled()
             expect(mockRemoveShipmentOperation).toHaveBeenCalledWith('pickup-shipment')

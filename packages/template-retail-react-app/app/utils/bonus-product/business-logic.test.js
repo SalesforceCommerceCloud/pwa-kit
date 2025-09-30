@@ -13,6 +13,7 @@ describe('Bonus Product Business Logic', () => {
             const basket = {
                 bonusDiscountLineItems: [
                     {
+                        promotionId: 'promo-1', // Include the promotion ID to make it a choice promotion
                         bonusProducts: [{productId: 'different-product'}]
                     }
                 ]

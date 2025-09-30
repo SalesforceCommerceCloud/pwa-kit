@@ -600,12 +600,17 @@ describe('ShippingAddress', () => {
             }
             useCheckout.mockReturnValue(editingContext)
 
-            renderWithIntl(<ShippingAddress {...defaultProps} basket={singleItemBasket} />)
+            // Mock useCurrentBasket to return the single item basket
+            useCurrentBasket.mockReturnValue({
+                data: singleItemBasket
+            })
+
+            renderWithIntl(<ShippingAddress {...defaultProps} />)
 
             // Should show shipping address selection
             expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-            // Multi-shipping should not be available for single item
-            expect(screen.queryByTestId('multi-shipping')).not.toBeInTheDocument()
+            // Edit action button (Ship to Multiple Addresses) should not be rendered for single item
+            expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
         })
     })
 
