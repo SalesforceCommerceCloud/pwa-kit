@@ -575,6 +575,7 @@ describe('processLambdaResponse', () => {
     const testCases = [
         {
             name: 'valid correlation id header in event object',
+            response: {},
             event: {headers: {'x-correlation-id': 'e46cd109-39b7-4173-963e-2c5de78ba087'}},
             validate: (headers) => {
                 expect(headers['x-correlation-id']).toBe('e46cd109-39b7-4173-963e-2c5de78ba087')
@@ -582,16 +583,41 @@ describe('processLambdaResponse', () => {
         },
         {
             name: 'no correlation id header in event object',
+            response: {},
             event: {headers: {}},
             validate: (headers) => {
                 expect(headers['x-correlation-id']).toBeFalsy()
+            }
+        },
+        {
+            name: 'restore CONTENT_TYPE from X_ORIGINAL_CONTENT_TYPE',
+            response: {
+                multiValueHeaders: {
+                    'x-original-content-type': ['application/json']
+                }
+            },
+            event: {},
+            validate: (headers) => {
+                expect(headers['content-type']).toBe('application/json')
+                expect(headers['x-original-content-type']).toBeUndefined()
+            }
+        },
+        {
+            name: 'Convert from multiValueHeaders to headers',
+            response: {
+                multiValueHeaders: {
+                    'Accept-Language': ['en-US', 'en;q=0.9']
+                }
+            },
+            event: {},
+            validate: (headers) => {
+                expect(headers['accept-language']).toBe('en-US,en;q=0.9')
             }
         }
     ]
     testCases.forEach((testCase) => {
         test(`${testCase.name}`, () => {
-            const response = {}
-            const res = processLambdaResponse(response, testCase.event)
+            const res = processLambdaResponse(testCase.response, testCase.event)
             testCase.validate(res.headers)
         })
     })

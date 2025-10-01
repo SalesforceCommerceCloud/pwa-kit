@@ -1,4 +1,5 @@
 ## v3.14.0-dev (Sep 26, 2025)
+- Replace aws-serverless-express with @h4ad/serverless-adapter [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
 
 ## v3.13.0 (Sep 25, 2025)
 

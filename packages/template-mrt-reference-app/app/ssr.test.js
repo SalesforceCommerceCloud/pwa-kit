@@ -50,7 +50,6 @@ describe('server', () => {
     })
     afterEach(() => {
         process.env = originalEnv
-        server.close()
         jest.restoreAllMocks()
     })
     test.each([
@@ -83,8 +82,8 @@ describe('server', () => {
         expect(response.body.headers['random-header']).toBe('random')
     })
 
-    test('Path "/cookie" sets cookie', () => {
-        return request(app)
+    test('Path "/cookie" sets cookie', async () => {
+        return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
@@ -108,6 +107,18 @@ describe('server', () => {
         expect(response.body.logs).toBe(true)
     })
 
+    test('Path "/isolation" succeeds with Region', async () => {
+        jest.spyOn(console, 'error')
+        lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
+        s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
+        logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&Region=us-west-1`
+        const response = await request(app).get(`/isolation?${params}`)
+        expect(response.body.origin).toBe(true)
+        expect(response.body.storage).toBe(true)
+        expect(response.body.logs).toBe(true)
+    })
+
     test('Path "/isolation" fails', async () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).resolves()
@@ -125,5 +136,16 @@ describe('server', () => {
         ]
         const calls = console.error.mock.calls.map((call) => call[0])
         expect(errors.some((error) => calls.includes(error))).toBe(true)
+    })
+
+    test('Check incoming headers are lowercase', async () => {
+        const response = await request(app)
+            .get('/headers')
+            .set('Random-Header', 'random')
+            .set('Another-Mixed-Case-Header', 'value')
+            .set('UPPERCASE-HEADER', 'test')
+        for (const header in response.body.headers) {
+            expect(header).toBe(header.toLowerCase())
+        }
     })
 })

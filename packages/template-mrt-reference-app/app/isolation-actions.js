@@ -25,8 +25,11 @@ export const isolationOriginLambdaTest = async (input) => {
 }
 
 export const isolationS3Test = async (input) => {
-    const region = process.env.AWS_REGION || 'us-east-1'
+    // For cross region tests, we need to specify the region
+    const region = input.Region || process.env.AWS_REGION || 'us-east-1'
     const client = new S3Client({region: region})
+    // Remove the Region parameter from the input for the S3 command
+    delete input.Region
     try {
         await client.send(new GetObjectCommand(input))
     } catch (e) {
@@ -61,7 +64,7 @@ export const isolationLogsTest = async (input) => {
 export const executeIsolationTests = async (params) => {
     const tests = [
         {name: 'origin', keys: ['FunctionName'], fn: isolationOriginLambdaTest},
-        {name: 'storage', keys: ['Bucket', 'Key'], fn: isolationS3Test},
+        {name: 'storage', keys: ['Bucket', 'Key', 'Region'], fn: isolationS3Test},
         {name: 'logs', keys: ['logGroupName'], fn: isolationLogsTest}
     ]
     let results = {}
