@@ -17,7 +17,10 @@ import {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    autoDetectNodeModulesPath,
+    autoDetectCommerceSDKTypesPath,
+    checkCommerceSDKInNodeModules
 } from './utils.js'
 
 export {
@@ -33,5 +36,8 @@ export {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    autoDetectNodeModulesPath,
+    autoDetectCommerceSDKTypesPath,
+    checkCommerceSDKInNodeModules
 }

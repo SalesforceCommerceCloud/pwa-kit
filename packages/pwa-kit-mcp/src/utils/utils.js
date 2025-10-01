@@ -219,3 +219,119 @@ export function generateComponentImportStatement(
     const normalizedPath = relativePath.replace(/\\/g, '/')
     return `import ${componentName} from '${normalizedPath}'`
 }
+
+/**
+ * Auto-detects the node_modules directory path
+ * @param {string} [startPath] - Optional starting path for detection
+ * @returns {string|null} The absolute path to node_modules or null if not found
+ */
+export function autoDetectNodeModulesPath(startPath = process.cwd()) {
+    // 1. Check for node_modules in cwd and its parents
+    let currentPath = path.resolve(startPath)
+    while (currentPath !== path.dirname(currentPath)) {
+        const nodeModulesPath = path.join(currentPath, 'node_modules')
+        if (fs.existsSync(nodeModulesPath)) {
+            return nodeModulesPath
+        }
+        currentPath = path.dirname(currentPath)
+    }
+    // 2. Check for explicit environment variable (and its parents)
+    const storefrontAppPath = process.env.PWA_STOREFRONT_APP_PATH
+    if (storefrontAppPath) {
+        let envPath = path.resolve(storefrontAppPath)
+        while (envPath !== path.dirname(envPath)) {
+            const nodeModulesPath = path.join(envPath, 'node_modules')
+            if (fs.existsSync(nodeModulesPath)) {
+                return nodeModulesPath
+            }
+            envPath = path.dirname(envPath)
+        }
+    }
+    // 3. Check for node_modules in common PWA Kit app subfolders (fallback)
+    const resolvedStartPath = path.resolve(startPath)
+    const appSpecificPaths = [
+        path.join(resolvedStartPath, 'retail-react-app/node_modules'),
+        path.join(resolvedStartPath, 'app/node_modules'),
+        path.join(resolvedStartPath, 'node_modules')
+    ]
+    for (const appPath of appSpecificPaths) {
+        if (fs.existsSync(appPath)) {
+            return appPath
+        }
+    }
+    // 4. Not found
+    return null
+}
+
+/**
+ * Auto-detects the commerce-sdk-isomorphic type definitions path
+ * @param {string} [nodeModulesPath] - Optional node_modules path
+ * @returns {string|null} The absolute path to index.cjs.d.ts or null if not found
+ */
+export function autoDetectCommerceSDKTypesPath(nodeModulesPath = null) {
+    // Try the provided node_modules path first
+    if (nodeModulesPath) {
+        const result = checkCommerceSDKInNodeModules(nodeModulesPath)
+        if (result) return result
+    }
+
+    // Try auto-detected node_modules
+    const nmPath = autoDetectNodeModulesPath()
+    if (nmPath) {
+        const result = checkCommerceSDKInNodeModules(nmPath)
+        if (result) return result
+    }
+
+    // Try common PWA Kit project locations
+    // Use only current working directory for better detection (removed ESM-specific logic)
+    const currentDir = process.cwd()
+    const commonPaths = [
+        // From MCP package, look for demo app (relative to current working directory)
+        path.resolve(currentDir, '../../../demo-pwa-app/retail-react-app/node_modules'),
+        path.resolve(currentDir, '../../demo-pwa-app/retail-react-app/node_modules'),
+        path.resolve(currentDir, '../demo-pwa-app/retail-react-app/node_modules'),
+        // Look for other common locations
+        path.resolve(currentDir, '../../../retail-react-app-demo/node_modules'),
+        path.resolve(currentDir, '../../retail-react-app-demo/node_modules'),
+        path.resolve(currentDir, '../retail-react-app-demo/node_modules'),
+        // Commerce SDK React package
+        path.resolve(currentDir, '../commerce-sdk-react/node_modules'),
+        // Current directory variations
+        path.resolve(currentDir, './node_modules'),
+        path.resolve(currentDir, '../node_modules'),
+        path.resolve(currentDir, '../../node_modules')
+    ]
+
+    for (const commonPath of commonPaths) {
+        if (fs.existsSync(commonPath)) {
+            const result = checkCommerceSDKInNodeModules(commonPath)
+            if (result) return result
+        }
+    }
+
+    return null
+}
+
+/**
+ * Helper function to check for commerce-sdk-isomorphic in a specific node_modules directory
+ * @param {string} nodeModulesPath - Path to node_modules directory
+ * @returns {string|null} Path to type definitions or null if not found
+ */
+function checkCommerceSDKInNodeModules(nodeModulesPath) {
+    const possiblePaths = [
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/lib/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/lib/index.cjs.d.ts'),
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/dist/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/dist/index.cjs.d.ts'),
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/index.cjs.d.ts')
+    ]
+
+    for (const possiblePath of possiblePaths) {
+        if (fs.existsSync(possiblePath)) {
+            return possiblePath
+        }
+    }
+
+    return null
+}
