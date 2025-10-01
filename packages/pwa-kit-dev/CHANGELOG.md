@@ -2,6 +2,7 @@
 
 ## v3.13.0 (Sep 25, 2025)
 - Exclude opentelemetry packages from client side bundling [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)
+- Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
 
 ## v3.12.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)

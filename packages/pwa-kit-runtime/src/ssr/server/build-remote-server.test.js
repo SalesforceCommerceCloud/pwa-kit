@@ -4,16 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {once, RemoteServerFactory} from './build-remote-server'
+import {once, RemoteServerFactory, isBinary} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
-import awsServerlessExpress from 'aws-serverless-express'
-
-jest.mock('aws-serverless-express', () => {
-    return {
-        createServer: jest.fn(),
-        proxy: jest.fn()
-    }
-})
+import {default as createEvent} from '@serverless/event-mocks'
 
 jest.mock('../../utils/ssr-config', () => {
     return {
@@ -49,7 +42,13 @@ describe('remote server factory test coverage', () => {
 describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
     test('encodes request headers', () => {
         const mockApp = {
-            sendMetric: jest.fn()
+            sendMetric: jest.fn(),
+            _requestMonitor: {
+                _waitForResponses: jest.fn(() => Promise.resolve())
+            },
+            metrics: {
+                flush: jest.fn()
+            }
         }
 
         const mockOptions = {
@@ -62,9 +61,11 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
             'x-regular-header': 'ascii-str'
         }
 
-        const event = {
+        const event = createEvent('aws:apiGateway', {
+            path: '/',
+            body: undefined,
             headers: {...originalHeaders}
-        }
+        })
 
         const expectedHeaders = {
             'x-non-ascii-header-one': '%E3%83%86%E3%82%B9%E3%83%88',
@@ -74,9 +75,9 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         }
 
         const {handler} = RemoteServerFactory._createHandler(mockApp, mockOptions)
-        expect(event.headers).toEqual(originalHeaders)
-        handler(event, {}, {})
-        expect(event.headers).toEqual(expectedHeaders)
+        expect(event.headers).toMatchObject(originalHeaders)
+        handler(event, {}, () => {})
+        expect(event.headers).toMatchObject(expectedHeaders)
         expect(decodeURIComponent(event.headers['x-non-ascii-header-one'])).toEqual(
             originalHeaders['x-non-ascii-header-one']
         )
@@ -124,5 +125,34 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         // confirm ASCII headers are not modified
         res.setHeader(regularHeaderKey, regularHeaderValue)
         expect(res.getHeader(regularHeaderKey)).toEqual(regularHeaderValue)
+    })
+})
+
+describe('isBinary function', () => {
+    test('returns true if the content type is binary', () => {
+        const headers = {
+            'content-type': 'application/json'
+        }
+        expect(isBinary(headers)).toBe(true)
+    })
+
+    test('returns false if neither content type nor content encoding is binary', () => {
+        const headers = {
+            'content-type': 'text/plain',
+            'content-encoding': 'identity'
+        }
+        expect(isBinary(headers)).toBe(false)
+    })
+
+    test('returns false if headers are empty', () => {
+        const headers = {}
+        expect(isBinary(headers)).toBe(false)
+    })
+
+    test('returns false if content type is non-binary and content encoding is missing', () => {
+        const headers = {
+            'content-type': 'text/html'
+        }
+        expect(isBinary(headers)).toBe(false)
     })
 })

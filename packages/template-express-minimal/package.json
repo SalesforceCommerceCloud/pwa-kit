@@ -15,6 +15,7 @@
     "test": "pwa-kit-dev test"
   },
   "devDependencies": {
+    "@h4ad/serverless-adapter": "4.4.0",
     "@salesforce/pwa-kit-dev": "3.14.0-dev",
     "@salesforce/pwa-kit-runtime": "3.14.0-dev",
     "supertest": "^4.0.2"

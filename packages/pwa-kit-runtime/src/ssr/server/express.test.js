@@ -1108,7 +1108,7 @@ describe('SLAS private client proxy', () => {
         slasTarget: slasTarget
     }
 
-    beforeAll(() => {
+    beforeEach(() => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
         // by setting slasTarget, rather than forwarding the request to SLAS,
         // we send the proxy request here so we can return the request headers
@@ -1119,13 +1119,8 @@ describe('SLAS private client proxy', () => {
         proxyServer = proxyApp.listen(proxyPort)
     })
 
-    afterEach(() => {
+    afterEach(async () => {
         process.env = savedEnvironment
-    })
-
-    // There is a lot of cleanup done here to ensure the proxy server is closed
-    // after these tests.
-    afterAll(async () => {
         if (proxyServer) {
             // Close the server and wait for it to fully close
             await new Promise((resolve) => {
