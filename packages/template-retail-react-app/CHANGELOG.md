@@ -1,6 +1,5 @@
 ## v8.1.1 (Oct 1, 2025)
-- International URL Support Message in MIAW chat [#3555]
-(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3355)
+- International URL Support Message in Shopper Agent chat [#3555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3355)
 
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
