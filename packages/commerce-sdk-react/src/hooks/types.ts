@@ -13,6 +13,7 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
@@ -91,6 +92,7 @@ export interface ApiClients {
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
     shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperPayments?: ShopperPayments<ApiClientConfigParams>
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>

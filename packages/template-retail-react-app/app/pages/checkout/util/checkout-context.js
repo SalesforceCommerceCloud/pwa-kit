@@ -20,8 +20,15 @@ export const CheckoutProvider = ({children}) => {
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled;
 
-    const CHECKOUT_STEPS_LIST = [
+    const CHECKOUT_STEPS_LIST = sfPaymentsEnabled ? [
+        'CONTACT_INFO',
+        'PICKUP_ADDRESS',
+        'SHIPPING_ADDRESS',
+        'SHIPPING_OPTIONS',
+        'PAYMENT'
+    ] : [
         'CONTACT_INFO',
         'PICKUP_ADDRESS',
         'SHIPPING_ADDRESS',
@@ -37,7 +44,7 @@ export const CheckoutProvider = ({children}) => {
         if (isBasketLoading || !customer || !basket) {
             return
         }
-        let step = STEPS.REVIEW_ORDER
+        let step = sfPaymentsEnabled ? STEPS.PAYMENT : STEPS.REVIEW_ORDER
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO

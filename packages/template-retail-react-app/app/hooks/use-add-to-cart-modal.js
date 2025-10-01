@@ -36,6 +36,8 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
 
 import {
@@ -83,6 +85,7 @@ export const AddToCartModal = () => {
         : Array.isArray(itemsAdded)
         ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
         : 0
+    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
 
     // Bonus product logic
     const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
@@ -421,6 +424,13 @@ export const AddToCartModal = () => {
                                         id: 'add_to_cart_modal.link.checkout'
                                     })}
                                 </Button>
+
+                                {sfPaymentsEnabled && (
+                                    <SFPaymentsExpress
+                                        expressButtonLayout="vertical"
+                                        maximumButtonCount={1}
+                                    />
+                                )}
                             </Stack>
                         </Box>
                     </Flex>
