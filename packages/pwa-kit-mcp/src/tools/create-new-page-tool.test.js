@@ -464,4 +464,30 @@ describe('Cross-Project compatibility', () => {
         expect(result.content[0].text).toContain('Error detecting workspace configuration')
         expect(result.content[0].text).toContain('PWA_STOREFRONT_APP_PATH does not exist')
     })
+
+    it('should return system prompt when project path cannot be detected', async () => {
+        // mock detectWorkspacePaths to throw user prompt error
+        const utils = await import('../utils/utils')
+        jest.spyOn(utils, 'detectWorkspacePaths').mockRejectedValue(
+            new Error(
+                "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
+            )
+        )
+
+        const args = {
+            pageName: 'TestPage',
+            componentList: ['Header'],
+            route: '/test-page'
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain(
+            'I need to know where your PWA Kit project is located'
+        )
+        expect(result.content[0].text).toContain(
+            "Please provide the path to your PWA Kit project's app directory"
+        )
+    })
 })

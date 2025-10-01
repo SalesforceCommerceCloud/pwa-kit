@@ -99,6 +99,20 @@ class CreateNewPageTool {
                 return this.createPage(args.pageName, args.componentList, args.route, absolutePaths)
             } catch (error) {
                 logMCPMessage(`Error detecting workspace paths: ${error.message}`)
+
+                // if this is a user prompt error (project path not detected)
+                if (error.message.includes('Could not detect PWA Kit project directory')) {
+                    return {
+                        role: 'system',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `I need to know where your PWA Kit project is located to create the page. ${error.message}\n\nPlease provide the path to your PWA Kit project's app directory.`
+                            }
+                        ]
+                    }
+                }
+
                 return {
                     role: 'developer',
                     content: [

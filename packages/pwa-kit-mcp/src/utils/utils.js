@@ -187,27 +187,44 @@ export async function logMCPMessage(message) {
 }
 
 /**
- * Detects workspace paths based on current working directory
+ * Detects workspace paths based on current working directory or pre-set environment variable
  * @returns {Object} containing detected absolute paths & configuration
  */
 export async function detectWorkspacePaths() {
-    // Use PWA_STOREFRONT_APP_PATH (always provided by MCP configuration)
-    const appPath = process.env.PWA_STOREFRONT_APP_PATH
+    let appPath = null
+
+    const cwd = process.cwd()
+    const cwdPagesPath = path.join(cwd, 'pages')
+    const cwdComponentsPath = path.join(cwd, 'components')
+    const cwdRoutesPath = path.join(cwd, 'routes.jsx')
+
+    if (
+        fs.existsSync(cwdPagesPath) &&
+        fs.existsSync(cwdComponentsPath) &&
+        fs.existsSync(cwdRoutesPath)
+    ) {
+        appPath = cwd
+    }
+
+    if (!appPath) {
+        const envAppPath = process.env.PWA_STOREFRONT_APP_PATH
+        if (envAppPath) {
+            try {
+                await fsPromises.access(envAppPath)
+                appPath = envAppPath
+            } catch (error) {
+                // no env path variable
+            }
+        }
+    }
 
     if (!appPath) {
         throw new Error(
-            'PWA_STOREFRONT_APP_PATH environment variable is not set. Please check your MCP configuration.'
+            "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
         )
     }
 
-    // Verify the provided app path exists
-    try {
-        await fsPromises.access(appPath)
-    } catch (error) {
-        throw new Error(`PWA_STOREFRONT_APP_PATH does not exist: ${appPath}`)
-    }
-
-    // Build paths relative to the provided app directory
+    // Build paths relative to the detected app directory
     const pagesPath = path.join(appPath, 'pages')
     const componentsPath = path.join(appPath, 'components')
     const routesPath = path.join(appPath, 'routes.jsx')
