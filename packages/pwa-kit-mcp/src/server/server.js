@@ -45,14 +45,14 @@ class PwaStorefrontMCPServerHighLevel {
                 const start = Date.now()
                 try {
                     const result = await handler(...handlerArgs)
-                    this.telemetry?.sendEvent('TOOL_CALLED', {
+                    this.telemetry?.sendEvent('TOOL_CALLED_' + name, {
                         toolName: name,
                         runTimeMs: Date.now() - start,
                         isError: false
                     })
                     return result
                 } catch (error) {
-                    this.telemetry?.sendEvent('TOOL_CALLED', {
+                    this.telemetry?.sendEvent('TOOL_CALLED_' + name, {
                         toolName: name,
                         runTimeMs: Date.now() - start,
                         isError: true
