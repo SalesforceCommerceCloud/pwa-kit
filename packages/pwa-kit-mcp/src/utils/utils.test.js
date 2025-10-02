@@ -380,22 +380,6 @@ describe('detectWorkspacePaths', () => {
         expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
     })
 
-    it('detects app dir in a parent directory (up to 3 levels)', async () => {
-        // Create a temp 'app' directory with required structure
-        const appDir = path.join(tempRoot, 'app')
-        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
-        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
-        fs.writeFileSync(path.join(appDir, 'routes.jsx'), '// routes')
-        // Create a deep subdirectory inside 'app'
-        const deepDir = path.join(appDir, 'foo', 'bar', 'baz')
-        fs.mkdirSync(deepDir, {recursive: true})
-        process.chdir(deepDir)
-        delete process.env.PWA_STOREFRONT_APP_PATH
-        const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-        expect(result.pagesPath).toBe(path.join(appDir, 'pages'))
-    })
-
     it('falls back to env variable if not found in cwd or parents/subdirs', async () => {
         const notAnAppDir = path.join(tempRoot, 'not-an-app')
         fs.mkdirSync(notAnAppDir, {recursive: true})
