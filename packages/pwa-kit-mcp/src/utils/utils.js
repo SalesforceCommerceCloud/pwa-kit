@@ -211,6 +211,23 @@ function findAppDirInCwdAndParents(cwd) {
     return null
 }
 
+function findAppDirInSubdirs(cwd) {
+    const subdirs = fs
+        .readdirSync(cwd, {withFileTypes: true})
+        .filter((d) => d.isDirectory())
+        .map((d) => path.join(cwd, d.name))
+    for (const subdir of subdirs) {
+        const candidate = path.join(subdir, 'app')
+        if (isValidAppDir(candidate)) {
+            return candidate
+        }
+        if (isValidAppDir(subdir)) {
+            return subdir
+        }
+    }
+    return null
+}
+
 export async function detectWorkspacePaths() {
     let appPath = null
     const cwd = process.cwd()
@@ -218,23 +235,8 @@ export async function detectWorkspacePaths() {
     // Use cwd and parent search
     appPath = findAppDirInCwdAndParents(cwd)
 
-    // search immediate subdirectories (3 levels) of cwd for expected project structure
     if (!appPath) {
-        const subdirs = fs
-            .readdirSync(cwd, {withFileTypes: true})
-            .filter((d) => d.isDirectory())
-            .map((d) => path.join(cwd, d.name))
-        for (const subdir of subdirs) {
-            const candidate = path.join(subdir, 'app')
-            if (isValidAppDir(candidate)) {
-                appPath = candidate
-                break
-            }
-            if (isValidAppDir(subdir)) {
-                appPath = subdir
-                break
-            }
-        }
+        appPath = findAppDirInSubdirs(cwd)
     }
 
     // fall back to env variable
