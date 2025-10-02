@@ -7,6 +7,9 @@
 export default {
     baseStyle: {
         container: {
+            /** TOOLKIT CUSTOMIZATION **/
+            height: 'full',
+            /** END TOOLKIT CUSTOMIZATION **/
             minWidth: 'xs',
             width: 'full',
             boxShadow: 'base',

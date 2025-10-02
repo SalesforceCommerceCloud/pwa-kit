@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect} from 'react'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
 // Components
@@ -14,25 +14,22 @@ import {
     Box,
     Button,
     SimpleGrid,
-    HStack,
-    VStack,
+    Heading,
     Text,
-    Flex,
     Stack,
-    Container,
-    Link
+    Link,
+    Image,
+    VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import Hero from '@salesforce/retail-react-app/app/components/hero'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import Section from '@salesforce/retail-react-app/app/components/section'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
 import Island from '@salesforce/retail-react-app/app/components/island'
+import Banner from '@salesforce/retail-react-app/app/components/banner'
 
 // Others
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/home/data'
 
 //Hooks
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
@@ -49,10 +46,8 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 
 /**
- * This is the home page for Retail React App.
- * The page is created for demonstration purposes.
- * The page renders SEO metadata and a few promotion
- * categories and products, data is from local file.
+ * Visual-rich home page inspired by NTO demo site
+ * Features: Hero banners, category showcase, content cards
  */
 const Home = () => {
     const intl = useIntl()
@@ -85,242 +80,236 @@ const Home = () => {
         dataCloud.sendViewPage(pathname)
     }, [])
 
+    // Category data for showcase grid
+    const categories = [
+        {
+            name: 'Women',
+            slug: 'womens',
+            image: getAssetUrl('static/img/category/women-subcategory-footwear-200-200.png')
+        },
+        {
+            name: 'Men',
+            slug: 'mens',
+            image: getAssetUrl('static/img/category/men-subcategory-jackets-200-200.png')
+        },
+        {
+            name: 'New Arrivals',
+            slug: 'newarrivals',
+            image: getAssetUrl('static/img/category/footwear-subcategory-kids-200-200.png')
+        },
+        {
+            name: 'Gear',
+            slug: 'newarrivals',
+            image: getAssetUrl('static/img/category/gear-subcategory-bags-200-200.png')
+        },
+        {
+            name: 'Kids',
+            slug: 'newarrivals',
+            image: getAssetUrl('static/img/category/footwear-subcategory-kids-200-200.png')
+        },
+        {
+            name: 'Nutrition',
+            slug: 'newarrivals',
+            image: getAssetUrl('static/img/category/nutrition-subcategory-energy-200-200.png')
+        }
+    ]
+
     return (
-        <Box data-testid="home-page" layerStyle="page">
+        <Box data-testid="home-page">
             <Seo
                 title="Home Page"
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
 
+            {/* Main Hero Banner */}
             <Island hydrateOn={'visible'}>
-                <Hero
-                    title={intl.formatMessage({
-                        defaultMessage: 'The React PWA Starter Store for Retail',
-                        id: 'home.title.react_starter_store'
-                    })}
-                    img={{
-                        src: getAssetUrl('static/img/hero.png'),
-                        alt: 'npx pwa-kit-create-app',
-                        fetchPriority: 'high'
-                    }}
-                    actions={
-                        <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
-                            <Button
-                                as={Link}
-                                href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
-                                target="_blank"
-                                width={{base: 'full', md: 'inherit'}}
-                                paddingX={7}
+                <Banner
+                    background={getAssetUrl('static/img/homepage/home-banner-01-1905-800.jpg')}
+                    height={500}
+                    variant="center"
+                    backgroundY={0.4}
+                >
+                    <VStack spacing={4}>
+                        <Heading
+                            as="h1"
+                            size="2xl"
+                            color="white"
+                            textShadow="2px 2px 4px rgba(0,0,0,0.8)"
+                        >
+                            Adventure Awaits
+                        </Heading>
+                        <Button
+                            size="lg"
+                            colorScheme="blue"
+                            as={Link}
+                            href="/category/newarrivals"
+                            _hover={{textDecoration: 'none'}}
+                        >
+                            Shop Now
+                        </Button>
+                    </VStack>
+                </Banner>
+            </Island>
+
+            {/* Shop By Category Section */}
+            <Island hydrateOn={'visible'}>
+                <Box maxW="container.xxxl" mx="auto" px={[4, 4, 6, 8]} pt={4} pb={8}>
+                    <Heading as="h2" size="xl" textAlign="center" mb={8}>
+                        Shop By Category
+                    </Heading>
+                    <SimpleGrid columns={{base: 2, md: 3, lg: 6}} spacing={6}>
+                        {categories.map((category, index) => (
+                            <Link
+                                key={index}
+                                href={`/category/${category.slug}`}
                                 _hover={{textDecoration: 'none'}}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Get started"
-                                    id="home.link.get_started"
-                                />
-                            </Button>
-                        </Stack>
-                    }
-                />
-            </Island>
-
-            <Island hydrateOn={'visible'}>
-                <Section
-                    background={'gray.50'}
-                    marginX="auto"
-                    paddingY={{base: 8, md: 16}}
-                    paddingX={{base: 4, md: 8}}
-                    borderRadius="base"
-                    width={{base: '100vw', md: 'inherit'}}
-                    position={{base: 'relative', md: 'inherit'}}
-                    left={{base: '50%', md: 'inherit'}}
-                    right={{base: '50%', md: 'inherit'}}
-                    marginLeft={{base: '-50vw', md: 'auto'}}
-                    marginRight={{base: '-50vw', md: 'auto'}}
-                >
-                    <SimpleGrid
-                        columns={{base: 1, md: 1, lg: 3}}
-                        spacingX={{base: 1, md: 4}}
-                        spacingY={{base: 4, md: 14}}
-                    >
-                        {heroFeatures.map((feature, index) => {
-                            const featureMessage = feature.message
-                            return (
-                                <Link key={index} target="_blank" href={feature.href}>
+                                <Box
+                                    position="relative"
+                                    overflow="hidden"
+                                    borderRadius="lg"
+                                    _hover={{transform: 'scale(1.05)', transition: 'all 0.3s'}}
+                                >
+                                    <Image
+                                        src={category.image}
+                                        alt={category.name}
+                                        w="100%"
+                                        h="200px"
+                                        objectFit="cover"
+                                    />
                                     <Box
-                                        background={'white'}
-                                        boxShadow="0px 2px 2px rgba(0, 0, 0, 0.1)"
-                                        borderRadius={'4px'}
+                                        position="absolute"
+                                        bottom={0}
+                                        left={0}
+                                        right={0}
+                                        bg="rgba(0,0,0,0.6)"
+                                        color="white"
+                                        py={3}
+                                        textAlign="center"
                                     >
-                                        <HStack>
-                                            <Flex
-                                                paddingLeft={6}
-                                                height={24}
-                                                align={'center'}
-                                                justify={'center'}
-                                            >
-                                                {feature.icon}
-                                            </Flex>
-                                            <Text fontWeight="700">
-                                                {intl.formatMessage(featureMessage.title)}
-                                            </Text>
-                                        </HStack>
+                                        <Heading as="h3" size="md">
+                                            {category.name}
+                                        </Heading>
                                     </Box>
-                                </Link>
-                            )
-                        })}
+                                </Box>
+                            </Link>
+                        ))}
                     </SimpleGrid>
-                </Section>
+                </Box>
             </Island>
 
+            {/* Content Banner - Rain Gear */}
+            <Island hydrateOn={'visible'}>
+                <Banner
+                    background={getAssetUrl('static/img/assets/071519_Tile_Rain_475x300.jpeg')}
+                    height={400}
+                    variant="left"
+                >
+                    <VStack align="start" spacing={4}>
+                        <Heading as="h2" size="xl" color="white">
+                            Rain? Where?
+                        </Heading>
+                        <Text fontSize="lg" color="white">
+                            Stay dry with our premium rain jackets
+                        </Text>
+                        <Button colorScheme="blue" size="lg">
+                            Shop Rain Gear
+                        </Button>
+                    </VStack>
+                </Banner>
+            </Island>
+
+            {/* New Arrivals Banner */}
+            <Island hydrateOn={'visible'}>
+                <Banner
+                    background={getAssetUrl('static/img/assets/071519_Tile_new_arrivals_475x300.jpeg')}
+                    height={400}
+                    variant="right"
+                >
+                    <VStack align="end" spacing={4}>
+                        <Heading as="h2" size="xl" color="white">
+                            New Seasons, New Styles
+                        </Heading>
+                        <Text fontSize="lg" color="white">
+                            Discover our latest collection
+                        </Text>
+                        <Button colorScheme="blue" size="lg">
+                            Shop New Arrivals
+                        </Button>
+                    </VStack>
+                </Banner>
+            </Island>
+
+            {/* Image + Text Content Card */}
+            <Island hydrateOn={'visible'}>
+                <Box maxW="container.xxxl" mx="auto" px={[4, 4, 6, 8]} py={16}>
+                    <SimpleGrid columns={{base: 1, md: 2}} spacing={10} alignItems="center">
+                        <Image
+                            src={getAssetUrl('static/img/assets/gear_collage_475x300.jpg')}
+                            alt="Outdoor Adventure"
+                            borderRadius="lg"
+                            w="100%"
+                            h="400px"
+                            objectFit="cover"
+                        />
+                        <Box>
+                            <Heading as="h2" size="xl" mb={6}>
+                                Created for a Lifetime of Exploring
+                            </Heading>
+                            <Text fontSize="lg" color="gray.700" lineHeight="tall">
+                                NTO gear and apparel is guaranteed to last, that's our promise to
+                                you. We believe a life outdoors is a life well lived and we want to
+                                enable everyone to discover the benefits of spending time outdoors.
+                            </Text>
+                            <Button mt={6} colorScheme="blue" size="lg">
+                                Shop Gear
+                            </Button>
+                        </Box>
+                    </SimpleGrid>
+                </Box>
+            </Island>
+
+            {/* Recommended Products */}
             {productSearchResult && (
                 <Island hydrateOn={'visible'}>
-                    <Section
-                        padding={4}
-                        paddingTop={16}
-                        title={intl.formatMessage({
-                            defaultMessage: 'Shop Products',
-                            id: 'home.heading.shop_products'
-                        })}
-                        subtitle={intl.formatMessage(
-                            {
-                                defaultMessage:
-                                    'This section contains content from the catalog. {docLink} on how to replace it.',
-                                id: 'home.description.shop_products',
-                                description:
-                                    '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
-                            },
-                            {
-                                docLink: (
-                                    <Link
-                                        target="_blank"
-                                        href={'https://sfdc.co/business-manager-manage-catalogs'}
-                                        textDecoration={'none'}
-                                        position={'relative'}
-                                        _after={{
-                                            position: 'absolute',
-                                            content: `""`,
-                                            height: '2px',
-                                            bottom: '-2px',
-                                            margin: '0 auto',
-                                            left: 0,
-                                            right: 0,
-                                            background: 'gray.700'
-                                        }}
-                                        _hover={{textDecoration: 'none'}}
-                                    >
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Read docs',
-                                            id: 'home.link.read_docs'
-                                        })}
-                                    </Link>
-                                )
-                            }
-                        )}
-                    >
+                    <Box maxW="container.xxxl" mx="auto" px={[4, 4, 6, 8]} py={16}>
+                        <Heading as="h2" size="xl" textAlign="center" mb={8}>
+                            Recommended For You
+                        </Heading>
                         <Stack pt={8} spacing={16}>
                             <ProductScroller
                                 products={productSearchResult?.hits}
                                 isLoading={isLoading}
                             />
                         </Stack>
-                    </Section>
+                    </Box>
                 </Island>
             )}
 
+            {/* Social Section */}
             <Island hydrateOn={'visible'}>
-                <Section
-                    padding={4}
-                    paddingTop={32}
-                    title={intl.formatMessage({
-                        defaultMessage: 'Features',
-                        id: 'home.heading.features'
-                    })}
-                    subtitle={intl.formatMessage({
-                        defaultMessage:
-                            'Out-of-the-box features so that you focus only on adding enhancements.',
-                        id: 'home.description.features'
-                    })}
-                >
-                    <Container maxW={'6xl'} marginTop={10}>
-                        <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
-                            {features.map((feature, index) => {
-                                const featureMessage = feature.message
-                                return (
-                                    <HStack key={index} align={'top'}>
-                                        <VStack align={'start'}>
-                                            <Flex
-                                                width={16}
-                                                height={16}
-                                                align={'center'}
-                                                justify={'left'}
-                                                color={'gray.900'}
-                                                paddingX={2}
-                                            >
-                                                {feature.icon}
-                                            </Flex>
-                                            <Text
-                                                as="h3"
-                                                color={'black'}
-                                                fontWeight={700}
-                                                fontSize={20}
-                                            >
-                                                {intl.formatMessage(featureMessage.title)}
-                                            </Text>
-                                            <Text color={'black'}>
-                                                {intl.formatMessage(featureMessage.text)}
-                                            </Text>
-                                        </VStack>
-                                    </HStack>
-                                )
-                            })}
+                <Box bg="gray.100" py={16}>
+                    <Box maxW="container.xxxl" mx="auto" px={[4, 4, 6, 8]} textAlign="center">
+                        <Heading as="h2" size="xl" mb={4}>
+                            #WeAreNTO
+                        </Heading>
+                        <Text fontSize="lg" color="gray.700" mb={8}>
+                            Share how you take NTO with you on your outdoor adventures
+                        </Text>
+                        <SimpleGrid columns={{base: 2, md: 4}} spacing={6}>
+                            {[1, 2, 3, 4].map((item) => (
+                                <Box
+                                    key={item}
+                                    bg="white"
+                                    h="200px"
+                                    borderRadius="lg"
+                                    boxShadow="md"
+                                />
+                            ))}
                         </SimpleGrid>
-                    </Container>
-                </Section>
-            </Island>
-
-            <Island hydrateOn={'visible'}>
-                <Section
-                    padding={4}
-                    paddingTop={32}
-                    title={intl.formatMessage({
-                        defaultMessage: "We're here to help",
-                        id: 'home.heading.here_to_help'
-                    })}
-                    subtitle={
-                        <>
-                            <>
-                                {intl.formatMessage({
-                                    defaultMessage: 'Contact our support staff.',
-                                    id: 'home.description.here_to_help'
-                                })}
-                            </>
-                            <br />
-                            <>
-                                {intl.formatMessage({
-                                    defaultMessage: 'They will get you to the right place.',
-                                    id: 'home.description.here_to_help_line_2'
-                                })}
-                            </>
-                        </>
-                    }
-                    actions={
-                        <Button
-                            as={Link}
-                            href="https://help.salesforce.com/s/?language=en_US"
-                            target="_blank"
-                            width={'auto'}
-                            paddingX={7}
-                            _hover={{textDecoration: 'none'}}
-                        >
-                            <FormattedMessage
-                                defaultMessage="Contact Us"
-                                id="home.link.contact_us"
-                            />
-                        </Button>
-                    }
-                    maxWidth={'xl'}
-                />
+                    </Box>
+                </Box>
             </Island>
         </Box>
     )

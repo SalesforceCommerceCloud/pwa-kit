@@ -116,10 +116,12 @@ const AppConfig = ({children, locals = {}}) => {
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
-                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                    <ChakraProvider theme={theme} disableEnvironment={true}>
+                        {children}
+                    </ChakraProvider>
                 </StoreLocatorProvider>
             </MultiSiteProvider>
-            <ReactQueryDevtools />
+            {/* <ReactQueryDevtools /> - Commented out for cleaner UI */}
         </CommerceApiProvider>
     )
 }
