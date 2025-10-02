@@ -13,7 +13,7 @@ const description =
     'Install the Agent MCP Tool Usage Guidelines for the PWA-Kit Retail React Application into the project'
 
 const InstallAgentRulesTool = {
-    name: 'b2c_install_agent_rules',
+    name: 'retailapp_install_agent_rules',
     description,
     inputSchema: {
         projectRoot: z.string().describe('Absolute path to the project root'),

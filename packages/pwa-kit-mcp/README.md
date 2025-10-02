@@ -22,23 +22,23 @@ _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were 
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
 
-* **`b2c_create_storefront_app`**:
+* **`retailapp_create_storefront`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
-* **`b2c_create_component`**:
+* **`retailapp_create_component`**:
   Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
-* **`b2c_create_page`**:
+* **`retailapp_create_page`**:
   Interactive tool to generate a new PWA storefront page with custom routing and components.
 
-* **`b2c_development_guidelines`**:
+* **`retailapp_get_dev_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
-* **`b2c_run_site_test`**:
+* **`retailapp_run_site_test`**:
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
-* ** `b2c_install_agent_rules` **:
+* ** `retailapp_install_agent_rules` **:
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 

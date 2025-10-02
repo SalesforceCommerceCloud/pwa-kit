@@ -35,7 +35,7 @@ describe('InstallAgentRulesTool', () => {
 
     it('has correct tool structure', () => {
         expect(InstallAgentRulesTool).toMatchObject({
-            name: 'b2c_install_agent_rules',
+            name: 'retailapp_install_agent_rules',
             description: expect.any(String),
             inputSchema: expect.any(Object),
             fn: expect.any(Function)

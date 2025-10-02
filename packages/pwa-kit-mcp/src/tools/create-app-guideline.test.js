@@ -63,7 +63,7 @@ describe('CreateAppGuidelinesTool', () => {
     describe('Tool Structure', () => {
         it('should have correct structure', () => {
             expect(tool).toMatchObject({
-                name: 'b2c_create_storefront_app',
+                name: 'retailapp_create_storefront',
                 description: expect.stringContaining(
                     'Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.'
                 ),
