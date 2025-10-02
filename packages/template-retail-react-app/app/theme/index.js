@@ -53,6 +53,19 @@ import ImageGallery from '@salesforce/retail-react-app/app/theme/components/proj
 import SearchSuggestions from '@salesforce/retail-react-app/app/theme/components/project/search-suggestions'
 import HorizontalSuggestions from '@salesforce/retail-react-app/app/theme/components/project/horizontal-suggestions'
 
+/** TOOLKIT CUSTOMIZATION **/
+import Banner from '@salesforce/retail-react-app/app/theme/components/project/banner'
+import PopularCategory from '@salesforce/retail-react-app/app/theme/components/project/popular-category'
+import SectionHeader from '@salesforce/retail-react-app/app/theme/components/project/section-header'
+import ContentCard from '@salesforce/retail-react-app/app/theme/components/project/content-card'
+import ServiceChatBot from '@salesforce/retail-react-app/app/theme/components/project/serviceChatBot'
+import ProductPricing from '@salesforce/retail-react-app/app/theme/components/project/product-pricing'
+import Grid from '@salesforce/retail-react-app/app/theme/components/project/grid'
+import Image from '@salesforce/retail-react-app/app/theme/components/project/image'
+import PopularCategories from '@salesforce/retail-react-app/app/theme/components/project/popular-categories'
+import ProductBadge from '@salesforce/retail-react-app/app/theme/components/project/product-badge'
+/** END TOOLKIT CUSTOMIZATION **/
+
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
 // more about extending and overriding themes for your project.
@@ -101,7 +114,20 @@ export const overrides = {
         SwatchGroup,
         ImageGallery,
         SearchSuggestions,
-        HorizontalSuggestions
+        HorizontalSuggestions,
+
+        /** TOOLKIT CUSTOMIZATION **/
+        Banner,
+        PopularCategory,
+        PopularCategories,
+        SectionHeader,
+        ContentCard,
+        ServiceChatBot,
+        ProductPricing,
+        Image,
+        Grid,
+        ProductBadge
+        /** END TOOLKIT CUSTOMIZATION **/
     }
 }
 
