@@ -186,38 +186,37 @@ export async function logMCPMessage(message) {
     }
 }
 
-/**
- * Detects workspace paths based on current working directory or pre-set environment variable
- * @returns {Object} containing detected absolute paths & configuration
- */
-export async function detectWorkspacePaths() {
-    let appPath = null
-    const cwd = process.cwd()
+function isValidAppDir(dir) {
+    return (
+        fs.existsSync(path.join(dir, 'pages')) &&
+        fs.existsSync(path.join(dir, 'components')) &&
+        fs.existsSync(path.join(dir, 'routes.jsx'))
+    )
+}
 
-    function isValidAppDir(dir) {
-        return (
-            fs.existsSync(path.join(dir, 'pages')) &&
-            fs.existsSync(path.join(dir, 'components')) &&
-            fs.existsSync(path.join(dir, 'routes.jsx'))
-        )
-    }
-
+function findAppDirInCwdAndParents(cwd) {
     let current = cwd
     for (let i = 0; i < 3; i++) {
         const candidate = path.join(current, 'app')
         if (isValidAppDir(candidate)) {
-            appPath = candidate
-            break
+            return candidate
         }
-
         if (isValidAppDir(current)) {
-            appPath = current
-            break
+            return current
         }
         const parent = path.dirname(current)
         if (parent === current) break
         current = parent
     }
+    return null
+}
+
+export async function detectWorkspacePaths() {
+    let appPath = null
+    const cwd = process.cwd()
+
+    // Use cwd and parent search
+    appPath = findAppDirInCwdAndParents(cwd)
 
     // search immediate subdirectories (3 levels) of cwd for expected project structure
     if (!appPath) {
@@ -252,11 +251,10 @@ export async function detectWorkspacePaths() {
     }
 
     // prompt user
-    if (!appPath) {
+    if (!appPath)
         throw new Error(
             "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
         )
-    }
 
     // Build paths relative to the detected app directory
     const pagesPath = path.join(appPath, 'pages')
