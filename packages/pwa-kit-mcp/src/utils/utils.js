@@ -192,20 +192,53 @@ export async function logMCPMessage(message) {
  */
 export async function detectWorkspacePaths() {
     let appPath = null
-
     const cwd = process.cwd()
-    const cwdPagesPath = path.join(cwd, 'pages')
-    const cwdComponentsPath = path.join(cwd, 'components')
-    const cwdRoutesPath = path.join(cwd, 'routes.jsx')
 
-    if (
-        fs.existsSync(cwdPagesPath) &&
-        fs.existsSync(cwdComponentsPath) &&
-        fs.existsSync(cwdRoutesPath)
-    ) {
-        appPath = cwd
+    function isValidAppDir(dir) {
+        return (
+            fs.existsSync(path.join(dir, 'pages')) &&
+            fs.existsSync(path.join(dir, 'components')) &&
+            fs.existsSync(path.join(dir, 'routes.jsx'))
+        )
     }
 
+    let current = cwd
+    for (let i = 0; i < 3; i++) {
+        const candidate = path.join(current, 'app')
+        if (isValidAppDir(candidate)) {
+            appPath = candidate
+            break
+        }
+
+        if (isValidAppDir(current)) {
+            appPath = current
+            break
+        }
+        const parent = path.dirname(current)
+        if (parent === current) break
+        current = parent
+    }
+
+    // search immediate subdirectories (3 levels) of cwd for expected project structure
+    if (!appPath) {
+        const subdirs = fs
+            .readdirSync(cwd, {withFileTypes: true})
+            .filter((d) => d.isDirectory())
+            .map((d) => path.join(cwd, d.name))
+        for (const subdir of subdirs) {
+            const candidate = path.join(subdir, 'app')
+            if (isValidAppDir(candidate)) {
+                appPath = candidate
+                break
+            }
+            if (isValidAppDir(subdir)) {
+                appPath = subdir
+                break
+            }
+        }
+    }
+
+    // fall back to env variable
     if (!appPath) {
         const envAppPath = process.env.PWA_STOREFRONT_APP_PATH
         if (envAppPath) {
@@ -218,6 +251,7 @@ export async function detectWorkspacePaths() {
         }
     }
 
+    // prompt user
     if (!appPath) {
         throw new Error(
             "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
@@ -228,11 +262,7 @@ export async function detectWorkspacePaths() {
     const pagesPath = path.join(appPath, 'pages')
     const componentsPath = path.join(appPath, 'components')
     const routesPath = path.join(appPath, 'routes.jsx')
-
-    // Node modules is typically one level up from the app directory
     const nodeModulesPath = path.join(appPath, '..', 'node_modules')
-
-    // Check if overrides directory exists (for ccExtensibility.overridesDir)
     const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
 
     // Verify essential directories exist

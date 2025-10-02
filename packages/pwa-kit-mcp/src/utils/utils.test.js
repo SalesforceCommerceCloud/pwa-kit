@@ -329,86 +329,87 @@ describe('logMCPMessage', () => {
 describe('detectWorkspacePaths', () => {
     const originalEnv = process.env.PWA_STOREFRONT_APP_PATH
     const originalCwd = process.cwd()
-    const tempDir = path.join(__dirname, 'temp-test-app')
+    const tempRoot = path.join(__dirname, 'temp-root')
+    const tempOverrides = path.join(tempRoot, 'overrides')
+    const tempApp = path.join(tempOverrides, 'app')
 
-    beforeEach(async () => {
-        // clean up any existing temp dir
-        try {
-            await fs.promises.rm(tempDir, {recursive: true, force: true})
-        } catch (e) {
-            // dir doesn't exist
-        }
+    function setupAppDir(appDir) {
+        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
+        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
+        fs.writeFileSync(path.join(appDir, 'routes.jsx'), 'export const routes = []')
+        fs.mkdirSync(path.join(appDir, '..', 'node_modules'), {recursive: true})
+    }
+
+    beforeEach(() => {
+        fs.rmSync(tempRoot, {recursive: true, force: true})
+        fs.mkdirSync(tempApp, {recursive: true})
+        setupAppDir(tempApp)
     })
 
-    afterEach(async () => {
+    afterEach(() => {
         if (originalEnv) {
             process.env.PWA_STOREFRONT_APP_PATH = originalEnv
         } else {
             delete process.env.PWA_STOREFRONT_APP_PATH
         }
-
-        // restore original cwd
         process.chdir(originalCwd)
-
-        // clean up temp dir
-        try {
-            await fs.promises.rm(tempDir, {recursive: true, force: true})
-        } catch (e) {
-            // directory doesn't exist
-        }
+        fs.rmSync(tempRoot, {recursive: true, force: true})
     })
 
-    it('should detect PWA Kit project in current working directory', async () => {
-        // create complete temp app structure
-        await fs.promises.mkdir(tempDir, {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
-        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
-        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
-
-        // change to temp directory and clear env
-        process.chdir(tempDir)
+    it('detects app dir when cwd is the app dir', async () => {
+        process.chdir(tempApp)
         delete process.env.PWA_STOREFRONT_APP_PATH
-
         const utils = await import('./utils')
         const result = await utils.detectWorkspacePaths()
-
-        expect(result).toEqual({
-            pagesPath: path.join(tempDir, 'pages'),
-            componentsPath: path.join(tempDir, 'components'),
-            routesPath: path.join(tempDir, 'routes.jsx'),
-            nodeModulesPath: path.join(tempDir, '..', 'node_modules'),
-            hasOverridesDir: fs.existsSync(path.join(tempDir, '..', 'overrides'))
-        })
+        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
     })
 
-    it('should fall back to PWA_STOREFRONT_APP_PATH when cwd is not a PWA Kit project', async () => {
-        // create complete temp app structure
-        await fs.promises.mkdir(tempDir, {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
-        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
-        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
-
-        // change to parent directory (not a PWA Kit project) and set env
-        process.chdir(path.join(tempDir, '..'))
-        process.env.PWA_STOREFRONT_APP_PATH = tempDir
-
+    it('detects app dir when cwd is the overrides dir (finds app as subdir)', async () => {
+        process.chdir(tempOverrides)
+        delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
         const result = await utils.detectWorkspacePaths()
-
-        expect(result).toEqual({
-            pagesPath: path.join(tempDir, 'pages'),
-            componentsPath: path.join(tempDir, 'components'),
-            routesPath: path.join(tempDir, 'routes.jsx'),
-            nodeModulesPath: path.join(tempDir, '..', 'node_modules'),
-            hasOverridesDir: fs.existsSync(path.join(tempDir, '..', 'overrides'))
-        })
+        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
     })
 
-    it('should throw user prompt error when both cwd and env fail', async () => {
-        // be in a directory that's not PWA Kit project
-        process.chdir(path.join(__dirname, '..'))
+    it('detects app dir when cwd is the project root (finds overrides/app as subdir)', async () => {
+        process.chdir(tempRoot)
+        delete process.env.PWA_STOREFRONT_APP_PATH
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
+    })
+
+    it('detects app dir in a parent directory (up to 3 levels)', async () => {
+        // Create a temp 'app' directory with required structure
+        const appDir = path.join(tempRoot, 'app')
+        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
+        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
+        fs.writeFileSync(path.join(appDir, 'routes.jsx'), '// routes')
+        // Create a deep subdirectory inside 'app'
+        const deepDir = path.join(appDir, 'foo', 'bar', 'baz')
+        fs.mkdirSync(deepDir, {recursive: true})
+        process.chdir(deepDir)
+        delete process.env.PWA_STOREFRONT_APP_PATH
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+        expect(result.pagesPath).toBe(path.join(appDir, 'pages'))
+    })
+
+    it('falls back to env variable if not found in cwd or parents/subdirs', async () => {
+        const notAnAppDir = path.join(tempRoot, 'not-an-app')
+        fs.mkdirSync(notAnAppDir, {recursive: true})
+        process.chdir(notAnAppDir)
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
+    })
+
+    it('prompts user if nothing is found', async () => {
+        const notAnAppDir = path.join(tempRoot, 'not-an-app')
+        fs.mkdirSync(notAnAppDir, {recursive: true})
+        process.chdir(notAnAppDir)
         delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
         await expect(utils.detectWorkspacePaths()).rejects.toThrow(
@@ -416,71 +417,31 @@ describe('detectWorkspacePaths', () => {
         )
     })
 
-    it('should throw error when PWA_STOREFRONT_APP_PATH does not exist', async () => {
-        process.env.PWA_STOREFRONT_APP_PATH = '/nonexistent/path/app'
+    it('throws error when pages directory is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'pages'), {recursive: true, force: true})
+        process.chdir(tempApp)
+        delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
         await expect(utils.detectWorkspacePaths()).rejects.toThrow(
             'Could not detect PWA Kit project directory. Please either:'
         )
     })
-
-    it('should throw error when pages directory is missing', async () => {
-        // create temp app structure without pages dir
-        await fs.promises.mkdir(tempDir, {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
-        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
-        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
-
-        // change to parent directory (not a PWA Kit project) and set env
-        process.chdir(path.join(tempDir, '..'))
-        process.env.PWA_STOREFRONT_APP_PATH = tempDir
+    it('throws error when components directory is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'components'), {recursive: true, force: true})
+        process.chdir(tempApp)
+        delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
-
         await expect(utils.detectWorkspacePaths()).rejects.toThrow(
-            `Pages directory not found at: ${path.join(tempDir, 'pages')}`
+            'Could not detect PWA Kit project directory. Please either:'
         )
     })
-
-    it('should return correct paths when all directories exist via env path variable', async () => {
-        // create complete temp app structure
-        await fs.promises.mkdir(tempDir, {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
-        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
-        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
-
-        // change to parent directory (not a PWA Kit project) and set env
-        process.chdir(path.join(tempDir, '..'))
-        process.env.PWA_STOREFRONT_APP_PATH = tempDir
-
+    it('throws error when routes.jsx is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'routes.jsx'), {force: true})
+        process.chdir(tempApp)
+        delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-
-        expect(result).toEqual({
-            pagesPath: path.join(tempDir, 'pages'),
-            componentsPath: path.join(tempDir, 'components'),
-            routesPath: path.join(tempDir, 'routes.jsx'),
-            nodeModulesPath: path.join(tempDir, '..', 'node_modules'),
-            hasOverridesDir: fs.existsSync(path.join(tempDir, '..', 'overrides'))
-        })
-    })
-
-    it('should detect hasOverridesDir when overrides directory exists', async () => {
-        // create complete temp app structure with overrides
-        await fs.promises.mkdir(tempDir, {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'pages'), {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, 'components'), {recursive: true})
-        await fs.promises.writeFile(path.join(tempDir, 'routes.jsx'), 'export const routes = []')
-        await fs.promises.mkdir(path.join(tempDir, '..', 'node_modules'), {recursive: true})
-        await fs.promises.mkdir(path.join(tempDir, '..', 'overrides'), {recursive: true})
-
-        // change to parent directory (not a PWA Kit project) and set env
-        process.chdir(path.join(tempDir, '..'))
-        process.env.PWA_STOREFRONT_APP_PATH = tempDir
-
-        const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-
-        expect(result.hasOverridesDir).toBe(true)
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            'Could not detect PWA Kit project directory. Please either:'
+        )
     })
 })
