@@ -212,7 +212,6 @@ const AccountPayments = () => {
     }
 
     const removePayment = async (paymentInstrumentId) => {
-        setDeletingId(paymentInstrumentId)
         try {
             await deleteCustomerPaymentInstrument.mutateAsync(
                 {
@@ -241,8 +240,6 @@ const AccountPayments = () => {
                 status: 'error',
                 isClosable: true
             })
-        } finally {
-            setDeletingId(null)
         }
     }
 
