@@ -1,4 +1,5 @@
 ## v0.4.0-dev (Sep 26, 2025)
+- Added Agent Guidelines. [#3366](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3366)
 
 ## v0.3.0 (Sep 25, 2025)
 - Added telemetry for MCP tools. [#3327](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3327)

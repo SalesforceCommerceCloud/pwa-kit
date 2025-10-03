@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {EmptyJsonSchema} from '../utils/utils'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 const guidelinesText = `# Salesforce Commerce Composable Storefront Development Guidelines
 
@@ -106,8 +107,8 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 `
 
 export default {
-    name: 'get_development_guidelines',
-    description: `You must follow the PWA Kit development guidelines before attempting to analyze, generate, refactor, modify, or fix code.
+    name: 'pwakit_get_dev_guidelines',
+    description: `You must follow the ${PWA_KIT_DESCRIPTIVE_NAME} development guidelines before attempting to analyze, generate, refactor, modify, or fix code.
 Example prompts: "Create a customer service Chat component", "Find bugs in my_script.jsx", and "Refactor my_script.jsx to use React Hooks".`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({

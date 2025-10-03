@@ -8,6 +8,7 @@ import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase} from '../utils'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
@@ -43,9 +44,8 @@ What is the main purpose of this component? Reply with exactly one of the follow
 
 class CreateNewComponentTool {
     constructor() {
-        this.name = 'create_component'
-        this.description =
-            'Create a sample React component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
+        this.name = 'pwakit_create_component'
+        this.description = `Create a new ${PWA_KIT_DESCRIPTIVE_NAME} component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.`
         this.inputSchema = {
             componentName: z.string().min(1, 'The name of the new component to create?'),
             purpose: z

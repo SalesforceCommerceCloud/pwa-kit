@@ -17,6 +17,7 @@ import {
     generateComponentImportStatement
 } from '../utils'
 import {z} from 'zod'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
         Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
@@ -71,9 +72,8 @@ const systemPromptForUnfoundComponents = (unfoundComponents) =>
 
 class CreateNewPageTool {
     constructor() {
-        this.name = 'create_page'
-        this.description =
-            'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
+        this.name = 'pwakit_create_page'
+        this.description = `Create a new ${PWA_KIT_DESCRIPTIVE_NAME} page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.`
         this.inputSchema = {
             pageName: z.string().describe('The name of the new page to create'),
             componentList: z

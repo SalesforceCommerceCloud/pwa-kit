@@ -10,6 +10,7 @@ import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../u
 import shell from 'shelljs'
 import fs from 'fs'
 import path from 'path'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 const CREATE_APP_COMMAND = getCreateAppCommand()
 const DISPLAY_PROGRAM_FLAG = '--displayProgram'
@@ -69,10 +70,10 @@ If the user requests a project using a **template**:
 `
 
 class CreateAppGuidelinesTool {
-    name = 'create_storefront_app'
+    name = 'pwakit_create_storefront'
     description = `
     
-Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.
+Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new ${PWA_KIT_DESCRIPTIVE_NAME} project.
 
 Do not attempt to create a project without using this tool first.
 
