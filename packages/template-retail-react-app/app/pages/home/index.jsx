@@ -17,7 +17,6 @@ import {
     Heading,
     Text,
     Stack,
-    Link,
     Image,
     VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -27,6 +26,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
 import Island from '@salesforce/retail-react-app/app/components/island'
 import Banner from '@salesforce/retail-react-app/app/components/banner'
+import Link from '@salesforce/retail-react-app/app/components/link'
 
 // Others
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
