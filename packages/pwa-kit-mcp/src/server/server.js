@@ -17,6 +17,7 @@ import {
     InstallAgentRulesTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -85,8 +86,8 @@ class PwaStorefrontMCPServerHighLevel {
             DeveloperGuidelinesTool.fn
         )
         this.server.tool(
-            'retailapp_run_site_test',
-            'Run site or app performance or accessibility test for a given site URL',
+            'pwakit_run_site_test',
+            `Run the ${PWA_KIT_DESCRIPTIVE_NAME} site or app performance or accessibility test for a given site URL`,
             {
                 testType: z.enum(['performance', 'accessibility']).describe('Type of test to run'),
                 siteUrl: z.string().describe('Site URL to test')

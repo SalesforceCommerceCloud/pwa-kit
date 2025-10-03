@@ -8,12 +8,12 @@ import {z} from 'zod'
 import fs from 'fs'
 import fsp from 'fs/promises'
 import path from 'path'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
-const description =
-    'Install the Agent MCP Tool Usage Guidelines for the PWA-Kit Retail React Application into the project'
+const description = `Install the Agent MCP Tool Usage Guidelines for the ${PWA_KIT_DESCRIPTIVE_NAME} into the project`
 
 const InstallAgentRulesTool = {
-    name: 'retailapp_install_agent_rules',
+    name: 'pwakit_install_agent_rules',
     description,
     inputSchema: {
         projectRoot: z.string().describe('Absolute path to the project root'),

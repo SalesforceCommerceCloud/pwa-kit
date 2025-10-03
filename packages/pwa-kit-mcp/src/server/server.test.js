@@ -60,7 +60,7 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
         expect(response.result).toHaveProperty('tools')
         // Check that at least the DeveloperGuidelinesTool is present
         const toolNames = response.result.tools.map((t) => t.name)
-        expect(toolNames).toContain('retailapp_get_dev_guidelines')
+        expect(toolNames).toContain('pwakit_get_dev_guidelines')
 
         child.kill()
     }, 10000)
