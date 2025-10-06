@@ -12,9 +12,7 @@ import {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement,
-    findAppDirInSubdirs,
-    findAppDirInCwdAndParents
+    generateComponentImportStatement
 } from './utils'
 import fs from 'fs'
 import path from 'path'
@@ -328,97 +326,18 @@ describe('logMCPMessage', () => {
     })
 })
 
-describe('findAppDirInSubdirs', () => {
-    const tempRoot = path.join(__dirname, 'temp-subdir-root')
-    const appDir = path.join(tempRoot, 'my-app')
-    const appSubdir = path.join(tempRoot, 'sub', 'app')
-
-    function setupAppDir(appDir) {
-        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
-        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
-        fs.writeFileSync(path.join(appDir, 'routes.jsx'), 'export const routes = []')
-    }
-
-    beforeEach(() => {
-        fs.rmSync(tempRoot, {recursive: true, force: true})
-        fs.mkdirSync(appDir, {recursive: true})
-        setupAppDir(appDir)
-        fs.mkdirSync(path.dirname(appSubdir), {recursive: true})
-        setupAppDir(appSubdir)
-    })
-
-    afterEach(() => {
-        fs.rmSync(tempRoot, {recursive: true, force: true})
-    })
-
-    it('finds app dir in cwd', () => {
-        expect(findAppDirInSubdirs(appDir)).toBe(appDir)
-    })
-
-    it('finds app dir in immediate subdirectory', () => {
-        expect(findAppDirInSubdirs(tempRoot)).toBe(appDir)
-    })
-
-    it('finds app dir in subdir/app', () => {
-        expect(findAppDirInSubdirs(tempRoot)).toBe(appDir)
-    })
-
-    it('returns null if no app dir found', () => {
-        const unrelated = path.join(tempRoot, 'unrelated')
-        fs.mkdirSync(unrelated, {recursive: true})
-        expect(findAppDirInSubdirs(unrelated)).toBeNull()
-    })
-})
-
-describe('findAppDirInCwdAndParents', () => {
-    const tempRoot = path.join(__dirname, 'temp-parent-root')
-    const parentApp = path.join(tempRoot, 'parent-app')
-    const childDir = path.join(parentApp, 'child')
-    const grandchildDir = path.join(childDir, 'grandchild')
-
-    function setupAppDir(appDir) {
-        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
-        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
-        fs.writeFileSync(path.join(appDir, 'routes.jsx'), 'export const routes = []')
-    }
-
-    beforeEach(() => {
-        fs.rmSync(tempRoot, {recursive: true, force: true})
-        fs.mkdirSync(grandchildDir, {recursive: true})
-        setupAppDir(parentApp)
-    })
-
-    afterEach(() => {
-        fs.rmSync(tempRoot, {recursive: true, force: true})
-    })
-
-    it('finds app dir in parent directory up to 3 levels', () => {
-        expect(findAppDirInCwdAndParents(grandchildDir)).toBe(parentApp)
-    })
-
-    it('returns null if no parent app dir found within 3 levels', () => {
-        const unrelated = path.join(tempRoot, 'unrelated')
-        fs.mkdirSync(unrelated, {recursive: true})
-        expect(findAppDirInCwdAndParents(unrelated)).toBeNull()
-    })
-})
-
 describe('detectWorkspacePaths', () => {
     const originalEnv = process.env.PWA_STOREFRONT_APP_PATH
-    const originalCwd = process.cwd()
-    const tempRoot = path.join(__dirname, 'temp-root')
-    const tempOverrides = path.join(tempRoot, 'overrides')
-    const tempApp = path.join(tempOverrides, 'app')
+    const tempApp = path.join(__dirname, 'temp-app')
 
     function setupAppDir(appDir) {
         fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
         fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
         fs.writeFileSync(path.join(appDir, 'routes.jsx'), 'export const routes = []')
-        fs.mkdirSync(path.join(appDir, '..', 'node_modules'), {recursive: true})
     }
 
     beforeEach(() => {
-        fs.rmSync(tempRoot, {recursive: true, force: true})
+        fs.rmSync(tempApp, {recursive: true, force: true})
         fs.mkdirSync(tempApp, {recursive: true})
         setupAppDir(tempApp)
     })
@@ -429,48 +348,17 @@ describe('detectWorkspacePaths', () => {
         } else {
             delete process.env.PWA_STOREFRONT_APP_PATH
         }
-        process.chdir(originalCwd)
-        fs.rmSync(tempRoot, {recursive: true, force: true})
+        fs.rmSync(tempApp, {recursive: true, force: true})
     })
 
-    it('detects app dir when cwd is the app dir', async () => {
-        process.chdir(tempApp)
-        delete process.env.PWA_STOREFRONT_APP_PATH
-        const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
-    })
-
-    it('detects app dir when cwd is the overrides dir (finds app as subdir)', async () => {
-        process.chdir(tempOverrides)
-        delete process.env.PWA_STOREFRONT_APP_PATH
-        const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
-    })
-
-    it('detects app dir when cwd is the project root (finds overrides/app as subdir)', async () => {
-        process.chdir(tempRoot)
-        delete process.env.PWA_STOREFRONT_APP_PATH
-        const utils = await import('./utils')
-        const result = await utils.detectWorkspacePaths()
-        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
-    })
-
-    it('falls back to env variable if not found in cwd or parents/subdirs', async () => {
-        const notAnAppDir = path.join(tempRoot, 'not-an-app')
-        fs.mkdirSync(notAnAppDir, {recursive: true})
-        process.chdir(notAnAppDir)
+    it('detects app dir via env variable', async () => {
         process.env.PWA_STOREFRONT_APP_PATH = tempApp
         const utils = await import('./utils')
         const result = await utils.detectWorkspacePaths()
         expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
     })
 
-    it('prompts user if nothing is found', async () => {
-        const notAnAppDir = path.join(tempRoot, 'not-an-app')
-        fs.mkdirSync(notAnAppDir, {recursive: true})
-        process.chdir(notAnAppDir)
+    it('prompts user if env variable is not set', async () => {
         delete process.env.PWA_STOREFRONT_APP_PATH
         const utils = await import('./utils')
         await expect(utils.detectWorkspacePaths()).rejects.toThrow(
@@ -480,29 +368,22 @@ describe('detectWorkspacePaths', () => {
 
     it('throws error when pages directory is missing', async () => {
         fs.rmSync(path.join(tempApp, 'pages'), {recursive: true, force: true})
-        process.chdir(tempApp)
-        delete process.env.PWA_STOREFRONT_APP_PATH
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
         const utils = await import('./utils')
-        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
-            'Could not detect PWA Kit project directory. Please either:'
-        )
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow('Pages directory not found at:')
     })
     it('throws error when components directory is missing', async () => {
         fs.rmSync(path.join(tempApp, 'components'), {recursive: true, force: true})
-        process.chdir(tempApp)
-        delete process.env.PWA_STOREFRONT_APP_PATH
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
         const utils = await import('./utils')
         await expect(utils.detectWorkspacePaths()).rejects.toThrow(
-            'Could not detect PWA Kit project directory. Please either:'
+            'Components directory not found at:'
         )
     })
     it('throws error when routes.jsx is missing', async () => {
         fs.rmSync(path.join(tempApp, 'routes.jsx'), {force: true})
-        process.chdir(tempApp)
-        delete process.env.PWA_STOREFRONT_APP_PATH
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
         const utils = await import('./utils')
-        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
-            'Could not detect PWA Kit project directory. Please either:'
-        )
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow('Routes file not found at:')
     })
 })

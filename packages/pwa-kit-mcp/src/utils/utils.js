@@ -10,7 +10,6 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
-import os from 'os'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -187,71 +186,8 @@ export async function logMCPMessage(message) {
     }
 }
 
-function isValidAppDir(dir) {
-    const hasPages = fs.existsSync(path.join(dir, 'pages'))
-    const hasComponents = fs.existsSync(path.join(dir, 'components'))
-    const hasRoutes = fs.existsSync(path.join(dir, 'routes.jsx'))
-    return hasPages && hasComponents && hasRoutes
-}
-
-function findAppDirInSubdirs(cwd) {
-    if (isValidAppDir(cwd)) {
-        return cwd
-    }
-
-    const appSubdir = path.join(cwd, 'app')
-    if (isValidAppDir(appSubdir)) {
-        return appSubdir
-    }
-    // check each immediate subdirectory and their 'app' subdirectory
-    let subdirs
-    try {
-        subdirs = fs
-            .readdirSync(cwd, {withFileTypes: true})
-            .filter((d) => d.isDirectory() && !d.name.startsWith('.') && !d.isSymbolicLink())
-            .map((d) => path.join(cwd, d.name))
-    } catch (e) {
-        return null
-    }
-    for (const subdir of subdirs) {
-        if (isValidAppDir(subdir)) {
-            return subdir
-        }
-        const subdirApp = path.join(subdir, 'app')
-        if (isValidAppDir(subdirApp)) {
-            return subdirApp
-        }
-    }
-    return null
-}
-
-function findAppDirInCwdAndParents(cwd) {
-    let current = cwd
-    const homeDir = os.homedir()
-    for (let i = 0; i < 3; i++) {
-        const candidate = path.join(current, 'app')
-        if (isValidAppDir(candidate)) {
-            return candidate
-        }
-        if (isValidAppDir(current)) {
-            return current
-        }
-        const parent = path.dirname(current)
-        if (parent === current || parent === homeDir) break // stop at root/home
-        current = parent
-    }
-    return null
-}
-
 export async function detectWorkspacePaths() {
     let appPath = null
-    const cwd = process.cwd()
-
-    appPath = findAppDirInSubdirs(cwd)
-
-    if (!appPath) {
-        appPath = findAppDirInCwdAndParents(cwd)
-    }
 
     // Fall back to env variable
     if (!appPath) {
@@ -333,5 +269,3 @@ export function generateComponentImportStatement(
     const normalizedPath = relativePath.replace(/\\/g, '/')
     return `import ${componentName} from '${normalizedPath}'`
 }
-
-export {findAppDirInSubdirs, findAppDirInCwdAndParents}
