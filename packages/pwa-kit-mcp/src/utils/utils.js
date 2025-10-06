@@ -10,6 +10,7 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
+import os from 'os'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -187,14 +188,14 @@ export async function logMCPMessage(message) {
 }
 
 function isValidAppDir(dir) {
-    return (
-        fs.existsSync(path.join(dir, 'pages')) &&
-        fs.existsSync(path.join(dir, 'components')) &&
-        fs.existsSync(path.join(dir, 'routes.jsx'))
-    )
+    const hasPages = fs.existsSync(path.join(dir, 'pages'))
+    const hasComponents = fs.existsSync(path.join(dir, 'components'))
+    const hasRoutes = fs.existsSync(path.join(dir, 'routes.jsx'))
+    return hasPages && hasComponents && hasRoutes
 }
 
 function findAppDirInCwdAndParents(cwd) {
+    const homeDir = os.homedir()
     let current = cwd
     for (let i = 0; i < 3; i++) {
         const candidate = path.join(current, 'app')
@@ -205,17 +206,20 @@ function findAppDirInCwdAndParents(cwd) {
             return current
         }
         const parent = path.dirname(current)
-        if (parent === current) break
+        if (parent === current || parent === homeDir) break // stop at home dir
         current = parent
     }
     return null
 }
 
-function findAppDirInSubdirs(cwd) {
+function findAppDirInSubdirs(cwd, maxDepth = 3, currentDepth = 0) {
+    if (currentDepth >= maxDepth) return null
+
     const subdirs = fs
         .readdirSync(cwd, {withFileTypes: true})
         .filter((d) => d.isDirectory())
         .map((d) => path.join(cwd, d.name))
+
     for (const subdir of subdirs) {
         const candidate = path.join(subdir, 'app')
         if (isValidAppDir(candidate)) {
@@ -224,7 +228,11 @@ function findAppDirInSubdirs(cwd) {
         if (isValidAppDir(subdir)) {
             return subdir
         }
+
+        const deeper = findAppDirInSubdirs(subdir, maxDepth, currentDepth + 1)
+        if (deeper) return deeper
     }
+
     return null
 }
 
@@ -235,18 +243,30 @@ export async function detectWorkspacePaths() {
     // Use cwd and parent search
     appPath = findAppDirInCwdAndParents(cwd)
 
+    // Use subdirectory search
     if (!appPath) {
+        console.log(
+            '[detectWorkspacePaths] CWD/parent search failed, searching immediate subdirectories...'
+        )
         appPath = findAppDirInSubdirs(cwd)
+        console.log(`[detectWorkspacePaths] Subdir search result: ${appPath}`)
     }
 
     // fall back to env variable
     if (!appPath) {
+        console.log(
+            '[detectWorkspacePaths] Subdir search failed, checking PWA_STOREFRONT_APP_PATH environment variable...'
+        )
         const envAppPath = process.env.PWA_STOREFRONT_APP_PATH
         if (envAppPath) {
             try {
                 await fsPromises.access(envAppPath)
                 appPath = envAppPath
+                console.log(`[detectWorkspacePaths] Using env variable path: ${appPath}`)
             } catch (error) {
+                console.log(
+                    `[detectWorkspacePaths] Env variable path is not accessible: ${envAppPath}`
+                )
                 // no env path variable
             }
         }
