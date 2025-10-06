@@ -186,6 +186,52 @@ export async function logMCPMessage(message) {
     }
 }
 
+export async function detectWorkspacePaths() {
+    let appPath = process.env.PWA_STOREFRONT_APP_PATH
+
+    if (appPath) {
+        try {
+            await fsPromises.access(appPath)
+        } catch (error) {
+            // no env path variable
+            appPath = null
+        }
+    }
+
+    // Prompt user if detection failed
+    if (!appPath) {
+        throw new Error(
+            "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
+        )
+    }
+
+    // Build paths relative to the detected app directory
+    const pagesPath = path.join(appPath, 'pages')
+    const componentsPath = path.join(appPath, 'components')
+    const routesPath = path.join(appPath, 'routes.jsx')
+    const nodeModulesPath = path.join(appPath, '..', 'node_modules')
+    const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
+
+    // Verify essential directories exist
+    if (!fs.existsSync(pagesPath)) {
+        throw new Error(`Pages directory not found at: ${pagesPath}`)
+    }
+    if (!fs.existsSync(componentsPath)) {
+        throw new Error(`Components directory not found at: ${componentsPath}`)
+    }
+    if (!fs.existsSync(routesPath)) {
+        throw new Error(`Routes file not found at: ${routesPath}`)
+    }
+
+    return {
+        pagesPath,
+        componentsPath,
+        routesPath,
+        nodeModulesPath,
+        hasOverridesDir
+    }
+}
+
 /**
  * Returns the import statement for a component
  * @param {string} componentName - The name of the component to import.

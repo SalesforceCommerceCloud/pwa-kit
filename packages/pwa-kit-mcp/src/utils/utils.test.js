@@ -325,3 +325,65 @@ describe('logMCPMessage', () => {
         expect(exists).toBe(false)
     })
 })
+
+describe('detectWorkspacePaths', () => {
+    const originalEnv = process.env.PWA_STOREFRONT_APP_PATH
+    const tempApp = path.join(__dirname, 'temp-app')
+
+    function setupAppDir(appDir) {
+        fs.mkdirSync(path.join(appDir, 'pages'), {recursive: true})
+        fs.mkdirSync(path.join(appDir, 'components'), {recursive: true})
+        fs.writeFileSync(path.join(appDir, 'routes.jsx'), 'export const routes = []')
+    }
+
+    beforeEach(() => {
+        fs.rmSync(tempApp, {recursive: true, force: true})
+        fs.mkdirSync(tempApp, {recursive: true})
+        setupAppDir(tempApp)
+    })
+
+    afterEach(() => {
+        if (originalEnv) {
+            process.env.PWA_STOREFRONT_APP_PATH = originalEnv
+        } else {
+            delete process.env.PWA_STOREFRONT_APP_PATH
+        }
+        fs.rmSync(tempApp, {recursive: true, force: true})
+    })
+
+    it('detects app dir via env variable', async () => {
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
+        const utils = await import('./utils')
+        const result = await utils.detectWorkspacePaths()
+        expect(result.pagesPath).toBe(path.join(tempApp, 'pages'))
+    })
+
+    it('prompts user if env variable is not set', async () => {
+        delete process.env.PWA_STOREFRONT_APP_PATH
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            'Could not detect PWA Kit project directory. Please either:'
+        )
+    })
+
+    it('throws error when pages directory is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'pages'), {recursive: true, force: true})
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow('Pages directory not found at:')
+    })
+    it('throws error when components directory is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'components'), {recursive: true, force: true})
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow(
+            'Components directory not found at:'
+        )
+    })
+    it('throws error when routes.jsx is missing', async () => {
+        fs.rmSync(path.join(tempApp, 'routes.jsx'), {force: true})
+        process.env.PWA_STOREFRONT_APP_PATH = tempApp
+        const utils = await import('./utils')
+        await expect(utils.detectWorkspacePaths()).rejects.toThrow('Routes file not found at:')
+    })
+})
