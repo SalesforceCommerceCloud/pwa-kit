@@ -187,22 +187,17 @@ export async function logMCPMessage(message) {
 }
 
 export async function detectWorkspacePaths() {
-    let appPath = null
+    const appPath = process.env.PWA_STOREFRONT_APP_PATH
 
-    // Fall back to env variable
-    if (!appPath) {
-        const envAppPath = process.env.PWA_STOREFRONT_APP_PATH
-        if (envAppPath) {
-            try {
-                await fsPromises.access(envAppPath)
-                appPath = envAppPath
-            } catch (error) {
-                // no env path variable
-            }
+    if (appPath) {
+        try {
+            await fsPromises.access(appPath)
+        } catch (error) {
+            // no env path variable
         }
     }
 
-    // Prompt user if both detection methods failed
+    // Prompt user if detection failed
     if (!appPath) {
         throw new Error(
             "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
