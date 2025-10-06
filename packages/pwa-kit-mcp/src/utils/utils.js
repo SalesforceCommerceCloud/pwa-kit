@@ -10,6 +10,7 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
+import os from 'os'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -224,11 +225,33 @@ function findAppDirInSubdirs(cwd) {
     return null
 }
 
+function findAppDirInCwdAndParents(cwd) {
+    let current = cwd
+    const homeDir = os.homedir()
+    for (let i = 0; i < 3; i++) {
+        const candidate = path.join(current, 'app')
+        if (isValidAppDir(candidate)) {
+            return candidate
+        }
+        if (isValidAppDir(current)) {
+            return current
+        }
+        const parent = path.dirname(current)
+        if (parent === current || parent === homeDir) break // stop at root/home
+        current = parent
+    }
+    return null
+}
+
 export async function detectWorkspacePaths() {
     let appPath = null
     const cwd = process.cwd()
 
     appPath = findAppDirInSubdirs(cwd)
+
+    if (!appPath) {
+        appPath = findAppDirInCwdAndParents(cwd)
+    }
 
     // Fall back to env variable
     if (!appPath) {
