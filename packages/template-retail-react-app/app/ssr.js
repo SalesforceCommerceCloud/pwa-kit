@@ -39,7 +39,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: parseInt(process.env.PORT) || 3000,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
@@ -330,7 +330,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com'
-                    ]
+                    ],
+                        'font-src': [
+                            // Default font sources
+                            "'self'"
+                        ],
+                        'style-src': [
+                            // Allow inline styles for Chakra UI
+                            "'self'",
+                            "'unsafe-inline'"
+                        ]
                 }
             }
         })

@@ -56,6 +56,8 @@ import HorizontalSuggestions from '@salesforce/retail-react-app/app/theme/compon
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
 // more about extending and overriding themes for your project.
+
+// Fiorivia Fashion Theme Configuration
 export const overrides = {
     styles,
     layerStyles,
@@ -64,6 +66,27 @@ export const overrides = {
     space,
     gradients,
     shadows,
+    // Fiorivia theme customizations
+    radii: {
+        none: '0',
+        sm: 'calc(0.875rem - 4px)', // 10px
+        md: 'calc(0.875rem - 2px)', // 12px
+        base: '0.875rem', // 14px
+        lg: '0.875rem', // 14px
+        xl: 'calc(0.875rem + 4px)', // 18px
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        full: '9999px'
+    },
+    semanticTokens: {
+        colors: {
+            // Core semantic colors for Fiorivia theme
+            'chakra-body-bg': {default: '#ffffff'},
+            'chakra-body-text': {default: '#17171b'},
+            'chakra-border-color': {default: '#fafafa'},
+            'chakra-placeholder-color': {default: '#71717a'}
+        }
+    },
     components: {
         // base components
         Accordion,

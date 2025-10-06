@@ -130,11 +130,24 @@ const DrawerMenu = ({
                             defaultMessage: 'Menu Drawer'
                         })}
                     >
-                        <IconButton
-                            icon={<BrandLogo {...styles.logo} />}
-                            variant="unstyled"
+                        <Box
+                            as="button"
                             onClick={onLogoClick}
-                        />
+                            cursor="pointer"
+                            bg="transparent"
+                            border="none"
+                            padding={0}
+                            display="flex"
+                            alignItems="center"
+                            gap={2}
+                            _hover={{opacity: 0.8}}
+                            transition="opacity 0.2s"
+                        >
+                            <BrandLogo {...styles.logo} />
+                            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+                                MontClair
+                            </Text>
+                        </Box>
 
                         <DrawerCloseButton />
                     </DrawerHeader>

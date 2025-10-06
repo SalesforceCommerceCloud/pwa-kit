@@ -28,7 +28,12 @@ const LoginForm = ({
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
-                <BrandLogo width="60px" height="auto" />
+                <Stack align="center" spacing={2}>
+                    <BrandLogo width="48px" height="auto" />
+                    <Text fontSize="xl" fontWeight="bold" color="gray.800">
+                        MontClair
+                    </Text>
+                </Stack>
                 <Text align="center" fontSize="xl" fontWeight="semibold">
                     <FormattedMessage
                         defaultMessage="Welcome Back"

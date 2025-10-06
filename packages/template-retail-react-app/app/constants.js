@@ -10,7 +10,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Global app defaults
 export const DEFAULT_LOCALE = 'en-US'
-export const DEFAULT_SITE_TITLE = 'Retail React App'
+export const DEFAULT_SITE_TITLE = 'MontClair'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
 export const STALE_WHILE_REVALIDATE = 60 * 15 // 15 min
 
@@ -35,7 +35,7 @@ export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'medium'
 export const PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID = 'color'
 
 // Constants for the Homepage's Shop Products section.
-export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
+export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'womens-clothing-tops'
 export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 // Constants for menu

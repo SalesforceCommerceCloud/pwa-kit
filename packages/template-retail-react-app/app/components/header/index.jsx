@@ -177,16 +177,28 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMenuClick}
                     />
-                    <IconButton
+                    <Box
+                        as="button"
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.logo',
                             defaultMessage: 'Logo'
                         })}
-                        icon={<BrandLogo {...styles.logo} />}
-                        {...styles.icons}
-                        variant="unstyled"
                         onClick={onLogoClick}
-                    />
+                        cursor="pointer"
+                        bg="transparent"
+                        border="none"
+                        padding={0}
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        _hover={{opacity: 0.8}}
+                        transition="opacity 0.2s"
+                    >
+                        <BrandLogo {...styles.logo} />
+                        <Text fontSize="lg" fontWeight="bold" color="gray.800">
+                            MontClair
+                        </Text>
+                    </Box>
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <HideOnMobile>
                         <SearchBar />
