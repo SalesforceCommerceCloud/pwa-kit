@@ -49,25 +49,44 @@ import {
     slasPrivateProxyPath
 } from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
-import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
+import {ServerlessAdapter} from '@h4ad/serverless-adapter'
+import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
+import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
+import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
+import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
+import {is as typeis} from 'type-is'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
- * as binary by awsServerlessExpress when processing responses.
+ * as binary by serverless-adapter when processing responses.
  * We intentionally exclude all text/* values since we assume UTF8
  * encoding and there's no reason to bulk up the response by base64
  * encoding the result.
  *
  * We can use '*' in these types as a wildcard - see
  * https://www.npmjs.com/package/type-is#type--typeisismediatype-types
- *
  * @private
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
+
+export const isContentTypeBinary = (headers) => {
+    // Replicating the aws-serverless-express behavior
+    let contentType = headers['content-type'] || headers['Content-Type']
+    if (!contentType) {
+        return false
+    }
+    // Remove the encoding from the content type
+    contentType = contentType.split(';')[0]
+    return !!typeis(contentType, binaryMimeTypes)
+}
+
+export const isBinary = (headers) => {
+    return isContentTypeBinary(headers)
+}
 
 /**
  * Environment variables that must be set for the Express app to run remotely.
@@ -1187,7 +1206,15 @@ export const RemoteServerFactory = {
         // it indicates that the Lambda container has been reused.
         let lambdaContainerReused = false
 
-        const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
+        const serverlessAdapterHandler = ServerlessAdapter.new(app)
+            .setBinarySettings({
+                isBinary: isBinary
+            })
+            .setFramework(new ExpressFramework())
+            .setHandler(new DefaultHandler())
+            .setResolver(new CallbackResolver())
+            .addAdapter(new ApiGatewayV1Adapter({lowercaseRequestHeaders: true}))
+            .build()
 
         const handler = (event, context, callback) => {
             // encode non ASCII request headers
@@ -1244,42 +1271,25 @@ export const RemoteServerFactory = {
                 app.sendMetric('LambdaCreated')
             }
 
-            // Proxy the request through to the server. When the response
-            // is done, context.succeed will be called with the response
-            // data.
-            awsServerlessExpress.proxy(
-                server,
-                event, // The incoming event
-                context, // The event context
-                'CALLBACK', // How the proxy signals completion
-                (err, response) => {
-                    // The 'response' parameter here is NOT the same response
-                    // object handled by ExpressJS code. The awsServerlessExpress
-                    // middleware works by sending an http.Request to the Express
-                    // server and parsing the HTTP response that it returns.
-                    // Wait util all pending metrics have been sent, and any pending
-                    // response caching to complete. We have to do this now, before
-                    // sending the response; there's no way to do it afterwards
-                    // because the Lambda container is frozen inside the callback.
-
-                    // We return this Promise, but the awsServerlessExpress object
-                    // doesn't make any use of it.
-                    return (
-                        app._requestMonitor
-                            ._waitForResponses()
-                            .then(() => app.metrics.flush())
-                            // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response, event)))
-                        // DON'T add any then() handlers here, after the callback.
-                        // They won't be called after the response is sent, but they
-                        // *might* be called if the Lambda container running this code
-                        // is reused, which can lead to odd and unpredictable
-                        // behaviour.
-                    )
-                }
-            )
+            const managedCallback = (err, response) => {
+                return (
+                    app._requestMonitor
+                        ._waitForResponses()
+                        .then(() => app.metrics.flush())
+                        // Now call the Lambda callback to complete the response
+                        .then(() => callback(err, processLambdaResponse(response, event)))
+                    // DON'T add any then() handlers here, after the callback.
+                    // They won't be called after the response is sent, but they
+                    // *might* be called if the Lambda container running this code
+                    // is reused, which can lead to odd and unpredictable
+                    // behaviour.
+                )
+            }
+            return serverlessAdapterHandler(event, context, managedCallback)
         }
-        return {handler, server, app}
+        // Upgrading to serverless-adapter removes the server property
+        // return a null server to maintain backwards compatibility
+        return {handler, server: null, app}
     },
 
     /**
@@ -1475,9 +1485,10 @@ const applyPatches = once((options) => {
     https.request = outgoingRequestHook(https.request, options)
     https.get = outgoingRequestHook(https.get, options)
 
-    // Patch the ExpressJS Response class's redirect function to suppress
-    // the creation of a body (DESKTOP-485). Including the body may
-    // trigger a parsing error in aws-serverless-express.
+    // We no longer use aws-serverless-express but to maintain compatibility with the old code, we still patch the redirect function.
+    // - Patch the ExpressJS Response class's redirect function to suppress
+    // - the creation of a body (DESKTOP-485). Including the body may
+    // - trigger a parsing error in aws-serverless-express.
     express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url
@@ -1489,6 +1500,9 @@ const applyPatches = once((options) => {
 
         // Duplicate behaviour in node_modules/express/lib/response.js
         const address = this.location(workingUrl).get('Location')
+
+        // aws-serverless-express would add a Content-Length header to the response even if there was no body
+        this.set('Content-Length', 0)
 
         // Send a minimal response with just a status and location
         this.status(workingStatus).location(address).end()

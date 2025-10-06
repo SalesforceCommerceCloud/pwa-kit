@@ -20,7 +20,9 @@ module.exports = {
     collectCoverage: true,
     moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
     moduleNameMapper: {
-        '^.+\\.svg$': path.join(__dirname, '__mocks__', 'emptyStringMock.js')
+        '^.+\\.svg$': path.join(__dirname, '__mocks__', 'emptyStringMock.js'),
+        '^@h4ad/serverless-adapter/lib/(.*)$':
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/$1/index.cjs'
     },
     testPathIgnorePatterns: [
         '/dist/',

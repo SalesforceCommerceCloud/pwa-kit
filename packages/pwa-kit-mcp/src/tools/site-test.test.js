@@ -14,7 +14,7 @@ jest.mock('./site-test-accessibility.js', () => ({
     runAccessibilityTest: jest.fn(async (url) => ({mock: 'accessibility', url}))
 }))
 
-const DEFAULT_SITE_URL = 'https://pwa-kit.mobify-storefront.com'
+const TEST_SITE_URL = 'https://pwa-kit.mobify-storefront.com'
 
 describe('TestWithPlaywrightTool', () => {
     let tool
@@ -23,19 +23,32 @@ describe('TestWithPlaywrightTool', () => {
     })
 
     it('runs performance test with provided siteUrl', async () => {
-        const result = await tool.run('performance', DEFAULT_SITE_URL)
-        expect(result).toEqual({mock: 'performance', url: DEFAULT_SITE_URL})
+        const result = await tool.run('performance', TEST_SITE_URL)
+        expect(result).toEqual({mock: 'performance', url: TEST_SITE_URL})
     })
 
-    it('runs performance test with default siteUrl if not provided', async () => {
-        // Remove the error throw for missing siteUrl in your implementation if you want this to pass
+    it('returns structured error if siteUrl is missing for performance test', async () => {
         const result = await tool.run('performance')
-        expect(result).toEqual({mock: 'performance', url: DEFAULT_SITE_URL})
+        expect(result).toEqual({
+            content: [
+                {
+                    type: 'text',
+                    text: 'Missing required argument: siteUrl (full site URL)'
+                }
+            ]
+        })
     })
 
-    it('throws error if testType is unsupported', async () => {
+    it('returns structured error for unsupported test type', async () => {
         const result = await tool.run('unknown', 'https://example.com')
-        expect(result).toEqual({error: 'unsupported test type'})
+        expect(result).toEqual({
+            content: [
+                {
+                    type: 'text',
+                    text: "Unsupported test type: unknown. Use 'performance' or 'accessibility'."
+                }
+            ]
+        })
     })
 
     it('runs accessibility test with provided siteUrl', async () => {
@@ -43,8 +56,15 @@ describe('TestWithPlaywrightTool', () => {
         expect(result).toEqual({mock: 'accessibility', url: 'https://foo.com'})
     })
 
-    it('runs accessibility test with default siteUrl if not provided', async () => {
+    it('returns structured error if siteUrl is missing for accessibility test', async () => {
         const result = await tool.run('accessibility')
-        expect(result).toEqual({mock: 'accessibility', url: DEFAULT_SITE_URL})
+        expect(result).toEqual({
+            content: [
+                {
+                    type: 'text',
+                    text: 'Missing required argument: siteUrl (full site URL)'
+                }
+            ]
+        })
     })
 })
