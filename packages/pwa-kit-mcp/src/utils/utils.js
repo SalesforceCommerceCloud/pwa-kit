@@ -333,3 +333,5 @@ export function generateComponentImportStatement(
     const normalizedPath = relativePath.replace(/\\/g, '/')
     return `import ${componentName} from '${normalizedPath}'`
 }
+
+export {findAppDirInSubdirs, findAppDirInCwdAndParents}
