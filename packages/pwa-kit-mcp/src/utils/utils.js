@@ -187,13 +187,14 @@ export async function logMCPMessage(message) {
 }
 
 export async function detectWorkspacePaths() {
-    const appPath = process.env.PWA_STOREFRONT_APP_PATH
+    let appPath = process.env.PWA_STOREFRONT_APP_PATH
 
     if (appPath) {
         try {
             await fsPromises.access(appPath)
         } catch (error) {
             // no env path variable
+            appPath = null
         }
     }
 
