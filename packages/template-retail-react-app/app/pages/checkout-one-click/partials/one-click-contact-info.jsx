@@ -50,6 +50,7 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
+import {useSecureCustomerLookup} from '@salesforce/retail-react-app/app/hooks/use-secure-customer-lookup'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -65,6 +66,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
+    const {lookupCustomer, isLoading: isLookingUpCustomer, message: lookupMessage} = useSecureCustomerLookup()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -83,8 +85,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+    const [isProcessing, setIsProcessing] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
+    const [lookupResult, setLookupResult] = useState(null)
+    const [uniformMessage, setUniformMessage] = useState('')
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -98,7 +103,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onClose: onOtpModalClose
     } = useDisclosure()
 
-    // Handle email field blur/focus events
+    // Handle email field blur/focus events with secure lookup
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
         if (fields.email.onBlur) {
@@ -121,8 +126,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             return
         }
 
-        // Email is valid, proceed with OTP check
-        await handleSendEmailOtp(email)
+        // Email is valid, proceed with secure lookup
+        await handleSecureCustomerLookup(email)
     }
 
     const handleEmailFocus = (e) => {
@@ -143,22 +148,31 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         setEmailError('')
     }
 
-    // Handle sending OTP email
-    const handleSendEmailOtp = async (email) => {
+    // Handle secure customer lookup with uniform UI (Option 3: Hybrid Approach)
+    const handleSecureCustomerLookup = async (email) => {
         form.clearErrors('global')
         setIsCheckingEmail(true)
+        setEmailError('')
+
         try {
-            await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
-                callbackURI: `${callbackURL}?mode=otp_email`
-            })
-            // Only open modal if API call succeeds
-            onOtpModalOpen()
+            // Hide continue button during lookup
+            setShowContinueButton(false)
+
+            // Perform secure lookup with encrypted response
+            const result = await lookupCustomer(email)
+
+            // Always show same final state regardless of registration
+            setUniformMessage("We've sent verification instructions to your email if it's registered with us.")
+            setShowContinueButton(true) // Always show same button
+
+            // Store result privately for later use (not visible to user)
+            setLookupResult(result)
+
         } catch (error) {
-            // Keep continue button visible if email is valid (for unregistered users)
-            if (isValidEmail(email)) {
-                setShowContinueButton(true)
-            }
+            // Always show same uniform response even on errors
+            setUniformMessage("We've sent verification instructions to your email if it's registered with us.")
+            setShowContinueButton(true)
+            setLookupResult({ isRegistered: false, shouldShowOtp: false })
         } finally {
             setIsCheckingEmail(false)
         }
@@ -169,27 +183,68 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onOtpModalClose()
     }
 
-    // Handle checkout as guest from OTP modal
-    const handleCheckoutAsGuest = async () => {
+    // Handle continue button click
+    const handleContinueClick = async () => {
+        const email = form.getValues('email')
+
+        // Show processing state
+        setIsProcessing(true)
+        setUniformMessage('Processing...')
+
         try {
-            const email = form.getValues('email')
+            if (lookupResult?.shouldShowOtp) {
+                // Registered user - send OTP and show modal
+                try {
+                    await authorizePasswordlessLogin.mutateAsync({
+                        userid: email,
+                        callbackURI: `${callbackURL}?mode=otp_email`
+                    })
+                    setIsProcessing(false)
+                    setUniformMessage('')
+                    onOtpModalOpen()
+                } catch (otpError) {
+                    // OTP failed - proceed as guest
+                    setIsProcessing(false)
+                    await proceedAsGuest(email)
+                }
+            } else {
+                // Unregistered user - proceed as guest
+                setIsProcessing(false)
+                await proceedAsGuest(email)
+            }
+        } catch (error) {
+            setIsProcessing(false)
+            setError('Unable to continue. Please try again.')
+        }
+    }
+
+    // Helper function to proceed as guest
+    const proceedAsGuest = async (email) => {
+        try {
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: {email: email}
             })
 
-            // Set the flag that "Checkout as Guest" was clicked
+            // Set the flag that user is proceeding as guest
             setRegisteredUserChoseGuest(true)
             if (onRegisteredUserChoseGuest) {
                 onRegisteredUserChoseGuest(true)
             }
 
-            // Proceed to next step (shipping address)
+            // Clear uniform message and proceed to next step
+            setUniformMessage('')
             goToNextStep()
         } catch (error) {
             setError(error.message)
         }
+    }
+
+    // Handle checkout as guest from OTP modal
+    const handleCheckoutAsGuest = async () => {
+        const email = form.getValues('email')
+        await proceedAsGuest(email)
     }
 
     // Handle OTP verification
@@ -248,19 +303,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             return
         }
 
-        await updateCustomerForBasket.mutateAsync({
-            parameters: {basketId: basket.basketId},
-            body: {email: data.email}
-        })
-
         // Reset guest checkout flag since user is proceeding normally
         setRegisteredUserChoseGuest(false)
         if (onRegisteredUserChoseGuest) {
             onRegisteredUserChoseGuest(false)
         }
 
-        setShowContinueButton(false)
-        handleSendEmailOtp(data.email)
+        // Start the secure lookup process with uniform UI
+        handleSecureCustomerLookup(data.email)
     }
 
     return (
@@ -317,7 +367,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                                 ...fields.email.inputProps
                                             }}
                                         />
-                                        {isCheckingEmail && (
+                                        {(isCheckingEmail || isLookingUpCustomer || isProcessing) && (
                                             <InputRightElement
                                                 height="100%"
                                                 display="flex"
@@ -339,6 +389,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             {emailError}
                                         </Text>
                                     )}
+
+                                    {/* Uniform message display */}
+                                    {uniformMessage && (
+                                        <Text fontSize="sm" color="blue.600" mt={2} textAlign="center">
+                                            {uniformMessage}
+                                        </Text>
+                                    )}
                                 </Stack>
 
                                 <Stack spacing={3}>
@@ -348,10 +405,15 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         idps={idps}
                                     />
                                     {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button type="submit">
+                                        <Button
+                                            type={lookupResult ? "button" : "submit"}
+                                            onClick={lookupResult ? handleContinueClick : undefined}
+                                            isLoading={isProcessing}
+                                            loadingText="Processing..."
+                                        >
                                             <FormattedMessage
-                                                defaultMessage="Continue to Shipping Address"
-                                                id="contact_info.button.continue_to_shipping_address"
+                                                defaultMessage="Continue"
+                                                id="contact_info.button.continue"
                                             />
                                         </Button>
                                     )}
