@@ -6,3 +6,4 @@
  */
 export const PWA_KIT_DESCRIPTIVE_NAME =
     'B2C Commerce Cloud Composable Storefront PWA-Kit Retail React Application'
+export const OAUTH_TOKEN_URL = 'https://account.demandware.com/dwsso/oauth2/access_token'

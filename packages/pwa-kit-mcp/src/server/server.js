@@ -133,6 +133,12 @@ class PwaStorefrontMCPServerHighLevel {
         }
 
         const noTelemetry = !!readFlag('no-telemetry', false)
+        const dwJsonPath = readFlag('dw-json', null)
+        console.error('dwJsonPath', dwJsonPath)
+        // Store dw.json path globally so tools can access it
+        if (dwJsonPath) {
+            global.DW_JSON_PATH = dwJsonPath
+        }
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
         // when telemetry is enabled, then send telemetry events
