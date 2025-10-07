@@ -54,13 +54,15 @@ const BoxArrow = () => {
 
 const AccountPayments = () => {
     const {formatMessage} = useIntl()
-    const {data: customer, isLoading, error, refetch} = useCurrentCustomer()
+    const {data: customer, isLoading: isLoadingCustomer, error, refetch} = useCurrentCustomer()
     const showToast = useToast()
     const [isAdding, setIsAdding] = useState(false)
     const [formKey, setFormKey] = useState(0)
     const addPaymentForm = useForm()
     const {
-        data: {configurations}
+        data: configurations,
+        isLoading: isLoadingConfigurations,
+        error: configurationsError
     } = useConfigurations()
     const createCustomerPaymentInstrument = useShopperCustomersMutation(
         'createCustomerPaymentInstrument'
@@ -69,7 +71,7 @@ const AccountPayments = () => {
         'deleteCustomerPaymentInstrument'
     )
 
-    const isSalesforcePaymentsEnabled = configurations?.find(
+    const isSalesforcePaymentsEnabled = configurations?.configurations?.find(
         (config) => config.id === SALESFORCE_PAYMENTS_ALLOWED
     )?.value
 
@@ -160,7 +162,7 @@ const AccountPayments = () => {
     }
 
     // Show loading state
-    if (isLoading) {
+    if (isLoadingCustomer || isLoadingConfigurations) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -184,7 +186,7 @@ const AccountPayments = () => {
     }
 
     // Show error state
-    if (error) {
+    if (error || configurationsError) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -294,7 +296,7 @@ const AccountPayments = () => {
                     </Heading>
                     <Button
                         onClick={() => refetch()}
-                        isLoading={isLoading}
+                        isLoading={isLoadingCustomer}
                         size="sm"
                         variant="outline"
                     >
