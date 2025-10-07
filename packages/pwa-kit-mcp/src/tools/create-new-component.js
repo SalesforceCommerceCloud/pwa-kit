@@ -81,7 +81,7 @@ class CreateNewComponentTool {
                         content: [
                             {
                                 type: 'text',
-                                text: `I need to know where your PWA Kit project is located to create the page. ${error.message}\n\nPlease provide the path to your PWA Kit project's app directory.`
+                                text: `I need to know where your PWA Kit project is located to create the component. ${error.message}\n\nPlease provide the path to your PWA Kit project's app directory.`
                             }
                         ]
                     }
