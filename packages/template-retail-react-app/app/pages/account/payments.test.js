@@ -480,6 +480,41 @@ describe('AccountPayments', () => {
         expect(screen.getByText('Mastercard')).toBeInTheDocument()
     })
 
+    test('handles the isLoading state for the shopper configuration API', () => {
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {customerId: 'test-customer-id', paymentInstruments: []},
+            isLoading: false,
+            error: null
+        })
+        mockUseConfigurations.mockReturnValue({
+            data: null,
+            isLoading: true,
+            error: null
+        })
+
+        renderWithProviders(<AccountPayments />)
+
+        expect(screen.getByText(/loading payment methods/i)).toBeInTheDocument()
+    })
+
+    test('handles the error state for the shopper configuration API', () => {
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {customerId: 'test-customer-id', paymentInstruments: []},
+            isLoading: false,
+            error: null
+        })
+        mockUseConfigurations.mockReturnValue({
+            data: null,
+            isLoading: false,
+            error: new Error('Failed to load payment methods')
+        })
+
+        renderWithProviders(<AccountPayments />)
+
+        expect(screen.getByText(/error loading payment methods/i)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /retry/i})).toBeInTheDocument()
+    })
+
     test('handles missing SalesforcePaymentsAllowed configuration gracefully', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: {customerId: 'test-customer-id', paymentInstruments: []},
