@@ -18,6 +18,10 @@ PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates
 
 _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
+## Important
+
+Feature is available as a developer preview. Feature isn’t generally available unless or until Salesforce announces its general availability in documentation or in press releases or public statements. All commands, parameters, and other features are subject to change or deprecation at any time, with or without notice. Don't implement functionality developed with these commands or tools.
+
 ## 🧰 Features
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
