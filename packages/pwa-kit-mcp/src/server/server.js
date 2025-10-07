@@ -14,7 +14,8 @@ import {
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
-    ExploreCommerceAPITool
+    ExploreCommerceAPITool,
+    HooksRecommendationTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 
@@ -68,6 +69,7 @@ class PwaStorefrontMCPServerHighLevel {
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
         this.exploreCommerceAPITool = new ExploreCommerceAPITool()
+        this.hooksRecommendationTool = new HooksRecommendationTool()
         this.setupTools()
     }
 
@@ -111,6 +113,12 @@ class PwaStorefrontMCPServerHighLevel {
             this.exploreCommerceAPITool.description,
             this.exploreCommerceAPITool.inputSchema,
             this.exploreCommerceAPITool.handler
+        )
+        this.server.tool(
+            this.hooksRecommendationTool.name,
+            this.hooksRecommendationTool.description,
+            this.hooksRecommendationTool.inputSchema,
+            this.hooksRecommendationTool.handler
         )
     }
 
