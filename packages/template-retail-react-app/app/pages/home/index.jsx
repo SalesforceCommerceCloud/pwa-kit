@@ -84,8 +84,8 @@ const Home = () => {
         {
             title: 'Designed for comfort,\ncrafted with care.',
             subtitle: 'Experience the elegance of MontClair fashion.',
-            video: getAssetUrl('static/video/banner_video.mp4'),
-            poster: getAssetUrl('static/img/hero@3x.jpg'),
+            video: getAssetUrl('static/video/banner_video.webm'),
+            poster: getAssetUrl('static/img/hero-df-1.jpg'),
             buttonText: 'Shop Now'
         }
     ]
