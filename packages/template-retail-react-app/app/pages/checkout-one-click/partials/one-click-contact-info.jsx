@@ -85,11 +85,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
-    const [isProcessing, setIsProcessing] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
     const [lookupResult, setLookupResult] = useState(null)
-    const [uniformMessage, setUniformMessage] = useState('')
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -157,22 +155,33 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         try {
             // Hide continue button during lookup
             setShowContinueButton(false)
-
+            
             // Perform secure lookup with encrypted response
             const result = await lookupCustomer(email)
-
-            // Always show same final state regardless of registration
-            setUniformMessage("We've sent verification instructions to your email if it's registered with us.")
-            setShowContinueButton(true) // Always show same button
-
-            // Store result privately for later use (not visible to user)
+            
+            // Store result privately for use in OTP modal
             setLookupResult(result)
+            
+            // For registered users, attempt to send OTP
+            if (result.shouldShowOtp) {
+                try {
+                    await authorizePasswordlessLogin.mutateAsync({
+                        userid: email,
+                        callbackURI: `${callbackURL}?mode=otp_email`
+                    })
+                } catch (otpError) {
+                    // OTP failed but still show modal with skip-only option
+                    console.log('OTP send failed:', otpError)
+                }
+            }
+            
+            // Always show OTP modal directly (uniform UI)
+            onOtpModalOpen()
 
         } catch (error) {
-            // Always show same uniform response even on errors
-            setUniformMessage("We've sent verification instructions to your email if it's registered with us.")
-            setShowContinueButton(true)
+            // On error, still show OTP modal with guest-only functionality
             setLookupResult({ isRegistered: false, shouldShowOtp: false })
+            onOtpModalOpen()
         } finally {
             setIsCheckingEmail(false)
         }
@@ -183,40 +192,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onOtpModalClose()
     }
 
-    // Handle continue button click
-    const handleContinueClick = async () => {
-        const email = form.getValues('email')
-
-        // Show processing state
-        setIsProcessing(true)
-        setUniformMessage('Processing...')
-
-        try {
-            if (lookupResult?.shouldShowOtp) {
-                // Registered user - send OTP and show modal
-                try {
-                    await authorizePasswordlessLogin.mutateAsync({
-                        userid: email,
-                        callbackURI: `${callbackURL}?mode=otp_email`
-                    })
-                    setIsProcessing(false)
-                    setUniformMessage('')
-                    onOtpModalOpen()
-                } catch (otpError) {
-                    // OTP failed - proceed as guest
-                    setIsProcessing(false)
-                    await proceedAsGuest(email)
-                }
-            } else {
-                // Unregistered user - proceed as guest
-                setIsProcessing(false)
-                await proceedAsGuest(email)
-            }
-        } catch (error) {
-            setIsProcessing(false)
-            setError('Unable to continue. Please try again.')
-        }
-    }
 
     // Helper function to proceed as guest
     const proceedAsGuest = async (email) => {
@@ -367,7 +342,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                                 ...fields.email.inputProps
                                             }}
                                         />
-                                        {(isCheckingEmail || isLookingUpCustomer || isProcessing) && (
+                                        {(isCheckingEmail || isLookingUpCustomer) && (
                                             <InputRightElement
                                                 height="100%"
                                                 display="flex"
@@ -390,12 +365,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         </Text>
                                     )}
 
-                                    {/* Uniform message display */}
-                                    {uniformMessage && (
-                                        <Text fontSize="sm" color="blue.600" mt={2} textAlign="center">
-                                            {uniformMessage}
-                                        </Text>
-                                    )}
                                 </Stack>
 
                                 <Stack spacing={3}>
@@ -405,12 +374,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         idps={idps}
                                     />
                                     {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button
-                                            type={lookupResult ? "button" : "submit"}
-                                            onClick={lookupResult ? handleContinueClick : undefined}
-                                            isLoading={isProcessing}
-                                            loadingText="Processing..."
-                                        >
+                                        <Button type="submit">
                                             <FormattedMessage
                                                 defaultMessage="Continue"
                                                 id="contact_info.button.continue"
@@ -420,7 +384,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                 </Stack>
                             </Stack>
 
-                            {/* OTP Auth Modal */}
+                            {/* OTP Auth Modal - Uniform for all users */}
                             <OtpAuth
                                 isOpen={isOtpModalOpen}
                                 onClose={handleOtpModalClose}
@@ -428,6 +392,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                 handleSendEmailOtp={handleSendEmailOtp}
                                 handleOtpVerification={handleOtpVerification}
                                 onCheckoutAsGuest={handleCheckoutAsGuest}
+                                isRegisteredUser={lookupResult?.shouldShowOtp || false}
+                                uniformMode={true}
                             />
                         </form>
                     </Container>
