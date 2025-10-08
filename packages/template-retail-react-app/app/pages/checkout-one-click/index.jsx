@@ -78,7 +78,9 @@ const CheckoutOneClick = () => {
     )
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
-    let shopperPaymentInstrument
+    const [shopperPaymentInstrument, setShopperPaymentInstrument] = useState(null)
+    const [selectedPaymentMethodFromChild, setSelectedPaymentMethodFromChild] = useState(null)
+    const [isEditingPaymentFromChild, setIsEditingPaymentFromChild] = useState(false)
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -148,13 +150,15 @@ const CheckoutOneClick = () => {
             }
         }
 
-        shopperPaymentInstrument = {
+        const fullCardDetails = {
             holder: formValue.holder,
             number: formValue.number,
             cardType: getPaymentInstrumentCardType(formValue.cardType),
             expirationMonth: parseInt(expirationMonth),
             expirationYear: parseInt(`20${expirationYear}`)
         }
+
+        setShopperPaymentInstrument(fullCardDetails)
 
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
@@ -192,7 +196,7 @@ const CheckoutOneClick = () => {
         })
     }
 
-    const submitOrder = async () => {
+    const submitOrder = async (fullCardDetails) => {
         const saveShippingAddress = async (customerId, address) => {
             try {
                 await createCustomerAddress({
@@ -226,25 +230,52 @@ const CheckoutOneClick = () => {
             }
         }
 
-        // Save payment instrument for existing registered users if they checked the save box
-        const savePaymentInstrumentForRegisteredUser = async (
+        const savePaymentInstrumentWithDetails = async (
             customerId,
-            orderPaymentInstrument
+            paymentMethodId,
+            fullCardDetails
         ) => {
             try {
-                if (orderPaymentInstrument && shopperPaymentInstrument) {
-                    await savePaymentInstrument(customerId, orderPaymentInstrument.paymentMethodId)
+                const paymentInstrument = {
+                    paymentMethodId: paymentMethodId,
+                    paymentCard: {
+                        holder: fullCardDetails.holder,
+                        number: fullCardDetails.number,
+                        cardType: fullCardDetails.cardType,
+                        expirationMonth: fullCardDetails.expirationMonth,
+                        expirationYear: fullCardDetails.expirationYear
+                    }
                 }
+
+                await createCustomerPaymentInstruments.mutateAsync({
+                    body: paymentInstrument,
+                    parameters: {customerId: customerId}
+                })
             } catch (error) {
-                console.error(
-                    '🔍 Debug - Failed to save payment instrument for registered user:',
-                    error
-                )
                 // Fail silently
             }
         }
 
-        const registerUser = async (data) => {
+        // Save payment instrument for existing registered users if they checked the save box
+        const savePaymentInstrumentForRegisteredUser = async (
+            customerId,
+            orderPaymentInstrument,
+            fullCardDetails
+        ) => {
+            try {
+                if (orderPaymentInstrument && fullCardDetails) {
+                    await savePaymentInstrumentWithDetails(
+                        customerId,
+                        orderPaymentInstrument.paymentMethodId,
+                        fullCardDetails
+                    )
+                }
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
+        const registerUser = async (data, fullCardDetails) => {
             try {
                 const body = {
                     customer: {
@@ -261,8 +292,16 @@ const CheckoutOneClick = () => {
                 // Save the shipping address from this order, should not block account creation
                 await saveShippingAddress(customer.customerId, data.address)
 
-                // Save the payment instrument
-                await savePaymentInstrument(customer.customerId, data.paymentMethodId)
+                // Save the payment instrument with full card details
+                if (fullCardDetails) {
+                    await savePaymentInstrumentWithDetails(
+                        customer.customerId,
+                        data.paymentMethodId,
+                        fullCardDetails
+                    )
+                } else {
+                    await savePaymentInstrument(customer.customerId, data.paymentMethodId)
+                }
 
                 showToast({
                     variant: 'subtle',
@@ -304,6 +343,8 @@ const CheckoutOneClick = () => {
             // Ensure we are using the freshest basket id
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed.data?.basketId || basket.basketId
+
+            // Create order with the latest basket
             const order = await createOrder({
                 body: {basketId: latestBasketId}
             })
@@ -314,21 +355,26 @@ const CheckoutOneClick = () => {
                 const {id, ...address} = order.shipments[0].shippingAddress
                 address.addressId = nanoid()
 
-                await registerUser({
-                    firstName: order.billingAddress.firstName,
-                    lastName: order.billingAddress.lastName,
-                    email: order.customerInfo.email,
-                    phoneHome: order.billingAddress.phone,
-                    address: address,
-                    paymentMethodId: order.paymentInstruments[0].paymentMethodId
-                })
+                await registerUser(
+                    {
+                        firstName: order.billingAddress.firstName,
+                        lastName: order.billingAddress.lastName,
+                        email: order.customerInfo.email,
+                        phoneHome: order.billingAddress.phone,
+                        address: address,
+                        paymentMethodId: order.paymentInstruments[0].paymentMethodId
+                    },
+                    fullCardDetails
+                )
             } else {
                 // For existing registered users, save payment instrument if they checked the save box
-                if (shouldSavePaymentMethod && order.paymentInstruments?.[0]) {
+                // Only save if we have full card details (i.e., user entered a new card)
+                if (shouldSavePaymentMethod && order.paymentInstruments?.[0] && fullCardDetails) {
                     const paymentInstrument = order.paymentInstruments[0]
                     await savePaymentInstrumentForRegisteredUser(
                         order.customerInfo.customerId,
-                        paymentInstrument
+                        paymentInstrument,
+                        fullCardDetails
                     )
                 }
             }
@@ -345,30 +391,31 @@ const CheckoutOneClick = () => {
         }
     }
 
-    const onPlaceOrder = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
+    const onPlaceOrder = async () => {
         try {
+            // Check if we have form values (new card entered)
+            const paymentFormValues = paymentMethodForm.getValues()
+            const hasFormValues = paymentFormValues && paymentFormValues.expiry
+
+            // Prepare full card details for saving (only if we have form values for new cards)
+            let fullCardDetails = null
+            if (hasFormValues) {
+                const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
+                fullCardDetails = {
+                    holder: paymentFormValues.holder,
+                    number: paymentFormValues.number, // Full card number from form
+                    cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
+            }
+            // For saved payments (appliedPayment), we don't need fullCardDetails
+            // because we're not saving them again - they're already saved
+
             if (!appliedPayment) {
-                await onPaymentSubmit(paymentFormValues)
-            } else {
-                if (paymentFormValues && paymentFormValues.expiry) {
-                    const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
-                    shopperPaymentInstrument = {
-                        holder: paymentFormValues.holder,
-                        number:
-                            appliedPayment.paymentCard?.maskedNumber || paymentFormValues.number,
-                        cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
-                        expirationMonth: parseInt(expirationMonth),
-                        expirationYear: parseInt(`20${expirationYear}`)
-                    }
-                } else {
-                    // Fallback to using the applied payment data directly
-                    shopperPaymentInstrument = {
-                        holder: appliedPayment.paymentCard?.holder || '',
-                        number: appliedPayment.paymentCard?.maskedNumber || '',
-                        cardType: appliedPayment.paymentCard?.cardType || '',
-                        expirationMonth: appliedPayment.paymentCard?.expirationMonth || 0,
-                        expirationYear: appliedPayment.paymentCard?.expirationYear || 0
-                    }
+                // No payment applied, need to add a new payment instrument
+                if (hasFormValues) {
+                    await onPaymentSubmit(paymentFormValues)
                 }
             }
 
@@ -377,12 +424,12 @@ const CheckoutOneClick = () => {
             const updatedBasket = await onBillingSubmit()
 
             if (updatedBasket) {
-                await submitOrder()
+                await submitOrder(fullCardDetails)
             }
         } catch (error) {
             showError()
         }
-    })
+    }
 
     useEffect(() => {
         if (error || step === 4) {
@@ -422,6 +469,9 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}
                                 onSavePreferenceChange={handleSavePreferenceChange}
+                                onPaymentSubmitted={onPaymentSubmit}
+                                onSelectedPaymentMethodChange={setSelectedPaymentMethodFromChild}
+                                onIsEditingChange={setIsEditingPaymentFromChild}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -432,8 +482,10 @@ const CheckoutOneClick = () => {
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
                                             isDisabled={
-                                                !paymentMethodForm.formState.isValid &&
-                                                !appliedPayment
+                                                !appliedPayment &&
+                                                !isEditingPaymentFromChild &&
+                                                (!paymentMethodForm.formState.isValid ||
+                                                    !paymentMethodForm.getValues()?.expiry)
                                             }
                                             data-testid="place-order-button"
                                             size="lg"

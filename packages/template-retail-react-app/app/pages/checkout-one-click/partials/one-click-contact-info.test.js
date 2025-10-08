@@ -135,8 +135,9 @@ describe('ContactInfo Component', () => {
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
-        // Focus and then blur without entering email to trigger validation
-        await user.click(emailInput)
+        // Enter email and then clear it to trigger validation
+        await user.type(emailInput, 'test@example.com')
+        await user.clear(emailInput)
         await user.tab()
 
         expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
@@ -157,7 +158,7 @@ describe('ContactInfo Component', () => {
         await user.click(emailInput)
         await user.tab()
 
-        expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
+        expect(screen.getAllByText('Please enter your email address.')).toHaveLength(2)
     })
 
     test('validates email format on form submission', async () => {
@@ -168,9 +169,11 @@ describe('ContactInfo Component', () => {
 
         // Enter invalid email and trigger blur validation
         await user.type(emailInput, 'invalid-email')
-        await user.tab()
+        fireEvent.blur(emailInput)
 
-        expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        })
 
         // Should not show required email error
         expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()

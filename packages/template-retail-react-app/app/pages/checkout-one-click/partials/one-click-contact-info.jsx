@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -86,6 +86,18 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
+    // Auto-focus the email field when the component mounts
+    useEffect(() => {
+        // Small delay to ensure the field is fully rendered
+        const timer = setTimeout(() => {
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
+        }, 100)
+
+        return () => clearTimeout(timer)
+    }, [])
+
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -145,6 +157,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
+        if (isCheckingEmail) {
+            return {isRegistered: true}
+        }
+
         form.clearErrors('global')
         setIsCheckingEmail(true)
         try {
@@ -154,11 +170,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             })
             // Only open modal if API call succeeds
             onOtpModalOpen()
+            return {isRegistered: true}
         } catch (error) {
             // Keep continue button visible if email is valid (for unregistered users)
             if (isValidEmail(email)) {
                 setShowContinueButton(true)
             }
+            return {isRegistered: false}
         } finally {
             setIsCheckingEmail(false)
         }
@@ -235,32 +253,57 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
-    const submitForm = async (data) => {
-        setError(null)
+    // Custom form submit handler to prevent default form submission for registered users
+    const handleFormSubmit = async (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        // Get form data
+        const formData = form.getValues()
+
         // Validate email before proceeding
-        if (!data.email) {
+        if (!formData.email) {
             setError('Please enter your email address.')
             return
         }
 
-        if (!isValidEmail(data.email)) {
+        if (!isValidEmail(formData.email)) {
             setError('Please enter a valid email address.')
             return
         }
 
-        await updateCustomerForBasket.mutateAsync({
-            parameters: {basketId: basket.basketId},
-            body: {email: data.email}
-        })
+        try {
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: formData.email}
+            })
 
-        // Reset guest checkout flag since user is proceeding normally
-        setRegisteredUserChoseGuest(false)
-        if (onRegisteredUserChoseGuest) {
-            onRegisteredUserChoseGuest(false)
+            // Reset guest checkout flag since user is proceeding normally
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
+            }
+
+            setShowContinueButton(false)
+
+            // Check if OTP modal is already open (from blur event)
+            if (isOtpModalOpen) {
+                // Modal is already open, don't proceed to next step
+                return
+            }
+
+            // Call handleSendEmailOtp and wait for result
+            // For registered users: OTP modal will open, don't proceed to next step
+            // For guest users: API call will fail, proceed to next step
+            const result = await handleSendEmailOtp(formData.email)
+            if (!result.isRegistered) {
+                // User is not registered (guest), proceed to next step
+                goToNextStep()
+            }
+            // If user is registered, OTP modal should be open, don't proceed to next step
+        } catch (error) {
+            setError('An error occurred. Please try again.')
         }
-
-        setShowContinueButton(false)
-        handleSendEmailOtp(data.email)
     }
 
     return (
@@ -293,7 +336,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             >
                 <ToggleCardEdit>
                     <Container variant="form">
-                        <form onSubmit={form.handleSubmit(submitForm)}>
+                        <form onSubmit={handleFormSubmit}>
                             <Stack spacing={6}>
                                 {error && (
                                     <Alert status="error">
