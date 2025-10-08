@@ -50,7 +50,6 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
-import {useSecureCustomerLookup} from '@salesforce/retail-react-app/app/hooks/use-secure-customer-lookup'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -66,7 +65,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {lookupCustomer, isLoading: isLookingUpCustomer, message: lookupMessage} = useSecureCustomerLookup()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -84,10 +82,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
-    const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
-    const [lookupResult, setLookupResult] = useState(null)
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -125,7 +121,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
 
         // Email is valid, proceed with secure lookup
-        await handleSecureCustomerLookup(email)
+        await handleEmailSubmission(email)
     }
 
     const handleEmailFocus = (e) => {
@@ -139,57 +135,73 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             onOtpModalClose()
         }
 
-        // Clear email checking state
-        setIsCheckingEmail(false)
-
         // Clear email error when user focuses back on the field
         setEmailError('')
     }
 
-    // Handle secure customer lookup with uniform UI (Option 3: Hybrid Approach)
-    const handleSecureCustomerLookup = async (email) => {
+    // Handle email submission - TRUE zero enumeration via server-side proxy
+    const handleEmailSubmission = async (email) => {
         form.clearErrors('global')
-        setIsCheckingEmail(true)
         setEmailError('')
 
         try {
-            // Hide continue button during lookup
-            setShowContinueButton(false)
-            
-            // Perform secure lookup with encrypted response
-            const result = await lookupCustomer(email)
-            
-            // Store result privately for use in OTP modal
-            setLookupResult(result)
-            
-            // For registered users, attempt to send OTP
-            if (result.shouldShowOtp) {
-                try {
-                    await authorizePasswordlessLogin.mutateAsync({
-                        userid: email,
-                        callbackURI: `${callbackURL}?mode=otp_email`
-                    })
-                } catch (otpError) {
-                    // OTP failed but still show modal with skip-only option
-                    console.log('OTP send failed:', otpError)
-                }
-            }
-            
-            // Always show OTP modal directly (uniform UI)
+            // Use uniform OTP send proxy - always returns 200 regardless of registration status
+            const response = await fetch(`${appOrigin}/api/uniform-otp-send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    callbackURI: `${callbackURL}?mode=otp_email`
+                })
+            })
+
+            // Always gets 200 response - no way to distinguish registered vs guest users
+            const result = await response.json()
+
+            // Always show OTP modal - true zero enumeration achieved
             onOtpModalOpen()
 
         } catch (error) {
-            // On error, still show OTP modal with guest-only functionality
-            setLookupResult({ isRegistered: false, shouldShowOtp: false })
+            // Even on network error, show OTP modal to maintain uniform behavior
             onOtpModalOpen()
-        } finally {
-            setIsCheckingEmail(false)
         }
     }
 
     // Handle OTP modal close
     const handleOtpModalClose = () => {
         onOtpModalClose()
+    }
+
+    // Handle OTP send/resend using uniform proxy (prevents enumeration)
+    const handleSendEmailOtp = async (email) => {
+        try {
+            // Use uniform OTP send proxy - always returns 200 regardless of registration status
+            const response = await fetch(`${appOrigin}/api/uniform-otp-send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email || form.getValues('email'),
+                    callbackURI: `${callbackURL}?mode=otp_email`
+                })
+            })
+
+            // Always gets 200 response - no way to distinguish registered vs guest users
+            const result = await response.json()
+
+            // Return success (even though we can't know if OTP was actually sent)
+            return { success: true, message: result.message }
+
+        } catch (error) {
+            // Even on network error, return success to maintain uniform behavior
+            return {
+                success: true,
+                message: "If your email is registered with us, you'll receive a verification code shortly."
+            }
+        }
     }
 
 
@@ -208,8 +220,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 onRegisteredUserChoseGuest(true)
             }
 
-            // Clear uniform message and proceed to next step
-            setUniformMessage('')
+            // Proceed to next step
             goToNextStep()
         } catch (error) {
             setError(error.message)
@@ -285,7 +296,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
 
         // Start the secure lookup process with uniform UI
-        handleSecureCustomerLookup(data.email)
+        handleEmailSubmission(data.email)
     }
 
     return (
@@ -336,27 +347,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             inputProps={{
                                                 onBlur: handleEmailBlur,
                                                 onFocus: handleEmailFocus,
-                                                paddingRight: isCheckingEmail
-                                                    ? '2.5rem'
-                                                    : undefined,
                                                 ...fields.email.inputProps
                                             }}
                                         />
-                                        {(isCheckingEmail || isLookingUpCustomer) && (
-                                            <InputRightElement
-                                                height="100%"
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                paddingTop="25px"
-                                            >
-                                                <Spinner
-                                                    size="md"
-                                                    color="blue.500"
-                                                    borderWidth="2px"
-                                                />
-                                            </InputRightElement>
-                                        )}
                                     </InputGroup>
 
                                     {emailError && (
@@ -384,7 +377,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                 </Stack>
                             </Stack>
 
-                            {/* OTP Auth Modal - Uniform for all users */}
+                            {/* OTP Auth Modal - Zero Enumeration Design */}
                             <OtpAuth
                                 isOpen={isOtpModalOpen}
                                 onClose={handleOtpModalClose}
@@ -392,8 +385,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                 handleSendEmailOtp={handleSendEmailOtp}
                                 handleOtpVerification={handleOtpVerification}
                                 onCheckoutAsGuest={handleCheckoutAsGuest}
-                                isRegisteredUser={lookupResult?.shouldShowOtp || false}
-                                uniformMode={true}
+                                zeroEnumerationMode={true}
                             />
                         </form>
                     </Container>

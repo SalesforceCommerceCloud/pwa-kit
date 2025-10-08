@@ -382,6 +382,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     })
 
+    // Uniform OTP Send Endpoint - TRUE zero enumeration via server-side proxy
+    app.post('/api/uniform-otp-send', async (req, res) => {
+        const {default: handler} = await import('./api/uniform-otp-send.js')
+        handler(req, res)
+    })
+
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 

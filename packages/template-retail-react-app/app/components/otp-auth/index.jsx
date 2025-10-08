@@ -35,8 +35,7 @@ const OtpAuth = ({
     handleSendEmailOtp,
     handleOtpVerification,
     onCheckoutAsGuest,
-    isRegisteredUser = true,
-    uniformMode = false
+    zeroEnumerationMode = false
 }) => {
     const OTP_LENGTH = 8
     const [isVerifying, setIsVerifying] = useState(false)
@@ -113,8 +112,9 @@ const OtpAuth = ({
         })
 
         try {
-            if (isRegisteredUser) {
-                // Registered user - attempt actual OTP verification
+            if (zeroEnumerationMode) {
+                // Zero enumeration mode: Always attempt OTP verification
+                // Let the actual verification determine if user is registered or guest
                 const result = await handleOtpVerification(code)
                 if (result && !result.success) {
                     setError(result.error)
@@ -126,30 +126,39 @@ const OtpAuth = ({
                         context: 'authentication',
                         error: result.error
                     })
+                } else if (result && result.success) {
+                    // Track successful OTP verification
+                    track('/otp-verification-success', {
+                        activity: 'otp_verification_successful',
+                        context: 'authentication'
+                    })
                 }
             } else {
-                // Guest user - simulate verification behavior for uniform UI
-                // Always show "invalid code" error after same timing
-                await new Promise(resolve => setTimeout(resolve, 200))
-                setError('Invalid verification code. Please try again.')
-                otpInputs.clear()
-
-                // Track failed OTP verification (same as registered users)
-                track('/otp-verification-failed', {
-                    activity: 'otp_verification_failed',
-                    context: 'authentication',
-                    error: 'Invalid verification code'
-                })
+                // Legacy mode - kept for backward compatibility
+                if (isRegisteredUser) {
+                    const result = await handleOtpVerification(code)
+                    if (result && !result.success) {
+                        setError(result.error)
+                        otpInputs.clear()
+                        track('/otp-verification-failed', {
+                            activity: 'otp_verification_failed',
+                            context: 'authentication',
+                            error: result.error
+                        })
+                    }
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 200))
+                    setError('Invalid verification code. Please try again.')
+                    otpInputs.clear()
+                    track('/otp-verification-failed', {
+                        activity: 'otp_verification_failed',
+                        context: 'authentication',
+                        error: 'Invalid verification code'
+                    })
+                }
             }
         } finally {
             setIsVerifying(false)
-            if (isRegisteredUser) {
-                // Track successful OTP verification only for registered users
-                track('/otp-verification-success', {
-                    activity: 'otp_verification_successful',
-                    context: 'authentication'
-                })
-            }
         }
     }
 
@@ -161,16 +170,25 @@ const OtpAuth = ({
                 context: 'authentication',
                 resendAttempt: true
             })
-            
-            // For uniform UI, always attempt to send OTP
-            // For registered users: OTP will be sent successfully
-            // For guest users: OTP send will fail silently but UI behavior remains identical
-            if (isRegisteredUser) {
-                await handleSendEmailOtp(form.getValues('email'))
+
+            if (zeroEnumerationMode) {
+                // Zero enumeration mode: Always attempt to send OTP
+                // This will succeed for registered users, fail silently for guests
+                // No way to determine registration status from the UI
+                try {
+                    await handleSendEmailOtp(form.getValues('email'))
+                } catch (error) {
+                    // OTP send failed - could be guest user or other error
+                    // We don't reveal this information
+                    console.log('OTP resend attempt completed')
+                }
             } else {
-                // Guest user - simulate the same timing and behavior
-                // This maintains uniform UI while not actually sending OTP
-                await new Promise(resolve => setTimeout(resolve, 200))
+                // Legacy mode - kept for backward compatibility
+                if (isRegisteredUser) {
+                    await handleSendEmailOtp(form.getValues('email'))
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 200))
+                }
             }
         } catch (error) {
             // Reset timer on any error (same behavior for both user types)
@@ -225,25 +243,34 @@ const OtpAuth = ({
                 <ModalCloseButton disabled={isVerifying} />
                 <ModalBody pb={6}>
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
-                        {/* Uniform message for all users */}
-                        <Text fontSize="sm" color="blue.600" textAlign="center" mb={2}>
-                            <FormattedMessage
-                                defaultMessage="We've sent verification instructions to your email if it's registered with us."
-                                id="otp.message.uniform_instructions"
-                            />
-                        </Text>
-                        
-                        <Text fontSize="md" maxWidth="300px" textAlign="center">
-                            {uniformMode && !isRegisteredUser ? (
+                        <Text fontSize="md" maxWidth="350px" textAlign="center">
+                            {zeroEnumerationMode ? (
                                 <FormattedMessage
-                                    defaultMessage="To continue with your order, you can either enter a verification code if you have one, or proceed as a guest."
-                                    id="otp.message.uniform_guest_mode"
+                                    defaultMessage="We've sent a verification code to your email. Enter it below to continue, or proceed as a guest."
+                                    id="otp.message.zero_enumeration_mode"
                                 />
                             ) : (
-                                <FormattedMessage
-                                    defaultMessage="To use your account information enter the code sent to your email."
-                                    id="otp.message.enter_code_for_account"
-                                />
+                                <>
+                                    {/* Legacy uniform message */}
+                                    <Text fontSize="sm" color="blue.600" textAlign="center" mb={2}>
+                                        <FormattedMessage
+                                            defaultMessage="We've sent verification instructions to your email if it's registered with us."
+                                            id="otp.message.uniform_instructions"
+                                        />
+                                    </Text>
+
+                                    {uniformMode && !isRegisteredUser ? (
+                                        <FormattedMessage
+                                            defaultMessage="To continue with your order, you can either enter a verification code if you have one, or proceed as a guest."
+                                            id="otp.message.uniform_guest_mode"
+                                        />
+                                    ) : (
+                                        <FormattedMessage
+                                            defaultMessage="To use your account information enter the code sent to your email."
+                                            id="otp.message.enter_code_for_account"
+                                        />
+                                    )}
+                                </>
                             )}
                         </Text>
 
@@ -363,8 +390,7 @@ OtpAuth.propTypes = {
     handleSendEmailOtp: PropTypes.func.isRequired,
     handleOtpVerification: PropTypes.func.isRequired,
     onCheckoutAsGuest: PropTypes.func,
-    isRegisteredUser: PropTypes.bool,
-    uniformMode: PropTypes.bool
+    zeroEnumerationMode: PropTypes.bool
 }
 
 export default OtpAuth
