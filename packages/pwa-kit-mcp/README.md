@@ -71,6 +71,62 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 ```
 _NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
 
+### 🔧 Configuration Options
+
+The MCP server supports two ways to configure your Salesforce Commerce Cloud credentials:
+
+#### Option 1: dw.json Configuration File (Recommended)
+
+Create a `dw.json` file in your project directory with your SFCC credentials:
+
+```json
+{
+  "hostname": "https://your-instance.dx.commercecloud.salesforce.com",
+  "instance-id": "your-instance-id",
+  "client-id": "your-client-id",
+  "client-secret": "your-client-secret",
+  "org-id": "your-org-id",
+  "short-code": "your-short-code"
+}
+```
+
+Then update your `mcp.json` to point to the dw.json file:
+
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "node",
+      "args": [
+        "/path/to/pwa-kit-mcp/dist/server/server.js",
+        "--dw-json",
+        "/path/to/your/dw.json"
+      ],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+
+#### Option 2: Environment Variables (in mcp.json)
+
+Use environment variables to set SFCC credentials:
+
+```json
+{
+        "SFCC_HOSTNAME": "https://your-instance.dx.commercecloud.salesforce.com",
+        "SFCC_ORG_ID": "your-org-id",
+        "SFCC_SHORT_CODE": "your-short-code",
+        "SFCC_INSTANCE_ID": "your-instance-id",
+        "AM_CLIENT_ID": "your-client-id",
+        "AM_CLIENT_SECRET": "your-client-secret"
+}
+```
+
+**Note:** `dw.json` values take precedence over environment variables if both are provided. See `dw.json.example` for a complete template.
+
 ## 📊 Telemetry
 
 The server collects minimal, anonymous usage data to improve reliability and the developer experience.
@@ -87,10 +143,11 @@ The server collects minimal, anonymous usage data to improve reliability and the
 
 These are the available flags that you can pass to the `args` option. 
 
-| Flag Name | Description | Required? |Notes |
+| Flag Name | Description | Required? | Notes |
 | -----------------| -------| ------- | ----- |
-| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it.  |
-| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this.
+| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it. |
+| `--dw-json` | Path to a `dw.json` configuration file containing SFCC credentials. | No | Alternative to environment variables. Example: `--dw-json /path/to/dw.json` |
+| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this. |
 
 Once saved, Cursor will:
 
@@ -129,7 +186,12 @@ from the command pallet and editing your `pwa-kit` entry to look like the entry 
   "mcpServers": {
     "pwa-kit": {
       "command": "node",
-      "args": ["{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js"],
+      "args": [
+        "{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js",
+        "--no-telemetry",
+        "--dw-json",
+        "{{path-to-dw.json}}"
+      ],
       "env": {
         "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
       }
