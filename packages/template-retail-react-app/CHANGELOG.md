@@ -1,7 +1,28 @@
-## v7.1.0-dev (July 28, 2025)
+## v8.2.0-dev (Sep 26, 2025)
 
+## v8.1.0 (Sep 25, 2025)
+- Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
+- Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
+- Added warning modal for guest users when toggling between multi ship and ship to one address. [#3280](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3280) [#3302](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3302)
+- Fix the invalid address error that could occur when consolidating a pickup shipment into the default shipment `me` on checkout. [#3333](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3333)
+- Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+- Removed domainUrl, locale, basetId properties as part off the ShopperAgent during initialization. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+- Only show option to deliver to multiple addresses if there are multiple items in the basket. [#3336](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3336)
+- Added support for Choice of Bonus Products feature. Users can now select from available bonus products when they qualify for the associated promotion. The bonus product selection flow can be entered from either the "Item Added to Cart" modal (when adding the qualifying product to the cart) or from the cart page. [#3292] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3292)
+- Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+
+## v8.0.0 (Sep 04, 2025)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- [Breaking] Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203) [#3211] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3211) [#3217](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3217) [#3216] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3216) [#3231] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3231) [#3240] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3240)
 - The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
+- Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
+- [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+- Fix config parsing to gracefully handle missing properties [#3230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3230)
+- [Bugfix] Fix unit test failures in generated projects [3204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3204)
 
 ## v7.0.0 (July 22, 2025)
 
@@ -19,14 +40,13 @@
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
 - Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
-- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815) 
+- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815)
 - [Breaking] Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
 - Introduce store locator [#2542](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2542)
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
 - Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
-
 
 ## v6.1.0 (May 22, 2025)
 

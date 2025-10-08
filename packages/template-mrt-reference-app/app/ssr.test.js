@@ -11,7 +11,7 @@ const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
 const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
 const {
     CloudWatchLogsClient,
-    PutLogEventsCommand,
+    CreateLogStreamCommand,
     AccessDeniedException
 } = require('@aws-sdk/client-cloudwatch-logs')
 const {mockClient} = require('aws-sdk-client-mock')
@@ -37,7 +37,8 @@ describe('server', () => {
             DEPLOY_TARGET: 'test',
             EXTERNAL_DOMAIN_NAME: 'test.com',
             MOBIFY_PROPERTY_ID: 'test',
-            AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote'
+            AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote',
+            AWS_REGION: 'us-east-2'
         })
 
         const ssr = require('./ssr')
@@ -49,7 +50,6 @@ describe('server', () => {
     })
     afterEach(() => {
         process.env = originalEnv
-        server.close()
         jest.restoreAllMocks()
     })
     test.each([
@@ -82,8 +82,8 @@ describe('server', () => {
         expect(response.body.headers['random-header']).toBe('random')
     })
 
-    test('Path "/cookie" sets cookie', () => {
-        return request(app)
+    test('Path "/cookie" sets cookie', async () => {
+        return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
@@ -99,8 +99,20 @@ describe('server', () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
         s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
-        logsMock.on(PutLogEventsCommand).rejects(new AccessDeniedException())
-        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&logStreamName=lsName`
+        logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
+        const response = await request(app).get(`/isolation?${params}`)
+        expect(response.body.origin).toBe(true)
+        expect(response.body.storage).toBe(true)
+        expect(response.body.logs).toBe(true)
+    })
+
+    test('Path "/isolation" succeeds with Region', async () => {
+        jest.spyOn(console, 'error')
+        lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
+        s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
+        logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&Region=us-west-1`
         const response = await request(app).get(`/isolation?${params}`)
         expect(response.body.origin).toBe(true)
         expect(response.body.storage).toBe(true)
@@ -111,8 +123,8 @@ describe('server', () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).resolves()
         s3Mock.on(GetObjectCommand).resolves()
-        logsMock.on(PutLogEventsCommand).resolves()
-        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&logStreamName=lsName`
+        logsMock.on(CreateLogStreamCommand).resolves()
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
         const response = await request(app).get(`/isolation?${params}`)
         expect(response.body.origin).toBe(false)
         expect(response.body.storage).toBe(false)
@@ -124,5 +136,16 @@ describe('server', () => {
         ]
         const calls = console.error.mock.calls.map((call) => call[0])
         expect(errors.some((error) => calls.includes(error))).toBe(true)
+    })
+
+    test('Check incoming headers are lowercase', async () => {
+        const response = await request(app)
+            .get('/headers')
+            .set('Random-Header', 'random')
+            .set('Another-Mixed-Case-Header', 'value')
+            .set('UPPERCASE-HEADER', 'test')
+        for (const header in response.body.headers) {
+            expect(header).toBe(header.toLowerCase())
+        }
     })
 })

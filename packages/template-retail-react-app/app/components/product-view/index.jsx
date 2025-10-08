@@ -27,12 +27,13 @@ import {
 
 // Constants
 const DELIVERY_OPTIONS = {
-    SHIP: 'ship',
+    DELIVERY: 'delivery',
     PICKUP: 'pickup'
 }
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -146,7 +147,10 @@ const ProductView = forwardRef(
             pickupInStore = false,
             setPickupInStore = () => {},
             onOpenStoreLocator = () => {},
-            showDeliveryOptions = true
+            showDeliveryOptions = true,
+            customButtons = [],
+            maxOrderQuantity = null,
+            imageGalleryFooter = null
         },
         ref
     ) => {
@@ -154,6 +158,8 @@ const ProductView = forwardRef(
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
+        const storeLocatorEnabled =
+            getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
@@ -376,6 +382,19 @@ const ProductView = forwardRef(
                 )
             }
 
+            // Add custom buttons if provided
+            if (customButtons && customButtons.length > 0) {
+                customButtons.forEach((customButton, index) => {
+                    buttons.push(
+                        React.cloneElement(customButton, {
+                            key: `custom-button-${index}`,
+                            width: customButton.props.width || '100%',
+                            marginBottom: customButton.props.marginBottom || 4
+                        })
+                    )
+                })
+            }
+
             return buttons
         }
 
@@ -491,11 +510,27 @@ const ProductView = forwardRef(
                             ) : (
                                 <ImageGallerySkeleton />
                             )}
+                            {/* Custom footer content (e.g., Back to Selection button) */}
+                            {imageGalleryFooter && (
+                                <Box mt={6} mb={2}>
+                                    {imageGalleryFooter}
+                                </Box>
+                            )}
                         </Box>
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack align="stretch" spacing={8} flex={1}>
+                    <VStack
+                        align="stretch"
+                        spacing={8}
+                        flex={1}
+                        pb={[
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            4
+                        ]}
+                    >
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
@@ -618,6 +653,7 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
+                                        {...(maxOrderQuantity != null && {max: maxOrderQuantity})}
                                         onChange={(stringValue, numberValue) => {
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
@@ -706,14 +742,14 @@ const ProductView = forwardRef(
                                                 value={
                                                     pickupInStore
                                                         ? DELIVERY_OPTIONS.PICKUP
-                                                        : DELIVERY_OPTIONS.SHIP
+                                                        : DELIVERY_OPTIONS.DELIVERY
                                                 }
                                                 onChange={handleDeliveryOptionChange}
                                                 mb={1}
                                             >
                                                 <Stack direction="column" spacing={2}>
                                                     <Radio
-                                                        value={DELIVERY_OPTIONS.SHIP}
+                                                        value={DELIVERY_OPTIONS.DELIVERY}
                                                         isDisabled={disableButton}
                                                     >
                                                         <FormattedMessage
@@ -721,7 +757,7 @@ const ProductView = forwardRef(
                                                             id="product_view.label.ship_to_address"
                                                         />
                                                     </Radio>
-                                                    {STORE_LOCATOR_IS_ENABLED && (
+                                                    {storeLocatorEnabled && (
                                                         <Radio
                                                             value={DELIVERY_OPTIONS.PICKUP}
                                                             isDisabled={
@@ -741,7 +777,7 @@ const ProductView = forwardRef(
                                             </RadioGroup>
                                         </Box>
 
-                                        {STORE_LOCATOR_IS_ENABLED && (
+                                        {storeLocatorEnabled && (
                                             <>
                                                 {storeName && inventoryId && (
                                                     <Text
@@ -889,7 +925,12 @@ ProductView.propTypes = {
     pickupInStore: PropTypes.bool,
     setPickupInStore: PropTypes.func,
     onOpenStoreLocator: PropTypes.func,
-    showDeliveryOptions: PropTypes.bool
+    showDeliveryOptions: PropTypes.bool,
+    customButtons: PropTypes.array,
+    promotionId: PropTypes.string,
+    maxOrderQuantity: PropTypes.number,
+    imageGalleryFooter: PropTypes.node,
+    alignItems: PropTypes.string
 }
 
 export default ProductView

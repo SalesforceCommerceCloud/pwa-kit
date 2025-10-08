@@ -42,11 +42,12 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockAbsolutePaths)
+
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
-            route: '/test',
-            ...mockAbsolutePaths
+            route: '/test'
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('Created page')
@@ -55,11 +56,12 @@ describe('CreateNewPageTool', () => {
     it('returns error if page already exists', async () => {
         jest.spyOn(fs, 'access').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockAbsolutePaths)
+
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
-            route: '/test',
-            ...mockAbsolutePaths
+            route: '/test'
         })
         expect(result.role).toBe('developer')
         expect(result.content[0].text).toContain('Error creating page')
@@ -78,6 +80,7 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(fs, 'writeFile').mockResolvedValue()
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockAbsolutePaths)
         // Mock generatePageContent to simulate unfound component
         jest.spyOn(createNewPageTool, 'generatePageContent').mockImplementation(function () {
             this.unfoundComponents = ['MissingComponent']
@@ -86,8 +89,7 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['MissingComponent'],
-            route: '/test',
-            ...mockAbsolutePaths
+            route: '/test'
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('MissingComponent')
@@ -100,11 +102,12 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('dummy')
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockAbsolutePaths)
+
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['ProductView'],
-            route: '/test',
-            ...mockAbsolutePaths
+            route: '/test'
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain(
@@ -117,10 +120,17 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `const productId = '25592300M';\nexport default function Page() { return <div>{productId}</div>; }`
         )
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['ProductView'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('25592300M')
         expect(pageContent).not.toMatch(/error|exception|fail/i)
@@ -131,10 +141,17 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `import Image from 'somewhere';\n${imageComponentString}`
         )
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('Image')
         expect(pageContent).toContain('static/img/hero.png')
@@ -146,10 +163,17 @@ describe('CreateNewPageTool', () => {
             `import Image from 'somewhere';\n${defaultImageString}`
         )
         // Simulate user says no to custom image (in real flow, this would be a follow-up, here we just check the generated content)
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('static/img/hero.png')
         expect(pageContent).not.toMatch(/https?:\/\//)
@@ -159,10 +183,17 @@ describe('CreateNewPageTool', () => {
         if (createNewPageTool.generatePageContent.mockRestore) {
             createNewPageTool.generatePageContent.mockRestore()
         }
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Test'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('import TestComponent from')
         expect(pageContent).toContain('<TestComponent />')
@@ -181,6 +212,7 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(fs, 'writeFile').mockResolvedValue()
         jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockAbsolutePaths)
         jest.spyOn(createNewPageTool, 'generatePageContent').mockImplementation(function () {
             this.unfoundComponents = ['ImageSpliter']
             return Promise.resolve('dummy')
@@ -188,8 +220,7 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['ImageSpliter'],
-            route: '/test',
-            ...mockAbsolutePaths
+            route: '/test'
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('ImageSpliter')
@@ -213,10 +244,17 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
       }
     }`
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain(customSrc)
         expect(ssrContent).toContain('.commercecloud.salesforce.com')
@@ -239,10 +277,17 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://some-other-domain.com"]
       }
     }`
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
         expect(isAllowed).toBe(false)
@@ -324,5 +369,125 @@ describe('updateRoutes route insertion', () => {
         expect(newRouteIndex).toBeGreaterThan(-1)
         expect(existingRouteIndex).toBeGreaterThan(-1)
         expect(newRouteIndex).toBeLessThan(existingRouteIndex)
+    })
+})
+
+describe('Cross-Project compatibility', () => {
+    let createNewPageTool
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        createNewPageTool = require('./create-new-page-tool').default
+    })
+
+    it('should work with simplified 3 params only', async () => {
+        // mock detectWorkspacePaths to return valid paths
+        const utils = await import('../utils/utils')
+        const mockPaths = {
+            pagesPath: '/test/pages',
+            componentsPath: '/test/components',
+            routesPath: '/test/routes.jsx',
+            nodeModulesPath: '/test/node_modules',
+            hasOverridesDir: false
+        }
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(mockPaths)
+
+        const args = {
+            pageName: 'TestPage',
+            componentList: ['Header', 'Footer'],
+            route: '/test-page'
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain('Created page TestPage')
+        expect(result.content[0].text).toContain('Added route /test-page')
+    })
+
+    it('should return system prompt when parameters are missing', async () => {
+        const args = {
+            pageName: 'TestPage'
+            // no componentList & route
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain(
+            'Please ask the user to provide following information'
+        )
+    })
+
+    it('should handle customer project paths correctly', async () => {
+        // mock detectWorkspacePaths to return generated project structure
+        const utils = await import('../utils/utils')
+        const customerPaths = {
+            pagesPath: '/Users/customer/retail-react-app/overrides/app/pages',
+            componentsPath: '/Users/customer/retail-react-app/overrides/app/components',
+            routesPath: '/Users/customer/retail-react-app/overrides/app/routes.jsx',
+            nodeModulesPath: '/Users/customer/retail-react-app/node_modules',
+            hasOverridesDir: true
+        }
+        jest.spyOn(utils, 'detectWorkspacePaths').mockResolvedValue(customerPaths)
+
+        const args = {
+            pageName: 'CustomerPage',
+            componentList: ['Header'],
+            route: '/customer-page'
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain('Created page CustomerPage')
+        expect(utils.detectWorkspacePaths).toHaveBeenCalled()
+    })
+
+    it('should handle path detection errors gracefully', async () => {
+        // mock detectWorkspacePaths to throw an error
+        const utils = await import('../utils/utils')
+        jest.spyOn(utils, 'detectWorkspacePaths').mockRejectedValue(
+            new Error('PWA_STOREFRONT_APP_PATH does not exist: /invalid/path')
+        )
+
+        const args = {
+            pageName: 'TestPage',
+            componentList: ['Header'],
+            route: '/test-page'
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('developer')
+        expect(result.content[0].text).toContain('Error detecting workspace configuration')
+        expect(result.content[0].text).toContain('PWA_STOREFRONT_APP_PATH does not exist')
+    })
+
+    it('should return system prompt when project path cannot be detected', async () => {
+        // mock detectWorkspacePaths to throw user prompt error
+        const utils = await import('../utils/utils')
+        jest.spyOn(utils, 'detectWorkspacePaths').mockRejectedValue(
+            new Error(
+                "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
+            )
+        )
+
+        const args = {
+            pageName: 'TestPage',
+            componentList: ['Header'],
+            route: '/test-page'
+        }
+
+        const result = await createNewPageTool.handler(args)
+
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain(
+            'I need to know where your PWA Kit project is located'
+        )
+        expect(result.content[0].text).toContain(
+            "Please provide the path to your PWA Kit project's app directory"
+        )
     })
 })

@@ -7,7 +7,7 @@
 import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {FetchStrategy} from '../fetch-strategy'
-import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance-marks'
 
 export const withLegacyGetProps = (Wrapped) => {
     /* istanbul ignore next */
@@ -33,7 +33,7 @@ export const withLegacyGetProps = (Wrapped) => {
                 // to avoid blocking the execution of the getProps function to maximize performance
                 // getTemplateName should be very fast, under 0.2ms
                 c.getTemplateName().then((templateName) => {
-                    res.__performanceTimer.mark(
+                    res.__performanceTimer?.mark(
                         `${PERFORMANCE_MARKS.getProps}.${templateName}`,
                         'start'
                     )
@@ -48,7 +48,7 @@ export const withLegacyGetProps = (Wrapped) => {
                           })
                           .then((result) => {
                               c.getTemplateName().then((templateName) => {
-                                  res.__performanceTimer.mark(
+                                  res.__performanceTimer?.mark(
                                       `${PERFORMANCE_MARKS.getProps}.${templateName}`,
                                       'end'
                                   )

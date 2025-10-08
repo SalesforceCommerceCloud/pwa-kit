@@ -21,14 +21,18 @@ test('Selecting store from store locator sets the PLP filter', async ({page}) =>
     await selectStoreFromPLP({page})
 
     // Verify the filter is updated with the store name
-    const inventoryFilter = page.locator('input[aria-label*="Filter Products by Store Availability at"]')
+    const inventoryFilter = page.locator(
+        'input[aria-label*="Filter Products by Store Availability at"]'
+    )
     await expect(inventoryFilter).toBeVisible()
 })
 
 /**
  * Test that adding a product via Pickup in Store to Cart shows pickup address in Checkout
  */
-test('Adding a product via Pickup in Store to Cart shows pickup address in Checkout', async ({page}) => {
+test('Adding a product via Pickup in Store to Cart shows pickup address in Checkout', async ({
+    page
+}) => {
     await page.goto(config.RETAIL_APP_HOME)
     await answerConsentTrackingForm(page)
 
@@ -42,30 +46,34 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     await pantsNav.click()
 
     // Navigate to PDP
-    const productTile = page.getByRole('link', {
-        name: /Casual To Dressy Trousers/i
-    }).first()
+    const productTile = page
+        .getByRole('link', {
+            name: /Casual To Dressy Trousers/i
+        })
+        .first()
     await productTile.click()
 
     // Select size and Pickup in Store option
-    await expect(page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()).toBeVisible()
+    await expect(
+        page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()
+    ).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
     await page.waitForLoadState()
-    
+
     // Select pickup option immediately after size selection
     const pickupRadio = page.locator('label.chakra-radio:has(input[value="pickup"])')
     await pickupRadio.click()
     await page.waitForLoadState()
-    
+
     // Verify the pickup radio is selected
     await expect(pickupRadio).toHaveAttribute('data-checked')
-    
+
     const addToCartButton = page.getByRole('button', {name: /Add to Cart/i})
     await page.waitForLoadState()
 
     // Add to Cart
     await addToCartButton.click()
-    
+
     // Navigate to cart
     await expect(page.getByText(/1 item added to cart/i)).toBeVisible()
     await page.getByRole('link', {name: 'View Cart'}).click()

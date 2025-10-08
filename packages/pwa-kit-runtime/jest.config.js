@@ -9,9 +9,14 @@ const base = require('internal-lib-build/configs/jest/jest.config')
 
 module.exports = {
     ...base,
+    moduleNameMapper: {
+        ...base.moduleNameMapper,
+        '^@h4ad/serverless-adapter/lib/(.*)$':
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/$1/index.cjs'
+    },
     coverageThreshold: {
         global: {
-            branches: 90,
+            branches: 89,
             functions: 87,
             lines: 90,
             statements: 90

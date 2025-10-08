@@ -10,8 +10,6 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
-import os from 'os'
-import {exec} from 'child_process'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -157,46 +155,6 @@ export const getCreateAppCommand = () => {
 }
 
 /**
- * Runs an NPX command and captures its output.
- *
- * @returns {Promise<string>} - Resolves with the command output.
- */
-export async function runNpxCommand(NPX_COMMAND, CREATE_APP_COMMAND, DISPLAY_PROGRAM_COMMAND) {
-    return new Promise((resolve, reject) => {
-        const tempDir = os.tmpdir()
-        const outputFilePath = path.join(tempDir, 'npx-output.json')
-        const errorFilePath = path.join(tempDir, 'npx-error.log')
-        const command = `${NPX_COMMAND} ${CREATE_APP_COMMAND} ${DISPLAY_PROGRAM_COMMAND} > ${outputFilePath} 2> ${errorFilePath}`
-
-        exec(command, (error) => {
-            if (error) {
-                reject(error)
-                return
-            }
-
-            fsPromises.promises
-                .readFile(outputFilePath, 'utf-8')
-                .then((data) => resolve(data))
-                .catch((err) => reject(err))
-        })
-    })
-}
-
-/**
- * Returns the copyright header with the current year
- * @returns {string} The copyright header text
- */
-export const getCopyrightHeader = () => {
-    const year = new Date().getFullYear()
-    return `/*
- * Copyright (c) ${year}, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */`
-}
-
-/**
  * Converts a string to kebab-case (e.g., ProductCard -> product-card)
  */
 export function toKebabCase(str) {
@@ -214,7 +172,7 @@ export async function logMCPMessage(message) {
     if (process.env.DEBUG) {
         // Check if DEBUG mode is enabled
         const logFilePath = path.join(__dirname, 'mcp-debug.log')
-        const timestamp = new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
+        const timestamp = new Date().toLocaleString('en-US', {timeZone: 'GMT'})
         const logMessage = `[${timestamp}] ${message}\n`
         try {
             // Ensure the log file exists, create it if it doesn't
@@ -225,6 +183,52 @@ export async function logMCPMessage(message) {
         } catch (error) {
             console.error(`Failed to write to log file: ${error.message}`)
         }
+    }
+}
+
+export async function detectWorkspacePaths() {
+    let appPath = process.env.PWA_STOREFRONT_APP_PATH
+
+    if (appPath) {
+        try {
+            await fsPromises.access(appPath)
+        } catch (error) {
+            // no env path variable
+            appPath = null
+        }
+    }
+
+    // Prompt user if detection failed
+    if (!appPath) {
+        throw new Error(
+            "Could not detect PWA Kit project directory. Please either:\n1. Navigate to your PWA Kit project directory, or\n2. Set PWA_STOREFRONT_APP_PATH environment variable to your project's app directory path."
+        )
+    }
+
+    // Build paths relative to the detected app directory
+    const pagesPath = path.join(appPath, 'pages')
+    const componentsPath = path.join(appPath, 'components')
+    const routesPath = path.join(appPath, 'routes.jsx')
+    const nodeModulesPath = path.join(appPath, '..', 'node_modules')
+    const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
+
+    // Verify essential directories exist
+    if (!fs.existsSync(pagesPath)) {
+        throw new Error(`Pages directory not found at: ${pagesPath}`)
+    }
+    if (!fs.existsSync(componentsPath)) {
+        throw new Error(`Components directory not found at: ${componentsPath}`)
+    }
+    if (!fs.existsSync(routesPath)) {
+        throw new Error(`Routes file not found at: ${routesPath}`)
+    }
+
+    return {
+        pagesPath,
+        componentsPath,
+        routesPath,
+        nodeModulesPath,
+        hasOverridesDir
     }
 }
 

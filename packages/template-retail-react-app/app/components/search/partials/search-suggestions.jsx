@@ -4,28 +4,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 import RecentSearches from '@salesforce/retail-react-app/app/components/search/partials/recent-searches'
-import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
+import SuggestionSection from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions-section'
 
 const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
-    const useSuggestions = searchSuggestions && searchSuggestions?.categorySuggestions?.length
+    const styles = useMultiStyleConfig('SearchSuggestions')
+    const hasCategories = searchSuggestions?.categorySuggestions?.length
+    const hasProducts = searchSuggestions?.productSuggestions?.length
+    const hasBrands = searchSuggestions?.brandSuggestions?.length
+    const hasSuggestions = hasCategories || hasProducts || hasBrands
+
     return (
-        <Stack padding={6} spacing={0}>
-            {useSuggestions ? (
-                <Fragment>
-                    <Suggestions
-                        closeAndNavigate={closeAndNavigate}
-                        suggestions={searchSuggestions?.categorySuggestions}
-                    />
-                    {/* <Suggestions
-                        closeAndNavigate={closeAndNavigate}
-                        suggestions={searchSuggestions?.phraseSuggestions}
-                    /> */}
-                    {/* <Suggestions suggestions={searchSuggestions.productSuggestions} /> */}
-                </Fragment>
+        <Stack {...styles.container}>
+            {hasSuggestions ? (
+                <SuggestionSection
+                    searchSuggestions={searchSuggestions}
+                    closeAndNavigate={closeAndNavigate}
+                    styles={styles}
+                />
             ) : (
                 <RecentSearches
                     recentSearches={recentSearches}

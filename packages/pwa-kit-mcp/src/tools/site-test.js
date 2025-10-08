@@ -7,16 +7,24 @@
 import {runPerformanceTest} from './site-test-performance'
 import {runAccessibilityTest} from './site-test-accessibility'
 
-const DEFAULT_SITE_URL = 'https://pwa-kit.mobify-storefront.com'
-
 export class TestWithPlaywrightTool {
     /**
      * Runs a Playwright test file by name (e.g., 'performance' or 'accessibility')
      * @param {string} testType - 'performance' or 'accessibility'
-     * @param {string} [siteUrl] - Optional site URL to test
+     * @param {string} siteUrl - Site URL to test
      * @returns {object} - Result of the test run
      */
-    async run(testType, siteUrl = DEFAULT_SITE_URL) {
+    async run(testType, siteUrl) {
+        if (!siteUrl) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: 'Missing required argument: siteUrl (full site URL)'
+                    }
+                ]
+            }
+        }
         switch (testType) {
             case 'performance': {
                 return runPerformanceTest(siteUrl)
@@ -25,7 +33,14 @@ export class TestWithPlaywrightTool {
                 return runAccessibilityTest(siteUrl)
             }
             default: {
-                const result = {error: 'unsupported test type'}
+                const result = {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Unsupported test type: ${testType}. Use 'performance' or 'accessibility'.`
+                        }
+                    ]
+                }
                 console.log('Unsupported test type result:', result)
                 return result
             }

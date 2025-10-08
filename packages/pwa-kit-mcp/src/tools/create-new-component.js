@@ -7,7 +7,8 @@
 import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase, getCopyrightHeader} from '../utils'
+import {toKebabCase, toPascalCase} from '../utils'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
@@ -43,21 +44,20 @@ What is the main purpose of this component? Reply with exactly one of the follow
 
 class CreateNewComponentTool {
     constructor() {
-        this.name = 'create_new_component'
-        this.description =
-            'Create a sample React component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
+        this.name = 'pwakit_create_component'
+        this.description = `Create a new ${PWA_KIT_DESCRIPTIVE_NAME} component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.`
         this.inputSchema = {
-            componentName: z.string().min(1, 'The name of the new Component to create?'),
+            componentName: z.string().min(1, 'The name of the new component to create?'),
             purpose: z
                 .string()
                 .min(
                     1,
-                    'The Purpose of the new component (e.g., Display a single Product, Display a list of Products or something else)'
+                    'The purpose of the new component (e.g., display a single Product, display a list of products or something else)'
                 )
                 .describe(systemPromptForComponentPurpose),
             location: z
                 .string()
-                .describe('The location of the component to be created')
+                .describe('The location of the component to create')
                 .default(process.env.PWA_STOREFRONT_APP_PATH)
         }
         this.handler = async (args) => {
@@ -126,7 +126,7 @@ class CreateNewComponentTool {
         if (entityType === 'product') {
             // If options.list is true, generate a list-of-products component
             if (options.list) {
-                code = `${getCopyrightHeader()}
+                code = `
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Text, Image, Stack } from '@chakra-ui/react';
@@ -165,7 +165,7 @@ export default ${pascalComponentName};
 `
             } else {
                 // Single product component (with selectors, image, etc.)
-                code = `${getCopyrightHeader()}
+                code = `
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Text, Image, Button, HStack, Stack } from '@chakra-ui/react';
