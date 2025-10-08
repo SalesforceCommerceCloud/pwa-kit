@@ -209,8 +209,8 @@ export async function detectWorkspacePaths() {
     const pagesPath = path.join(appPath, 'pages')
     const componentsPath = path.join(appPath, 'components')
     const routesPath = path.join(appPath, 'routes.jsx')
-    const nodeModulesPath = path.join(appPath, '..', 'node_modules')
-    const hasOverridesDir = fs.existsSync(path.join(appPath, '..', 'overrides'))
+    const nodeModulesPath = path.join(appPath, '../../', 'node_modules')
+    const hasOverridesDir = fs.existsSync(path.join(appPath, '../../', 'overrides'))
 
     // Verify essential directories exist
     if (!fs.existsSync(pagesPath)) {
