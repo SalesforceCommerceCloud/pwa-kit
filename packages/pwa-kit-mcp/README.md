@@ -18,25 +18,33 @@ PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates
 
 _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
+## Important
+
+Feature is available as a developer preview. Feature isn’t generally available unless or until Salesforce announces its general availability in documentation or in press releases or public statements. All commands, parameters, and other features are subject to change or deprecation at any time, with or without notice. Don't implement functionality developed with these commands or tools.
+
 ## 🧰 Features
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
 
-* **`create_storefront_app`**:
+* **`pwakit_create_storefront`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
-* **`create_sample_component`**:
+* **`pwakit_create_component`**:
   Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
-* **`create_sample_page`**:
+* **`pwakit_create_page`**:
   Interactive tool to generate a new PWA storefront page with custom routing and components.
 
-* **`development_guidelines`**:
+* **`pwakit_get_dev_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
-* **`run_site_test`**:
+* **`pwakit_run_site_test`**:
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
+
+* ** `pwakit_install_agent_rules` **:
+  Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
+  *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
 
 ## ▶️ Running the MCP Server
