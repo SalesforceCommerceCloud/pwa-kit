@@ -10,11 +10,16 @@ import {createClient} from 'webdav'
  * Create WebDAV client with authentication
  */
 export function createWebDAVClient(hostname, accessToken) {
-    return createClient(hostname, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
-    })
+    try {
+        return createClient(hostname, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        })
+    } catch (error) {
+        console.error('Error creating WebDAV client:', error)
+        throw error
+    }
 }
 
 /**
