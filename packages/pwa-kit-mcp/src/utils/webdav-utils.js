@@ -4,72 +4,92 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export function parseWebDAVResponse(xmlText) {
-    const items = []
-    // Look for href elements (without namespace in this case)
-    const regex = /<href>([^<]+)<\/href>/g
-    let match
+import {createClient} from 'webdav'
 
-    while ((match = regex.exec(xmlText)) !== null) {
-        const href = match[1]
-        // Remove trailing slash and split by /
-        const cleanHref = href.endsWith('/') ? href.slice(0, -1) : href
-        const pathParts = cleanHref.split('/')
-        const name = pathParts[pathParts.length - 1]
+/**
+ * Create WebDAV client with authentication
+ */
+export function createWebDAVClient(hostname, accessToken) {
+    return createClient(hostname, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    })
+}
 
-        if (name && name !== '') {
-            // Check if this is a directory by looking for <resourcetype><collection/> in the same response block
-            const isDirectory = isDirectoryInWebDAVResponse(xmlText, href)
-            if (isDirectory) {
-                items.push(name)
+/**
+ * Get directory contents using WebDAV client
+ */
+export async function getDirectoryContents(client, path) {
+    try {
+        const contents = await client.getDirectoryContents(path)
+        return contents.map((item) => ({
+            filename: item.filename,
+            basename: item.basename,
+            isDirectory: item.type === 'directory'
+        }))
+    } catch (error) {
+        console.error('Error getting directory contents:', error)
+        return []
+    }
+}
+
+/**
+ * Recursively search for a specific folder in WebDAV
+ */
+export async function findFolderRecursively(client, basePath, targetFolderName) {
+    const results = []
+
+    try {
+        const contents = await getDirectoryContents(client, basePath)
+
+        for (const item of contents) {
+            if (item.isDirectory) {
+                // Check if this directory matches our target
+                if (item.basename.toLowerCase() === targetFolderName.toLowerCase()) {
+                    results.push({
+                        path: item.filename,
+                        basename: item.basename
+                    })
+                }
+
+                // Recursively search subdirectories
+                const subResults = await findFolderRecursively(
+                    client,
+                    item.filename,
+                    targetFolderName
+                )
+                results.push(...subResults)
             }
         }
+    } catch (error) {
+        console.error(`Error searching in ${basePath}:`, error)
     }
 
-    return items
+    return results
 }
 
 /**
- * Check if a href corresponds to a directory in WebDAV response
+ * Get file content from WebDAV
  */
-export function isDirectoryInWebDAVResponse(xmlText, href) {
-    // Find the response block for this href and check for <D:resourcetype><D:collection/>
-    const responseRegex = new RegExp(
-        // eslint-disable-next-line no-useless-escape
-        `<response>.*?<href>${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}<\/href>.*?<\/response>`,
-        's'
-    )
-    const responseMatch = xmlText.match(responseRegex)
-
-    if (responseMatch) {
-        const responseBlock = responseMatch[0]
-        // Check if this response contains <resourcetype><collection/>
-        return responseBlock.includes('<resourcetype><collection/>')
+export async function getFileContent(client, filePath) {
+    try {
+        const content = await client.getFileContents(filePath, {format: 'text'})
+        return content
+    } catch (error) {
+        console.error(`Error getting file content from ${filePath}:`, error)
+        return null
     }
-
-    return false
 }
 
 /**
- * Parse WebDAV XML response to extract all items (both files and directories)
+ * Check if a path exists in WebDAV
  */
-export function parseWebDAVResponseAll(xmlText) {
-    const items = []
-    // Look for href elements (without namespace in this case)
-    const regex = /<href>([^<]+)<\/href>/g
-    let match
-
-    while ((match = regex.exec(xmlText)) !== null) {
-        const href = match[1]
-        // Remove trailing slash and split by /
-        const cleanHref = href.endsWith('/') ? href.slice(0, -1) : href
-        const pathParts = cleanHref.split('/')
-        const name = pathParts[pathParts.length - 1]
-
-        if (name && name !== '') {
-            items.push(name)
-        }
+export async function pathExists(client, path) {
+    try {
+        return await client.exists(path)
+    } catch (error) {
+        console.error(`Error checking if path exists ${path}:`, error)
+        return false
     }
-
-    return items
 }

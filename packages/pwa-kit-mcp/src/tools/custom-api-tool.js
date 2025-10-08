@@ -6,7 +6,7 @@
  */
 import {loadConfig} from '../utils/utils.js'
 import {OAUTH_TOKEN_URL} from '../utils/constants.js'
-import {parseWebDAVResponse, parseWebDAVResponseAll} from '../utils/webdav-utils.js'
+import {createWebDAVClient, findFolderRecursively, getFileContent} from '../utils/webdav-utils.js'
 
 /**
  * Formats error messages for display
@@ -61,141 +61,34 @@ async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationI
 }
 
 /**
- * Recursively searches for files related to an endpoint within a cartridge
+ * Search for API schema files using WebDAV client
  */
-async function searchForEndpointFiles(
-    hostname,
-    accessToken,
-    activeCodeVersion,
-    cartridgeName,
-    apiName
-) {
-    const baseUrl = `${hostname}/on/demandware.servlet/webdav/Sites/Cartridges/${activeCodeVersion}/${cartridgeName}/`
-
-    // First, get the root cartridge directory structure
-    const response = await fetch(baseUrl, {
-        method: 'PROPFIND',
-        headers: {
-            'Content-Type': 'application/xml',
-            Authorization: `Bearer ${accessToken}`,
-            Depth: '1'
-        }
-    })
-
-    if (!response.ok) {
-        throw new Error(`WebDAV HTTP error! status: ${response.status}`)
-    }
-
-    const responseText = await response.text()
-
-    // Parse the XML response to find directories to search
-    const directories = parseWebDAVResponse(responseText)
-    let searchResults = []
-
-    // Search recursively in each subdirectory for the API name folder
-    for (const dir of directories) {
-        try {
-            const foundInDir = await searchRecursivelyForApiName(
-                baseUrl,
-                dir,
-                accessToken,
-                apiName,
-                '',
-                0
-            )
-            if (foundInDir.results && foundInDir.results.length > 0) {
-                searchResults.push(...foundInDir.results)
-            }
-        } catch (error) {
-            // Continue searching other directories even if one fails
-        }
-    }
-
-    return {
-        searchResults: searchResults
-    }
-}
-
-/**
- * Recursively search for API name folder in a directory and its subdirectories
- */
-async function searchRecursivelyForApiName(
-    baseUrl,
-    currentDir,
-    accessToken,
-    apiName,
-    currentPath,
-    depth = 0
-) {
-    const results = []
-    // Normalize path building to avoid double slashes
-    const dirUrl = `${baseUrl.replace(/\/$/, '')}/${currentDir.replace(/^\//, '')}/`
-    const fullPath = currentPath ? `${currentPath}/${currentDir}` : currentDir
+async function searchForApiSchema(webdavClient, activeCodeVersion, cartridgeName, apiName) {
+    const basePath = `/on/demandware.servlet/webdav/Sites/Cartridges/${activeCodeVersion}/${cartridgeName}/`
 
     try {
-        const dirResponse = await fetch(dirUrl, {
-            method: 'PROPFIND',
-            headers: {
-                'Content-Type': 'application/xml',
-                Authorization: `Bearer ${accessToken}`,
-                Depth: '1'
-            }
-        })
+        // Search recursively for the API folder
+        const foundFolders = await findFolderRecursively(webdavClient, basePath, apiName)
 
-        if (dirResponse.ok) {
-            const dirText = await dirResponse.text()
-            const items = parseWebDAVResponseAll(dirText)
+        const results = []
+        for (const folder of foundFolders) {
+            // Try to get schema.yaml from each found folder
+            const schemaPath = `${folder.path}/schema.yaml`
+            const schemaContent = await getFileContent(webdavClient, schemaPath)
 
-            // Check if the API name folder is in this directory
-            const apiNameFolder = items.find((item) => item.toLowerCase() === apiName.toLowerCase())
-
-            if (apiNameFolder) {
-                // Try to fetch the schema.yaml file from the API folder
-                let schemaContent = null
-                try {
-                    const schemaUrl = `${dirUrl}${apiNameFolder}/schema.yaml`
-                    const schemaResponse = await fetch(schemaUrl, {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                            'Content-Type': 'application/xml'
-                        }
-                    })
-
-                    if (schemaResponse.ok) {
-                        schemaContent = await schemaResponse.text()
-                    }
-                } catch (error) {
-                    // Continue on error
-                }
-
-                results.push({
-                    directory: fullPath,
-                    apiNameFolder: apiNameFolder,
-                    fullPath: `${fullPath}/${apiNameFolder}`,
-                    schemaContent: schemaContent
-                })
-            }
-
-            // Get subdirectories using proper directory detection
-            const subdirs = parseWebDAVResponse(dirText)
-            for (const subdir of subdirs) {
-                const subResults = await searchRecursivelyForApiName(
-                    baseUrl,
-                    `${currentDir}/${subdir}`,
-                    accessToken,
-                    apiName,
-                    fullPath,
-                    depth + 1
-                )
-                results.push(...subResults.results)
-            }
+            results.push({
+                directory: folder.path,
+                apiNameFolder: folder.basename,
+                fullPath: folder.path,
+                schemaContent: schemaContent
+            })
         }
-    } catch (error) {
-        // Continue on error
-    }
 
-    return {results}
+        return {searchResults: results}
+    } catch (error) {
+        console.error('Error searching for API schema:', error)
+        return {searchResults: []}
+    }
 }
 
 export default {
@@ -210,8 +103,6 @@ export default {
         // Load configuration from dw.json or environment variables
         const config = loadConfig()
         const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} = config
-        console.error('config', config)
-
         const customApiHost = `${shortCode}.api.commercecloud.salesforce.com`
         const oauthScope = `SALESFORCE_COMMERCE_API:${instanceId} sfcc.custom-apis`
 
@@ -232,6 +123,8 @@ export default {
                 throw new Error('Invalid Custom API DX response.')
             }
 
+            // Create WebDAV client once and reuse it
+            const webdavClient = createWebDAVClient(hostname, tokenData.access_token)
             // Process each custom API and get the schema content
             const processedEntries = []
             activeCodeVersion = dxResponse.activeCodeVersion
@@ -239,9 +132,8 @@ export default {
             for (const entry of dxResponse.data) {
                 if (entry.cartridgeName) {
                     try {
-                        const webdavResponse = await searchForEndpointFiles(
-                            hostname,
-                            tokenData.access_token,
+                        const webdavResponse = await searchForApiSchema(
+                            webdavClient,
                             activeCodeVersion,
                             entry.cartridgeName,
                             entry.apiName
@@ -292,7 +184,6 @@ export default {
             result += formatError('API Processing Error', error)
         }
 
-        console.error(result)
         return {
             content: [
                 {
