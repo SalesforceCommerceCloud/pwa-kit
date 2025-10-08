@@ -9,7 +9,7 @@ export const PWA_KIT_DESCRIPTIVE_NAME =
 
 export const SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS = `MANDATORY LINTING STEP - DO NOT SKIP:
 
-You MUST run this exact terminal command using the run_terminal_cmd tool:
+You MUST run this exact terminal command using the run terminal command tool:
 
 npm run lint -- --fix
 
@@ -43,7 +43,7 @@ CRITICAL RULES:
 - Execute ALL steps in order - do not skip any step for any reason
 - Do not add extra steps that are not listed
 - Each step must be completed successfully before proceeding to the next
-- When a step instructs you to run a terminal command, you MUST use the run_terminal_cmd tool to execute it
+- When a step instructs you to run a terminal command, you MUST use the run terminal command tool to execute it
 - DO NOT assume what the result of a command will be - you MUST actually run it and check the output
 - DO NOT skip steps that involve linting, formatting, or validation commands
 - If a command fails or shows errors, fix the errors and re-run the command until it succeeds
