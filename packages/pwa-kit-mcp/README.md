@@ -1,4 +1,4 @@
-# 🚀 PWA Kit MCP Server
+# 🚀 PWA Kit MCP Server DO NOT MERGE
 
 An MCP server that enhances the entire development lifecycle of PWA Kit storefront apps — from project creation and management to AI-assisted coding, testing, and implementation of best practices — all within your IDE.
 
