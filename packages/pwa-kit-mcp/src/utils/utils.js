@@ -243,9 +243,9 @@ export function loadConfig() {
     return {
         hostname: dwConfig.hostname || dwConfig['hostname'] || process.env.SFCC_HOSTNAME,
         instanceId: dwConfig.instanceId || dwConfig['instance-id'] || process.env.SFCC_INSTANCE_ID,
-        clientId: dwConfig.clientId || dwConfig['client-id'] || process.env.AM_CLIENT_ID,
+        clientId: dwConfig.clientId || dwConfig['client-id'] || process.env.SFCC_CLIENT_ID,
         clientSecret:
-            dwConfig.clientSecret || dwConfig['client-secret'] || process.env.AM_CLIENT_SECRET,
+            dwConfig.clientSecret || dwConfig['client-secret'] || process.env.SFCC_CLIENT_SECRET,
         organizationId: dwConfig.organizationId || dwConfig['org-id'] || process.env.SFCC_ORG_ID,
         shortCode: dwConfig.shortCode || dwConfig['short-code'] || process.env.SFCC_SHORT_CODE
     }

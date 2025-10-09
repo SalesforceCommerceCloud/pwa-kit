@@ -110,7 +110,7 @@ Then update your `mcp.json` to point to the dw.json file:
 }
 ```
 
-#### Option 2: Environment Variables (in mcp.json)
+#### Option 2: Environment Variables
 
 Use environment variables to set SFCC credentials:
 
@@ -120,8 +120,8 @@ Use environment variables to set SFCC credentials:
         "SFCC_ORG_ID": "your-org-id",
         "SFCC_SHORT_CODE": "your-short-code",
         "SFCC_INSTANCE_ID": "your-instance-id",
-        "AM_CLIENT_ID": "your-client-id",
-        "AM_CLIENT_SECRET": "your-client-secret"
+        "SFCC_CLIENT_ID": "your-client-id",
+        "SFCC_CLIENT_SECRET": "your-client-secret"
 }
 ```
 
@@ -146,7 +146,7 @@ These are the available flags that you can pass to the `args` option.
 | Flag Name | Description | Required? | Notes |
 | -----------------| -------| ------- | ----- |
 | `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it. |
-| `--dw-json` | Path to a `dw.json` configuration file containing SFCC credentials. | No | Alternative to environment variables. Example: `--dw-json /path/to/dw.json` |
+| `"--dw-json", "/path/to/dw.json"` | Path to a `dw.json` configuration file containing SFCC credentials. | No | Alternative to environment variables. |
 | `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this. |
 
 Once saved, Cursor will:
@@ -188,7 +188,6 @@ from the command pallet and editing your `pwa-kit` entry to look like the entry 
       "command": "node",
       "args": [
         "{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js",
-        "--no-telemetry",
         "--dw-json",
         "{{path-to-dw.json}}"
       ],

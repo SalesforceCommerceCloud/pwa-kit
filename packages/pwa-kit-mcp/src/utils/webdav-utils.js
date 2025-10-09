@@ -6,6 +6,7 @@
  */
 import {createClient} from 'webdav'
 import {logMCPMessage} from './utils.js'
+
 /**
  * Create WebDAV client with authentication
  */
