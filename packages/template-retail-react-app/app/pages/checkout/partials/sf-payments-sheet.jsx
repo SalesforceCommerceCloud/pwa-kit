@@ -23,6 +23,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
+import {useConfigurations} from '@salesforce/commerce-sdk-react'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
 import {STATUS_SUCCESS, useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
@@ -63,7 +64,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             currency,
             countryCode: basket?.countryCode || countryCode || 'US' // TODO: remove US when parameter made optional
         }
-    })
+    });
+
+    const {data: shopperConfigurations} = useConfigurations();
+
+    // Helper function to get configuration value by id
+    const getConfigurationValue = (id, defaultValue = null) => {
+        if (!shopperConfigurations?.configurations) return defaultValue;
+        const config = shopperConfigurations.configurations.find(c => c.id === id);
+        return config ? config.value : defaultValue;
+    };
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -136,7 +146,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         // Create SF Payments basket payment instrument before creating order
         const basketPaymentInstrument = {
-            bankRoutingNumber: paymentMethodType.current,    // see W-19626908
+            paymentMethodType: paymentMethodType.current,    // see W-19626908
             paymentMethodId: 'Salesforce Payments',
             amount: updatedBasket.orderTotal
         }
@@ -229,7 +239,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Ensure updated order state shown on confirmation page
             // TODO: only invalidate order queries
             queryClient.invalidateQueries()
-
             // Finally return the created order
             return order
         } finally {
@@ -251,7 +260,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         if (
             sfp &&
             metadata &&
-            containerElementRef.current
+            containerElementRef.current &&
+            paymentConfig &&
+            shopperConfigurations
         ) {
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
@@ -262,7 +273,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 theme: buildTheme(),
                 actions: {},
                 options: {
-                    useManualCapture: !paymentConfig.card_capture_automatic,
+                    useManualCapture: !getConfigurationValue('cardCaptureAutomatic', true),
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                 }
             }
@@ -274,9 +285,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 locale: intl.locale
             }
 
-            containerElementRef.current.innerHTML = '<div></div>'
-
-            const paymentElement = containerElementRef.current.firstChild
+            // Clear the container and create a new div element
+            containerElementRef.current.innerHTML = ''
+            const paymentElement = document.createElement('div')
+            containerElementRef.current.appendChild(paymentElement)
+            
             paymentElement.addEventListener('load', handlePaymentMethodSelected);
             paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected);
 
@@ -297,7 +310,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }, [
         sfp,
         metadata,
-        containerElementRef.current
+        containerElementRef.current,
+        paymentConfig,
+        shopperConfigurations
     ])
 
     return (

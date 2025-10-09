@@ -55,8 +55,8 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '391eb8c7-cd8f-4ad1-b191-8c507a1ef89b',
-                organizationId: 'f_ecom_zyom_011',
+                clientId: 'e7c5bcbc-4028-41dd-9e4e-3afa8c8e26ba',
+                organizationId: 'f_ecom_zyoe_003',
                 shortCode: 'sandbox-001',
                 siteId: 'RefArch'
             }
@@ -82,10 +82,10 @@ module.exports = {
         multishipEnabled: true,
         sfPayments: {
             enabled: true,
-            //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
-            //metadataUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
-            sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
-            metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+            sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            metadataUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+            // sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            // metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-RefArch-Site/-/default/v0/sfp/sfp.js',
             //metadataUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         }
