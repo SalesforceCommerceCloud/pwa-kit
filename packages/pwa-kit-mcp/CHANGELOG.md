@@ -1,6 +1,7 @@
 ## v0.4.0-dev (Sep 26, 2025)
 - Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359), [#3379] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3379)
 - Create page and component tools integrate their responses into agent IDE [#3377](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3377)
+- Added Hooks Recommendation tool [#3388](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3388)
 - Added Agent Guidelines. [#3366](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3366)
 - Added Explore SCAPI SHOP API Tool  [#3385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3385)
 
