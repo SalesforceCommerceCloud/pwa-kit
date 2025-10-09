@@ -40,26 +40,39 @@ const handleSignOut = async () => {
 Hook for local storage.
 
 ```javascript
-// Imports: {useState, useEffect} from 'react'
-// Persist a value in localStorage without relying on a custom hook
-const [value, setValue] = useState(() => {
-    if (typeof window === 'undefined') return null
-    try {
-        const stored = window.localStorage.getItem('my-key')
-        return stored ? JSON.parse(stored) : null
-    } catch {
-        return null
-    }
-})
+import React, {useState} from 'react'
+import useLocalStorage from '@salesforce/commerce-sdk-react/src/hooks/useLocalStorage'
 
-useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-        window.localStorage.setItem('my-key', JSON.stringify(value))
-    } catch {
-        // ignore write errors
-    }
-}, [value])
+function DemoLocalStorage() {
+  const STORAGE_KEY = 'my-message'
+
+  // Our custom setter for localStorage (hook does not provide a setter)
+  const [input, setInput] = useState('')
+  const savedValue = useLocalStorage(STORAGE_KEY) // will reflect new value if any code updates localStorage
+
+  // Handle update button click
+  const handleSave = () => {
+    localStorage.setItem(STORAGE_KEY, input)
+    setInput('') // Optionally clear the input
+  }
+  // Example:
+  return (
+    <div>
+      <h3>Saved value:</h3>
+      <div style={{padding: 8, border: '1px solid #ddd', marginBottom: 16}}>
+        {savedValue ?? <i>No value saved</i>}
+      </div>
+      <input
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="Enter new value"
+      />
+      <button onClick={handleSave} style={{marginLeft: 8}}>Save to localStorage</button>
+    </div>
+  )
+}
+
+export default DemoLocalStorage
 ```
 
 ### useShippingMethodsForShipment
@@ -152,17 +165,37 @@ export default function CustomerOrdersExample() {
 Hook for page.
 
 ```javascript
-Skeleton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePageUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronRightIcon, ReceiptIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
-import PropTypes from 'prop-types'
+import React from 'react'
+import Skeleton from '@salesforce/retail-react-app/app/components/shared/ui'
+import {usePage} from '@salesforce/commerce-sdk-react'
+import {useSearchParams} from '@salesforce/retail-react-app/app/hooks'
+
+function PageDesignerPage() {
+  // Reading params from URL or defaults
+  const [params] = useSearchParams()
+  const pageId = params.pageId || 'your-default-page-id'
+
+  // Hook to fetch the page by ID
+  const {data, isLoading, isError, error} = usePage({
+    parameters: {
+      id: pageId
+    }
+    // queryOptions? (optional)
+  })
+  // Exxample:
+  if (isLoading) return <Skeleton count={1} />
+  if (isError) return <div>Error: {String(error)}</div>
+  if (!data) return <div>No Page Data</div>
+
+  return (
+    <div>
+      <h1>Page {data.id}</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  )
+}
+
+export default PageDesignerPage
 ```
 
 ### useOrder
@@ -193,21 +226,23 @@ Hook for products.
 
 ```javascript
 import React from 'react'
-import {useProducts} from '@salesforce/commerce-sdk-react'; {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-// Expect an array of product IDs in `inputIds`
-const productIds = ['test-product-id-1', 'test-product-id-2']
-const ids = productIds.join(',')
+import {useProducts} from '@salesforce/commerce-sdk-react'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
-// Optional inventory scoping by selected store
-const {selectedStore} = useSelectedStore()
-const selectedInventoryId = selectedStore?.inventoryId || null
+export default function ProductsExample() {
+  // Expect an array of product IDs in `inputIds`
+  const productIds = ['test-product-id-1', 'test-product-id-2']
 
-const {
-    data: productsResponse,
-    isLoading: isProductsLoading,
-    isError: isProductsError,
-    error: productsError
-} = useProducts(
+  // Optional inventory scoping by selected store
+  const {selectedStore} = useSelectedStore()
+  const selectedInventoryId = selectedStore?.inventoryId || null
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error
+  } = useProducts(
     {
       parameters: {
         ids: productIds.join(','),
@@ -232,47 +267,54 @@ Hook for product.
 
 ```javascript
 import React from 'react'
-import {useParams, useLocation} from 'react-router-dom'; {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-// Inside your component
-const {productId} = useParams()
-const location = useLocation()
-const urlParams = new URLSearchParams(location.search)
+import {useParams, useLocation} from 'react-router-dom'
+import {useProduct} from '@salesforce/commerce-sdk-react'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
-// If your site uses store selection/inventory
-const {selectedStore} = useSelectedStore()
-const selectedInventoryId = selectedStore?.inventoryId || null
+export default function ProductExample() {
+  // Inside your component
+  const {productId} = useParams()
+  const location = useLocation()
+  const urlParams = new URLSearchParams(location.search)
 
-const {
+  // If your site uses store selection/inventory
+  const {selectedStore} = useSelectedStore()
+  const selectedInventoryId = selectedStore?.inventoryId || null
+
+  const {
     data: productResponse,
-    isLoading: isProductLoading,
-    isError: isProductError,
-    error: productError
-} = useProduct(
+    isLoading,
+    isError,
+    error
+  } = useProduct(
     {
-        parameters: {
-            id: urlParams.get('pid') || productId,
-            perPricebook: true,
-            expand: [
-                'availability',
-                'promotions',
-                'options',
-                'images',
-                'prices',
-                'variations',
-                'set_products',
-                'bundled_products',
-                'page_meta_tags'
-            ],
-            allImages: true,
-            ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
-        }
+      parameters: {
+        id: urlParams.get('pid') || productId,
+        perPricebook: true,
+        expand: [
+          'availability',
+          'promotions',
+          'options',
+          'images',
+          'prices',
+          'variations',
+          'set_products',
+          'bundled_products',
+          'page_meta_tags'
+        ],
+        allImages: true,
+        ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+      }
     },
     {
-        keepPreviousData: true
+      keepPreviousData: true
     }
-)
-
-// product data available as `productResponse`
+  )
+  // Example:
+  if (isLoading) return <div>Loading product…</div>
+  if (isError) return <div>Error: {String(error)}</div>
+  return <pre>{JSON.stringify(productResponse, null, 2)}</pre>
+}
 ```
 
 ### useCategory
@@ -280,21 +322,29 @@ const {
 Hook for category.
 
 ```javascript
-// Imports: {useCategory} from '@salesforce/commerce-sdk-react'; {useParams} from 'react-router-dom'
-// Use category id from route or props
-const {categoryId} = useParams()
+import React from 'react'
+import {useCategory} from '@salesforce/commerce-sdk-react'
+import {useParams} from 'react-router-dom'
 
-const {
+export default function CategoryExample() {
+  const {categoryId} = useParams()
+
+  const {
     data: category,
-    isLoading: isCategoryLoading,
-    isError: isCategoryError,
-    error: categoryError
-} = useCategory({
+    isLoading,
+    isError,
+    error
+  } = useCategory({
     parameters: {
-        id: categoryId,
-        levels: 1
+      id: categoryId,
+      levels: 1
     }
-})
+  })
+  // Example:
+  if (isLoading) return <div>Loading category…</div>
+  if (isError) return <div>Error: {String(error)}</div>
+  return <pre>{JSON.stringify(category, null, 2)}</pre>
+}
 ```
 
 ### usePromotions
@@ -378,27 +428,34 @@ export default function SearchSuggestionsExample() {
 Hook for stores.
 
 ```javascript
-// Imports: {useStores} from '@salesforce/commerce-sdk-react'; {useState, useEffect} from 'react'
-// Geolocation-driven store search
-const [coords, setCoords] = useState(null)
+import React, {useState, useEffect} from 'react'
+import {useStores} from '@salesforce/commerce-sdk-react'
 
-useEffect(() => {
+export default function StoresExample() {
+  // Geolocation-driven store search
+  const [coords, setCoords] = useState(null)
+
+  useEffect(() => {
     if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition((pos) => {
-        setCoords({lat: pos.coords.latitude, lon: pos.coords.longitude})
+    navigator.geolocation.getCurrentPosition(pos => {
+      setCoords({lat: pos.coords.latitude, lon: pos.coords.longitude})
     })
-}, [])
+  }, [])
 
-const {data: stores, isLoading: isStoresLoading} = useStores(
+  const {data: stores, isLoading} = useStores(
     {
-        parameters: {
-            latitude: coords?.lat,
-            longitude: coords?.lon,
-            radius: 50
-        }
+      parameters: {
+        latitude: coords?.lat,
+        longitude: coords?.lon,
+        radius: 50
+      }
     },
     {enabled: Boolean(coords)}
-)
+  )
+  // Example:
+  if (isLoading) return <div>Loading stores…</div>
+  return <pre>{JSON.stringify(stores, null, 2)}</pre>
+}
 ```
 
 ### useSelectedStore
