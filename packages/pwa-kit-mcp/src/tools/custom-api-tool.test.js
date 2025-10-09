@@ -92,7 +92,6 @@ describe('CustomApiTool', () => {
         webdavUtils.getFileContent.mockResolvedValue(
             'schema:\n  type: object\n  properties:\n    name:\n      type: string'
         )
-        setupSuccessfulFetchMocks()
     })
 
     it('has correct tool structure', () => {
