@@ -224,26 +224,19 @@ export function generateComponentImportStatement(
  * Loads configuration from dw.json file if it exists, otherwise falls back to environment variables
  * Priority: dw.json file > Environment variables
  *
- * @param {string} [dwJsonPath] - Optional path to dw.json file. If not provided, checks global.DW_JSON_PATH, then process.env.DW_JSON_PATH, then looks in current directory
  * @returns {Object} Configuration object with SFCC settings
  */
-export function loadConfig(dwJsonPath) {
+export function loadConfig() {
     let dwConfig = {}
 
-    // Try to load dw.json if path provided or check default locations
-    // Priority: parameter > global.DW_JSON_PATH > env.DW_JSON_PATH > cwd/dw.json
-    const configPath =
-        dwJsonPath ||
-        global.DW_JSON_PATH ||
-        process.env.DW_JSON_PATH ||
-        path.join(process.cwd(), 'dw.json')
+    // Try to load dw.json
+    const configPath = global.DW_JSON_PATH
     if (fs.existsSync(configPath)) {
         try {
             const fileContent = fs.readFileSync(configPath, 'utf-8')
             dwConfig = JSON.parse(fileContent)
-            console.error(`[MCP] Loaded configuration from ${configPath}`)
         } catch (error) {
-            console.error(`[MCP] Warning: Failed to parse dw.json: ${error.message}`)
+            logMCPMessage(`Failed to parse dw.json: ${error.message}`)
         }
     }
     // Merge with environment variables (dw.json takes precedence if both exist)

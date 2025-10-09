@@ -7,16 +7,46 @@
 import {loadConfig} from '../utils/utils.js'
 import {OAUTH_TOKEN_URL} from '../utils/constants.js'
 import {createWebDAVClient, findFolderRecursively, getFileContent} from '../utils/webdav-utils.js'
+import {logMCPMessage} from '../utils/utils.js'
 
 /**
- * Formats error messages for display
+ * Fetches and validates configuration from dw.json or environment variables
  */
-function formatError(type, error) {
-    return `${type}:
-- Error: ${error.message}
-- Status: Failed to ${type.toLowerCase().replace(' ', ' ').replace('Error', '')}
+function fetchAndValidateConfigs() {
+    // Load configuration from dw.json or environment variables
+    const config = loadConfig()
+    const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} = config
 
-`
+    // Validate configuration fields
+    const nullConfigFields = Object.entries(config)
+        .filter(([, value]) => value === null || value === undefined)
+        .map(([key]) => key)
+
+    if (nullConfigFields.length > 0) {
+        throw new Error(`Required configuration fields are null: ${nullConfigFields.join(', ')}`)
+    }
+
+    return {clientId, clientSecret, organizationId, instanceId, shortCode, hostname}
+}
+
+/**
+ * Helper function to throw formatted OAuth error messages
+ */
+function throwOAuthError(message, tokenData) {
+    const errorMessage = tokenData.error_description
+        ? `${message}. Error: ${tokenData.error}. Description: ${tokenData.error_description}`
+        : `${message}. Error: ${tokenData.error}`
+    throw new Error(errorMessage)
+}
+
+/**
+ * Helper function to handle custom API DX endpoint errors
+ */
+function throwDxEndpointError(message, response) {
+    const errorMessage = response.title
+        ? `${message}. Title: ${response.title}. Detail: ${response.detail}`
+        : `${message}. Response: ${JSON.stringify(response)}`
+    throw new Error(errorMessage)
 }
 
 /**
@@ -31,10 +61,6 @@ async function getOAuthToken(clientId, clientSecret, oauthScope) {
         },
         body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
     })
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
 
     return await response.json()
 }
@@ -52,10 +78,6 @@ async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationI
             'Content-Type': 'application/json'
         }
     })
-
-    if (!response.ok) {
-        throw new Error(`Custom API HTTP error! status: ${response.status}`)
-    }
 
     return await response.json()
 }
@@ -86,7 +108,7 @@ async function searchForApiSchema(webdavClient, activeCodeVersion, cartridgeName
 
         return {searchResults: results}
     } catch (error) {
-        console.error('Error searching for API schema:', error)
+        logMCPMessage('Error searching for API schema: ' + error.message)
         return {searchResults: []}
     }
 }
@@ -98,38 +120,39 @@ export default {
     inputSchema: {},
     fn: async () => {
         let result = ''
+        let dxEndpointResponse = null
         let activeCodeVersion = null
-
-        // Load configuration from dw.json or environment variables
-        const config = loadConfig()
-        const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} = config
+        const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} =
+            fetchAndValidateConfigs()
         const customApiHost = `${shortCode}.api.commercecloud.salesforce.com`
         const oauthScope = `SALESFORCE_COMMERCE_API:${instanceId} sfcc.custom-apis`
 
         try {
             // Get OAuth token
             const tokenData = await getOAuthToken(clientId, clientSecret, oauthScope)
-            if (!tokenData?.access_token) {
-                throw new Error('Invalid OAuth response.')
+            if (!tokenData?.access_token || tokenData.error) {
+                throwOAuthError('Invalid OAuth response', tokenData)
             }
 
             // Call custom API DX endpoint and retrieve custom APIs on the instance
-            const dxResponse = await callCustomApiDxEndpoint(
+            dxEndpointResponse = await callCustomApiDxEndpoint(
                 tokenData.access_token,
                 customApiHost,
                 organizationId
             )
-            if (!dxResponse.data) {
-                throw new Error('Invalid Custom API DX response.')
+            if (!dxEndpointResponse.data || dxEndpointResponse.error) {
+                throwDxEndpointError('Invalid Custom API DX response', dxEndpointResponse)
             }
 
             // Create WebDAV client once and reuse it
             const webdavClient = createWebDAVClient(hostname, tokenData.access_token)
-            // Process each custom API and get the schema content
-            const processedEntries = []
-            activeCodeVersion = dxResponse.activeCodeVersion
 
-            for (const entry of dxResponse.data) {
+            const processedEntries = []
+            activeCodeVersion = dxEndpointResponse.activeCodeVersion
+
+            // Process each custom API and attempt to get the schema content from WebDAV
+            // If the schema content is not found, still create the entry with content from DX response
+            for (const entry of dxEndpointResponse.data) {
                 if (entry.cartridgeName) {
                     try {
                         const webdavResponse = await searchForApiSchema(
@@ -179,11 +202,18 @@ export default {
                 }
             }
 
-            result += `Processed API Entries:\n${JSON.stringify(processedEntries, null, 2)}\n\n`
+            result += `Custom APIs Discovered:\n${JSON.stringify(processedEntries, null, 2)}\n\n`
         } catch (error) {
-            result += formatError('API Processing Error', error)
+            result += error.message
+            // If DX endpoint response is available and contains actual API data, include it
+            if (dxEndpointResponse?.data) {
+                result +=
+                    '\n\nCustom APIs Discovered:\n' +
+                    JSON.stringify(dxEndpointResponse.data, null, 2)
+            }
         }
 
+        console.error('result', result)
         return {
             content: [
                 {

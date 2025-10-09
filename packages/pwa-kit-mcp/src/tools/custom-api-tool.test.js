@@ -111,7 +111,7 @@ describe('CustomApiTool', () => {
             content: [
                 {
                     type: 'text',
-                    text: expect.stringContaining('Processed API Entries')
+                    text: expect.stringContaining('Custom APIs Discovered:')
                 }
             ],
             activeCodeVersion: 'version_1'
@@ -198,7 +198,6 @@ describe('CustomApiTool', () => {
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('API Processing Error')
         expect(result.content[0].text).toContain('Network error')
     })
 
@@ -213,7 +212,73 @@ describe('CustomApiTool', () => {
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('API Processing Error')
         expect(result.content[0].text).toContain('API endpoint error')
+    })
+
+    it('handles DX response with error field', async () => {
+        // Mock OAuth success but DX response with error
+        global.fetch
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve(mockOAuthResponse)
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () =>
+                    Promise.resolve({
+                        error: 'Invalid request',
+                        status: 400
+                    })
+            })
+
+        const result = await CustomApiTool.fn()
+
+        expect(result.content[0].text).toContain('Invalid Custom API DX response. Status: 400')
+    })
+
+    it('includes partial DX response when webDAV fails', async () => {
+        // Mock OAuth success and DX response success, but WebDAV failure
+        global.fetch
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve(mockOAuthResponse)
+            })
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () =>
+                    Promise.resolve({
+                        ...mockDxResponse,
+                        ok: true
+                    })
+            })
+
+        // Mock WebDAV client creation to throw error
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const webdavUtils = require('../utils/webdav-utils.js')
+        webdavUtils.createWebDAVClient.mockImplementation(() => {
+            throw new Error('WebDAV connection failed')
+        })
+
+        const result = await CustomApiTool.fn()
+
+        expect(result.content[0].text).toContain('WebDAV connection failed')
+        // Should not include partial DX response since WebDAV error happens after DX success
+    })
+
+    it('throws error when some configuration fields are null', async () => {
+        // Override the default config mock to return null values
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('../utils/utils.js').loadConfig.mockReturnValue({
+            clientId: 'client-id',
+            clientSecret: null,
+            organizationId: null,
+            instanceId: 'instance-id',
+            shortCode: 'short-code',
+            hostname: 'hostname'
+        })
+
+        await expect(CustomApiTool.fn()).rejects.toThrow(
+            'Required configuration fields are null: clientSecret, organizationId'
+        )
     })
 })

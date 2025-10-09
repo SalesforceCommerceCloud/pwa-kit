@@ -12,7 +12,8 @@ import {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    loadConfig
 } from './utils'
 import fs from 'fs'
 import path from 'path'
@@ -323,5 +324,191 @@ describe('logMCPMessage', () => {
             exists = false
         }
         expect(exists).toBe(false)
+    })
+})
+
+describe('loadConfig', () => {
+    const originalEnv = {
+        SFCC_HOSTNAME: process.env.SFCC_HOSTNAME,
+        SFCC_INSTANCE_ID: process.env.SFCC_INSTANCE_ID,
+        AM_CLIENT_ID: process.env.AM_CLIENT_ID,
+        AM_CLIENT_SECRET: process.env.AM_CLIENT_SECRET,
+        SFCC_ORG_ID: process.env.SFCC_ORG_ID,
+        SFCC_SHORT_CODE: process.env.SFCC_SHORT_CODE,
+        DW_JSON_PATH: process.env.DW_JSON_PATH
+    }
+    const originalGlobal = global.DW_JSON_PATH
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        // Reset environment variables
+        Object.keys(originalEnv).forEach((key) => {
+            delete process.env[key]
+        })
+        delete global.DW_JSON_PATH
+        // Mock process.cwd to return a predictable path
+        jest.spyOn(process, 'cwd').mockReturnValue('/mock/current/directory')
+    })
+
+    afterEach(() => {
+        // Restore environment variables
+        Object.entries(originalEnv).forEach(([key, value]) => {
+            if (value !== undefined) {
+                process.env[key] = value
+            } else {
+                delete process.env[key]
+            }
+        })
+        global.DW_JSON_PATH = originalGlobal
+        jest.restoreAllMocks()
+    })
+
+    describe('when dw.json file exists', () => {
+        const mockDwConfig = {
+            hostname: 'https://test.dx.commercecloud.salesforce.com',
+            'instance-id': 'test_instance',
+            'client-id': 'test-client-id',
+            'client-secret': 'test-client-secret',
+            'org-id': 'test_org_id',
+            'short-code': 'test123'
+        }
+
+        it('loads configuration from dw.json file when file exists', () => {
+            global.DW_JSON_PATH = '/mock/current/directory/dw.json'
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            expect(fs.existsSync).toHaveBeenCalledWith('/mock/current/directory/dw.json')
+            expect(fs.readFileSync).toHaveBeenCalledWith('/mock/current/directory/dw.json', 'utf-8')
+            expect(result).toEqual({
+                hostname: 'https://test.dx.commercecloud.salesforce.com',
+                instanceId: 'test_instance',
+                clientId: 'test-client-id',
+                clientSecret: 'test-client-secret',
+                organizationId: 'test_org_id',
+                shortCode: 'test123'
+            })
+        })
+
+        it('uses global.DW_JSON_PATH when set', () => {
+            global.DW_JSON_PATH = '/global/path/dw.json'
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            loadConfig()
+
+            expect(fs.existsSync).toHaveBeenCalledWith('/global/path/dw.json')
+        })
+
+        it('handles malformed JSON gracefully', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue('invalid json')
+            jest.spyOn(console, 'error').mockImplementation()
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: undefined,
+                instanceId: undefined,
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: undefined,
+                shortCode: undefined
+            })
+        })
+
+        it('prefers dw.json values over environment variables', () => {
+            // Set environment variables
+            process.env.SFCC_HOSTNAME = 'env-hostname'
+            process.env.SFCC_INSTANCE_ID = 'env-instance'
+            process.env.AM_CLIENT_ID = 'env-client-id'
+            process.env.AM_CLIENT_SECRET = 'env-client-secret'
+            process.env.SFCC_ORG_ID = 'env-org-id'
+            process.env.SFCC_SHORT_CODE = 'env-short-code'
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            // Should use dw.json values, not env values
+            expect(result.hostname).toBe('https://test.dx.commercecloud.salesforce.com')
+            expect(result.instanceId).toBe('test_instance')
+            expect(result.clientId).toBe('test-client-id')
+            expect(result.clientSecret).toBe('test-client-secret')
+            expect(result.organizationId).toBe('test_org_id')
+            expect(result.shortCode).toBe('test123')
+        })
+    })
+
+    describe('when dw.json file does not exist', () => {
+        it('falls back to environment variables', () => {
+            global.DW_JSON_PATH = undefined
+            process.env.SFCC_HOSTNAME = 'env-hostname'
+            process.env.SFCC_INSTANCE_ID = 'env-instance'
+            process.env.AM_CLIENT_ID = 'env-client-id'
+            process.env.AM_CLIENT_SECRET = 'env-client-secret'
+            process.env.SFCC_ORG_ID = 'env-org-id'
+            process.env.SFCC_SHORT_CODE = 'env-short-code'
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'env-hostname',
+                instanceId: 'env-instance',
+                clientId: 'env-client-id',
+                clientSecret: 'env-client-secret',
+                organizationId: 'env-org-id',
+                shortCode: 'env-short-code'
+            })
+        })
+
+        it('returns undefined values when no environment variables are set', () => {
+            global.DW_JSON_PATH = undefined
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: undefined,
+                instanceId: undefined,
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: undefined,
+                shortCode: undefined
+            })
+        })
+    })
+
+    describe('mixed configuration scenarios', () => {
+        it('handles partial dw.json with missing environment variables', () => {
+            global.DW_JSON_PATH = '/mock/current/directory/dw.json'
+            const partialDwConfig = {
+                hostname: 'https://partial.dx.commercecloud.salesforce.com',
+                'instance-id': 'partial_instance'
+                // Missing other fields
+            }
+
+            process.env.AM_CLIENT_ID = 'env-client-id'
+            process.env.AM_CLIENT_SECRET = 'env-client-secret'
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(partialDwConfig))
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://partial.dx.commercecloud.salesforce.com',
+                instanceId: 'partial_instance',
+                clientId: 'env-client-id',
+                clientSecret: 'env-client-secret',
+                organizationId: undefined,
+                shortCode: undefined
+            })
+        })
     })
 })

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {createClient} from 'webdav'
-
+import {logMCPMessage} from './utils.js'
 /**
  * Create WebDAV client with authentication
  */
@@ -17,8 +17,7 @@ export function createWebDAVClient(hostname, accessToken) {
             }
         })
     } catch (error) {
-        console.error('Error creating WebDAV client:', error)
-        throw error
+        throw new Error('Error creating WebDAV client: ' + error.message)
     }
 }
 
@@ -34,7 +33,7 @@ export async function getDirectoryContents(client, path) {
             isDirectory: item.type === 'directory'
         }))
     } catch (error) {
-        console.error('Error getting directory contents:', error)
+        logMCPMessage('Error getting directory contents: ' + error.message)
         return []
     }
 }
@@ -68,7 +67,7 @@ export async function findFolderRecursively(client, basePath, targetFolderName) 
             }
         }
     } catch (error) {
-        console.error(`Error searching in ${basePath}:`, error)
+        logMCPMessage('Error searching in ' + basePath + ': ' + error.message)
     }
 
     return results
@@ -82,7 +81,7 @@ export async function getFileContent(client, filePath) {
         const content = await client.getFileContents(filePath, {format: 'text'})
         return content
     } catch (error) {
-        console.error(`Error getting file content from ${filePath}:`, error)
+        logMCPMessage('Error getting file content from ' + filePath + ': ' + error.message)
         return null
     }
 }
@@ -94,7 +93,7 @@ export async function pathExists(client, path) {
     try {
         return await client.exists(path)
     } catch (error) {
-        console.error(`Error checking if path exists ${path}:`, error)
+        logMCPMessage('Error checking if path exists ' + path + ': ' + error.message)
         return false
     }
 }
