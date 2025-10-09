@@ -9,9 +9,11 @@ import HooksRecommendationTool, {
     updatePageWithHooks
 } from './hooks-recommendation-tool.js'
 import fs from 'fs/promises'
+import {loadHooksCatalog} from '../utils/data'
 
-// Mock fs/promises
+// Mock fs/promises and data module
 jest.mock('fs/promises')
+jest.mock('../utils/data')
 
 describe('HooksRecommendationTool', () => {
     let tool
@@ -69,7 +71,7 @@ describe('HooksRecommendationTool', () => {
         ]
 
         it('should recommend hooks for a use case', async () => {
-            fs.readFile.mockResolvedValue(JSON.stringify(mockCatalog))
+            loadHooksCatalog.mockResolvedValue(mockCatalog)
 
             const result = await tool.handler({
                 useCase: 'fetch product data'
@@ -90,9 +92,8 @@ const TestPage = () => {
 
 export default TestPage`
 
-            fs.readFile
-                .mockResolvedValueOnce(JSON.stringify(mockCatalog))
-                .mockResolvedValueOnce(mockPageContent)
+            loadHooksCatalog.mockResolvedValue(mockCatalog)
+            fs.readFile.mockResolvedValue(mockPageContent)
 
             const result = await tool.handler({
                 selectedHooks: ['useProduct'],
@@ -107,7 +108,7 @@ export default TestPage`
 
     describe('handler - error paths', () => {
         it('should handle error when catalog not found', async () => {
-            fs.readFile.mockRejectedValue(new Error('File not found'))
+            loadHooksCatalog.mockRejectedValue(new Error('File not found'))
 
             const result = await tool.handler({
                 useCase: 'test case'
@@ -118,7 +119,7 @@ export default TestPage`
         })
 
         it('should handle error when hook not found in catalog', async () => {
-            const mockCatalog = [
+            const mockCatalogSingle = [
                 {
                     name: 'useProduct',
                     summary: 'Hook for product.',
@@ -126,9 +127,8 @@ export default TestPage`
                 }
             ]
 
-            fs.readFile
-                .mockResolvedValueOnce(JSON.stringify(mockCatalog))
-                .mockResolvedValueOnce('const TestPage = () => {}')
+            loadHooksCatalog.mockResolvedValue(mockCatalogSingle)
+            fs.readFile.mockResolvedValue('const TestPage = () => {}')
 
             const result = await tool.handler({
                 selectedHooks: ['useNonExistent'],
@@ -146,18 +146,20 @@ describe('recommendHooksForUseCase', () => {
         jest.resetAllMocks()
     })
 
-    it('should throw error if catalog file cannot be read', async () => {
-        fs.readFile.mockRejectedValue(new Error('ENOENT: file not found'))
+    it('should throw error if catalog cannot be loaded', async () => {
+        loadHooksCatalog.mockRejectedValue(new Error('ENOENT: file not found'))
 
         await expect(recommendHooksForUseCase('test use case')).rejects.toThrow(
             'Failed to read hook catalog'
         )
     })
 
-    it('should throw error if catalog JSON is invalid', async () => {
-        fs.readFile.mockResolvedValue('invalid json')
+    it('should handle catalog load errors gracefully', async () => {
+        loadHooksCatalog.mockRejectedValue(new Error('Parse error'))
 
-        await expect(recommendHooksForUseCase('test use case')).rejects.toThrow()
+        await expect(recommendHooksForUseCase('test use case')).rejects.toThrow(
+            'Failed to read hook catalog'
+        )
     })
 })
 
@@ -202,12 +204,8 @@ export default TestPage`
     })
 
     it('should add hook imports and implementations to page', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         const result = await updatePageWithHooks(['useProduct'], '/test/page.jsx')
 
@@ -220,12 +218,8 @@ export default TestPage`
     })
 
     it('should add multiple hooks to page', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         const result = await updatePageWithHooks(['useProduct', 'useBasket'], '/test/page.jsx')
 
@@ -236,12 +230,8 @@ export default TestPage`
     })
 
     it('should handle hooks with standard import statements', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         const result = await updatePageWithHooks(['useStandardImport'], '/test/page.jsx')
 
@@ -250,12 +240,8 @@ export default TestPage`
     })
 
     it('should exclude content after "Example:" comment', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         const result = await updatePageWithHooks(['useProduct'], '/test/page.jsx')
 
@@ -263,12 +249,8 @@ export default TestPage`
     })
 
     it('should throw error when hook not found in catalog', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         await expect(updatePageWithHooks(['useNonExistent'], '/test/page.jsx')).rejects.toThrow(
             'The following hooks were not found in the catalog: useNonExistent'
@@ -276,12 +258,8 @@ export default TestPage`
     })
 
     it('should throw error for multiple missing hooks', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         await expect(
             updatePageWithHooks(['useNonExistent1', 'useNonExistent2'], '/test/page.jsx')
@@ -289,12 +267,8 @@ export default TestPage`
     })
 
     it('should throw error if page file cannot be read', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.reject(new Error('ENOENT: file not found'))
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockRejectedValue(new Error('ENOENT: file not found'))
 
         await expect(updatePageWithHooks(['useProduct'], '/test/page.jsx')).rejects.toThrow(
             'Failed to update page with hooks'
@@ -308,12 +282,8 @@ export default TestPage`
 
 export default TestPage`
 
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(pageWithNoImports)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(pageWithNoImports)
 
         const result = await updatePageWithHooks(['useBasket'], '/test/page.jsx')
 
@@ -330,12 +300,8 @@ const TestPage = () => {
 
 export default TestPage`
 
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(pageWithArrowFunction)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(pageWithArrowFunction)
 
         const result = await updatePageWithHooks(['useBasket'], '/test/page.jsx')
 
@@ -344,12 +310,8 @@ export default TestPage`
     })
 
     it('should not duplicate imports', async () => {
-        fs.readFile.mockImplementation((path) => {
-            if (path.includes('catalog')) {
-                return Promise.resolve(JSON.stringify(mockCatalog))
-            }
-            return Promise.resolve(mockPageContent)
-        })
+        loadHooksCatalog.mockResolvedValue(mockCatalog)
+        fs.readFile.mockResolvedValue(mockPageContent)
 
         const result = await updatePageWithHooks(['useProduct', 'useBasket'], '/test/page.jsx')
 

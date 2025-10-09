@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import fs from 'fs/promises'
-import path from 'path'
 import {z} from 'zod'
+import {loadHooksCatalog} from '../utils/data'
 
 const systemPromptForHooksRecommendation = `please enter a page path and list of hooks to include in the page.
 If you would like to recommend hooks for a use case, please enter the use case.`
@@ -17,15 +17,11 @@ const systemPromptForHooksIntegration = `please enter the path to the page to up
  * Recommend hooks from the catalog based on a user-provided use case.
  * The tool outputs a prompt that tells the LLM to copy the snippet field exactly from the catalog, not to generate or modify code snippets.
  * @param {string} useCase - The use case description provided by the user.
- * @param {string} [catalogPath] - Optional absolute path to the hook catalog JSON file.
  * @returns {Promise<string>}
  */
-export async function recommendHooksForUseCase(useCase, catalogPath) {
+export async function recommendHooksForUseCase(useCase) {
     try {
-        const resolvedCatalogPath =
-            catalogPath || path.resolve(__dirname, '../data/hook-catalog.json')
-        const catalogRaw = await fs.readFile(resolvedCatalogPath, 'utf8')
-        const catalog = JSON.parse(catalogRaw)
+        const catalog = await loadHooksCatalog()
         const recommendations = `
 Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.
 After the recommendations, ask the user: "Based on these hook recommendations, which hooks would you like to include in your page? Please provide the hook names separated by commas (e.g., 'useProduct, useBasket'), or type 'none' if you don't want to include any hooks."
@@ -54,15 +50,11 @@ ${JSON.stringify(catalog, null, 2)}
  * Update a page file with selected hooks from the catalog.
  * @param {string} selectedHooks - Array of string hook names selected by user.
  * @param {string} pagePath - Absolute path to the page file to update.
- * @param {string} [catalogPath] - Optional absolute path to the hook catalog JSON file.
  * @returns {Promise<string>}
  */
-export async function updatePageWithHooks(selectedHooks, pagePath, catalogPath) {
+export async function updatePageWithHooks(selectedHooks, pagePath) {
     try {
-        const resolvedCatalogPath =
-            catalogPath || path.resolve(__dirname, '../data/hook-catalog.json')
-        const catalogRaw = await fs.readFile(resolvedCatalogPath, 'utf8')
-        const catalog = JSON.parse(catalogRaw)
+        const catalog = await loadHooksCatalog()
 
         // Find hooks in catalog
         const selectedHookData = []
