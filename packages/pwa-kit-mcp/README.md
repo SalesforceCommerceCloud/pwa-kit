@@ -34,7 +34,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 * **`development_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
-* **`retailapp_recommend_hooks`**:
+* **`pwakit_recommend_hooks`**:
   Interactive tool to help developers identify and integrate hooks that solve specific use cases.
 
 * **`run_site_test`**:

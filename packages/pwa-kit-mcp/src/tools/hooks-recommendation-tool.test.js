@@ -25,7 +25,7 @@ describe('HooksRecommendationTool', () => {
 
     describe('Tool metadata', () => {
         it('should have correct name', () => {
-            expect(tool.name).toBe('retailapp_recommend_hooks')
+            expect(tool.name).toBe('pwakit_recommend_hooks')
         })
 
         it('should have description', () => {

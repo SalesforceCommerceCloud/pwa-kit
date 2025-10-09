@@ -26,7 +26,7 @@ export async function recommendHooksForUseCase(useCase) {
 Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.
 After the recommendations, ask the user: "Based on these hook recommendations, which hooks would you like to include in your page? Please provide the hook names separated by commas (e.g., 'useProduct, useBasket'), or type 'none' if you don't want to include any hooks."
 
-Once the user provides their hook selection, use the retailapp_recommend_hooks tool to update the page with the selected hooks.
+Once the user provides their hook selection, use the pwakit_recommend_hooks tool to update the page with the selected hooks.
 
 For each recommended hook, output:
 - The hook name (as a heading)
@@ -187,7 +187,7 @@ ${updatedContent}`
 }
 class HooksRecommendationTool {
     constructor() {
-        this.name = 'retailapp_recommend_hooks'
+        this.name = 'pwakit_recommend_hooks'
         this.description = `Recommend React hooks from the out of the box hooks based on a specific use case.`
         this.inputSchema = {
             useCase: z
