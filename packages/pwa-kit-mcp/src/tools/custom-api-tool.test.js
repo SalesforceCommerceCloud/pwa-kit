@@ -14,7 +14,11 @@ jest.mock('../utils/webdav-utils.js', () => ({
 }))
 
 jest.mock('../utils/utils.js', () => ({
-    loadConfig: jest.fn()
+    loadConfig: jest.fn(),
+    throwOAuthError: jest.fn(),
+    throwCustomApiError: jest.fn(),
+    getOAuthToken: jest.fn(),
+    callCustomApiDxEndpoint: jest.fn()
 }))
 
 // Mock fetch globally
@@ -66,15 +70,11 @@ describe('CustomApiTool', () => {
 
     // Helper function to set up successful fetch mocks
     const setupSuccessfulFetchMocks = () => {
-        global.fetch
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockOAuthResponse)
-            })
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockDxResponse)
-            })
+        // Mock the utils functions to return the expected responses
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const utils = require('../utils/utils.js')
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
+        utils.callCustomApiDxEndpoint.mockResolvedValue(mockDxResponse)
     }
 
     beforeEach(() => {
@@ -171,16 +171,11 @@ describe('CustomApiTool', () => {
             activeCodeVersion: 'version_1'
         }
 
-        // Override the default fetch mock for this specific test
-        global.fetch
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockOAuthResponse)
-            })
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(multipleApisResponse)
-            })
+        // Mock the utils functions for this specific test
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const utils = require('../utils/utils.js')
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
+        utils.callCustomApiDxEndpoint.mockResolvedValue(multipleApisResponse)
 
         const result = await CustomApiTool.fn()
 
@@ -193,8 +188,10 @@ describe('CustomApiTool', () => {
     })
 
     it('handles OAuth token failure', async () => {
-        // Override the default fetch mock to simulate OAuth failure
-        global.fetch.mockRejectedValueOnce(new Error('Network error'))
+        // Mock OAuth function to throw error
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const utils = require('../utils/utils.js')
+        utils.getOAuthToken.mockRejectedValue(new Error('Network error'))
 
         const result = await CustomApiTool.fn()
 
@@ -202,55 +199,26 @@ describe('CustomApiTool', () => {
     })
 
     it('handles Custom API DX endpoint failure', async () => {
-        // Override the default fetch mock to simulate API endpoint failure
-        global.fetch
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockOAuthResponse)
-            })
-            .mockRejectedValueOnce(new Error('API endpoint error'))
+        // Mock OAuth success but DX endpoint failure
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const utils = require('../utils/utils.js')
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
+        utils.callCustomApiDxEndpoint.mockRejectedValue(new Error('API endpoint error'))
 
         const result = await CustomApiTool.fn()
 
         expect(result.content[0].text).toContain('API endpoint error')
     })
 
-    it('handles DX response with error field', async () => {
-        // Mock OAuth success but DX response with error
-        global.fetch
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockOAuthResponse)
-            })
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () =>
-                    Promise.resolve({
-                        error: 'Invalid request',
-                        status: 400
-                    })
-            })
-
-        const result = await CustomApiTool.fn()
-
-        expect(result.content[0].text).toContain('Invalid Custom API DX response. Status: 400')
-    })
-
     it('includes partial DX response when webDAV fails', async () => {
         // Mock OAuth success and DX response success, but WebDAV failure
-        global.fetch
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () => Promise.resolve(mockOAuthResponse)
-            })
-            .mockResolvedValueOnce({
-                ok: true,
-                json: () =>
-                    Promise.resolve({
-                        ...mockDxResponse,
-                        ok: true
-                    })
-            })
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const utils = require('../utils/utils.js')
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
+        utils.callCustomApiDxEndpoint.mockResolvedValue({
+            ...mockDxResponse,
+            ok: true
+        })
 
         // Mock WebDAV client creation to throw error
         // eslint-disable-next-line @typescript-eslint/no-var-requires

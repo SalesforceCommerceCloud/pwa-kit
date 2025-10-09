@@ -13,7 +13,11 @@ import {
     isLocalComponent,
     isLocalSharedUIComponent,
     generateComponentImportStatement,
-    loadConfig
+    loadConfig,
+    throwOAuthError,
+    throwCustomApiError,
+    getOAuthToken,
+    callCustomApiDxEndpoint
 } from './utils'
 import fs from 'fs'
 import path from 'path'
@@ -510,5 +514,122 @@ describe('loadConfig', () => {
                 shortCode: undefined
             })
         })
+    })
+})
+
+describe('throwOAuthError', () => {
+    it('should throw OAuth error with proper structure', () => {
+        const message = 'OAuth authentication failed'
+        const tokenData = {
+            error: 'invalid_client',
+            error_description: 'Client authentication failed'
+        }
+
+        expect(() => throwOAuthError(message, tokenData)).toThrow(
+            'OAuth authentication failed. Error: invalid_client. Description: Client authentication failed'
+        )
+    })
+})
+
+describe('throwCustomApiError', () => {
+    it('should throw Custom API DX endpoint error with proper structure', () => {
+        const message = 'Custom API request failed'
+        const response = {
+            title: 'Bad Request',
+            detail: 'Invalid organization ID provided'
+        }
+
+        expect(() => throwCustomApiError(message, response)).toThrow(
+            'Custom API request failed. Error: Bad Request. Description: Invalid organization ID provided'
+        )
+    })
+})
+
+describe('getOAuthToken', () => {
+    const originalFetch = global.fetch
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        global.fetch = jest.fn()
+    })
+
+    afterEach(() => {
+        global.fetch = originalFetch
+    })
+
+    it('should successfully obtain OAuth token', async () => {
+        const mockTokenResponse = {
+            access_token: 'mock_access_token',
+            token_type: 'Bearer',
+            expires_in: 3600
+        }
+
+        global.fetch.mockResolvedValueOnce({
+            json: () => Promise.resolve(mockTokenResponse)
+        })
+
+        const result = await getOAuthToken('test_client_id', 'test_client_secret', 'test_scope')
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://account.demandware.com/dwsso/oauth2/access_token',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization:
+                        'Basic ' +
+                        Buffer.from('test_client_id:test_client_secret').toString('base64')
+                },
+                body: 'grant_type=client_credentials&scope=test_scope'
+            }
+        )
+        expect(result).toEqual(mockTokenResponse)
+    })
+})
+
+describe('callCustomApiDxEndpoint', () => {
+    const originalFetch = global.fetch
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        global.fetch = jest.fn()
+    })
+
+    afterEach(() => {
+        global.fetch = originalFetch
+    })
+
+    it('should successfully call custom API DX endpoint', async () => {
+        const mockApiResponse = {
+            endpoints: [
+                {
+                    id: 'endpoint1',
+                    name: 'Test Endpoint',
+                    url: '/api/test'
+                }
+            ]
+        }
+
+        global.fetch.mockResolvedValueOnce({
+            json: () => Promise.resolve(mockApiResponse)
+        })
+
+        const result = await callCustomApiDxEndpoint(
+            'mock_access_token',
+            'test.dx.commercecloud.salesforce.com',
+            'test_org_id'
+        )
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://test.dx.commercecloud.salesforce.com/dx/custom-apis/v1/organizations/test_org_id/endpoints',
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer mock_access_token',
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+        expect(result).toEqual(mockApiResponse)
     })
 })

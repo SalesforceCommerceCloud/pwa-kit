@@ -250,3 +250,58 @@ export function loadConfig() {
         shortCode: dwConfig.shortCode || dwConfig['short-code'] || process.env.SFCC_SHORT_CODE
     }
 }
+
+/**
+ * Throws formatted OAuth error messages
+ */
+export function throwOAuthError(message, tokenData) {
+    const errorMessage = tokenData.error
+        ? `${message}. Error: ${tokenData.error}. Description: ${tokenData.error_description}`
+        : `${message}. Error: ${tokenData}`
+    throw new Error(errorMessage)
+}
+
+/**
+ * Throws formatted Custom API DX endpoint error messages
+ */
+export function throwCustomApiError(message, response) {
+    const errorMessage = response.title
+        ? `${message}. Error: ${response.title}. Description: ${response.detail}`
+        : `${message}. Error: ${response}`
+    throw new Error(errorMessage)
+}
+
+/**
+ * Obtains OAuth access token
+ */
+export async function getOAuthToken(clientId, clientSecret, oauthScope) {
+    const {OAUTH_TOKEN_URL} = await import('./constants.js')
+
+    const response = await fetch(OAUTH_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        },
+        body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
+    })
+
+    return await response.json()
+}
+
+/**
+ * Calls the custom API DX endpoint
+ */
+export async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationId) {
+    const customApiBase = `https://${customApiHost}/dx/custom-apis/v1/organizations/${organizationId}/endpoints`
+
+    const response = await fetch(customApiBase, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+
+    return await response.json()
+}

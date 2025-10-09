@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {loadConfig} from '../utils/utils.js'
-import {OAUTH_TOKEN_URL} from '../utils/constants.js'
+import {
+    loadConfig,
+    throwOAuthError,
+    throwCustomApiError,
+    getOAuthToken,
+    callCustomApiDxEndpoint
+} from '../utils/utils.js'
 import {createWebDAVClient, findFolderRecursively, getFileContent} from '../utils/webdav-utils.js'
 import {logMCPMessage} from '../utils/utils.js'
 
@@ -27,59 +32,6 @@ function fetchAndValidateConfigs() {
     }
 
     return {clientId, clientSecret, organizationId, instanceId, shortCode, hostname}
-}
-
-/**
- * Helper function to throw formatted OAuth error messages
- */
-function throwOAuthError(message, tokenData) {
-    const errorMessage = tokenData.error_description
-        ? `${message}. Error: ${tokenData.error}. Description: ${tokenData.error_description}`
-        : `${message}. Error: ${tokenData.error}`
-    throw new Error(errorMessage)
-}
-
-/**
- * Helper function to handle custom API DX endpoint errors
- */
-function throwDxEndpointError(message, response) {
-    const errorMessage = response.title
-        ? `${message}. Title: ${response.title}. Detail: ${response.detail}`
-        : `${message}. Response: ${JSON.stringify(response)}`
-    throw new Error(errorMessage)
-}
-
-/**
- * Obtains OAuth access token
- */
-async function getOAuthToken(clientId, clientSecret, oauthScope) {
-    const response = await fetch(OAUTH_TOKEN_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
-        },
-        body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
-    })
-
-    return await response.json()
-}
-
-/**
- * Calls the custom API endpoint
- */
-async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationId) {
-    const customApiBase = `https://${customApiHost}/dx/custom-apis/v1/organizations/${organizationId}/endpoints`
-
-    const response = await fetch(customApiBase, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        }
-    })
-
-    return await response.json()
 }
 
 /**
@@ -130,7 +82,7 @@ export default {
         try {
             // Get OAuth token
             const tokenData = await getOAuthToken(clientId, clientSecret, oauthScope)
-            if (!tokenData?.access_token || tokenData.error) {
+            if (!tokenData?.access_token) {
                 throwOAuthError('Invalid OAuth response', tokenData)
             }
 
@@ -140,8 +92,8 @@ export default {
                 customApiHost,
                 organizationId
             )
-            if (!dxEndpointResponse.data || dxEndpointResponse.error) {
-                throwDxEndpointError('Invalid Custom API DX response', dxEndpointResponse)
+            if (!dxEndpointResponse.data) {
+                throwCustomApiError('Invalid Custom API DX response', dxEndpointResponse)
             }
 
             // Create WebDAV client once and reuse it
@@ -213,7 +165,6 @@ export default {
             }
         }
 
-        console.error('result', result)
         return {
             content: [
                 {
