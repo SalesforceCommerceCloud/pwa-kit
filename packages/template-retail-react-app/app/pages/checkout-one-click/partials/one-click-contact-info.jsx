@@ -81,7 +81,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
-    const [showContinueButton, setShowContinueButton] = useState(true)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
@@ -97,8 +96,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onClose: onOtpModalClose
     } = useDisclosure()
 
-    // Handle email field blur/focus events with secure lookup
-    const handleEmailBlur = async (e) => {
+    // Handle email field blur - just validation, no automatic OTP
+    const handleEmailBlur = (e) => {
         // Call original React Hook Form blur handler if it exists
         if (fields.email.onBlur) {
             fields.email.onBlur(e)
@@ -109,19 +108,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         // Clear previous email error
         setEmailError('')
 
-        // Validate email format
-        if (!email) {
-            setEmailError('Please enter your email address.')
-            return
-        }
-
-        if (!isValidEmail(email)) {
+        // Validate email format but don't trigger OTP automatically
+        if (email && !isValidEmail(email)) {
             setEmailError('Please enter a valid email address.')
-            return
         }
-
-        // Email is valid, proceed with secure lookup
-        await handleEmailSubmission(email)
     }
 
     const handleEmailFocus = (e) => {
@@ -137,6 +127,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Clear email error when user focuses back on the field
         setEmailError('')
+    }
+
+    // Check if email is valid and show action buttons
+    const isEmailValid = () => {
+        const email = form.getValues('email')
+        return email && isValidEmail(email) && !emailError
     }
 
     // Handle email submission - TRUE zero enumeration via server-side proxy
@@ -172,6 +168,52 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Handle OTP modal close
     const handleOtpModalClose = () => {
         onOtpModalClose()
+    }
+
+    // Handle "Login with OTP" button click
+    const handleLoginWithOtp = async () => {
+        const email = form.getValues('email')
+        
+        // Validate email before proceeding
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        // Clear any previous errors
+        form.clearErrors('global')
+        setEmailError('')
+
+        // Trigger uniform OTP flow (same for registered and guest users)
+        await handleEmailSubmission(email)
+    }
+
+    // Handle "Continue as Guest" button click
+    const handleContinueAsGuest = async () => {
+        const email = form.getValues('email')
+        
+        // Validate email before proceeding
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        // Clear any previous errors
+        form.clearErrors('global')
+        setEmailError('')
+
+        // Proceed directly as guest without OTP
+        await proceedAsGuest(email)
     }
 
     // Handle OTP send/resend using uniform proxy (prevents enumeration)
@@ -276,27 +318,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
-    const submitForm = async (data) => {
-        setError(null)
-        // Validate email before proceeding
-        if (!data.email) {
-            setError('Please enter your email address.')
-            return
-        }
-
-        if (!isValidEmail(data.email)) {
-            setError('Please enter a valid email address.')
-            return
-        }
-
-        // Reset guest checkout flag since user is proceeding normally
-        setRegisteredUserChoseGuest(false)
-        if (onRegisteredUserChoseGuest) {
-            onRegisteredUserChoseGuest(false)
-        }
-
-        // Start the secure lookup process with uniform UI
-        handleEmailSubmission(data.email)
+    // Prevent default form submission - we use explicit buttons instead
+    const submitForm = (e) => {
+        e.preventDefault()
+        // No automatic submission - user must choose "Login with OTP" or "Continue as Guest"
     }
 
     return (
@@ -366,13 +391,41 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         isSocialEnabled={isSocialEnabled}
                                         idps={idps}
                                     />
-                                    {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button type="submit">
-                                            <FormattedMessage
-                                                defaultMessage="Continue"
-                                                id="contact_info.button.continue"
-                                            />
-                                        </Button>
+                                    
+                                    {/* Two-button approach for better UX */}
+                                    {isEmailValid() && step === STEPS.CONTACT_INFO && (
+                                        <Stack spacing={3}>
+                                            <Text fontSize="sm" color="gray.600" textAlign="center">
+                                                <FormattedMessage
+                                                    defaultMessage="Choose how you'd like to proceed:"
+                                                    id="contact_info.text.choose_option"
+                                                />
+                                            </Text>
+                                            
+                                            <Button 
+                                                colorScheme="blue" 
+                                                onClick={handleLoginWithOtp}
+                                                size="lg"
+                                                width="full"
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Login with OTP"
+                                                    id="contact_info.button.login_with_otp"
+                                                />
+                                            </Button>
+                                            
+                                            <Button 
+                                                variant="outline" 
+                                                onClick={handleContinueAsGuest}
+                                                size="lg"
+                                                width="full"
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Continue as Guest"
+                                                    id="contact_info.button.continue_as_guest"
+                                                />
+                                            </Button>
+                                        </Stack>
                                     )}
                                 </Stack>
                             </Stack>
