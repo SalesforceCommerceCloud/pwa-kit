@@ -7,6 +7,11 @@
 import fs from 'fs/promises'
 import {z} from 'zod'
 import {loadHooksCatalog} from '../utils/data'
+import {
+    systemPromptForFileGeneration,
+    systemPromptForOrderedFileChanges,
+    SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS
+} from '../utils/constants'
 
 const systemPromptForHooksRecommendation = `please enter a page path and list of hooks to include in the page.
 If you would like to recommend hooks for a use case, please enter the use case.`
@@ -26,7 +31,7 @@ export async function recommendHooksForUseCase(useCase) {
 Given the following use case and hook catalog, recommend the top 3 most relevant hooks (with summary and snippet) for this use case.
 After the recommendations, ask the user: "Based on these hook recommendations, which hooks would you like to include in your page? Please provide the hook names separated by commas (e.g., 'useProduct, useBasket'), or type 'none' if you don't want to include any hooks."
 
-Once the user provides their hook selection, use the pwakit_recommend_hooks tool to update the page with the selected hooks.
+Once the user provides their hook selection, you must use the pwakit_recommend_hooks tool to update the page with the selected hooks.
 
 For each recommended hook, output:
 - The hook name (as a heading)
@@ -174,13 +179,10 @@ export async function updatePageWithHooks(selectedHooks, pagePath) {
             }
         }
 
-        return `You are a smart assistant that can use tools when needed.
-Use the file edit tools to add the following contents to this file "${pagePath}".
-Correct any logic errors in the updated content.
-Use the exact command "npm run lint -- --fix" to verify linting and prettier errors are fixed, but do not try tofix any warnings.
-Merge the return statements from the original and updated file content as needed.
-Do not add additional content that is not in the original file or in this content:
-${updatedContent}`
+        const messages = []
+        messages.push(systemPromptForFileGeneration(pagePath, updatedContent))
+        messages.push(SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS)
+        return systemPromptForOrderedFileChanges(messages)
     } catch (error) {
         throw new Error(`Failed to update page with hooks: ${error.message}`)
     }
@@ -188,7 +190,7 @@ ${updatedContent}`
 class HooksRecommendationTool {
     constructor() {
         this.name = 'pwakit_recommend_hooks'
-        this.description = `Recommend React hooks from the out of the box hooks based on a specific use case.`
+        this.description = `Recommend and use React hooks from the out of the box hooks based on a specific use case.`
         this.inputSchema = {
             useCase: z
                 .string()
@@ -218,7 +220,7 @@ class HooksRecommendationTool {
         }
 
         try {
-            const result = selectedHooks
+            const result = selectedHooks?.length
                 ? await updatePageWithHooks(selectedHooks, pagePath)
                 : await recommendHooksForUseCase(useCase)
             return {

@@ -29,7 +29,7 @@ describe('HooksRecommendationTool', () => {
         })
 
         it('should have description', () => {
-            expect(tool.description).toContain('Recommend React hooks')
+            expect(tool.description).toContain('Recommend and use React hooks')
         })
 
         it('should have input schema', () => {

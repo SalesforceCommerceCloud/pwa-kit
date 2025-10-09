@@ -33,26 +33,26 @@ function AccessTokenExample() {
       isMounted = false
     }
   }, [getTokenWhenReady])
-  // Example:
-  return (
-    <div style={{padding: 24, maxWidth: 480}}>
-      <h2>Shopper Access Token Example</h2>
-      <div>
-        <strong>Token (from hook sync):</strong>
-        <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
-          {token ?? <i>None found</i>}
-        </div>
-      </div>
-      <div style={{marginTop: 24}}>
-        <strong>Token (from getTokenWhenReady):</strong>
-        <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
-          {readyLoading && <span>Loading…</span>}
-          {readyError && <span style={{color: 'red'}}>Error: {String(readyError)}</span>}
-          {!readyLoading && !readyError && (asyncToken ?? <i>None found</i>)}
-        </div>
-      </div>
-    </div>
-  )
+// Example:
+//   return (
+//     <div style={{padding: 24, maxWidth: 480}}>
+//       <h2>Shopper Access Token Example</h2>
+//       <div>
+//         <strong>Token (from hook sync):</strong>
+//         <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
+//           {token ?? <i>None found</i>}
+//         </div>
+//       </div>
+//       <div style={{marginTop: 24}}>
+//         <strong>Token (from getTokenWhenReady):</strong>
+//         <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
+//           {readyLoading && <span>Loading…</span>}
+//           {readyError && <span style={{color: 'red'}}>Error: {String(readyError)}</span>}
+//           {!readyLoading && !readyError && (asyncToken ?? <i>None found</i>)}
+//         </div>
+//       </div>
+//     </div>
+//   )
 }
 
 export default AccessTokenExample
@@ -80,16 +80,16 @@ function GuestLogin() {
     // You can pass options if needed; the most common SDK configuration is handled via context/config at app level.
     loginAsGuest()
   }
-  // Example:
-  return (
-    <div>
-      <button onClick={handleLogin} disabled={isLoading}>
-        {isLoading ? 'Logging in…' : 'Login as Guest'}
-      </button>
-      {isSuccess && <div>Guest Login Success! Access Token: {data?.access_token}</div>}
-      {error && <div style={{color: 'red'}}>Error: {String(error)}</div>}
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <button onClick={handleLogin} disabled={isLoading}>
+//         {isLoading ? 'Logging in…' : 'Login as Guest'}
+//       </button>
+//       {isSuccess && <div>Guest Login Success! Access Token: {data?.access_token}</div>}
+//       {error && <div style={{color: 'red'}}>Error: {String(error)}</div>}
+//     </div>
+//   )
 }
 
 export default GuestLogin
@@ -115,21 +115,21 @@ function DemoLocalStorage() {
     localStorage.setItem(STORAGE_KEY, input)
     setInput('') // Optionally clear the input
   }
-  // Example:
-  return (
-    <div>
-      <h3>Saved value:</h3>
-      <div style={{padding: 8, border: '1px solid #ddd', marginBottom: 16}}>
-        {savedValue ?? <i>No value saved</i>}
-      </div>
-      <input
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        placeholder="Enter new value"
-      />
-      <button onClick={handleSave} style={{marginLeft: 8}}>Save to localStorage</button>
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <h3>Saved value:</h3>
+//       <div style={{padding: 8, border: '1px solid #ddd', marginBottom: 16}}>
+//         {savedValue ?? <i>No value saved</i>}
+//       </div>
+//       <input
+//         value={input}
+//         onChange={e => setInput(e.target.value)}
+//         placeholder="Enter new value"
+//       />
+//       <button onClick={handleSave} style={{marginLeft: 8}}>Save to localStorage</button>
+//     </div>
+//   )
 }
 
 export default DemoLocalStorage
@@ -156,25 +156,25 @@ function ShippingMethods({basketId, shipmentId}) {
       shipmentId
     }
   })
-  // Example:
-  if (isLoading) return <div>Loading shipping methods…</div>
-  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
-  if (!shippingMethods || !shippingMethods.applicableShippingMethods?.length) {
-    return <div>No shipping methods found for this shipment.</div>
-  }
-  return (
-    <div>
-      <h3>Available Shipping Methods</h3>
-      <ul>
-        {shippingMethods.applicableShippingMethods.map((method) => (
-          <li key={method.shipmentMethodId}>
-            <strong>{method.name}</strong><br />
-            Cost: {method.shippingCost?.formatted}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <div>Loading shipping methods…</div>
+//   if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+//   if (!shippingMethods || !shippingMethods.applicableShippingMethods?.length) {
+//     return <div>No shipping methods found for this shipment.</div>
+//   }
+//   return (
+//     <div>
+//       <h3>Available Shipping Methods</h3>
+//       <ul>
+//         {shippingMethods.applicableShippingMethods.map((method) => (
+//           <li key={method.shipmentMethodId}>
+//             <strong>{method.name}</strong><br />
+//             Cost: {method.shippingCost?.formatted}
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   )
 }
 
 export default ShippingMethods
@@ -201,16 +201,16 @@ function ShopperContextInfo({usid, siteId}) {
       siteId   // Needed in some setups/configurations
     }
   })
-  // Example:
-  if (isLoading) return <div>Loading shopper context…</div>
-  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
-  if (!shopperContext) return <div>No shopper context found.</div>
-  return (
-    <div>
-      <h3>Shopper Context</h3>
-      <pre>{JSON.stringify(shopperContext, null, 2)}</pre>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <div>Loading shopper context…</div>
+//   if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+//   if (!shopperContext) return <div>No shopper context found.</div>
+//   return (
+//     <div>
+//       <h3>Shopper Context</h3>
+//       <pre>{JSON.stringify(shopperContext, null, 2)}</pre>
+//     </div>
+//   )
 }
 
 export default ShopperContextInfo
@@ -237,25 +237,25 @@ function CustomerBasketsList({customerId, siteId}) {
       siteId       // optional, but typically good practice
     }
   })
-  // Example:
-  if (isLoading) return <div>Loading customer baskets…</div>
-  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
-  if (!baskets || !baskets.data?.length) return <div>No baskets found for this customer.</div>
-  return (
-    <div>
-      <h3>Customer Baskets</h3>
-      <ul>
-        {baskets.data.map(basket => (
-          <li key={basket.basketId}>
-            <div>Basket ID: {basket.basketId}</div>
-            <div>Total: {basket.productTotal?.formatted}</div>
-            <div>Status: {basket.status}</div>
-            {/* Display any other basket info here */}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <div>Loading customer baskets…</div>
+//   if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+//   if (!baskets || !baskets.data?.length) return <div>No baskets found for this customer.</div>
+//   return (
+//     <div>
+//       <h3>Customer Baskets</h3>
+//       <ul>
+//         {baskets.data.map(basket => (
+//           <li key={basket.basketId}>
+//             <div>Basket ID: {basket.basketId}</div>
+//             <div>Total: {basket.productTotal?.formatted}</div>
+//             <div>Status: {basket.status}</div>
+//             {/* Display any other basket info here */}
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   )
 }
 
 export default CustomerBasketsList
@@ -275,15 +275,15 @@ export default function CustomerOrdersExample() {
     {parameters: {customerId, limit: 10, offset: 0, sort: 'creationDate desc'}},
     {enabled: Boolean(customerId)}
   )
-    // Example:
-  if (isLoading) return <div>Loading orders…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return (
-    <div>
-      <h2>Orders ({paging?.total ?? orders.length})</h2>
-      <pre>{JSON.stringify(orders, null, 2)}</pre>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <div>Loading orders…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return (
+//     <div>
+//       <h2>Orders ({paging?.total ?? orders.length})</h2>
+//       <pre>{JSON.stringify(orders, null, 2)}</pre>
+//     </div>
+//   )
 }
 ```
 
@@ -309,17 +309,16 @@ function PageDesignerPage() {
     }
     // queryOptions? (optional)
   })
-  // Example:
-  if (isLoading) return <Skeleton count={1} />
-  if (isError) return <div>Error: {String(error)}</div>
-  if (!data) return <div>No Page Data</div>
-
-  return (
-    <div>
-      <h1>Page {data.id}</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <Skeleton count={1} />
+//   if (isError) return <div>Error: {String(error)}</div>
+//   if (!data) return <div>No Page Data</div>
+//   return (
+//     <div>
+//       <h1>Page {data.id}</h1>
+//       <pre>{JSON.stringify(data, null, 2)}</pre>
+//     </div>
+//   )
 }
 
 export default PageDesignerPage
@@ -340,10 +339,10 @@ export default function OrderExample() {
     {parameters: {orderNo}},
     {enabled: Boolean(orderNo)}
   )
-  // Example:
-  if (isLoading) return <div>Loading order...</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(order, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading order...</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(order, null, 2)}</pre>
 }
 ```
 
@@ -381,10 +380,10 @@ export default function ProductsExample() {
     },
     {enabled: productIds.length > 0, keepPreviousData: true}
   )
-  // Example:
-  if (isLoading) return <div>Loading products…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(data, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading products…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
 ```
 
@@ -437,10 +436,10 @@ export default function ProductExample() {
       keepPreviousData: true
     }
   )
-  // Example:
-  if (isLoading) return <div>Loading product…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(productResponse, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading product…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(productResponse, null, 2)}</pre>
 }
 ```
 
@@ -467,10 +466,10 @@ export default function CategoryExample() {
       levels: 1
     }
   })
-  // Example:
-  if (isLoading) return <div>Loading category…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(category, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading category…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(category, null, 2)}</pre>
 }
 ```
 
@@ -488,10 +487,10 @@ export default function PromotionsExample() {
     {parameters: {ids: promotionIds.join(',')}},
     {enabled: promotionIds.length > 0}
   )
-  // Example:
-  if (isLoading) return <div>Loading promotions…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(data, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading promotions…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
 ```
 
@@ -516,13 +515,13 @@ export default function ProductSearchExample() {
       sort: ''
     }
   })
-  // Example:
-  return (
-    <div>
-      <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-      {isLoading ? 'Loading…' : isError ? String(error) : <pre>{JSON.stringify(data, null, 2)}</pre>}
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+//       {isLoading ? 'Loading…' : isError ? String(error) : <pre>{JSON.stringify(data, null, 2)}</pre>}
+//     </div>
+//   )
 }
 ```
 
@@ -540,13 +539,13 @@ export default function SearchSuggestionsExample() {
     {parameters: {q: searchQuery}},
     {enabled: searchQuery.length > 1}
   )
-  // Example:
-  return (
-    <div>
-      <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-      {isLoading ? 'Loading…' : <pre>{JSON.stringify(suggestions, null, 2)}</pre>}
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+//       {isLoading ? 'Loading…' : <pre>{JSON.stringify(suggestions, null, 2)}</pre>}
+//     </div>
+//   )
 }
 ```
 
@@ -579,9 +578,9 @@ export default function StoresExample() {
     },
     {enabled: Boolean(coords)}
   )
-  // Example:
-  if (isLoading) return <div>Loading stores…</div>
-  return <pre>{JSON.stringify(stores, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading stores…</div>
+//   return <pre>{JSON.stringify(stores, null, 2)}</pre>
 }
 ```
 
@@ -595,10 +594,10 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 
 export default function SelectedStoreExample() {
   const {selectedStore, hasSelectedStore, isLoading, isError, error} = useSelectedStore()
-  // Example:
-  if (isLoading) return <div>Loading store…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify({hasSelectedStore, selectedStore}, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading store…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify({hasSelectedStore, selectedStore}, null, 2)}</pre>
 }
 ```
 
@@ -612,17 +611,17 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 
 export default function CurrentBasketExample() {
   const {data: basket, derivedData, isLoading, isError, error} = useCurrentBasket()
-  // Example:
-  if (isLoading) return <div>Loading basket…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return (
-    <div>
-      <h3>Derived</h3>
-      <pre>{JSON.stringify(derivedData, null, 2)}</pre>
-      <h3>Basket</h3>
-      <pre>{JSON.stringify(basket, null, 2)}</pre>
-    </div>
-  )
+// Example:
+//   if (isLoading) return <div>Loading basket…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return (
+//     <div>
+//       <h3>Derived</h3>
+//       <pre>{JSON.stringify(derivedData, null, 2)}</pre>
+//       <h3>Basket</h3>
+//       <pre>{JSON.stringify(basket, null, 2)}</pre>
+//     </div>
+//   )
 }
 ```
 
@@ -650,14 +649,14 @@ import {useMultiSite} from '@salesforce/retail-react-app/app/contexts'
 
 export default function MultiSiteExample() {
   const {site, buildUrl, locale} = useMultiSite()
-  // Example:
-  return (
-    <div>
-      <h3>Site</h3>
-      <pre>{JSON.stringify({id: site?.id, locale}, null, 2)}</pre>
-      <div>Home URL: {buildUrl('/')}</div>
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <h3>Site</h3>
+//       <pre>{JSON.stringify({id: site?.id, locale}, null, 2)}</pre>
+//       <div>Home URL: {buildUrl('/')}</div>
+//     </div>
+//   )
 }
 ```
 
@@ -671,15 +670,15 @@ import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-loc
 
 export default function GeolocationExample() {
   const {coordinates, loading, error, refresh} = useGeolocation()
-  // Example:
-  if (loading) return <div>Detecting location…</div>
-  if (error) return <div>Error: {String(error)}</div>
-  return (
-    <div>
-      <pre>{JSON.stringify(coordinates, null, 2)}</pre>
-      <button onClick={refresh}>Refresh</button>
-    </div>
-  )
+// Example:
+//   if (loading) return <div>Detecting location…</div>
+//   if (error) return <div>Error: {String(error)}</div>
+//   return (
+//     <div>
+//       <pre>{JSON.stringify(coordinates, null, 2)}</pre>
+//       <button onClick={refresh}>Refresh</button>
+//     </div>
+//   )
 }
 ```
 
@@ -711,13 +710,13 @@ import {useSearchParams} from '@salesforce/retail-react-app/app/hooks'
 
 export default function SearchParamsExample() {
   const [params, setParams] = useSearchParams({limit: 12, offset: 0})
-  // Example:
-  return (
-    <div>
-      <pre>{JSON.stringify(params, null, 2)}</pre>
-      <button onClick={() => setParams({offset: params.offset + 12})}>Next</button>
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <pre>{JSON.stringify(params, null, 2)}</pre>
+//       <button onClick={() => setParams({offset: params.offset + 12})}>Next</button>
+//     </div>
+//   )
 }
 ```
 
@@ -731,8 +730,8 @@ import {usePageUrls} from '@salesforce/retail-react-app/app/hooks'
 
 export default function PageUrlsExample() {
   const {pageUrls} = usePageUrls({total: 100, limit: 12})
-  // Example:
-  return <pre>{JSON.stringify(pageUrls, null, 2)}</pre>
+// Example:
+//   return <pre>{JSON.stringify(pageUrls, null, 2)}</pre>
 }
 ```
 
@@ -746,13 +745,13 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 export default function CurrencyExample() {
   const {currency, setCurrency} = useCurrency()
-  // Example:
-  return (
-    <div>
-      <pre>{JSON.stringify(currency, null, 2)}</pre>
-      <button onClick={() => setCurrency('USD')}>Set USD</button>
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <pre>{JSON.stringify(currency, null, 2)}</pre>
+//       <button onClick={() => setCurrency('USD')}>Set USD</button>
+//     </div>
+//   )
 }
 ```
 
@@ -766,10 +765,10 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 export default function WishListExample() {
   const {data: wishlist, isLoading, isError, error} = useWishList()
-  // Example:
-  if (isLoading) return <div>Loading wishlist…</div>
-  if (isError) return <div>Error: {String(error)}</div>
-  return <pre>{JSON.stringify(wishlist, null, 2)}</pre>
+// Example:
+//   if (isLoading) return <div>Loading wishlist…</div>
+//   if (isError) return <div>Error: {String(error)}</div>
+//   return <pre>{JSON.stringify(wishlist, null, 2)}</pre>
 }
 ```
 
@@ -844,8 +843,8 @@ import {useVariant} from '@salesforce/retail-react-app/app/hooks'
 
 export default function VariantExample({product}) {
   const variant = useVariant(product)
-  // Example:
-  return <pre>{JSON.stringify(variant, null, 2)}</pre>
+// Example:
+//   return <pre>{JSON.stringify(variant, null, 2)}</pre>
 }
 ```
 
@@ -859,8 +858,8 @@ import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks'
 
 export default function VariationAttributesExample({product}) {
   const attrs = useVariationAttributes(product)
-  // Example:
-  return <pre>{JSON.stringify(attrs, null, 2)}</pre>
+// Example:
+//   return <pre>{JSON.stringify(attrs, null, 2)}</pre>
 }
 ```
 
@@ -874,8 +873,8 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks'
 
 export default function VariationParamsExample({product}) {
   const params = useVariationParams(product)
-  // Example:
-  return <pre>{JSON.stringify(params, null, 2)}</pre>
+// Example:
+//   return <pre>{JSON.stringify(params, null, 2)}</pre>
 }
 ```
 
@@ -889,8 +888,8 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
 export default function DerivedProductExample({product}) {
   const state = useDerivedProduct(product)
-  // Example:
-  return <pre>{JSON.stringify(state, null, 2)}</pre>
+// Example:
+//   return <pre>{JSON.stringify(state, null, 2)}</pre>
 }
 ```
 
@@ -904,13 +903,13 @@ import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-st
 
 export default function ModalStateExample() {
   const {isOpen, data, onOpen, onClose} = useModalState()
-  // Example:
-  return (
-    <div>
-      <button onClick={() => onOpen({id: 1})}>Open</button>
-      <button onClick={onClose}>Close</button>
-      <pre>{JSON.stringify({isOpen, data}, null, 2)}</pre>
-    </div>
-  )
+// Example:
+//   return (
+//     <div>
+//       <button onClick={() => onOpen({id: 1})}>Open</button>
+//       <button onClick={onClose}>Close</button>
+//       <pre>{JSON.stringify({isOpen, data}, null, 2)}</pre>
+//     </div>
+//   )
 }
 ```
