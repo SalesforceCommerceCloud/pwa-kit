@@ -331,6 +331,11 @@ describe('ContactInfo Component', () => {
     })
 
     test('shows error message when updateCustomerForBasket fails', async () => {
+        // Mock OTP API to fail so user becomes guest (not registered)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('User not registered')
+        )
+
         // Mock updateCustomerForBasket to reject with an error
         mockUpdateCustomerForBasket.mutateAsync.mockRejectedValue(new Error('API Error'))
 

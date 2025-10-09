@@ -164,10 +164,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
-        if (isCheckingEmail) {
-            return {isRegistered: true}
-        }
-
         form.clearErrors('global')
         setIsCheckingEmail(true)
         try {
@@ -192,6 +188,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Handle OTP modal close
     const handleOtpModalClose = () => {
         onOtpModalClose()
+        // Show continue button when modal is closed/canceled
+        setShowContinueButton(true)
+        // Reset submitting state when modal is closed/canceled
+        setIsSubmitting(false)
     }
 
     // Handle checkout as guest from OTP modal
@@ -271,7 +271,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const handleFormSubmit = async (event) => {
         event.preventDefault()
         event.stopPropagation()
-
         setIsSubmitting(true)
 
         // Get form data
@@ -301,8 +300,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 onRegisteredUserChoseGuest(false)
             }
 
-            setShowContinueButton(false)
-
             // Check if OTP modal is already open (from blur event)
             if (isOtpModalOpen) {
                 return
@@ -314,6 +311,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Check if OTP modal is now open (after the API call)
             if (isOtpModalOpen) {
+                // Hide continue button when OTP modal is open
+                setShowContinueButton(false)
                 return
             }
 
@@ -327,16 +326,29 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     // Update basket and immediately advance to next step for smooth UX
                     goToNextStep()
+
+                    // Reset both states immediately for guest users
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
+
+                    return
                 } catch (error) {
                     setError('An error occurred. Please try again.')
+                    // Show continue button again if there's an error
+                    setShowContinueButton(true)
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
                 }
             }
             // If user is registered, OTP modal should be open, don't proceed to next step
         } catch (error) {
             setError('An error occurred. Please try again.')
         } finally {
-            // Always reset submitting state
-            setIsSubmitting(false)
+            // Only reset submitting state for registered users (when OTP modal is open)
+            // Guest users will have already returned above
+            if (isOtpModalOpen) {
+                setIsSubmitting(false)
+            }
         }
     }
 
