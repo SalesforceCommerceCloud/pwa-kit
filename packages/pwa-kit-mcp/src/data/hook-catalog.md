@@ -275,8 +275,8 @@ export default function CustomerOrdersExample() {
     {parameters: {customerId, limit: 10, offset: 0, sort: 'creationDate desc'}},
     {enabled: Boolean(customerId)}
   )
+    // Example:
   if (isLoading) return <div>Loading orders…</div>
-  // Example:
   if (isError) return <div>Error: {String(error)}</div>
   return (
     <div>
