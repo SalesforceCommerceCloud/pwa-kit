@@ -5,34 +5,94 @@ Note: This hooks catalog file uses the subset of markdown parsable by hooksCatal
 Hook that returns the access token.
 
 ```javascript
-// Imports: {useAccessToken} from '@salesforce/commerce-sdk-react'; {useEffect} from 'react'
-// Retrieve an access token when ready
-const {getTokenWhenReady} = useAccessToken()
+import React, {useState, useEffect} from 'react'
+import useAccessToken from '@salesforce/commerce-sdk-react'
 
-useEffect(() => {
+function AccessTokenExample() {
+  const {token, getTokenWhenReady} = useAccessToken()
+  const [asyncToken, setAsyncToken] = useState(null)
+  const [readyLoading, setReadyLoading] = useState(false)
+  const [readyError, setReadyError] = useState(null)
+
+  useEffect(() => {
     let isMounted = true
-    getTokenWhenReady().then((token) => {
+    setReadyLoading(true)
+    setReadyError(null)
+    getTokenWhenReady()
+      .then((tok) => {
         if (!isMounted) return
-        // use token here
-    })
+        setAsyncToken(tok)
+        setReadyLoading(false)
+      })
+      .catch((err) => {
+        if (!isMounted) return
+        setReadyError(err)
+        setReadyLoading(false)
+      })
     return () => {
-        isMounted = false
+      isMounted = false
     }
-}, [getTokenWhenReady])
+  }, [getTokenWhenReady])
+  // Example:
+  return (
+    <div style={{padding: 24, maxWidth: 480}}>
+      <h2>Shopper Access Token Example</h2>
+      <div>
+        <strong>Token (from hook sync):</strong>
+        <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
+          {token ?? <i>None found</i>}
+        </div>
+      </div>
+      <div style={{marginTop: 24}}>
+        <strong>Token (from getTokenWhenReady):</strong>
+        <div style={{wordBreak: 'break-word', background: '#f0f0f0', padding: 12}}>
+          {readyLoading && <span>Loading…</span>}
+          {readyError && <span style={{color: 'red'}}>Error: {String(readyError)}</span>}
+          {!readyLoading && !readyError && (asyncToken ?? <i>None found</i>)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default AccessTokenExample
 ```
 
 ### useAuthHelper
 
-Hook for auth helper.
+Hook for authentication
 
 ```javascript
-// Imports: {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-const logout = useAuthHelper(AuthHelpers.Logout)
+import React from 'react'
+import {useAuthHelper} from '@Salesforce/commerce-sdk-react'
 
-const handleSignOut = async () => {
-    await logout.mutateAsync()
-    // optionally navigate('/login')
+function GuestLogin() {
+  const {
+    mutate: loginAsGuest,
+    data,
+    error,
+    isLoading,
+    isSuccess
+  } = useAuthHelper('loginGuestUser')
+
+  // Optionally, add fields for siteId and clientId from your app config if not set globally
+  const handleLogin = () => {
+    // You can pass options if needed; the most common SDK configuration is handled via context/config at app level.
+    loginAsGuest()
+  }
+  // Example:
+  return (
+    <div>
+      <button onClick={handleLogin} disabled={isLoading}>
+        {isLoading ? 'Logging in…' : 'Login as Guest'}
+      </button>
+      {isSuccess && <div>Guest Login Success! Access Token: {data?.access_token}</div>}
+      {error && <div style={{color: 'red'}}>Error: {String(error)}</div>}
+    </div>
+  )
 }
+
+export default GuestLogin
 ```
 
 ### useLocalStorage
@@ -81,22 +141,43 @@ Hook for shipping methods for shipment.
 
 ```javascript
 import React from 'react'
-import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'; {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-// Ensure you have access to the current basket
-const {data: basket} = useCurrentBasket()
+import {useShippingMethodsForShipment} from '@Salesforce/commerce-sdk-react'
 
-// Fetch available shipping methods for the active shipment
-useShippingMethodsForShipment(
-    {
-        parameters: {
-            basketId: basket?.basketId,
-            shipmentId: 'me'
-        }
-    },
-    {
-        enabled: Boolean(basket?.basketId)
+function ShippingMethods({basketId, shipmentId}) {
+  // Fetch shipping methods for a given basket and shipment
+  const {
+    data: shippingMethods,
+    isLoading,
+    isError,
+    error
+  } = useShippingMethodsForShipment({
+    parameters: {
+      basketId,
+      shipmentId
     }
-)
+  })
+  // Example:
+  if (isLoading) return <div>Loading shipping methods…</div>
+  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+  if (!shippingMethods || !shippingMethods.applicableShippingMethods?.length) {
+    return <div>No shipping methods found for this shipment.</div>
+  }
+  return (
+    <div>
+      <h3>Available Shipping Methods</h3>
+      <ul>
+        {shippingMethods.applicableShippingMethods.map((method) => (
+          <li key={method.shipmentMethodId}>
+            <strong>{method.name}</strong><br />
+            Cost: {method.shippingCost?.formatted}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default ShippingMethods
 ```
 
 ### useShopperContext
@@ -105,19 +186,34 @@ Hook for shopper context.
 
 ```javascript
 import React from 'react'
-import {useShopperContext, useUsid} from '@salesforce/commerce-sdk-react'; {useMultiSite} from '@salesforce/retail-react-app/app/contexts'
-// Requires usid and siteId
-const {site} = useMultiSite()
-const {usid} = useUsid()
+import {useShopperContext} from '@Salesforce/commerce-sdk-react'
 
-const {data: shopperContext, isLoading: isShopperContextLoading} = useShopperContext(
-    {
-        parameters: {usid, siteId: site.id}
-    },
-    {
-        enabled: Boolean(usid && site?.id)
+function ShopperContextInfo({usid, siteId}) {
+  // Fetch shopper context for the given usid/siteId
+  const {
+    data: shopperContext,
+    isLoading,
+    isError,
+    error
+  } = useShopperContext({
+    parameters: {
+      usid,    // User session ID, required
+      siteId   // Needed in some setups/configurations
     }
-)
+  })
+  // Example:
+  if (isLoading) return <div>Loading shopper context…</div>
+  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+  if (!shopperContext) return <div>No shopper context found.</div>
+  return (
+    <div>
+      <h3>Shopper Context</h3>
+      <pre>{JSON.stringify(shopperContext, null, 2)}</pre>
+    </div>
+  )
+}
+
+export default ShopperContextInfo
 ```
 
 ### useCustomerBaskets
@@ -125,13 +221,44 @@ const {data: shopperContext, isLoading: isShopperContextLoading} = useShopperCon
 Hook for customer baskets.
 
 ```javascript
-// Imports: {useCustomerBaskets, useCustomerId} from '@salesforce/commerce-sdk-react'
-const customerId = useCustomerId()
+import React from 'react'
+import {useCustomerBaskets} from '@Salesforce/commerce-sdk-react'
 
-const {data: baskets, isLoading: isBasketsLoading} = useCustomerBaskets(
-    {parameters: {customerId}},
-    {enabled: Boolean(customerId), keepPreviousData: true}
-)
+function CustomerBasketsList({customerId, siteId}) {
+  // Fetch all baskets for a given customer (and optional site)
+  const {
+    data: baskets,
+    isLoading,
+    isError,
+    error
+  } = useCustomerBaskets({
+    parameters: {
+      customerId,  // required parameter
+      siteId       // optional, but typically good practice
+    }
+  })
+  // Example:
+  if (isLoading) return <div>Loading customer baskets…</div>
+  if (isError) return <div style={{color: 'red'}}>Error: {String(error)}</div>
+  if (!baskets || !baskets.data?.length) return <div>No baskets found for this customer.</div>
+  return (
+    <div>
+      <h3>Customer Baskets</h3>
+      <ul>
+        {baskets.data.map(basket => (
+          <li key={basket.basketId}>
+            <div>Basket ID: {basket.basketId}</div>
+            <div>Total: {basket.productTotal?.formatted}</div>
+            <div>Status: {basket.status}</div>
+            {/* Display any other basket info here */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default CustomerBasketsList
 ```
 
 ### useCustomerOrders
@@ -182,7 +309,7 @@ function PageDesignerPage() {
     }
     // queryOptions? (optional)
   })
-  // Exxample:
+  // Example:
   if (isLoading) return <Skeleton count={1} />
   if (isError) return <div>Error: {String(error)}</div>
   if (!data) return <div>No Page Data</div>
