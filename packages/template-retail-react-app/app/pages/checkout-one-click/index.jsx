@@ -281,6 +281,10 @@ const CheckoutOneClick = () => {
                     )
                 }
             } catch (error) {
+                console.error(
+                    '🔍 Debug - Failed to save payment instrument for registered user:',
+                    error
+                )
                 // Fail silently
             }
         }

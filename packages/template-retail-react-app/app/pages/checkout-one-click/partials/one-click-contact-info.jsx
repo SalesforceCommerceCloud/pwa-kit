@@ -294,11 +294,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // For registered users, we'll update basket after OTP verification
             // For guest users, we'll update basket and proceed to next step
 
-            // Reset guest checkout flag since user is proceeding normally
-            setRegisteredUserChoseGuest(false)
-            if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(false)
-            }
 
             // Check if OTP modal is already open (from blur event)
             if (isOtpModalOpen) {
