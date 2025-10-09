@@ -377,8 +377,10 @@ describe('ContactInfo Component', () => {
 
         // Verify that the OTP modal is still open and we haven't proceeded to next step
         expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
-        expect(screen.getByText('To use your account information enter the code sent to your email.')).toBeInTheDocument()
-        
+        expect(
+            screen.getByText('To use your account information enter the code sent to your email.')
+        ).toBeInTheDocument()
+
         // The modal should still be visible, indicating we didn't proceed to the next step
         expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
         expect(screen.getByText('Resend code')).toBeInTheDocument()

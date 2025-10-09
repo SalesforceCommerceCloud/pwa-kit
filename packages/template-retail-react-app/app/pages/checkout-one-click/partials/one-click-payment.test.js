@@ -216,7 +216,7 @@ const mockPaymentInstruments = [
 const mockBasket = {
     basketId: 'test-basket-id',
     paymentInstruments: [],
-    orderTotal: 100.00,
+    orderTotal: 100.0,
     shipments: [
         {
             shippingAddress: {
@@ -252,7 +252,11 @@ const TestWrapper = ({
     onSavePreferenceChange = jest.fn(),
     registeredUserChoseGuest = false,
     removePaymentShouldFail = false,
-    initialStep = 4
+    initialStep = 4,
+    selectedPaymentMethod = null,
+    isEditing = false,
+    onSelectedPaymentMethodChange = jest.fn(),
+    onIsEditingChange = jest.fn()
 }) => {
     // Mock hooks
     useCurrentCustomer.mockReturnValue({data: customerData})
@@ -352,6 +356,10 @@ const TestWrapper = ({
                     registeredUserChoseGuest={registeredUserChoseGuest}
                     onPaymentMethodSaved={onPaymentMethodSaved}
                     onSavePreferenceChange={onSavePreferenceChange}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    isEditing={isEditing}
+                    onSelectedPaymentMethodChange={onSelectedPaymentMethodChange}
+                    onIsEditingChange={onIsEditingChange}
                 />
             </CurrencyProvider>
         </IntlProvider>
@@ -555,11 +563,18 @@ describe('Payment Component', () => {
                 paymentInstruments: [mockPaymentInstruments[0]]
             }
 
-            // Start at REVIEW_ORDER step to show summary with edit button
-            render(
+            // Create state management for the test
+            let isEditing = false
+            const mockOnIsEditingChange = jest.fn((value) => {
+                isEditing = value
+            })
+
+            const {rerender} = render(
                 <TestWrapper
                     basketData={basketWithPayment}
                     initialStep={5} // REVIEW_ORDER step
+                    isEditing={isEditing}
+                    onIsEditingChange={mockOnIsEditingChange}
                 />
             )
 
@@ -569,6 +584,16 @@ describe('Payment Component', () => {
                 name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
             })
             await user.click(editButton)
+
+            // Re-render with updated state
+            rerender(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    initialStep={5}
+                    isEditing={isEditing}
+                    onIsEditingChange={mockOnIsEditingChange}
+                />
+            )
 
             // Should enter edit mode successfully
             await waitFor(() => {

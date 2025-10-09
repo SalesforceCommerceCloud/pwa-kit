@@ -83,6 +83,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isBlurChecking, setIsBlurChecking] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
@@ -134,7 +136,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
 
         // Email is valid, proceed with OTP check
-        await handleSendEmailOtp(email)
+        // Use separate blur checking state to avoid disabling the button
+        if (!isBlurChecking) {
+            setIsBlurChecking(true)
+            await handleSendEmailOtp(email)
+            setIsBlurChecking(false)
+        }
     }
 
     const handleEmailFocus = (e) => {
@@ -225,6 +232,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 })
             }
 
+            // Update basket with email after successful OTP verification
+            const email = form.getValues('email')
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
+
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
             if (onRegisteredUserChoseGuest) {
@@ -258,25 +272,28 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         event.preventDefault()
         event.stopPropagation()
 
+        setIsSubmitting(true)
+
         // Get form data
         const formData = form.getValues()
 
         // Validate email before proceeding
         if (!formData.email) {
             setError('Please enter your email address.')
+            setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
 
         if (!isValidEmail(formData.email)) {
             setError('Please enter a valid email address.')
+            setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
 
         try {
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: formData.email}
-            })
+            // Don't update basket yet - wait to see if user is registered
+            // For registered users, we'll update basket after OTP verification
+            // For guest users, we'll update basket and proceed to next step
 
             // Reset guest checkout flag since user is proceeding normally
             setRegisteredUserChoseGuest(false)
@@ -288,21 +305,38 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Check if OTP modal is already open (from blur event)
             if (isOtpModalOpen) {
-                // Modal is already open, don't proceed to next step
                 return
             }
 
-            // Call handleSendEmailOtp and wait for result
-            // For registered users: OTP modal will open, don't proceed to next step
-            // For guest users: API call will fail, proceed to next step
+            // If modal is not open, we need to check if user is registered
+            // This handles cases where blur event didn't trigger or user clicked without tabbing out
             const result = await handleSendEmailOtp(formData.email)
+
+            // Check if OTP modal is now open (after the API call)
+            if (isOtpModalOpen) {
+                return
+            }
+
             if (!result.isRegistered) {
-                // User is not registered (guest), proceed to next step
-                goToNextStep()
+                try {
+                    // User is not registered (guest), update basket and proceed to next step
+                    await updateCustomerForBasket.mutateAsync({
+                        parameters: {basketId: basket.basketId},
+                        body: {email: formData.email}
+                    })
+
+                    // Update basket and immediately advance to next step for smooth UX
+                    goToNextStep()
+                } catch (error) {
+                    setError('An error occurred. Please try again.')
+                }
             }
             // If user is registered, OTP modal should be open, don't proceed to next step
         } catch (error) {
             setError('An error occurred. Please try again.')
+        } finally {
+            // Always reset submitting state
+            setIsSubmitting(false)
         }
     }
 
@@ -391,7 +425,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         idps={idps}
                                     />
                                     {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button type="submit">
+                                        <Button
+                                            type="submit"
+                                            isLoading={isSubmitting}
+                                            disabled={isSubmitting}
+                                        >
                                             <FormattedMessage
                                                 defaultMessage="Continue to Shipping Address"
                                                 id="contact_info.button.continue_to_shipping_address"

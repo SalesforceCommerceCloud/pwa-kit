@@ -49,6 +49,8 @@ const Payment = ({
     onPaymentMethodSaved,
     onSavePreferenceChange,
     onPaymentSubmitted,
+    selectedPaymentMethod,
+    isEditing,
     onSelectedPaymentMethodChange,
     onIsEditingChange
 }) => {
@@ -69,20 +71,11 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-        appliedPayment?.customerPaymentInstrumentId || 'cc'
-    )
-    const [isEditing, setIsEditing] = useState(false)
 
-    // Notify parent when selected payment method changes
-    useEffect(() => {
-        onSelectedPaymentMethodChange?.(selectedPaymentMethod)
-    }, [selectedPaymentMethod, onSelectedPaymentMethodChange])
-
-    // Notify parent when editing state changes
-    useEffect(() => {
-        onIsEditingChange?.(isEditing)
-    }, [isEditing, onIsEditingChange])
+    // Use props for parent-managed state with fallback defaults
+    const currentSelectedPaymentMethod =
+        selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
+    const currentIsEditing = isEditing ?? false
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -218,7 +211,7 @@ const Payment = ({
             if (step !== STEPS.PAYMENT || isCustomerLoading) return
             if (autoAppliedRef.current) return
             // Don't auto-apply when in edit mode - user is manually entering/selecting payment
-            if (isEditing) return
+            if (currentIsEditing) return
             const isRegistered = customer?.isRegistered
             const hasSaved = customer?.paymentInstruments?.length > 0
             const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
@@ -256,21 +249,25 @@ const Payment = ({
     }, [step, isCustomerLoading])
 
     const onPaymentMethodChange = async (paymentInstrumentId) => {
-        try {
-            await onPaymentRemoval()
-        } catch (_e) {
-            // Removal failed: inform user and do NOT enter edit mode
-            showError(
-                formatMessage({
-                    defaultMessage:
-                        'Could not remove the applied payment. Please try again or use the current payment to place your order.',
-                    id: 'checkout_payment.error.cannot_remove_applied_payment'
-                })
-            )
-            return
+        // Only try to remove payment if there's actually an applied payment
+        if (appliedPayment) {
+            try {
+                await onPaymentRemoval()
+            } catch (_e) {
+                // Removal failed: inform user and do NOT proceed with payment change
+                showError(
+                    formatMessage({
+                        defaultMessage:
+                            'Could not remove the applied payment. Please try again or use the current payment to place your order.',
+                        id: 'checkout_payment.error.cannot_remove_applied_payment'
+                    })
+                )
+                return
+            }
         }
+
         if (paymentInstrumentId === 'cc') {
-            setSelectedPaymentMethod('cc')
+            onSelectedPaymentMethodChange?.('cc')
         } else {
             setIsApplyingSavedPayment(true)
             await addPaymentInstrumentToBasket({
@@ -282,7 +279,7 @@ const Payment = ({
             })
             await currentBasketQuery.refetch()
             setIsApplyingSavedPayment(false)
-            setSelectedPaymentMethod(paymentInstrumentId)
+            onSelectedPaymentMethodChange?.(paymentInstrumentId)
         }
     }
 
@@ -315,7 +312,7 @@ const Payment = ({
                     paymentInstrumentId: appliedPayment.paymentInstrumentId
                 }
             })
-            setSelectedPaymentMethod('cc')
+            onSelectedPaymentMethodChange?.('cc')
         } catch (e) {
             showError()
             throw e
@@ -333,7 +330,7 @@ const Payment = ({
         } catch (error) {
             showError()
         } finally {
-            setIsEditing(false)
+            onIsEditingChange?.(false)
         }
     })
 
@@ -342,16 +339,16 @@ const Payment = ({
             // After removal, set the radio selection (but don't apply to basket yet)
             const savedId = appliedPayment?.customerPaymentInstrumentId
             if (savedId) {
-                setSelectedPaymentMethod(savedId)
+                onSelectedPaymentMethodChange?.(savedId)
             } else if (customer?.paymentInstruments?.length > 0) {
                 // Default to first saved method in the radio selection
-                setSelectedPaymentMethod(customer.paymentInstruments[0].paymentInstrumentId)
+                onSelectedPaymentMethodChange?.(customer.paymentInstruments[0].paymentInstrumentId)
             } else {
                 // No saved methods, default to new card form
-                setSelectedPaymentMethod('cc')
+                onSelectedPaymentMethodChange?.('cc')
             }
         }
-        setIsEditing(true)
+        onIsEditingChange?.(true)
         goToStep(STEPS.PAYMENT)
     }
 
@@ -369,7 +366,7 @@ const Payment = ({
                     defaultMessage: 'Payment',
                     id: 'checkout_payment.title.payment'
                 })}
-                editing={isEditing || step === STEPS.PAYMENT}
+                editing={currentIsEditing || step === STEPS.PAYMENT}
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
                     billingAddressForm.formState.isSubmitting ||
@@ -406,7 +403,7 @@ const Payment = ({
                                         onSubmit={onSubmit}
                                         savedPaymentInstruments={customer.paymentInstruments}
                                         onPaymentMethodChange={onPaymentMethodChange}
-                                        selectedPaymentMethod={selectedPaymentMethod}
+                                        selectedPaymentMethod={currentSelectedPaymentMethod}
                                     >
                                         {/* Show for returning users (registered) while editing/adding a new card */}
                                         {!isGuest && (
@@ -548,6 +545,10 @@ Payment.propTypes = {
     onSavePreferenceChange: PropTypes.func,
     /** Callback when payment is submitted with full card details */
     onPaymentSubmitted: PropTypes.func,
+    /** Selected payment method from parent */
+    selectedPaymentMethod: PropTypes.string,
+    /** Editing state from parent */
+    isEditing: PropTypes.bool,
     /** Callback when selected payment method changes */
     onSelectedPaymentMethodChange: PropTypes.func,
     /** Callback when editing state changes */

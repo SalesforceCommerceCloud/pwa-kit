@@ -79,8 +79,8 @@ const CheckoutOneClick = () => {
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
     const [shopperPaymentInstrument, setShopperPaymentInstrument] = useState(null)
-    const [selectedPaymentMethodFromChild, setSelectedPaymentMethodFromChild] = useState(null)
-    const [isEditingPaymentFromChild, setIsEditingPaymentFromChild] = useState(false)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
+    const [isEditingPayment, setIsEditingPayment] = useState(false)
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -226,7 +226,12 @@ const CheckoutOneClick = () => {
                     parameters: {customerId: customerId}
                 })
             } catch (error) {
-                // Fail silently
+                showError(
+                    formatMessage({
+                        id: 'checkout_payment.error.cannot_save_payment',
+                        defaultMessage: 'Could not save payment method. Please try again.'
+                    })
+                )
             }
         }
 
@@ -252,7 +257,12 @@ const CheckoutOneClick = () => {
                     parameters: {customerId: customerId}
                 })
             } catch (error) {
-                // Fail silently
+                showError(
+                    formatMessage({
+                        id: 'checkout_payment.error.cannot_save_payment',
+                        defaultMessage: 'Could not save payment method. Please try again.'
+                    })
+                )
             }
         }
 
@@ -470,8 +480,10 @@ const CheckoutOneClick = () => {
                                 registeredUserChoseGuest={registeredUserChoseGuest}
                                 onSavePreferenceChange={handleSavePreferenceChange}
                                 onPaymentSubmitted={onPaymentSubmit}
-                                onSelectedPaymentMethodChange={setSelectedPaymentMethodFromChild}
-                                onIsEditingChange={setIsEditingPaymentFromChild}
+                                selectedPaymentMethod={selectedPaymentMethod}
+                                isEditing={isEditingPayment}
+                                onSelectedPaymentMethodChange={setSelectedPaymentMethod}
+                                onIsEditingChange={setIsEditingPayment}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -483,9 +495,8 @@ const CheckoutOneClick = () => {
                                             isLoading={isLoading}
                                             isDisabled={
                                                 !appliedPayment &&
-                                                !isEditingPaymentFromChild &&
-                                                (!paymentMethodForm.formState.isValid ||
-                                                    !paymentMethodForm.getValues()?.expiry)
+                                                !isEditingPayment &&
+                                                !paymentMethodForm.formState.isValid
                                             }
                                             data-testid="place-order-button"
                                             size="lg"
