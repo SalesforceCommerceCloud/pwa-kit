@@ -14,8 +14,6 @@ import {
     isLocalSharedUIComponent,
     generateComponentImportStatement,
     loadConfig,
-    throwOAuthError,
-    throwCustomApiError,
     getOAuthToken,
     callCustomApiDxEndpoint
 } from './utils'
@@ -507,34 +505,6 @@ describe('loadConfig', () => {
     })
 })
 
-describe('throwOAuthError', () => {
-    it('should throw OAuth error with proper structure', () => {
-        const message = 'OAuth authentication failed'
-        const tokenData = {
-            error: 'invalid_client',
-            error_description: 'Client authentication failed'
-        }
-
-        expect(() => throwOAuthError(message, tokenData)).toThrow(
-            'OAuth authentication failed. Error: invalid_client. Description: Client authentication failed'
-        )
-    })
-})
-
-describe('throwCustomApiError', () => {
-    it('should throw Custom API DX endpoint error with proper structure', () => {
-        const message = 'Custom API request failed'
-        const response = {
-            title: 'Bad Request',
-            detail: 'Invalid organization ID provided'
-        }
-
-        expect(() => throwCustomApiError(message, response)).toThrow(
-            'Custom API request failed. Error: Bad Request. Description: Invalid organization ID provided'
-        )
-    })
-})
-
 describe('getOAuthToken', () => {
     const originalFetch = global.fetch
 
@@ -554,9 +524,13 @@ describe('getOAuthToken', () => {
             expires_in: 3600
         }
 
-        global.fetch.mockResolvedValueOnce({
+        const mockResponse = {
+            ok: true,
+            status: 200,
             json: () => Promise.resolve(mockTokenResponse)
-        })
+        }
+
+        global.fetch.mockResolvedValueOnce(mockResponse)
 
         const result = await getOAuthToken('test_client_id', 'test_client_secret', 'test_scope')
 
@@ -573,7 +547,7 @@ describe('getOAuthToken', () => {
                 body: 'grant_type=client_credentials&scope=test_scope'
             }
         )
-        expect(result).toEqual(mockTokenResponse)
+        expect(result).toEqual(mockResponse)
     })
 })
 
@@ -600,9 +574,13 @@ describe('callCustomApiDxEndpoint', () => {
             ]
         }
 
-        global.fetch.mockResolvedValueOnce({
+        const mockResponse = {
+            ok: true,
+            status: 200,
             json: () => Promise.resolve(mockApiResponse)
-        })
+        }
+
+        global.fetch.mockResolvedValueOnce(mockResponse)
 
         const result = await callCustomApiDxEndpoint(
             'mock_access_token',
@@ -620,6 +598,6 @@ describe('callCustomApiDxEndpoint', () => {
                 }
             }
         )
-        expect(result).toEqual(mockApiResponse)
+        expect(result).toEqual(mockResponse)
     })
 })

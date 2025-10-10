@@ -70,11 +70,25 @@ describe('CustomApiTool', () => {
 
     // Helper function to set up successful fetch mocks
     const setupSuccessfulFetchMocks = () => {
-        // Mock the utils functions to return the expected responses
+        // Mock the utils functions to return Response objects
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const utils = require('../utils/utils.js')
-        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
-        utils.callCustomApiDxEndpoint.mockResolvedValue(mockDxResponse)
+
+        // Mock OAuth response
+        const mockOAuthResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockOAuthResponse)
+        }
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponseObj)
+
+        // Mock Custom API DX response
+        const mockDxResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockDxResponse)
+        }
+        utils.callCustomApiDxEndpoint.mockResolvedValue(mockDxResponseObj)
     }
 
     beforeEach(() => {
@@ -111,35 +125,49 @@ describe('CustomApiTool', () => {
             content: [
                 {
                     type: 'text',
-                    text: expect.stringContaining('Custom APIs Discovered:')
+                    text: expect.stringContaining('"metadata"')
                 }
-            ],
-            activeCodeVersion: 'version_1'
+            ]
         })
 
-        // Verify the result contains expected API information
-        expect(result.content[0].text).toContain('test-api')
-        expect(result.content[0].text).toContain('v1')
-        expect(result.content[0].text).toContain('test-cartridge')
-        expect(result.content[0].text).toContain('GET')
-        expect(result.content[0].text).toContain('active')
+        // Parse the JSON response to verify structure
+        const responseData = JSON.parse(result.content[0].text)
+
+        // Verify metadata structure
+        expect(responseData.metadata).toMatchObject({
+            activeCodeVersion: 'version_1',
+            totalApis: 1,
+            timestamp: expect.any(String)
+        })
+
+        // Verify custom APIs structure
+        expect(responseData.customApis).toHaveLength(1)
+        expect(responseData.customApis[0]).toMatchObject({
+            apiName: 'test-api',
+            apiVersion: 'v1',
+            cartridgeName: 'test-cartridge',
+            httpMethod: 'GET',
+            status: 'active'
+        })
     })
 
     it('includes schema content when WebDAV search is successful', async () => {
         setupSuccessfulFetchMocks()
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('schema:')
-        expect(result.content[0].text).toContain('type: object')
-        expect(result.content[0].text).toContain('properties:')
+        const responseData = JSON.parse(result.content[0].text)
+        expect(responseData.customApis[0].schema).toContain('schema:')
+        expect(responseData.customApis[0].schema).toContain('type: object')
+        expect(responseData.customApis[0].schema).toContain('properties:')
     })
 
     it('constructs correct base URLs for custom APIs', async () => {
         setupSuccessfulFetchMocks()
         const result = await CustomApiTool.fn()
 
+        const responseData = JSON.parse(result.content[0].text)
         // Verify the base URL is constructed correctly
-        expect(result.content[0].text).toContain(
+        expect(responseData.customApis[0].baseUrl).toBe(
             'https://test.api.commercecloud.salesforce.com/custom/test-api/v1/organizations/test-org-id//test'
         )
     })
@@ -174,17 +202,32 @@ describe('CustomApiTool', () => {
         // Mock the utils functions for this specific test
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const utils = require('../utils/utils.js')
-        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
-        utils.callCustomApiDxEndpoint.mockResolvedValue(multipleApisResponse)
+
+        const mockOAuthResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockOAuthResponse)
+        }
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponseObj)
+
+        const mockDxResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(multipleApisResponse)
+        }
+        utils.callCustomApiDxEndpoint.mockResolvedValue(mockDxResponseObj)
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('api-1')
-        expect(result.content[0].text).toContain('api-2')
-        expect(result.content[0].text).toContain('cartridge-1')
-        expect(result.content[0].text).toContain('cartridge-2')
-        expect(result.content[0].text).toContain('GET')
-        expect(result.content[0].text).toContain('POST')
+        const responseData = JSON.parse(result.content[0].text)
+        expect(responseData.metadata.totalApis).toBe(2)
+        expect(responseData.customApis).toHaveLength(2)
+        expect(responseData.customApis[0].apiName).toBe('api-1')
+        expect(responseData.customApis[1].apiName).toBe('api-2')
+        expect(responseData.customApis[0].cartridgeName).toBe('cartridge-1')
+        expect(responseData.customApis[1].cartridgeName).toBe('cartridge-2')
+        expect(responseData.customApis[0].httpMethod).toBe('GET')
+        expect(responseData.customApis[1].httpMethod).toBe('POST')
     })
 
     it('handles OAuth token failure', async () => {
@@ -195,30 +238,47 @@ describe('CustomApiTool', () => {
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('Network error')
+        const responseData = JSON.parse(result.content[0].text)
+        expect(responseData.error).toContain('Network error')
     })
 
     it('handles Custom API DX endpoint failure', async () => {
         // Mock OAuth success but DX endpoint failure
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const utils = require('../utils/utils.js')
-        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
+
+        const mockOAuthResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockOAuthResponse)
+        }
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponseObj)
         utils.callCustomApiDxEndpoint.mockRejectedValue(new Error('API endpoint error'))
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('API endpoint error')
+        const responseData = JSON.parse(result.content[0].text)
+        expect(responseData.error).toContain('API endpoint error')
     })
 
     it('includes partial DX response when webDAV fails', async () => {
         // Mock OAuth success and DX response success, but WebDAV failure
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const utils = require('../utils/utils.js')
-        utils.getOAuthToken.mockResolvedValue(mockOAuthResponse)
-        utils.callCustomApiDxEndpoint.mockResolvedValue({
-            ...mockDxResponse,
-            ok: true
-        })
+
+        const mockOAuthResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockOAuthResponse)
+        }
+        utils.getOAuthToken.mockResolvedValue(mockOAuthResponseObj)
+
+        const mockDxResponseObj = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockDxResponse)
+        }
+        utils.callCustomApiDxEndpoint.mockResolvedValue(mockDxResponseObj)
 
         // Mock WebDAV client creation to throw error
         // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -229,7 +289,8 @@ describe('CustomApiTool', () => {
 
         const result = await CustomApiTool.fn()
 
-        expect(result.content[0].text).toContain('WebDAV connection failed')
+        const responseData = JSON.parse(result.content[0].text)
+        expect(responseData.error).toContain('WebDAV connection failed')
         // Should not include partial DX response since WebDAV error happens after DX success
     })
 

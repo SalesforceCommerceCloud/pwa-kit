@@ -252,26 +252,6 @@ export function loadConfig() {
 }
 
 /**
- * Throws formatted OAuth error messages
- */
-export function throwOAuthError(message, tokenData) {
-    const errorMessage = tokenData.error
-        ? `${message}. Error: ${tokenData.error}. Description: ${tokenData.error_description}`
-        : `${message}. Error: ${tokenData}`
-    throw new Error(errorMessage)
-}
-
-/**
- * Throws formatted Custom API DX endpoint error messages
- */
-export function throwCustomApiError(message, response) {
-    const errorMessage = response.title
-        ? `${message}. Error: ${response.title}. Description: ${response.detail}`
-        : `${message}. Error: ${response}`
-    throw new Error(errorMessage)
-}
-
-/**
  * Obtains OAuth access token
  */
 export async function getOAuthToken(clientId, clientSecret, oauthScope) {
@@ -286,7 +266,7 @@ export async function getOAuthToken(clientId, clientSecret, oauthScope) {
         body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
     })
 
-    return await response.json()
+    return response
 }
 
 /**
@@ -303,5 +283,5 @@ export async function callCustomApiDxEndpoint(accessToken, customApiHost, organi
         }
     })
 
-    return await response.json()
+    return response
 }
