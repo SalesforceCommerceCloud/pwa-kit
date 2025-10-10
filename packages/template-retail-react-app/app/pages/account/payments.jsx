@@ -29,6 +29,10 @@ import FormActionButtons from '@salesforce/retail-react-app/app/components/forms
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useConfigurations} from '@salesforce/commerce-sdk-react'
+import {SHOPPER_CONFIGURATION_IDS} from '@salesforce/commerce-sdk-react/constant'
+
+export const SALESFORCE_PAYMENTS_ALLOWED = 'SalesforcePaymentsAllowed'
 
 const BoxArrow = () => {
     return (
@@ -50,18 +54,27 @@ const BoxArrow = () => {
 
 const AccountPayments = () => {
     const {formatMessage} = useIntl()
-    const {data: customer, isLoading, error, refetch} = useCurrentCustomer()
+    const {data: customer, isLoading: isLoadingCustomer, error, refetch} = useCurrentCustomer()
     const showToast = useToast()
     const [isAdding, setIsAdding] = useState(false)
     const [formKey, setFormKey] = useState(0)
-    const [deletingId, setDeletingId] = useState(null)
     const addPaymentForm = useForm()
+    const {
+        data: configurations,
+        isLoading: isLoadingConfigurations,
+        error: configurationsError
+    } = useConfigurations()
     const createCustomerPaymentInstrument = useShopperCustomersMutation(
         'createCustomerPaymentInstrument'
     )
     const deleteCustomerPaymentInstrument = useShopperCustomersMutation(
         'deleteCustomerPaymentInstrument'
     )
+
+    const isSalesforcePaymentsEnabled = configurations?.configurations?.find(
+        (config) => config.id === SALESFORCE_PAYMENTS_ALLOWED
+    )?.value
+
     const onAddPaymentSubmit = async (values) => {
         const body = createCreditCardPaymentBodyFromForm(values)
         body.paymentMethodId = 'CREDIT_CARD'
@@ -117,7 +130,6 @@ const AccountPayments = () => {
     const closeAdd = () => setIsAdding(false)
 
     const removePayment = async (paymentInstrumentId) => {
-        setDeletingId(paymentInstrumentId)
         try {
             await deleteCustomerPaymentInstrument.mutateAsync(
                 {
@@ -146,13 +158,11 @@ const AccountPayments = () => {
                 status: 'error',
                 isClosable: true
             })
-        } finally {
-            setDeletingId(null)
         }
     }
 
     // Show loading state
-    if (isLoading) {
+    if (isLoadingCustomer || isLoadingConfigurations) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -176,7 +186,7 @@ const AccountPayments = () => {
     }
 
     // Show error state
-    if (error) {
+    if (error || configurationsError) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -225,18 +235,26 @@ const AccountPayments = () => {
                                 id="account.payments.placeholder.heading"
                             />
                         </Text>
-                        <Text color="gray.600" mt={1}>
-                            <FormattedMessage
-                                defaultMessage="Add a new payment method for faster checkout."
-                                id="account.payments.placeholder.text"
-                            />
-                        </Text>
-                        <Button mt={4} onClick={openAdd} leftIcon={<PlusIcon boxSize={3} />}>
-                            <FormattedMessage
-                                defaultMessage="Add Payment"
-                                id="account_payments.button.add_payment"
-                            />
-                        </Button>
+                        {!isSalesforcePaymentsEnabled && (
+                            <div>
+                                <Text color="gray.600" mt={1}>
+                                    <FormattedMessage
+                                        defaultMessage="Add a new payment method for faster checkout."
+                                        id="account.payments.placeholder.text"
+                                    />
+                                </Text>
+                                <Button
+                                    mt={4}
+                                    onClick={openAdd}
+                                    leftIcon={<PlusIcon boxSize={3} />}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Add Payment"
+                                        id="account_payments.button.add_payment"
+                                    />
+                                </Button>
+                            </div>
+                        )}
                     </Box>
                     {isAdding && (
                         <Box
@@ -278,7 +296,7 @@ const AccountPayments = () => {
                     </Heading>
                     <Button
                         onClick={() => refetch()}
-                        isLoading={isLoading}
+                        isLoading={isLoadingCustomer}
                         size="sm"
                         variant="outline"
                     >
@@ -290,24 +308,26 @@ const AccountPayments = () => {
                 </Flex>
 
                 <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
-                    <Button
-                        variant="outline"
-                        border="1px dashed"
-                        borderColor="gray.200"
-                        color="blue.600"
-                        height={{lg: 'full'}}
-                        minHeight={11}
-                        rounded="base"
-                        fontWeight="medium"
-                        leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
-                        onClick={openAdd}
-                    >
-                        <FormattedMessage
-                            defaultMessage="Add Payment"
-                            id="account_payments.button.add_payment"
-                        />
-                        {isAdding && <BoxArrow />}
-                    </Button>
+                    {!isSalesforcePaymentsEnabled && (
+                        <Button
+                            variant="outline"
+                            border="1px dashed"
+                            borderColor="gray.200"
+                            color="blue.600"
+                            height={{lg: 'full'}}
+                            minHeight={11}
+                            rounded="base"
+                            fontWeight="medium"
+                            leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
+                            onClick={openAdd}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Add Payment"
+                                id="account_payments.button.add_payment"
+                            />
+                            {isAdding && <BoxArrow />}
+                        </Button>
+                    )}
 
                     {isAdding && (
                         <Box
