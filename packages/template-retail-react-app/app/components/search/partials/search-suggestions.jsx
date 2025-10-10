@@ -17,7 +17,8 @@ const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}
     const hasBrands = searchSuggestions?.brandSuggestions?.length
     const hasPopularSearches = searchSuggestions?.popularSearchSuggestions?.length
     const hasRecentSearches = searchSuggestions?.recentSearchSuggestions?.length
-    const hasSuggestions = hasCategories || hasProducts || hasBrands || hasPopularSearches || hasRecentSearches
+    const hasSuggestions =
+        hasCategories || hasProducts || hasBrands || hasPopularSearches || hasRecentSearches
 
     return (
         <Stack {...styles.container}>

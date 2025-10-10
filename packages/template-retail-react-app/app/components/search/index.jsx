@@ -99,26 +99,24 @@ const formatSuggestions = (searchSuggestions) => {
             }
         ),
         // Einstein suggestions for popular and recent searches
-        popularSearchSuggestions: searchSuggestions?.einsteinSuggestions?.popularSearchPhrases?.map(
-            (phrase) => {
+        popularSearchSuggestions:
+            searchSuggestions?.einsteinSuggestedPhrases?.popularSearchPhrases?.map((phrase) => {
                 return {
                     type: 'popular',
                     name: phrase.phrase,
                     link: searchUrlBuilder(phrase.phrase),
                     exactMatch: phrase.exactMatch
                 }
-            }
-        ),
-        recentSearchSuggestions: searchSuggestions?.einsteinSuggestions?.recentSearchPhrases?.map(
-            (phrase) => {
+            }),
+        recentSearchSuggestions:
+            searchSuggestions?.einsteinSuggestedPhrases?.recentSearchPhrases?.map((phrase) => {
                 return {
                     type: 'recent',
                     name: phrase.phrase,
                     link: searchUrlBuilder(phrase.phrase),
                     exactMatch: phrase.exactMatch
                 }
-            }
-        ),
+            }),
         searchPhrase: searchSuggestions?.searchPhrase
     }
 }
@@ -151,169 +149,18 @@ const Search = (props) => {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
 
-    // Mock Einstein suggestions data
-    const mockEinsteinSuggestions = {
-        "brandSuggestions": {
-            "suggestedTerms": [
-                {
-                    "originalTerm": "dress"
-                }
-            ]
+    const searchSuggestion = useSearchSuggestions(
+        {
+            parameters: {
+                q: searchQuery,
+                expand: 'images,prices',
+                includeEinsteinSuggestedPhrases: true
+            }
         },
-        "categorySuggestions": {
-            "categories": [
-                {
-                    "id": "womens-clothing-dresses",
-                    "name": "Dresses",
-                    "parentCategoryName": "Clothing"
-                }
-            ],
-            "suggestedPhrases": [
-                {
-                    "exactMatch": false,
-                    "phrase": "Dresses"
-                }
-            ],
-            "suggestedTerms": [
-                {
-                    "originalTerm": "dress",
-                    "terms": [
-                        {
-                            "completed": false,
-                            "corrected": false,
-                            "exactMatch": true,
-                            "value": "dress"
-                        }
-                    ]
-                }
-            ]
-        },
-        "contentSuggestions": {
-            "suggestedTerms": [
-                {
-                    "originalTerm": "dress"
-                }
-            ]
-        },
-        "customSuggestions": {
-            "suggestedPhrases": [
-                {
-                    "exactMatch": false,
-                    "phrase": "Dresses"
-                }
-            ],
-            "suggestedTerms": [
-                {
-                    "originalTerm": "dress",
-                    "terms": [
-                        {
-                            "completed": false,
-                            "corrected": false,
-                            "exactMatch": true,
-                            "value": "dress"
-                        }
-                    ]
-                }
-            ]
-        },
-        "einsteinSuggestions": {
-            "popularSearchPhrases": [
-                {
-                    "exactMatch": false,
-                    "phrase": "Dresses"
-                }
-            ],
-            "recentSearchPhrases": [
-                {
-                    "exactMatch": false,
-                    "phrase": "Dresses"
-                }
-            ]
-        },
-        "productSuggestions": {
-            "products": [
-                {
-                    "currency": "GBP",
-                    "productId": "A Standard Dress-1",
-                    "productName": "A Standard Dress"
-                },
-                {
-                    "currency": "GBP",
-                    "image": {
-                        "alt": "Floral Dress, , small",
-                        "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17dc4593/images/small/PG.10237222.JJB52A0.PZ.jpg",
-                        "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17dc4593/images/small/PG.10237222.JJB52A0.PZ.jpg",
-                        "title": "Floral Dress, "
-                    },
-                    "price": 82.56,
-                    "productId": "25592581M",
-                    "productName": "Floral Dress"
-                },
-                {
-                    "currency": "GBP",
-                    "image": {
-                        "alt": "Pack-And-Go Dress, , small",
-                        "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb331c78d/images/small/PG.10239018.JJ3WCXX.PZ.jpg",
-                        "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb331c78d/images/small/PG.10239018.JJ3WCXX.PZ.jpg",
-                        "title": "Pack-And-Go Dress, "
-                    },
-                    "price": 82.56,
-                    "productId": "25589753M",
-                    "productName": "Pack-And-Go Dress"
-                },
-                {
-                    "currency": "GBP",
-                    "image": {
-                        "alt": "V-Neck Dress, , small",
-                        "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf295eccb/images/small/PG.10229762.JJ169XX.PZ.jpg",
-                        "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf295eccb/images/small/PG.10229762.JJ169XX.PZ.jpg",
-                        "title": "V-Neck Dress, "
-                    },
-                    "price": 75.52,
-                    "productId": "25593727M",
-                    "productName": "V-Neck Dress"
-                },
-                {
-                    "currency": "GBP",
-                    "image": {
-                        "alt": "Neutral Floral Dress, , small",
-                        "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0db45f1c/images/small/PG.10227905.JJ0KMXX.PZ.jpg",
-                        "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw0db45f1c/images/small/PG.10227905.JJ0KMXX.PZ.jpg",
-                        "title": "Neutral Floral Dress, "
-                    },
-                    "price": 82.56,
-                    "productId": "25592479M",
-                    "productName": "Neutral Floral Dress"
-                }
-            ],
-            "suggestedPhrases": [
-                {
-                    "exactMatch": true,
-                    "phrase": "dress"
-                }
-            ],
-            "suggestedTerms": [
-                {
-                    "originalTerm": "dress",
-                    "terms": [
-                        {
-                            "completed": false,
-                            "corrected": false,
-                            "exactMatch": true,
-                            "value": "dress"
-                        }
-                    ]
-                }
-            ]
-        },
-        "searchPhrase": "dress"
-    }
-
-    const searchSuggestion = {
-        data: mockEinsteinSuggestions,
-        isLoading: false,
-        error: null
-    }
+        {
+            enabled: searchQuery?.length >= RECENT_SEARCH_MIN_LENGTH
+        }
+    )
     const searchInputRef = useRef()
     const miawChatRef = useRef({
         newChatLaunched: false,
