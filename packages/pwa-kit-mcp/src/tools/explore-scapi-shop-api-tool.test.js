@@ -149,3 +149,29 @@ describe('parseInterfaceProperties', () => {
         expect(parseInterfaceProperties('\n\n  // nothing')).toEqual({properties: []})
     })
 })
+
+describe('ExploreCommerceAPITool', () => {
+    let tool
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        tool = new ExploreCommerceAPITool()
+    })
+
+    describe('Tool metadata', () => {
+        it('should have correct name', () => {
+            expect(tool.name).toBe('pwakit_explore_scapi_shop_api')
+        })
+
+        it('should have description', () => {
+            expect(tool.description).toContain(
+                'Explore and document any commerce-sdk-isomorphic class API endpoints'
+            )
+        })
+
+        it('should have input schema', () => {
+            expect(tool.inputSchema).toBeDefined()
+            expect(tool.inputSchema.prompt).toBeDefined()
+        })
+    })
+})
