@@ -42,6 +42,10 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
+  * ** `pwakit_custom_api_discovery` **:
+  Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
+  *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
+
 
 ## ▶️ Running the MCP Server
 

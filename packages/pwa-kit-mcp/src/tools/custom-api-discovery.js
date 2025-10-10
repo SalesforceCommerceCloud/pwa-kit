@@ -130,7 +130,7 @@ async function searchForApiSchema(webdavClient, activeCodeVersion, cartridgeName
 }
 
 export default {
-    name: 'custom_api_tool',
+    name: 'pwakit_custom_api_discovery',
     description:
         'Discovers and retrieves information about custom APIs deployed in Salesforce Commerce Cloud instances. Use this tool when you need to: find available custom APIs, get API schemas/documentation, understand API endpoints and methods, or analyze custom API implementations. This tool searches through SFCC cartridges, retrieves OAuth tokens, and fetches comprehensive API metadata including endpoints, HTTP methods, security schemes, and OpenAPI schemas.',
     inputSchema: {},
