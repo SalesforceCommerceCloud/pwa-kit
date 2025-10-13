@@ -26,7 +26,6 @@ function isDirectoryInWebDAVResponse(xmlText, href) {
         // Check if this response contains <resourcetype><collection/> (self-closing tag)
         return responseBlock.includes('<resourcetype><collection/>')
     }
-
     return false
 }
 
@@ -46,7 +45,6 @@ export function parseWebDAVDirectories(xmlText) {
             const cleanHref = href.endsWith('/') ? href.slice(0, -1) : href
             const pathParts = cleanHref.split('/')
 
-            // Add bounds checking
             if (pathParts.length > 0) {
                 const name = pathParts[pathParts.length - 1]
                 if (name && name !== '') {
@@ -61,7 +59,6 @@ export function parseWebDAVDirectories(xmlText) {
         logMCPMessage(`Error parsing WebDAV directories: ${error}`)
         return []
     }
-
     return items
 }
 
@@ -92,7 +89,6 @@ export function parseWebDAVResponse(xmlText) {
         logMCPMessage(`Error parsing WebDAV response: ${error}`)
         return []
     }
-
     return items
 }
 
