@@ -38,6 +38,9 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 * **`pwakit_get_dev_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
+* **`pwakit_recommend_hooks`**:
+  Interactive tool to help developers identify and integrate hooks that solve specific use cases.
+
 * **`pwakit_run_site_test`**:
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
@@ -46,6 +49,9 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
+* ** `pwakit_explore_scapi_shop_api` **:
+  Explore and document the out of box SCAPI API endpoints, parameters, and usage examples.
+  *Example: `How do I get a product?`*
 
 ## ▶️ Running the MCP Server
 
