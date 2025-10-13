@@ -321,7 +321,11 @@ export function loadConfig() {
 }
 
 /**
- * Obtains OAuth access token
+ * Obtains OAuth access token from Salesforce Commerce Cloud
+ * @param {string} clientId - The OAuth client ID
+ * @param {string} clientSecret - The OAuth client secret
+ * @param {string} oauthScope - The OAuth scope for the token
+ * @returns {Promise<Response>} The fetch response containing the OAuth token
  */
 export async function getOAuthToken(clientId, clientSecret, oauthScope) {
     const accountManagerHost = process.env.SFCC_LOGIN_URL || 'account.demandware.com'
@@ -335,12 +339,15 @@ export async function getOAuthToken(clientId, clientSecret, oauthScope) {
         },
         body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
     })
-
     return response
 }
 
 /**
  * Calls the custom API DX endpoint
+ * @param {string} accessToken - The OAuth access token for authentication
+ * @param {string} customApiHost - The hostname for the custom API DX endpoint
+ * @param {string} organizationId - The organization ID for the API request
+ * @returns {Promise<Response>} The fetch response containing custom API data
  */
 export async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationId) {
     const customApiBase = `https://${customApiHost}/dx/custom-apis/v1/organizations/${organizationId}/endpoints`
@@ -352,7 +359,6 @@ export async function callCustomApiDxEndpoint(accessToken, customApiHost, organi
             'Content-Type': 'application/json'
         }
     })
-
     return response
 }
 

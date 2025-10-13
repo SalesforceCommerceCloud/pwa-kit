@@ -137,7 +137,7 @@ SFCC_CLIENT_ID=your-client-id
 SFCC_CLIENT_SECRET=your-client-secret
 ```
 
-**Note:** Environment variables take precedence over`dw.json` values if both are provided. See `dw.json.example` for a complete template.
+**Note:** Environment variables take precedence over`dw.json` values if both are provided.
 
 ## 📊 Telemetry
 
