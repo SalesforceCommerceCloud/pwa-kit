@@ -15,3 +15,6 @@ export {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use
 export {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 export {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-derived-product'
 export {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
+export {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
+// @deprecated Use useRuleBasedBonusProducts instead - this uses the simpler useProductSearch approach
+export {useEvaluateProducts} from '@salesforce/retail-react-app/app/hooks/use-evaluate-products'
