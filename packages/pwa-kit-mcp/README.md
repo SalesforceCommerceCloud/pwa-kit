@@ -42,9 +42,11 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
-  * ** `pwakit_custom_api_discovery` **:
+  * ** `scapi_custom_api_discovery` **:
   Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
   *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
+  
+  **Custom API DX Endpoint Documentation**: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
 
 
 ## ▶️ Running the MCP Server
@@ -81,7 +83,7 @@ The MCP server supports two ways to configure your Salesforce Commerce Cloud cre
 
 #### Option 1: dw.json Configuration File (Recommended)
 
-Create a `dw.json` file in your project directory with your SFCC credentials:
+Create a `dw.json` file under your project root directory with your SFCC credentials:
 
 ```json
 {
@@ -94,18 +96,14 @@ Create a `dw.json` file in your project directory with your SFCC credentials:
 }
 ```
 
-Then update your `mcp.json` to point to the dw.json file:
+If `dw.json` doesn't live directly under your project root directory, then update your `mcp.json` to point to the `dw.json` file path:
 
 ```json
 {
   "mcpServers": {
     "pwa-kit": {
-      "command": "node",
-      "args": [
-        "/path/to/pwa-kit-mcp/dist/server/server.js",
-        "--dw-json",
-        "/path/to/your/dw.json"
-      ],
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp", "--dw-json", "/path/to/your/dw.json"],
       "env": {
         "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
       }
@@ -147,9 +145,11 @@ These are the available flags that you can pass to the `args` option.
 
 | Flag Name | Description | Required? | Notes |
 | -----------------| -------| ------- | ----- |
+| `"-y", "@salesforce/pwa-kit-mcp"` | Tells `npx` to automatically install the `@salesforce/pwa-kit-mcp` package instead of asking permission. | Yes | Don't change this. |
+| `"--dw-json", "/path/to/dw.json"` | Path to a `dw.json` configuration file containing SFCC credentials. Use this flag if `dw.json` does not live under your project root directory. | No | Alternative to environment variables. |
 | `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it. |
-| `"--dw-json", "/path/to/dw.json"` | Path to a `dw.json` configuration file containing SFCC credentials. | No | Alternative to environment variables. |
-| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this. |
+
+
 
 Once saved, Cursor will:
 

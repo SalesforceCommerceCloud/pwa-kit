@@ -221,7 +221,7 @@ export function generateComponentImportStatement(
 }
 
 /**
- * Loads configuration from dw.json file if it exists, otherwise falls back to environment variables
+ * Loads configuration from environment variables or dw.json file if it exists
  * Priority: Environment variables > dw.json file
  *
  * @returns {Object} Configuration object with SFCC settings
@@ -229,31 +229,32 @@ export function generateComponentImportStatement(
 export function loadConfig() {
     let dwConfig = {}
 
-    // Try to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from global path
-    const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
-        ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
-        : null
-
-    const configFromGlobalPath = global.DW_JSON_PATH
-
-    const configPath =
-        configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
-            ? configFromStorefrontPath
-            : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
-            ? configFromGlobalPath
+    // Attempt to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from current working directory, then from global path
+    try {
+        const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
+            ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
             : null
+        const configFromCwdPath = path.join(process.cwd(), 'dw.json')
+        const configFromGlobalPath = global.DW_JSON_PATH
 
-    if (configPath) {
-        try {
+        const configPath =
+            configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
+                ? configFromStorefrontPath
+                : configFromCwdPath && fs.existsSync(configFromCwdPath)
+                ? configFromCwdPath
+                : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
+                ? configFromGlobalPath
+                : null
+        if (configPath) {
             const fileContent = fs.readFileSync(configPath, 'utf-8')
             dwConfig = JSON.parse(fileContent)
-        } catch (error) {
-            logMCPMessage(`Failed to parse dw.json: ${error.message}`)
         }
+    } catch (error) {
+        logMCPMessage(`Failed to parse dw.json: ${error.message}`)
     }
 
     // Get hostname first to derive a fallback organizationId
-    const hostname = dwConfig.hostname || dwConfig['hostname'] || process.env.SFCC_HOSTNAME
+    const hostname = process.env.SFCC_HOSTNAME || dwConfig['hostname']
 
     // Extract instance ID from hostname pattern: https://zzrf-001.dx.commercecloud.salesforce.com
     const hostnameMatch = hostname?.match(
@@ -264,21 +265,12 @@ export function loadConfig() {
 
     // Merge with environment variables (environment variables take precedence if both exist)
     return {
-        hostname: process.env.SFCC_HOSTNAME || hostname,
-        instanceId:
-            process.env.SFCC_INSTANCE_ID ||
-            dwConfig.instanceId ||
-            dwConfig['instance-id'] ||
-            derivedInstanceId,
-        clientId: process.env.SFCC_CLIENT_ID || dwConfig.clientId || dwConfig['client-id'],
-        clientSecret:
-            process.env.SFCC_CLIENT_SECRET || dwConfig.clientSecret || dwConfig['client-secret'],
-        organizationId:
-            process.env.SFCC_ORG_ID ||
-            dwConfig.organizationId ||
-            dwConfig['org-id'] ||
-            derivedOrganizationId,
-        shortCode: process.env.SFCC_SHORT_CODE || dwConfig.shortCode || dwConfig['short-code']
+        hostname: hostname,
+        instanceId: process.env.SFCC_INSTANCE_ID || dwConfig['instance-id'] || derivedInstanceId,
+        organizationId: process.env.SFCC_ORG_ID || dwConfig['org-id'] || derivedOrganizationId,
+        clientId: process.env.SFCC_CLIENT_ID || dwConfig['client-id'],
+        clientSecret: process.env.SFCC_CLIENT_SECRET || dwConfig['client-secret'],
+        shortCode: process.env.SFCC_SHORT_CODE || dwConfig['short-code']
     }
 }
 

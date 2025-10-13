@@ -4,97 +4,142 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {createClient} from 'webdav'
 import {logMCPMessage} from './utils.js'
 
 /**
  * Create WebDAV client with authentication
  */
-export function createWebDAVClient(hostname, accessToken) {
-    try {
-        return createClient(hostname, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        })
-    } catch (error) {
-        throw new Error('Error creating WebDAV client: ' + error.message)
+function isDirectoryInWebDAVResponse(xmlText, href) {
+    // Find the response block for this href and check for <D:resourcetype><D:collection/>
+    const responseRegex = new RegExp(
+        `<response>[\\s\\S]*?<href>${href.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+            // eslint-disable-next-line no-useless-escape
+        )}<\/href>[\\s\\S]*?<\/response>`,
+        'g'
+    )
+    const responseMatch = xmlText.match(responseRegex)
+
+    if (responseMatch) {
+        const responseBlock = responseMatch[0]
+        // Check if this response contains <resourcetype><collection/> (self-closing tag)
+        return responseBlock.includes('<resourcetype><collection/>')
     }
+
+    return false
 }
 
 /**
- * Get directory contents using WebDAV client
+ * Parse WebDAV XML response to extract directory names only
+ * @param {string} xmlText - The XML response text from WebDAV PROPFIND request
+ * @returns {string[]} Array of directory names found in the WebDAV response
  */
-export async function getDirectoryContents(client, path) {
-    try {
-        const contents = await client.getDirectoryContents(path)
-        return contents.map((item) => ({
-            filename: item.filename,
-            basename: item.basename,
-            isDirectory: item.type === 'directory'
-        }))
-    } catch (error) {
-        logMCPMessage('Error getting directory contents: ' + error.message)
-        return []
-    }
-}
-
-/**
- * Recursively search for a specific folder in WebDAV
- */
-export async function findFolderRecursively(client, basePath, targetFolderName) {
-    const results = []
+export function parseWebDAVDirectories(xmlText) {
+    const items = []
+    const regex = /<href>([^<]+)<\/href>/g
+    let match
 
     try {
-        const contents = await getDirectoryContents(client, basePath)
+        while ((match = regex.exec(xmlText)) !== null) {
+            const href = match[1]
+            const cleanHref = href.endsWith('/') ? href.slice(0, -1) : href
+            const pathParts = cleanHref.split('/')
 
-        for (const item of contents) {
-            if (item.isDirectory) {
-                // Check if this directory matches our target
-                if (item.basename.toLowerCase() === targetFolderName.toLowerCase()) {
-                    results.push({
-                        path: item.filename,
-                        basename: item.basename
-                    })
+            // Add bounds checking
+            if (pathParts.length > 0) {
+                const name = pathParts[pathParts.length - 1]
+                if (name && name !== '') {
+                    const isDirectory = isDirectoryInWebDAVResponse(xmlText, href)
+                    if (isDirectory) {
+                        items.push(name)
+                    }
                 }
-
-                // Recursively search subdirectories
-                const subResults = await findFolderRecursively(
-                    client,
-                    item.filename,
-                    targetFolderName
-                )
-                results.push(...subResults)
             }
         }
     } catch (error) {
-        logMCPMessage('Error searching in ' + basePath + ': ' + error.message)
+        logMCPMessage(`Error parsing WebDAV directories: ${error}`)
+        return []
     }
 
-    return results
+    return items
 }
 
 /**
- * Get file content from WebDAV
+ * Parse WebDAV XML response to extract all items (both files and directories)
+ * @param {string} xmlText - The XML response text from WebDAV PROPFIND request
+ * @returns {string[]} Array of all item names (files and directories) found in the WebDAV response
  */
-export async function getFileContent(client, filePath) {
+export function parseWebDAVResponse(xmlText) {
+    const items = []
+    const regex = /<href>([^<]+)<\/href>/g
+    let match
+
     try {
-        const content = await client.getFileContents(filePath, {format: 'text'})
-        return content
+        while ((match = regex.exec(xmlText)) !== null) {
+            const href = match[1]
+            const cleanHref = href.endsWith('/') ? href.slice(0, -1) : href
+            const pathParts = cleanHref.split('/')
+
+            if (pathParts.length > 0) {
+                const name = pathParts[pathParts.length - 1]
+                if (name && name !== '') {
+                    items.push(name)
+                }
+            }
+        }
     } catch (error) {
-        logMCPMessage('Error getting file content from ' + filePath + ': ' + error.message)
-        return null
+        logMCPMessage(`Error parsing WebDAV response: ${error}`)
+        return []
+    }
+
+    return items
+}
+
+/**
+ * Validates WebDAV response and throws error if not successful
+ * @param {Response} response - The fetch response object from WebDAV request
+ * @throws {Error} If response status is not successful
+ */
+export function validateWebDAVResponse(response) {
+    if (!response.ok) {
+        throw new Error(
+            `WebDAV HTTP error. Status: ${response.status}. Description: ${response.statusText}.`
+        )
     }
 }
 
 /**
- * Check if a path exists in WebDAV
+ * Makes a WebDAV PROPFIND request to list directory contents
+ * @param {string} url - The WebDAV URL to perform PROPFIND on
+ * @param {string} accessToken - The OAuth access token for authentication
+ * @returns {Promise<Response>} The fetch response object
  */
-export async function pathExists(client, path) {
-    try {
-        return await client.exists(path)
-    } catch (error) {
-        logMCPMessage('Error checking if path exists ' + path + ': ' + error.message)
-        return false
-    }
+export async function makeWebDAVPropfindRequest(url, accessToken) {
+    const response = await fetch(url, {
+        method: 'PROPFIND',
+        headers: {
+            'Content-Type': 'application/xml',
+            Authorization: `Bearer ${accessToken}`,
+            Depth: '1'
+        }
+    })
+    return response
+}
+
+/**
+ * Makes a WebDAV GET request to retrieve file contents
+ * @param {string} url - The WebDAV URL to retrieve content from
+ * @param {string} accessToken - The OAuth access token for authentication
+ * @returns {Promise<Response>} The fetch response object
+ */
+export async function makeWebDAVGetRequest(url, accessToken) {
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/xml'
+        }
+    })
+    return response
 }
