@@ -222,16 +222,28 @@ export function generateComponentImportStatement(
 
 /**
  * Loads configuration from dw.json file if it exists, otherwise falls back to environment variables
- * Priority: dw.json file > Environment variables
+ * Priority: Environment variables > dw.json file
  *
  * @returns {Object} Configuration object with SFCC settings
  */
 export function loadConfig() {
     let dwConfig = {}
 
-    // Try to load dw.json
-    const configPath = global.DW_JSON_PATH
-    if (fs.existsSync(configPath)) {
+    // Try to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from global path
+    const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
+        ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
+        : null
+
+    const configFromGlobalPath = global.DW_JSON_PATH
+
+    const configPath =
+        configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
+            ? configFromStorefrontPath
+            : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
+            ? configFromGlobalPath
+            : null
+
+    if (configPath) {
         try {
             const fileContent = fs.readFileSync(configPath, 'utf-8')
             dwConfig = JSON.parse(fileContent)
@@ -239,15 +251,34 @@ export function loadConfig() {
             logMCPMessage(`Failed to parse dw.json: ${error.message}`)
         }
     }
-    // Merge with environment variables (dw.json takes precedence if both exist)
+
+    // Get hostname first to derive a fallback organizationId
+    const hostname = dwConfig.hostname || dwConfig['hostname'] || process.env.SFCC_HOSTNAME
+
+    // Extract instance ID from hostname pattern: https://zzrf-001.dx.commercecloud.salesforce.com
+    const hostnameMatch = hostname?.match(
+        /https?:\/\/([a-z0-9-]+)\.dx\.commercecloud\.salesforce\.com/
+    )
+    const derivedInstanceId = hostnameMatch ? hostnameMatch[1].replace(/-/g, '_') : null
+    const derivedOrganizationId = derivedInstanceId ? `f_ecom_${derivedInstanceId}` : null
+
+    // Merge with environment variables (environment variables take precedence if both exist)
     return {
-        hostname: dwConfig.hostname || dwConfig['hostname'] || process.env.SFCC_HOSTNAME,
-        instanceId: dwConfig.instanceId || dwConfig['instance-id'] || process.env.SFCC_INSTANCE_ID,
-        clientId: dwConfig.clientId || dwConfig['client-id'] || process.env.SFCC_CLIENT_ID,
+        hostname: process.env.SFCC_HOSTNAME || hostname,
+        instanceId:
+            process.env.SFCC_INSTANCE_ID ||
+            dwConfig.instanceId ||
+            dwConfig['instance-id'] ||
+            derivedInstanceId,
+        clientId: process.env.SFCC_CLIENT_ID || dwConfig.clientId || dwConfig['client-id'],
         clientSecret:
-            dwConfig.clientSecret || dwConfig['client-secret'] || process.env.SFCC_CLIENT_SECRET,
-        organizationId: dwConfig.organizationId || dwConfig['org-id'] || process.env.SFCC_ORG_ID,
-        shortCode: dwConfig.shortCode || dwConfig['short-code'] || process.env.SFCC_SHORT_CODE
+            process.env.SFCC_CLIENT_SECRET || dwConfig.clientSecret || dwConfig['client-secret'],
+        organizationId:
+            process.env.SFCC_ORG_ID ||
+            dwConfig.organizationId ||
+            dwConfig['org-id'] ||
+            derivedOrganizationId,
+        shortCode: process.env.SFCC_SHORT_CODE || dwConfig.shortCode || dwConfig['short-code']
     }
 }
 
@@ -255,9 +286,10 @@ export function loadConfig() {
  * Obtains OAuth access token
  */
 export async function getOAuthToken(clientId, clientSecret, oauthScope) {
-    const {OAUTH_TOKEN_URL} = await import('./constants.js')
+    const accountManagerHost = process.env.SFCC_LOGIN_URL || 'account.demandware.com'
+    const oauthTokenUrl = `https://${accountManagerHost}/dwsso/oauth2/access_token`
 
-    const response = await fetch(OAUTH_TOKEN_URL, {
+    const response = await fetch(oauthTokenUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

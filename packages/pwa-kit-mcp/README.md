@@ -118,18 +118,16 @@ Then update your `mcp.json` to point to the dw.json file:
 
 Use environment variables to set SFCC credentials:
 
-```json
-{
-        "SFCC_HOSTNAME": "https://your-instance.dx.commercecloud.salesforce.com",
-        "SFCC_ORG_ID": "your-org-id",
-        "SFCC_SHORT_CODE": "your-short-code",
-        "SFCC_INSTANCE_ID": "your-instance-id",
-        "SFCC_CLIENT_ID": "your-client-id",
-        "SFCC_CLIENT_SECRET": "your-client-secret"
-}
+```
+SFCC_HOSTNAME=https://your-instance.dx.commercecloud.salesforce.com
+SFCC_ORG_ID=your-org-id
+SFCC_SHORT_CODE=your-short-code
+SFCC_INSTANCE_ID=your-instance-id
+SFCC_CLIENT_ID=your-client-id
+SFCC_CLIENT_SECRET=your-client-secret
 ```
 
-**Note:** `dw.json` values take precedence over environment variables if both are provided. See `dw.json.example` for a complete template.
+**Note:** Environment variables take precedence over`dw.json` values if both are provided. See `dw.json.example` for a complete template.
 
 ## 📊 Telemetry
 
