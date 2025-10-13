@@ -7423,6 +7423,20 @@
       "value": "]"
     }
   ],
+  "search.suggestions.popular": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥǿǿƥŭŭŀȧȧř Şḗḗȧȧřƈħḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "search.suggestions.products": [
     {
       "type": 0,
@@ -7431,6 +7445,20 @@
     {
       "type": 0,
       "value": "Ƥřǿǿḓŭŭƈŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search.suggestions.recent": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƈḗḗƞŧ Şḗḗȧȧřƈħḗḗş"
     },
     {
       "type": 0,
