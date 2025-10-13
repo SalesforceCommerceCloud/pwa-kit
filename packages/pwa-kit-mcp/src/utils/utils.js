@@ -356,6 +356,7 @@ export async function callCustomApiDxEndpoint(accessToken, customApiHost, organi
     return response
 }
 
+/**
  * Auto-detects the node_modules directory path
  * @param {string} [startPath] - Optional starting path for detection
  * @returns {string|null} The absolute path to node_modules or null if not found
