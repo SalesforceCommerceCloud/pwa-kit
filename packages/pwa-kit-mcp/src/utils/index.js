@@ -12,13 +12,16 @@ import {
     toKebabCase,
     toPascalCase,
     logMCPMessage,
-    getCopyrightHeader,
     isBaseComponent,
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
-} from './utils'
+    generateComponentImportStatement,
+    detectWorkspacePaths,
+    autoDetectNodeModulesPath,
+    autoDetectCommerceSDKTypesPath,
+    checkCommerceSDKInNodeModules
+} from './utils.js'
 
 export {
     EmptyJsonSchema,
@@ -28,10 +31,13 @@ export {
     toKebabCase,
     toPascalCase,
     logMCPMessage,
-    getCopyrightHeader,
     isBaseComponent,
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    detectWorkspacePaths,
+    autoDetectNodeModulesPath,
+    autoDetectCommerceSDKTypesPath,
+    checkCommerceSDKInNodeModules
 }

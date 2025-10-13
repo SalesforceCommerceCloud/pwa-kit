@@ -5,10 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {z} from 'zod'
-import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase} from '../utils'
-import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
+import {toKebabCase, toPascalCase, detectWorkspacePaths} from '../utils'
+import {logMCPMessage} from '../utils'
+import {
+    PWA_KIT_DESCRIPTIVE_NAME,
+    SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS,
+    systemPromptForFileGeneration,
+    systemPromptForOrderedFileChanges
+} from '../utils/constants'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
@@ -54,32 +59,64 @@ class CreateNewComponentTool {
                     1,
                     'The purpose of the new component (e.g., display a single Product, display a list of products or something else)'
                 )
-                .describe(systemPromptForComponentPurpose),
-            location: z
-                .string()
-                .describe('The location of the component to create')
-                .default(process.env.PWA_STOREFRONT_APP_PATH)
+                .describe(systemPromptForComponentPurpose)
         }
         this.handler = async (args) => {
-            if (!args || !args.componentName || !args.purpose || !args.location) {
+            if (!args || !args.componentName || !args.purpose) {
                 return {
-                    role: 'system',
                     content: [{type: 'text', text: systemPrompt}]
                 }
             }
+
+            let absolutePaths
+            try {
+                absolutePaths = await detectWorkspacePaths()
+                logMCPMessage(`Detected workspace paths: ${JSON.stringify(absolutePaths)}`)
+            } catch (error) {
+                logMCPMessage(`Error detecting workspace paths: ${error.message}`)
+
+                // if this is a user prompt error (project path not detected)
+                if (error.message.includes('Could not detect PWA Kit project directory')) {
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: `I need to know where your PWA Kit project is located to create the component. ${error.message}\n\nPlease provide the path to your PWA Kit project's app directory.`
+                            }
+                        ]
+                    }
+                }
+
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Error detecting workspace configuration: ${error.message}`
+                        }
+                    ]
+                }
+            }
+
             const normalizedPurpose = args.purpose.trim().toLowerCase()
             const isSingleProduct = normalizedPurpose === 'display a single product'
             const isProductList = normalizedPurpose === 'display a list of products'
 
             if (isSingleProduct) {
                 // Proceed with standard component creation
-                return this.createComponent(args.componentName, args.location, 'singleProduct')
+                return this.createComponent(
+                    args.componentName,
+                    absolutePaths.componentsPath,
+                    'singleProduct'
+                )
             } else if (isProductList) {
-                return this.createComponent(args.componentName, args.location, 'productList')
+                return this.createComponent(
+                    args.componentName,
+                    absolutePaths.componentsPath,
+                    'productList'
+                )
             } else {
                 // Custom purpose: let Cursor take over and ask clarifying questions
                 return {
-                    role: 'system',
                     content: [{type: 'text', text: systemPromptForCustomComponent}]
                 }
             }
@@ -88,29 +125,20 @@ class CreateNewComponentTool {
 
     async createComponent(componentName, location, entityType) {
         try {
-            const result = await this.generateComponentFiles(componentName, location, entityType)
-            return {
-                role: 'system',
-                content: [{type: 'text', text: result}]
-            }
+            return await this.generateComponentFiles(componentName, location, entityType)
         } catch (error) {
             return {
-                role: 'developer',
                 content: [{type: 'text', text: `Error creating component: ${error.message}`}]
             }
         }
     }
 
     async generateComponentFiles(componentName, location, entityType) {
-        const componentsDir = path.join(location, 'components')
         if (entityType === 'singleProduct' || entityType === 'productList') {
             // Call updateComponentToPresentational for product-based components
-            return await this.updateComponentToPresentational(
-                'product',
-                componentName,
-                componentsDir,
-                {list: entityType === 'productList'}
-            )
+            return await this.updateComponentToPresentational('product', componentName, location, {
+                list: entityType === 'productList'
+            })
         }
     }
 
@@ -118,7 +146,6 @@ class CreateNewComponentTool {
         const kebabDirName = toKebabCase(componentName)
         const pascalComponentName = toPascalCase(componentName)
         const componentDir = path.join(location, kebabDirName)
-        await fs.mkdir(componentDir, {recursive: true})
         const componentFilePath = path.join(componentDir, 'index.jsx')
         let code = ''
 
@@ -314,8 +341,19 @@ export default ${pascalComponentName};
             throw new Error(`Entity type '${entityType}' is not supported.`)
         }
 
-        await fs.writeFile(componentFilePath, code, 'utf-8')
-        return `✅ Updated ${componentFilePath} to presentational component for ${entityType}`
+        const messages = []
+        messages.push(systemPromptForFileGeneration(componentFilePath, code))
+
+        messages.push(SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS)
+
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: systemPromptForOrderedFileChanges(messages)
+                }
+            ]
+        }
     }
 }
 

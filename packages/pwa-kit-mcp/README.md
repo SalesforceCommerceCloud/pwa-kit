@@ -18,6 +18,10 @@ PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates
 
 _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
+## Important
+
+Feature is available as a developer preview. Feature isn’t generally available unless or until Salesforce announces its general availability in documentation or in press releases or public statements. All commands, parameters, and other features are subject to change or deprecation at any time, with or without notice. Don't implement functionality developed with these commands or tools.
+
 ## 🧰 Features
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
@@ -34,19 +38,27 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 * **`pwakit_get_dev_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
+* **`pwakit_recommend_hooks`**:
+  Interactive tool to help developers identify and integrate hooks that solve specific use cases.
+
 * **`pwakit_run_site_test`**:
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
-* ** `pwakit_install_agent_rules` **:
+* **`pwakit_install_agent_rules`**:
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
-  * ** `scapi_custom_api_discovery` **:
+* **`pwakit_explore_scapi_shop_api`**:
+  Explore and document the out of box SCAPI API endpoints, parameters, and usage examples.
+  *Example: `How do I get a product?`*
+  
+* **`scapi_custom_api_discovery`**:
   Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
   *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
   
-  **Custom API DX Endpoint Documentation**: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
+  *Custom API DX Endpoint Documentation*: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
+
 
 
 ## ▶️ Running the MCP Server

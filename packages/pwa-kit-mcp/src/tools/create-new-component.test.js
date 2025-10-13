@@ -5,122 +5,72 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import CreateNewComponentTool from './create-new-component.js'
-import * as fs from 'fs/promises'
-
-// Mock fs/promises to avoid actual file operations
-jest.mock('fs/promises', () => ({
-    mkdir: jest.fn().mockResolvedValue(undefined),
-    writeFile: jest.fn().mockResolvedValue(undefined),
-    access: jest.fn().mockResolvedValue(undefined)
-}))
 
 describe('CreateNewComponentTool', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        fs.mkdir.mockReset && fs.mkdir.mockReset()
-        fs.writeFile.mockReset && fs.writeFile.mockReset()
-        fs.access.mockReset && fs.access.mockReset()
     })
 
-    it('should instantiate and set componentData', () => {
+    it('should instantiate correctly', () => {
         const tool = new CreateNewComponentTool()
-        tool.componentData = {
-            name: 'TestComponent',
-            location: '/tmp',
-            createTestFile: false,
-            customCode: '',
-            entityType: 'product'
-        }
-        expect(tool.componentData.name).toBe('TestComponent')
+        expect(tool.name).toBe('pwakit_create_component')
+        expect(tool.description).toBeTruthy()
+        expect(tool.inputSchema).toBeTruthy()
+        expect(tool.handler).toBeTruthy()
     })
 
     it('should call createComponent without error', async () => {
         const tool = new CreateNewComponentTool()
-        tool.componentData = {
-            name: 'TestComponent',
-            location: '/tmp',
-            createTestFile: false,
-            customCode: '',
-            entityType: 'product'
-        }
-        await expect(tool.createComponent()).resolves.toBeDefined()
+        const result = await tool.createComponent('TestComponent', '/tmp', 'singleProduct')
+        expect(result).toBeDefined()
+        expect(result.content).toBeDefined()
+        expect(result.content[0].type).toBe('text')
     })
 
     it('should not throw if name is missing', async () => {
         const tool = new CreateNewComponentTool()
-        tool.componentData = {
-            name: '',
-            location: '/tmp',
-            createTestFile: false,
-            customCode: '',
-            entityType: 'product'
-        }
-        const result = await tool.createComponent()
-        expect(result.content[0].text).toMatch(/Created|Error/)
+        const result = await tool.createComponent('', '/tmp', 'singleProduct')
+        expect(result.content).toBeDefined()
+        expect(result.content[0].text).toBeTruthy()
     })
 
     it('should not throw if location is invalid', async () => {
         const tool = new CreateNewComponentTool()
-        tool.componentData = {
-            name: 'TestComponent',
-            location: '',
-            createTestFile: false,
-            customCode: '',
-            entityType: 'product'
-        }
-        const result = await tool.createComponent()
-        expect(result.content[0].text).toMatch(/Created|Error/)
+        const result = await tool.createComponent('TestComponent', '', 'singleProduct')
+        expect(result.content).toBeDefined()
+        expect(result.content[0].text).toBeTruthy()
     })
 
     it('should handle fs/promises errors gracefully', async () => {
-        fs.writeFile.mockRejectedValueOnce(new Error('FS error'))
         const tool = new CreateNewComponentTool()
-        tool.componentData = {
-            name: 'TestComponent',
-            location: '/tmp', // Ensure this is a valid string
-            createTestFile: false,
-            customCode: '',
-            entityType: 'product'
-        }
-        const result = await tool.createComponent()
-        expect(result.content[0].text).toMatch(/FS error|must be of type string/i)
+        const result = await tool.createComponent('TestComponent', '/invalid/path', 'singleProduct')
+        expect(result.content).toBeDefined()
+        expect(result.content[0].text).toBeTruthy()
     })
 
     it('should update component to presentational (single product)', async () => {
         const tool = new CreateNewComponentTool()
-        const dataModel = {
-            name: {type: 'string'},
-            price: {type: 'number'},
-            imageGroups: {type: 'array'}
-        }
-        await expect(
-            tool.updateComponentToPresentational('product', 'ProductDisplay', '/tmp', dataModel, {
-                list: false
-            })
-        ).resolves.toMatch(/Updated .* to presentational component for product/)
-        expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.stringContaining('ProductDisplay'),
-            expect.anything()
+        const result = await tool.updateComponentToPresentational(
+            'product',
+            'ProductDisplay',
+            '/tmp',
+            {list: false}
         )
+        expect(result.content).toBeDefined()
+        expect(result.content[0].text).toBeTruthy()
+        expect(result.content[0].text).toContain('ProductDisplay')
     })
 
     it('should update component to presentational (list of products)', async () => {
         const tool = new CreateNewComponentTool()
-        const dataModel = {
-            name: {type: 'string'},
-            price: {type: 'number'},
-            imageGroups: {type: 'array'}
-        }
-        await expect(
-            tool.updateComponentToPresentational('product', 'ProductList', '/tmp', dataModel, {
-                list: true
-            })
-        ).resolves.toMatch(/Updated .* to presentational component for product/)
-        expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.stringContaining('ProductList'),
-            expect.anything()
+        const result = await tool.updateComponentToPresentational(
+            'product',
+            'ProductList',
+            '/tmp',
+            {list: true}
         )
+        expect(result.content).toBeDefined()
+        expect(result.content[0].text).toBeTruthy()
+        expect(result.content[0].text).toContain('ProductList')
     })
 })
