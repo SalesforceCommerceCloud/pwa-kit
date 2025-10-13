@@ -12,9 +12,11 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {withRouter} from 'react-router-dom'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -56,6 +58,8 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
+// NOTE: If you add/remove routes here, it is a good practice to update the pwaKitRoutes list in default.js.
+// The default.js pwaKitRoutes list is the source of truth in case hybridProxy is enabled.
 export const routes = [
     {
         path: '/',
@@ -143,7 +147,50 @@ export const routes = [
 
 export default () => {
     const config = getConfig()
-    return configureRoutes(routes, config, {
+    let routesToConfigure = routes
+
+    if (config.hybrid?.enableHybrid) {
+        const pwaKitRoutes = config.hybrid?.pwaKitRoutes || []
+
+        // Filter to only PWA-owned routes + add catch-all redirect to SFRA
+        const hybridRoutes = [
+            ...routes.filter((route) => pwaKitRoutes.includes(route.path)),
+            {
+                path: '*',
+                component: withRouter((props) => {
+                    const {location} = props
+                    const urlParams = new URLSearchParams(location.search)
+                    const {site} = useMultiSite()
+                    const siteId = site?.id || config?.app?.defaultSite
+
+                    if (typeof window !== 'undefined') {
+                        useEffect(() => {
+                            if (!urlParams.has('redirected')) {
+                                const newURL = new URL(window.location)
+                                newURL.searchParams.append('redirected', '1')
+                                // Rewrite to SFRA format: /s/{siteId}/{locale}/{rest}
+                                newURL.pathname = `/s/${siteId}/${window.location.pathname
+                                    .split('/')
+                                    .slice(2)
+                                    .join('/')}`
+                                window.location.replace(newURL)
+                            }
+                        }, [window.location.href])
+                    }
+
+                    // If already redirected once and still here, show 404
+                    if (urlParams.has('redirected')) {
+                        return <PageNotFound {...props} />
+                    }
+                    return null
+                })
+            }
+        ]
+
+        routesToConfigure = hybridRoutes
+    }
+
+    return configureRoutes(routesToConfigure, config, {
         ignoredRoutes: ['/callback', '*']
     })
 }

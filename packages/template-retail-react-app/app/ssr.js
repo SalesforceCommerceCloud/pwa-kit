@@ -28,6 +28,34 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const config = getConfig()
 
+// Get the simple route list
+const pwaKitRoutes = config.hybrid?.pwaKitRoutes || []
+
+const hybridRules = []
+
+// Add special PWA Kit paths that don't use site/locale structure
+hybridRules.push(
+    'http.request.uri.path eq "/"',
+    'http.request.uri.path matches "^/callback"',
+    'http.request.uri.path matches "^/mobify"',
+    'http.request.uri.path matches "^/worker.js"'
+)
+
+// For each PWA Kit route, generate the multi-site/locale pattern
+pwaKitRoutes.forEach((path) => {
+    if (path === '/' || path === '/callback' || path === '*') {
+        return // Already handled or not needed
+    }
+
+    // Convert route params to regex for Fastly rules
+    const regexPath = path.replace(/:(\w+)\?/g, '(?:/([^/]+))?').replace(/:(\w+)/g, '/([^/]+)')
+
+    hybridRules.push(`http.request.uri.path matches "^/(\\w+)/([-\\w]+)${regexPath}"`)
+
+    // Also add the direct path (without site/locale)
+    hybridRules.push(`http.request.uri.path matches "^${regexPath}"`)
+})
+
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -66,7 +94,25 @@ const options = {
     // of the keys of headers that have been encoded
     // There may be a slight performance loss with requests/responses with large number
     // of headers as we loop through all the headers to verify ASCII vs non ASCII
-    encodeNonAsciiHttpHeaders: true
+    encodeNonAsciiHttpHeaders: true,
+
+    // If this is enabled, the hybrid proxy will be enabled. This is required for SFCC sessions to work. Out-of-the-box value is false.
+    // This will work for both local devlopment and MRT to ODS connection.
+    enableHybridProxy: config.hybrid?.enableHybrid || false,
+
+    // The origin of the SFCC instance (i.e. the instance that is being proxied to which hosts the storefront). This is required for hybrid proxy to work.
+    // The value will be fetched from the config/default.js file for the ocapi host.
+    sfccOrigin: `https://${
+        config.ssrParameters.proxyConfigs.find((cfg) => cfg.path === 'ocapi').host
+    }`,
+
+    // The MRT rules to apply to the hybrid proxy. This is required for hybrid proxy to work.
+    // These rules determine which requests are handled by PWA Kit (MRT) vs proxied to SFCC
+    // Paths excluded from the rules will not be re-directed to PWA Kit storefront.
+    hybridRoutingRules: hybridRules
+
+    // To be used when hybrid proxy is enabled
+    //localAllowCookies: true
 }
 
 const runtime = getRuntime()

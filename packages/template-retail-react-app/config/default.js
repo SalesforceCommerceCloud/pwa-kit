@@ -86,6 +86,30 @@ module.exports = {
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    hybrid: {
+        // default value is false
+        enableHybrid: false,
+        pwaKitRoutes: [
+            '/',
+            '/login',
+            '/registration',
+            '/reset-password',
+            '/passwordless-login-landing',
+            '/reset-password-landing',
+            '/social-callback',
+            '/account',
+            '/account/orders',
+            '/account/wishlist',
+            '/product/:productId',
+            '/checkout',
+            '/cart',
+            '/checkout/confirmation/:orderNo',
+            '/search',
+            '/category/:categoryId',
+            '/store-locator',
+            '/callback'
+        ]
+    },
     ssrShared: [
         'static/ico/favicon.ico',
         'static/robots.txt',
@@ -104,6 +128,11 @@ module.exports = {
                 host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
+            // in case of hybrid proxy, need to add the dwrestatic path. Example:
+            // {
+            //     host: '<shortCode>.dx.commercecloud.salesforce.com',
+            //     path: 'dwrestatic'
+            // }
         ]
     }
 }
