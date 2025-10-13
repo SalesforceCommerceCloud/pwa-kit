@@ -40,6 +40,12 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
                     organizationId: 'f_ecom_test_001'
                 }
             }
+        },
+        ssrParameters: {
+            proxyConfigs: [
+                { host: 'mock-api-host.com', path: 'api' },
+                { host: 'mock-ocapi-host.com', path: 'ocapi' }
+            ]
         }
     }))
 }))
