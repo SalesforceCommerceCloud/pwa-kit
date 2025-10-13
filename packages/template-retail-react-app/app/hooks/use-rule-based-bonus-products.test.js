@@ -7,6 +7,7 @@
 
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
+import PropTypes from 'prop-types'
 import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
@@ -40,6 +41,13 @@ const MockComponent = ({promotionId, enabled = true, limit, offset}) => {
             ))}
         </div>
     )
+}
+
+MockComponent.propTypes = {
+    promotionId: PropTypes.string,
+    enabled: PropTypes.bool,
+    limit: PropTypes.number,
+    offset: PropTypes.number
 }
 
 describe('useRuleBasedBonusProducts', () => {

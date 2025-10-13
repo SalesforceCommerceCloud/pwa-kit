@@ -7,8 +7,10 @@
 
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
+import PropTypes from 'prop-types'
 import {useEvaluateProducts} from '@salesforce/retail-react-app/app/hooks/use-evaluate-products'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {useCommerceApi} from '@salesforce/commerce-sdk-react'
 
 // Mock fetch globally
 global.fetch = jest.fn()
@@ -63,6 +65,11 @@ const MockComponent = ({promotionId, enabled = true}) => {
             <div data-testid="products-total">{data?.total || 0}</div>
         </div>
     )
+}
+
+MockComponent.propTypes = {
+    promotionId: PropTypes.string,
+    enabled: PropTypes.bool
 }
 
 describe('useEvaluateProducts', () => {
@@ -192,7 +199,6 @@ describe('useEvaluateProducts', () => {
 
     test('handles missing auth token', async () => {
         // Override the mock for this test
-        const {useCommerceApi} = require('@salesforce/commerce-sdk-react')
         useCommerceApi.mockReturnValueOnce({
             clientConfig: {
                 organizationId: 'test-org',
