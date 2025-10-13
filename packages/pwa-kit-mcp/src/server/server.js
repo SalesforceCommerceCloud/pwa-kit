@@ -14,7 +14,9 @@ import {
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
-    InstallAgentRulesTool
+    InstallAgentRulesTool,
+    ExploreCommerceAPITool,
+    HooksRecommendationTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
@@ -68,6 +70,8 @@ class PwaStorefrontMCPServerHighLevel {
         this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
+        this.exploreCommerceAPITool = new ExploreCommerceAPITool()
+        this.hooksRecommendationTool = new HooksRecommendationTool()
         this.setupTools()
     }
 
@@ -111,6 +115,18 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            this.exploreCommerceAPITool.name,
+            this.exploreCommerceAPITool.description,
+            this.exploreCommerceAPITool.inputSchema,
+            this.exploreCommerceAPITool.handler
+        )
+        this.server.tool(
+            this.hooksRecommendationTool.name,
+            this.hooksRecommendationTool.description,
+            this.hooksRecommendationTool.inputSchema,
+            this.hooksRecommendationTool.handler
         )
     }
 
