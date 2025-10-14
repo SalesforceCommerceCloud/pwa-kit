@@ -30,7 +30,7 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
     const {data, isLoading, error, ...rest} = useProductSearch(
         {
             parameters: {
-                promotionId, // Filter by promotion
+                promotionId,
                 limit: limit || 25,
                 offset: offset || 0
             }
@@ -40,14 +40,8 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
         }
     )
 
-    console.log('🔍 Fetching rule-based bonus products:', {
-        promotionId,
-        productsFound: data?.hits?.length || 0,
-        total: data?.total
-    })
-
     return {
-        products: data?.hits || [], // Array of products
+        products: data?.hits || [],
         total: data?.total || 0,
         isLoading,
         error,
