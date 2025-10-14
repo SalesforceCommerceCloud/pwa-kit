@@ -376,15 +376,16 @@ describe('loadConfig', () => {
         }
 
         it('loads configuration from dw.json file when file exists in current directory', () => {
-            jest.spyOn(fs, 'existsSync').mockImplementation((path) => {
-                return path === '/mock/current/directory/dw.json'
+            const expectedPath = path.join('/mock/current/directory', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
             })
             jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
 
             const result = loadConfig()
 
-            expect(fs.existsSync).toHaveBeenCalledWith('/mock/current/directory/dw.json')
-            expect(fs.readFileSync).toHaveBeenCalledWith('/mock/current/directory/dw.json', 'utf-8')
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+            expect(fs.readFileSync).toHaveBeenCalledWith(expectedPath, 'utf-8')
             expect(result).toEqual({
                 hostname: 'https://test.dx.commercecloud.salesforce.com',
                 instanceId: 'test_instance',
@@ -397,15 +398,16 @@ describe('loadConfig', () => {
 
         it('loads configuration from PWA_STOREFRONT_APP_PATH when available', () => {
             process.env.PWA_STOREFRONT_APP_PATH = '/mock/storefront/path'
-            jest.spyOn(fs, 'existsSync').mockImplementation((path) => {
-                return path === '/mock/storefront/path/dw.json'
+            const expectedPath = path.join('/mock/storefront/path', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
             })
             jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
 
             const result = loadConfig()
 
-            expect(fs.existsSync).toHaveBeenCalledWith('/mock/storefront/path/dw.json')
-            expect(fs.readFileSync).toHaveBeenCalledWith('/mock/storefront/path/dw.json', 'utf-8')
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+            expect(fs.readFileSync).toHaveBeenCalledWith(expectedPath, 'utf-8')
             expect(result).toEqual({
                 hostname: 'https://test.dx.commercecloud.salesforce.com',
                 instanceId: 'test_instance',
