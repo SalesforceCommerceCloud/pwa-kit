@@ -88,27 +88,7 @@ module.exports = {
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     hybrid: {
         // default value is false
-        enableHybrid: false,
-        pwaKitRoutes: [
-            '/',
-            '/login',
-            '/registration',
-            '/reset-password',
-            '/passwordless-login-landing',
-            '/reset-password-landing',
-            '/social-callback',
-            '/account',
-            '/account/orders',
-            '/account/wishlist',
-            '/product/:productId',
-            '/checkout',
-            '/cart',
-            '/checkout/confirmation/:orderNo',
-            '/search',
-            '/category/:categoryId',
-            '/store-locator',
-            '/callback'
-        ]
+        enableHybrid: false
     },
     ssrShared: [
         'static/ico/favicon.ico',

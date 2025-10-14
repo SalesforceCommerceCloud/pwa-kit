@@ -68,11 +68,28 @@ describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isR
 })
 
 describe('catchAndLog', () => {
-    test('error', () => {
+    test('error with no args', () => {
         const error = jest.spyOn(console, 'error').mockImplementation(() => {})
         utils.catchAndLog()
         expect(error).toHaveBeenCalledWith(
             'pwa-kit-runtime.catchAndLog ERROR Uncaught exception:  {"stack":"(no error)"}'
         )
+    })
+    test('error with stack', () => {
+        const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const err = new Error('test error')
+        utils.catchAndLog(err)
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('Uncaught exception'))
+    })
+    test('error with message only', () => {
+        const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const err = {message: 'just a message'}
+        utils.catchAndLog(err)
+        expect(error).toHaveBeenCalled()
+    })
+    test('error as string', () => {
+        const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+        utils.catchAndLog('string error')
+        expect(error).toHaveBeenCalled()
     })
 })

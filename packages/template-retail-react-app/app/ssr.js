@@ -25,36 +25,23 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {buildHybridRules} from '@salesforce/pwa-kit-runtime/utils/ssr-server/hybrid-rules-creation'
 
 const config = getConfig()
 
-// Get the simple route list
-const pwaKitRoutes = config.hybrid?.pwaKitRoutes || []
-
-const hybridRules = []
-
-// Add special PWA Kit paths that don't use site/locale structure
-hybridRules.push(
-    'http.request.uri.path eq "/"',
-    'http.request.uri.path matches "^/callback"',
-    'http.request.uri.path matches "^/mobify"',
-    'http.request.uri.path matches "^/worker.js"'
-)
-
-// For each PWA Kit route, generate the multi-site/locale pattern
-pwaKitRoutes.forEach((path) => {
-    if (path === '/' || path === '/callback' || path === '*') {
-        return // Already handled or not needed
+// Auto-resolve routes file for generated/overrides apps (overrides first, then default)
+const overridesCandidate = path.resolve(process.cwd(), 'overrides/app/routes.jsx')
+const defaultCandidate = path.resolve(process.cwd(), 'app/routes.jsx')
+const routesFilePath = (() => {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const fs = require('fs')
+        return fs.existsSync(overridesCandidate) ? overridesCandidate : defaultCandidate
+    } catch (_) {
+        return defaultCandidate
     }
-
-    // Convert route params to regex for Fastly rules
-    const regexPath = path.replace(/:(\w+)\?/g, '(?:/([^/]+))?').replace(/:(\w+)/g, '/([^/]+)')
-
-    hybridRules.push(`http.request.uri.path matches "^/(\\w+)/([-\\w]+)${regexPath}"`)
-
-    // Also add the direct path (without site/locale)
-    hybridRules.push(`http.request.uri.path matches "^${regexPath}"`)
-})
+})()
+const hybridRules = buildHybridRules(routesFilePath)
 
 const options = {
     // The build directory (an absolute path)
@@ -112,7 +99,7 @@ const options = {
     hybridRoutingRules: hybridRules
 
     // To be used when hybrid proxy is enabled
-    //localAllowCookies: true
+    // localAllowCookies: true
 }
 
 const runtime = getRuntime()

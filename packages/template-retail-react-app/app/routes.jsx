@@ -12,7 +12,7 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {withRouter} from 'react-router-dom'
@@ -150,47 +150,29 @@ export default () => {
     let routesToConfigure = routes
 
     if (config.hybrid?.enableHybrid) {
-        const pwaKitRoutes = config.hybrid?.pwaKitRoutes || []
-
-        // Filter to only PWA-owned routes + add catch-all redirect to SFRA
-        const hybridRoutes = [
-            ...routes.filter((route) => pwaKitRoutes.includes(route.path)),
-            {
-                path: '*',
-                component: withRouter((props) => {
-                    const {location} = props
-                    const urlParams = new URLSearchParams(location.search)
-                    const {site} = useMultiSite()
-                    const siteId = site?.id || config?.app?.defaultSite
-
-                    if (typeof window !== 'undefined') {
-                        useEffect(() => {
-                            if (!urlParams.has('redirected')) {
-                                const newURL = new URL(window.location)
-                                newURL.searchParams.append('redirected', '1')
-                                // Rewrite to SFRA format: /s/{siteId}/{locale}/{rest}
-                                newURL.pathname = `/s/${siteId}/${window.location.pathname
-                                    .split('/')
-                                    .slice(2)
-                                    .join('/')}`
-                                window.location.replace(newURL)
-                            }
-                        }, [window.location.href])
-                    }
-
-                    // If already redirected once and still here, show 404
-                    if (urlParams.has('redirected')) {
-                        return <PageNotFound {...props} />
-                    }
-                    return null
-                })
+        // Client side SPA redirect to SFRA pages.
+        const HybridCatchAll = withRouter((props) => {
+            const {site} = useMultiSite()
+            const siteId = site && site.id ? site.id : config?.app?.defaultSite
+            if (typeof window !== 'undefined') {
+                const parts = window.location.pathname.split('/').filter(Boolean)
+                const locale = parts[1]
+                const rest = parts.slice(2).join('/')
+                const target = `/s/${siteId}/${locale}/${rest}`
+                window.location.replace(target)
             }
+            return null
+        })
+
+        const hybridRoutes = [
+            ...routes.filter((r) => r.path !== '*'),
+            {path: '*', component: HybridCatchAll}
         ]
 
         routesToConfigure = hybridRoutes
     }
 
     return configureRoutes(routesToConfigure, config, {
-        ignoredRoutes: ['/callback', '*']
+        ignoredRoutes: config.hybrid?.enableHybrid ? ['/callback'] : ['/callback', '*']
     })
 }

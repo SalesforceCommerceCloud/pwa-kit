@@ -52,6 +52,29 @@ export function hybridProxy(options) {
         // rewrite Location headers
         autoRewrite: true,
         hostRewrite: true,
+        pathRewrite: (reqPath) => {
+            // Takes care of hard page refreshes and server-side redirects/loads
+            // Skip rewrite for already-SFRA or non-page assets
+            if (/^(?:\/s\/|\/mobify\/|\/on\/|\/waroot|\/worker\.js)/.test(reqPath)) {
+                return reqPath
+            }
+
+            // Match /{siteOrAliasOrId}/{locale}/{rest}
+            const match = reqPath.match(/^\/([^/]+)\/([^/]+)\/(.*)$/)
+            if (!match) return reqPath
+
+            const [, siteSegment, locale, rest] = match
+            if (siteSegment === 's') return reqPath // already SFRA
+
+            const appCfg = options.mobify?.app || {}
+            const aliasMap = appCfg.siteAliases || {}
+            const siteId =
+                Object.keys(aliasMap).find((id) => aliasMap[id] === siteSegment) ||
+                appCfg.defaultSite ||
+                siteSegment
+
+            return `/s/${siteId}/${locale}/${rest}`
+        },
         cookieDomainRewrite: true,
         selfHandleResponse: true,
         onProxyRes: (proxyRes, req, res) => {
@@ -129,6 +152,10 @@ export function hybridProxy(options) {
         // So the traffic we proxy to SFCC will be the opposite
         return !match
     }, PROXY_OPTIONS)
+}
+
+export function shouldProxyRequest(rules, reqFields) {
+    return !rules.some((rule) => evaluateRule(rule, reqFields))
 }
 
 const isString = (element) => {
