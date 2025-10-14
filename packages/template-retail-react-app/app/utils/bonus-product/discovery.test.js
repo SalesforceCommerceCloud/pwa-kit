@@ -159,4 +159,224 @@ describe('Bonus Product Discovery', () => {
             expect(result).toEqual([])
         })
     })
+
+    describe('Rule-Based Promotions Support', () => {
+        const mockRuleBasedBasket = {
+            bonusDiscountLineItems: [
+                {
+                    id: 'rule-based-123',
+                    promotionId: 'rule-based-promo',
+                    maxBonusItems: 3,
+                    bonusProducts: [] // Empty array indicates rule-based
+                }
+            ],
+            productItems: [
+                {
+                    productId: 'prod-456',
+                    priceAdjustments: [{promotionId: 'rule-based-promo', price: -15}]
+                }
+            ]
+        }
+
+        const mockProductsForRuleBased = {
+            'prod-456': {
+                id: 'prod-456',
+                productPromotions: [
+                    {
+                        promotionId: 'rule-based-promo',
+                        calloutMsg: 'Get choice of bonus from Electronics category!'
+                    }
+                ]
+            }
+        }
+
+        const mockRuleBasedProductsMap = {
+            'rule-based-promo': [
+                {productId: 'rule-product-1', productName: 'Rule Product 1'},
+                {productId: 'rule-product-2', productName: 'Rule Product 2'},
+                {productId: 'rule-product-3', productName: 'Rule Product 3'}
+            ]
+        }
+
+        describe('getAvailableBonusItemsForProduct with rule-based products', () => {
+            test('returns rule-based products from ruleBasedProductsMap', () => {
+                const result = discoveryUtils.getAvailableBonusItemsForProduct(
+                    mockRuleBasedBasket,
+                    'prod-456',
+                    mockProductsForRuleBased,
+                    mockRuleBasedProductsMap
+                )
+
+                expect(result).toHaveLength(3)
+                expect(result[0]).toEqual({
+                    productId: 'rule-product-1',
+                    productName: 'Rule Product 1',
+                    promotionId: 'rule-based-promo',
+                    discountLineItemId: 'rule-based-123'
+                })
+                expect(result[1].productId).toBe('rule-product-2')
+                expect(result[2].productId).toBe('rule-product-3')
+            })
+
+            test('returns empty array when ruleBasedProductsMap is not provided', () => {
+                const result = discoveryUtils.getAvailableBonusItemsForProduct(
+                    mockRuleBasedBasket,
+                    'prod-456',
+                    mockProductsForRuleBased
+                    // No ruleBasedProductsMap provided
+                )
+
+                expect(result).toEqual([])
+            })
+
+            test('handles mixed list-based and rule-based promotions', () => {
+                const mixedBasket = {
+                    bonusDiscountLineItems: [
+                        {
+                            id: 'list-based-123',
+                            promotionId: 'list-based-promo',
+                            maxBonusItems: 1,
+                            bonusProducts: [{productId: 'list-product-1'}]
+                        },
+                        {
+                            id: 'rule-based-456',
+                            promotionId: 'rule-based-promo',
+                            maxBonusItems: 2,
+                            bonusProducts: [] // Rule-based
+                        }
+                    ],
+                    productItems: []
+                }
+
+                const mixedProducts = {
+                    'prod-789': {
+                        id: 'prod-789',
+                        productPromotions: [
+                            {promotionId: 'list-based-promo'},
+                            {promotionId: 'rule-based-promo'}
+                        ]
+                    }
+                }
+
+                const result = discoveryUtils.getAvailableBonusItemsForProduct(
+                    mixedBasket,
+                    'prod-789',
+                    mixedProducts,
+                    mockRuleBasedProductsMap
+                )
+
+                expect(result).toHaveLength(4) // 1 list-based + 3 rule-based
+                expect(result[0].productId).toBe('list-product-1')
+                expect(result[1].productId).toBe('rule-product-1')
+                expect(result[2].productId).toBe('rule-product-2')
+                expect(result[3].productId).toBe('rule-product-3')
+            })
+        })
+
+        describe('getRemainingAvailableBonusProductsForProduct with rule-based products', () => {
+            test('calculates remaining count for rule-based products', () => {
+                const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
+                    mockRuleBasedBasket,
+                    'prod-456',
+                    mockProductsForRuleBased,
+                    mockRuleBasedProductsMap
+                )
+
+                expect(result.bonusItems).toHaveLength(3)
+                expect(result.aggregatedMaxBonusItems).toBe(3)
+                expect(result.aggregatedSelectedItems).toBe(0)
+                expect(result.hasRemainingCapacity).toBe(true)
+                expect(result.bonusItems[0].remainingBonusItemsCount).toBe(3)
+            })
+
+            test('filters out rule-based products when capacity is full', () => {
+                const basketWithBonusItems = {
+                    ...mockRuleBasedBasket,
+                    productItems: [
+                        ...mockRuleBasedBasket.productItems,
+                        {
+                            productId: 'rule-product-1',
+                            bonusProductLineItem: true,
+                            bonusDiscountLineItemId: 'rule-based-123',
+                            quantity: 3 // Fill the capacity
+                        }
+                    ]
+                }
+
+                const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
+                    basketWithBonusItems,
+                    'prod-456',
+                    mockProductsForRuleBased,
+                    mockRuleBasedProductsMap
+                )
+
+                expect(result.bonusItems).toEqual([])
+                expect(result.aggregatedMaxBonusItems).toBe(3)
+                expect(result.aggregatedSelectedItems).toBe(3)
+                expect(result.hasRemainingCapacity).toBe(false)
+            })
+
+            test('handles mixed promotions with different remaining counts', () => {
+                const mixedBasket = {
+                    bonusDiscountLineItems: [
+                        {
+                            id: 'list-based-123',
+                            promotionId: 'list-based-promo',
+                            maxBonusItems: 2,
+                            bonusProducts: [{productId: 'list-product-1'}]
+                        },
+                        {
+                            id: 'rule-based-456',
+                            promotionId: 'rule-based-promo',
+                            maxBonusItems: 3,
+                            bonusProducts: []
+                        }
+                    ],
+                    productItems: [
+                        {
+                            productId: 'list-product-1',
+                            bonusProductLineItem: true,
+                            bonusDiscountLineItemId: 'list-based-123',
+                            quantity: 1 // 1 of 2 used
+                        }
+                    ]
+                }
+
+                const mixedProducts = {
+                    'prod-789': {
+                        id: 'prod-789',
+                        productPromotions: [
+                            {promotionId: 'list-based-promo'},
+                            {promotionId: 'rule-based-promo'}
+                        ]
+                    }
+                }
+
+                const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
+                    mixedBasket,
+                    'prod-789',
+                    mixedProducts,
+                    mockRuleBasedProductsMap
+                )
+
+                // List-based has 1 remaining, rule-based has 3 remaining
+                expect(result.bonusItems).toHaveLength(4)
+                expect(result.aggregatedMaxBonusItems).toBe(5)
+                expect(result.aggregatedSelectedItems).toBe(1)
+                expect(result.hasRemainingCapacity).toBe(true)
+
+                // Check that list-based product has remainingCount of 1
+                const listBasedItem = result.bonusItems.find(
+                    (item) => item.productId === 'list-product-1'
+                )
+                expect(listBasedItem.remainingBonusItemsCount).toBe(1)
+
+                // Check that rule-based products have remainingCount of 3
+                const ruleBasedItem = result.bonusItems.find(
+                    (item) => item.productId === 'rule-product-1'
+                )
+                expect(ruleBasedItem.remainingBonusItemsCount).toBe(3)
+            })
+        })
+    })
 })
