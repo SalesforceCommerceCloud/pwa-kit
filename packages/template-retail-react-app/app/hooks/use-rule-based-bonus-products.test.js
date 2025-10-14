@@ -55,7 +55,7 @@ describe('useRuleBasedBonusProducts', () => {
         jest.clearAllMocks()
     })
 
-    test('🔍 fetches products successfully using useProductSearch', async () => {
+    test('fetches products successfully using useProductSearch', async () => {
         const mockData = {
             hits: [
                 {productId: 'product-1', productName: 'Bonus Product 1'},
@@ -187,7 +187,7 @@ describe('useRuleBasedBonusProducts', () => {
         })
     })
 
-    test('⏳ shows loading state', async () => {
+    test('shows loading state', async () => {
         useProductSearch.mockReturnValue({
             data: null,
             isLoading: true,
@@ -241,6 +241,87 @@ describe('useRuleBasedBonusProducts', () => {
                     promotionId: 'test-promotion-id',
                     limit: 25, // Default value
                     offset: 0 // Default value
+                }
+            },
+            {
+                enabled: true
+            }
+        )
+    })
+
+    test('handles multiple rule-based promotions for same product', async () => {
+        const mockDataPromo1 = {
+            hits: [
+                {productId: 'promo1-product-1', productName: 'Promo 1 Product 1'},
+                {productId: 'promo1-product-2', productName: 'Promo 1 Product 2'}
+            ],
+            total: 2
+        }
+
+        const mockDataPromo2 = {
+            hits: [
+                {productId: 'promo2-product-1', productName: 'Promo 2 Product 1'},
+                {productId: 'promo2-product-2', productName: 'Promo 2 Product 2'},
+                {productId: 'promo2-product-3', productName: 'Promo 2 Product 3'}
+            ],
+            total: 3
+        }
+
+        // First call with promotion-1
+        useProductSearch.mockReturnValueOnce({
+            data: mockDataPromo1,
+            isLoading: false,
+            error: null
+        })
+
+        const {rerender} = renderWithProviders(<MockComponent promotionId="promotion-1" />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('products-count')).toHaveTextContent('2')
+            expect(screen.getByTestId('products-total')).toHaveTextContent('2')
+            expect(screen.getByTestId('promo1-product-1')).toBeInTheDocument()
+            expect(screen.getByTestId('promo1-product-2')).toBeInTheDocument()
+        })
+
+        // Second call with promotion-2
+        useProductSearch.mockReturnValueOnce({
+            data: mockDataPromo2,
+            isLoading: false,
+            error: null
+        })
+
+        rerender(<MockComponent promotionId="promotion-2" />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('products-count')).toHaveTextContent('3')
+            expect(screen.getByTestId('products-total')).toHaveTextContent('3')
+            expect(screen.getByTestId('promo2-product-1')).toBeInTheDocument()
+            expect(screen.getByTestId('promo2-product-2')).toBeInTheDocument()
+            expect(screen.getByTestId('promo2-product-3')).toBeInTheDocument()
+        })
+
+        // Verify hook was called with correct promotionIds
+        expect(useProductSearch).toHaveBeenNthCalledWith(
+            1,
+            {
+                parameters: {
+                    promotionId: 'promotion-1',
+                    limit: 25,
+                    offset: 0
+                }
+            },
+            {
+                enabled: true
+            }
+        )
+
+        expect(useProductSearch).toHaveBeenNthCalledWith(
+            2,
+            {
+                parameters: {
+                    promotionId: 'promotion-2',
+                    limit: 25,
+                    offset: 0
                 }
             },
             {

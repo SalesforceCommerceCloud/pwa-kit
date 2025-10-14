@@ -1,3 +1,6 @@
+## v8.3.0
+- Add support for Rule Based Promotions for Choice of Bonus Products.
+
 ## v8.2.0-dev (Sep 26, 2025)
 - [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
 ## v8.1.0 (Sep 25, 2025)
