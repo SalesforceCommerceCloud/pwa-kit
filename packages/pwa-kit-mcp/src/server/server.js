@@ -16,7 +16,8 @@ import {
     CreateNewPageTool,
     InstallAgentRulesTool,
     ExploreCommerceAPITool,
-    HooksRecommendationTool
+    HooksRecommendationTool,
+    CustomApiTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
@@ -128,6 +129,12 @@ class PwaStorefrontMCPServerHighLevel {
             this.hooksRecommendationTool.inputSchema,
             this.hooksRecommendationTool.handler
         )
+        this.server.tool(
+            CustomApiTool.name,
+            CustomApiTool.description,
+            CustomApiTool.inputSchema,
+            CustomApiTool.fn
+        )
     }
 
     async run() {
@@ -142,6 +149,13 @@ class PwaStorefrontMCPServerHighLevel {
         }
 
         const noTelemetry = !!readFlag('no-telemetry', false)
+
+        // Store dw.json path globally so tools can access it
+        const dwJsonPath = readFlag('dw-json', null)
+        if (dwJsonPath) {
+            global.DW_JSON_PATH = dwJsonPath
+        }
+
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
         // when telemetry is enabled, then send telemetry events

@@ -12,7 +12,10 @@ import {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement
+    generateComponentImportStatement,
+    loadConfig,
+    getOAuthToken,
+    callCustomApiDxEndpoint
 } from './utils'
 import fs from 'fs'
 import path from 'path'
@@ -323,6 +326,393 @@ describe('logMCPMessage', () => {
             exists = false
         }
         expect(exists).toBe(false)
+    })
+})
+
+describe('loadConfig', () => {
+    const originalEnv = {
+        SFCC_HOSTNAME: process.env.SFCC_HOSTNAME,
+        SFCC_INSTANCE_ID: process.env.SFCC_INSTANCE_ID,
+        SFCC_CLIENT_ID: process.env.SFCC_CLIENT_ID,
+        SFCC_CLIENT_SECRET: process.env.SFCC_CLIENT_SECRET,
+        SFCC_ORG_ID: process.env.SFCC_ORG_ID,
+        SFCC_SHORT_CODE: process.env.SFCC_SHORT_CODE,
+        PWA_STOREFRONT_APP_PATH: process.env.PWA_STOREFRONT_APP_PATH
+    }
+    const originalGlobal = global.DW_JSON_PATH
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        // Reset environment variables
+        Object.keys(originalEnv).forEach((key) => {
+            delete process.env[key]
+        })
+        delete global.DW_JSON_PATH
+        // Mock process.cwd to return a predictable path
+        jest.spyOn(process, 'cwd').mockReturnValue('/mock/current/directory')
+    })
+
+    afterEach(() => {
+        // Restore environment variables
+        Object.entries(originalEnv).forEach(([key, value]) => {
+            if (value !== undefined) {
+                process.env[key] = value
+            } else {
+                delete process.env[key]
+            }
+        })
+        global.DW_JSON_PATH = originalGlobal
+        jest.restoreAllMocks()
+    })
+
+    describe('when dw.json file exists', () => {
+        const mockDwConfig = {
+            hostname: 'https://test.dx.commercecloud.salesforce.com',
+            'instance-id': 'test_instance',
+            'client-id': 'test-client-id',
+            'client-secret': 'test-client-secret',
+            'org-id': 'test_org_id',
+            'short-code': 'test123'
+        }
+
+        it('loads configuration from dw.json file when file exists in current directory', () => {
+            const expectedPath = path.join('/mock/current/directory', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+            expect(fs.readFileSync).toHaveBeenCalledWith(expectedPath, 'utf-8')
+            expect(result).toEqual({
+                hostname: 'https://test.dx.commercecloud.salesforce.com',
+                instanceId: 'test_instance',
+                clientId: 'test-client-id',
+                clientSecret: 'test-client-secret',
+                organizationId: 'test_org_id',
+                shortCode: 'test123'
+            })
+        })
+
+        it('loads configuration from PWA_STOREFRONT_APP_PATH when available', () => {
+            process.env.PWA_STOREFRONT_APP_PATH = '/mock/storefront/path'
+            const expectedPath = path.join('/mock/storefront/path', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+            expect(fs.readFileSync).toHaveBeenCalledWith(expectedPath, 'utf-8')
+            expect(result).toEqual({
+                hostname: 'https://test.dx.commercecloud.salesforce.com',
+                instanceId: 'test_instance',
+                clientId: 'test-client-id',
+                clientSecret: 'test-client-secret',
+                organizationId: 'test_org_id',
+                shortCode: 'test123'
+            })
+        })
+
+        it('loads configuration from global DW_JSON_PATH when available', () => {
+            global.DW_JSON_PATH = '/mock/global/dw.json'
+            jest.spyOn(fs, 'existsSync').mockImplementation((path) => {
+                return path === '/mock/global/dw.json'
+            })
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            expect(fs.existsSync).toHaveBeenCalledWith('/mock/global/dw.json')
+            expect(fs.readFileSync).toHaveBeenCalledWith('/mock/global/dw.json', 'utf-8')
+            expect(result).toEqual({
+                hostname: 'https://test.dx.commercecloud.salesforce.com',
+                instanceId: 'test_instance',
+                clientId: 'test-client-id',
+                clientSecret: 'test-client-secret',
+                organizationId: 'test_org_id',
+                shortCode: 'test123'
+            })
+        })
+
+        it('handles malformed JSON gracefully', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue('invalid json')
+            jest.spyOn(console, 'error').mockImplementation()
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: undefined,
+                instanceId: null,
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: null,
+                shortCode: undefined
+            })
+        })
+
+        it('prefers environment variables over dw.json values', () => {
+            // Set environment variables
+            process.env.SFCC_HOSTNAME = 'env-hostname'
+            process.env.SFCC_INSTANCE_ID = 'env-instance'
+            process.env.SFCC_CLIENT_ID = 'env-client-id'
+            process.env.SFCC_CLIENT_SECRET = 'env-client-secret'
+            process.env.SFCC_ORG_ID = 'env-org-id'
+            process.env.SFCC_SHORT_CODE = 'env-short-code'
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockDwConfig))
+
+            const result = loadConfig()
+
+            // Should use environment values, not dw.json values
+            expect(result.hostname).toBe('env-hostname')
+            expect(result.instanceId).toBe('env-instance')
+            expect(result.clientId).toBe('env-client-id')
+            expect(result.clientSecret).toBe('env-client-secret')
+            expect(result.organizationId).toBe('env-org-id')
+            expect(result.shortCode).toBe('env-short-code')
+        })
+    })
+
+    describe('when dw.json file does not exist', () => {
+        it('falls back to environment variables', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            process.env.SFCC_HOSTNAME = 'env-hostname'
+            process.env.SFCC_INSTANCE_ID = 'env-instance'
+            process.env.SFCC_CLIENT_ID = 'env-client-id'
+            process.env.SFCC_CLIENT_SECRET = 'env-client-secret'
+            process.env.SFCC_ORG_ID = 'env-org-id'
+            process.env.SFCC_SHORT_CODE = 'env-short-code'
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'env-hostname',
+                instanceId: 'env-instance',
+                clientId: 'env-client-id',
+                clientSecret: 'env-client-secret',
+                organizationId: 'env-org-id',
+                shortCode: 'env-short-code'
+            })
+        })
+
+        it('returns undefined values when no environment variables are set', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: undefined,
+                instanceId: null,
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: null,
+                shortCode: undefined
+            })
+        })
+    })
+
+    describe('mixed configuration scenarios', () => {
+        it('handles partial dw.json with missing environment variables', () => {
+            const partialDwConfig = {
+                hostname: 'https://partial.dx.commercecloud.salesforce.com',
+                'instance-id': 'partial_instance'
+                // Missing other fields
+            }
+
+            process.env.SFCC_CLIENT_ID = 'env-client-id'
+            process.env.SFCC_CLIENT_SECRET = 'env-client-secret'
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(partialDwConfig))
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://partial.dx.commercecloud.salesforce.com',
+                instanceId: 'partial_instance',
+                clientId: 'env-client-id',
+                clientSecret: 'env-client-secret',
+                organizationId: 'f_ecom_partial',
+                shortCode: undefined
+            })
+        })
+    })
+
+    describe('hostname derivation', () => {
+        it('derives instanceId and organizationId from hostname when not provided', () => {
+            process.env.SFCC_HOSTNAME = 'https://zzrf-001.dx.commercecloud.salesforce.com'
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                instanceId: 'zzrf_001',
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: undefined
+            })
+        })
+
+        it('derives instanceId and organizationId from dw.json hostname when not provided', () => {
+            const dwConfig = {
+                hostname: 'https://test-123.dx.commercecloud.salesforce.com'
+            }
+
+            jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(dwConfig))
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://test-123.dx.commercecloud.salesforce.com',
+                instanceId: 'test_123',
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: 'f_ecom_test_123',
+                shortCode: undefined
+            })
+        })
+
+        it('does not derive values from invalid hostname format', () => {
+            process.env.SFCC_HOSTNAME = 'https://invalid-hostname.com'
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://invalid-hostname.com',
+                instanceId: null,
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: null,
+                shortCode: undefined
+            })
+        })
+
+        it('prefers explicit values over derived values', () => {
+            process.env.SFCC_HOSTNAME = 'https://zzrf-001.dx.commercecloud.salesforce.com'
+            process.env.SFCC_INSTANCE_ID = 'explicit-instance'
+            process.env.SFCC_ORG_ID = 'explicit-org'
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = loadConfig()
+
+            expect(result).toEqual({
+                hostname: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                instanceId: 'explicit-instance',
+                clientId: undefined,
+                clientSecret: undefined,
+                organizationId: 'explicit-org',
+                shortCode: undefined
+            })
+        })
+    })
+})
+
+describe('getOAuthToken', () => {
+    const originalFetch = global.fetch
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        global.fetch = jest.fn()
+    })
+
+    afterEach(() => {
+        global.fetch = originalFetch
+    })
+
+    it('should successfully obtain OAuth token', async () => {
+        const mockTokenResponse = {
+            access_token: 'mock_access_token',
+            token_type: 'Bearer',
+            expires_in: 3600
+        }
+
+        const mockResponse = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockTokenResponse)
+        }
+
+        global.fetch.mockResolvedValueOnce(mockResponse)
+
+        const result = await getOAuthToken('test_client_id', 'test_client_secret', 'test_scope')
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://account.demandware.com/dwsso/oauth2/access_token',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization:
+                        'Basic ' +
+                        Buffer.from('test_client_id:test_client_secret').toString('base64')
+                },
+                body: 'grant_type=client_credentials&scope=test_scope'
+            }
+        )
+        expect(result).toEqual(mockResponse)
+    })
+})
+
+describe('callCustomApiDxEndpoint', () => {
+    const originalFetch = global.fetch
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        global.fetch = jest.fn()
+    })
+
+    afterEach(() => {
+        global.fetch = originalFetch
+    })
+
+    it('should successfully call custom API DX endpoint', async () => {
+        const mockApiResponse = {
+            endpoints: [
+                {
+                    id: 'endpoint1',
+                    name: 'Test Endpoint',
+                    url: '/api/test'
+                }
+            ]
+        }
+
+        const mockResponse = {
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(mockApiResponse)
+        }
+
+        global.fetch.mockResolvedValueOnce(mockResponse)
+
+        const result = await callCustomApiDxEndpoint(
+            'mock_access_token',
+            'test.dx.commercecloud.salesforce.com',
+            'test_org_id'
+        )
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            'https://test.dx.commercecloud.salesforce.com/dx/custom-apis/v1/organizations/test_org_id/endpoints',
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer mock_access_token',
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+        expect(result).toEqual(mockResponse)
     })
 })
 
