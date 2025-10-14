@@ -86,6 +86,10 @@ module.exports = {
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    hybrid: {
+        // default value is false
+        enableHybrid: false
+    },
     ssrShared: [
         'static/ico/favicon.ico',
         'static/robots.txt',
@@ -104,6 +108,11 @@ module.exports = {
                 host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
+            // in case of hybrid proxy, need to add the dwrestatic path. Example:
+            // {
+            //     host: '<shortCode>.dx.commercecloud.salesforce.com',
+            //     path: 'dwrestatic'
+            // }
         ]
     }
 }

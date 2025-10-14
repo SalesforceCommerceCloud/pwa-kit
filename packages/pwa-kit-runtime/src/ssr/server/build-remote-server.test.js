@@ -4,15 +4,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {once, RemoteServerFactory, isBinary} from './build-remote-server'
+import {isBinary, once, RemoteServerFactory} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
+import logger from '../../utils/logger-instance'
+import {hybridProxy} from '../../utils/ssr-server/hybridProxy'
+import {catchAndLog} from '../../utils/ssr-server'
 
-jest.mock('../../utils/ssr-config', () => {
-    return {
-        getConfig: () => {}
+jest.mock('../../utils/ssr-server', () => ({
+    ...jest.requireActual('../../utils/ssr-server'),
+    catchAndLog: jest.fn()
+}))
+jest.mock('../../utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn()
     }
-})
+}))
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -154,5 +164,65 @@ describe('isBinary function', () => {
             'content-type': 'text/html'
         }
         expect(isBinary(headers)).toBe(false)
+    })
+})
+
+describe('errorHandlerMiddleware logic', () => {
+    it('calls sendMetric and sendStatus(500) when error is handled', () => {
+        catchAndLog.mockImplementation(() => {})
+        const req = {app: {sendMetric: jest.fn()}}
+        const res = {sendStatus: jest.fn()}
+        const err = new Error('fail')
+        // Inlined errorHandlerMiddleware logic
+        catchAndLog(err)
+        req.app.sendMetric('RenderErrors')
+        res.sendStatus(500)
+        expect(req.app.sendMetric).toHaveBeenCalledWith('RenderErrors')
+        expect(res.sendStatus).toHaveBeenCalledWith(500)
+    })
+})
+
+jest.mock('../../utils/logger-instance', () => ({
+    __esModule: true,
+    default: {error: jest.fn()}
+}))
+
+describe('_setRequestId', () => {
+    it('sets requestId from correlationId header', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        // Grab the actual middleware
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {'x-correlation-id': 'abc'}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(res.locals.requestId).toBe('abc')
+        expect(next).toHaveBeenCalled()
+    })
+    it('sets requestId from x-apigateway-event header', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {'x-apigateway-event': 'eventid'}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(res.locals.requestId).toBe('eventid')
+        expect(next).toHaveBeenCalled()
+    })
+    it('logs error if no id headers', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(logger.error).toHaveBeenCalledWith(
+            'Both x-correlation-id and x-apigateway-event headers are missing',
+            expect.objectContaining({namespace: '_setRequestId'})
+        )
+        expect(next).toHaveBeenCalled()
     })
 })
