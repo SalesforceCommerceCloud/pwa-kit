@@ -170,9 +170,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onOtpModalClose()
     }
 
-    // Handle "Login with OTP" button click
-    const handleLoginWithOtp = async () => {
-        console.log('🔵 Login with OTP button clicked') // Debug
+    // Handle "Sign in" button click
+    const handleSignIn = async () => {
+        console.log('🔵 Sign in button clicked') // Debug
         
         const email = form.getValues('email')
         console.log('📧 Email value:', email) // Debug
@@ -215,46 +215,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
-    // Handle "Continue as Guest" button click (main page)
-    const handleContinueAsGuest = async () => {
-        console.log('👤 Main "Continue as Guest" clicked - will allow registration during checkout') // Debug
-        
-        const email = form.getValues('email')
-        
-        // Validate email before proceeding
-        if (!email) {
-            setEmailError('Please enter your email address.')
-            // Focus email field for better UX
-            if (emailRef.current) {
-                emailRef.current.focus()
-            }
-            return
-        }
-
-        if (!isValidEmail(email)) {
-            setEmailError('Please enter a valid email address.')
-            // Focus email field for better UX
-            if (emailRef.current) {
-                emailRef.current.focus()
-            }
-            return
-        }
-
-        // Clear any previous errors
-        form.clearErrors('global')
-        setEmailError('')
-        
-        // Set flag to allow account registration during checkout
-        setAllowAccountRegistration(true)
-        console.log('✅ Main "Continue as Guest" - allowAccountRegistration set to TRUE') // Debug
-        
-        // Proceed directly as guest without OTP
-        try {
-            await proceedAsGuestWithRegistrationFlag(email, true)
-        } catch (error) {
-            setError(error.message)
-        }
-    }
 
     // Handle OTP send/resend using direct SLAS (uniform UI behavior)
     const handleSendEmailOtp = async (email) => {
@@ -315,12 +275,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle checkout as guest from OTP modal
     const handleCheckoutAsGuest = async () => {
-        console.log('🚫 OTP Modal "Continue as Guest" clicked - will NOT allow registration during checkout') // Debug
+        console.log('🚫 OTP Modal "Continue as Guest" clicked - user explicitly declined sign in, no registration option') // Debug
         
         const email = form.getValues('email')
         
         // Set flag to prevent account registration during checkout
-        // User already declined to use their account via OTP
+        // User explicitly declined to sign in, so they don't want an account
         setAllowAccountRegistration(false)
         console.log('🚫 OTP Modal "Continue as Guest" - allowAccountRegistration set to FALSE') // Debug
         
@@ -371,10 +331,40 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
-    // Prevent default form submission - we use explicit buttons instead
-    const submitForm = (e) => {
+    // Handle form submission - user proceeds as guest with registration option
+    const submitForm = async (e) => {
         e.preventDefault()
-        // No automatic submission - user must choose "Login with OTP" or "Continue as Guest"
+        console.log('📝 Form submitted - proceeding as guest with registration option') // Debug
+        
+        const email = form.getValues('email')
+        
+        // Validate email before proceeding
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
+            return
+        }
+
+        // Clear any previous errors
+        form.clearErrors('global')
+        setEmailError('')
+        
+        // User proceeds as guest with registration option (default behavior)
+        try {
+            await proceedAsGuestWithRegistrationFlag(email, true)
+        } catch (error) {
+            setError(error.message)
+        }
     }
 
     return (
@@ -445,27 +435,26 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         idps={idps}
                                     />
                                     
-                                    {/* Always show both buttons - better UX with immediate choice visibility */}
+                                    {/* Show action buttons */}
                                     {step === STEPS.CONTACT_INFO && (
                                         <Stack spacing={3}>
                                             <Button 
-                                                type="button"
+                                                type="submit"
                                                 colorScheme="blue" 
-                                                onClick={handleLoginWithOtp}
                                                 size="lg"
                                                 width="full"
                                             >
-                                                Login with OTP
+                                                Continue
                                             </Button>
                                             
                                             <Button 
                                                 type="button"
-                                                variant="outline" 
-                                                onClick={handleContinueAsGuest}
+                                                variant="outline"
+                                                onClick={handleSignIn}
                                                 size="lg"
                                                 width="full"
                                             >
-                                                Continue as Guest
+                                                Sign in
                                             </Button>
                                         </Stack>
                                     )}

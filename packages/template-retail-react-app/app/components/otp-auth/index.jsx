@@ -245,10 +245,7 @@ const OtpAuth = ({
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
                         <Text fontSize="md" maxWidth="350px" textAlign="center">
                             {zeroEnumerationMode ? (
-                                <FormattedMessage
-                                    defaultMessage="We've sent a verification code to your email. Enter it below to continue, or proceed as a guest."
-                                    id="otp.message.zero_enumeration_mode"
-                                />
+                                "If your email is registered with us, you'll receive a verification code shortly. Enter it below to continue, or proceed as a guest."
                             ) : (
                                 <>
                                     {/* Legacy uniform message */}
@@ -344,10 +341,7 @@ const OtpAuth = ({
                                     bg: 'gray.200'
                                 }}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Continue as guest"
-                                    id="otp.button.continue_as_guest"
-                                />
+                                Continue as Guest
                             </Button>
 
                             {/* Resend button - Fully functional for ALL users (uniform UI) */}

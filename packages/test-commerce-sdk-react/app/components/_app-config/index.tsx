@@ -28,14 +28,15 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     return (
         <CommerceApiProvider
             siteId={siteId}
-            shortCode="kv7kzm78"
-            clientId="4afbc51f-6423-41c8-8b29-d7f2825b5bee"
-            organizationId="f_ecom_zzrf_006"
-            redirectURI="http://localhost:3000/callback"
-            proxy={`http://localhost:3000/${String(proxyBasePath)}/api`}
+            shortCode="sandbox-001"
+            clientId="bd565e90-73aa-4700-8e6e-c524379a971c"
+            organizationId="f_ecom_bhbg_stg"
+            redirectURI="http://localhost:3001/callback"
+            proxy={`http://localhost:3001/${String(proxyBasePath)}/api`}
             locale={locale}
             currency="USD"
             headers={headers}
+            enablePWAKitPrivateClient={true}
         >
             {props.children}
             <div

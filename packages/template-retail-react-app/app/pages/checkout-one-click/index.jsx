@@ -65,6 +65,7 @@ const CheckoutOneClick = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [allowAccountRegistration, setAllowAccountRegistration] = useState(true)
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
 
     const currentBasketQuery = useCurrentBasket()
@@ -165,7 +166,9 @@ const CheckoutOneClick = () => {
     // Reset guest checkout flag when step changes (user goes back to edit)
     useEffect(() => {
         if (step === 0) {
+            console.log('🔄 User went back to edit contact info - resetting registration state') // Debug
             setRegisteredUserChoseGuest(false)
+            setAllowAccountRegistration(true) // Reset to allow registration by default
         }
     }, [step])
 
@@ -411,13 +414,21 @@ const CheckoutOneClick = () => {
                             <ContactInfo
                                 isSocialEnabled={isSocialEnabled}
                                 idps={idps}
-                                onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
+                                onRegisteredUserChoseGuest={(isGuest, allowRegistration) => {
+                                    console.log('📥 Main checkout received callback:', {
+                                        isGuest,
+                                        allowRegistration
+                                    }) // Debug
+                                    setRegisteredUserChoseGuest(isGuest)
+                                    setAllowAccountRegistration(allowRegistration)
+                                }}
                             />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
+                                allowAccountRegistration={allowAccountRegistration}
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}
