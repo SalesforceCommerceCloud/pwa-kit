@@ -66,17 +66,18 @@ export const useDerivedProduct = (
     // Product details for selected store
     const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
-    const selectedStoreLowestStockLevelProductName = selectedStoreInventory?.lowestStockLevelProductName
+    const selectedStoreLowestStockLevelProductName =
+        selectedStoreInventory?.lowestStockLevelProductName
     // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
     // so we don't need to check for variation attributes
-    const isSelectedStoreOutOfStock =
-        !selectedStoreStockLevel ||
-        !selectedStoreInventory?.orderable
+    const isSelectedStoreOutOfStock = !selectedStoreStockLevel || !selectedStoreInventory?.orderable
     const selectedStoreUnfulfillable = selectedStoreStockLevel < quantity
 
     // Use appropriate inventory based on pickup/delivery selection
     const currentStockLevel = pickupInStore ? selectedStoreStockLevel : stockLevel
-    const currentLowestStockLevelProductName = pickupInStore ? selectedStoreLowestStockLevelProductName : lowestStockLevelProductName
+    const currentLowestStockLevelProductName = pickupInStore
+        ? selectedStoreLowestStockLevelProductName
+        : lowestStockLevelProductName
     const currentIsOutOfStock = pickupInStore ? isSelectedStoreOutOfStock : isOutOfStock
     const currentUnfulfillable = pickupInStore ? selectedStoreUnfulfillable : unfulfillable
 
@@ -104,7 +105,8 @@ export const useDerivedProduct = (
 
     // showInventoryMessage controls if add to cart button is disabled
     const showInventoryMessage =
-        (variant || isProductABundle || isStandardProduct) && (currentIsOutOfStock || currentUnfulfillable)
+        (variant || isProductABundle || isStandardProduct) &&
+        (currentIsOutOfStock || currentUnfulfillable)
     const inventoryMessage =
         (currentIsOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (currentUnfulfillable && inventoryMessages[UNFULFILLABLE])
