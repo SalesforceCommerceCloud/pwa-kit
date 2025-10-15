@@ -108,11 +108,6 @@ module.exports = {
                 host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
-            // in case of hybrid proxy, need to add the dwrestatic path. Example:
-            // {
-            //     host: '<shortCode>.dx.commercecloud.salesforce.com',
-            //     path: 'dwrestatic'
-            // }
         ]
     }
 }
