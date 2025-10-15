@@ -1237,6 +1237,12 @@
       "value": "Could not remove the applied payment. Please try again or use the current payment to place your order."
     }
   ],
+  "checkout_payment.error.cannot_save_payment": [
+    {
+      "type": 0,
+      "value": "Could not save payment method. Please try again."
+    }
+  ],
   "checkout_payment.heading.billing_address": [
     {
       "type": 0,

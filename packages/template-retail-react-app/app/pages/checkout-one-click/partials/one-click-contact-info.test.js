@@ -135,8 +135,9 @@ describe('ContactInfo Component', () => {
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
-        // Focus and then blur without entering email to trigger validation
-        await user.click(emailInput)
+        // Enter email and then clear it to trigger validation
+        await user.type(emailInput, 'test@example.com')
+        await user.clear(emailInput)
         await user.tab()
 
         expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
@@ -157,7 +158,7 @@ describe('ContactInfo Component', () => {
         await user.click(emailInput)
         await user.tab()
 
-        expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
+        expect(screen.getAllByText('Please enter your email address.')).toHaveLength(2)
     })
 
     test('validates email format on form submission', async () => {
@@ -168,9 +169,11 @@ describe('ContactInfo Component', () => {
 
         // Enter invalid email and trigger blur validation
         await user.type(emailInput, 'invalid-email')
-        await user.tab()
+        fireEvent.blur(emailInput)
 
-        expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        })
 
         // Should not show required email error
         expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
@@ -323,6 +326,67 @@ describe('ContactInfo Component', () => {
         expect(
             screen.getByText('To use your account information enter the code sent to your email.')
         ).toBeInTheDocument()
+        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+        expect(screen.getByText('Resend code')).toBeInTheDocument()
+    })
+
+    test('shows error message when updateCustomerForBasket fails', async () => {
+        // Mock OTP API to fail so user becomes guest (not registered)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('User not registered')
+        )
+
+        // Mock updateCustomerForBasket to reject with an error
+        mockUpdateCustomerForBasket.mutateAsync.mockRejectedValue(new Error('API Error'))
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+
+        // Find and click the submit button
+        const submitButton = screen.getByRole('button', {
+            name: /continue to shipping address/i
+        })
+        await user.click(submitButton)
+
+        // Wait for error message to appear
+        await waitFor(() => {
+            expect(screen.getByText('An error occurred. Please try again.')).toBeInTheDocument()
+        })
+    })
+
+    test('does not proceed to next step when OTP modal is already open on form submission', async () => {
+        // Mock successful OTP authorization
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
+            success: true
+        })
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+
+        // First, trigger OTP modal to open via blur event
+        fireEvent.blur(emailInput)
+
+        // Wait for OTP modal to appear
+        await waitFor(() => {
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        })
+
+        // Now try to submit the form while modal is already open
+        // We'll use fireEvent.submit on the form instead of clicking the button
+        const form = emailInput.closest('form')
+        fireEvent.submit(form)
+
+        // Verify that the OTP modal is still open and we haven't proceeded to next step
+        expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        expect(
+            screen.getByText('To use your account information enter the code sent to your email.')
+        ).toBeInTheDocument()
+
+        // The modal should still be visible, indicating we didn't proceed to the next step
         expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
         expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
