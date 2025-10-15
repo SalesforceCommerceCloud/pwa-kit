@@ -19,7 +19,11 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
-import {EXPRESS_BUY_NOW, EXPRESS_PAY_NOW, useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {
+    EXPRESS_BUY_NOW,
+    EXPRESS_PAY_NOW,
+    useSFPayments
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {buildTheme} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
@@ -360,7 +364,7 @@ const SFPaymentsExpressButtons = ({
 
                         // Create SF Payments basket payment instrument before creating order
                         const basketPaymentInstrument = {
-                            bankRoutingNumber: paymentMethodType,    // see W-19626908
+                            bankRoutingNumber: paymentMethodType, // see W-19626908
                             paymentMethodId: 'Salesforce Payments',
                             amount: updatedBasket.orderTotal
                         }
@@ -392,7 +396,7 @@ const SFPaymentsExpressButtons = ({
                         paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
                     },
                     body: {
-                        bankRoutingNumber: paymentMethodType,    // remove after W-19626908
+                        bankRoutingNumber: paymentMethodType, // remove after W-19626908
                         paymentMethodId: 'Salesforce Payments',
                         amount: order.orderTotal
                     }
@@ -486,7 +490,10 @@ const SFPaymentsExpressButtons = ({
             paymentElement.addEventListener('sfppaymentbuttonbeforeapprove', onBeforeApprove)
             paymentElement.addEventListener('sfppaymentbuttonapprove', onApproveEvent)
             paymentElement.addEventListener('sfppaymentbuttonerror', paymentError)
-            paymentElement.addEventListener('sfppaymentmethodsrendered', handlePaymentMethodsRendered)
+            paymentElement.addEventListener(
+                'sfppaymentmethodsrendered',
+                handlePaymentMethodsRendered
+            )
 
             expressComponent.current = sfp.express(
                 metadata,

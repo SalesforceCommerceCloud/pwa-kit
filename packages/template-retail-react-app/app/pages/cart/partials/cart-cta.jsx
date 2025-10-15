@@ -19,7 +19,7 @@ import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-pa
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CartCta = () => {
-    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled;
+    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
 
     return (
         <Fragment>
@@ -28,7 +28,7 @@ const CartCta = () => {
                 to="/checkout"
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
-                mb={sfPaymentsEnabled ? 2: 4}
+                mb={sfPaymentsEnabled ? 2 : 4}
                 rightIcon={<LockIcon />}
                 variant="solid"
             >

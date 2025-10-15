@@ -20,22 +20,18 @@ export const CheckoutProvider = ({children}) => {
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled;
+    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
 
-    const CHECKOUT_STEPS_LIST = sfPaymentsEnabled ? [
-        'CONTACT_INFO',
-        'PICKUP_ADDRESS',
-        'SHIPPING_ADDRESS',
-        'SHIPPING_OPTIONS',
-        'PAYMENT'
-    ] : [
-        'CONTACT_INFO',
-        'PICKUP_ADDRESS',
-        'SHIPPING_ADDRESS',
-        'SHIPPING_OPTIONS',
-        'PAYMENT',
-        'REVIEW_ORDER'
-    ]
+    const CHECKOUT_STEPS_LIST = sfPaymentsEnabled
+        ? ['CONTACT_INFO', 'PICKUP_ADDRESS', 'SHIPPING_ADDRESS', 'SHIPPING_OPTIONS', 'PAYMENT']
+        : [
+              'CONTACT_INFO',
+              'PICKUP_ADDRESS',
+              'SHIPPING_ADDRESS',
+              'SHIPPING_OPTIONS',
+              'PAYMENT',
+              'REVIEW_ORDER'
+          ]
     const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
 
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]

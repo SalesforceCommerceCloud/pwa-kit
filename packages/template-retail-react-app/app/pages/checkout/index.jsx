@@ -156,7 +156,9 @@ const Checkout = () => {
                                     <SFPaymentsExpress
                                         expressButtonLayout="horizontal"
                                         maximumButtonCount={3}
-                                        onPaymentMethodsRendered={() => setExpressPaymentMethodsRendered(true)}
+                                        onPaymentMethodsRendered={() =>
+                                            setExpressPaymentMethodsRendered(true)
+                                        }
                                     />
                                 </Box>
                             )}

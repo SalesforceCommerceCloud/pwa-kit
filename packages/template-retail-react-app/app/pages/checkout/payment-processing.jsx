@@ -31,7 +31,7 @@ const PaymentProcessing = () => {
 
     useEffect(() => {
         if (!isError && sfp) {
-            (async () => {
+            ;(async () => {
                 // If the URL has the necessary parameters, attempt to handle the redirect
                 const result = await sfp.handleRedirect()
                 if (result.responseCode === STATUS_SUCCESS) {
@@ -40,12 +40,11 @@ const PaymentProcessing = () => {
                 } else {
                     // Show an error message that the payment was unsuccessful
                     toast({
-                        title:
-                            intl.formatMessage({
-                                defaultMessage:
-                                    'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
-                                id: 'payment_processing.error.unsuccessful'
-                            }),
+                        title: intl.formatMessage({
+                            defaultMessage:
+                                'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
+                            id: 'payment_processing.error.unsuccessful'
+                        }),
                         status: 'error',
                         duration: 30000
                     })

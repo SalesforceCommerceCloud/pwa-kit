@@ -198,7 +198,7 @@ const ProductView = forwardRef(
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
-        const sfPaymentsEnabled = getConfig().app.sfPayments.enabled;
+        const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -342,10 +342,12 @@ const ProductView = forwardRef(
             }
 
             const prepareBasket = async () => {
-                return addItemToNewOrExistingBasket([{
-                    productId: variant?.productId || product.id,
-                    quantity: quantity
-                }])
+                return addItemToNewOrExistingBasket([
+                    {
+                        productId: variant?.productId || product.id,
+                        quantity: quantity
+                    }
+                ])
             }
 
             // child product of bundles do not have add to cart button
@@ -394,7 +396,13 @@ const ProductView = forwardRef(
                 )
             }
 
-            if (sfPaymentsEnabled && !isProductASet && !isProductPartOfBundle && activeCurrency && priceData.currentPrice) {
+            if (
+                sfPaymentsEnabled &&
+                !isProductASet &&
+                !isProductPartOfBundle &&
+                activeCurrency &&
+                priceData.currentPrice
+            ) {
                 buttons.push(
                     <SFPaymentsExpressButtons
                         key="express-buttons"

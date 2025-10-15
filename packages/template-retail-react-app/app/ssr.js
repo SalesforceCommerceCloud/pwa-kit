@@ -19,7 +19,7 @@
 import crypto from 'crypto'
 import express from 'express'
 import helmet from 'helmet'
-import https from 'https' 
+import https from 'https'
 import {createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
@@ -425,7 +425,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     method: 'GET',
                     rejectUnauthorized: false, // This bypasses SSL verification
                     headers: {
-                        'Accept': 'application/json'
+                        Accept: 'application/json'
                     }
                 }
 
@@ -454,9 +454,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             res.setHeader('Content-Type', 'application/json')
             res.json(transformedData)
         } catch (error) {
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to fetch metadata',
-                details: error.message 
+                details: error.message
             })
         }
     })

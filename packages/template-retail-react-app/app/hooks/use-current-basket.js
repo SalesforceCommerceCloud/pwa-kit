@@ -101,7 +101,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         dataUpdatedAt: basketsDataUpdatedAt,
         isLoading: basketsIsLoading,
         derivedData: {
-            hasBasket: currentBasket || (basketsData?.total > 0),
+            hasBasket: currentBasket || basketsData?.total > 0,
             ...memoizedDerived
         }
     }

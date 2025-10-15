@@ -64,16 +64,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             currency,
             countryCode: basket?.countryCode || countryCode || 'US' // TODO: remove US when parameter made optional
         }
-    });
+    })
 
-    const {data: shopperConfigurations} = useConfigurations();
+    const {data: shopperConfigurations} = useConfigurations()
 
     // Helper function to get configuration value by id
     const getConfigurationValue = (id, defaultValue = null) => {
-        if (!shopperConfigurations?.configurations) return defaultValue;
-        const config = shopperConfigurations.configurations.find(c => c.id === id);
-        return config ? config.value : defaultValue;
-    };
+        if (!shopperConfigurations?.configurations) return defaultValue
+        const config = shopperConfigurations.configurations.find((c) => c.id === id)
+        return config ? config.value : defaultValue
+    }
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -145,7 +145,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         startConfirming(updatedBasket)
 
         // Create SF Payments basket payment instrument before creating order
-        const basketPaymentInstrument = { 
+        const basketPaymentInstrument = {
             paymentMethodId: 'Salesforce Payments',
             amount: updatedBasket.orderTotal
         }
@@ -291,9 +291,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             containerElementRef.current.innerHTML = ''
             const paymentElement = document.createElement('div')
             containerElementRef.current.appendChild(paymentElement)
-            
-            paymentElement.addEventListener('load', handlePaymentMethodSelected);
-            paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected);
+
+            paymentElement.addEventListener('load', handlePaymentMethodSelected)
+            paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected)
 
             checkoutComponent.current = sfp.checkout(
                 metadata,
@@ -309,13 +309,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
-    }, [
-        sfp,
-        metadata,
-        containerElementRef.current,
-        paymentConfig,
-        shopperConfigurations
-    ])
+    }, [sfp, metadata, containerElementRef.current, paymentConfig, shopperConfigurations])
 
     return (
         <ToggleCard
@@ -400,5 +394,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         </ToggleCard>
     )
 })
+
+SFPaymentsSheet.displayName = 'SFPaymentsSheet'
 
 export default SFPaymentsSheet

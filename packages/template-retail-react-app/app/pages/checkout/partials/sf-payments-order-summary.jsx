@@ -88,10 +88,7 @@ const SFPaymentsOrderSummary = ({paymentInstrument}) => {
                         id="checkout_confirmation.heading.credit_card"
                     />
                 ) : paymentInstrument.c_paymentReference_type === 'eps' ? (
-                    <FormattedMessage
-                        defaultMessage="EPS"
-                        id="checkout_confirmation.heading.eps"
-                    />
+                    <FormattedMessage defaultMessage="EPS" id="checkout_confirmation.heading.eps" />
                 ) : paymentInstrument.c_paymentReference_type === 'ideal' ? (
                     <FormattedMessage
                         defaultMessage="iDEAL"

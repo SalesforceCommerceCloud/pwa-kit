@@ -12,7 +12,11 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
 import {EXPRESS_PAY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
-const SFPaymentsExpress = ({expressButtonLayout = 'vertical', maximumButtonCount = undefined, onPaymentMethodsRendered}) => {
+const SFPaymentsExpress = ({
+    expressButtonLayout = 'vertical',
+    maximumButtonCount = undefined,
+    onPaymentMethodsRendered
+}) => {
     const {data: basket} = useCurrentBasket()
 
     const prepareBasket = useCallback(() => basket, [basket?.basketId])

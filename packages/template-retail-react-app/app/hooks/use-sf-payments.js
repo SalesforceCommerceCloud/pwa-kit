@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState, useSyncExternalStore} from 'react'
+import {useEffect, useSyncExternalStore} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
@@ -16,7 +16,7 @@ export const EXPRESS_PAY_NOW = 1
 
 export const STATUS_SUCCESS = 0
 
-const store = {
+export const store = {
     sfp: null,
     confirmingBasket: null
 }
@@ -28,14 +28,17 @@ export const useSFPayments = () => {
     // Add script tag to page if not already present
     const status = useScript(getConfig().app.sfPayments.sdkUrl)
 
-    if (typeof window !== 'undefined') {
-        useEffect(() => {
-            if (status.loaded && !store.sfp && typeof window.SFPayments === 'function') {
-                // Create SFPayments object when script loaded
-                store.sfp = new window.SFPayments()
-            }
-        }, [status.loaded])
-    }
+    useEffect(() => {
+        if (
+            typeof window !== 'undefined' &&
+            status.loaded &&
+            !store.sfp &&
+            typeof window.SFPayments === 'function'
+        ) {
+            // Create SFPayments object when script loaded
+            store.sfp = new window.SFPayments()
+        }
+    }, [status.loaded])
 
     const {data: serverMetadata, isLoading: serverMetadataLoading} = useQuery({
         queryKey: ['payment-metadata'],
@@ -49,19 +52,23 @@ export const useSFPayments = () => {
         staleTime: 10 * 60 * 1000 // 10 minutes
     })
 
-    const subscribe = callback => {
+    const subscribe = (callback) => {
         subscribers.add(callback)
         return () => subscribers.delete(callback)
     }
-    const notify = () => subscribers.forEach(callback => callback())
-    const globals = useSyncExternalStore(subscribe, () => store, () => ({}))
+    const notify = () => subscribers.forEach((callback) => callback())
+    const globals = useSyncExternalStore(
+        subscribe,
+        () => store,
+        () => ({})
+    )
 
     const startConfirming = (basket) => {
-        globals.confirmingBasket = basket
+        store.confirmingBasket = basket
         notify()
     }
     const endConfirming = () => {
-        globals.confirmingBasket = null
+        store.confirmingBasket = null
         notify()
     }
 
