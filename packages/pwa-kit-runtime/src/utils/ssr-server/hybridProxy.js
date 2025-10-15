@@ -74,8 +74,8 @@ export function hybridProxy(options) {
 
                         // replace any redirects to the SFCC origin with the proxy origin
                         if (
-                            //proxyRes?.headers?.location &&
-                            proxyRes?.headers?.location?.includes(sfccOrigin)
+                            proxyRes?.headers?.location &&
+                            proxyRes?.headers?.location.includes(sfccOrigin)
                         ) {
                             logger.info(`Rewriting location header => ${proxyRes.headers.location}`)
                             res.setHeader(

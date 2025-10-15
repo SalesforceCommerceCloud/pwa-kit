@@ -109,7 +109,7 @@ export function evaluateRule(ruleExpression, {host, uri, path, cookies = ''} = {
             ].concat(Object.values(TRANSFORMS))
         )
     } catch (e) {
-        console.error('Error evaluating rule. Check compiled expression: ', _expr)
+        console.error('Error evaluating rule. Check compiled expression: ', parsedExpression)
         throw e
     }
 }

@@ -69,7 +69,7 @@ const options = {
     encodeNonAsciiHttpHeaders: true,
 
     // Cookie handling configuration for security and session management.
-    // 
+    //
     // SECURITY CONSIDERATIONS:
     // - Set to 'false' in production for enhanced security (prevents XSS attacks via client-side cookie access)
     // - Set to 'true' only in development when testing SFCC session integration or Hybrid Proxy functionality
@@ -82,7 +82,7 @@ const options = {
     localAllowCookies: false,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
-    // 
+    //
     // IMPORTANT SECURITY NOTES:
     // - This should ONLY be used for local development and testing
     // - NEVER enable in production - use eCDN rules instead for production routing
@@ -92,7 +92,7 @@ const options = {
     // REFERENCE: https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-authentication.html
     hybridProxy: {
         // If this is enabled, the Hybrid Proxy will be enabled to proxy requests to the SFCC instance.
-        // IMPORTANT: This should only be used for local development. For production, this should be disabled and use eCDN to direct requests to the SFCC instance. 
+        // IMPORTANT: This should only be used for local development. For production, this should be disabled and use eCDN to direct requests to the SFCC instance.
         // Refer to https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-authentication.html for more details.
         enabled: false,
 

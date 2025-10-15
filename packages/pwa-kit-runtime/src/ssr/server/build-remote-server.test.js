@@ -8,7 +8,6 @@ import {isBinary, once, RemoteServerFactory} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
 import logger from '../../utils/logger-instance'
-import {hybridProxy} from '../../utils/ssr-server/hybridProxy'
 import {catchAndLog} from '../../utils/ssr-server'
 
 jest.mock('../../utils/ssr-server', () => ({
@@ -182,11 +181,6 @@ describe('errorHandlerMiddleware logic', () => {
     })
 })
 
-jest.mock('../../utils/logger-instance', () => ({
-    __esModule: true,
-    default: {error: jest.fn()}
-}))
-
 describe('_setRequestId', () => {
     it('sets requestId from correlationId header', () => {
         const app = {use: jest.fn()}
@@ -224,5 +218,131 @@ describe('_setRequestId', () => {
             expect.objectContaining({namespace: '_setRequestId'})
         )
         expect(next).toHaveBeenCalled()
+    })
+})
+
+describe('_setupHybridProxy', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('should call app.use with hybridProxy when enabled', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: true,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call app.use when hybridProxy is disabled', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: {
+                enabled: false,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy is undefined', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {}
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy is null', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: null
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy.enabled is undefined', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: {
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should call app.use when hybridProxy.enabled is explicitly true', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: true,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call app.use when hybridProxy.enabled is truthy string', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: 'true', // truthy string
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call app.use when hybridProxy.enabled is falsy', () => {
+        const mockApp = {use: jest.fn()}
+        const falsyValues = [false, 0, '', null, undefined]
+
+        falsyValues.forEach((falsyValue) => {
+            jest.clearAllMocks()
+            const options = {
+                hybridProxy: {
+                    enabled: falsyValue,
+                    sfccOrigin: 'https://test.com',
+                    routingRules: ['http.request.uri.path eq "/test"']
+                }
+            }
+
+            RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+            expect(mockApp.use).not.toHaveBeenCalled()
+        })
     })
 })

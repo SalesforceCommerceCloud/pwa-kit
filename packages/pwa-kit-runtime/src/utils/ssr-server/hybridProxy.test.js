@@ -6,6 +6,7 @@
  */
 import {iterate, hybridProxy} from './hybridProxy'
 import logger from '../logger-instance'
+import * as utils from './utils'
 
 // Mock the utils module
 jest.mock('./utils', () => ({
@@ -73,7 +74,6 @@ describe('hybridProxy', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         // Reset isRemote mock to default value
-        const utils = require('./utils')
         utils.isRemote.mockReturnValue(false)
     })
     it('warns when localAllowCookies is missing', () => {
@@ -234,25 +234,25 @@ describe('hybridProxy', () => {
             appHostname: 'localhost',
             protocol: 'http'
         })
-        
+
         // Test that the filter function is called with correct parameters
         expect(typeof proxy).toBe('function')
         expect(typeof __capturedFilter).toBe('function')
-        
+
         // Test the filter function behavior with a mock request
         const mockReq = {
             hostname: 'localhost',
             url: '/test',
-            headers: { cookie: 'test=value' }
+            headers: {cookie: 'test=value'}
         }
-        
+
         // The filter function should be called and return a boolean
         // We can't easily mock evaluateRule here since it's imported, but we can test the function exists
         expect(() => __capturedFilter('/test', mockReq)).not.toThrow()
     })
 
     it('proxy middleware filter function handles missing cookies header', () => {
-        const proxy = hybridProxy({
+        hybridProxy({
             localAllowCookies: true,
             hybridProxy: {
                 sfccOrigin: 'https://test.com',
@@ -261,14 +261,14 @@ describe('hybridProxy', () => {
             appHostname: 'localhost',
             protocol: 'http'
         })
-        
+
         // Test with request that has no cookies header
         const mockReq = {
             hostname: 'localhost',
             url: '/test',
             headers: {} // No cookie header
         }
-        
+
         // Should not throw when cookies header is missing
         expect(() => __capturedFilter('/test', mockReq)).not.toThrow()
     })
@@ -286,13 +286,13 @@ describe('hybridProxy', () => {
             sfccOrigin: 'https://original.com',
             proxyOrigin: 'https://proxied.com'
         })
-        expect(result1).toBe(null)
+        expect(result1).toBeNull()
 
         const result2 = iterate(undefined, null, {
             sfccOrigin: 'https://original.com',
             proxyOrigin: 'https://proxied.com'
         })
-        expect(result2).toBe(undefined)
+        expect(result2).toBeUndefined()
     })
 
     it('iterate handles arrays with redirectUrl', () => {
@@ -311,10 +311,9 @@ describe('hybridProxy', () => {
     })
 
     it('uses https protocol when isRemote returns true', () => {
-        // Import the mocked utils module
-        const utils = require('./utils')
+        // Set the mocked utils module to return true
         utils.isRemote.mockReturnValue(true)
-        
+
         const proxy = hybridProxy({
             localAllowCookies: true,
             hybridProxy: {
@@ -324,7 +323,7 @@ describe('hybridProxy', () => {
             appHostname: 'localhost',
             protocol: 'http' // This should be overridden to https
         })
-        
+
         expect(typeof proxy).toBe('function')
         // The proxy should use https://localhost as the proxy origin when isRemote is true
     })
@@ -342,12 +341,12 @@ describe('hybridProxy', () => {
         const proxyRes = {
             headers: {
                 'content-type': 'text/html',
-                'location': 'https://other-domain.com/redirect-path'
+                location: 'https://other-domain.com/redirect-path'
             }
         }
         const res = {setHeader: jest.fn()}
         __capturedOptions.onProxyRes(proxyRes, {}, res)
-        
+
         // Verify that the location header was NOT rewritten
         expect(res.setHeader).not.toHaveBeenCalledWith('location', expect.any(String))
     })
@@ -362,10 +361,12 @@ describe('hybridProxy', () => {
             appHostname: 'localhost',
             protocol: 'http'
         })
-        
+
         expect(typeof proxy).toBe('function')
         // Should warn about empty routing rules
-        expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('hybridProxy.routingRules'))
+        expect(logger.warn).toHaveBeenCalledWith(
+            expect.stringContaining('hybridProxy.routingRules')
+        )
     })
 
     it('onProxyRes handles location header with sfccOrigin but no content-type', async () => {
@@ -380,13 +381,13 @@ describe('hybridProxy', () => {
         })
         const proxyRes = {
             headers: {
-                'location': 'https://sfcc.example.com/redirect-path'
+                location: 'https://sfcc.example.com/redirect-path'
                 // No content-type header
             }
         }
         const res = {setHeader: jest.fn()}
         __capturedOptions.onProxyRes(proxyRes, {}, res)
-        
+
         // Should not rewrite location header when content-type is not text/html
         expect(res.setHeader).not.toHaveBeenCalledWith('location', expect.any(String))
     })
@@ -404,12 +405,12 @@ describe('hybridProxy', () => {
         const proxyRes = {
             headers: {
                 'content-type': 'text/html',
-                'location': 'https://other-domain.com/redirect-path'
+                location: 'https://other-domain.com/redirect-path'
             }
         }
         const res = {setHeader: jest.fn()}
         __capturedOptions.onProxyRes(proxyRes, {}, res)
-        
+
         // Should not rewrite location header when it doesn't contain sfccOrigin
         expect(res.setHeader).not.toHaveBeenCalledWith('location', expect.any(String))
     })
@@ -425,7 +426,7 @@ describe('hybridProxy', () => {
             sfccOrigin: 'https://original.com',
             proxyOrigin: 'https://proxied.com'
         })
-        
+
         // Only redirectUrl should be rewritten (string key and value)
         expect(output.redirectUrl).toBe('https://proxied.com/redirect')
         expect(output.nonStringKey).toBe(123) // unchanged
@@ -446,12 +447,12 @@ describe('hybridProxy', () => {
         const proxyRes = {
             headers: {
                 'content-type': 'text/html',
-                'location': '' // empty location header
+                location: '' // empty location header
             }
         }
         const res = {setHeader: jest.fn()}
         __capturedOptions.onProxyRes(proxyRes, {}, res)
-        
+
         // Should not rewrite empty location header
         expect(res.setHeader).not.toHaveBeenCalledWith('location', expect.any(String))
     })
@@ -467,7 +468,7 @@ describe('hybridProxy', () => {
             sfccOrigin: 'https://original.com',
             proxyOrigin: 'https://proxied.com'
         })
-        
+
         // All case variations of redirectUrl should be rewritten
         expect(output.redirectUrl).toBe('https://proxied.com/redirect')
         expect(output.REDIRECTURL).toBe('https://proxied.com/redirect2')
@@ -490,11 +491,11 @@ describe('hybridProxy', () => {
             sfccOrigin: 'https://original.com',
             proxyOrigin: 'https://proxied.com'
         })
-        
+
         // Only string values should be rewritten
         expect(output.redirectUrl).toBe('https://proxied.com/redirect')
-        expect(output.redirectUrl2).toBe(null) // unchanged
-        expect(output.redirectUrl3).toBe(undefined) // unchanged
+        expect(output.redirectUrl2).toBeNull() // unchanged
+        expect(output.redirectUrl3).toBeUndefined() // unchanged
         expect(output.redirectUrl4).toBe(123) // unchanged
         expect(output.redirectUrl5).toEqual({}) // unchanged
         expect(output.redirectUrl6).toEqual([]) // unchanged
@@ -512,27 +513,25 @@ describe('hybridProxy', () => {
             appHostname: 'localhost',
             protocol: 'http'
         })
-        
+
         // Test various falsy values that could cause errors without the first check
         const falsyValues = [null, undefined, '', 0, false]
-        
-        falsyValues.forEach(falsyValue => {
+
+        falsyValues.forEach((falsyValue) => {
             const proxyRes = {
                 headers: {
                     'content-type': 'text/html',
-                    'location': falsyValue
+                    location: falsyValue
                 }
             }
             const res = {setHeader: jest.fn()}
-            
+
             // Should not throw an error and should not rewrite
             expect(() => {
                 __capturedOptions.onProxyRes(proxyRes, {}, res)
             }).not.toThrow()
-            
+
             expect(res.setHeader).not.toHaveBeenCalledWith('location', expect.any(String))
         })
     })
-
-
 })
