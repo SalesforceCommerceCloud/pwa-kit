@@ -145,8 +145,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         startConfirming(updatedBasket)
 
         // Create SF Payments basket payment instrument before creating order
-        const basketPaymentInstrument = {
-            paymentMethodType: paymentMethodType.current,    // see W-19626908
+        const basketPaymentInstrument = { 
             paymentMethodId: 'Salesforce Payments',
             amount: updatedBasket.orderTotal
         }
@@ -172,9 +171,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
                 },
                 body: {
-                    bankRoutingNumber: paymentMethodType.current,    // remove after W-19626908
                     paymentMethodId: 'Salesforce Payments',
-                    amount: order.orderTotal
+                    amount: order.orderTotal,
+                    paymentReferenceRequest: {
+                        paymentMethodType: paymentMethodType.current,
+                        zoneId: getConfigurationValue('zoneId', 'default')
+                    }
                 }
             })
 
