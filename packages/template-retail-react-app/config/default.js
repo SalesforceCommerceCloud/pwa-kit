@@ -82,8 +82,8 @@ module.exports = {
         multishipEnabled: true,
         sfPayments: {
             enabled: true,
-            sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
-            metadataUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+            sdkUrl: 'https://zyoe-003.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            metadataUrl: 'https://zyoe-003.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             // sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             // metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-RefArch-Site/-/default/v0/sfp/sfp.js',

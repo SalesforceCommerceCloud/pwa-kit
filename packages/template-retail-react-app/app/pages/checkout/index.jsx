@@ -61,6 +61,7 @@ const Checkout = () => {
     const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
+    const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -139,6 +140,7 @@ const Checkout = () => {
                                     rounded={[0, 0, 'base']}
                                     px={[4, 4, 6]}
                                     position="relative"
+                                    display={expressPaymentMethodsRendered ? 'block' : 'none'}
                                 >
                                     <Heading
                                         fontSize="lg"
@@ -154,6 +156,7 @@ const Checkout = () => {
                                     <SFPaymentsExpress
                                         expressButtonLayout="horizontal"
                                         maximumButtonCount={3}
+                                        onPaymentMethodsRendered={() => setExpressPaymentMethodsRendered(true)}
                                     />
                                 </Box>
                             )}

@@ -30,7 +30,8 @@ const SFPaymentsExpressButtons = ({
     initialAmount,
     prepareBasket,
     expressButtonLayout = 'vertical',
-    maximumButtonCount = undefined
+    maximumButtonCount = undefined,
+    onPaymentMethodsRendered
 }) => {
     const intl = useIntl()
     const navigate = useNavigation()
@@ -430,6 +431,12 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
+            const handlePaymentMethodsRendered = (details) => {
+                if (onPaymentMethodsRendered && details.detail.rendered.length > 0) {
+                    onPaymentMethodsRendered()
+                }
+            }
+
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
@@ -479,6 +486,7 @@ const SFPaymentsExpressButtons = ({
             paymentElement.addEventListener('sfppaymentbuttonbeforeapprove', onBeforeApprove)
             paymentElement.addEventListener('sfppaymentbuttonapprove', onApproveEvent)
             paymentElement.addEventListener('sfppaymentbuttonerror', paymentError)
+            paymentElement.addEventListener('sfppaymentmethodsrendered', handlePaymentMethodsRendered)
 
             expressComponent.current = sfp.express(
                 metadata,
@@ -507,7 +515,8 @@ SFPaymentsExpressButtons.propTypes = {
     initialAmount: PropTypes.number.isRequired,
     prepareBasket: PropTypes.func.isRequired,
     expressButtonLayout: PropTypes.oneOf(['horizontal', 'vertical']),
-    maximumButtonCount: PropTypes.number
+    maximumButtonCount: PropTypes.number,
+    onPaymentMethodsRendered: PropTypes.func
 }
 
 export default SFPaymentsExpressButtons
