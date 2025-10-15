@@ -14,6 +14,7 @@ export {default as CreateNewPageTool} from './create-new-page-tool.js'
 export {default as InstallAgentRulesTool} from './install-agent-rules.js'
 export {default as ExploreCommerceAPITool} from './explore-scapi-shop-api-tool.js'
 export {default as HooksRecommendationTool} from './hooks-recommendation.js'
+export {default as CustomApiTool} from './custom-api-discovery.js'
 
 // Re-export individual test functions
 export {runAccessibilityTest} from './site-test-accessibility.js'

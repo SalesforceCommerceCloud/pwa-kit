@@ -45,13 +45,20 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
-* ** `pwakit_install_agent_rules` **:
+* **`pwakit_install_agent_rules`**:
   Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
   *Example: `Install the Agent MCP Tool Usage Guidelines`*
 
-* ** `pwakit_explore_scapi_shop_api` **:
+* **`pwakit_explore_scapi_shop_api`**:
   Explore and document the out of box SCAPI API endpoints, parameters, and usage examples.
   *Example: `How do I get a product?`*
+  
+* **`scapi_custom_api_discovery`**:
+  Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
+  *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
+  
+  *Custom API DX Endpoint Documentation*: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
+
 
 
 ## ▶️ Running the MCP Server
@@ -82,6 +89,56 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 ```
 _NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
 
+### 🔧 Configuration Options
+
+The MCP server supports two ways to configure your Salesforce Commerce Cloud credentials:
+
+#### Option 1: dw.json Configuration File (Recommended)
+
+Create a `dw.json` file under your project root directory with your SFCC credentials:
+
+```json
+{
+  "hostname": "https://your-instance.dx.commercecloud.salesforce.com",
+  "instance-id": "your-instance-id",
+  "client-id": "your-client-id",
+  "client-secret": "your-client-secret",
+  "org-id": "your-org-id",
+  "short-code": "your-short-code"
+}
+```
+
+If `dw.json` doesn't live directly under your project root directory, then update your `mcp.json` to point to the `dw.json` file path:
+
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp", "--dw-json", "/path/to/your/dw.json"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+
+#### Option 2: Environment Variables
+
+Use environment variables to set SFCC credentials:
+
+```
+SFCC_HOSTNAME=https://your-instance.dx.commercecloud.salesforce.com
+SFCC_ORG_ID=your-org-id
+SFCC_SHORT_CODE=your-short-code
+SFCC_INSTANCE_ID=your-instance-id
+SFCC_CLIENT_ID=your-client-id
+SFCC_CLIENT_SECRET=your-client-secret
+```
+
+**Note:** Environment variables take precedence over`dw.json` values if both are provided.
+
 ## 📊 Telemetry
 
 The server collects minimal, anonymous usage data to improve reliability and the developer experience.
@@ -98,10 +155,13 @@ The server collects minimal, anonymous usage data to improve reliability and the
 
 These are the available flags that you can pass to the `args` option. 
 
-| Flag Name | Description | Required? |Notes |
+| Flag Name | Description | Required? | Notes |
 | -----------------| -------| ------- | ----- |
-| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it.  |
-| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this.
+| `"-y", "@salesforce/pwa-kit-mcp"` | Tells `npx` to automatically install the `@salesforce/pwa-kit-mcp` package instead of asking permission. | Yes | Don't change this. |
+| `"--dw-json", "/path/to/dw.json"` | Path to a `dw.json` configuration file containing SFCC credentials. Use this flag if `dw.json` does not live under your project root directory. | No | Alternative to environment variables. |
+| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it. |
+
+
 
 Once saved, Cursor will:
 
@@ -140,7 +200,11 @@ from the command pallet and editing your `pwa-kit` entry to look like the entry 
   "mcpServers": {
     "pwa-kit": {
       "command": "node",
-      "args": ["{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js"],
+      "args": [
+        "{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js",
+        "--dw-json",
+        "{{path-to-dw.json}}"
+      ],
       "env": {
         "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
       }
