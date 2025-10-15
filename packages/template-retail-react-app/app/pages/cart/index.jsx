@@ -1083,6 +1083,9 @@ const Cart = () => {
                                                             renderSecondaryActions={
                                                                 renderSecondaryActions
                                                             }
+                                                            getShipmentInfoForProduct={
+                                                                getShipmentInfoForProduct
+                                                            }
                                                             renderDeliveryActions={(
                                                                 productItem
                                                             ) => {
