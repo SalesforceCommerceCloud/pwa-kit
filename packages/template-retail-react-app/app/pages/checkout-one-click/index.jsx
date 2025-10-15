@@ -140,13 +140,15 @@ const CheckoutOneClick = () => {
             }
         }
 
-        shopperPaymentInstrument = {
+        const fullCardDetails = {
             holder: formValue.holder,
             number: formValue.number,
             cardType: getPaymentInstrumentCardType(formValue.cardType),
             expirationMonth: parseInt(expirationMonth),
             expirationYear: parseInt(`20${expirationYear}`)
         }
+
+        setShopperPaymentInstrument(fullCardDetails)
 
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
@@ -385,7 +387,7 @@ const CheckoutOneClick = () => {
         } catch (error) {
             showError()
         }
-    })
+    }
 
     useEffect(() => {
         if (error || step === 4) {

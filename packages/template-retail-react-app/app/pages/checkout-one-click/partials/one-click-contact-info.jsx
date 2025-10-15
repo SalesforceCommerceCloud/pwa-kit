@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -329,6 +329,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             if (onRegisteredUserChoseGuest) {
                 onRegisteredUserChoseGuest(false)
             }
+
+            // Update basket with email after successful OTP verification
+            const email = form.getValues('email')
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)

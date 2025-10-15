@@ -188,9 +188,11 @@ describe('ContactInfo Component', () => {
 
         // Enter invalid email and trigger blur validation
         await user.type(emailInput, 'invalid-email')
-        await user.tab()
+        fireEvent.blur(emailInput)
 
-        expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+        })
 
         // Should not show required email error
         expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()

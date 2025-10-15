@@ -71,10 +71,11 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-        appliedPayment?.customerPaymentInstrumentId || 'cc'
-    )
-    const [isEditing, setIsEditing] = useState(false)
+
+    // Use props for parent-managed state with fallback defaults
+    const currentSelectedPaymentMethod =
+        selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
+    const currentIsEditing = isEditing ?? false
 
     const activeBasketIdRef = useRef(null)
 
@@ -638,10 +639,5 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
-
-Payment.propTypes = {
-    paymentMethodForm: PropTypes.object.isRequired,
-    billingAddressForm: PropTypes.object.isRequired
-}
 
 export default Payment
