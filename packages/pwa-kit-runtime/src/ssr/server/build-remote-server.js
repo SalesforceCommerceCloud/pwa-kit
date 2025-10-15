@@ -419,7 +419,7 @@ export const RemoteServerFactory = {
     },
 
     _setupHybridProxy(app, options) {
-        if (options.enableHybridProxy) {
+        if (options.hybridProxy?.enabled) {
             app.use(hybridProxy(options))
         }
     },

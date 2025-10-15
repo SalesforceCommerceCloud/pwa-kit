@@ -16,8 +16,8 @@ import {evaluateRule} from './mrt-rule-matcher'
  * @param {Object} options runtime options
  */
 export function hybridProxy(options) {
-    var PROXY_OPTIONS = {}
-    var HYBRID_ROUTING_RULES = []
+    var proxyOptions = {}
+    var hybridRoutingRules = []
 
     if (!options.localAllowCookies) {
         logger.warn(
@@ -27,54 +27,31 @@ export function hybridProxy(options) {
 
     // Target SFCC Instance to Proxy Requests to
     // ex. https://abcd-002.dx.commercecloud.salesforce.com
-    const SFCC_ORIGIN = options.sfccOrigin
-    if (!SFCC_ORIGIN) {
+    const sfccOrigin = options.hybridProxy?.sfccOrigin
+    if (!sfccOrigin) {
         logger.warn(
-            'WARNING: options.sfccOrigin is required to use hybrid proxy. Please set it in your server options.'
+            'WARNING: options.hybridProxy.sfccOrigin is required to use hybrid proxy. Please set it in your server options.'
         )
     }
 
     // Ourselves, the pwa-kit application
     const appHostname = options.appHostname
     const protocol = isRemote() ? 'https' : options.protocol
-    const PROXY_ORIGIN = `${protocol}://${appHostname}`
-    // Gather Hybrid routing rules from options. If the rule is not matched, we will proxy the request to SFCC_ORIGIN.
-    HYBRID_ROUTING_RULES = options.hybridRoutingRules
-    if (HYBRID_ROUTING_RULES.length === 0) {
+    const proxyOrigin = `${protocol}://${appHostname}`
+    // Gather Hybrid routing rules from options. If the rule is not matched, we will proxy the request to sfccOrigin.
+    hybridRoutingRules = options.hybridProxy?.routingRules || []
+    if (hybridRoutingRules.length === 0) {
         logger.warn(
-            'WARNING: No hybridRoutingRules rules found. Please set options.hybridRoutingRules in your server options.'
+            'WARNING: No hybridProxy.routingRules found. Please set options.hybridProxy.routingRules in your server options.'
         )
     }
 
-    PROXY_OPTIONS = {
-        target: SFCC_ORIGIN,
+    proxyOptions = {
+        target: sfccOrigin,
         changeOrigin: true,
         // rewrite Location headers
         autoRewrite: true,
         hostRewrite: true,
-        pathRewrite: (reqPath) => {
-            // Takes care of hard page refreshes and server-side redirects/loads
-            // Skip rewrite for already-SFRA or non-page assets
-            if (/^(?:\/s\/|\/mobify\/|\/on\/|\/waroot|\/worker\.js)/.test(reqPath)) {
-                return reqPath
-            }
-
-            // Match /{siteOrAliasOrId}/{locale}/{rest}
-            const match = reqPath.match(/^\/([^/]+)\/([^/]+)\/(.*)$/)
-            if (!match) return reqPath
-
-            const [, siteSegment, locale, rest] = match
-            if (siteSegment === 's') return reqPath // already SFRA
-
-            const appCfg = options.mobify?.app || {}
-            const aliasMap = appCfg.siteAliases || {}
-            const siteId =
-                Object.keys(aliasMap).find((id) => aliasMap[id] === siteSegment) ||
-                appCfg.defaultSite ||
-                siteSegment
-
-            return `/s/${siteId}/${locale}/${rest}`
-        },
         cookieDomainRewrite: true,
         selfHandleResponse: true,
         onProxyRes: (proxyRes, req, res) => {
@@ -91,19 +68,19 @@ export function hybridProxy(options) {
 
                         // some links are absolute URLs, replace them so they go through the proxy
                         updatedResponse = response.replace(
-                            new RegExp(`${SFCC_ORIGIN}`, 'g'),
-                            PROXY_ORIGIN
+                            new RegExp(`${sfccOrigin}`, 'g'),
+                            proxyOrigin
                         )
 
-                        // replace any redirects to the SFCC origin with the proxy origin (for example: URLUtils.https)
+                        // replace any redirects to the SFCC origin with the proxy origin
                         if (
-                            proxyRes?.headers?.location &&
-                            proxyRes?.headers?.location.includes(SFCC_ORIGIN)
+                            //proxyRes?.headers?.location &&
+                            proxyRes?.headers?.location?.includes(sfccOrigin)
                         ) {
                             logger.info(`Rewriting location header => ${proxyRes.headers.location}`)
                             res.setHeader(
                                 'location',
-                                proxyRes.headers.location.replace(SFCC_ORIGIN, PROXY_ORIGIN)
+                                proxyRes.headers.location.replace(sfccOrigin, proxyOrigin)
                             )
                         }
 
@@ -120,7 +97,7 @@ export function hybridProxy(options) {
                         try {
                             response = JSON.parse(responseBuffer.toString('utf8'))
                             return JSON.stringify(
-                                iterate(response, null, {SFCC_ORIGIN, PROXY_ORIGIN})
+                                iterate(response, null, {sfccOrigin, proxyOrigin})
                             )
                         } catch (e) {
                             logger.error(`error parsing JSON input: ${e}`)
@@ -135,7 +112,7 @@ export function hybridProxy(options) {
 
     // Attach the proxy middleware if we are in hybrid mode
     return createProxyMiddleware(function (pathname, req) {
-        let match = HYBRID_ROUTING_RULES.some((rule) =>
+        let match = hybridRoutingRules.some((rule) =>
             evaluateRule(rule, {
                 host: req.hostname,
                 uri: req.url,
@@ -144,38 +121,17 @@ export function hybridProxy(options) {
             })
         )
 
-        // uncomment to debug
-        // logger.debug(`*********** ${pathname} => ${match ? 'MRT' : 'SFCC'}`)
-
-        // HYBRID_ROUTING_RULES(MRT eCDN rules) are evaluated to determine what gets sent to MRT
+        // hybridRoutingRules(MRT eCDN rules) are evaluated to determine what gets sent to MRT
         // https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=createMrtRules
         // So the traffic we proxy to SFCC will be the opposite
         return !match
-    }, PROXY_OPTIONS)
+    }, proxyOptions)
 }
 
-export function shouldProxyRequest(rules, reqFields) {
-    return !rules.some((rule) => evaluateRule(rule, reqFields))
-}
-
-const isString = (element) => {
-    if (!element) return false
-    return typeof element === 'string'
-}
-
-const isArray = (element) => {
-    if (!element) return false
-    return Array.isArray(element)
-}
-
-const isObject = (element) => {
-    if (!element) return false
-    return typeof element === 'object'
-}
-const isIterable = (element) => {
-    if (!element) return false
-    return isArray(element) || isObject(element)
-}
+const isString = (element) => typeof element === 'string'
+const isArray = (element) => Array.isArray(element)
+const isObject = (element) => element && typeof element === 'object'
+const isIterable = (element) => isArray(element) || isObject(element)
 
 const forEachIn = (iterable, functionRef) => {
     Object.keys(iterable).forEach((key) => {
@@ -183,24 +139,23 @@ const forEachIn = (iterable, functionRef) => {
     })
 }
 
+/**
+ * This key is used to identify JSON properties that contain URLs
+ * that need to be rewritten from SFCC origin to proxy origin.
+ */
+const KEY_TO_REWRITE = 'redirecturl'
+
 export const iterate = (object, parent, vars = {}) => {
     if (!isIterable(object)) return object
-    const {SFCC_ORIGIN, PROXY_ORIGIN} = vars
+    const {sfccOrigin, proxyOrigin} = vars
     forEachIn(object, (key, value) => {
         // replace any urls to the SFCC origin with the proxy origin
-        if (
-            isString(value) &&
-            isString(key) &&
-            KEYS_TO_REWRITE.indexOf(String(key).toLowerCase()) > -1
-        ) {
+        if (isString(value) && isString(key) && String(key).toLowerCase() === KEY_TO_REWRITE) {
             logger.info(`Rewriting JSON value => ${value} for key: ${key}`)
-            object[key] = value.replace(SFCC_ORIGIN, PROXY_ORIGIN)
+            object[key] = value.replace(sfccOrigin, proxyOrigin)
             logger.info(`new value => ${object[key]}`)
         }
         iterate(value, parent, vars)
     })
     return object
 }
-
-// use all lowercase keys
-const KEYS_TO_REWRITE = ['redirecturl']

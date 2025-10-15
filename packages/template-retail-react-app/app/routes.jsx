@@ -15,8 +15,6 @@
 import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {withRouter} from 'react-router-dom'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -58,8 +56,6 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
-// NOTE: If you add/remove routes here, it is a good practice to update the pwaKitRoutes list in default.js.
-// The default.js pwaKitRoutes list is the source of truth in case hybridProxy is enabled.
 export const routes = [
     {
         path: '/',
@@ -147,32 +143,7 @@ export const routes = [
 
 export default () => {
     const config = getConfig()
-    let routesToConfigure = routes
-
-    if (config.hybrid?.enableHybrid) {
-        // Client side SPA redirect to SFRA pages.
-        const HybridCatchAll = withRouter((props) => {
-            const {site} = useMultiSite()
-            const siteId = site && site.id ? site.id : config?.app?.defaultSite
-            if (typeof window !== 'undefined') {
-                const parts = window.location.pathname.split('/').filter(Boolean)
-                const locale = parts[1]
-                const rest = parts.slice(2).join('/')
-                const target = `/s/${siteId}/${locale}/${rest}`
-                window.location.replace(target)
-            }
-            return null
-        })
-
-        const hybridRoutes = [
-            ...routes.filter((r) => r.path !== '*'),
-            {path: '*', component: HybridCatchAll}
-        ]
-
-        routesToConfigure = hybridRoutes
-    }
-
-    return configureRoutes(routesToConfigure, config, {
-        ignoredRoutes: config.hybrid?.enableHybrid ? ['/callback'] : ['/callback', '*']
+    return configureRoutes(routes, config, {
+        ignoredRoutes: ['/callback', '*']
     })
 }
