@@ -15,7 +15,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Helmet} from 'react-helmet'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useHistory} from 'react-router-dom'
@@ -37,6 +37,12 @@ const PageNotFound = () => {
             height={'100%'}
             padding={{lg: 8, md: 6, sm: 0, base: 0}}
         >
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Page Not Found"
+                    id="page_not_found.title.page_not_found"
+                />
+            </Heading>
             <Helmet>
                 <title>
                     {intl.formatMessage({

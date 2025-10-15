@@ -124,6 +124,9 @@ const Account = () => {
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
+            <Heading as="h1" srOnly>
+                <FormattedMessage defaultMessage="My Account" id="account.title.my_account" />
+            </Heading>
             <Seo title="My Account" description="Customer Account Page" />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}

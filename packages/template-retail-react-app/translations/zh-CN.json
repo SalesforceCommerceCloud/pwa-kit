@@ -234,6 +234,33 @@
   "checkout.message.generic_error": {
     "defaultMessage": "结账时发生意外错误。"
   },
+  "checkout.title.checkout": {
+    "defaultMessage": "结账"
+  },
+  "home.title.home": {
+    "defaultMessage": "首页"
+  },
+  "cart.title.shopping_cart": {
+    "defaultMessage": "购物车"
+  },
+  "product_detail.title.product_details": {
+    "defaultMessage": "产品详情"
+  },
+  "login.title.sign_in": {
+    "defaultMessage": "登录"
+  },
+  "registration.title.create_account": {
+    "defaultMessage": "创建账户"
+  },
+  "account.title.my_account": {
+    "defaultMessage": "我的账户"
+  },
+  "page_not_found.title.page_not_found": {
+    "defaultMessage": "页面未找到"
+  },
+  "reset_password.title.reset_password": {
+    "defaultMessage": "重置密码"
+  },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "创建账户"
   },
