@@ -1138,6 +1138,9 @@ const Cart = () => {
                                                                 renderSecondaryActions={
                                                                     renderSecondaryActions
                                                                 }
+                                                                getShipmentInfoForProduct={
+                                                                    getShipmentInfoForProduct
+                                                                }
                                                                 renderDeliveryActions={(
                                                                     productItem
                                                                 ) =>
@@ -1176,6 +1179,9 @@ const Cart = () => {
                                                                 onRemoveItemClick={handleRemoveItem}
                                                                 renderSecondaryActions={
                                                                     renderSecondaryActions
+                                                                }
+                                                                getShipmentInfoForProduct={
+                                                                    getShipmentInfoForProduct
                                                                 }
                                                                 renderDeliveryActions={(
                                                                     productItem
