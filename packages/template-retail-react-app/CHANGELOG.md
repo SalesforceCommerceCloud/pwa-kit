@@ -1,6 +1,6 @@
 ## v8.2.0-dev (Sep 26, 2025)
 - [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
-- Added hybrid cdn for routing [#3393] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3393)
+- Added Hybrid Proxy support for local and ODS hybrid development [#] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/)
 
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)

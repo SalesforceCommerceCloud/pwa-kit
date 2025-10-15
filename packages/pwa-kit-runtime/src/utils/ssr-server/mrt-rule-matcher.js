@@ -90,30 +90,11 @@ export function parseRuleExpression(ruleExpression) {
  * @return {boolean} does the rule evaluation to true for the given options
  */
 export function evaluateRule(ruleExpression, {host, uri, path, cookies = ''} = {}) {
-    const _expr = parseRuleExpression(ruleExpression)
+    const parsedExpression = parseRuleExpression(ruleExpression)
 
-    const args = ['http'].concat(Object.keys(TRANSFORMS)).concat(`return ${_expr}`)
+    const args = ['http'].concat(Object.keys(TRANSFORMS)).concat(`return ${parsedExpression}`)
     try {
         const func = new Function(...args)
-        // const func = (http, ...transforms) => {
-        //     return (
-        //         http.host === 'localhost' &&
-        //         (http.request._path === '/' ||
-        //             http.request._path.match('^/callback') ||
-        //             http.request._path.match('^/mobify') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/login') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/reset-password') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/registration') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/account') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/cart') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/account/orders') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/account/orders/(\\w+)') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/account/wishlist') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/product/(\\w+)') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/search') ||
-        //             http.request._path.match('^/(\\w+)/([-\\w]+)/category/(\\w+)'))
-        //     )
-        // }
         return !!func.apply(
             undefined,
             [
@@ -128,7 +109,7 @@ export function evaluateRule(ruleExpression, {host, uri, path, cookies = ''} = {
             ].concat(Object.values(TRANSFORMS))
         )
     } catch (e) {
-        console.error('Error evaluating rule. Check compiled expression: ', _expr)
+        console.error('Error evaluating rule. Check compiled expression: ', parsedExpression)
         throw e
     }
 }

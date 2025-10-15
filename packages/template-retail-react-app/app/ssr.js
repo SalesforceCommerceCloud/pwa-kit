@@ -25,23 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {buildHybridRules} from '@salesforce/pwa-kit-runtime/utils/ssr-server/hybrid-rules-creation'
 
 const config = getConfig()
-
-// Auto-resolve routes file for generated/overrides apps (overrides first, then default)
-const overridesCandidate = path.resolve(process.cwd(), 'overrides/app/routes.jsx')
-const defaultCandidate = path.resolve(process.cwd(), 'app/routes.jsx')
-const routesFilePath = (() => {
-    try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const fs = require('fs')
-        return fs.existsSync(overridesCandidate) ? overridesCandidate : defaultCandidate
-    } catch (_) {
-        return defaultCandidate
-    }
-})()
-const hybridRules = buildHybridRules(routesFilePath)
 
 const options = {
     // The build directory (an absolute path)
@@ -83,23 +68,47 @@ const options = {
     // of headers as we loop through all the headers to verify ASCII vs non ASCII
     encodeNonAsciiHttpHeaders: true,
 
-    // If this is enabled, the hybrid proxy will be enabled. This is required for SFCC sessions to work. Out-of-the-box value is false.
-    // This will work for both local devlopment and MRT to ODS connection.
-    enableHybridProxy: config.hybrid?.enableHybrid || false,
+    // Cookie handling configuration for security and session management.
+    //
+    // SECURITY CONSIDERATIONS:
+    // - Set to 'false' in production for enhanced security (prevents XSS attacks via client-side cookie access)
+    // - Set to 'true' only in development when testing SFCC session integration or Hybrid Proxy functionality
+    // - When false: cookies are stripped from requests and cannot be set in responses (server-only cookies)
+    // - When true: allows client-side JavaScript access to cookies (development/testing only)
+    //
+    // HYBRID PROXY REQUIREMENT:
+    // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
+    // - Only enable Hybrid Proxy in development environments, never in production
+    localAllowCookies: false,
 
-    // The origin of the SFCC instance (i.e. the instance that is being proxied to which hosts the storefront). This is required for hybrid proxy to work.
-    // The value will be fetched from the config/default.js file for the ocapi host.
-    sfccOrigin: `https://${
-        config.ssrParameters.proxyConfigs.find((cfg) => cfg.path === 'ocapi').host
-    }`,
+    // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
+    //
+    // IMPORTANT SECURITY NOTES:
+    // - This should ONLY be used for local development and testing
+    // - NEVER enable in production - use eCDN rules instead for production routing
+    // - When enabled, localAllowCookies must be set to 'true' for SFCC sessions to work
+    // - Production deployments should use eCDN to direct requests to SFCC instances
+    //
+    // REFERENCE: https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-authentication.html
+    hybridProxy: {
+        // If this is enabled, the Hybrid Proxy will be enabled to proxy requests to the SFCC instance.
+        // IMPORTANT: This should only be used for local development. For production, this should be disabled and use eCDN to direct requests to the SFCC instance.
+        // Refer to https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-authentication.html for more details.
+        enabled: false,
 
-    // The MRT rules to apply to the hybrid proxy. This is required for hybrid proxy to work.
-    // These rules determine which requests are handled by PWA Kit (MRT) vs proxied to SFCC
-    // Paths excluded from the rules will not be re-directed to PWA Kit storefront.
-    hybridRoutingRules: hybridRules
+        // The origin of the SFCC instance (i.e. the instance that is being proxied to which hosts the storefront).
+        sfccOrigin: 'https://zzrf-001.dx.commercecloud.salesforce.com',
 
-    // To be used when hybrid proxy is enabled
-    // localAllowCookies: true
+        // The MRT rules to apply to the hybrid proxy.
+        // These rules determine which requests are handled by PWA Kit (MRT) vs proxied to SFCC. The same rules should be used in the eCDN rules for the same requests.
+        // Paths excluded from the rules will be re-directed to SFCC instance. In the following example, the Cart and checkout pages are excluded from the rules.
+        // Refer to the following links for more details:
+        // * https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=MrtRules
+        // * https://developer.salesforce.com/docs/commerce/commerce-api/guide/ecdn-rules-for-phased-headless-rollout.html
+        routingRules: [
+            'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/$" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/login" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/reset-password" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/registration" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/product/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/search" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/category/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/order-status" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page-viewer/(\\\\w+)"'
+        ]
+    }
 }
 
 const runtime = getRuntime()
