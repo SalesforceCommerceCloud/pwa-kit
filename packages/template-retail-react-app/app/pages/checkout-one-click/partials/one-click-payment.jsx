@@ -47,7 +47,12 @@ const Payment = ({
     setEnableUserRegistration,
     registeredUserChoseGuest = false,
     onPaymentMethodSaved,
-    onSavePreferenceChange
+    onSavePreferenceChange,
+    onPaymentSubmitted,
+    selectedPaymentMethod,
+    isEditing,
+    onSelectedPaymentMethodChange,
+    onIsEditingChange
 }) => {
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
@@ -66,10 +71,11 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-        appliedPayment?.customerPaymentInstrumentId || 'cc'
-    )
-    const [isEditing, setIsEditing] = useState(false)
+
+    // Use props for parent-managed state with fallback defaults
+    const currentSelectedPaymentMethod =
+        selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
+    const currentIsEditing = isEditing ?? false
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -187,6 +193,11 @@ const Payment = ({
             }
         }
 
+        // Notify parent component with full card details (before masking)
+        if (onPaymentSubmitted) {
+            onPaymentSubmitted(formValue)
+        }
+
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
@@ -199,6 +210,8 @@ const Payment = ({
         const autoSelectSavedPayment = async () => {
             if (step !== STEPS.PAYMENT || isCustomerLoading) return
             if (autoAppliedRef.current) return
+            // Don't auto-apply when in edit mode - user is manually entering/selecting payment
+            if (currentIsEditing) return
             const isRegistered = customer?.isRegistered
             const hasSaved = customer?.paymentInstruments?.length > 0
             const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
@@ -236,8 +249,25 @@ const Payment = ({
     }, [step, isCustomerLoading])
 
     const onPaymentMethodChange = async (paymentInstrumentId) => {
+        // Only try to remove payment if there's actually an applied payment
+        if (appliedPayment) {
+            try {
+                await onPaymentRemoval()
+            } catch (_e) {
+                // Removal failed: inform user and do NOT proceed with payment change
+                showError(
+                    formatMessage({
+                        defaultMessage:
+                            'Could not remove the applied payment. Please try again or use the current payment to place your order.',
+                        id: 'checkout_payment.error.cannot_remove_applied_payment'
+                    })
+                )
+                return
+            }
+        }
+
         if (paymentInstrumentId === 'cc') {
-            setSelectedPaymentMethod('cc')
+            onSelectedPaymentMethodChange?.('cc')
         } else {
             setIsApplyingSavedPayment(true)
             await addPaymentInstrumentToBasket({
@@ -249,7 +279,7 @@ const Payment = ({
             })
             await currentBasketQuery.refetch()
             setIsApplyingSavedPayment(false)
-            setSelectedPaymentMethod(paymentInstrumentId)
+            onSelectedPaymentMethodChange?.(paymentInstrumentId)
         }
     }
 
@@ -282,7 +312,7 @@ const Payment = ({
                     paymentInstrumentId: appliedPayment.paymentInstrumentId
                 }
             })
-            setSelectedPaymentMethod('cc')
+            onSelectedPaymentMethodChange?.('cc')
         } catch (e) {
             showError()
             throw e
@@ -300,37 +330,25 @@ const Payment = ({
         } catch (error) {
             showError()
         } finally {
-            setIsEditing(false)
+            onIsEditingChange?.(false)
         }
     })
 
     const handleEditPayment = async () => {
         if (appliedPayment) {
-            // Pre-select the applied saved payment in the radio list if present
+            // After removal, set the radio selection (but don't apply to basket yet)
             const savedId = appliedPayment?.customerPaymentInstrumentId
             if (savedId) {
-                onPaymentMethodChange(savedId)
+                onSelectedPaymentMethodChange?.(savedId)
             } else if (customer?.paymentInstruments?.length > 0) {
-                // Default to first saved method if any; otherwise leave current selection
-                onPaymentMethodChange(customer.paymentInstruments[0].paymentInstrumentId)
-            }
-            try {
-                await onPaymentRemoval()
-                // Ensure basket reflects removal before rendering form
-                await currentBasketQuery.refetch()
-            } catch (_e) {
-                // Removal failed: inform user and do NOT enter edit mode
-                showError(
-                    formatMessage({
-                        defaultMessage:
-                            'Could not remove the applied payment. Please try again or use the current payment to place your order.',
-                        id: 'checkout_payment.error.cannot_remove_applied_payment'
-                    })
-                )
-                return
+                // Default to first saved method in the radio selection
+                onSelectedPaymentMethodChange?.(customer.paymentInstruments[0].paymentInstrumentId)
+            } else {
+                // No saved methods, default to new card form
+                onSelectedPaymentMethodChange?.('cc')
             }
         }
-        setIsEditing(true)
+        onIsEditingChange?.(true)
         goToStep(STEPS.PAYMENT)
     }
 
@@ -348,7 +366,7 @@ const Payment = ({
                     defaultMessage: 'Payment',
                     id: 'checkout_payment.title.payment'
                 })}
-                editing={isEditing || step === STEPS.PAYMENT}
+                editing={currentIsEditing || step === STEPS.PAYMENT}
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
                     billingAddressForm.formState.isSubmitting ||
@@ -385,7 +403,7 @@ const Payment = ({
                                         onSubmit={onSubmit}
                                         savedPaymentInstruments={customer.paymentInstruments}
                                         onPaymentMethodChange={onPaymentMethodChange}
-                                        selectedPaymentMethod={selectedPaymentMethod}
+                                        selectedPaymentMethod={currentSelectedPaymentMethod}
                                     >
                                         {/* Show for returning users (registered) while editing/adding a new card */}
                                         {!isGuest && (
@@ -524,7 +542,21 @@ Payment.propTypes = {
     /** Callback when payment method is successfully saved */
     onPaymentMethodSaved: PropTypes.func,
     /** Callback when save preference changes */
-    onSavePreferenceChange: PropTypes.func
+    onSavePreferenceChange: PropTypes.func,
+    /** Callback when payment is submitted with full card details */
+    onPaymentSubmitted: PropTypes.func,
+    /** Selected payment method from parent */
+    selectedPaymentMethod: PropTypes.string,
+    /** Editing state from parent */
+    isEditing: PropTypes.bool,
+    /** Callback when selected payment method changes */
+    onSelectedPaymentMethodChange: PropTypes.func,
+    /** Callback when editing state changes */
+    onIsEditingChange: PropTypes.func,
+    /** Payment method form */
+    paymentMethodForm: PropTypes.object.isRequired,
+    /** Billing address form */
+    billingAddressForm: PropTypes.object.isRequired
 }
 
 Payment.propTypes = {
@@ -552,10 +584,5 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
-
-Payment.propTypes = {
-    paymentMethodForm: PropTypes.object.isRequired,
-    billingAddressForm: PropTypes.object.isRequired
-}
 
 export default Payment

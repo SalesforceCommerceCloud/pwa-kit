@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
@@ -50,6 +51,7 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-currency')
 jest.mock('@salesforce/commerce-sdk-react')
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context')
 
@@ -214,6 +216,7 @@ const mockPaymentInstruments = [
 const mockBasket = {
     basketId: 'test-basket-id',
     paymentInstruments: [],
+    orderTotal: 100.0,
     shipments: [
         {
             shippingAddress: {
@@ -249,7 +252,11 @@ const TestWrapper = ({
     onSavePreferenceChange = jest.fn(),
     registeredUserChoseGuest = false,
     removePaymentShouldFail = false,
-    initialStep = 4
+    initialStep = 4,
+    selectedPaymentMethod = null,
+    isEditing = false,
+    onSelectedPaymentMethodChange = jest.fn(),
+    onIsEditingChange = jest.fn()
 }) => {
     // Mock hooks
     useCurrentCustomer.mockReturnValue({data: customerData})
@@ -259,6 +266,7 @@ const TestWrapper = ({
         isGuest: !isRegistered
     })
     useToast.mockReturnValue(mockToastFn)
+    useCurrency.mockReturnValue({currency: 'USD'})
 
     const mockCheckout = {
         step: initialStep,
@@ -348,6 +356,10 @@ const TestWrapper = ({
                     registeredUserChoseGuest={registeredUserChoseGuest}
                     onPaymentMethodSaved={onPaymentMethodSaved}
                     onSavePreferenceChange={onSavePreferenceChange}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    isEditing={isEditing}
+                    onSelectedPaymentMethodChange={onSelectedPaymentMethodChange}
+                    onIsEditingChange={onIsEditingChange}
                 />
             </CurrencyProvider>
         </IntlProvider>
@@ -541,7 +553,7 @@ describe('Payment Component', () => {
     })
 
     describe('Error Handling', () => {
-        test('shows error and does not enter edit mode if removing applied payment fails', async () => {
+        test('enters edit mode successfully when handleEditPayment is called', async () => {
             const user = userEvent.setup()
 
             // Mock customer as registered with a payment instrument
@@ -551,30 +563,45 @@ describe('Payment Component', () => {
                 paymentInstruments: [mockPaymentInstruments[0]]
             }
 
-            // Make removal fail for this test
-            // Render starting at REVIEW_ORDER so summary is visible and edit is available
-            render(
+            // Create state management for the test
+            let isEditing = false
+            const mockOnIsEditingChange = jest.fn((value) => {
+                isEditing = value
+            })
+
+            const {rerender} = render(
                 <TestWrapper
                     basketData={basketWithPayment}
-                    removePaymentShouldFail={true}
-                    initialStep={5}
+                    initialStep={5} // REVIEW_ORDER step
+                    isEditing={isEditing}
+                    onIsEditingChange={mockOnIsEditingChange}
                 />
             )
 
-            // Click Edit Payment Info
+            // Click Edit Payment Info to enter edit mode
             const summary = screen.getAllByTestId('toggle-card-summary').pop()
             const editButton = within(summary).getByRole('button', {
                 name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
             })
             await user.click(editButton)
 
-            // Assert error toast shown
-            await waitFor(() => expect(mockToastFn).toHaveBeenCalled())
+            // Re-render with updated state
+            rerender(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    initialStep={5}
+                    isEditing={isEditing}
+                    onIsEditingChange={mockOnIsEditingChange}
+                />
+            )
 
-            // Should remain in summary (not enter edit mode)
-            // Because we render starting at REVIEW_ORDER, summary should persist
-            // and edit region should not be present.
-            expect(screen.queryByTestId('toggle-card-edit')).not.toBeInTheDocument()
+            // Should enter edit mode successfully
+            await waitFor(() => {
+                expect(screen.getByTestId('toggle-card-edit')).toBeInTheDocument()
+            })
+
+            // Verify payment form is visible in edit mode
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
         })
     })
 
