@@ -7,6 +7,11 @@
 import React, {useEffect, useRef} from 'react'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
+import {
+    useShopperContext,
+    useUsid,
+    useShopperContextsMutation
+} from '@salesforce/commerce-sdk-react'
 
 import {
     getCurrencyValueForApi,
@@ -486,6 +491,78 @@ export const GooglePayExpress = ({
         site: providedSite
     })
 
+    // Get usid for shopper context
+    const {usid} = useUsid()
+
+    // Shopper context hooks
+    const updateShopperContext = useShopperContextsMutation('updateShopperContext')
+    const {
+        data: shopperContext,
+        isLoading: isShopperContextLoading,
+        error: shopperContextError
+    } = useShopperContext(
+        {parameters: {usid, siteId: finalSite?.id}},
+        {enabled: Boolean(usid) && Boolean(finalSite?.id)}
+    )
+
+    // Update shopper context with agentSessionId when context is available
+    useEffect(() => {
+        const updateContextWithAgentId = async () => {
+            if (!shopperContext || !usid || !finalSite?.id) {
+                return
+            }
+
+            // Check if agentSessionId is already set
+            if (shopperContext.customQualifiers?.agentSessionId === 'agent_mockId') {
+                console.log(
+                    '🎯 GooglePay - agentSessionId already set:',
+                    shopperContext.customQualifiers.agentSessionId
+                )
+                return
+            }
+
+            console.log('🔄 GooglePay - Updating shopper context with agentSessionId...')
+            try {
+                const updatedContext = {
+                    ...shopperContext,
+                    customQualifiers: {
+                        ...shopperContext.customQualifiers,
+                        agentSessionId: 'agent_mockId'
+                    }
+                }
+
+                const result = await updateShopperContext.mutateAsync({
+                    parameters: {usid, siteId: finalSite.id},
+                    body: updatedContext
+                })
+
+                console.log('✅ GooglePay - Shopper context updated successfully:', result)
+            } catch (error) {
+                console.error('❌ GooglePay - Failed to update shopper context:', error)
+                console.error('Update error details:', {
+                    status: error?.response?.status,
+                    statusText: error?.response?.statusText,
+                    data: error?.response?.data
+                })
+            }
+        }
+
+        updateContextWithAgentId()
+    }, [shopperContext, usid, finalSite?.id, updateShopperContext])
+
+    // Log shopper context data for debugging
+    useEffect(() => {
+        if (shopperContext) {
+            console.log('🎉 GooglePay - Current Shopper Context:', shopperContext)
+        }
+        if (shopperContextError) {
+            console.error('❌ GooglePay - Shopper Context Error:', shopperContextError)
+        }
+        if (isShopperContextLoading) {
+            console.log('⏳ GooglePay - Loading Shopper Context...')
+        }
+    }, [shopperContext, isShopperContextLoading, shopperContextError])
+
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
         return () => {
@@ -628,6 +705,7 @@ GooglePayExpress.propTypes = {
     basket: PropTypes.object,
     sku: PropTypes.string,
     quantity: PropTypes.number,
+    currency: PropTypes.string,
     isPdpMode: PropTypes.bool,
     manager: PropTypes.object
 }
