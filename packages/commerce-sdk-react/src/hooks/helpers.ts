@@ -53,6 +53,7 @@ export const generateCustomEndpointOptions = (
     return {
         ...options,
         options: {
+            ...options.options,
             method: options.options?.method || 'GET',
             headers: {
                 Authorization: `Bearer ${access_token}`,
@@ -61,8 +62,7 @@ export const generateCustomEndpointOptions = (
                 ...globalHeaders,
                 ...options.options?.headers,
                 ...(args?.headers ? args.headers : {})
-            },
-            ...options.options
+            }
         },
         clientConfig: {
             ...globalClientConfig,
