@@ -4,10 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useUsid,
+    useShopperContext,
+    useShopperContextsMutation
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -15,6 +19,7 @@ import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -158,7 +163,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const theme = useTheme()
 
     // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {locale, site} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
@@ -167,9 +172,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
 
     // Customer details for express payments
-
     const {getTokenWhenReady} = useAccessToken()
-
     const customerId = useCustomerId()
 
     // Destructure configuration for cleaner access
@@ -187,6 +190,130 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+
+    // Authentication ready state
+    const [isAuthReady, setIsAuthReady] = useState(false)
+    const [contextInitialized, setContextInitialized] = useState(false)
+
+    // Wait for authentication to be ready
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await getTokenWhenReady()
+                setIsAuthReady(true)
+            } catch (error) {
+                console.error('Auth not ready:', error)
+                setIsAuthReady(false)
+            }
+        }
+        if (usid && !isServer) {
+            checkAuth()
+        }
+    }, [usid, getTokenWhenReady])
+
+    // Shopper context creation and retrieval
+    const createShopperContext = useShopperContextsMutation('createShopperContext')
+    const {
+        data: shopperContext,
+        isLoading: isShopperContextLoading,
+        error: shopperContextError,
+        refetch: refetchShopperContext
+    } = useShopperContext(
+        {parameters: {usid, siteId: site.id}},
+        {
+            enabled:
+                !isServer && Boolean(usid) && Boolean(site?.id) && isAuthReady && contextInitialized
+        }
+    )
+
+    // Initialize shopper context once when authentication is ready
+    useEffect(() => {
+        // Skip if already initialized or missing requirements
+        if (contextInitialized || !usid || !site?.id || !isAuthReady || isServer) {
+            return
+        }
+
+        console.log('🔍 ShopperAgent - Initializing shopper context:', {
+            usid: Boolean(usid),
+            siteId: site?.id,
+            isAuthReady,
+            isServer,
+            contextInitialized,
+            usidValue: usid,
+            siteIdValue: site?.id
+        })
+
+        const initializeContext = async () => {
+            try {
+                // First, try to fetch existing context
+                console.log('📥 Checking for existing shopper context...')
+                const existingContextResult = await refetchShopperContext()
+
+                if (existingContextResult.data) {
+                    console.log(
+                        '🎉 ShopperAgent - Existing Shopper Context Found:',
+                        existingContextResult.data
+                    )
+                    setContextInitialized(true)
+                    return
+                }
+            } catch (fetchError) {
+                console.log('📭 No existing context found, will create new one')
+            }
+
+            // If no existing context, create one
+            console.log('🔨 Creating new shopper context...')
+            try {
+                // Custom payload with your data
+                const customPayload = {
+                    parameters: {usid, siteId: site.id},
+                    body: {
+                        customQualifiers: {
+                            shopperAgent: 'true'
+                        }
+                    }
+                }
+                console.log('🔧 Creating with custom payload:', customPayload.body)
+                const result = await createShopperContext.mutateAsync(customPayload)
+                console.log('✅ Shopper context created successfully:', result)
+                setContextInitialized(true)
+            } catch (error) {
+                console.error('❌ Failed to create shopper context:', error)
+                console.error('Create error details:', {
+                    status: error?.response?.status,
+                    statusText: error?.response?.statusText,
+                    data: error?.response?.data
+                })
+
+                // Even if creation fails, mark as initialized to prevent retries
+                // The useShopperContext hook will handle fetching
+                setContextInitialized(true)
+            }
+        }
+
+        initializeContext()
+    }, [
+        usid,
+        site?.id,
+        isAuthReady,
+        isServer,
+        contextInitialized,
+        createShopperContext,
+        refetchShopperContext
+    ])
+
+    // Log shopper context data changes
+    useEffect(() => {
+        if (shopperContext) {
+            console.log('🎉 ShopperAgent - Shopper Context Data:', shopperContext)
+        }
+        if (shopperContextError) {
+            console.error('❌ ShopperAgent - Shopper Context Error:', shopperContextError)
+        }
+        if (isShopperContextLoading) {
+            console.log('⏳ ShopperAgent - Loading Shopper Context...')
+        }
+    }, [shopperContext, isShopperContextLoading, shopperContextError])
 
     /**
      * Retrieves conversation context data based on configuration.
@@ -298,6 +425,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                         customerId,
                         authToken
                     })
+                } else if (event.data.type === 'lwc.sendAgentSessionInfo') {
+                    console.log('standard pwa checkout agent session info ', event.data.payload)
+                    event.data.payload.agent_session_id = 'agent_mockId'
                 }
             } catch (error) {
                 console.error('Error handling Miaw event:', error)
