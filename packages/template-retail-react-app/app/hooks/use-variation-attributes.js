@@ -113,7 +113,6 @@ export const useVariationAttributes = (
             }
         })
     }
-
     return useMemo(
         () =>
             variationAttributes.map((variationAttribute) => ({

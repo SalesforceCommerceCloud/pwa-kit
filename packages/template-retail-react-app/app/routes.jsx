@@ -38,7 +38,10 @@ const Registration = loadable(() => import('./pages/registration'), {
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
 const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout-container'), {
+const Checkout = loadable(() => import('./pages/checkout'), {
+    fallback
+})
+const CheckoutOneClick = loadable(() => import('./pages/checkout-one-click'), {
     fallback
 })
 const CheckoutConfirmation = loadable(() => import('./pages/confirmation'), {fallback})
@@ -93,7 +96,10 @@ export const routes = [
     },
     {
         path: '/checkout',
-        component: Checkout,
+        component: (props) => {
+            const enabled = getConfig()?.app?.oneClickCheckout?.enabled
+            return enabled ? <CheckoutOneClick {...props} /> : <Checkout {...props} />
+        },
         exact: true
     },
     {

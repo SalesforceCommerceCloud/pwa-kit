@@ -28,6 +28,7 @@ jest.setTimeout(60000)
 
 const mockProduct = {
     ...mockedCustomerProductListsDetails.data[0],
+    productId: 'mocked-product-id',
     productName: mockedCustomerProductListsDetails.data[0].name,
     bonusProductLineItem: false,
     quantity: 1
@@ -41,7 +42,9 @@ const mockBonusProduct = {
 const MockedComponent = ({
     product = mockProduct,
     onItemQuantityChange = async () => {},
-    showLoading = false
+    showLoading = false,
+    containerStyles,
+    deliveryActions
 }) => {
     return (
         <ProductItem
@@ -50,6 +53,8 @@ const MockedComponent = ({
             showLoading={showLoading}
             primaryAction={<button>Primary Action</button>}
             secondaryActions={<button>Secondary Action</button>}
+            deliveryActions={deliveryActions}
+            containerStyles={containerStyles}
         />
     )
 }
@@ -57,7 +62,9 @@ const MockedComponent = ({
 MockedComponent.propTypes = {
     product: PropTypes.object,
     onItemQuantityChange: PropTypes.func,
-    showLoading: PropTypes.bool
+    showLoading: PropTypes.bool,
+    containerStyles: PropTypes.object,
+    deliveryActions: PropTypes.node
 }
 
 describe('ProductItem Component', () => {
@@ -70,10 +77,67 @@ describe('ProductItem Component', () => {
         expect(screen.queryByRole('spinbutton')).toBeInTheDocument()
     })
 
+    test('renders with containerStyles', () => {
+        const styles = {
+            background: 'blue',
+            border: '1px solid red'
+        }
+        renderWithProviders(<MockedComponent containerStyles={styles} />)
+        const productItem = screen.getByTestId(`sf-cart-item-${mockProduct.productId}`)
+        // The containerStyles are applied to the Stack component, which is a child of the product item
+        const stackContainer = productItem.firstChild
+        expect(stackContainer).toHaveStyle('background: blue')
+        expect(stackContainer).toHaveStyle('border: 1px solid red')
+    })
+
+    test('renders delivery actions when passed', () => {
+        renderWithProviders(<MockedComponent deliveryActions={<button>Delivery Action</button>} />)
+        const deliveryActions = screen.getAllByText(/Delivery Action/i)
+        expect(deliveryActions).toHaveLength(2)
+        deliveryActions.forEach((action) => expect(action).toBeInTheDocument())
+    })
+
     test('renders bonus product without quantity picker', () => {
         renderWithProviders(<MockedComponent product={mockBonusProduct} />)
 
         expect(screen.getByText(/Quantity:/i)).toBeInTheDocument()
         expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
+    })
+
+    test('does not render delivery actions for bonus products', () => {
+        renderWithProviders(
+            <MockedComponent
+                product={mockBonusProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        expect(screen.queryByText(/Delivery Action/i)).not.toBeInTheDocument()
+    })
+
+    test('renders delivery actions for regular products but not bonus products', () => {
+        // Test regular product first
+        const {unmount} = renderWithProviders(
+            <MockedComponent
+                product={mockProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        // Regular product should show delivery actions (appears twice - mobile and desktop)
+        expect(screen.getAllByText(/Delivery Action/i)).toHaveLength(2)
+
+        // Cleanup completely
+        unmount()
+
+        // Test bonus product with fresh render
+        renderWithProviders(
+            <MockedComponent
+                product={mockBonusProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        expect(screen.queryAllByText(/Delivery Action/i)).toHaveLength(0)
     })
 })

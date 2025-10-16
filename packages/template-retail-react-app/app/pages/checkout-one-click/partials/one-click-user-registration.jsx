@@ -15,9 +15,18 @@ import {
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-export default function UserRegistration({enableUserRegistration, setEnableUserRegistration}) {
+export default function UserRegistration({
+    enableUserRegistration,
+    setEnableUserRegistration,
+    isGuestCheckout = false
+}) {
     const handleUserRegistrationChange = (e) => {
         setEnableUserRegistration(e.target.checked)
+    }
+
+    // Hide the form if the "Checkout as Guest" button was clicked
+    if (isGuestCheckout) {
+        return null
     }
 
     return (
@@ -67,5 +76,7 @@ UserRegistration.propTypes = {
     /** Whether user registration is enabled */
     enableUserRegistration: PropTypes.bool,
     /** Callback to set user registration state */
-    setEnableUserRegistration: PropTypes.func
+    setEnableUserRegistration: PropTypes.func,
+    /** Whether the "Checkout as Guest" button was clicked */
+    isGuestCheckout: PropTypes.bool
 }

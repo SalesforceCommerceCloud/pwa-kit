@@ -42,6 +42,9 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 
+// Constants for shipments
+export const DEFAULT_SHIPMENT_ID = 'me'
+
 // Default details of badge labels and the corresponding product custom properties that enable badges.
 export const PRODUCT_BADGE_DETAILS = [
     {
@@ -99,11 +102,6 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'This feature is not currently available.',
     id: 'global.error.feature_unavailable'
 })
-export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
-    defaultMessage:
-        'This feature is not currently available. You must create an account to access this feature.',
-    id: 'global.error.create_account'
-})
 
 export const HOME_HREF = '/'
 
@@ -142,6 +140,11 @@ export const TOAST_ACTION_VIEW_WISHLIST = defineMessage({
 export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     id: 'global.info.removed_from_wishlist',
     defaultMessage: 'Item removed from wishlist'
+})
+
+export const TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY = defineMessage({
+    id: 'global.info.store_insufficient_inventory',
+    defaultMessage: "Some items aren't available for pickup at this store."
 })
 
 // Einstein recommender constants used in <RecommendedProducts/>
@@ -184,6 +187,10 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
+/**
+ * Constant to enable the store locator and shop the store feature.
+ * @deprecated Use `storeLocatorEnabled` in the config file instead
+ */
 export const STORE_LOCATOR_IS_ENABLED = true
 export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {
@@ -255,6 +262,10 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
+/**
+ * @deprecated The SLAS private client proxy will mask user not found errors
+ * so this variable should not be used as the app will not see these errors.
+ */
 export const USER_NOT_FOUND_ERROR = /user not found/i
 
 /**

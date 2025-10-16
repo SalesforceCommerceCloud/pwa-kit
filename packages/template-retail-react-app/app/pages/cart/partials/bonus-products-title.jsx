@@ -5,24 +5,26 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const BonusProductsTitle = () => {
-    const {data: basket} = useCurrentBasket()
-    const bonusItemsCount =
-        basket?.productItems?.filter((item) => item.bonusProductLineItem)?.length || 0
-
+const BonusProductsTitle = ({bonusItemsCount = 0}) => {
     return (
-        <Heading as="h2" fontSize="xl">
-            <FormattedMessage
-                defaultMessage="Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-                values={{itemCount: bonusItemsCount}}
-                id="bonus_products_title.title.num_of_items"
-            />
-        </Heading>
+        <Box layerStyle="cardBordered" p={3}>
+            <Text fontWeight="bold">
+                <FormattedMessage
+                    defaultMessage="Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+                    values={{itemCount: bonusItemsCount}}
+                    id="bonus_products_title.title.num_of_items"
+                />
+            </Text>
+        </Box>
     )
+}
+
+BonusProductsTitle.propTypes = {
+    bonusItemsCount: PropTypes.number
 }
 
 export default BonusProductsTitle

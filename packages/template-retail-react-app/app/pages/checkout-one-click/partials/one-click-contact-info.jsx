@@ -26,7 +26,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import {
     ToggleCard,
@@ -43,15 +43,15 @@ import {
     AuthHelpers,
     useAuthHelper,
     useShopperBasketsMutation,
-    useCustomerType,
-    useConfig
+    useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 
-const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
+const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const appOrigin = useAppOrigin()
@@ -59,9 +59,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const {isRegistered} = useCustomerType()
-    const config = useConfig()
 
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
@@ -85,6 +83,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isBlurChecking, setIsBlurChecking] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [emailError, setEmailError] = useState('')
+
+    // Auto-focus the email field when the component mounts
+    useEffect(() => {
+        // Small delay to ensure the field is fully rendered
+        const timer = setTimeout(() => {
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
+        }, 100)
+
+        return () => clearTimeout(timer)
+    }, [])
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -106,13 +120,27 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         }
 
         const email = form.getValues('email')
-        const isValid = await form.trigger()
-        // Manually trigger the browser native form validations
-        if (isValid) {
-            // Try to send OTP first, only open modal if successful
+
+        // Clear previous email error
+        setEmailError('')
+
+        // Validate email format
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        // Email is valid, proceed with OTP check
+        // Use separate blur checking state to avoid disabling the button
+        if (!isBlurChecking) {
+            setIsBlurChecking(true)
             await handleSendEmailOtp(email)
-        } else {
-            form.reportValidity()
+            setIsBlurChecking(false)
         }
     }
 
@@ -129,6 +157,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
         // Clear email checking state
         setIsCheckingEmail(false)
+
+        // Clear email error when user focuses back on the field
+        setEmailError('')
     }
 
     // Handle sending OTP email
@@ -142,8 +173,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             })
             // Only open modal if API call succeeds
             onOtpModalOpen()
+            return {isRegistered: true}
         } catch (error) {
-            //fail silently
+            // Keep continue button visible if email is valid (for unregistered users)
+            if (isValidEmail(email)) {
+                setShowContinueButton(true)
+            }
+            return {isRegistered: false}
         } finally {
             setIsCheckingEmail(false)
         }
@@ -152,6 +188,33 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     // Handle OTP modal close
     const handleOtpModalClose = () => {
         onOtpModalClose()
+        // Show continue button when modal is closed/canceled
+        setShowContinueButton(true)
+        // Reset submitting state when modal is closed/canceled
+        setIsSubmitting(false)
+    }
+
+    // Handle checkout as guest from OTP modal
+    const handleCheckoutAsGuest = async () => {
+        try {
+            const email = form.getValues('email')
+            // Update basket with guest email
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
+
+            // Set the flag that "Checkout as Guest" was clicked
+            setRegisteredUserChoseGuest(true)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(true)
+            }
+
+            // Proceed to next step (shipping address)
+            goToNextStep()
+        } catch (error) {
+            setError(error.message)
+        }
     }
 
     // Handle OTP verification
@@ -167,6 +230,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                         createDestinationBasket: true
                     }
                 })
+            }
+
+            // Update basket with email after successful OTP verification
+            const email = form.getValues('email')
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
+
+            // Reset guest checkout flag since user is now logged in
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
             }
 
             // Close modal
@@ -191,15 +267,83 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         }
     }
 
-    const submitForm = async (data) => {
-        setError(null)
+    // Custom form submit handler to prevent default form submission for registered users
+    const handleFormSubmit = async (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        setIsSubmitting(true)
 
-        await updateCustomerForBasket.mutateAsync({
-            parameters: {basketId: basket.basketId},
-            body: {email: data.email}
-        })
-        setShowContinueButton(false)
-        goToNextStep()
+        // Get form data
+        const formData = form.getValues()
+
+        // Validate email before proceeding
+        if (!formData.email) {
+            setError('Please enter your email address.')
+            setIsSubmitting(false) // Reset submitting state on validation error
+            return
+        }
+
+        if (!isValidEmail(formData.email)) {
+            setError('Please enter a valid email address.')
+            setIsSubmitting(false) // Reset submitting state on validation error
+            return
+        }
+
+        try {
+            // Don't update basket yet - wait to see if user is registered
+            // For registered users, we'll update basket after OTP verification
+            // For guest users, we'll update basket and proceed to next step
+
+            // Check if OTP modal is already open (from blur event)
+            if (isOtpModalOpen) {
+                return
+            }
+
+            // If modal is not open, we need to check if user is registered
+            // This handles cases where blur event didn't trigger or user clicked without tabbing out
+            const result = await handleSendEmailOtp(formData.email)
+
+            // Check if OTP modal is now open (after the API call)
+            if (isOtpModalOpen) {
+                // Hide continue button when OTP modal is open
+                setShowContinueButton(false)
+                return
+            }
+
+            if (!result.isRegistered) {
+                try {
+                    // User is not registered (guest), update basket and proceed to next step
+                    await updateCustomerForBasket.mutateAsync({
+                        parameters: {basketId: basket.basketId},
+                        body: {email: formData.email}
+                    })
+
+                    // Update basket and immediately advance to next step for smooth UX
+                    goToNextStep()
+
+                    // Reset both states immediately for guest users
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
+
+                    return
+                } catch (error) {
+                    setError('An error occurred. Please try again.')
+                    // Show continue button again if there's an error
+                    setShowContinueButton(true)
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
+                }
+            }
+            // If user is registered, OTP modal should be open, don't proceed to next step
+        } catch (error) {
+            setError('An error occurred. Please try again.')
+        } finally {
+            // Only reset submitting state for registered users (when OTP modal is open)
+            // Guest users will have already returned above
+            if (isOtpModalOpen) {
+                setIsSubmitting(false)
+            }
+        }
     }
 
     return (
@@ -232,7 +376,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             >
                 <ToggleCardEdit>
                     <Container variant="form">
-                        <form onSubmit={form.handleSubmit(submitForm)}>
+                        <form onSubmit={handleFormSubmit}>
                             <Stack spacing={6}>
                                 {error && (
                                     <Alert status="error">
@@ -245,6 +389,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                     <InputGroup>
                                         <Field
                                             {...fields.email}
+                                            error={null}
                                             inputRef={emailRef}
                                             inputProps={{
                                                 onBlur: handleEmailBlur,
@@ -271,6 +416,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                             </InputRightElement>
                                         )}
                                     </InputGroup>
+
+                                    {emailError && (
+                                        <Text fontSize="sm" color="red.500" mt={2}>
+                                            {emailError}
+                                        </Text>
+                                    )}
                                 </Stack>
 
                                 <Stack spacing={3}>
@@ -280,7 +431,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                         idps={idps}
                                     />
                                     {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button type="submit">
+                                        <Button
+                                            type="submit"
+                                            isLoading={isSubmitting}
+                                            disabled={isSubmitting}
+                                        >
                                             <FormattedMessage
                                                 defaultMessage="Continue to Shipping Address"
                                                 id="contact_info.button.continue_to_shipping_address"
@@ -297,6 +452,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                 form={form}
                                 handleSendEmailOtp={handleSendEmailOtp}
                                 handleOtpVerification={handleOtpVerification}
+                                onCheckoutAsGuest={handleCheckoutAsGuest}
                             />
                         </form>
                     </Container>
@@ -325,7 +481,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
 ContactInfo.propTypes = {
     isSocialEnabled: PropTypes.bool,
-    idps: PropTypes.arrayOf(PropTypes.string)
+    idps: PropTypes.arrayOf(PropTypes.string),
+    onRegisteredUserChoseGuest: PropTypes.func
 }
 
 const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {

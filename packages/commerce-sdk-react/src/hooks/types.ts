@@ -7,6 +7,7 @@
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
+    ShopperConfigurations,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
@@ -16,7 +17,7 @@ import {
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
-    ShopperSeo,
+    ShopperSEO,
     ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
@@ -94,8 +95,9 @@ export interface ApiClients {
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>
-    shopperSeo?: ShopperSeo<ApiClientConfigParams>
+    shopperSeo?: ShopperSEO<ApiClientConfigParams>
     shopperStores?: ShopperStores<ApiClientConfigParams>
+    shopperConfigurations?: ShopperConfigurations<ApiClientConfigParams>
 }
 
 export type ApiClient = NonNullable<ApiClients[keyof ApiClients]>
@@ -149,8 +151,9 @@ export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> 
 >
 
 /** Query key interface used by API query hooks. */
-export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, unknown>> =
-    readonly [...path: (string | undefined)[], parameters: Params]
+export type ApiQueryKey<
+    Params extends Record<string, unknown> | undefined = Record<string, unknown> | undefined
+> = readonly [...path: (string | undefined)[], parameters: Params]
 
 /** Query options for endpoint hooks. */
 export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<

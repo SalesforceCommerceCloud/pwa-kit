@@ -241,8 +241,16 @@ const throwSlasTokenValidationError = (message, code) => {
 export const createRemoteJWKSet = (tenantId) => {
     const appOrigin = getAppOrigin()
     const {app: appConfig} = getConfig()
-    const shortCode = appConfig.commerceAPI.parameters.shortCode
-    const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
+    const shortCode = appConfig.commerceAPI?.parameters?.shortCode
+    const configTenantId = appConfig.commerceAPI?.parameters?.organizationId?.replace(
+        /^f_ecom_/,
+        ''
+    )
+    if (!shortCode || !configTenantId) {
+        throw new Error(
+            'Cannot find `commerceAPI.parameters.(shortCode|organizationId)` in your config file. Please check the config file.'
+        )
+    }
     if (tenantId !== configTenantId) {
         throw new Error(
             `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`
@@ -343,7 +351,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback?*', (req, res) => {
+    app.get('/callback', (req, res) => {
         // This endpoint does nothing and is not expected to change
         // Thus we cache it for a year to maximize performance
         res.set('Cache-Control', `max-age=31536000`)

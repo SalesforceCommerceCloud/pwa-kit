@@ -29,16 +29,24 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {
+    useCheckout,
+    CheckoutProvider
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     API_ERROR_MESSAGE,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -52,11 +60,15 @@ import {nanoid} from 'nanoid'
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step} = useCheckout()
+    const {step, STEPS} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-    const {data: basket} = useCurrentBasket()
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
+
+    const currentBasketQuery = useCurrentBasket()
+    const {data: basket} = currentBasketQuery
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
@@ -66,7 +78,9 @@ const CheckoutOneClick = () => {
     )
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
-    let shopperPaymentInstrument
+    const [shopperPaymentInstrument, setShopperPaymentInstrument] = useState(null)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
+    const [isEditingPayment, setIsEditingPayment] = useState(false)
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -75,6 +89,9 @@ const CheckoutOneClick = () => {
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
+
+    // appliedPayment includes both manually entered payment instruments and saved payment instruments
+    // that have been applied to the basket via addPaymentInstrumentToBasket
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
@@ -89,6 +106,10 @@ const CheckoutOneClick = () => {
         ShopperCustomersMutations.CreateCustomerAddress
     )
 
+    const handleSavePreferenceChange = (shouldSave) => {
+        setShouldSavePaymentMethod(shouldSave)
+    }
+
     const showError = (message) => {
         showToast({
             title: message || formatMessage(API_ERROR_MESSAGE),
@@ -97,7 +118,14 @@ const CheckoutOneClick = () => {
     }
 
     // Form for payment method
-    const paymentMethodForm = useForm()
+    const paymentMethodForm = useForm({
+        defaultValues: {
+            holder: '',
+            number: '',
+            cardType: '',
+            expiry: ''
+        }
+    })
 
     // Form for billing address
     const billingAddressForm = useForm({
@@ -122,7 +150,7 @@ const CheckoutOneClick = () => {
             }
         }
 
-        shopperPaymentInstrument = {
+        const fullCardDetails = {
             holder: formValue.holder,
             number: formValue.number,
             cardType: getPaymentInstrumentCardType(formValue.cardType),
@@ -130,11 +158,20 @@ const CheckoutOneClick = () => {
             expirationYear: parseInt(`20${expirationYear}`)
         }
 
+        setShopperPaymentInstrument(fullCardDetails)
+
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
         })
     }
+
+    // Reset guest checkout flag when step changes (user goes back to edit)
+    useEffect(() => {
+        if (step === 0) {
+            setRegisteredUserChoseGuest(false)
+        }
+    }, [step])
 
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
@@ -152,13 +189,14 @@ const CheckoutOneClick = () => {
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
+        const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
         return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId}
+            parameters: {basketId: latestBasketId}
         })
     }
 
-    const submitOrder = async () => {
+    const submitOrder = async (fullCardDetails) => {
         const saveShippingAddress = async (customerId, address) => {
             try {
                 await createCustomerAddress({
@@ -188,11 +226,70 @@ const CheckoutOneClick = () => {
                     parameters: {customerId: customerId}
                 })
             } catch (error) {
+                showError(
+                    formatMessage({
+                        id: 'checkout_payment.error.cannot_save_payment',
+                        defaultMessage: 'Could not save payment method. Please try again.'
+                    })
+                )
+            }
+        }
+
+        const savePaymentInstrumentWithDetails = async (
+            customerId,
+            paymentMethodId,
+            fullCardDetails
+        ) => {
+            try {
+                const paymentInstrument = {
+                    paymentMethodId: paymentMethodId,
+                    paymentCard: {
+                        holder: fullCardDetails.holder,
+                        number: fullCardDetails.number,
+                        cardType: fullCardDetails.cardType,
+                        expirationMonth: fullCardDetails.expirationMonth,
+                        expirationYear: fullCardDetails.expirationYear
+                    }
+                }
+
+                await createCustomerPaymentInstruments.mutateAsync({
+                    body: paymentInstrument,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                showError(
+                    formatMessage({
+                        id: 'checkout_payment.error.cannot_save_payment',
+                        defaultMessage: 'Could not save payment method. Please try again.'
+                    })
+                )
+            }
+        }
+
+        // Save payment instrument for existing registered users if they checked the save box
+        const savePaymentInstrumentForRegisteredUser = async (
+            customerId,
+            orderPaymentInstrument,
+            fullCardDetails
+        ) => {
+            try {
+                if (orderPaymentInstrument && fullCardDetails) {
+                    await savePaymentInstrumentWithDetails(
+                        customerId,
+                        orderPaymentInstrument.paymentMethodId,
+                        fullCardDetails
+                    )
+                }
+            } catch (error) {
+                console.error(
+                    'Debug - Failed to save payment instrument for registered user:',
+                    error
+                )
                 // Fail silently
             }
         }
 
-        const registerUser = async (data) => {
+        const registerUser = async (data, fullCardDetails) => {
             try {
                 const body = {
                     customer: {
@@ -209,8 +306,16 @@ const CheckoutOneClick = () => {
                 // Save the shipping address from this order, should not block account creation
                 await saveShippingAddress(customer.customerId, data.address)
 
-                // Save the payment instrument
-                await savePaymentInstrument(customer.customerId, data.paymentMethodId)
+                // Save the payment instrument with full card details
+                if (fullCardDetails) {
+                    await savePaymentInstrumentWithDetails(
+                        customer.customerId,
+                        data.paymentMethodId,
+                        fullCardDetails
+                    )
+                } else {
+                    await savePaymentInstrument(customer.customerId, data.paymentMethodId)
+                }
 
                 showToast({
                     variant: 'subtle',
@@ -249,23 +354,43 @@ const CheckoutOneClick = () => {
 
         setIsLoading(true)
         try {
+            // Ensure we are using the freshest basket id
+            const refreshed = await currentBasketQuery.refetch()
+            const latestBasketId = refreshed.data?.basketId || basket.basketId
+
+            // Create order with the latest basket
             const order = await createOrder({
-                body: {basketId: basket.basketId}
+                body: {basketId: latestBasketId}
             })
 
             if (enableUserRegistration) {
                 // Remove the id property from the address
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const {id, ...address} = order.shipments[0].shippingAddress
                 address.addressId = nanoid()
 
-                await registerUser({
-                    firstName: order.billingAddress.firstName,
-                    lastName: order.billingAddress.lastName,
-                    email: order.customerInfo.email,
-                    phoneHome: order.billingAddress.phone,
-                    address: address,
-                    paymentMethodId: order.paymentInstruments[0].paymentMethodId
-                })
+                await registerUser(
+                    {
+                        firstName: order.billingAddress.firstName,
+                        lastName: order.billingAddress.lastName,
+                        email: order.customerInfo.email,
+                        phoneHome: order.billingAddress.phone,
+                        address: address,
+                        paymentMethodId: order.paymentInstruments[0].paymentMethodId
+                    },
+                    fullCardDetails
+                )
+            } else {
+                // For existing registered users, save payment instrument if they checked the save box
+                // Only save if we have full card details (i.e., user entered a new card)
+                if (shouldSavePaymentMethod && order.paymentInstruments?.[0] && fullCardDetails) {
+                    const paymentInstrument = order.paymentInstruments[0]
+                    await savePaymentInstrumentForRegisteredUser(
+                        order.customerInfo.customerId,
+                        paymentInstrument,
+                        fullCardDetails
+                    )
+                }
             }
 
             navigate(`/checkout/confirmation/${order.orderNo}`)
@@ -280,10 +405,32 @@ const CheckoutOneClick = () => {
         }
     }
 
-    const onPlaceOrder = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
+    const onPlaceOrder = async () => {
         try {
+            // Check if we have form values (new card entered)
+            const paymentFormValues = paymentMethodForm.getValues()
+            const hasFormValues = paymentFormValues && paymentFormValues.expiry
+
+            // Prepare full card details for saving (only if we have form values for new cards)
+            let fullCardDetails = null
+            if (hasFormValues) {
+                const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
+                fullCardDetails = {
+                    holder: paymentFormValues.holder,
+                    number: paymentFormValues.number, // Full card number from form
+                    cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
+            }
+            // For saved payments (appliedPayment), we don't need fullCardDetails
+            // because we're not saving them again - they're already saved
+
             if (!appliedPayment) {
-                await onPaymentSubmit(paymentFormValues)
+                // No payment applied, need to add a new payment instrument
+                if (hasFormValues) {
+                    await onPaymentSubmit(paymentFormValues)
+                }
             }
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
@@ -291,12 +438,12 @@ const CheckoutOneClick = () => {
             const updatedBasket = await onBillingSubmit()
 
             if (updatedBasket) {
-                await submitOrder()
+                await submitOrder(fullCardDetails)
             }
         } catch (error) {
             showError()
         }
-    })
+    }
 
     useEffect(() => {
         if (error || step === 4) {
@@ -322,7 +469,11 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
+                            <ContactInfo
+                                isSocialEnabled={isSocialEnabled}
+                                idps={idps}
+                                onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
+                            />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
@@ -330,9 +481,16 @@ const CheckoutOneClick = () => {
                                 setEnableUserRegistration={setEnableUserRegistration}
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
+                                registeredUserChoseGuest={registeredUserChoseGuest}
+                                onSavePreferenceChange={handleSavePreferenceChange}
+                                onPaymentSubmitted={onPaymentSubmit}
+                                selectedPaymentMethod={selectedPaymentMethod}
+                                isEditing={isEditingPayment}
+                                onSelectedPaymentMethodChange={setSelectedPaymentMethod}
+                                onIsEditingChange={setIsEditingPayment}
                             />
 
-                            {step === 4 && (
+                            {step >= STEPS.PAYMENT && (
                                 <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
                                     <Container variant="form">
                                         <Button
@@ -340,8 +498,9 @@ const CheckoutOneClick = () => {
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
                                             isDisabled={
-                                                !paymentMethodForm.formState.isValid &&
-                                                !appliedPayment
+                                                !appliedPayment &&
+                                                !isEditingPayment &&
+                                                !paymentMethodForm.formState.isValid
                                             }
                                             data-testid="place-order-button"
                                             size="lg"
@@ -372,4 +531,61 @@ const CheckoutOneClick = () => {
     )
 }
 
-export default CheckoutOneClick
+const CheckoutContainer = () => {
+    const {data: customer} = useCurrentCustomer()
+    const {data: basket} = useCurrentBasket()
+    const {formatMessage} = useIntl()
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const toast = useToast()
+    const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+
+    const handleRemoveItem = async (product) => {
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                }
+            }
+        )
+    }
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        setIsDeletingUnavailableItem(true)
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        setIsDeletingUnavailableItem(false)
+    }
+
+    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+        return <CheckoutSkeleton />
+    }
+
+    return (
+        <CheckoutProvider>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+
+            <CheckoutOneClick />
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
+        </CheckoutProvider>
+    )
+}
+
+export default CheckoutContainer

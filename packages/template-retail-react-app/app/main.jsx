@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {start, registerServiceWorker} from '@salesforce/pwa-kit-react-sdk/ssr/browser/main'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 const main = () => {
     // The path to your service worker should match what is set up in ssr.js
-    return Promise.all([start(), registerServiceWorker('/worker.js')])
+    return Promise.all([start(), registerServiceWorker(`${getEnvBasePath()}/worker.js`)])
 }
 
 main()

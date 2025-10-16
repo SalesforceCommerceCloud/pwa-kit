@@ -28,6 +28,7 @@ import {
     bundleProductItemsForPDP
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {mockStandardProductOrderable} from '@salesforce/retail-react-app/app/mocks/standard-product'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -79,32 +80,47 @@ jest.mock('@salesforce/retail-react-app/app/components/recommended-products', ()
     return MockedRecommendedProducts
 })
 
+// Mock getConfig to return test values
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            storeLocatorEnabled: true,
+            multishipEnabled: false
+        }
+    }))
+}))
+
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...originalModule,
-        DEFAULT_DNT_STATE: false
+        DEFAULT_DNT_STATE: false,
+        STORE_LOCATOR_IS_ENABLED: true
     }
 })
 
-jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
-    // eslint-disable-next-line react/prop-types
-    function MockStoreLocatorModal({isOpen, onClose}) {
-        return isOpen ? (
-            <div data-testid="store-locator-modal">
-                <button onClick={onClose}>Close Modal</button>
-            </div>
-        ) : null
-    }
-    return {
-        StoreLocatorModal: MockStoreLocatorModal
-    }
-})
+jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
+    useStoreLocatorModal: jest.fn(() => ({
+        isOpen: false,
+        onOpen: jest.fn(),
+        onClose: jest.fn()
+    }))
+}))
 
 // Mock useSelectedStore hook
 const mockUseSelectedStore = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
     useSelectedStore: () => mockUseSelectedStore()
+}))
+
+// Mock useMultiship hook
+const mockGetShipmentForItems = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+    useMultiship: () => ({
+        getShipmentIdForItems: mockGetShipmentForItems
+    })
 }))
 
 const MockedComponent = () => {
@@ -128,6 +144,7 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: false
     }))
+    mockGetShipmentForItems.mockResolvedValue('me')
 
     global.server.use(
         // By default, the page will be rendered with a product set
@@ -329,6 +346,74 @@ describe('product set', () => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
         })
+    })
+
+    test('pickup in store radio is enabled when all child products have inventory in selected store', async () => {
+        const inventoryId = 'inventory_m_store_store1'
+        const storeId = 'store-123'
+
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: storeId,
+                name: 'Test Store',
+                inventoryId: inventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        // Create product set with parent and child products that all have inventory in the selected store
+        const productSetWithInventory = {
+            ...mockedProductSet,
+            setProducts: mockedProductSet.setProducts.map((childProduct) => ({
+                ...childProduct,
+                inventories: [
+                    {
+                        id: inventoryId,
+                        orderable: true,
+                        ats: 10,
+                        stockLevel: 10
+                    }
+                ]
+            }))
+        }
+
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(productSetWithInventory))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+
+        // Wait for child products to load
+        const childProducts = await screen.findAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3) // 3 child products in the winter look set
+
+        // Check that each child product has pickup in store radio enabled
+        for (const childProduct of childProducts) {
+            await waitFor(() => {
+                const pickupRadio = within(childProduct).getByRole('radio', {
+                    name: /pick up in store/i
+                })
+                expect(pickupRadio).toBeEnabled()
+            })
+        }
+
+        // Check that the parent product pickup in store radio is also enabled
+        const allPickupRadios = await screen.findAllByRole('radio', {name: /pick up in store/i})
+        // Should have 4 pickup radios total: 1 parent + 3 children
+        expect(allPickupRadios).toHaveLength(4)
+
+        // The first pickup radio should be the parent product (rendered before child products)
+        const parentPickupRadio = allPickupRadios[0]
+        expect(parentPickupRadio).toBeEnabled()
     })
 })
 
@@ -657,8 +742,6 @@ describe('Delivery Options Restrictions', () => {
             hasSelectedStore: true
         }))
 
-        // Track if updatePickupShipment was called
-        let updatePickupShipmentCalled = false
         let shipmentUpdateRequest = null
 
         // Mock the product to be a simple master product with inventory
@@ -684,7 +767,6 @@ describe('Delivery Options Restrictions', () => {
             }),
             // Mock the shipment update call that updatePickupShipment makes
             rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
-                updatePickupShipmentCalled = true
                 shipmentUpdateRequest = await req.json()
 
                 // Verify the correct parameters are passed to updatePickupShipment
@@ -988,7 +1070,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 1
+                    quantity: 1,
+                    shipmentId: 'me'
                 }
             ])
         })
@@ -1018,7 +1101,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 3
+                    quantity: 3,
+                    shipmentId: 'me'
                 }
             ])
         })

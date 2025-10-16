@@ -17,7 +17,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     ToggleCard,
@@ -72,7 +72,7 @@ export default function ShippingOptions() {
     }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
 
     // Use calculated loading state or manual loading state
-    const effectiveIsLoading = isLoading || shouldShowInitialLoading
+    const effectiveIsLoading = Boolean(isLoading) || Boolean(shouldShowInitialLoading)
 
     const form = useForm({
         shouldUnregister: false,
@@ -101,15 +101,15 @@ export default function ShippingOptions() {
                 return
             }
 
+            // Only proceed for authenticated users
+            if (!customer?.isRegistered) {
+                return
+            }
+
             // Skip if basket already has a shipping method
             if (selectedShippingMethod?.id) {
                 setHasAutoSelected(true)
                 goToNextStep()
-                return
-            }
-
-            // Only proceed for authenticated users
-            if (!customer?.isRegistered) {
                 return
             }
 
@@ -119,9 +119,10 @@ export default function ShippingOptions() {
             }
 
             const defaultMethodId = shippingMethods.defaultShippingMethodId
-            const defaultMethod = shippingMethods.applicableShippingMethods.find(
-                (method) => method.id === defaultMethodId
-            )
+            const defaultMethod =
+                shippingMethods.applicableShippingMethods.find(
+                    (method) => method.id === defaultMethodId
+                ) || shippingMethods.applicableShippingMethods[0]
 
             if (defaultMethod) {
                 //Auto-selecting default shipping method

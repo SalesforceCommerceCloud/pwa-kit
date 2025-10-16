@@ -47,6 +47,7 @@ import {
 
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
@@ -117,6 +118,7 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {
         getButtonProps: getAccountMenuButtonProps,
         getDisclosureProps: getAccountMenuDisclosureProps,
@@ -132,6 +134,13 @@ const Header = ({
     const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
+    const {oneClickCheckout = {}} = getConfig().app || {}
+    const isOneClickCheckoutEnabled = oneClickCheckout.enabled
+
+    // Filter navigation links based on 1CC configuration
+    const filteredNavLinks = isOneClickCheckoutEnabled
+        ? navLinks
+        : navLinks.filter((link) => link.name !== 'payments')
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -252,7 +261,7 @@ const Header = ({
                                 <PopoverBody>
                                     <Box as="nav">
                                         <Stack spacing={0} as="ul" data-testid="account-detail-nav">
-                                            {navLinks.map((link) => {
+                                            {filteredNavLinks.map((link) => {
                                                 const LinkIcon = link.icon
                                                 return (
                                                     <Box
@@ -311,7 +320,7 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
-                    {STORE_LOCATOR_IS_ENABLED && (
+                    {storeLocatorEnabled && (
                         <IconButton
                             aria-label={intl.formatMessage({
                                 defaultMessage: 'Store Locator',

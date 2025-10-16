@@ -17,41 +17,70 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {
+    CheckoutProvider,
+    useCheckout
+} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
+import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {
+    API_ERROR_MESSAGE,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+} from '@salesforce/retail-react-app/app/constants'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const {removeEmptyShipments} = useMultiship(basket)
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+
+    // cart has both pickup and delivery orders
+    const isDeliveryAndPickupOrder =
+        multishipEnabled &&
+        derivedData?.totalPickupShipments > 0 &&
+        derivedData?.totalDeliveryShipments > 0
+
+    // Check if there are pickup shipments
+    const hasPickupShipments = derivedData?.totalPickupShipments > 0
 
     // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
         }
     }, [error, step])
+
+    // Remove any empty shipments whenever navigating to the checkout page
+    // Using basketId ensures that the basket is in a valid state before removing empty shipments
+    useEffect(() => {
+        if (basket?.shipments?.length > 1) {
+            removeEmptyShipments(basket)
+        }
+    }, [basket?.basketId])
 
     const submitOrder = async () => {
         setIsLoading(true)
@@ -94,8 +123,16 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
-                            {!isPickupOrder && <ShippingOptions />}
+
+                            {isPickupOrderOnly ? (
+                                <PickupAddress />
+                            ) : (
+                                <>
+                                    {hasPickupShipments && <PickupAddress />}
+                                    <ShippingAddress />
+                                    <ShippingMethods />
+                                </>
+                            )}
                             <Payment />
 
                             {step === 5 && (
@@ -165,4 +202,61 @@ const Checkout = () => {
     )
 }
 
-export default Checkout
+const CheckoutContainer = () => {
+    const {data: customer} = useCurrentCustomer()
+    const {data: basket} = useCurrentBasket()
+    const {formatMessage} = useIntl()
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const toast = useToast()
+    const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+
+    const handleRemoveItem = async (product) => {
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                }
+            }
+        )
+    }
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        setIsDeletingUnavailableItem(true)
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        setIsDeletingUnavailableItem(false)
+    }
+
+    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+        return <CheckoutSkeleton />
+    }
+
+    return (
+        <CheckoutProvider>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+
+            <Checkout />
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
+        </CheckoutProvider>
+    )
+}
+
+export default CheckoutContainer

@@ -23,7 +23,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import {
     ToggleCard,
@@ -45,12 +45,11 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES,
-    USER_NOT_FOUND_ERROR
+    PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
@@ -83,7 +82,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
+        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -95,9 +94,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = USER_NOT_FOUND_ERROR.test(error.message)
-                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             setError(message)

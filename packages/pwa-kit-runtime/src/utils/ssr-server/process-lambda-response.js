@@ -6,6 +6,7 @@
  */
 
 import {CONTENT_TYPE, X_ORIGINAL_CONTENT_TYPE} from '../../ssr/server/constants'
+import {getFlattenedHeadersMap} from '@h4ad/serverless-adapter'
 
 export const processLambdaResponse = (response, event) => {
     if (!response) return response
@@ -13,26 +14,26 @@ export const processLambdaResponse = (response, event) => {
     // Retrieve the correlation ID from the event headers
     const correlationId = event.headers?.['x-correlation-id']
 
-    const responseHeaders = {
-        ...response.headers
-    }
+    let joinedHeaders = getFlattenedHeadersMap(response.multiValueHeaders || {}, ',', true)
+    joinedHeaders['date'] = new Date().toUTCString()
+    delete response['multiValueHeaders']
 
     // Add the correlation ID to the response headers if it exists
     if (correlationId) {
-        responseHeaders['x-correlation-id'] = correlationId
+        joinedHeaders['x-correlation-id'] = correlationId
     }
 
     // If the response contains an X_ORIGINAL_CONTENT_TYPE header,
     // then replace the current CONTENT_TYPE header with it.
-    const originalContentType = response.headers?.[X_ORIGINAL_CONTENT_TYPE]
+    const originalContentType = joinedHeaders[X_ORIGINAL_CONTENT_TYPE]
     if (originalContentType) {
-        responseHeaders[CONTENT_TYPE] = originalContentType
-        delete responseHeaders[X_ORIGINAL_CONTENT_TYPE]
+        joinedHeaders[CONTENT_TYPE] = originalContentType
+        delete joinedHeaders[X_ORIGINAL_CONTENT_TYPE]
     }
 
     const result = {
         ...response,
-        headers: responseHeaders
+        headers: joinedHeaders
     }
     return result
 }

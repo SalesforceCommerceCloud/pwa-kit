@@ -52,11 +52,13 @@ import Island from '@salesforce/retail-react-app/app/components/island'
 
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {
     DntNotification,
     useDntNotification
 } from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {BonusProductSelectionModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -84,6 +86,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -140,15 +143,16 @@ const App = (props) => {
     const authModal = useAuthModal()
     const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useStoreLocatorModal()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -215,8 +219,8 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        return config.app.commerceAgent
-    }, [config?.app])
+        return getCommerceAgentConfig()
+    }, [config.app.commerceAgent])
 
     useEffect(() => {
         // update the basket customer email
@@ -363,9 +367,6 @@ const App = (props) => {
                         {commerceAgentConfiguration?.enabled === 'true' && (
                             <ShopperAgent
                                 commerceAgentConfiguration={commerceAgentConfiguration}
-                                domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
-                                locale={locale?.id}
-                                basketId={basket?.basketId}
                                 basketDoneLoading={basketQueryLastUpdateTime > 0}
                             />
                         )}
@@ -374,9 +375,9 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {STORE_LOCATOR_IS_ENABLED && (
+                            {storeLocatorEnabled && (
                                 <StoreLocatorModal
-                                    isOpen={isOpenStoreLocator}
+                                    isOpen={isStoreLocatorOpen}
                                     onClose={onCloseStoreLocator}
                                 />
                             )}
@@ -430,34 +431,36 @@ const App = (props) => {
                             </Island>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                <BonusProductSelectionModalProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
 
-                                <Island hydrateOn={'visible'}>
-                                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                                </Island>
+                                    <Island hydrateOn={'visible'}>
+                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    </Island>
 
-                                <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                    <AuthModal {...authModal} />
+                                    <DntNotification {...dntNotification} />
+                                </BonusProductSelectionModalProvider>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

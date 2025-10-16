@@ -21,8 +21,6 @@ import {Route, Switch} from 'react-router-dom'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
-let mockCustomer = {}
-
 const MockedComponent = () => {
     return (
         <Switch>
@@ -116,4 +114,30 @@ test('Non ECOM user cannot see the password card', async () => {
     expect(screen.queryByText(/edit/i)).not.toBeInTheDocument()
 
     expect(screen.queryByText(/Password/i)).not.toBeInTheDocument()
+})
+
+test('Email field is readonly when editing profile', async () => {
+    sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByText(/Account Details/i)).toBeInTheDocument()
+    })
+
+    const profileCard = screen.getByTestId('sf-toggle-card-my-profile')
+    // Click edit to open the profile form
+    await user.click(within(profileCard).getByText(/edit/i))
+
+    // Profile Form must be present
+    expect(screen.getByLabelText('Profile Form')).toBeInTheDocument()
+
+    // Find the email input field
+    const emailInput = screen.getByLabelText('Email')
+    expect(emailInput).toBeInTheDocument()
+
+    // Verify the email field is readonly
+    expect(emailInput).toHaveAttribute('readonly')
 })

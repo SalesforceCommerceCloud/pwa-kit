@@ -16,7 +16,7 @@ import {
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 
 // Hooks
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
 

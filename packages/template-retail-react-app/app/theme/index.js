@@ -50,6 +50,8 @@ import ProductTile from '@salesforce/retail-react-app/app/theme/components/proje
 import SocialIcons from '@salesforce/retail-react-app/app/theme/components/project/social-icons'
 import SwatchGroup from '@salesforce/retail-react-app/app/theme/components/project/swatch-group'
 import ImageGallery from '@salesforce/retail-react-app/app/theme/components/project/image-gallery'
+import SearchSuggestions from '@salesforce/retail-react-app/app/theme/components/project/search-suggestions'
+import HorizontalSuggestions from '@salesforce/retail-react-app/app/theme/components/project/horizontal-suggestions'
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -97,7 +99,9 @@ export const overrides = {
         Pagination,
         ProductTile,
         SwatchGroup,
-        ImageGallery
+        ImageGallery,
+        SearchSuggestions,
+        HorizontalSuggestions
     }
 }
 

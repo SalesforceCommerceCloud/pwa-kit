@@ -84,15 +84,13 @@ const CartSecondaryButtonGroup = ({
                 divider={<Divider display={{base: 'block', lg: 'none'}} />}
             >
                 <ButtonGroup spacing="6">
-                    {!isBonusProduct && (
-                        <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
-                            <FormattedMessage
-                                defaultMessage="Remove"
-                                id="cart_secondary_button_group.action.remove"
-                            />
-                        </Button>
-                    )}
-                    {customer.isRegistered && !isBonusProduct && (
+                    <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
+                        <FormattedMessage
+                            defaultMessage="Remove"
+                            id="cart_secondary_button_group.action.remove"
+                        />
+                    </Button>
+                    {customer.isRegistered && (
                         <Button
                             variant="link"
                             size="sm"

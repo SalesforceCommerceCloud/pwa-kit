@@ -5,16 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import logger from './logger-instance'
-export const PERFORMANCE_MARKS = {
-    total: 'ssr.total',
-    renderToString: 'ssr.render-to-string',
-    routeMatching: 'ssr.route-matching',
-    loadComponent: 'ssr.load-component',
-    fetchStrategies: 'ssr.fetch-strategies',
-    reactQueryPrerender: 'ssr.fetch-strategies.react-query.pre-render',
-    reactQueryUseQuery: 'ssr.fetch-strategies.react-query.use-query',
-    getProps: 'ssr.fetch-strategies.get-prop'
-}
+import {createChildSpan, endSpan} from './opentelemetry'
 
 /**
  * This is an SDK internal class that is responsible for measuring server side performance.
@@ -32,11 +23,10 @@ export default class PerformanceTimer {
     }
     constructor(options = {}) {
         this.enabled = options.enabled || false
-        this.marks = {
-            start: new Map(),
-            end: new Map()
-        }
         this.metrics = []
+        this.spans = new Map()
+        this.spanTimeouts = new Map()
+        this.maxSpanDuration = options.maxSpanDuration || 30000 // 30 seconds default
     }
 
     /**
@@ -78,50 +68,152 @@ export default class PerformanceTimer {
      * This is a utility function to create performance marks.
      * The data will be used in console logs and the http response header `server-timing`.
      *
-     * @function
-     * @private
+     * @param {string} name - Unique identifier for the performance measurement.
+     * Must be the same for both start and end marks of a pair. E.g. 'ssr.render-to-string'
+     *
+     * @param {string} type - Mark type, either 'start' or 'end'. 'start' creates spans and browser marks,
+     * 'end' completes measurement and cleanup.
+     *
+     * @param {Object} [options={}] - Optional configuration object
+     * @param {string|Object} [options.detail=''] - Additional metadata for the mark
+     * included in logs and tracing attributes.
      */
     mark(name, type, options = {}) {
-        if (!this.enabled) {
-            return
-        }
-
-        if (!name) {
-            logger.warn('Performance mark cannot be created because the name is undefined.', {
-                namespace: 'performance'
-            })
+        const {detail = ''} = options
+        if (!this.enabled || !name || !type) {
             return
         }
 
         if (type !== this.MARKER_TYPES.START && type !== this.MARKER_TYPES.END) {
-            logger.warn(
-                'Performance mark cannot be created because the type must be either "start" or "end".',
-                {
-                    namespace: 'performance'
-                }
-            )
+            logger.warn('Invalid mark type', {type, name, namespace: 'PerformanceTimer.mark'})
             return
         }
 
-        const timestamp = performance.now()
-        const isEnd = type === this.MARKER_TYPES.END
-        const storage = isEnd ? this.marks.end : this.marks.start
-        storage.set(name, {
-            name,
-            timestamp,
-            detail: options.detail
-        })
+        try {
+            performance.mark(`${name}.${type}`, {
+                detail: detail
+            })
 
-        if (isEnd) {
-            const startMark = this.marks.start.get(name)
-            if (startMark) {
-                const measurement = {
-                    name,
-                    duration: timestamp - startMark.timestamp,
-                    detail: options.detail
+            // Only create spans for 'start' events and store them for later use
+            if (type === this.MARKER_TYPES.START) {
+                if (!this.spans.has(name)) {
+                    const span = createChildSpan(name, {
+                        performance_mark: name,
+                        performance_type: type,
+                        performance_detail: detail
+                    })
+                    if (span) {
+                        this.spans.set(name, span)
+
+                        // Set up automatic cleanup for orphaned spans
+                        const timeoutId = setTimeout(() => {
+                            this._cleanupOrphanedSpan(name, 'timeout')
+                        }, this.maxSpanDuration)
+                        this.spanTimeouts.set(name, timeoutId)
+                    }
+                } else {
+                    logger.warn('Span already exists', {
+                        name,
+                        namespace: 'PerformanceTimer.mark'
+                    })
                 }
-                this.metrics.push(measurement)
+            } else if (type === this.MARKER_TYPES.END) {
+                const startMark = `${name}.${this.MARKER_TYPES.START}`
+                const endMark = `${name}.${this.MARKER_TYPES.END}`
+
+                try {
+                    const measure = performance.measure(name, startMark, endMark)
+
+                    // Add the metric to the metrics array for Server-Timing header
+                    this.metrics.push({
+                        name,
+                        duration: measure.duration,
+                        detail: detail
+                    })
+
+                    // End the corresponding span if it exists and clear timeout
+                    const span = this.spans.get(name)
+                    if (span) {
+                        endSpan(span)
+                        this.spans.delete(name)
+
+                        // Clear the timeout since span completed normally
+                        const timeoutId = this.spanTimeouts.get(name)
+                        if (timeoutId) {
+                            clearTimeout(timeoutId)
+                            this.spanTimeouts.delete(name)
+                        }
+                    }
+
+                    // Clear the marks
+                    performance.clearMarks(startMark)
+                    performance.clearMarks(endMark)
+                    performance.clearMeasures(name)
+                } catch (error) {
+                    logger.error('Failed to measure performance mark', {
+                        name,
+                        error: error.message,
+                        startMark,
+                        endMark,
+                        namespace: 'PerformanceTimer.mark'
+                    })
+                }
+            }
+        } catch (error) {
+            if (error.name === 'SyntaxError') {
+                logger.error('Invalid performance mark name', {name, error: error.message})
+            } else {
+                logger.error('Error creating performance mark:', {
+                    name,
+                    type,
+                    error: error.message,
+                    namespace: 'PerformanceTimer.mark'
+                })
             }
         }
+    }
+
+    /**
+     * Helper method to clean up a specific orphaned span
+     * @private
+     */
+    _cleanupOrphanedSpan(name, reason = 'manual') {
+        const span = this.spans.get(name)
+        if (span) {
+            logger.warn('Cleaning up orphaned span', {
+                name,
+                error: 'Deleting orphaned span (reason: ' + reason + ' cleanup)',
+                namespace: 'PerformanceTimer._cleanupOrphanedSpan'
+            })
+            endSpan(span)
+            this.spans.delete(name)
+        }
+
+        // Clear the timeout
+        const timeoutId = this.spanTimeouts.get(name)
+        if (timeoutId) {
+            clearTimeout(timeoutId)
+            this.spanTimeouts.delete(name)
+        }
+    }
+
+    /**
+     * Clean up all orphaned spans and clear all timeouts
+     * Call this when the timer is no longer needed or when you want to force cleanup
+     */
+    cleanup() {
+        // Clean up any orphaned spans
+        this.spans.forEach((span, name) => {
+            this._cleanupOrphanedSpan(name, 'manual_cleanup')
+        })
+
+        // Clear any remaining timeouts
+        this.spanTimeouts.forEach((timeoutId) => {
+            clearTimeout(timeoutId)
+        })
+        this.spanTimeouts.clear()
+
+        // Clear metrics as well
+        this.metrics = []
     }
 }
