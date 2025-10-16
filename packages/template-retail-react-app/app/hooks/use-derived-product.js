@@ -23,6 +23,7 @@ const getInventoryById = (product, inventoryId) => {
 }
 
 // TODO: This needs to be refactored.
+// If compatibility with API version < v8.1 is needed, keep pickupInStore as false
 export const useDerivedProduct = (
     product,
     isProductPartOfSet = false,
