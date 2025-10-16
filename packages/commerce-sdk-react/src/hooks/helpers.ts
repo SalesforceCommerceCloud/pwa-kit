@@ -62,7 +62,7 @@ export const generateCustomEndpointOptions = (
                 ...globalHeaders,
                 ...options.options?.headers,
                 ...(args?.headers ? args.headers : {})
-            },
+            }
         },
         clientConfig: {
             ...globalClientConfig,
