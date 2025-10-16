@@ -57,8 +57,8 @@ const options = {
     // customize this regex to include the additional endpoints the custom SLAS
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+    applySLASPrivateClientToEndpoints:
+        /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -98,7 +98,7 @@ function generateUniqueId() {
  *
  * @return {Promise<object>} A promise that resolves to the response object received from the Marketing Cloud API.
  */
-async function sendMarketingCloudEmail(emailId, marketingCloudConfig) {
+async function sendMarketingCloudEmail(emailId, marketingCloudConfig, attributes) {
     // Refresh token if expired
     if (new Date() > marketingCloudTokenExpiration) {
         const {clientId, clientSecret, subdomain} = marketingCloudConfig
@@ -175,7 +175,6 @@ export async function emailLink(emailId, templateId, attributes) {
     const marketingCloudConfig = {
         clientId: process.env.MARKETING_CLOUD_CLIENT_ID,
         clientSecret: process.env.MARKETING_CLOUD_CLIENT_SECRET,
-        magicLink: magicLink,
         subdomain: process.env.MARKETING_CLOUD_SUBDOMAIN,
         templateId: templateId
     }
@@ -246,11 +245,6 @@ export const createRemoteJWKSet = (tenantId) => {
         /^f_ecom_/,
         ''
     )
-    if (!shortCode || !configTenantId) {
-        throw new Error(
-            'Cannot find `commerceAPI.parameters.(shortCode|organizationId)` in your config file. Please check the config file.'
-        )
-    }
     if (tenantId !== configTenantId) {
         throw new Error(
             `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`
@@ -327,7 +321,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        "*.demandware.net"
+                        '*.demandware.net'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -371,19 +365,15 @@ const {handler} = runtime.createHandler(options, (app) => {
         const redirectUrl = req.query.redirectUrl
         const mode = req.query.mode
         validateSlasCallbackToken(slasCallbackToken).then(() => {
-            if (mode === 'magic_link') {
+            if (mode === 'otp_email') {
+                sendOtpEmail(req, res, process.env.MARKETING_CLOUD_OTP_EMAIL_TEMPLATE)
+            } else {
                 sendMagicLinkEmail(
                     req,
                     res,
                     config.app.login?.passwordless?.landingPath,
                     process.env.MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE,
                     redirectUrl
-                )
-            } else if (mode === 'otp_email') {
-                sendOtpEmail(
-                    req,
-                    res,
-                    process.env.MARKETING_CLOUD_OTP_EMAIL_TEMPLATE
                 )
             }
         })
