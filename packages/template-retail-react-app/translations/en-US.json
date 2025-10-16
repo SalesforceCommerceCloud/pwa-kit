@@ -8,6 +8,9 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
+  "account.title.my_account": {
+    "defaultMessage": "My Account"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },
@@ -237,6 +240,9 @@
   "cart.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
   },
+  "cart.title.shopping_cart": {
+    "defaultMessage": "Shopping Cart"
+  },
   "cart_cta.link.checkout": {
     "defaultMessage": "Proceed to Checkout"
   },
@@ -275,6 +281,9 @@
   },
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
+  },
+  "checkout.title.checkout": {
+    "defaultMessage": "Checkout"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
@@ -844,6 +853,9 @@
   "home.link.read_docs": {
     "defaultMessage": "Read docs"
   },
+  "home.title.home": {
+    "defaultMessage": "Home"
+  },
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
   },
@@ -1044,6 +1056,9 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
+  "login.title.sign_in": {
+    "defaultMessage": "Sign In"
+  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
@@ -1149,6 +1164,9 @@
   },
   "page_not_found.title.page_cant_be_found": {
     "defaultMessage": "The page you're looking for can't be found."
+  },
+  "page_not_found.title.page_not_found": {
+    "defaultMessage": "Page Not Found"
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
@@ -1263,6 +1281,9 @@
   },
   "product_detail.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
+  },
+  "product_detail.title.product_details": {
+    "defaultMessage": "Product Details"
   },
   "product_item.label.quantity": {
     "defaultMessage": "Quantity:"
@@ -1449,6 +1470,12 @@
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
+  },
+  "registration.title.create_account": {
+    "defaultMessage": "Create Account"
+  },
+  "reset_password.title.reset_password": {
+    "defaultMessage": "Reset Password"
   },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Sign in"

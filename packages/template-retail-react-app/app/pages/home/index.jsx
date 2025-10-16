@@ -20,7 +20,8 @@ import {
     Flex,
     Stack,
     Container,
-    Link
+    Link,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -87,6 +88,9 @@ const Home = () => {
 
     return (
         <Box data-testid="home-page" layerStyle="page">
+            <Heading as="h1" srOnly>
+                <FormattedMessage defaultMessage="Home" id="home.title.home" />
+            </Heading>
             <Seo
                 title="Home Page"
                 description="Commerce Cloud Retail React App"

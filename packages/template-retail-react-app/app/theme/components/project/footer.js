@@ -46,6 +46,7 @@ export default {
         },
         subscribeHeading: {
             fontSize: 'md',
+            paddingTop: {base: 0, lg: 3},
             marginBottom: 2
         },
         subscribeMessage: {
