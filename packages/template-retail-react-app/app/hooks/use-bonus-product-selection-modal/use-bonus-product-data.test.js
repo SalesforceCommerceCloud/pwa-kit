@@ -20,9 +20,14 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     findAvailableBonusDiscountLineItemIds: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products', () => ({
+    useRuleBasedBonusProducts: jest.fn()
+}))
+
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 
 describe('useBonusProductData', () => {
     const mockBasket = {
@@ -81,6 +86,12 @@ describe('useBonusProductData', () => {
             isLoading: false
         })
         findAvailableBonusDiscountLineItemIds.mockReturnValue([['bonus-1', 1]])
+        useRuleBasedBonusProducts.mockReturnValue({
+            products: [],
+            total: 0,
+            isLoading: false,
+            error: null
+        })
     })
 
     test('returns correct bonus products data', () => {
@@ -635,12 +646,12 @@ describe('useBonusProductData', () => {
 
             const {result} = renderHook(() => useBonusProductData(ruleBasedModalData))
 
-            // Should return null for products not in any bonusProducts list
+            // Should return metadata for rule-based products from rule-based promotion
             const meta = result.current.computeBonusMeta({productId: 'rule-fetched-product'})
 
             expect(meta).toEqual({
-                promotionId: null,
-                bonusDiscountLineItemId: null
+                promotionId: 'rule-promo',
+                bonusDiscountLineItemId: 'rule-based-1'
             })
         })
     })
