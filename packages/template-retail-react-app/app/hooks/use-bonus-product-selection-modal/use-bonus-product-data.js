@@ -49,10 +49,7 @@ export const useBonusProductData = (modalData) => {
     // Fetch rule-based products for all rule-based promotions
     // Note: This fetches for the first promotion. If multiple rule-based promotions exist,
     // we'd need to call the hook multiple times or aggregate the promotionIds
-    const {
-        products: ruleBasedProducts,
-        isLoading: isLoadingRuleBased
-    } = useRuleBasedBonusProducts(
+    const {products: ruleBasedProducts, isLoading: isLoadingRuleBased} = useRuleBasedBonusProducts(
         ruleBasedPromotions[0] || '',
         {
             enabled: ruleBasedPromotions.length > 0,
@@ -141,9 +138,7 @@ export const useBonusProductData = (modalData) => {
             }
         } else {
             // If not in list-based, check if it's from a rule-based promotion
-            const ruleBasedCandidates = bonusProducts.filter((bli) =>
-                isRuleBasedPromotion(bli)
-            )
+            const ruleBasedCandidates = bonusProducts.filter((bli) => isRuleBasedPromotion(bli))
 
             if (ruleBasedCandidates.length > 0) {
                 for (const candidate of ruleBasedCandidates) {
