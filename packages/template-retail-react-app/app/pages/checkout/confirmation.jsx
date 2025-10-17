@@ -173,7 +173,7 @@ const CheckoutConfirmation = () => {
                 <Stack spacing={4}>
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
-                            <Heading align="center" fontSize={['2xl']}>
+                            <Heading as="h1" align="center" fontSize={['2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Thank you for your order!"
                                     id="checkout_confirmation.heading.thank_you_for_order"

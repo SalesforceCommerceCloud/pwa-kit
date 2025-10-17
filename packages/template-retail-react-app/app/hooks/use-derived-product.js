@@ -23,10 +23,12 @@ const getInventoryById = (product, inventoryId) => {
 }
 
 // TODO: This needs to be refactored.
+// If compatibility with API version < v8.1 is needed, keep pickupInStore as false
 export const useDerivedProduct = (
     product,
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    pickupInStore = false
 ) => {
     const showLoading = !product
     const isProductABundle = product?.type?.bundle
@@ -49,14 +51,6 @@ export const useDerivedProduct = (
     const [quantity, setQuantity] = useState(initialQuantity)
     const {selectedStore} = useSelectedStore()
 
-    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
-    const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
-    // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
-    // so we don't need to check for variation attributes
-    const isSelectedStoreOutOfStock =
-        !selectedStoreStockLevel ||
-        selectedStoreStockLevel < quantity ||
-        !selectedStoreInventory?.orderable
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
     // will sometimes return all the variants even if they are out of stock, but for other
@@ -69,34 +63,54 @@ export const useDerivedProduct = (
             Object.keys(variationParams).length === variationAttributes.length) ||
         (!isProductABundle && variant && !variant.orderable)
     const unfulfillable = stockLevel < quantity
+
+    // Product details for selected store
+    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
+    const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
+    const selectedStoreLowestStockLevelProductName =
+        selectedStoreInventory?.lowestStockLevelProductName
+    // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
+    // so we don't need to check for variation attributes
+    const isSelectedStoreOutOfStock = !selectedStoreStockLevel || !selectedStoreInventory?.orderable
+    const selectedStoreUnfulfillable = selectedStoreStockLevel < quantity
+
+    // Use appropriate inventory based on pickup/delivery selection
+    const currentStockLevel = pickupInStore ? selectedStoreStockLevel : stockLevel
+    const currentLowestStockLevelProductName = pickupInStore
+        ? selectedStoreLowestStockLevelProductName
+        : lowestStockLevelProductName
+    const currentIsOutOfStock = pickupInStore ? isSelectedStoreOutOfStock : isOutOfStock
+    const currentUnfulfillable = pickupInStore ? selectedStoreUnfulfillable : unfulfillable
+
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({
             defaultMessage: 'Out of stock',
             id: 'use_product.message.out_of_stock'
         }),
-        [UNFULFILLABLE]: lowestStockLevelProductName
+        [UNFULFILLABLE]: currentLowestStockLevelProductName
             ? intl.formatMessage(
                   {
                       defaultMessage: 'Only {stockLevel} left for {productName}!',
                       id: 'use_product.message.inventory_remaining_for_product'
                   },
-                  {stockLevel, productName: lowestStockLevelProductName}
+                  {stockLevel: currentStockLevel, productName: currentLowestStockLevelProductName}
               )
             : intl.formatMessage(
                   {
                       defaultMessage: 'Only {stockLevel} left!',
                       id: 'use_product.message.inventory_remaining'
                   },
-                  {stockLevel}
+                  {stockLevel: currentStockLevel}
               )
     }
 
     // showInventoryMessage controls if add to cart button is disabled
     const showInventoryMessage =
-        (variant || isProductABundle || isStandardProduct) && (isOutOfStock || unfulfillable)
+        (variant || isProductABundle || isStandardProduct) &&
+        (currentIsOutOfStock || currentUnfulfillable)
     const inventoryMessage =
-        (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
-        (unfulfillable && inventoryMessages[UNFULFILLABLE])
+        (currentIsOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
+        (currentUnfulfillable && inventoryMessages[UNFULFILLABLE])
 
     // If the `initialQuantity` changes, update the state. This typically happens
     // when either the master product changes, or the inventory of the product changes
@@ -105,6 +119,7 @@ export const useDerivedProduct = (
         setQuantity(initialQuantity)
     }, [initialQuantity])
 
+    // Lump the out of stock/unfulfillable checks together for easier consumption
     return {
         showLoading,
         showInventoryMessage,
@@ -119,7 +134,7 @@ export const useDerivedProduct = (
         stockLevel,
         isOutOfStock,
         unfulfillable,
-        isSelectedStoreOutOfStock,
+        isSelectedStoreOutOfStock: isSelectedStoreOutOfStock || selectedStoreUnfulfillable,
         selectedStore
     }
 }
