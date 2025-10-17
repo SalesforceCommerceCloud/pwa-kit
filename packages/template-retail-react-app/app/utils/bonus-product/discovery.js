@@ -29,6 +29,42 @@ import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus
  */
 
 /**
+ * Processes bonus products from a discount item based on promotion type.
+ * Handles both rule-based and list-based promotions.
+ *
+ * @param {Object} discountItem - The bonus discount line item
+ * @param {Object} ruleBasedProductsMap - Map of promotionId to products array for rule-based promotions
+ * @param {Object} additionalFields - Additional fields to merge into each product
+ * @returns {Array<Object>} Array of processed bonus products with metadata
+ */
+const processBonusProducts = (discountItem, ruleBasedProductsMap, additionalFields = {}) => {
+    const products = []
+
+    if (isRuleBasedPromotion(discountItem)) {
+        // Use products from ruleBasedProductsMap
+        const ruleProducts = ruleBasedProductsMap[discountItem.promotionId] || []
+        ruleProducts.forEach((product) => {
+            products.push({
+                ...product,
+                promotionId: discountItem.promotionId,
+                ...additionalFields
+            })
+        })
+    } else {
+        // List-based: use existing bonusProducts array
+        discountItem.bonusProducts?.forEach((bonusProduct) => {
+            products.push({
+                ...bonusProduct,
+                promotionId: discountItem.promotionId,
+                ...additionalFields
+            })
+        })
+    }
+
+    return products
+}
+
+/**
  * Gets all available bonus discount line items that are triggered by a specific product.
  *
  * Supports both list-based and rule-based promotions:
@@ -67,27 +103,10 @@ export const getAvailableBonusItemsForProduct = (
     // Flatten the bonus products from all matching discount line items
     const availableBonusItems = []
     matchingDiscountItems.forEach((discountItem) => {
-        // Check if this is a rule-based promotion
-        if (isRuleBasedPromotion(discountItem)) {
-            // Use products from ruleBasedProductsMap
-            const ruleProducts = ruleBasedProductsMap[discountItem.promotionId] || []
-            ruleProducts.forEach((product) => {
-                availableBonusItems.push({
-                    ...product,
-                    promotionId: discountItem.promotionId,
-                    discountLineItemId: discountItem.id
-                })
-            })
-        } else {
-            // List-based: use existing bonusProducts array
-            discountItem.bonusProducts?.forEach((bonusProduct) => {
-                availableBonusItems.push({
-                    ...bonusProduct,
-                    promotionId: discountItem.promotionId,
-                    discountLineItemId: discountItem.id
-                })
-            })
-        }
+        const products = processBonusProducts(discountItem, ruleBasedProductsMap, {
+            discountLineItemId: discountItem.id
+        })
+        availableBonusItems.push(...products)
     })
 
     return availableBonusItems
@@ -223,29 +242,11 @@ export const getRemainingAvailableBonusProductsForProduct = (
 
         // If there are remaining slots, add all bonus products from this discount item
         if (remainingBonusItemsCount > 0) {
-            // Check if this is a rule-based promotion
-            if (isRuleBasedPromotion(discountItem)) {
-                // Use products from ruleBasedProductsMap
-                const ruleProducts = ruleBasedProductsMap[discountItem.promotionId] || []
-                ruleProducts.forEach((product) => {
-                    remainingBonusItems.push({
-                        ...product,
-                        promotionId: discountItem.promotionId,
-                        bonusDiscountLineItemId: discountItem.id,
-                        remainingBonusItemsCount: remainingBonusItemsCount
-                    })
-                })
-            } else {
-                // List-based: use existing bonusProducts array
-                discountItem.bonusProducts?.forEach((bonusProduct) => {
-                    remainingBonusItems.push({
-                        ...bonusProduct,
-                        promotionId: discountItem.promotionId,
-                        bonusDiscountLineItemId: discountItem.id,
-                        remainingBonusItemsCount: remainingBonusItemsCount
-                    })
-                })
-            }
+            const products = processBonusProducts(discountItem, ruleBasedProductsMap, {
+                bonusDiscountLineItemId: discountItem.id,
+                remainingBonusItemsCount: remainingBonusItemsCount
+            })
+            remainingBonusItems.push(...products)
         }
     })
 
