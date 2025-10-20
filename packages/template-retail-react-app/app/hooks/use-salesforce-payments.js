@@ -13,9 +13,8 @@ import {useConfigurations} from '@salesforce/commerce-sdk-react'
  */
 export const useSalesforcePayments = () => {
     const {data: configurations} = useConfigurations()
-    return (
-        configurations?.configurations?.find(
-            (configuration) => configuration.id === 'sfPaymentsEnabled'
-        )?.value === 'true'
+    const config = configurations?.configurations?.find(
+        (configuration) => configuration.id === 'SalesforcePaymentsAllowed'
     )
+    return config?.value === true || config?.value === 'true'
 }

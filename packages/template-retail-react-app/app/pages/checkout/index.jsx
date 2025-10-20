@@ -63,6 +63,7 @@ const Checkout = () => {
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
+    const [shouldHidePlaceOrderButton, setShouldHidePlaceOrderButton] = useState(false)
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -89,6 +90,11 @@ const Checkout = () => {
             removeEmptyShipments(basket)
         }
     }, [basket?.basketId])
+
+    // Callback to handle when payment method requires its own pay button
+    const handleRequiresPayButtonChange = (requiresPayButton) => {
+        setShouldHidePlaceOrderButton(requiresPayButton === false)
+    }
 
     const submitOrder = async () => {
         const doCreateOrder = async () => {
@@ -184,12 +190,15 @@ const Checkout = () => {
                             )}
 
                             {sfPaymentsEnabled ? (
-                                <SFPaymentsSheet ref={sfPaymentsSheetRef} />
+                                <SFPaymentsSheet
+                                    ref={sfPaymentsSheetRef}
+                                    onRequiresPayButtonChange={handleRequiresPayButtonChange}
+                                />
                             ) : (
                                 <Payment />
                             )}
 
-                            {step === placeOrderCheckoutStep && (
+                            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -216,7 +225,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === placeOrderCheckoutStep && (
+                        {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -230,7 +239,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === placeOrderCheckoutStep && (
+            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

@@ -440,10 +440,16 @@ const SFPaymentsExpressButtons = ({
                     onPaymentMethodsRendered()
                 }
             }
-
+            
+            // TODO remove this once Paypal is supported
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts?.map(account => {
+                    if (account.vendor === 'PayPal') {
+                        return {...account, vendor: 'Paypal'}
+                    }
+                    return account
+                })
             }
 
             const config = {

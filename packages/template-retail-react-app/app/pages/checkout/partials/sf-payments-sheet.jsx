@@ -6,6 +6,7 @@
  */
 
 import React, {useState, useMemo, useEffect, useRef, forwardRef, useImperativeHandle} from 'react'
+import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -39,6 +40,7 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 import {buildTheme} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
+    const {onRequiresPayButtonChange} = props
     const intl = useIntl()
     const formatMessage = intl.formatMessage
     const queryClient = useQueryClient()
@@ -113,6 +115,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const handlePaymentMethodSelected = (evt) => {
         paymentMethodType.current = evt.detail.selectedPaymentMethod
+        if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
+            onRequiresPayButtonChange(evt.detail.requiresPayButton)
+        }
     }
 
     const onBillingSubmit = async () => {
@@ -266,9 +271,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             paymentConfig &&
             shopperConfigurations
         ) {
+            
+            // TODO remove this once Paypal is supported
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts?.map(account => {
+                    if (account.vendor === 'PayPal') {
+                        return {...account, vendor: 'Paypal'}
+                    }
+                    return account
+                })
             }
 
             config.current = {
@@ -396,5 +408,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 })
 
 SFPaymentsSheet.displayName = 'SFPaymentsSheet'
+
+SFPaymentsSheet.propTypes = {
+    onRequiresPayButtonChange: PropTypes.func
+}
 
 export default SFPaymentsSheet
