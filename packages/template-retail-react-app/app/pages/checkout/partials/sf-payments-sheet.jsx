@@ -138,6 +138,27 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         })
     }
 
+    const createPaymentInstrument = async () => {
+        const updatedBasket = await onBillingSubmit()
+
+        if (!updatedBasket) {
+            throw new Error('Billing form errors')
+        }
+
+        const basketPaymentInstrument = {
+            paymentMethodId: 'Salesforce Payments',
+            amount: updatedBasket.orderTotal,
+            paymentReferenceRequest: {
+                paymentMethodType: paymentMethodType.current,
+                zoneId: getConfigurationValue('zoneId', 'default')
+            }
+        }
+        return await addPaymentInstrumentToBasket({
+            parameters: {basketId: updatedBasket.basketId},
+            body: basketPaymentInstrument
+        })
+    }
+
     const confirmPayment = async (createOrder) => {
         // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
         // submit, `undefined` is returned.
@@ -150,6 +171,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         startConfirming(updatedBasket)
 
         // Create SF Payments basket payment instrument before creating order
+        // TODO: add payment reference request
         const basketPaymentInstrument = {
             paymentMethodId: 'Salesforce Payments',
             amount: updatedBasket.orderTotal
@@ -271,21 +293,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             paymentConfig &&
             shopperConfigurations
         ) {
-            
-            // TODO remove this once Paypal is supported
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts?.map(account => {
-                    if (account.vendor === 'PayPal') {
-                        return {...account, vendor: 'Paypal'}
-                    }
-                    return account
-                })
+                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
             }
 
             config.current = {
                 theme: buildTheme(),
-                actions: {},
+                actions: {
+                    createIntentFunction: createPaymentInstrument
+                },
                 options: {
                     useManualCapture: !getConfigurationValue('cardCaptureAutomatic', true),
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`

@@ -43,7 +43,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
+import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -59,7 +59,7 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const sfPaymentsEnabled = useSalesforcePayments()
+    const sfPaymentsEnabled = useShopperConfiguration('SalesforcePaymentsAllowed') === true
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)

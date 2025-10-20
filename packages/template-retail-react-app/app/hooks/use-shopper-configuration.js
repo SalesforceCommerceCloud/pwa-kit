@@ -8,13 +8,14 @@
 import {useConfigurations} from '@salesforce/commerce-sdk-react'
 
 /**
- * Hook to check if Salesforce Payments is enabled.
- * @returns {boolean} True if Salesforce Payments is enabled, false otherwise
+ * Hook to get a shopper configuration value.
+ * @param {string} configurationId - The ID of the configuration to retrieve
+ * @returns {*} The configuration value, or undefined if not found
  */
-export const useSalesforcePayments = () => {
+export const useShopperConfiguration = (configurationId) => {
     const {data: configurations} = useConfigurations()
     const config = configurations?.configurations?.find(
-        (configuration) => configuration.id === 'SalesforcePaymentsAllowed'
+        (configuration) => configuration.id === configurationId
     )
-    return config?.value === true || config?.value === 'true'
+    return config?.value
 }
