@@ -234,6 +234,33 @@
   "checkout.message.generic_error": {
     "defaultMessage": "Une erreur inattendue s'est produite durant le checkout."
   },
+  "checkout.title.checkout": {
+    "defaultMessage": "Commande"
+  },
+  "home.title.home": {
+    "defaultMessage": "Accueil"
+  },
+  "cart.title.shopping_cart": {
+    "defaultMessage": "Panier"
+  },
+  "product_detail.title.product_details": {
+    "defaultMessage": "Détails du produit"
+  },
+  "login.title.sign_in": {
+    "defaultMessage": "Se connecter"
+  },
+  "registration.title.create_account": {
+    "defaultMessage": "Créer un compte"
+  },
+  "account.title.my_account": {
+    "defaultMessage": "Mon compte"
+  },
+  "page_not_found.title.page_not_found": {
+    "defaultMessage": "Page non trouvée"
+  },
+  "reset_password.title.reset_password": {
+    "defaultMessage": "Réinitialiser le mot de passe"
+  },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Créer un compte"
   },
