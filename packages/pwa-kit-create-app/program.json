@@ -611,7 +611,7 @@
                     },
                     {
                         "name": "project.commerce.siteId",
-                        "message": "What is your Site ID in Business Manager?",
+                        "message": "What is your Site ID in Business Manager? It should contain only letters, numbers, hyphens, or underscores (e.g., 'RefArch', 'RefArchGlobal', 'my-site-id').",
                         "validator": "validSiteId",
                         "_ai": {
                             "instruction": "Should validate the user input using the 'validSiteId' validator.",
