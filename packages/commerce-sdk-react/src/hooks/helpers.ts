@@ -37,7 +37,30 @@ export const generateCustomEndpointOptions = (
     config: Omit<CommerceApiProviderProps, 'children'>,
     access_token: string,
     args?: TMutationVariables
-) => {
+): {
+    options: {
+        method?: string
+        parameters?: {[key: string]: string | number | boolean | string[] | number[]}
+        customApiPathParameters?: {
+            apiName?: string
+            apiVersion?: string
+            endpointPath?: string
+            organizationId?: string
+            shortCode?: string
+        }
+        headers?: {[key: string]: string}
+        body?: unknown
+    }
+    clientConfig: {
+        parameters: {
+            shortCode: string
+            [key: string]: unknown
+        }
+        proxy?: string
+        throwOnBadResponse: boolean
+    }
+    rawResponse?: boolean
+} => {
     const globalHeaders = config.headers || {}
     const globalClientConfig = {
         parameters: {

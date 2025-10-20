@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -24,6 +24,8 @@ import {
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
+import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
+import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-sheet'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
@@ -41,6 +43,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -56,6 +59,10 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const sfPaymentsEnabled = useSalesforcePayments()
+    const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
+    const sfPaymentsSheetRef = useRef(null)
+    const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -84,11 +91,20 @@ const Checkout = () => {
     }, [basket?.basketId])
 
     const submitOrder = async () => {
-        setIsLoading(true)
-        try {
-            const order = await createOrder({
+        const doCreateOrder = async () => {
+            return await createOrder({
                 body: {basketId: basket.basketId}
             })
+        }
+
+        setIsLoading(true)
+        try {
+            let order
+            if (sfPaymentsEnabled) {
+                order = await sfPaymentsSheetRef.current.confirmPayment(doCreateOrder)
+            } else {
+                order = doCreateOrder()
+            }
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
@@ -122,6 +138,35 @@ const Checkout = () => {
                                 </Alert>
                             )}
 
+                            {sfPaymentsEnabled && (
+                                <Box
+                                    layerStyle="card"
+                                    rounded={[0, 0, 'base']}
+                                    px={[4, 4, 6]}
+                                    position="relative"
+                                    display={expressPaymentMethodsRendered ? 'block' : 'none'}
+                                >
+                                    <Heading
+                                        fontSize="lg"
+                                        lineHeight="30px"
+                                        tabIndex="0"
+                                        marginBottom="1rem"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Express Checkout"
+                                            id="checkout.heading.express_checkout"
+                                        />
+                                    </Heading>
+                                    <SFPaymentsExpress
+                                        expressButtonLayout="horizontal"
+                                        maximumButtonCount={3}
+                                        onPaymentMethodsRendered={() =>
+                                            setExpressPaymentMethodsRendered(true)
+                                        }
+                                    />
+                                </Box>
+                            )}
+
                             <ContactInfo
                                 isSocialEnabled={isSocialEnabled}
                                 isPasswordlessEnabled={isPasswordlessEnabled}
@@ -137,9 +182,14 @@ const Checkout = () => {
                                     <ShippingMethods />
                                 </>
                             )}
-                            <Payment />
 
-                            {step === 5 && (
+                            {sfPaymentsEnabled ? (
+                                <SFPaymentsSheet ref={sfPaymentsSheetRef} />
+                            ) : (
+                                <Payment />
+                            )}
+
+                            {step === placeOrderCheckoutStep && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -166,7 +216,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === 5 && (
+                        {step === placeOrderCheckoutStep && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -180,7 +230,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === 5 && (
+            {step === placeOrderCheckoutStep && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

@@ -34,6 +34,8 @@ import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/h
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -50,6 +52,8 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
+import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const ProductViewHeader = ({
     name,
@@ -165,6 +169,7 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
+        const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
@@ -194,6 +199,7 @@ const ProductView = forwardRef(
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
+        const sfPaymentsEnabled = useSalesforcePayments()
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -336,6 +342,15 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
+            const prepareBasket = async () => {
+                return addItemToNewOrExistingBasket([
+                    {
+                        productId: variant?.productId || product.id,
+                        quantity: quantity
+                    }
+                ])
+            }
+
             // child product of bundles do not have add to cart button
             if ((addToCart || updateCart) && !isProductPartOfBundle) {
                 buttons.push(
@@ -379,6 +394,27 @@ const ProductView = forwardRef(
                             ? buttonText.addBundleToWishlist
                             : buttonText.addToWishlist}
                     </ButtonWithRegistration>
+                )
+            }
+
+            if (
+                sfPaymentsEnabled &&
+                !isProductASet &&
+                !isProductPartOfBundle &&
+                activeCurrency &&
+                priceData.currentPrice
+            ) {
+                buttons.push(
+                    <SFPaymentsExpressButtons
+                        key="express-buttons"
+                        usage={EXPRESS_BUY_NOW}
+                        paymentCurrency={activeCurrency}
+                        paymentCountryCode={null}
+                        initialAmount={priceData.currentPrice}
+                        prepareBasket={prepareBasket}
+                        expressButtonLayout="vertical"
+                        maximumButtonCount={1}
+                    />
                 )
             }
 

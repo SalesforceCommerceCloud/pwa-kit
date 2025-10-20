@@ -15,8 +15,12 @@ import {
     VisaIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 const CartCta = () => {
+    const sfPaymentsEnabled = useSalesforcePayments()
+
     return (
         <Fragment>
             <Button
@@ -24,7 +28,7 @@ const CartCta = () => {
                 to="/checkout"
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
-                mb={4}
+                mb={sfPaymentsEnabled ? 2 : 4}
                 rightIcon={<LockIcon />}
                 variant="solid"
             >
@@ -33,12 +37,16 @@ const CartCta = () => {
                     id="cart_cta.link.checkout"
                 />
             </Button>
-            <Flex justify={'center'}>
-                <VisaIcon height={8} width={10} mr={2} />
-                <MastercardIcon height={8} width={10} mr={2} />
-                <AmexIcon height={8} width={10} mr={2} />
-                <DiscoverIcon height={8} width={10} mr={2} />
-            </Flex>
+            {sfPaymentsEnabled ? (
+                <SFPaymentsExpress expressButtonLayout="vertical" maximumButtonCount={4} />
+            ) : (
+                <Flex justify={'center'}>
+                    <VisaIcon height={8} width={10} mr={2} />
+                    <MastercardIcon height={8} width={10} mr={2} />
+                    <AmexIcon height={8} width={10} mr={2} />
+                    <DiscoverIcon height={8} width={10} mr={2} />
+                </Flex>
+            )}
         </Fragment>
     )
 }

@@ -45,7 +45,14 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             } else {
                 return originalModule.useShopperCustomersMutation(mutation)
             }
-        }
+        },
+        useConfigurations: jest.fn(() => ({
+            data: {
+                configurations: []
+            },
+            isLoading: false,
+            error: null
+        }))
     }
 })
 

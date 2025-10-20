@@ -1184,7 +1184,7 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         const configWithFetchOptions = {
             ...config,
             fetchOptions: {
-                credentials: 'include'
+                credentials: 'include' as RequestCredentials
             }
         }
         const auth = new Auth(configWithFetchOptions)
@@ -1213,7 +1213,7 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         const configWithFetchOptions = {
             ...config,
             fetchOptions: {
-                cache: 'no-cache'
+                cache: 'no-cache' as RequestCache
             }
         }
         const auth = new Auth(configWithFetchOptions)

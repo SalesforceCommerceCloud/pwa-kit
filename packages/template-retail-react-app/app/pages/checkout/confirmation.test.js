@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import {
@@ -18,6 +18,25 @@ import {
     mockOrder,
     mockProducts
 } from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+
+// Mock getConfig to provide necessary configuration for SF Payments
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
+    return {
+        ...actual,
+        getConfig: jest.fn(() => ({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                sfPayments: {
+                    enabled: true,
+                    sdkUrl: 'https://example.com/sfpayments.js'
+                }
+            }
+        }))
+    }
+})
 
 const MockedComponent = () => {
     return (
@@ -289,5 +308,271 @@ describe('Account form', () => {
         await waitFor(() => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
         })
+    })
+})
+
+describe('Salesforce Payments Integration', () => {
+    const mockSFPaymentsOrder = {
+        ...mockOrder,
+        paymentInstruments: [
+            {
+                amount: 82.56,
+                paymentInstrumentId: 'sfp123',
+                paymentMethodId: 'Salesforce Payments',
+                c_paymentReference_type: 'card',
+                c_paymentReference_brand: 'visa',
+                c_paymentReference_last4: '4242'
+            }
+        ]
+    }
+
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrder))
+            })
+        )
+    })
+
+    test('renders SFPaymentsOrderSummary for Salesforce Payments orders', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        // Wait for the page to load
+        await screen.findByText(mockSFPaymentsOrder.orderNo)
+
+        // Check that Payment Details section exists
+        const paymentDetailsHeading = screen.getByText('Payment Details')
+        expect(paymentDetailsHeading).toBeInTheDocument()
+
+        // The SFPaymentsOrderSummary should render instead of credit card display
+        const creditCardHeading = await screen.findByRole('heading', {name: /credit card/i})
+        expect(creditCardHeading).toBeInTheDocument()
+    })
+
+    test('displays Visa payment information for Salesforce Payments', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrder.orderNo)
+
+        // Check for Visa brand name
+        expect(await screen.findByText('Visa')).toBeInTheDocument()
+
+        // Check for last 4 digits with masked format
+        expect(screen.getByText(/4242/)).toBeInTheDocument()
+    })
+
+    test('renders different payment types for Salesforce Payments', async () => {
+        const mockOrderWithKlarna = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-klarna',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'klarna'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithKlarna))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithKlarna.orderNo)
+
+        // Check for Klarna heading
+        expect(await screen.findByText('Klarna')).toBeInTheDocument()
+    })
+
+    test('displays MasterCard payment information for Salesforce Payments', async () => {
+        const mockOrderWithMasterCard = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-mc',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'card',
+                    c_paymentReference_brand: 'mastercard',
+                    c_paymentReference_last4: '5454'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithMasterCard))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithMasterCard.orderNo)
+
+        // Check for MasterCard brand name
+        expect(await screen.findByText('MasterCard')).toBeInTheDocument()
+
+        // Check for last 4 digits
+        expect(screen.getByText(/5454/)).toBeInTheDocument()
+    })
+
+    test('displays SEPA Debit payment information for Salesforce Payments', async () => {
+        const mockOrderWithSEPA = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-sepa',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'sepa_debit',
+                    c_paymentReference_last4: '9012'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithSEPA))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithSEPA.orderNo)
+
+        // Check for SEPA Debit heading
+        expect(await screen.findByText('SEPA Debit')).toBeInTheDocument()
+
+        // Check for last 4 digits
+        expect(screen.getByText(/9012/)).toBeInTheDocument()
+    })
+
+    test('displays Bancontact payment information for Salesforce Payments', async () => {
+        const mockOrderWithBancontact = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-bancontact',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'bancontact',
+                    c_paymentReference_bankName: 'ING Bank',
+                    c_paymentReference_last4: '1234'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithBancontact))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithBancontact.orderNo)
+
+        // Check for Bancontact heading
+        expect(await screen.findByText('Bancontact')).toBeInTheDocument()
+
+        // Check for bank name
+        expect(screen.getByText('ING Bank')).toBeInTheDocument()
+
+        // Check for last 4 digits
+        expect(screen.getByText(/1234/)).toBeInTheDocument()
+    })
+
+    test('still renders traditional credit card display for non-SF Payments orders', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrder))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrder.orderNo)
+
+        // Check for traditional credit card display
+        expect(await screen.findByText('Credit Card')).toBeInTheDocument()
+        expect(screen.getByText('Visa')).toBeInTheDocument()
+        expect(screen.getByText(/1111/)).toBeInTheDocument()
+        expect(screen.getByText(/1\/2040/)).toBeInTheDocument()
+    })
+
+    test('renders billing address alongside Salesforce Payments details', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrder.orderNo)
+
+        // Check for billing address heading
+        const billingAddressHeading = screen.getByRole('heading', {name: /billing address/i})
+        expect(billingAddressHeading).toBeInTheDocument()
+
+        // Check that billing address is displayed (use getAllByText since address appears in multiple places)
+        const addresses = screen.getAllByText(/123 Walnut Place/)
+        expect(addresses.length).toBeGreaterThan(0)
+
+        // Verify Payment Details heading exists
+        expect(screen.getByText('Payment Details')).toBeInTheDocument()
+    })
+
+    test('displays Afterpay/Clearpay payment information for Salesforce Payments', async () => {
+        const mockOrderWithAfterpay = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-afterpay',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'afterpay_clearpay'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithAfterpay))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithAfterpay.orderNo)
+
+        // Check for Afterpay/Clearpay heading
+        expect(await screen.findByText('Afterpay/Clearpay')).toBeInTheDocument()
+    })
+
+    test('displays iDEAL payment information for Salesforce Payments', async () => {
+        const mockOrderWithIdeal = {
+            ...mockOrder,
+            paymentInstruments: [
+                {
+                    amount: 82.56,
+                    paymentInstrumentId: 'sfp-ideal',
+                    paymentMethodId: 'Salesforce Payments',
+                    c_paymentReference_type: 'ideal',
+                    c_paymentReference_bank: 'rabobank'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithIdeal))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrderWithIdeal.orderNo)
+
+        // Check for iDEAL heading
+        expect(await screen.findByText('iDEAL')).toBeInTheDocument()
     })
 })
