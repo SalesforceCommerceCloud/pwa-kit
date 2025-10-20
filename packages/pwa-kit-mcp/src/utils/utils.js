@@ -265,3 +265,187 @@ export function generateComponentImportStatement(
     const normalizedPath = relativePath.replace(/\\/g, '/')
     return `import ${componentName} from '${normalizedPath}'`
 }
+
+/**
+ * Loads configuration from environment variables or dw.json file if it exists
+ * Priority: Environment variables > dw.json file
+ *
+ * @returns {Object} Configuration object with SFCC settings
+ */
+export function loadConfig() {
+    let dwConfig = {}
+
+    // Attempt to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from current working directory, then from global path
+    try {
+        const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
+            ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
+            : null
+        const configFromCwdPath = path.join(process.cwd(), 'dw.json')
+        const configFromGlobalPath = global.DW_JSON_PATH
+
+        const configPath =
+            configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
+                ? configFromStorefrontPath
+                : configFromCwdPath && fs.existsSync(configFromCwdPath)
+                ? configFromCwdPath
+                : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
+                ? configFromGlobalPath
+                : null
+        if (configPath) {
+            const fileContent = fs.readFileSync(configPath, 'utf-8')
+            dwConfig = JSON.parse(fileContent)
+        }
+    } catch (error) {
+        logMCPMessage(`Failed to parse dw.json: ${error.message}`)
+    }
+
+    // Get hostname first to derive a fallback organizationId
+    const hostname = process.env.SFCC_HOSTNAME || dwConfig['hostname']
+
+    // Extract instance ID from hostname pattern: https://zzrf-001.dx.commercecloud.salesforce.com
+    const hostnameMatch = hostname?.match(
+        /https?:\/\/([a-z0-9-]+)\.dx\.commercecloud\.salesforce\.com/
+    )
+    const derivedInstanceId = hostnameMatch ? hostnameMatch[1].replace(/-/g, '_') : null
+    const derivedOrganizationId = derivedInstanceId ? `f_ecom_${derivedInstanceId}` : null
+
+    // Merge with environment variables (environment variables take precedence if both exist)
+    return {
+        hostname: hostname,
+        instanceId: process.env.SFCC_INSTANCE_ID || dwConfig['instance-id'] || derivedInstanceId,
+        organizationId: process.env.SFCC_ORG_ID || dwConfig['org-id'] || derivedOrganizationId,
+        clientId: process.env.SFCC_CLIENT_ID || dwConfig['client-id'],
+        clientSecret: process.env.SFCC_CLIENT_SECRET || dwConfig['client-secret'],
+        shortCode: process.env.SFCC_SHORT_CODE || dwConfig['short-code']
+    }
+}
+
+/**
+ * Obtains OAuth access token from Salesforce Commerce Cloud
+ * @param {string} clientId - The OAuth client ID
+ * @param {string} clientSecret - The OAuth client secret
+ * @param {string} oauthScope - The OAuth scope for the token
+ * @returns {Promise<Response>} The fetch response containing the OAuth token
+ */
+export async function getOAuthToken(clientId, clientSecret, oauthScope) {
+    const accountManagerHost = process.env.SFCC_LOGIN_URL || 'account.demandware.com'
+    const oauthTokenUrl = `https://${accountManagerHost}/dwsso/oauth2/access_token`
+
+    const response = await fetch(oauthTokenUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        },
+        body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
+    })
+    return response
+}
+
+/**
+ * Calls the custom API DX endpoint
+ * @param {string} accessToken - The OAuth access token for authentication
+ * @param {string} customApiHost - The hostname for the custom API DX endpoint
+ * @param {string} organizationId - The organization ID for the API request
+ * @returns {Promise<Response>} The fetch response containing custom API data
+ */
+export async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationId) {
+    const customApiBase = `https://${customApiHost}/dx/custom-apis/v1/organizations/${organizationId}/endpoints`
+
+    const response = await fetch(customApiBase, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    return response
+}
+
+/**
+ * Auto-detects the node_modules directory path
+ * @param {string} [startPath] - Optional starting path for detection
+ * @returns {string|null} The absolute path to node_modules or null if not found
+ */
+export function autoDetectNodeModulesPath(startPath = process.cwd()) {
+    // Check for explicit environment variable (and its parents)
+    const storefrontAppPath = process.env.PWA_STOREFRONT_APP_PATH
+    if (storefrontAppPath) {
+        let envPath = path.resolve(storefrontAppPath)
+        while (envPath !== path.dirname(envPath)) {
+            const nodeModulesPath = path.join(envPath, 'node_modules')
+            if (fs.existsSync(nodeModulesPath)) {
+                return nodeModulesPath
+            }
+            envPath = path.dirname(envPath)
+        }
+    }
+
+    // Check for node_modules in cwd and its parents
+    let currentPath = path.resolve(startPath)
+    while (currentPath !== path.dirname(currentPath)) {
+        const nodeModulesPath = path.join(currentPath, 'node_modules')
+        if (fs.existsSync(nodeModulesPath)) {
+            return nodeModulesPath
+        }
+        currentPath = path.dirname(currentPath)
+    }
+    // Check for node_modules in common PWA Kit app subfolders (fallback)
+    const resolvedStartPath = path.resolve(startPath)
+    const appSpecificPaths = [
+        path.join(resolvedStartPath, 'retail-react-app/node_modules'),
+        path.join(resolvedStartPath, 'app/node_modules'),
+        path.join(resolvedStartPath, 'node_modules')
+    ]
+    for (const appPath of appSpecificPaths) {
+        if (fs.existsSync(appPath)) {
+            return appPath
+        }
+    }
+    return null
+}
+
+/**
+ * Auto-detects the commerce-sdk-isomorphic type definitions path
+ * @param {string} [nodeModulesPath] - Optional node_modules path
+ * @returns {string|null} The absolute path to index.cjs.d.ts or null if not found
+ */
+export function autoDetectCommerceSDKTypesPath(nodeModulesPath = null) {
+    // Try the provided node_modules path first
+    if (nodeModulesPath) {
+        const result = checkCommerceSDKInNodeModules(nodeModulesPath)
+        if (result) return result
+    }
+
+    // Try auto-detected node_modules
+    const nmPath = autoDetectNodeModulesPath()
+    if (nmPath) {
+        const result = checkCommerceSDKInNodeModules(nmPath)
+        if (result) return result
+    }
+    return null
+}
+
+/**
+ * Helper function to check for commerce-sdk-isomorphic in a specific node_modules directory
+ * @param {string} nodeModulesPath - Path to node_modules directory
+ * @returns {string|null} Path to type definitions or null if not found
+ */
+function checkCommerceSDKInNodeModules(nodeModulesPath) {
+    const possiblePaths = [
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/lib/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/lib/index.cjs.d.ts'),
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/dist/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/dist/index.cjs.d.ts'),
+        path.join(nodeModulesPath, 'commerce-sdk-isomorphic/index.cjs.d.ts'),
+        path.join(nodeModulesPath, '@salesforce/commerce-sdk-isomorphic/index.cjs.d.ts')
+    ]
+
+    for (const possiblePath of possiblePaths) {
+        if (fs.existsSync(possiblePath)) {
+            return possiblePath
+        }
+    }
+
+    return null
+}

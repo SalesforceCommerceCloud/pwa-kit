@@ -14,7 +14,10 @@ import {
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
-    InstallAgentRulesTool
+    InstallAgentRulesTool,
+    ExploreCommerceAPITool,
+    HooksRecommendationTool,
+    CustomApiTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
@@ -68,6 +71,8 @@ class PwaStorefrontMCPServerHighLevel {
         this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
+        this.exploreCommerceAPITool = new ExploreCommerceAPITool()
+        this.hooksRecommendationTool = new HooksRecommendationTool()
         this.setupTools()
     }
 
@@ -112,6 +117,24 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
         )
+        this.server.tool(
+            this.exploreCommerceAPITool.name,
+            this.exploreCommerceAPITool.description,
+            this.exploreCommerceAPITool.inputSchema,
+            this.exploreCommerceAPITool.handler
+        )
+        this.server.tool(
+            this.hooksRecommendationTool.name,
+            this.hooksRecommendationTool.description,
+            this.hooksRecommendationTool.inputSchema,
+            this.hooksRecommendationTool.handler
+        )
+        this.server.tool(
+            CustomApiTool.name,
+            CustomApiTool.description,
+            CustomApiTool.inputSchema,
+            CustomApiTool.fn
+        )
     }
 
     async run() {
@@ -126,6 +149,13 @@ class PwaStorefrontMCPServerHighLevel {
         }
 
         const noTelemetry = !!readFlag('no-telemetry', false)
+
+        // Store dw.json path globally so tools can access it
+        const dwJsonPath = readFlag('dw-json', null)
+        if (dwJsonPath) {
+            global.DW_JSON_PATH = dwJsonPath
+        }
+
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
         // when telemetry is enabled, then send telemetry events

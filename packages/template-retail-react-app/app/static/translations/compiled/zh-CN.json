@@ -17,6 +17,12 @@
       "value": "登出"
     }
   ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -501,6 +507,12 @@
       "value": "最近查看"
     }
   ],
+  "cart.title.shopping_cart": [
+    {
+      "type": 0,
+      "value": "购物车"
+    }
+  ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
@@ -619,6 +631,12 @@
     {
       "type": 0,
       "value": "结账时发生意外错误。"
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "结账"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -1905,6 +1923,12 @@
       "value": "阅读文档"
     }
   ],
+  "home.title.home": [
+    {
+      "type": 0,
+      "value": "首页"
+    }
+  ],
   "home.title.react_starter_store": [
     {
       "type": 0,
@@ -2305,6 +2329,12 @@
       "value": "中文（台湾）"
     }
   ],
+  "login.title.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -2517,6 +2547,12 @@
       "value": "找不到您要查找的页面。"
     }
   ],
+  "page_not_found.title.page_not_found": [
+    {
+      "type": 0,
+      "value": "页面未找到"
+    }
+  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -2681,6 +2717,12 @@
     {
       "type": 0,
       "value": "最近查看"
+    }
+  ],
+  "product_detail.title.product_details": [
+    {
+      "type": 0,
+      "value": "产品详情"
     }
   ],
   "product_item.label.quantity": [
@@ -3101,6 +3143,18 @@
     {
       "type": 0,
       "value": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
+    }
+  ],
+  "registration.title.create_account": [
+    {
+      "type": 0,
+      "value": "创建账户"
+    }
+  ],
+  "reset_password.title.reset_password": [
+    {
+      "type": 0,
+      "value": "重置密码"
     }
   ],
   "reset_password_form.action.sign_in": [

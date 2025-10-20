@@ -7,8 +7,8 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl, FormattedMessage} from 'react-intl'
+import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
@@ -61,6 +61,12 @@ const Registration = () => {
 
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Create Account"
+                    id="registration.title.create_account"
+                />
+            </Heading>
             <Seo title="Registration" description="Customer sign up" />
             <Container
                 paddingTop={16}
