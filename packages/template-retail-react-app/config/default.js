@@ -86,10 +86,6 @@ module.exports = {
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    hybrid: {
-        // default value is false
-        enableHybrid: false
-    },
     ssrShared: [
         'static/ico/favicon.ico',
         'static/robots.txt',
