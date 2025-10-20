@@ -35,6 +35,7 @@ import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/u
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -198,7 +199,7 @@ const ProductView = forwardRef(
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
-        const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
+        const sfPaymentsEnabled = useSalesforcePayments()
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage

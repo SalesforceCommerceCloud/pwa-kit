@@ -11,6 +11,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 const CheckoutContext = React.createContext()
 
@@ -20,7 +21,7 @@ export const CheckoutProvider = ({children}) => {
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
+    const sfPaymentsEnabled = useSalesforcePayments()
 
     const CHECKOUT_STEPS_LIST = sfPaymentsEnabled
         ? ['CONTACT_INFO', 'PICKUP_ADDRESS', 'SHIPPING_ADDRESS', 'SHIPPING_OPTIONS', 'PAYMENT']

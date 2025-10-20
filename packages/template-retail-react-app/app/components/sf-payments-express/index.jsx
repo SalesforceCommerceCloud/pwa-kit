@@ -34,16 +34,22 @@ const SFPaymentsExpress = ({
     }
 
     return (
-        <SFPaymentsExpressButtons
-            usage={EXPRESS_PAY_NOW}
-            paymentCurrency={paymentCurrency}
-            paymentCountryCode={paymentCountryCode}
-            initialAmount={initialAmount}
-            prepareBasket={prepareBasket}
-            expressButtonLayout={expressButtonLayout}
-            maximumButtonCount={maximumButtonCount}
-            onPaymentMethodsRendered={onPaymentMethodsRendered}
-        />
+        <div
+            data-testid="sf-payments-express"
+            data-button-layout={expressButtonLayout}
+            data-maximum-button-count={maximumButtonCount}
+        >
+            <SFPaymentsExpressButtons
+                usage={EXPRESS_PAY_NOW}
+                paymentCurrency={paymentCurrency}
+                paymentCountryCode={paymentCountryCode}
+                initialAmount={initialAmount}
+                prepareBasket={prepareBasket}
+                expressButtonLayout={expressButtonLayout}
+                maximumButtonCount={maximumButtonCount}
+                onPaymentMethodsRendered={onPaymentMethodsRendered}
+            />
+        </div>
     )
 }
 

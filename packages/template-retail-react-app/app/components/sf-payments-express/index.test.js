@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
@@ -39,28 +38,38 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 
 // Mock the SFPaymentsExpressButtons child component
 jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-buttons', () => {
-    const MockSFPaymentsExpressButtons = (props) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const PropTypes = require('prop-types')
+
+    const MockSFPaymentsExpressButtons = ({
+        usage,
+        paymentCurrency,
+        paymentCountryCode,
+        initialAmount,
+        expressButtonLayout,
+        maximumButtonCount
+    }) => {
         return (
             <div data-testid="sf-payments-express-buttons">
-                <div data-testid="usage">{props.usage}</div>
-                <div data-testid="payment-currency">{props.paymentCurrency}</div>
-                <div data-testid="payment-country-code">{props.paymentCountryCode}</div>
-                <div data-testid="initial-amount">{props.initialAmount}</div>
-                <div data-testid="express-button-layout">{props.expressButtonLayout}</div>
-                <div data-testid="maximum-button-count">{props.maximumButtonCount}</div>
+                <div data-testid="usage">{usage}</div>
+                <div data-testid="payment-currency">{paymentCurrency}</div>
+                <div data-testid="payment-country-code">{paymentCountryCode}</div>
+                <div data-testid="initial-amount">{initialAmount}</div>
+                <div data-testid="express-button-layout">{expressButtonLayout}</div>
+                <div data-testid="maximum-button-count">{maximumButtonCount}</div>
             </div>
         )
     }
+
     MockSFPaymentsExpressButtons.propTypes = {
-        usage: PropTypes.string,
+        usage: PropTypes.number,
         paymentCurrency: PropTypes.string,
         paymentCountryCode: PropTypes.string,
         initialAmount: PropTypes.number,
         expressButtonLayout: PropTypes.string,
-        maximumButtonCount: PropTypes.number,
-        prepareBasket: PropTypes.func,
-        onPaymentMethodsRendered: PropTypes.func
+        maximumButtonCount: PropTypes.number
     }
+
     return MockSFPaymentsExpressButtons
 })
 

@@ -10,7 +10,6 @@ import {useQuery} from '@tanstack/react-query'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-
 export const EXPRESS_BUY_NOW = 0
 export const EXPRESS_PAY_NOW = 1
 
@@ -26,7 +25,9 @@ export const useSFPayments = () => {
     const appOrigin = useAppOrigin()
 
     // Add script tag to page if not already present
-    const status = useScript(getConfig().app.sfPayments.sdkUrl)
+    const config = getConfig()
+    const sdkUrl = config?.app?.sfPayments?.sdkUrl
+    const status = useScript(sdkUrl)
 
     useEffect(() => {
         if (

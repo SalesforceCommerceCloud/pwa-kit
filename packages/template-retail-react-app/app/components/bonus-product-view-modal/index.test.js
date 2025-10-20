@@ -42,6 +42,13 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperCustomersMutation: jest.fn(() => ({
         mutateAsync: jest.fn()
     })),
+    useConfigurations: jest.fn(() => ({
+        data: {
+            configurations: []
+        },
+        isLoading: false,
+        error: null
+    })),
     CommerceApiProvider: ({children}) => children
 }))
 

@@ -16,10 +16,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
 
 const CartCta = () => {
-    const sfPaymentsEnabled = getConfig().app.sfPayments.enabled
+    const sfPaymentsEnabled = useSalesforcePayments()
 
     return (
         <Fragment>

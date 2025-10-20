@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useConfigurations} from '@salesforce/commerce-sdk-react'
 
 /**
  * Returns a theme object containing CSS information for use with SF Payments components.

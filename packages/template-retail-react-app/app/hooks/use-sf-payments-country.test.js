@@ -8,7 +8,7 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {useSFPaymentsCountry} from '@salesforce/retail-react-app/../../app/hooks/use-sf-payments-country'
+import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
 
 // Mock dependencies
 const mockUseAppOrigin = jest.fn()

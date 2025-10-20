@@ -28,4 +28,3 @@ describe('Shopper Payments hooks', () => {
         expect([...unimplemented]).toEqual([])
     })
 })
-

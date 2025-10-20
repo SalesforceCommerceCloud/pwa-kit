@@ -41,6 +41,34 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+// Mock SFPaymentsExpress to simulate payment methods rendering
+jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const React = require('react')
+    // eslint-disable-next-line react/prop-types
+    return function MockSFPaymentsExpress({onPaymentMethodsRendered}) {
+        // Simulate payment methods being rendered by calling the callback immediately
+        React.useEffect(() => {
+            if (onPaymentMethodsRendered) {
+                onPaymentMethodsRendered()
+            }
+        }, [onPaymentMethodsRendered])
+        return React.createElement('div', {'data-testid': 'sf-payments-express'}, null)
+    }
+})
+
+// Mock useSalesforcePayments to respond to getConfig
+jest.mock('@salesforce/retail-react-app/app/hooks/use-salesforce-payments', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        useSalesforcePayments: jest.fn(() => {
+            const config = getConfig()
+            return config?.app?.sfPayments?.enabled === true
+        })
+    }
+})
+
 // This is a flaky test file!
 jest.retryTimes(5)
 jest.setTimeout(40_000)
