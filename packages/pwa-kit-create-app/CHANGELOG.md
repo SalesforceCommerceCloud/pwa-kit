@@ -1,4 +1,6 @@
-## v3.14.0-dev (Sep 26, 2025)
+## v3.14.0-dev (Oct 20, 2025)
+- Clarified prompt text for Site ID to match actual validation: Site ID may contain uppercase or lowercase letters, numbers, hyphens, or underscores.
+- Updated Site ID validator regex to allow both uppercase and lowercase letters for improved compatibility, clarity.
 
 ## v3.13.0 (Sep 25, 2025)
 - This features introduces enhancements to the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
