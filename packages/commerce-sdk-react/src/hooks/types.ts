@@ -13,11 +13,13 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
-    ShopperStores
+    ShopperStores,
+    ShopperConfigurations
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {CommerceApiProviderProps} from '../provider'
@@ -91,11 +93,13 @@ export interface ApiClients {
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
     shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperPayments?: ShopperPayments<ApiClientConfigParams>
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>
     shopperSeo?: ShopperSEO<ApiClientConfigParams>
     shopperStores?: ShopperStores<ApiClientConfigParams>
+    shopperConfigurations?: ShopperConfigurations<ApiClientConfigParams>
 }
 
 export type ApiClient = NonNullable<ApiClients[keyof ApiClients]>

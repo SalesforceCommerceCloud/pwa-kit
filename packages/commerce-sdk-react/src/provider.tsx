@@ -17,11 +17,13 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
     ShopperStores,
+    ShopperConfigurations,
     FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
@@ -265,11 +267,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
+            shopperPayments: new ShopperPayments(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSEO(config),
-            shopperStores: new ShopperStores(config)
+            shopperStores: new ShopperStores(config),
+            shopperConfigurations: new ShopperConfigurations(config)
         }
     }, [
         clientId,

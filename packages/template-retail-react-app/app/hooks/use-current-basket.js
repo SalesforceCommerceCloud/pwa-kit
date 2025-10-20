@@ -11,6 +11,7 @@ import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-uti
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMemo} from 'react'
+import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
@@ -20,7 +21,12 @@ import {useMemo} from 'react'
 export const useCurrentBasket = ({id = ''} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
-    const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
+    const {confirmingBasket} = useSFPayments()
+    const {
+        data: basketsData,
+        dataUpdatedAt: basketsDataUpdatedAt,
+        isLoading: basketsIsLoading
+    } = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer
@@ -28,7 +34,9 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     )
 
     const currentBasket =
-        basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
+        confirmingBasket ||
+        basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
+        basketsData?.baskets?.[0]
 
     const memoizedDerived = useMemo(() => {
         // count the number of items in each shipment and rollup total
@@ -89,10 +97,11 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     ])
 
     return {
-        ...restOfQuery,
         data: currentBasket,
+        dataUpdatedAt: basketsDataUpdatedAt,
+        isLoading: basketsIsLoading,
         derivedData: {
-            hasBasket: basketsData?.total > 0,
+            hasBasket: currentBasket || basketsData?.total > 0,
             ...memoizedDerived
         }
     }
