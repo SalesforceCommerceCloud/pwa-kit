@@ -53,6 +53,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Explore and document the out of box SCAPI API endpoints, parameters, and usage examples.
   *Example: `How do I get a product?`*
 
+
 ## ▶️ Running the MCP Server
 
 ### 🖥️ From Cursor IDE

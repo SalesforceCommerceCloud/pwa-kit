@@ -6,7 +6,8 @@
  */
 import {z} from 'zod'
 import path from 'path'
-import {toKebabCase, toPascalCase, detectWorkspacePaths, logMCPMessage} from '../utils'
+import {toKebabCase, toPascalCase, detectWorkspacePaths} from '../utils'
+import {logMCPMessage} from '../utils'
 import {
     PWA_KIT_DESCRIPTIVE_NAME,
     SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS,
