@@ -88,7 +88,7 @@ const options = {
         enabled: false,
 
         // The origin of the SFCC instance (i.e. the instance that is being proxied to which hosts the storefront).
-        sfccOrigin: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+        sfccOrigin: 'https://{{answers.project.commerce.instanceUrl}}',
 
         // The MRT rules to apply to the hybrid proxy.
         // These rules determine which requests are handled by PWA Kit (MRT) vs proxied to SFCC. The same rules should be used in the eCDN rules for the same requests.
