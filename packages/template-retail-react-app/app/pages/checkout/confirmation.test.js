@@ -291,7 +291,7 @@ describe('Account form', () => {
         })
     })
 
-    test('does not save pickup addresses when store locator is enabled', async () => {
+    test('save delivery addresses but does not save pickup addresses when store locator is enabled', async () => {
         const savedAddresses = []
         const mockOrderWithPickup = {
             ...mockOrder,
