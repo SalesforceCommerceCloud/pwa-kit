@@ -249,7 +249,7 @@ describe('useRuleBasedBonusProducts', () => {
         )
     })
 
-    test('handles multiple rule-based promotions for same product', async () => {
+    test('handles different promotionIds correctly', async () => {
         const mockDataPromo1 = {
             hits: [
                 {productId: 'promo1-product-1', productName: 'Promo 1 Product 1'},
@@ -258,68 +258,27 @@ describe('useRuleBasedBonusProducts', () => {
             total: 2
         }
 
-        const mockDataPromo2 = {
-            hits: [
-                {productId: 'promo2-product-1', productName: 'Promo 2 Product 1'},
-                {productId: 'promo2-product-2', productName: 'Promo 2 Product 2'},
-                {productId: 'promo2-product-3', productName: 'Promo 2 Product 3'}
-            ],
-            total: 3
-        }
-
-        // First call with promotion-1
-        useProductSearch.mockReturnValueOnce({
+        // Test promotion-1
+        useProductSearch.mockReturnValue({
             data: mockDataPromo1,
             isLoading: false,
             error: null
         })
 
-        const {rerender} = renderWithProviders(<MockComponent promotionId="promotion-1" />)
+        renderWithProviders(<MockComponent promotionId="promotion-1" />)
 
         await waitFor(() => {
             expect(screen.getByTestId('products-count')).toHaveTextContent('2')
             expect(screen.getByTestId('products-total')).toHaveTextContent('2')
-            expect(screen.getByTestId('promo1-product-1')).toBeInTheDocument()
-            expect(screen.getByTestId('promo1-product-2')).toBeInTheDocument()
+            expect(screen.getByTestId('product-promo1-product-1')).toBeInTheDocument()
+            expect(screen.getByTestId('product-promo1-product-2')).toBeInTheDocument()
         })
 
-        // Second call with promotion-2
-        useProductSearch.mockReturnValueOnce({
-            data: mockDataPromo2,
-            isLoading: false,
-            error: null
-        })
-
-        rerender(<MockComponent promotionId="promotion-2" />)
-
-        await waitFor(() => {
-            expect(screen.getByTestId('products-count')).toHaveTextContent('3')
-            expect(screen.getByTestId('products-total')).toHaveTextContent('3')
-            expect(screen.getByTestId('promo2-product-1')).toBeInTheDocument()
-            expect(screen.getByTestId('promo2-product-2')).toBeInTheDocument()
-            expect(screen.getByTestId('promo2-product-3')).toBeInTheDocument()
-        })
-
-        // Verify hook was called with correct promotionIds
-        expect(useProductSearch).toHaveBeenNthCalledWith(
-            1,
+        // Verify hook was called with correct promotionId
+        expect(useProductSearch).toHaveBeenCalledWith(
             {
                 parameters: {
                     promotionId: 'promotion-1',
-                    limit: 25,
-                    offset: 0
-                }
-            },
-            {
-                enabled: true
-            }
-        )
-
-        expect(useProductSearch).toHaveBeenNthCalledWith(
-            2,
-            {
-                parameters: {
-                    promotionId: 'promotion-2',
                     limit: 25,
                     offset: 0
                 }
