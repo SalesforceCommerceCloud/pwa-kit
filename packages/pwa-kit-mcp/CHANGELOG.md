@@ -4,7 +4,7 @@
 - Added Hooks Recommendation tool [#3388](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3388)
 - Added Agent Guidelines. [#3366](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3366)
 - Added Explore SCAPI SHOP API Tool  [#3385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3385)
-- Added Custom APIs Discovery. [##3387](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3387)
+- Added Custom APIs Discovery. [##3387](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3387), [#3413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3413)
 
 ## v0.3.0 (Sep 25, 2025)
 - Added telemetry for MCP tools. [#3327](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3327)
