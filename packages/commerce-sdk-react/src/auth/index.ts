@@ -21,7 +21,6 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
-    isAbsoluteUrl,
     stringToBase64,
     extractCustomParameters
 } from '../utils'
@@ -96,10 +95,19 @@ type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: string
+    /** When true, SLAS will register the customer as part of the passwordless flow */
+    register_customer?: boolean | string
+    /** Optional registration details forwarded to SLAS when register_customer=true */
+    first_name?: string
+    last_name?: string
+    email?: string
+    phone_number?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
+    /** When true, SLAS will register the customer if not already registered */
+    register_customer?: boolean | string
 }
 
 /**
@@ -1262,21 +1270,69 @@ class Auth {
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+        // Respect explicitly provided mode even when callbackURI is set
+        const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
-        const res = await helpers.authorizePasswordless({
+        // NOTE: We intentionally keep the direct endpoint call below as a commented fallback.
+        // It ensures we have a working option if the helper signature changes.
+        //
+        // const slasClient = this.client
+        // const options: any = {
+        //     headers: {},
+        //     parameters: {
+        //         ...(parameters.register_customer !== undefined && {
+        //             register_customer:
+        //                 typeof parameters.register_customer === 'boolean'
+        //                     ? String(parameters.register_customer)
+        //                     : parameters.register_customer
+        //         })
+        //     },
+        //     body: {
+        //         user_id: parameters.userid,
+        //         mode: finalMode,
+        //         channel_id: slasClient.clientConfig.parameters.siteId,
+        //         ...(usid && {usid}),
+        //         ...(callbackURI && {callback_uri: callbackURI}),
+        //         ...(parameters.last_name && {last_name: parameters.last_name}),
+        //         ...(parameters.email && {email: parameters.email}),
+        //         ...(parameters.first_name && {first_name: parameters.first_name}),
+        //         ...(parameters.phone_number && {phone_number: parameters.phone_number})
+        //     }
+        // }
+        // if (this.clientSecret) {
+        //     options.headers.Authorization = `Basic ${stringToBase64(
+        //         `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+        //     )}`
+        // }
+        // return await slasClient.authorizePasswordlessCustomer(options)
+
+        // Preferred path: use isomorphic helper and pass body + query (register_customer)
+        // Casting to Helpers to allow passing extended payload; underlying impl supports it
+        const res = await (helpers as unknown as Helpers).authorizePasswordless({
             slasClient: this.client,
             credentials: {
                 clientSecret: this.clientSecret
             },
             parameters: {
-                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
                 userid: parameters.userid,
-                mode: finalMode
+                mode: finalMode,
+                ...(parameters.register_customer !== undefined && {
+                    // Helper expects camelCase 'registerCustomer'
+                    registerCustomer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? Boolean(parameters.register_customer)
+                            : parameters.register_customer
+                }),
+                // Helper expects camelCase registration fields in parameters; it maps to body internally
+                ...(parameters.last_name && {lastName: parameters.last_name}),
+                ...(parameters.email && {email: parameters.email}),
+                ...(parameters.first_name && {firstName: parameters.first_name}),
+                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
-        })
-        if (res && res.status !== 200) {
+        } as any)
+        if (res && res.status && res.status !== 200) {
             const errorData = await res.json()
             throw new Error(`${res.status} ${String(errorData.message)}`)
         }
@@ -1289,6 +1345,7 @@ class Auth {
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
+        const usid = this.get('usid')
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
             credentials: {
@@ -1296,7 +1353,14 @@ class Auth {
             },
             parameters: {
                 pwdlessLoginToken,
-                dnt: dntPref !== undefined ? String(dntPref) : undefined
+                dnt: dntPref !== undefined ? String(dntPref) : undefined,
+                ...(usid && {usid}),
+                ...(parameters.register_customer !== undefined && {
+                    register_customer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? String(parameters.register_customer)
+                            : parameters.register_customer
+                })
             }
         })
         const isGuest = false

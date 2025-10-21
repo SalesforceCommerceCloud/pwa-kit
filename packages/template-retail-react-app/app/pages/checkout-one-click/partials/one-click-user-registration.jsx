@@ -18,7 +18,8 @@ import {
 export default function UserRegistration({
     enableUserRegistration,
     setEnableUserRegistration,
-    isGuestCheckout = false
+    isGuestCheckout = false,
+    isDisabled = false
 }) {
     const handleUserRegistrationChange = (e) => {
         setEnableUserRegistration(e.target.checked)
@@ -48,6 +49,7 @@ export default function UserRegistration({
                     name="userRegistration"
                     isChecked={enableUserRegistration}
                     onChange={handleUserRegistrationChange}
+                    isDisabled={isDisabled}
                     alignItems="flex-start"
                 >
                     <Stack spacing={1}>
@@ -78,5 +80,7 @@ UserRegistration.propTypes = {
     /** Callback to set user registration state */
     setEnableUserRegistration: PropTypes.func,
     /** Whether the "Checkout as Guest" button was clicked */
-    isGuestCheckout: PropTypes.bool
+    isGuestCheckout: PropTypes.bool,
+    /** Disable the registration checkbox (e.g., until payment info is filled) */
+    isDisabled: PropTypes.bool
 }

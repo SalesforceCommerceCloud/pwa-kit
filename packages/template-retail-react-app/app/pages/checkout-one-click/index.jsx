@@ -18,12 +18,9 @@ import {
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
-    useAuthHelper,
-    AuthHelpers,
     useShopperBasketsMutation,
     useShopperOrdersMutation,
     useShopperCustomersMutation,
-    ShopperCustomersMutations,
     ShopperBasketsMutations,
     ShopperOrdersMutations
 } from '@salesforce/commerce-sdk-react'
@@ -54,8 +51,6 @@ import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {generatePassword} from '@salesforce/retail-react-app/app/utils/password-utils'
-import {nanoid} from 'nanoid'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
@@ -78,7 +73,7 @@ const CheckoutOneClick = () => {
     )
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
-    const [shopperPaymentInstrument, setShopperPaymentInstrument] = useState(null)
+    // Removed: we no longer need to persist full card in state for post-order registration
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
     const [isEditingPayment, setIsEditingPayment] = useState(false)
 
@@ -101,10 +96,8 @@ const CheckoutOneClick = () => {
         ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
     const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
-    const {mutateAsync: register} = useAuthHelper(AuthHelpers.Register)
-    const {mutateAsync: createCustomerAddress} = useShopperCustomersMutation(
-        ShopperCustomersMutations.CreateCustomerAddress
-    )
+    // Registration on place order removed for guest users opting into account creation via OTP
+    // Removed: guest registration-on-order has been deprecated; address save handled elsewhere
 
     const handleSavePreferenceChange = (shouldSave) => {
         setShouldSavePaymentMethod(shouldSave)
@@ -150,15 +143,7 @@ const CheckoutOneClick = () => {
             }
         }
 
-        const fullCardDetails = {
-            holder: formValue.holder,
-            number: formValue.number,
-            cardType: getPaymentInstrumentCardType(formValue.cardType),
-            expirationMonth: parseInt(expirationMonth),
-            expirationYear: parseInt(`20${expirationYear}`)
-        }
-
-        setShopperPaymentInstrument(fullCardDetails)
+        // full card details are computed at place order time when needed
 
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
@@ -197,43 +182,44 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async (fullCardDetails) => {
-        const saveShippingAddress = async (customerId, address) => {
-            try {
-                await createCustomerAddress({
-                    body: address,
-                    parameters: {customerId: customerId}
-                })
-            } catch (error) {
-                // Fail silently
-            }
-        }
+        // Kept for reference; no longer used when guest registration is moved earlier via OTP.
+        // const saveShippingAddress = async (customerId, address) => {
+        //     try {
+        //         await createCustomerAddress({
+        //             body: address,
+        //             parameters: {customerId: customerId}
+        //         })
+        //     } catch (error) {
+        //         // Fail silently
+        //     }
+        // }
 
-        const savePaymentInstrument = async (customerId, paymentMethodId) => {
-            try {
-                const paymentInstrument = {
-                    paymentMethodId: paymentMethodId,
-                    paymentCard: {
-                        holder: shopperPaymentInstrument.holder,
-                        number: shopperPaymentInstrument.number,
-                        cardType: shopperPaymentInstrument.cardType,
-                        expirationMonth: shopperPaymentInstrument.expirationMonth,
-                        expirationYear: shopperPaymentInstrument.expirationYear
-                    }
-                }
-
-                await createCustomerPaymentInstruments.mutateAsync({
-                    body: paymentInstrument,
-                    parameters: {customerId: customerId}
-                })
-            } catch (error) {
-                showError(
-                    formatMessage({
-                        id: 'checkout_payment.error.cannot_save_payment',
-                        defaultMessage: 'Could not save payment method. Please try again.'
-                    })
-                )
-            }
-        }
+        // const savePaymentInstrument = async (customerId, paymentMethodId) => {
+        //     try {
+        //         const paymentInstrument = {
+        //             paymentMethodId: paymentMethodId,
+        //             paymentCard: {
+        //                 holder: shopperPaymentInstrument.holder,
+        //                 number: shopperPaymentInstrument.number,
+        //                 cardType: shopperPaymentInstrument.cardType,
+        //                 expirationMonth: shopperPaymentInstrument.expirationMonth,
+        //                 expirationYear: shopperPaymentInstrument.expirationYear
+        //             }
+        //         }
+        //
+        //         await createCustomerPaymentInstruments.mutateAsync({
+        //             body: paymentInstrument,
+        //             parameters: {customerId: customerId}
+        //         })
+        //     } catch (error) {
+        //         showError(
+        //             formatMessage({
+        //                 id: 'checkout_payment.error.cannot_save_payment',
+        //                 defaultMessage: 'Could not save payment method. Please try again.'
+        //             })
+        //         )
+        //     }
+        // }
 
         const savePaymentInstrumentWithDetails = async (
             customerId,
@@ -289,72 +275,11 @@ const CheckoutOneClick = () => {
             }
         }
 
-        const registerUser = async (data, fullCardDetails) => {
-            try {
-                const body = {
-                    customer: {
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        email: data.email,
-                        login: data.email,
-                        phoneHome: data.phoneHome
-                    },
-                    password: generatePassword()
-                }
-                const customer = await register(body)
-
-                // Save the shipping address from this order, should not block account creation
-                await saveShippingAddress(customer.customerId, data.address)
-
-                // Save the payment instrument with full card details
-                if (fullCardDetails) {
-                    await savePaymentInstrumentWithDetails(
-                        customer.customerId,
-                        data.paymentMethodId,
-                        fullCardDetails
-                    )
-                } else {
-                    await savePaymentInstrument(customer.customerId, data.paymentMethodId)
-                }
-
-                showToast({
-                    variant: 'subtle',
-                    title: `${formatMessage(
-                        {
-                            defaultMessage: 'Welcome {name},',
-                            id: 'auth_modal.info.welcome_user'
-                        },
-                        {
-                            name: data.firstName || ''
-                        }
-                    )}`,
-                    description: `${formatMessage({
-                        defaultMessage: "You're now signed in.",
-                        id: 'auth_modal.description.now_signed_in'
-                    })}`,
-                    status: 'success',
-                    position: 'top-right',
-                    isClosable: true
-                })
-            } catch (error) {
-                let message = formatMessage(API_ERROR_MESSAGE)
-                if (error.response) {
-                    const json = await error.response.json()
-                    if (/the login is already in use/i.test(json.detail)) {
-                        message = formatMessage({
-                            id: 'checkout_confirmation.message.already_has_account',
-                            defaultMessage: 'This email already has an account.'
-                        })
-                    }
-                }
-
-                showError(message)
-            }
-        }
+        // Registration previously done on place order has been removed. Guests opting to create
+        // an account are handled earlier via OTP/passwordless flow.
 
         setIsLoading(true)
         try {
-            // Ensure we are using the freshest basket id
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed.data?.basketId || basket.basketId
 
@@ -363,24 +288,8 @@ const CheckoutOneClick = () => {
                 body: {basketId: latestBasketId}
             })
 
-            if (enableUserRegistration) {
-                // Remove the id property from the address
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const {id, ...address} = order.shipments[0].shippingAddress
-                address.addressId = nanoid()
-
-                await registerUser(
-                    {
-                        firstName: order.billingAddress.firstName,
-                        lastName: order.billingAddress.lastName,
-                        email: order.customerInfo.email,
-                        phoneHome: order.billingAddress.phone,
-                        address: address,
-                        paymentMethodId: order.paymentInstruments[0].paymentMethodId
-                    },
-                    fullCardDetails
-                )
-            } else {
+            // If user is registered at this point, optionally save payment method
+            {
                 // For existing registered users, save payment instrument if they checked the save box
                 // Only save if we have full card details (i.e., user entered a new card)
                 if (shouldSavePaymentMethod && order.paymentInstruments?.[0] && fullCardDetails) {
