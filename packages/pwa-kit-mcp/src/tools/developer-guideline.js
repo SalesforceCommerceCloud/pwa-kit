@@ -99,6 +99,60 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 - Use kebab-case for file names. Only start with an underscore (_) if they are special components.
 - Use React Hooks (e.g., useState, useEffect, useContext, useMemo, useCallback) for state management and side effects. 
 
+### Custom API Implementation
+- Use 'useCustomQuery' or 'useCustomMutation' hooks from 'commerce-sdk-react'
+- **DON'T** include any extra '/' before or after path parameters in the 'customApiPathParameters' object
+- Parameters for 'useCustomQuery' or 'useCustomMutation':
+  - \`options\` (Object): Configuration for the API request.
+    - \`method\` (String): The HTTP method to use (e.g., 'POST', 'GET').
+    - \`customApiPathParameters\` (Object): Contains parameters to define the API path.
+      - \`endpointPath\` (String): Specific endpoint path to target in the API.
+      - \`apiName\` (String): The name of the API
+- \`useCustomQuery\` usage :
+    \`\`\`jsx
+    const query = useCustomQuery(
+        {
+            options: {
+                method: 'GET',
+                customApiPathParameters: {
+                    apiName: 'your-api-name',
+                    apiVersion: 'your-api-version',
+                    endpointPath: 'your-endpoint'
+                },
+                parameters: {
+                    c_yourParam: params.yourParam,
+                    // other parameters
+                }
+            }
+        }
+    )
+    \`\`\`
+#### \`mutate\` Method
+The \`mutation.mutate(args)\` function is used to execute the mutation. It accepts an argument \`args\`, which is an object that may contain the following properties:
+- \`headers\` (Object): Optional headers to send with the request.
+- \`parameters\` (Object): Optional query parameters to append to the API URL.
+- \`body\` (Object): Optional the payload for POST, PUT, PATCH methods.
+- \`useCustomMutation\` usage:
+    \`\`\`jsx
+    const mutation = useCustomMutation({
+        options: {
+            method: 'POST',
+            customApiPathParameters: {
+                apiName: 'your-api-name',
+                apiVersion: 'your-api-version',
+                endpointPath: 'your-endpoint'
+            }
+        }
+    });
+
+    // In your React component
+    <button onClick={() => mutation.mutate({
+        body: { test: '123' },
+        parameters: { additional: 'value' },
+        headers: { ['X-Custom-Header']: 'test' }
+    })}> Send Request </button>
+  \`\`\`
+  
 ## Quality Standards
 - Maintain consistent code formatting using project standards.
 - Write comprehensive test coverage.

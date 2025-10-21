@@ -241,11 +241,14 @@ export default {
             const processedEntries = []
             for (const entry of dxEndpointResponse.data) {
                 if (entry.cartridgeName) {
+                    const endpointPath = entry.endpointPath.startsWith('/')
+                        ? entry.endpointPath.substring(1)
+                        : entry.endpointPath
                     let customApiBaseUrl = null
                     let schemaContent = null
                     try {
                         // Construct the custom API base URL
-                        customApiBaseUrl = `https://${shortCode}.api.commercecloud.salesforce.com/custom/${entry.apiName}/${entry.apiVersion}/organizations/${organizationId}${entry.endpointPath}`
+                        customApiBaseUrl = `https://${shortCode}.api.commercecloud.salesforce.com/custom/${entry.apiName}/${entry.apiVersion}/organizations/${organizationId}/${endpointPath}`
 
                         const webdavResponse = await searchForEndpointFiles(
                             hostname,
@@ -265,7 +268,7 @@ export default {
                         apiName: entry.apiName,
                         apiVersion: entry.apiVersion,
                         cartridgeName: entry.cartridgeName,
-                        endpointPath: entry.endpointPath,
+                        endpointPath: endpointPath,
                         httpMethod: entry.httpMethod,
                         status: entry.status,
                         securityScheme: entry.securityScheme,
