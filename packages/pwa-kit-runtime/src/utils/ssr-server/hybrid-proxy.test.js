@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {iterate, hybridProxy} from './hybridProxy'
+import {iterate, hybridProxy} from './hybrid-proxy'
 import logger from '../logger-instance'
 import * as utils from './utils'
 
