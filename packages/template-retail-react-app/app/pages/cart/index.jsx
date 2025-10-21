@@ -15,7 +15,8 @@ import {
     Grid,
     GridItem,
     Container,
-    useDisclosure
+    useDisclosure,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -997,6 +998,9 @@ const Cart = () => {
 
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
+            <Heading as="h1" srOnly>
+                <FormattedMessage defaultMessage="Shopping Cart" id="cart.title.shopping_cart" />
+            </Heading>
             <Container
                 maxWidth="container.xl"
                 px={[4, 6, 6, 4]}
@@ -1083,6 +1087,9 @@ const Cart = () => {
                                                             renderSecondaryActions={
                                                                 renderSecondaryActions
                                                             }
+                                                            getShipmentInfoForProduct={
+                                                                getShipmentInfoForProduct
+                                                            }
                                                             renderDeliveryActions={(
                                                                 productItem
                                                             ) => {
@@ -1135,6 +1142,9 @@ const Cart = () => {
                                                                 renderSecondaryActions={
                                                                     renderSecondaryActions
                                                                 }
+                                                                getShipmentInfoForProduct={
+                                                                    getShipmentInfoForProduct
+                                                                }
                                                                 renderDeliveryActions={(
                                                                     productItem
                                                                 ) =>
@@ -1173,6 +1183,9 @@ const Cart = () => {
                                                                 onRemoveItemClick={handleRemoveItem}
                                                                 renderSecondaryActions={
                                                                     renderSecondaryActions
+                                                                }
+                                                                getShipmentInfoForProduct={
+                                                                    getShipmentInfoForProduct
                                                                 }
                                                                 renderDeliveryActions={(
                                                                     productItem

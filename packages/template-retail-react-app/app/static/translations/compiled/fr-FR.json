@@ -17,6 +17,12 @@
       "value": "Se déconnecter"
     }
   ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "Mon compte"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -493,6 +499,12 @@
       "value": "Consultés récemment"
     }
   ],
+  "cart.title.shopping_cart": [
+    {
+      "type": 0,
+      "value": "Panier"
+    }
+  ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
@@ -611,6 +623,12 @@
     {
       "type": 0,
       "value": "Une erreur inattendue s'est produite durant le checkout."
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "Commande"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -1889,6 +1907,12 @@
       "value": "Lire la documentation"
     }
   ],
+  "home.title.home": [
+    {
+      "type": 0,
+      "value": "Accueil"
+    }
+  ],
   "home.title.react_starter_store": [
     {
       "type": 0,
@@ -2293,6 +2317,12 @@
       "value": "Chinois (Taiwan)"
     }
   ],
+  "login.title.sign_in": [
+    {
+      "type": 0,
+      "value": "Se connecter"
+    }
+  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -2505,6 +2535,12 @@
       "value": "Impossible de trouver la page que vous cherchez."
     }
   ],
+  "page_not_found.title.page_not_found": [
+    {
+      "type": 0,
+      "value": "Page non trouvée"
+    }
+  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -2669,6 +2705,12 @@
     {
       "type": 0,
       "value": "Consultés récemment"
+    }
+  ],
+  "product_detail.title.product_details": [
+    {
+      "type": 0,
+      "value": "Détails du produit"
     }
   ],
   "product_item.label.quantity": [
@@ -3089,6 +3131,18 @@
     {
       "type": 0,
       "value": "Créez un compte pour bénéficier d’un accès privilégié aux meilleurs produits, à nos sources d’inspiration et à notre communauté."
+    }
+  ],
+  "registration.title.create_account": [
+    {
+      "type": 0,
+      "value": "Créer un compte"
+    }
+  ],
+  "reset_password.title.reset_password": [
+    {
+      "type": 0,
+      "value": "Réinitialiser le mot de passe"
     }
   ],
   "reset_password_form.action.sign_in": [

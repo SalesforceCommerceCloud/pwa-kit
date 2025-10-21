@@ -14,6 +14,7 @@ import {
     Container,
     Grid,
     GridItem,
+    Heading,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -102,6 +103,9 @@ const Checkout = () => {
 
     return (
         <Box background="gray.50" flex="1">
+            <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
+                <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
+            </Heading>
             <Container
                 data-testid="sf-checkout-container"
                 maxWidth="container.xl"

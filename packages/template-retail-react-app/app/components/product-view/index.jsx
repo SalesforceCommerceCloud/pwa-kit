@@ -183,7 +183,7 @@ const ProductView = forwardRef(
             unfulfillable,
             isSelectedStoreOutOfStock,
             selectedStore
-        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
+        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle, pickupInStore)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])

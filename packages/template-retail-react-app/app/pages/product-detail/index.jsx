@@ -12,7 +12,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
-import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
     useProducts,
@@ -649,6 +649,12 @@ const ProductDetail = () => {
             layerStyle="page"
             data-testid="product-details-page"
         >
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Product Details"
+                    id="product_detail.title.product_details"
+                />
+            </Heading>
             <Helmet>
                 <title>{product?.pageTitle}</title>
                 {product?.pageMetaTags?.length > 0 &&
