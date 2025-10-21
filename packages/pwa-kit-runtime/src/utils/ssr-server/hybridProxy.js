@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {isRemote} from './utils'
+import {isRemote, isString, isIterable, forEachIn} from './utils'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import logger from '../logger-instance'
 
@@ -126,17 +126,6 @@ export function hybridProxy(options) {
         // So the traffic we proxy to SFCC will be the opposite
         return !match
     }, proxyOptions)
-}
-
-const isString = (element) => typeof element === 'string'
-const isArray = (element) => Array.isArray(element)
-const isObject = (element) => element && typeof element === 'object'
-const isIterable = (element) => isArray(element) || isObject(element)
-
-const forEachIn = (iterable, functionRef) => {
-    Object.keys(iterable).forEach((key) => {
-        functionRef(key, iterable[key])
-    })
 }
 
 /**

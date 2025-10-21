@@ -8,8 +8,9 @@ import {iterate, hybridProxy} from './hybridProxy'
 import logger from '../logger-instance'
 import * as utils from './utils'
 
-// Mock the utils module
+// Mock only isRemote from utils module
 jest.mock('./utils', () => ({
+    ...jest.requireActual('./utils'),
     isRemote: jest.fn(() => false) // Default to false for most tests
 }))
 
