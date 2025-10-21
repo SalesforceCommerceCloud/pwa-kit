@@ -31,6 +31,9 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 // Components
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -51,7 +54,10 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 // Constants
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -96,19 +102,42 @@ const CheckoutConfirmation = () => {
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
     const submitForm = async (data) => {
+        // Save the unique delivery addresses, excluding pickup shipments
         const saveShippingAddress = async (customerId) => {
             try {
-                const shippingAddress = order.shipments[0].shippingAddress
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const {id, ...shippingAddressWithoutId} = shippingAddress
-                const bodyShippingAddress = {
-                    addressId: nanoid(),
-                    ...shippingAddressWithoutId
-                }
-                await createCustomerAddress.mutateAsync({
-                    body: bodyShippingAddress,
-                    parameters: {customerId: customerId}
+                const storeLocatorEnabled =
+                    getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+
+                const deliveryShipments = (order.shipments || []).filter((shipment) => {
+                    if (!shipment.shippingAddress) return false
+                    if (storeLocatorEnabled && isPickupShipment(shipment)) return false
+                    return true
                 })
+
+                const uniqueAddresses = []
+                deliveryShipments.forEach((shipment) => {
+                    const address = shipment.shippingAddress
+                    const isDuplicate = uniqueAddresses.some((existingAddr) =>
+                        areAddressesEqual(existingAddr, address)
+                    )
+                    if (!isDuplicate) {
+                        uniqueAddresses.push(address)
+                    }
+                })
+
+                for (let i = 0; i < uniqueAddresses.length; i++) {
+                    const shippingAddress = uniqueAddresses[i]
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const {id, _type, ...shippingAddressWithoutId} = shippingAddress
+                    const bodyShippingAddress = {
+                        addressId: nanoid(),
+                        ...shippingAddressWithoutId
+                    }
+                    await createCustomerAddress.mutateAsync({
+                        body: bodyShippingAddress,
+                        parameters: {customerId: customerId}
+                    })
+                }
             } catch (error) {
                 // Fail silently
             }
