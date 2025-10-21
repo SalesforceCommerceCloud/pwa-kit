@@ -26,6 +26,48 @@ import {
  */
 
 /**
+ * Detects if a bonus discount line item is rule-based.
+ * Rule-based promotions have empty bonusProducts arrays - products are
+ * determined by dynamic rules and must be fetched via SCAPI product search.
+ *
+ * Examples of rule-based promotions:
+ * - "Get choice of bonus where brand = 'Sony'"
+ * - "Get choice of bonus where price < $50"
+ * - "Get choice of bonus from 'Electronics' category"
+ *
+ * @param {Object} bonusDiscountLineItem - A single bonus discount line item from basket
+ * @returns {boolean} True if rule-based (empty bonusProducts array), false if list-based
+ *
+ * @example
+ * // Rule-based promotion (dynamic rules)
+ * const ruleBasedItem = {
+ *   promotionId: 'promo-123',
+ *   bonusProducts: []  // Empty array indicates rule-based
+ * }
+ * isRuleBasedPromotion(ruleBasedItem) // true
+ *
+ * @example
+ * // List-based promotion (static product list)
+ * const listBasedItem = {
+ *   promotionId: 'promo-456',
+ *   bonusProducts: [
+ *     { productId: 'p1', productName: 'Product 1' },
+ *     { productId: 'p2', productName: 'Product 2' }
+ *   ]
+ * }
+ * isRuleBasedPromotion(listBasedItem) // false
+ */
+export const isRuleBasedPromotion = (bonusDiscountLineItem) => {
+    if (!bonusDiscountLineItem) {
+        return false
+    }
+
+    // Rule-based indicator: bonusProducts array is empty or doesn't exist
+    const bonusProducts = bonusDiscountLineItem.bonusProducts || []
+    return bonusProducts.length === 0
+}
+
+/**
  * Determines if a product's promotions are automatic (no choice) or manual (choice of bonus products).
  * Automatic promotions add bonus products directly to cart without user selection.
  * Choice promotions allow users to select which bonus products they want.

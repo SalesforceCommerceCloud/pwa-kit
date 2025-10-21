@@ -515,4 +515,133 @@ describe('useBonusProductData', () => {
         expect(normalizedSet.selectedVariant.variationValues).toEqual({color: 'multi'})
         expect(normalizedSet.type.set).toBe(true)
     })
+
+    describe('Integration with Rule-Based Promotions', () => {
+        test('handles rule-based promotion with empty bonusProducts array', () => {
+            const ruleBasedModalData = {
+                bonusDiscountLineItems: [
+                    {
+                        id: 'rule-based-bonus-1',
+                        promotionId: 'rule-based-promo',
+                        maxBonusItems: 3,
+                        bonusProducts: [] // Empty for rule-based
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useBonusProductData(ruleBasedModalData))
+
+            // Should handle empty bonusProducts gracefully
+            expect(result.current.bonusProducts).toEqual(ruleBasedModalData.bonusDiscountLineItems)
+            expect(result.current.bonusLineItemIds).toEqual(['rule-based-bonus-1'])
+            expect(result.current.maxBonusItems).toBe(3)
+            expect(result.current.uniqueBonusProducts).toEqual([])
+            expect(result.current.productIds).toBe('')
+        })
+
+        test('handles mixed list-based and rule-based promotions', () => {
+            const mixedModalData = {
+                bonusDiscountLineItems: [
+                    {
+                        id: 'list-based-1',
+                        promotionId: 'list-promo',
+                        maxBonusItems: 2,
+                        bonusProducts: [
+                            {productId: 'list-product-1'},
+                            {productId: 'list-product-2'}
+                        ]
+                    },
+                    {
+                        id: 'rule-based-1',
+                        promotionId: 'rule-promo',
+                        maxBonusItems: 3,
+                        bonusProducts: [] // Rule-based
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useBonusProductData(mixedModalData))
+
+            // Should combine maxBonusItems from both
+            expect(result.current.maxBonusItems).toBe(5)
+            expect(result.current.bonusLineItemIds).toEqual(['list-based-1', 'rule-based-1'])
+
+            // Should only include products from list-based in uniqueBonusProducts
+            expect(result.current.uniqueBonusProducts).toEqual([
+                {productId: 'list-product-1'},
+                {productId: 'list-product-2'}
+            ])
+
+            // Product IDs should only include list-based products
+            expect(result.current.productIds).toBe('list-product-1,list-product-2')
+        })
+
+        test('computes selected items correctly with rule-based bonus products in basket', () => {
+            const mixedBasket = {
+                productItems: [
+                    {
+                        productId: 'list-bonus-1',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'list-based-1',
+                        quantity: 1
+                    },
+                    {
+                        productId: 'rule-bonus-1',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'rule-based-1',
+                        quantity: 2
+                    }
+                ]
+            }
+
+            useCurrentBasket.mockReturnValue({data: mixedBasket})
+
+            const mixedModalData = {
+                bonusDiscountLineItems: [
+                    {
+                        id: 'list-based-1',
+                        promotionId: 'list-promo',
+                        maxBonusItems: 2,
+                        bonusProducts: [{productId: 'list-bonus-1'}]
+                    },
+                    {
+                        id: 'rule-based-1',
+                        promotionId: 'rule-promo',
+                        maxBonusItems: 3,
+                        bonusProducts: []
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useBonusProductData(mixedModalData))
+
+            // Should count both list-based and rule-based selected items
+            expect(result.current.selectedBonusItems).toBe(3) // 1 + 2
+        })
+
+        test('computeBonusMeta handles rule-based promotion with no bonusProducts', () => {
+            const ruleBasedModalData = {
+                bonusDiscountLineItems: [
+                    {
+                        id: 'rule-based-1',
+                        promotionId: 'rule-promo',
+                        maxBonusItems: 3,
+                        bonusProducts: []
+                    }
+                ]
+            }
+
+            findAvailableBonusDiscountLineItemIds.mockReturnValue([['rule-based-1', 3]])
+
+            const {result} = renderHook(() => useBonusProductData(ruleBasedModalData))
+
+            // Should return null for products not in any bonusProducts list
+            const meta = result.current.computeBonusMeta({productId: 'rule-fetched-product'})
+
+            expect(meta).toEqual({
+                promotionId: null,
+                bonusDiscountLineItemId: null
+            })
+        })
+    })
 })
