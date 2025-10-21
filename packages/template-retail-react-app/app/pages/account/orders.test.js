@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -234,5 +234,174 @@ describe('Handles order with missing or partial data gracefully', () => {
         expect(screen.queryByText(/billing address/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/payment method/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/shipping address/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('Order with multiple shipments (pickup and delivery)', () => {
+    let orderNo
+
+    beforeEach(async () => {
+        const mockStore = {
+            data: [
+                {
+                    id: '00001',
+                    name: 'Downtown Store',
+                    address1: '100 Market St',
+                    city: 'San Francisco',
+                    stateCode: 'CA',
+                    postalCode: '94105',
+                    phone: '(415) 555-0001'
+                }
+            ]
+        }
+
+        const multiShipmentOrder = {
+            ...mockOrderHistory.data[0],
+            orderNo: '00099003',
+            productItems: [
+                {
+                    ...mockOrderHistory.data[0].productItems[0],
+                    shipmentId: 'pickup1',
+                    itemId: 'item1'
+                },
+                {
+                    ...mockOrderHistory.data[0].productItems[1],
+                    shipmentId: 'delivery1',
+                    itemId: 'item2'
+                }
+            ],
+            shipments: [
+                {
+                    adjustedMerchandizeTotalTax: 1.5,
+                    adjustedShippingTotalTax: 0,
+                    gift: false,
+                    merchandizeTotalTax: 1.5,
+                    productSubTotal: 30.0,
+                    productTotal: 30.0,
+                    shipmentId: 'pickup1',
+                    shipmentTotal: 30.0,
+                    shippingAddress: {
+                        address1: '100 Market St',
+                        city: 'San Francisco',
+                        countryCode: 'US',
+                        firstName: 'Downtown Store',
+                        fullName: 'Downtown Store',
+                        id: 'pickup1addr',
+                        lastName: 'pickup',
+                        phone: '(415) 555-0001',
+                        postalCode: '94105',
+                        stateCode: 'CA'
+                    },
+                    shippingMethod: {
+                        description: 'Pickup in store',
+                        id: '005',
+                        name: 'Store Pickup',
+                        price: 0,
+                        c_storePickupEnabled: true
+                    },
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: 0,
+                    shippingTotalTax: 0,
+                    taxTotal: 1.5,
+                    c_fromStoreId: '00001'
+                },
+                {
+                    adjustedMerchandizeTotalTax: 1.65,
+                    adjustedShippingTotalTax: 0.3,
+                    gift: false,
+                    merchandizeTotalTax: 1.65,
+                    productSubTotal: 32.98,
+                    productTotal: 32.98,
+                    shipmentId: 'delivery1',
+                    shipmentTotal: 38.97,
+                    shippingAddress: {
+                        address1: '123 Main St',
+                        city: 'Boston',
+                        countryCode: 'US',
+                        firstName: 'John',
+                        fullName: 'John Doe',
+                        id: 'delivery1addr',
+                        lastName: 'Doe',
+                        phone: '6175551234',
+                        postalCode: '02101',
+                        stateCode: 'MA'
+                    },
+                    shippingMethod: {
+                        description: 'Order received within 7-10 business days',
+                        id: '001',
+                        name: 'Ground',
+                        c_estimatedArrivalTime: '7-10 Business Days'
+                    },
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: 5.99,
+                    shippingTotalTax: 0.3,
+                    taxTotal: 1.95,
+                    trackingNumber: 'TRACK123456'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(multiShipmentOrder))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({...mockOrderHistory, data: [multiShipmentOrder]})
+                )
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            }),
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+
+        orderNo = multiShipmentOrder.orderNo
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults(`/account/orders/${orderNo}`)
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+    })
+
+    test('should render order details page with multiple shipments', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display pickup address section', async () => {
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping method and address sections', async () => {
+        expect(await screen.findByRole('heading', {name: /^shipping method$/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /^shipping address$/i})
+        ).toBeInTheDocument()
+    })
+
+    test('should display delivery address details', async () => {
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+        expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Boston/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping method name', async () => {
+        expect(await screen.findByText(/Ground/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking number', async () => {
+        expect(await screen.findByText(/TRACK123456/i)).toBeInTheDocument()
+    })
+
+    test('should display both payment method and billing address', async () => {
+        expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
     })
 })
