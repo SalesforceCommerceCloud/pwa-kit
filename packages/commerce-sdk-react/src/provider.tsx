@@ -10,7 +10,7 @@ import {ApiClientConfigParams, ApiClients, SDKClientTransformer} from './hooks/t
 import {Logger} from './types'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
-    ShopperBaskets,
+    ShopperBasketsV2,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
@@ -257,7 +257,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         }
 
         return {
-            shopperBaskets: new ShopperBaskets(config),
+            shopperBaskets: new ShopperBasketsV2(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
             shopperExperience: new ShopperExperience(config),
