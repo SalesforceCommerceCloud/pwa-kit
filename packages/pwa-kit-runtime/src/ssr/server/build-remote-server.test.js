@@ -10,6 +10,12 @@ import {default as createEvent} from '@serverless/event-mocks'
 import logger from '../../utils/logger-instance'
 import {catchAndLog} from '../../utils/ssr-server'
 
+jest.mock('../../utils/ssr-config', () => {
+    return {
+        getConfig: () => {}
+    }
+})
+
 jest.mock('../../utils/ssr-server', () => ({
     ...jest.requireActual('../../utils/ssr-server'),
     catchAndLog: jest.fn()
