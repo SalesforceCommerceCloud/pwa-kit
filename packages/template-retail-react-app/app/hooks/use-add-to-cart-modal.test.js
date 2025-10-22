@@ -67,11 +67,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
 // Mock getConfig for SF Payments configuration
 const mockGetConfig = jest.fn()
 
-// Mock useSalesforcePayments to respond to config
-jest.mock('@salesforce/retail-react-app/app/hooks/use-salesforce-payments', () => ({
-    useSalesforcePayments: jest.fn(() => {
+// Mock useShopperConfiguration to respond to config
+jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => ({
+    useShopperConfiguration: jest.fn((configId) => {
         const config = mockGetConfig()
-        return config?.app?.sfPayments?.enabled === true
+        if (configId === 'SalesforcePaymentsAllowed') {
+            return config?.app?.sfPayments?.enabled
+        }
+        return undefined
     })
 }))
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
