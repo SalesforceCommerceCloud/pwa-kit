@@ -6,6 +6,7 @@
  */
 
 import React, {useState, useMemo, useEffect, useRef, forwardRef, useImperativeHandle} from 'react'
+import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -39,6 +40,7 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 import {buildTheme} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
+    const {onRequiresPayButtonChange} = props
     const intl = useIntl()
     const formatMessage = intl.formatMessage
     const queryClient = useQueryClient()
@@ -113,6 +115,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const handlePaymentMethodSelected = (evt) => {
         paymentMethodType.current = evt.detail.selectedPaymentMethod
+        if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
+            onRequiresPayButtonChange(evt.detail.requiresPayButton)
+        }
     }
 
     const onBillingSubmit = async () => {
@@ -133,6 +138,27 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         })
     }
 
+    const createPaymentInstrument = async () => {
+        const updatedBasket = await onBillingSubmit()
+
+        if (!updatedBasket) {
+            throw new Error('Billing form errors')
+        }
+
+        const basketPaymentInstrument = {
+            paymentMethodId: 'Salesforce Payments',
+            amount: updatedBasket.orderTotal,
+            paymentReferenceRequest: {
+                paymentMethodType: paymentMethodType.current,
+                zoneId: getConfigurationValue('zoneId', 'default')
+            }
+        }
+        return await addPaymentInstrumentToBasket({
+            parameters: {basketId: updatedBasket.basketId},
+            body: basketPaymentInstrument
+        })
+    }
+
     const confirmPayment = async (createOrder) => {
         // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
         // submit, `undefined` is returned.
@@ -145,6 +171,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         startConfirming(updatedBasket)
 
         // Create SF Payments basket payment instrument before creating order
+        // TODO: add payment reference request
         const basketPaymentInstrument = {
             paymentMethodId: 'Salesforce Payments',
             amount: updatedBasket.orderTotal
@@ -273,7 +300,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             config.current = {
                 theme: buildTheme(),
-                actions: {},
+                actions: {
+                    createIntentFunction: createPaymentInstrument
+                },
                 options: {
                     useManualCapture: !getConfigurationValue('cardCaptureAutomatic', true),
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
@@ -396,5 +425,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 })
 
 SFPaymentsSheet.displayName = 'SFPaymentsSheet'
+
+SFPaymentsSheet.propTypes = {
+    onRequiresPayButtonChange: PropTypes.func
+}
 
 export default SFPaymentsSheet

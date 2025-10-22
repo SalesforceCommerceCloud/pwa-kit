@@ -43,7 +43,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {useSalesforcePayments} from '@salesforce/retail-react-app/app/hooks/use-salesforce-payments'
+import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -59,10 +59,11 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const sfPaymentsEnabled = useSalesforcePayments()
+    const sfPaymentsEnabled = useShopperConfiguration('SalesforcePaymentsAllowed') === true
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
+    const [shouldHidePlaceOrderButton, setShouldHidePlaceOrderButton] = useState(false)
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -89,6 +90,11 @@ const Checkout = () => {
             removeEmptyShipments(basket)
         }
     }, [basket?.basketId])
+
+    // Callback to handle when payment method requires its own pay button
+    const handleRequiresPayButtonChange = (requiresPayButton) => {
+        setShouldHidePlaceOrderButton(requiresPayButton === false)
+    }
 
     const submitOrder = async () => {
         const doCreateOrder = async () => {
@@ -184,12 +190,15 @@ const Checkout = () => {
                             )}
 
                             {sfPaymentsEnabled ? (
-                                <SFPaymentsSheet ref={sfPaymentsSheetRef} />
+                                <SFPaymentsSheet
+                                    ref={sfPaymentsSheetRef}
+                                    onRequiresPayButtonChange={handleRequiresPayButtonChange}
+                                />
                             ) : (
                                 <Payment />
                             )}
 
-                            {step === placeOrderCheckoutStep && (
+                            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -216,7 +225,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === placeOrderCheckoutStep && (
+                        {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -230,7 +239,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === placeOrderCheckoutStep && (
+            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

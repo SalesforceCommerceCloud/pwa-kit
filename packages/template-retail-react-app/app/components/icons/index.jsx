@@ -68,7 +68,7 @@ import CVVSymbol from '@salesforce/retail-react-app/app/assets/svg/cc-cvv.svg'
 import DiscoverSymbol from '@salesforce/retail-react-app/app/assets/svg/cc-discover.svg'
 import LocationSymbol from '@salesforce/retail-react-app/app/assets/svg/location.svg'
 import MastercardSymbol from '@salesforce/retail-react-app/app/assets/svg/cc-mastercard.svg'
-import PaypalSymbol from '@salesforce/retail-react-app/app/assets/svg/paypal.svg'
+import PaypalSymbol from '@salesforce/retail-react-app/app/assets/svg/paypal-icon.svg'
 import SocialPinterestSymbol from '@salesforce/retail-react-app/app/assets/svg/social-pinterest.svg'
 import VisaSymbol from '@salesforce/retail-react-app/app/assets/svg/cc-visa.svg'
 
@@ -186,7 +186,7 @@ export const LockIcon = icon(
     }
 )
 export const LocationIcon = icon('location')
-export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
+export const PaypalIcon = icon('paypal-icon', {viewBox: PaypalSymbol.viewBox})
 export const PlugIcon = icon('plug')
 export const PlusIcon = icon('plus')
 export const MastercardIcon = icon('cc-mastercard', {viewBox: MastercardSymbol.viewBox})

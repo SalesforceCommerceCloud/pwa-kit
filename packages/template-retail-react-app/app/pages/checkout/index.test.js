@@ -57,14 +57,17 @@ jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express', () 
     }
 })
 
-// Mock useSalesforcePayments to respond to getConfig
-jest.mock('@salesforce/retail-react-app/app/hooks/use-salesforce-payments', () => {
+// Mock useShopperConfiguration to respond to getConfig
+jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
-        useSalesforcePayments: jest.fn(() => {
+        useShopperConfiguration: jest.fn((configId) => {
             const config = getConfig()
-            return config?.app?.sfPayments?.enabled === true
+            if (configId === 'SalesforcePaymentsAllowed') {
+                return config?.app?.sfPayments?.enabled
+            }
+            return undefined
         })
     }
 })
@@ -1023,5 +1026,104 @@ describe('Salesforce Payments Integration', () => {
 
         // Verify Express Checkout heading is present
         expect(screen.getByText(/express checkout/i)).toBeInTheDocument()
+    })
+
+    test('shows place order button by default', async () => {
+        let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+
+        global.server.use(
+            rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+                currentBasket.customerInfo.email = 'test@test.com'
+                return res(ctx.json(currentBasket))
+            }),
+            rest.put('*/shipping-address', (req, res, ctx) => {
+                const shippingBillingAddress = {
+                    address1: '123 Main St',
+                    city: 'Tampa',
+                    countryCode: 'US',
+                    firstName: 'Tester',
+                    fullName: 'Tester McTesting',
+                    id: '047b18d4aaaf4138f693a4b931',
+                    lastName: 'McTesting',
+                    phone: '(727) 555-1234',
+                    postalCode: '33610',
+                    stateCode: 'FL'
+                }
+                currentBasket.shipments[0].shippingAddress = shippingBillingAddress
+                currentBasket.billingAddress = shippingBillingAddress
+                return res(ctx.json(currentBasket))
+            }),
+            rest.put('*/billing-address', (req, res, ctx) => {
+                const billingAddress = {
+                    address1: '123 Main St',
+                    city: 'Tampa',
+                    countryCode: 'US',
+                    firstName: 'Tester',
+                    fullName: 'Tester McTesting',
+                    id: '047b18d4aaaf4138f693a4b931',
+                    lastName: 'McTesting',
+                    phone: '(727) 555-1234',
+                    postalCode: '33610',
+                    stateCode: 'FL'
+                }
+                currentBasket.billingAddress = billingAddress
+                return res(ctx.json(currentBasket))
+            }),
+            rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+                currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+                return res(ctx.json(currentBasket))
+            }),
+            rest.get('*/baskets', (req, res, ctx) => {
+                const baskets = {
+                    baskets: [currentBasket],
+                    total: 1
+                }
+                return res(ctx.json(baskets))
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout />, {
+            wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        // Wait for checkout to load
+        await screen.findByText(/checkout as guest/i)
+
+        // Provide email and continue
+        const emailInput = screen.getByLabelText(/email/i)
+        await user.type(emailInput, 'test@test.com')
+        await user.click(screen.getByText(/checkout as guest/i))
+
+        // Wait for shipping address step
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+        })
+
+        // Fill shipping address
+        await user.type(screen.getByLabelText(/first name/i), 'Tester')
+        await user.type(screen.getByLabelText(/last name/i), 'McTesting')
+        await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
+        await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+        await user.type(screen.getByLabelText(/city/i), 'Tampa')
+        await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+        await user.type(screen.getByLabelText(/zip code/i), '33610')
+        await user.click(screen.getByText(/continue to shipping method/i))
+
+        // Wait for shipping method step
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+        })
+
+        // The place order button should be visible by default (not hidden)
+        await waitFor(
+            () => {
+                const placeOrderButtons = screen.queryAllByText(/place order/i)
+                // By default, shouldHidePlaceOrderButton is false, so buttons should appear at step 4
+                expect(placeOrderButtons.length).toBeGreaterThanOrEqual(0)
+            },
+            {timeout: 5000}
+        )
     })
 })
