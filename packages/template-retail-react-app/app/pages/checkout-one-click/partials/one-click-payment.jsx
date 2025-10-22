@@ -90,6 +90,7 @@ const Payment = ({
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
+    const otpDismissedRef = useRef(false)
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -189,6 +190,7 @@ const Payment = ({
                 shipmentSnapshot: basket?.shipments?.[0] || null,
                 doMerge: true
             })
+            otpDismissedRef.current = true
             // Ensure save-for-future is selected after successful registration
             setShouldSavePaymentMethod(true)
             // Inform guest they are now logged in
@@ -234,6 +236,7 @@ const Payment = ({
     const onUserRegistrationToggle = async (checked) => {
         setEnableUserRegistration(checked)
         if (checked && isGuest) {
+            if (otpDismissedRef.current) return
             // Default preferences for newly registering guest
             setBillingSameAsShipping(true)
             setShouldSavePaymentMethod(true)
