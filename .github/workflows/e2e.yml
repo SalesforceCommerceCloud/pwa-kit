@@ -183,9 +183,6 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
-      # The current recommended version for Managed Runtime:
-      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 11 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -251,11 +248,6 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
-
-      - name: Run a11y test for Node 22 with npm 11
-        if: env.IS_MRT_NODE == 'true'
-        run: npm run test:e2e:a11y:slas-public-client
-
   notify-slack-pwa-ext:
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
@@ -299,6 +291,9 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      # The current recommended version for Managed Runtime:
+      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+      IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 11 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -370,6 +365,9 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e
 
+      - name: Run a11y test for Node 22 with npm 11
+        if: env.IS_MRT_NODE == 'true'
+        run: npm run test:e2e:a11y
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]
     if: ${{ always() }}
