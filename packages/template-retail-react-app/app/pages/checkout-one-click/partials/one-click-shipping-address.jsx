@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -45,6 +45,8 @@ export default function ShippingAddress() {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
+    const updateCustomer = useShopperCustomersMutation('updateCustomer')
+    const hasSavedPhoneRef = useRef(false)
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -104,6 +106,19 @@ export default function ShippingAddress() {
                         addressName: addressId
                     }
                 })
+            }
+
+            // Persist phone number onto the customer profile as phoneHome
+            if (customer.isRegistered && phone && !hasSavedPhoneRef.current) {
+                try {
+                    await updateCustomer.mutateAsync({
+                        parameters: {customerId: customer.customerId},
+                        body: {phoneHome: phone}
+                    })
+                    hasSavedPhoneRef.current = true
+                } catch (_e) {
+                    // ignore; not blocking checkout
+                }
             }
 
             goToNextStep()

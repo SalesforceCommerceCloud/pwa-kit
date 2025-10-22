@@ -51,6 +51,7 @@ import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {nanoid} from 'nanoid'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
@@ -96,6 +97,8 @@ const CheckoutOneClick = () => {
         ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
     const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateCustomer = useShopperCustomersMutation('updateCustomer')
     // Registration on place order removed for guest users opting into account creation via OTP
     // Removed: guest registration-on-order has been deprecated; address save handled elsewhere
 
@@ -182,44 +185,6 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async (fullCardDetails) => {
-        // Kept for reference; no longer used when guest registration is moved earlier via OTP.
-        // const saveShippingAddress = async (customerId, address) => {
-        //     try {
-        //         await createCustomerAddress({
-        //             body: address,
-        //             parameters: {customerId: customerId}
-        //         })
-        //     } catch (error) {
-        //         // Fail silently
-        //     }
-        // }
-
-        // const savePaymentInstrument = async (customerId, paymentMethodId) => {
-        //     try {
-        //         const paymentInstrument = {
-        //             paymentMethodId: paymentMethodId,
-        //             paymentCard: {
-        //                 holder: shopperPaymentInstrument.holder,
-        //                 number: shopperPaymentInstrument.number,
-        //                 cardType: shopperPaymentInstrument.cardType,
-        //                 expirationMonth: shopperPaymentInstrument.expirationMonth,
-        //                 expirationYear: shopperPaymentInstrument.expirationYear
-        //             }
-        //         }
-        //
-        //         await createCustomerPaymentInstruments.mutateAsync({
-        //             body: paymentInstrument,
-        //             parameters: {customerId: customerId}
-        //         })
-        //     } catch (error) {
-        //         showError(
-        //             formatMessage({
-        //                 id: 'checkout_payment.error.cannot_save_payment',
-        //                 defaultMessage: 'Could not save payment method. Please try again.'
-        //             })
-        //         )
-        //     }
-        // }
 
         const savePaymentInstrumentWithDetails = async (
             customerId,
@@ -299,6 +264,59 @@ const CheckoutOneClick = () => {
                         paymentInstrument,
                         fullCardDetails
                     )
+                }
+
+                // For newly registered guests, persist shipping address to customer when billing same as shipping
+                try {
+                    const customerId = order.customerInfo?.customerId
+                    const shipping = order?.shipments?.[0]?.shippingAddress
+                    if (customerId && shipping) {
+                        // Whitelist fields and strip non-customer fields (e.g., id, _type)
+                        const {
+                            id, // remove
+                            _type, // remove
+                            addressId: _ignoreAddressId,
+                            creationDate: _ignoreCreation,
+                            lastModified: _ignoreModified,
+                            preferred: _ignorePreferred,
+                            address1,
+                            address2,
+                            city,
+                            countryCode,
+                            firstName,
+                            lastName,
+                            phone,
+                            postalCode,
+                            stateCode
+                        } = shipping || {}
+
+                        await createCustomerAddress.mutateAsync({
+                            parameters: {customerId},
+                            body: {
+                                addressId: nanoid(),
+                                preferred: true,
+                                address1,
+                                address2,
+                                city,
+                                countryCode,
+                                firstName,
+                                lastName,
+                                phone,
+                                postalCode,
+                                stateCode
+                            }
+                        })
+                        // Also persist billing phone as phoneHome
+                        const phoneHome = order?.billingAddress?.phone
+                        if (phoneHome) {
+                            await updateCustomer.mutateAsync({
+                                parameters: {customerId},
+                                body: {phoneHome}
+                            })
+                        }
+                    }
+                } catch (_e) {
+                    // Fail silently
                 }
             }
 

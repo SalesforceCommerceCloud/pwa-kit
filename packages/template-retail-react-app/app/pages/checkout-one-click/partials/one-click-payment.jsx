@@ -49,9 +49,8 @@ import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useQueryClient} from '@tanstack/react-query'
-import {useCommerceApi} from '@salesforce/commerce-sdk-react'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
+import useBasketRecovery from '@salesforce/retail-react-app/app/hooks/use-basket-recovery'
 const Payment = ({
     paymentMethodForm,
     billingAddressForm,
@@ -67,9 +66,8 @@ const Payment = ({
     onIsEditingChange
 }) => {
     const appOrigin = useAppOrigin()
-    const queryClient = useQueryClient()
-    const apiClients = useCommerceApi()
     const auth = useAuthContext()
+    const {recoverBasketAfterAuth} = useBasketRecovery()
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -175,175 +173,35 @@ const Payment = ({
         }
     }, [shouldSavePaymentMethod, onSavePreferenceChange])
 
-    // When user toggles "Create an account for a faster checkout":
-    // - If checked by a guest, open OTP modal and send OTP via email with register_customer=true
-    useEffect(() => {
-        const maybeStartGuestRegistration = async () => {
-            if (!isGuest) return
-            if (!enableUserRegistration) return
-            const email = basket?.customerInfo?.email
-            if (!email) return
-            try {
-                console.info('OTP authorize params (checkbox)', {
-                    userid: email,
-                    register_customer: true,
-                    callbackURI: `${callbackURL}?mode=otp_email`
-                })
-                await authorizePasswordlessLogin.mutateAsync({
-                    userid: email,
-                    callbackURI: `${callbackURL}?mode=otp_email`,
-                    register_customer: true,
-                    // When register_customer is true, last_name is required unless userid is an email
-                    // We pass email as last_name as a simple placeholder to satisfy SLAS requirement
-                    last_name: email,
-                    email: email
-                })
-                onOtpOpen()
-            } catch (_e) {
-                // If sending fails, silently ignore and keep checkbox state
-                // User can still place order as guest
-            }
-        }
-        void maybeStartGuestRegistration()
-        // Only react to changes of the checkbox value
-    }, [enableUserRegistration])
+    // Removed: OTP is sent via handleSendEmailOtp on checkbox action to avoid double requests
 
     const handleOtpVerification = async (otpCode) => {
         try {
-            // Ensure auth context is updated via passwordless token exchange
             await loginPasswordless.mutateAsync({
                 pwdlessLoginToken: otpCode,
                 register_customer: true
             })
             // Allow auth storage to settle before SCAPI calls
             await auth.refreshAccessToken()
-            // Auth has swapped to registered user; invalidate basket/customer queries
-            await queryClient.invalidateQueries({
-                predicate: (q) =>
-                    q?.meta?.displayName === 'useCustomerBaskets' ||
-                    q?.meta?.displayName === 'useBasket'
+
+            await recoverBasketAfterAuth({
+                preLoginItems: basket?.productItems || [],
+                shipmentSnapshot: basket?.shipments?.[0] || null,
+                doMerge: true
             })
-            // Snapshot guest basket data for fallback copy
-            const sourceItemsSnapshot = basket?.productItems || []
-            const snapshotShipment = basket?.shipments?.[0] || null
-            // Proceed with merge
-            const hasBasketItem = sourceItemsSnapshot.length > 0
-            if (hasBasketItem) {
-                const merged = await mergeBasket.mutateAsync({
-                    parameters: {
-                        createDestinationBasket: true
-                    }
-                })
-                // Capture destination basket id; if missing, list baskets for registered user
-                let destId = merged?.basketId || merged?.basket_id || merged?.id
-                if (!destId) {
-                    try {
-                        const list = await apiClients.shopperCustomers.getCustomerBaskets({
-                            parameters: {customerId: 'me'}
-                        })
-                        destId = list?.baskets?.[0]?.basketId
-                    } catch (_e) {
-                        // ignore and continue to invalidation path
-                    }
-                }
-                if (destId) {
-                    // Try to force-hydrate destination basket under the new token with simple retries
-                    let hydrated = false
-                    for (let i = 0; i < 3; i++) {
-                        try {
-                            await apiClients.shopperBaskets.getBasket({
-                                headers: {authorization: `Bearer ${auth.get('access_token')}`},
-                                parameters: {basketId: destId}
-                            })
-                            hydrated = true
-                            break
-                        } catch (_e) {
-                            await new Promise((r) => setTimeout(r, 300))
-                        }
-                    }
-                    // If still not available, create a basket and copy items + shipping
-                    if (!hydrated) {
-                        try {
-                            const created = await createBasket.mutateAsync({})
-                            destId =
-                                created?.basketId || created?.basket_id || created?.id || destId
-                            if (sourceItemsSnapshot?.length) {
-                                const payload = sourceItemsSnapshot.map((item) => {
-                                    const productId =
-                                        item.productId ||
-                                        item.product_id ||
-                                        item.id ||
-                                        item.product?.id
-                                    const quantity = item.quantity || item.amount || 1
-                                    const variationAttributes =
-                                        item.variationAttributes || item.variation_attributes || []
-                                    const optionItems = item.optionItems || item.option_items || []
-                                    const mappedVariations = Array.isArray(variationAttributes)
-                                        ? variationAttributes.map((v) => ({
-                                              attributeId: v.attributeId || v.attribute_id || v.id,
-                                              valueId: v.valueId || v.value_id || v.value
-                                          }))
-                                        : []
-                                    const mappedOptions = Array.isArray(optionItems)
-                                        ? optionItems.map((o) => ({
-                                              optionId: o.optionId || o.option_id || o.id,
-                                              optionValueId:
-                                                  o.optionValueId ||
-                                                  o.optionValue ||
-                                                  o.option_value ||
-                                                  o.value
-                                          }))
-                                        : []
-                                    const obj = {productId, quantity}
-                                    if (mappedVariations.length)
-                                        obj.variationAttributes = mappedVariations
-                                    if (mappedOptions.length) obj.optionItems = mappedOptions
-                                    return obj
-                                })
-                                if (payload.length > 0) {
-                                    await addItemToBasketMutation.mutateAsync({
-                                        parameters: {basketId: destId},
-                                        body: payload
-                                    })
-                                }
-                            }
-                            if (snapshotShipment && destId) {
-                                const s = snapshotShipment.shippingAddress
-                                if (s) {
-                                    await updateShippingAddressForShipment({
-                                        parameters: {basketId: destId, shipmentId: 'me'},
-                                        body: {
-                                            address1: s.address1,
-                                            address2: s.address2,
-                                            city: s.city,
-                                            countryCode: s.countryCode,
-                                            firstName: s.firstName,
-                                            lastName: s.lastName,
-                                            phone: s.phone,
-                                            postalCode: s.postalCode,
-                                            stateCode: s.stateCode
-                                        }
-                                    })
-                                }
-                                const methodId = snapshotShipment?.shippingMethod?.id
-                                if (methodId) {
-                                    await updateShippingMethodForShipment({
-                                        parameters: {basketId: destId, shipmentId: 'me'},
-                                        body: {id: methodId}
-                                    })
-                                }
-                            }
-                        } catch (_fallbackErr) {
-                            // Ignore; we will still invalidate below
-                        }
-                    }
-                }
-                await queryClient.invalidateQueries({
-                    predicate: (q) =>
-                        q?.meta?.displayName === 'useCustomerBaskets' ||
-                        q?.meta?.displayName === 'useBasket'
-                })
-            }
+            // Ensure save-for-future is selected after successful registration
+            setShouldSavePaymentMethod(true)
+            // Inform guest they are now logged in
+            showToast({
+                variant: 'subtle',
+                title: formatMessage({
+                    defaultMessage: "You're now signed in.",
+                    id: 'auth_modal.description.now_signed_in'
+                }),
+                status: 'success',
+                position: 'top-right',
+                isClosable: true
+            })
 
             // Note: Address and payment persistence for newly registered guests is temporarily disabled.
             onOtpClose()
@@ -372,6 +230,25 @@ const Payment = ({
         }
     }
 
+    // Handles user registration checkbox toggle
+    const onUserRegistrationToggle = async (checked) => {
+        setEnableUserRegistration(checked)
+        if (checked && isGuest) {
+            // Default preferences for newly registering guest
+            setBillingSameAsShipping(true)
+            setShouldSavePaymentMethod(true)
+            const email = basket?.customerInfo?.email
+            if (email) {
+                try {
+                    await handleSendEmailOtp(email)
+                } catch (_e) {
+                    // ignore send errors; user can still proceed as guest
+                }
+                onOtpOpen()
+            }
+        }
+    }
+
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
 
@@ -384,18 +261,6 @@ const Payment = ({
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-    const {mutateAsync: updateShippingAddressForShipment} = useShopperBasketsMutation(
-        'updateShippingAddressForShipment'
-    )
-    const {mutateAsync: updateShippingMethodForShipment} = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    const createBasket = useShopperBasketsMutation('createBasket')
-    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
-    // const createCustomerPaymentInstrument = useShopperCustomersMutation(
-    //     'createCustomerPaymentInstrument'
-    // )
 
     const showToast = useToast()
     const showError = (message) => {
@@ -644,6 +509,7 @@ const Payment = ({
                                             <SavePaymentMethod
                                                 paymentInstrument={currentFormPayment}
                                                 onSaved={handleSavePreferenceChange}
+                                                checked={shouldSavePaymentMethod}
                                             />
                                         )}
                                     </PaymentForm>
@@ -695,7 +561,7 @@ const Payment = ({
                                 {isGuest && (
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
-                                        setEnableUserRegistration={setEnableUserRegistration}
+                                        setEnableUserRegistration={onUserRegistrationToggle}
                                         isGuestCheckout={registeredUserChoseGuest}
                                         isDisabled={
                                             // Disable until there is either an applied payment or a valid form
@@ -752,6 +618,7 @@ const Payment = ({
                             <SavePaymentMethod
                                 paymentInstrument={newPaymentInstruments[0]}
                                 onSaved={onPaymentMethodSaved}
+                                checked={shouldSavePaymentMethod}
                             />
                         )}
 
