@@ -20,24 +20,15 @@ import {
     mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-// Mock getConfig to provide SF Payments configuration
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
+// Mock useSFPaymentsEnabled as a simple jest function
+const mockUseSFPaymentsEnabled = jest.fn(() => false)
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
-        getConfig: jest.fn(() => ({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                sfPayments: {
-                    enabled: false, // Default to false, will be overridden in specific tests
-                    sdkUrl: 'https://example.com/sfpayments.js'
-                }
-            }
-        }))
+        useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled()
     }
 })
 
@@ -54,21 +45,6 @@ jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express', () 
             }
         }, [onPaymentMethodsRendered])
         return React.createElement('div', {'data-testid': 'sf-payments-express'}, null)
-    }
-})
-
-// Mock useShopperConfiguration to respond to getConfig
-jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    return {
-        useShopperConfiguration: jest.fn((configId) => {
-            const config = getConfig()
-            if (configId === 'SalesforcePaymentsAllowed') {
-                return config?.app?.sfPayments?.enabled
-            }
-            return undefined
-        })
     }
 })
 
@@ -806,30 +782,12 @@ test('Should show both pickup and shipping sections for mixed orders', async () 
 describe('Salesforce Payments Integration', () => {
     beforeEach(() => {
         // Enable SF Payments for these tests
-        getConfig.mockReturnValue({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                sfPayments: {
-                    enabled: true,
-                    sdkUrl: 'https://example.com/sfpayments.js'
-                }
-            }
-        })
+        mockUseSFPaymentsEnabled.mockReturnValue(true)
     })
 
     afterEach(() => {
         // Reset to default (disabled) after each test
-        getConfig.mockReturnValue({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                sfPayments: {
-                    enabled: false,
-                    sdkUrl: 'https://example.com/sfpayments.js'
-                }
-            }
-        })
+        mockUseSFPaymentsEnabled.mockReturnValue(false)
     })
 
     test('renders express checkout section when SF Payments is enabled', async () => {

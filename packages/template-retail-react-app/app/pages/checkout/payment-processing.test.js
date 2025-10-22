@@ -11,24 +11,6 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import PaymentProcessing from '@salesforce/retail-react-app/app/pages/checkout/payment-processing'
 import {STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
-// Mock getConfig to provide necessary configuration
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
-    return {
-        ...actual,
-        getConfig: jest.fn(() => ({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                sfPayments: {
-                    enabled: true
-                }
-            }
-        }))
-    }
-})
-
 // Mock dependencies
 const mockNavigate = jest.fn()
 const mockToast = jest.fn()
@@ -46,6 +28,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => ({
     useSFPayments: () => mockUseSFPayments(),
+    useSFPaymentsEnabled: () => true,
     STATUS_SUCCESS: 0
 }))
 

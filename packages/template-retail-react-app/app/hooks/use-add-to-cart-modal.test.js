@@ -64,76 +64,76 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     default: jest.fn(() => jest.fn())
 }))
 
-// Mock getConfig for SF Payments configuration
-const mockGetConfig = jest.fn()
+// Mock useSFPaymentsEnabled as a simple jest function
+const mockUseSFPaymentsEnabled = jest.fn(() => false)
+const mockUseSFPayments = jest.fn(() => ({confirmingBasket: null}))
 
-// Mock useShopperConfiguration to respond to config
-jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => ({
-    useShopperConfiguration: jest.fn((configId) => {
-        const config = mockGetConfig()
-        if (configId === 'SalesforcePaymentsAllowed') {
-            return config?.app?.sfPayments?.enabled
-        }
-        return undefined
-    })
-}))
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
-        getConfig: () => {
-            const additionalConfig = mockGetConfig()
-            return {
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    ...additionalConfig.app
-                }
-            }
-        }
+        useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled(),
+        useSFPayments: () => mockUseSFPayments()
     }
 })
 
 // Mock SFPaymentsExpress component
-jest.mock(
-    '@salesforce/retail-react-app/app/components/sf-payments-express',
-    () =>
-        // eslint-disable-next-line react/prop-types
-        function MockSFPaymentsExpress({expressButtonLayout, maximumButtonCount}) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const React = require('react')
-            return React.createElement(
-                'div',
-                {
-                    'data-testid': 'sf-payments-express',
-                    'data-button-layout': expressButtonLayout,
-                    'data-maximum-button-count': maximumButtonCount
-                },
-                'SF Payments Express'
-            )
-        }
-)
+jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const React = require('react')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const PropTypes = require('prop-types')
+
+    function MockSFPaymentsExpress({
+        expressButtonLayout,
+        maximumButtonCount,
+        onExpressPaymentCompleted
+    }) {
+        return React.createElement(
+            'div',
+            {
+                'data-testid': 'sf-payments-express',
+                'data-button-layout': expressButtonLayout,
+                'data-maximum-button-count': maximumButtonCount,
+                'data-has-completion-callback': !!onExpressPaymentCompleted
+            },
+            'SF Payments Express'
+        )
+    }
+
+    MockSFPaymentsExpress.propTypes = {
+        expressButtonLayout: PropTypes.string,
+        maximumButtonCount: PropTypes.number,
+        onExpressPaymentCompleted: PropTypes.func
+    }
+
+    return MockSFPaymentsExpress
+})
 
 // Mock SelectBonusProductsCard to verify props being passed
+jest.mock('@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const React = require('react')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const PropTypes = require('prop-types')
 
-jest.mock(
-    '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card',
-    () =>
-        // eslint-disable-next-line react/prop-types
-        function MockSelectBonusProductsCard({hideSelectionCounter}) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const React = require('react')
-            return React.createElement(
-                'div',
-                {
-                    'data-testid': 'select-bonus-products-card',
-                    'data-hide-selection-counter': hideSelectionCounter
-                },
-                'Mock Bonus Products Card'
-            )
-        }
-)
+    function MockSelectBonusProductsCard({hideSelectionCounter}) {
+        return React.createElement(
+            'div',
+            {
+                'data-testid': 'select-bonus-products-card',
+                'data-hide-selection-counter': hideSelectionCounter
+            },
+            'Mock Bonus Products Card'
+        )
+    }
+
+    MockSelectBonusProductsCard.propTypes = {
+        hideSelectionCounter: PropTypes.bool
+    }
+
+    return MockSelectBonusProductsCard
+})
 
 // Mock bonus product utilities
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
@@ -781,14 +781,8 @@ beforeEach(() => {
         derivedData: {},
         currency: 'USD'
     })
-    // Default mock config with sfPayments disabled
-    mockGetConfig.mockReturnValue({
-        app: {
-            sfPayments: {
-                enabled: false
-            }
-        }
-    })
+    // Default mock with sfPayments disabled
+    mockUseSFPaymentsEnabled.mockReturnValue(false)
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -1083,14 +1077,8 @@ test('renders SelectBonusProductsCard with hideSelectionCounter=true in add-to-c
 })
 
 test('renders SFPaymentsExpress when sfPayments is enabled', () => {
-    // Enable sfPayments in config
-    mockGetConfig.mockReturnValue({
-        app: {
-            sfPayments: {
-                enabled: true
-            }
-        }
-    })
+    // Enable sfPayments
+    mockUseSFPaymentsEnabled.mockReturnValue(true)
 
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
@@ -1126,11 +1114,15 @@ test('renders SFPaymentsExpress when sfPayments is enabled', () => {
         </AddToCartModalContext.Provider>
     )
 
-    // Verify SFPaymentsExpress component is rendered with correct props
-    const sfPaymentsExpress = screen.getByTestId('sf-payments-express')
-    expect(sfPaymentsExpress).toBeInTheDocument()
-    expect(sfPaymentsExpress).toHaveAttribute('data-button-layout', 'vertical')
-    expect(sfPaymentsExpress).toHaveAttribute('data-maximum-button-count', '1')
+    // Verify SFPaymentsExpress component is rendered with correct props (rendered twice: desktop + mobile)
+    const sfPaymentsExpressComponents = screen.getAllByTestId('sf-payments-express')
+    expect(sfPaymentsExpressComponents).toHaveLength(2) // Desktop and mobile views
+    sfPaymentsExpressComponents.forEach((component) => {
+        expect(component).toBeInTheDocument()
+        expect(component).toHaveAttribute('data-button-layout', 'vertical')
+        expect(component).toHaveAttribute('data-maximum-button-count', '1')
+        expect(component).toHaveAttribute('data-has-completion-callback', 'true')
+    })
 })
 
 test('does not render SFPaymentsExpress when sfPayments is disabled', () => {
@@ -1173,15 +1165,9 @@ test('does not render SFPaymentsExpress when sfPayments is disabled', () => {
     expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
 })
 
-test('does not render SFPaymentsExpress when sfPayments.enabled is undefined', () => {
-    // Mock config with sfPayments but enabled is undefined
-    mockGetConfig.mockReturnValue({
-        app: {
-            sfPayments: {
-                enabled: undefined
-            }
-        }
-    })
+test('does not render SFPaymentsExpress when useSFPaymentsEnabled returns false', () => {
+    // Explicitly set sfPayments to false
+    mockUseSFPaymentsEnabled.mockReturnValue(false)
 
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
@@ -1205,7 +1191,6 @@ test('does not render SFPaymentsExpress when sfPayments.enabled is undefined', (
         currency: 'USD'
     })
 
-    // This should not throw an error and should not render SF Payments
     renderWithProviders(
         <AddToCartModalContext.Provider
             value={{

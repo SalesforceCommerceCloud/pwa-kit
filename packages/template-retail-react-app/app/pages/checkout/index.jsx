@@ -43,7 +43,10 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
+import {
+    useSFPaymentsEnabled,
+    useSFPayments
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -51,6 +54,7 @@ const Checkout = () => {
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket, derivedData} = useCurrentBasket()
+    const {confirmingBasket} = useSFPayments()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
@@ -59,7 +63,7 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const sfPaymentsEnabled = useShopperConfiguration('SalesforcePaymentsAllowed') === true
+    const sfPaymentsEnabled = useSFPaymentsEnabled()
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
@@ -96,18 +100,22 @@ const Checkout = () => {
         setShouldHidePlaceOrderButton(requiresPayButton === false)
     }
 
-    const submitOrder = async () => {
-        const doCreateOrder = async () => {
-            return await createOrder({
-                body: {basketId: basket.basketId}
-            })
-        }
+    const doCreateOrder = async () => {
+        return await createOrder({
+            body: {basketId: basket.basketId}
+        })
+    }
 
+    const handlePaymentError = (errorMessage) => {
+        setError(errorMessage)
+    }
+
+    const submitOrder = async () => {
         setIsLoading(true)
         try {
             let order
             if (sfPaymentsEnabled) {
-                order = await sfPaymentsSheetRef.current.confirmPayment(doCreateOrder)
+                order = await sfPaymentsSheetRef.current.confirmPayment()
             } else {
                 order = doCreateOrder()
             }
@@ -193,6 +201,8 @@ const Checkout = () => {
                                 <SFPaymentsSheet
                                     ref={sfPaymentsSheetRef}
                                     onRequiresPayButtonChange={handleRequiresPayButtonChange}
+                                    onCreateOrder={doCreateOrder}
+                                    onError={handlePaymentError}
                                 />
                             ) : (
                                 <Payment />
@@ -261,6 +271,9 @@ const Checkout = () => {
                     </Container>
                 </Box>
             )}
+
+            {/* Loading overlay during express payment confirmation */}
+            {confirmingBasket && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
         </Box>
     )
 }

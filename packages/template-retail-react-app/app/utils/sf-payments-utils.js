@@ -4,7 +4,127 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useConfigurations} from '@salesforce/commerce-sdk-react'
+
+/**
+ * Returns the first Salesforce Payments instrument found in a basket or order.
+ * @param {Object} basketOrOrder - A basket or order object containing paymentInstruments
+ * @returns {Object|undefined} First Salesforce Payments payment instrument found, or undefined if none exist
+ */
+export const getSFPaymentsInstrument = (basketOrOrder) => {
+    return basketOrOrder?.paymentInstruments?.find(
+        (pi) => pi.paymentMethodId === 'Salesforce Payments'
+    )
+}
+
+/**
+ * Transform address details from payment provider format to basket format.
+ * Handles name splitting and address field mapping.
+ * @param {Object} addressDetails - Address details from payment provider
+ * @returns {Object} Transformed address for basket API
+ */
+export const transformAddressDetails = (addressDetails) => {
+    const address = {
+        firstName: null,
+        lastName: null,
+        address1: addressDetails.address.line1,
+        address2: addressDetails.address.line2 || null,
+        city: addressDetails.address.city,
+        stateCode: addressDetails.address.state,
+        postalCode: addressDetails.address.postalCode,
+        countryCode: addressDetails.address.country,
+        phone: addressDetails.phone || null
+    }
+
+    if (addressDetails.name) {
+        const names = addressDetails.name.split(' ')
+        address.firstName = names.slice(0, -1).join(' ')
+        address.lastName = names.slice(-1).join(' ')
+    }
+
+    return address
+}
+
+/**
+ * Transform shipping methods from API format to express payment format.
+ * @param {Array} shippingMethods - Array of shipping methods from API
+ * @param {Object} basket - Basket object containing currency
+ * @param {string} selectedId - ID of the currently selected shipping method
+ * @param {boolean} sortSelected - Whether to sort selected method to the top
+ * @returns {Array} Transformed shipping methods
+ */
+export const transformShippingMethods = (
+    shippingMethods,
+    basket,
+    selectedId = null,
+    sortSelected = true
+) => {
+    const methods = shippingMethods.map((method) => ({
+        id: method.id,
+        name: method.name,
+        classOfService: method.description,
+        shippingFee: typeof method.price === 'number' ? method.price.toString() : method.price,
+        currencyIsoCode: basket.currency
+    }))
+
+    if (sortSelected && selectedId) {
+        methods.sort((m1, m2) => {
+            if (m1.id === selectedId) return -1
+            if (m2.id === selectedId) return 1
+            return 0
+        })
+    }
+
+    return methods
+}
+
+/**
+ * Get the currently selected shipping method ID from basket or fallback to default.
+ * @param {Object} basket - Basket object
+ * @param {Object} shippingMethods - Shipping methods object with defaultShippingMethodId
+ * @returns {string} Selected shipping method ID
+ */
+export const getSelectedShippingMethodId = (basket, shippingMethods) => {
+    return basket.shipments?.[0]?.shippingMethod?.id || shippingMethods.defaultShippingMethodId
+}
+
+/**
+ * Validates current shipping method is still applicable.
+ * Returns true if valid, false if the method needs to be updated.
+ * @param {Object} currentBasket - Basket object
+ * @param {Object} updatedShippingMethods - Updated shipping methods response
+ * @returns {boolean} Whether the current shipping method is still valid
+ */
+export const isShippingMethodValid = (currentBasket, updatedShippingMethods) => {
+    const currentShippingMethodId = currentBasket.shipments[0].shippingMethod?.id
+    return updatedShippingMethods.applicableShippingMethods.some(
+        (method) => method.id === currentShippingMethodId
+    )
+}
+
+/**
+ * Creates a payment instrument body for Salesforce Payments (for basket or order).
+ * @param {number} amount - Payment amount
+ * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @param {string} zoneId - Zone ID for payment processing
+ * @param {string} shippingPreference - optional shipping preference for PayPal payment processing
+ * @returns {Object} Payment instrument body
+ */
+export const createPaymentInstrumentBody = (
+    amount,
+    paymentMethodType,
+    zoneId,
+    shippingPreference
+) => {
+    return {
+        paymentMethodId: 'Salesforce Payments',
+        amount: amount,
+        paymentReferenceRequest: {
+            paymentMethodType: paymentMethodType,
+            zoneId: zoneId ?? 'default',
+            shippingPreference: shippingPreference
+        }
+    }
+}
 
 /**
  * Returns a theme object containing CSS information for use with SF Payments components.
