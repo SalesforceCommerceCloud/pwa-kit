@@ -193,33 +193,47 @@ const Payment = ({
             otpDismissedRef.current = true
             // Ensure save-for-future is selected after successful registration
             setShouldSavePaymentMethod(true)
-            // Inform guest they are now logged in
+
             showToast({
                 variant: 'subtle',
-                title: formatMessage({
+                title: `${formatMessage(
+                    {
+                        defaultMessage: 'Welcome {name},',
+                        id: 'auth_modal.info.welcome_user'
+                    },
+                    {
+                        name: customer.data?.firstName || ''
+                    }
+                )}`,
+                description: `${formatMessage({
                     defaultMessage: "You're now signed in.",
                     id: 'auth_modal.description.now_signed_in'
-                }),
+                })}`,
                 status: 'success',
                 position: 'top-right',
                 isClosable: true
             })
 
-            // Note: Address and payment persistence for newly registered guests is temporarily disabled.
             onOtpClose()
         } catch (error) {
-            return {success: false, error: formatMessage(API_ERROR_MESSAGE)}
+            let message = formatMessage(API_ERROR_MESSAGE)
+            if (error.response) {
+                const json = await error.response.json()
+                if (/the login is already in use/i.test(json.detail)) {
+                    message = formatMessage({
+                        id: 'checkout_confirmation.message.already_has_account',
+                        defaultMessage: 'This email already has an account.'
+                    })
+                }
+            }
+
+            showError(message)
         }
         return {success: true}
     }
 
     const handleSendEmailOtp = async (email) => {
         try {
-            console.info('OTP authorize params (resend)', {
-                userid: email,
-                register_customer: true,
-                callbackURI: `${callbackURL}?mode=otp_email`
-            })
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 callbackURI: `${callbackURL}?mode=otp_email`,
@@ -228,7 +242,14 @@ const Payment = ({
                 email: email
             })
         } catch (error) {
-            // noop: surfaced in OTP component if needed
+            showToast({
+                title: formatMessage({
+                    id: 'checkout_payment.error.registration_failed',
+                    defaultMessage:
+                        'We couldn’t send a verification code. You can continue as a guest.'
+                }),
+                status: 'error'
+            })
         }
     }
 

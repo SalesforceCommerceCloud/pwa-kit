@@ -74,7 +74,6 @@ const CheckoutOneClick = () => {
     )
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
-    // Removed: we no longer need to persist full card in state for post-order registration
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
     const [isEditingPayment, setIsEditingPayment] = useState(false)
 
@@ -99,8 +98,6 @@ const CheckoutOneClick = () => {
     const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
-    // Registration on place order removed for guest users opting into account creation via OTP
-    // Removed: guest registration-on-order has been deprecated; address save handled elsewhere
 
     const handleSavePreferenceChange = (shouldSave) => {
         setShouldSavePaymentMethod(shouldSave)
@@ -146,8 +143,6 @@ const CheckoutOneClick = () => {
             }
         }
 
-        // full card details are computed at place order time when needed
-
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
@@ -185,7 +180,6 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async (fullCardDetails) => {
-
         const savePaymentInstrumentWithDetails = async (
             customerId,
             paymentMethodId,
@@ -240,11 +234,9 @@ const CheckoutOneClick = () => {
             }
         }
 
-        // Registration previously done on place order has been removed. Guests opting to create
-        // an account are handled earlier via OTP/passwordless flow.
-
         setIsLoading(true)
         try {
+            // Ensure we are using the freshest basket id
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed.data?.basketId || basket.basketId
 
@@ -273,8 +265,6 @@ const CheckoutOneClick = () => {
                     if (customerId && shipping) {
                         // Whitelist fields and strip non-customer fields (e.g., id, _type)
                         const {
-                            id, // remove
-                            _type, // remove
                             addressId: _ignoreAddressId,
                             creationDate: _ignoreCreation,
                             lastModified: _ignoreModified,
@@ -316,7 +306,12 @@ const CheckoutOneClick = () => {
                         }
                     }
                 } catch (_e) {
-                    // Fail silently
+                    showError(
+                        formatMessage({
+                            id: 'checkout.error.cannot_save_address',
+                            defaultMessage: 'Could not save shipping address.'
+                        })
+                    )
                 }
             }
 

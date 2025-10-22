@@ -1270,44 +1270,8 @@ class Auth {
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        // Respect explicitly provided mode even when callbackURI is set
         const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
-        // NOTE: We intentionally keep the direct endpoint call below as a commented fallback.
-        // It ensures we have a working option if the helper signature changes.
-        //
-        // const slasClient = this.client
-        // const options: any = {
-        //     headers: {},
-        //     parameters: {
-        //         ...(parameters.register_customer !== undefined && {
-        //             register_customer:
-        //                 typeof parameters.register_customer === 'boolean'
-        //                     ? String(parameters.register_customer)
-        //                     : parameters.register_customer
-        //         })
-        //     },
-        //     body: {
-        //         user_id: parameters.userid,
-        //         mode: finalMode,
-        //         channel_id: slasClient.clientConfig.parameters.siteId,
-        //         ...(usid && {usid}),
-        //         ...(callbackURI && {callback_uri: callbackURI}),
-        //         ...(parameters.last_name && {last_name: parameters.last_name}),
-        //         ...(parameters.email && {email: parameters.email}),
-        //         ...(parameters.first_name && {first_name: parameters.first_name}),
-        //         ...(parameters.phone_number && {phone_number: parameters.phone_number})
-        //     }
-        // }
-        // if (this.clientSecret) {
-        //     options.headers.Authorization = `Basic ${stringToBase64(
-        //         `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
-        //     )}`
-        // }
-        // return await slasClient.authorizePasswordlessCustomer(options)
-
-        // Preferred path: use isomorphic helper and pass body + query (register_customer)
-        // Casting to Helpers to allow passing extended payload; underlying impl supports it
         const res = await (helpers as unknown as Helpers).authorizePasswordless({
             slasClient: this.client,
             credentials: {
