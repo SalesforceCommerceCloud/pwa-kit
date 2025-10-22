@@ -268,47 +268,52 @@ const AccountOrderDetail = () => {
                         ) : (
                             <>
                                 {/* Pickup Shipments */}
-                                {pickupShipments.map((shipment, index) => (
-                                    <Stack
-                                        spacing={1}
-                                        key={`pickup-${index}`}
-                                        gridColumn={{sm: 'span 2'}}
-                                    >
-                                        <Heading as="h2" fontSize="sm" pt={1}>
-                                            {pickupShipments.length > 1 ? (
-                                                <FormattedMessage
-                                                    defaultMessage="Pickup Address {number}"
-                                                    id="account_order_detail.heading.pickup_address_number"
-                                                    values={{number: index + 1}}
-                                                />
-                                            ) : (
-                                                <FormattedMessage
-                                                    defaultMessage="Pickup Address"
-                                                    id="account_order_detail.heading.pickup_address"
-                                                />
-                                            )}
-                                        </Heading>
-                                        <Box>
-                                            {getStoreData(shipment.c_fromStoreId) ? (
-                                                <StoreDisplay
-                                                    store={getStoreData(shipment.c_fromStoreId)}
-                                                    showDistance={false}
-                                                    showEmail={false}
-                                                    showPhone={true}
-                                                    showStoreHours={false}
-                                                />
-                                            ) : (
-                                                <Text fontSize="sm">
+                                {pickupShipments.map((shipment, index) => {
+                                    const storeData = getStoreData(shipment.c_fromStoreId)
+                                    return (
+                                        <Stack
+                                            spacing={1}
+                                            key={`pickup-${index}`}
+                                            gridColumn={{sm: 'span 2'}}
+                                        >
+                                            <Heading as="h2" fontSize="sm" pt={1}>
+                                                {pickupShipments.length > 1 ? (
                                                     <FormattedMessage
-                                                        defaultMessage="Pick up from Store {storeId}"
-                                                        id="account_order_detail.label.pickup_from_store"
-                                                        values={{storeId: shipment.c_fromStoreId}}
+                                                        defaultMessage="Pickup Address {number}"
+                                                        id="account_order_detail.heading.pickup_address_number"
+                                                        values={{number: index + 1}}
                                                     />
-                                                </Text>
-                                            )}
-                                        </Box>
-                                    </Stack>
-                                ))}
+                                                ) : (
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Address"
+                                                        id="account_order_detail.heading.pickup_address"
+                                                    />
+                                                )}
+                                            </Heading>
+                                            <Box>
+                                                {storeData ? (
+                                                    <StoreDisplay
+                                                        store={storeData}
+                                                        showDistance={false}
+                                                        showEmail={false}
+                                                        showPhone={true}
+                                                        showStoreHours={false}
+                                                    />
+                                                ) : (
+                                                    <Text fontSize="sm">
+                                                        <FormattedMessage
+                                                            defaultMessage="Pick up from Store {storeId}"
+                                                            id="account_order_detail.label.pickup_from_store"
+                                                            values={{
+                                                                storeId: shipment.c_fromStoreId
+                                                            }}
+                                                        />
+                                                    </Text>
+                                                )}
+                                            </Box>
+                                        </Stack>
+                                    )
+                                })}
 
                                 {/* Delivery Shipments */}
                                 {deliveryShipments.map((shipment, index) => (
