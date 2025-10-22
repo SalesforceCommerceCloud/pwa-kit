@@ -15,7 +15,9 @@ import {
 import {
     mockCustomerBaskets,
     mockOrderHistory,
-    mockOrderProducts
+    mockOrderProducts,
+    mockStore,
+    mockMultiShipmentOrder
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -241,114 +243,14 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
     let orderNo
 
     beforeEach(async () => {
-        const mockStore = {
-            data: [
-                {
-                    id: '00001',
-                    name: 'Downtown Store',
-                    address1: '100 Market St',
-                    city: 'San Francisco',
-                    stateCode: 'CA',
-                    postalCode: '94105',
-                    phone: '(415) 555-0001'
-                }
-            ]
-        }
-
-        const multiShipmentOrder = {
-            ...mockOrderHistory.data[0],
-            orderNo: '00099003',
-            productItems: [
-                {
-                    ...mockOrderHistory.data[0].productItems[0],
-                    shipmentId: 'pickup1',
-                    itemId: 'item1'
-                },
-                {
-                    ...mockOrderHistory.data[0].productItems[1],
-                    shipmentId: 'delivery1',
-                    itemId: 'item2'
-                }
-            ],
-            shipments: [
-                {
-                    adjustedMerchandizeTotalTax: 1.5,
-                    adjustedShippingTotalTax: 0,
-                    gift: false,
-                    merchandizeTotalTax: 1.5,
-                    productSubTotal: 30.0,
-                    productTotal: 30.0,
-                    shipmentId: 'pickup1',
-                    shipmentTotal: 30.0,
-                    shippingAddress: {
-                        address1: '100 Market St',
-                        city: 'San Francisco',
-                        countryCode: 'US',
-                        firstName: 'Downtown Store',
-                        fullName: 'Downtown Store',
-                        id: 'pickup1addr',
-                        lastName: 'pickup',
-                        phone: '(415) 555-0001',
-                        postalCode: '94105',
-                        stateCode: 'CA'
-                    },
-                    shippingMethod: {
-                        description: 'Pickup in store',
-                        id: '005',
-                        name: 'Store Pickup',
-                        price: 0,
-                        c_storePickupEnabled: true
-                    },
-                    shippingStatus: 'not_shipped',
-                    shippingTotal: 0,
-                    shippingTotalTax: 0,
-                    taxTotal: 1.5,
-                    c_fromStoreId: '00001'
-                },
-                {
-                    adjustedMerchandizeTotalTax: 1.65,
-                    adjustedShippingTotalTax: 0.3,
-                    gift: false,
-                    merchandizeTotalTax: 1.65,
-                    productSubTotal: 32.98,
-                    productTotal: 32.98,
-                    shipmentId: 'delivery1',
-                    shipmentTotal: 38.97,
-                    shippingAddress: {
-                        address1: '123 Main St',
-                        city: 'Boston',
-                        countryCode: 'US',
-                        firstName: 'John',
-                        fullName: 'John Doe',
-                        id: 'delivery1addr',
-                        lastName: 'Doe',
-                        phone: '6175551234',
-                        postalCode: '02101',
-                        stateCode: 'MA'
-                    },
-                    shippingMethod: {
-                        description: 'Order received within 7-10 business days',
-                        id: '001',
-                        name: 'Ground',
-                        c_estimatedArrivalTime: '7-10 Business Days'
-                    },
-                    shippingStatus: 'not_shipped',
-                    shippingTotal: 5.99,
-                    shippingTotalTax: 0.3,
-                    taxTotal: 1.95,
-                    trackingNumber: 'TRACK123456'
-                }
-            ]
-        }
-
         global.server.use(
             rest.get('*/orders/:orderNo', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(multiShipmentOrder))
+                return res(ctx.delay(0), ctx.json(mockMultiShipmentOrder))
             }),
             rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
                 return res(
                     ctx.delay(0),
-                    ctx.json({...mockOrderHistory, data: [multiShipmentOrder]})
+                    ctx.json({...mockOrderHistory, data: [mockMultiShipmentOrder]})
                 )
             }),
             rest.get('*/products', (req, res, ctx) => {
@@ -359,7 +261,7 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
             })
         )
 
-        orderNo = multiShipmentOrder.orderNo
+        orderNo = mockMultiShipmentOrder.orderNo
         window.history.pushState(
             {},
             'Order Details',

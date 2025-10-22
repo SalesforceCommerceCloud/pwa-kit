@@ -32,7 +32,7 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import PropTypes from 'prop-types'
@@ -126,19 +126,9 @@ const AccountOrderDetail = () => {
     const isLoading = isOrderLoading || !order
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
-        const pickup = []
-        const delivery = []
-
-        order?.shipments?.forEach((shipment) => {
-            const isPickup = storeLocatorEnabled && isPickupShipment(shipment)
-            if (isPickup) {
-                pickup.push(shipment)
-            } else {
-                delivery.push(shipment)
-            }
-        })
-
-        return {pickupShipments: pickup, deliveryShipments: delivery}
+        return storeLocatorEnabled
+            ? groupShipmentsByDeliveryOption(order)
+            : {pickupShipments: [], deliveryShipments: order?.shipments || []}
     }, [order?.shipments, storeLocatorEnabled])
 
     const storeIds = useMemo(
