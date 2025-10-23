@@ -267,6 +267,55 @@ export function generateComponentImportStatement(
 }
 
 /**
+ * Finds the dw.json configuration file in the following priority order:
+ * 1. Global DW_JSON_PATH (if set)
+ * 2. PWA_STOREFRONT_APP_PATH/dw.json (if PWA_STOREFRONT_APP_PATH exists)
+ * 3. PWA_STOREFRONT_APP_PATH/../dw.json (parent directory)
+ * 4. PWA_STOREFRONT_APP_PATH/../../dw.json (grandparent directory)
+ * 5. Current working directory/dw.json
+ *
+ * @returns {string|null} The path to the dw.json file, or null if not found
+ */
+export const findDwJsonPath = () => {
+    // Check global path
+    const configFromGlobalPath = global.DW_JSON_PATH
+    if (configFromGlobalPath && fs.existsSync(configFromGlobalPath)) {
+        return configFromGlobalPath
+    }
+
+    // Check PWA_STOREFRONT_APP_PATH and its parent directories
+    if (process.env.PWA_STOREFRONT_APP_PATH) {
+        const storefrontPath = process.env.PWA_STOREFRONT_APP_PATH
+
+        // Check PWA_STOREFRONT_APP_PATH/dw.json
+        const configFromStorefrontPath = path.join(storefrontPath, 'dw.json')
+        if (fs.existsSync(configFromStorefrontPath)) {
+            return configFromStorefrontPath
+        }
+
+        // Check PWA_STOREFRONT_APP_PATH/../dw.json
+        const configFromStorefrontParentPath = path.join(storefrontPath, '..', 'dw.json')
+        if (fs.existsSync(configFromStorefrontParentPath)) {
+            return configFromStorefrontParentPath
+        }
+
+        // Check PWA_STOREFRONT_APP_PATH/../../dw.json
+        const configFromStorefrontGrandparentPath = path.join(storefrontPath, '..', '..', 'dw.json')
+        if (fs.existsSync(configFromStorefrontGrandparentPath)) {
+            return configFromStorefrontGrandparentPath
+        }
+    }
+
+    // Check current working directory
+    const configFromCwdPath = path.join(process.cwd(), 'dw.json')
+    if (fs.existsSync(configFromCwdPath)) {
+        return configFromCwdPath
+    }
+
+    return null
+}
+
+/**
  * Loads configuration from environment variables or dw.json file if it exists
  * Priority: Environment variables > dw.json file
  *
@@ -275,22 +324,9 @@ export function generateComponentImportStatement(
 export function loadConfig() {
     let dwConfig = {}
 
-    // Attempt to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from current working directory, then from global path
+    // Attempt to load dw.json
     try {
-        const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
-            ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
-            : null
-        const configFromCwdPath = path.join(process.cwd(), 'dw.json')
-        const configFromGlobalPath = global.DW_JSON_PATH
-
-        const configPath =
-            configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
-                ? configFromStorefrontPath
-                : configFromCwdPath && fs.existsSync(configFromCwdPath)
-                ? configFromCwdPath
-                : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
-                ? configFromGlobalPath
-                : null
+        const configPath = findDwJsonPath()
         if (configPath) {
             const fileContent = fs.readFileSync(configPath, 'utf-8')
             dwConfig = JSON.parse(fileContent)
