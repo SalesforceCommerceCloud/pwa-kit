@@ -8,6 +8,13 @@ import {useCommerceApi} from '@salesforce/commerce-sdk-react'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
+// Dev-only debug logger to keep recovery silent in production
+const devDebug = (...args) => {
+    if (process.env.NODE_ENV !== 'production') {
+        console.debug(...args)
+    }
+}
+
 /**
  * Reusable basket recovery hook to stabilize basket after OTP/auth swap.
  * - Attempts merge (if caller already merged, pass skipMerge=true)
@@ -17,7 +24,6 @@ import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 const useBasketRecovery = () => {
     const api = useCommerceApi()
     const auth = useAuthContext()
-    // const currentBasketQuery = useCurrentBasket()
 
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const createBasket = useShopperBasketsMutation('createBasket')
@@ -30,9 +36,9 @@ const useBasketRecovery = () => {
     )
 
     const copyItemsAndShipping = async (
-        destBasketId,
+        destinationBasketId,
         items = [],
-        shipmentSnapshot = null,
+        shipment = null,
         shipmentId = 'me'
     ) => {
         if (items?.length) {
@@ -60,14 +66,17 @@ const useBasketRecovery = () => {
                 if (mappedOptions.length) obj.optionItems = mappedOptions
                 return obj
             })
-            await addItemToBasket.mutateAsync({parameters: {basketId: destBasketId}, body: payload})
+            await addItemToBasket.mutateAsync({
+                parameters: {basketId: destinationBasketId},
+                body: payload
+            })
         }
 
-        if (shipmentSnapshot) {
-            const shippingAddress = shipmentSnapshot.shippingAddress
+        if (shipment) {
+            const shippingAddress = shipment.shippingAddress
             if (shippingAddress) {
                 await updateShippingAddressForShipment.mutateAsync({
-                    parameters: {basketId: destBasketId, shipmentId},
+                    parameters: {basketId: destinationBasketId, shipmentId},
                     body: {
                         address1: shippingAddress.address1,
                         address2: shippingAddress.address2,
@@ -81,10 +90,10 @@ const useBasketRecovery = () => {
                     }
                 })
             }
-            const methodId = shipmentSnapshot?.shippingMethod?.id
+            const methodId = shipment?.shippingMethod?.id
             if (methodId) {
                 await updateShippingMethodForShipment.mutateAsync({
-                    parameters: {basketId: destBasketId, shipmentId},
+                    parameters: {basketId: destinationBasketId, shipmentId},
                     body: {id: methodId}
                 })
             }
@@ -93,83 +102,88 @@ const useBasketRecovery = () => {
 
     const recoverBasketAfterAuth = async ({
         preLoginItems = [],
-        shipmentSnapshot = null,
+        shipment = null,
         doMerge = true
     } = {}) => {
         // Ensure fresh token in provider
         await auth.refreshAccessToken()
-        // Defer invalidation to the end to avoid duplicate basket/shipping-method refetches
 
-        let destId
+        let destinationBasketId
         if (doMerge) {
             try {
                 const merged = await mergeBasket.mutateAsync({
                     parameters: {createDestinationBasket: true}
                 })
-                destId = merged?.basketId || merged?.basket_id || merged?.id
+                destinationBasketId = merged?.basketId || merged?.basket_id || merged?.id
             } catch (_e) {
-                /* noop */
+                devDebug('useBasketRecovery: mergeBasket failed; proceeding without merge', _e)
             }
         }
 
-        if (!destId) {
+        if (!destinationBasketId) {
             try {
                 const list = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: 'me'}
                 })
-                destId = list?.baskets?.[0]?.basketId
+                destinationBasketId = list?.baskets?.[0]?.basketId
             } catch (_e) {
-                /* noop */
+                devDebug(
+                    'useBasketRecovery: getCustomerBaskets failed; will attempt hydration/create',
+                    _e
+                )
             }
         }
 
-        if (destId) {
+        if (destinationBasketId) {
             // Avoid triggering a hook-level refetch that can cause UI remounts.
             // Instead, probe the destination basket directly for shipment id.
             let hydrated = null
             try {
                 hydrated = await api.shopperBaskets.getBasket({
                     headers: {authorization: `Bearer ${auth.get('access_token')}`},
-                    parameters: {basketId: destId}
+                    parameters: {basketId: destinationBasketId}
                 })
             } catch (_e) {
+                devDebug('useBasketRecovery: getBasket hydration failed', _e)
                 hydrated = null
             }
             if (!hydrated) {
                 try {
                     const created = await createBasket.mutateAsync({})
-                    destId = created?.basketId || created?.basket_id || created?.id || destId
-                    await copyItemsAndShipping(destId, preLoginItems, shipmentSnapshot)
+                    destinationBasketId =
+                        created?.basketId ||
+                        created?.basket_id ||
+                        created?.id ||
+                        destinationBasketId
+                    await copyItemsAndShipping(destinationBasketId, preLoginItems, shipment)
                 } catch (_e) {
-                    /* noop */
+                    devDebug(
+                        'useBasketRecovery: createBasket/copyItems failed during hydration path',
+                        _e
+                    )
                 }
-            } else if (shipmentSnapshot) {
+            } else if (shipment) {
                 // PII (shipping address/method) is not merged by API; re-apply from snapshot
                 try {
-                    const effectiveDestId = hydrated?.basketId || destId
+                    const effectiveDestId = hydrated?.basketId || destinationBasketId
                     const destShipmentId =
                         hydrated?.shipments?.[0]?.shipmentId || hydrated?.shipments?.[0]?.id || 'me'
-                    await copyItemsAndShipping(
-                        effectiveDestId,
-                        [],
-                        shipmentSnapshot,
-                        destShipmentId
-                    )
+                    await copyItemsAndShipping(effectiveDestId, [], shipment, destShipmentId)
                 } catch (_e) {
-                    /* noop */
+                    devDebug('useBasketRecovery: re-applying shipping from snapshot failed', _e)
                 }
             }
         } else {
             try {
                 const created = await createBasket.mutateAsync({})
-                destId = created?.basketId || created?.basket_id || created?.id
-                await copyItemsAndShipping(destId, preLoginItems, shipmentSnapshot)
+                destinationBasketId = created?.basketId || created?.basket_id || created?.id
+                await copyItemsAndShipping(destinationBasketId, preLoginItems, shipment)
             } catch (_e) {
-                /* noop */
+                devDebug('useBasketRecovery: createBasket/copyItems failed in fallback path', _e)
             }
         }
 
-        return destId
+        return destinationBasketId
     }
 
     return {recoverBasketAfterAuth}
