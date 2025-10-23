@@ -1,6 +1,7 @@
 ## v8.2.0-dev (Sep 26, 2025)
 - [Bugfix] Fix footer heading semantic consistency and alignment. Fix accessibility compliance by adding proper h1 headings to checkout pages to resolve the page-has-heading-one accessibility rule violation. [#3398](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3398)
 - [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
+- Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
 - My Account Order Details page correctly shows orders with BOPIS and with Multiple shipments [#3414](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3414)
 - Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
 - When registering a guest user on the confirmation page only save the delivery addresses to the new account
