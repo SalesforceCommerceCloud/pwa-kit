@@ -18,6 +18,8 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
     const hasCategories = searchSuggestions?.categorySuggestions?.length
     const hasProducts = searchSuggestions?.productSuggestions?.length
     const hasPhraseSuggestions = searchSuggestions?.phraseSuggestions?.length
+    const hasPopularSearches = searchSuggestions?.popularSearchSuggestions?.length
+    const hasRecentSearches = searchSuggestions?.recentSearchSuggestions?.length
 
     return (
         <Fragment>
@@ -65,6 +67,34 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                         />
                     </Fragment>
                 )}
+                {hasPopularSearches && (
+                    <Fragment>
+                        <Box {...styles.sectionHeader}>
+                            <FormattedMessage
+                                defaultMessage="Popular Searches"
+                                id="search.suggestions.popular"
+                            />
+                        </Box>
+                        <Suggestions
+                            closeAndNavigate={closeAndNavigate}
+                            suggestions={searchSuggestions?.popularSearchSuggestions}
+                        />
+                    </Fragment>
+                )}
+                {hasRecentSearches && (
+                    <Fragment>
+                        <Box {...styles.sectionHeader}>
+                            <FormattedMessage
+                                defaultMessage="Recent Searches"
+                                id="search.suggestions.recent"
+                            />
+                        </Box>
+                        <Suggestions
+                            closeAndNavigate={closeAndNavigate}
+                            suggestions={searchSuggestions?.recentSearchSuggestions}
+                        />
+                    </Fragment>
+                )}
             </HideOnDesktop>
             {/* Desktop - Vertical and Horizontal alignment */}
             <HideOnMobile>
@@ -97,6 +127,34 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                                 <Suggestions
                                     closeAndNavigate={closeAndNavigate}
                                     suggestions={searchSuggestions?.categorySuggestions}
+                                />
+                            </Fragment>
+                        )}
+                        {hasPopularSearches && (
+                            <Fragment>
+                                <Box {...styles.sectionHeader}>
+                                    <FormattedMessage
+                                        defaultMessage="Popular Searches"
+                                        id="search.suggestions.popular"
+                                    />
+                                </Box>
+                                <Suggestions
+                                    closeAndNavigate={closeAndNavigate}
+                                    suggestions={searchSuggestions?.popularSearchSuggestions}
+                                />
+                            </Fragment>
+                        )}
+                        {hasRecentSearches && (
+                            <Fragment>
+                                <Box {...styles.sectionHeader}>
+                                    <FormattedMessage
+                                        defaultMessage="Recent Searches"
+                                        id="search.suggestions.recent"
+                                    />
+                                </Box>
+                                <Suggestions
+                                    closeAndNavigate={closeAndNavigate}
+                                    suggestions={searchSuggestions?.recentSearchSuggestions}
                                 />
                             </Fragment>
                         )}
