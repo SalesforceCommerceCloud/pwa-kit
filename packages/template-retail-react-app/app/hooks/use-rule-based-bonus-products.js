@@ -49,18 +49,21 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
             const currency = api.shopperSearch.clientConfig.parameters.currency || 'USD'
             const organizationId = api.shopperSearch.clientConfig.parameters.organizationId
 
-            // Build URL with refine parameter using pmid
+            // Build URL with refine parameter using pmid and pmpt
             const params = new URLSearchParams({
                 siteId,
                 locale,
                 currency,
-                refine: `pmid=${promotionId}`,
                 limit: String(limit || 25),
                 offset: String(offset || 0)
             })
 
+            // Add multiple refine parameters (pmid for promotion ID, pmpt for bonus products only)
+            params.append('refine', `pmid=${promotionId}`)
+            params.append('refine', 'pmpt=bonus')
+
             // Use proxy (direct SCAPI blocked by CSP)
-            // The proxy should pass through the refine parameter to SCAPI
+            // The proxy should pass through the refine parameters to SCAPI
             const url = `${getAppOrigin()}/mobify/proxy/api/search/shopper-search/v1/organizations/${organizationId}/product-search?${params.toString()}`
 
             // Make direct fetch call
