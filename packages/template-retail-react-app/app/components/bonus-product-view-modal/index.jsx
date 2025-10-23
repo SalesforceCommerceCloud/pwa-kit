@@ -24,13 +24,9 @@ import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-pr
 import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
-import {
-    createGetRemainingBonusQuantity,
-    checkForRemainingBonusProducts
-} from '@salesforce/retail-react-app/app/components/bonus-product-view-modal/utils'
+import {checkForRemainingBonusProducts} from '@salesforce/retail-react-app/app/components/bonus-product-view-modal/utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'
@@ -113,28 +109,21 @@ const BonusProductViewModal = ({
         [intl]
     )
 
-    // Create getRemainingBonusQuantity function using the factory
-    const getRemainingBonusQuantity = useMemo(
-        () =>
-            createGetRemainingBonusQuantity(
-                basket,
-                product,
-                getRemainingAvailableBonusProductsForProduct
-            ),
-        [basket, product]
-    )
-
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
     const handleAddToCart = useCallback(
         async (products) => {
             try {
                 // Process products using the extracted helper function
+                // Use a function that returns the remaining capacity based on the bonus counts
+                const getRemainingQuantity = () =>
+                    Math.max(0, finalMaxBonusItems - finalSelectedBonusItems)
+
                 const productItems = processProductsForBonusCart(
                     products,
                     basket,
                     promotionId,
                     product,
-                    getRemainingBonusQuantity
+                    getRemainingQuantity
                 )
 
                 if (productItems.length === 0) {
@@ -190,7 +179,8 @@ const BonusProductViewModal = ({
             basket,
             promotionId,
             product,
-            getRemainingBonusQuantity,
+            finalMaxBonusItems,
+            finalSelectedBonusItems,
             onClose,
             navigate,
             onReturnToSelection,
@@ -367,8 +357,8 @@ const BonusProductViewModal = ({
         return finalProduct
     }, [productViewModalData.product, safeProduct, hasPromotionData, availableBonusProductIds])
 
-    // Calculate max order quantity for UI
-    const maxOrderQuantity = getRemainingBonusQuantity()
+    // Calculate max order quantity for UI - reuse the same calculation from the header
+    const maxOrderQuantity = Math.max(0, finalMaxBonusItems - finalSelectedBonusItems)
 
     return (
         <Modal
