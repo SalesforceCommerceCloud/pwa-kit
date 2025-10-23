@@ -74,10 +74,7 @@ export const createGetRemainingBonusQuantity = (
             [product.id]: product
         })
 
-        return Math.max(
-            0,
-            bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems
-        )
+        return Math.max(0, bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems)
     }
 }
 

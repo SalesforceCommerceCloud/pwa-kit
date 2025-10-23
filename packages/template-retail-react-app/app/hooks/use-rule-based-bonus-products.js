@@ -37,55 +37,51 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
 
-    const {data, isLoading, error, ...rest} = useQuery(
-        {
-            queryKey: ['rule-based-bonus-products', promotionId, limit, offset],
-            queryFn: async () => {
-                // Get auth token
-                const token = await getTokenWhenReady()
+    const {data, isLoading, error, ...rest} = useQuery({
+        queryKey: ['rule-based-bonus-products', promotionId, limit, offset],
+        queryFn: async () => {
+            // Get auth token
+            const token = await getTokenWhenReady()
 
-                // Get site configuration
-                const siteId = api.shopperSearch.clientConfig.parameters.siteId
-                const locale = api.shopperSearch.clientConfig.parameters.locale
-                const currency =
-                    api.shopperSearch.clientConfig.parameters.currency || 'USD'
-                const organizationId =
-                    api.shopperSearch.clientConfig.parameters.organizationId
-                const shortCode = api.shopperSearch.clientConfig.parameters.shortCode
+            // Get site configuration
+            const siteId = api.shopperSearch.clientConfig.parameters.siteId
+            const locale = api.shopperSearch.clientConfig.parameters.locale
+            const currency = api.shopperSearch.clientConfig.parameters.currency || 'USD'
+            const organizationId = api.shopperSearch.clientConfig.parameters.organizationId
+            const shortCode = api.shopperSearch.clientConfig.parameters.shortCode
 
-                // Build URL with refine parameter using pmid
-                // Based on Deepali's script: uses refine=pmid=<promotionId> format
-                const params = new URLSearchParams({
-                    siteId,
-                    locale,
-                    currency,
-                    refine: `pmid=${promotionId}`,
-                    limit: String(limit || 25),
-                    offset: String(offset || 0)
-                })
+            // Build URL with refine parameter using pmid
+            // Based on Deepali's script: uses refine=pmid=<promotionId> format
+            const params = new URLSearchParams({
+                siteId,
+                locale,
+                currency,
+                refine: `pmid=${promotionId}`,
+                limit: String(limit || 25),
+                offset: String(offset || 0)
+            })
 
-                // Use proxy (direct SCAPI blocked by CSP)
-                // The proxy should pass through the refine parameter to SCAPI
-                const url = `${getAppOrigin()}/mobify/proxy/api/search/shopper-search/v1/organizations/${organizationId}/product-search?${params.toString()}`
+            // Use proxy (direct SCAPI blocked by CSP)
+            // The proxy should pass through the refine parameter to SCAPI
+            const url = `${getAppOrigin()}/mobify/proxy/api/search/shopper-search/v1/organizations/${organizationId}/product-search?${params.toString()}`
 
-                // Make direct fetch call
-                const response = await fetch(url, {
-                    headers: {
-                        Authorization: token ? `Bearer ${token}` : '',
-                        'Content-Type': 'application/json'
-                    }
-                })
-
-                if (!response.ok) {
-                    const errorText = await response.text()
-                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+            // Make direct fetch call
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json'
                 }
+            })
 
-                return await response.json()
-            },
-            enabled: enabled && Boolean(promotionId)
-        }
-    )
+            if (!response.ok) {
+                const errorText = await response.text()
+                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+            }
+
+            return await response.json()
+        },
+        enabled: enabled && Boolean(promotionId)
+    })
 
     return {
         products: data?.hits || [],

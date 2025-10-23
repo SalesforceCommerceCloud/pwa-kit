@@ -81,11 +81,10 @@ export const useBonusProductData = (modalData) => {
         const allProducts = [...listBasedProducts, ...ruleBasedBonusProducts]
 
         // Deduplicate by productId
-        return allProducts
-            .filter(
-                (product, index, self) =>
-                    index === self.findIndex((p) => p.productId === product.productId)
-            )
+        return allProducts.filter(
+            (product, index, self) =>
+                index === self.findIndex((p) => p.productId === product.productId)
+        )
     }, [bonusProducts, ruleBasedBonusProducts])
 
     const productIds = useMemo(() => {
