@@ -1,6 +1,11 @@
 ## v8.2.0-dev (Sep 26, 2025)
 - [Bugfix] Fix footer heading semantic consistency and alignment. Fix accessibility compliance by adding proper h1 headings to checkout pages to resolve the page-has-heading-one accessibility rule violation. [#3398](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3398)
 - [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
+- My Account Order Details page correctly shows orders with BOPIS and with Multiple shipments [#3414](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3414)
+- Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
+- When registering a guest user on the confirmation page only save the delivery addresses to the new account
+[#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
+
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
 - Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
@@ -9,11 +14,8 @@
 - Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
 - Removed domainUrl, locale, basetId properties as part off the ShopperAgent during initialization. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
 - Only show option to deliver to multiple addresses if there are multiple items in the basket. [#3336](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3336)
-- When registering a guest user on the confirmation page only save the delivery addresses to the new account
-[#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412) 
 - Added support for Choice of Bonus Products feature. Users can now select from available bonus products when they qualify for the associated promotion. The bonus product selection flow can be entered from either the "Item Added to Cart" modal (when adding the qualifying product to the cart) or from the cart page. [#3292] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3292)
 - Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
-- Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
 
 ## v8.0.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
