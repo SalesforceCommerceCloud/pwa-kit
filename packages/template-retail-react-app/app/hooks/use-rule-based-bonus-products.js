@@ -50,7 +50,6 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
             const organizationId = api.shopperSearch.clientConfig.parameters.organizationId
 
             // Build URL with refine parameter using pmid
-            // Based on Deepali's script: uses refine=pmid=<promotionId> format
             const params = new URLSearchParams({
                 siteId,
                 locale,

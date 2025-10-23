@@ -81,6 +81,35 @@ describe('Bonus Product Business Logic', () => {
             const result = businessLogicUtils.isRuleBasedPromotion(bonusDiscountLineItem)
             expect(result).toBe(false)
         })
+
+        test('returns false when bonusProducts is empty but promotionId is missing', () => {
+            const bonusDiscountLineItem = {
+                bonusProducts: [] // Empty bonusProducts but no promotionId
+            }
+
+            const result = businessLogicUtils.isRuleBasedPromotion(bonusDiscountLineItem)
+            expect(result).toBe(false)
+        })
+
+        test('returns false when bonusProducts is empty but promotionId is null', () => {
+            const bonusDiscountLineItem = {
+                promotionId: null,
+                bonusProducts: [] // Empty bonusProducts but null promotionId
+            }
+
+            const result = businessLogicUtils.isRuleBasedPromotion(bonusDiscountLineItem)
+            expect(result).toBe(false)
+        })
+
+        test('returns false when bonusProducts is empty but promotionId is empty string', () => {
+            const bonusDiscountLineItem = {
+                promotionId: '',
+                bonusProducts: [] // Empty bonusProducts but empty promotionId
+            }
+
+            const result = businessLogicUtils.isRuleBasedPromotion(bonusDiscountLineItem)
+            expect(result).toBe(false)
+        })
     })
 
     describe('shouldShowBonusProductSelection', () => {

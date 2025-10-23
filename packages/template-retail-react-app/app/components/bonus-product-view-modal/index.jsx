@@ -73,9 +73,10 @@ const BonusProductViewModal = ({
     const stableProductViewModalData = React.useMemo(
         () => ({
             ...productViewModalData,
-            product: productViewModalData.isFetching && lastLoadedProductRef.current
-                ? lastLoadedProductRef.current
-                : productViewModalData.product
+            product:
+                productViewModalData.isFetching && lastLoadedProductRef.current
+                    ? lastLoadedProductRef.current
+                    : productViewModalData.product
         }),
         [productViewModalData.product, productViewModalData.isFetching]
     )
@@ -374,7 +375,12 @@ const BonusProductViewModal = ({
         }
 
         return finalProduct
-    }, [stableProductViewModalData.product, safeProduct, hasPromotionData, availableBonusProductIds])
+    }, [
+        stableProductViewModalData.product,
+        safeProduct,
+        hasPromotionData,
+        availableBonusProductIds
+    ])
 
     // Calculate max order quantity for UI - reuse the same calculation from the header
     const maxOrderQuantity = Math.max(0, finalMaxBonusItems - finalSelectedBonusItems)
@@ -436,7 +442,8 @@ const BonusProductViewModal = ({
                     }
                     pb={productViewModalTheme.layout.body.paddingBottom}
                 >
-                    {(stableProductViewModalData.isFetching && !stableProductViewModalData.product) ||
+                    {(stableProductViewModalData.isFetching &&
+                        !stableProductViewModalData.product) ||
                     !productToRender ? (
                         <Box p={8} textAlign="center">
                             <Text>Loading product details...</Text>

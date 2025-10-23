@@ -50,7 +50,10 @@ export const getBonusProductCountsForPromotion = (basket, promotionId) => {
             promotionBonusLineItemIds.includes(item.bonusDiscountLineItemId)
     )
 
-    const selectedBonusItems = bonusProductItems.reduce((sum, item) => sum + (item.quantity || 0), 0)
+    const selectedBonusItems = bonusProductItems.reduce(
+        (sum, item) => sum + (item.quantity || 0),
+        0
+    )
 
     return {selectedBonusItems, maxBonusItems}
 }
