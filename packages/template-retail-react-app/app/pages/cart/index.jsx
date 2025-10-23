@@ -128,7 +128,6 @@ const Cart = () => {
         updateShipmentsWithoutMethods,
         getItemsForShipment,
         findOrCreatePickupShipment,
-        findOrCreateDeliveryShipment,
         moveItemsToPickupShipment
     } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
@@ -873,13 +872,6 @@ const Cart = () => {
 
         return result
     }, [basket?.shipments, basket?.productItems, storeData])
-
-    // Get all qualifying products (non-bonus) for bonus product grouping
-    const allQualifyingProducts = useMemo(() => {
-        return (
-            basket?.productItems?.filter((productItem) => !productItem.bonusProductLineItem) || []
-        )
-    }, [basket?.productItems])
 
     // Helper function to get shipment info for a product
     const getShipmentInfoForProduct = (productItem) => {
