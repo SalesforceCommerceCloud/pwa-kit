@@ -58,13 +58,16 @@ export const useBonusProductData = (modalData) => {
     )
 
     // Convert rule-based products to the same format as list-based bonusProducts
+    // Keep the full product data including image information from productSearch
     const ruleBasedBonusProducts = useMemo(() => {
         if (!ruleBasedProducts || ruleBasedProducts.length === 0) {
             return []
         }
         return ruleBasedProducts.map((product) => ({
             productId: product.productId,
-            productName: product.productName
+            productName: product.productName,
+            // Keep the full product data for image rendering
+            _searchData: product
         }))
     }, [ruleBasedProducts])
 
