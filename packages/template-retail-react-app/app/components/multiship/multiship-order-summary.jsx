@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {defineMessages, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -21,13 +21,16 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     // Group shipments by type (pickup vs delivery)
-    const pickupShipments = []
-    const deliveryShipments = []
+    const {pickupShipments, deliveryShipments} = useMemo(() => {
+        return storeLocatorEnabled
+            ? groupShipmentsByDeliveryOption(order)
+            : {pickupShipments: [], deliveryShipments: order?.shipments || []}
+    }, [order?.shipments, storeLocatorEnabled])
 
     const messages = defineMessages({
         pickupItems: {
@@ -37,16 +40,6 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
         deliveryItems: {
             id: 'order_summary.label.delivery_items',
             defaultMessage: 'Delivery Items'
-        }
-    })
-
-    order.shipments.forEach((shipment) => {
-        const isPickup = storeLocatorEnabled && isPickupShipment(shipment)
-
-        if (isPickup) {
-            pickupShipments.push(shipment)
-        } else {
-            deliveryShipments.push(shipment)
         }
     })
 

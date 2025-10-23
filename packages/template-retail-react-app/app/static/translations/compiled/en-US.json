@@ -105,16 +105,52 @@
       "value": "Payment Method"
     }
   ],
+  "account_order_detail.heading.pickup_address": [
+    {
+      "type": 0,
+      "value": "Pickup Address"
+    }
+  ],
+  "account_order_detail.heading.pickup_address_number": [
+    {
+      "type": 0,
+      "value": "Pickup Address "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,
       "value": "Shipping Address"
     }
   ],
+  "account_order_detail.heading.shipping_address_number": [
+    {
+      "type": 0,
+      "value": "Shipping Address "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_method": [
     {
       "type": 0,
       "value": "Shipping Method"
+    }
+  ],
+  "account_order_detail.heading.shipping_method_number": [
+    {
+      "type": 0,
+      "value": "Shipping Method "
+    },
+    {
+      "type": 1,
+      "value": "number"
     }
   ],
   "account_order_detail.label.order_number": [
@@ -137,10 +173,14 @@
       "value": "date"
     }
   ],
-  "account_order_detail.label.pending_tracking_number": [
+  "account_order_detail.label.pickup_from_store": [
     {
       "type": 0,
-      "value": "Pending"
+      "value": "Pick up from Store "
+    },
+    {
+      "type": 1,
+      "value": "storeId"
     }
   ],
   "account_order_detail.label.tracking_number": [
