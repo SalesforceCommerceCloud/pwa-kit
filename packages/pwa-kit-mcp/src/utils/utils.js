@@ -276,7 +276,7 @@ export function generateComponentImportStatement(
  *
  * @returns {string|null} The path to the dw.json file, or null if not found
  */
-export function findDwJsonPath() {
+function findDwJsonPath() {
     // Check global path
     const configFromGlobalPath = global.DW_JSON_PATH
     if (configFromGlobalPath && fs.existsSync(configFromGlobalPath)) {
@@ -324,7 +324,7 @@ export function findDwJsonPath() {
 export function loadConfig() {
     let dwConfig = {}
 
-    // Attempt to load dw.json using the helper function
+    // Attempt to load dw.json
     try {
         const configPath = findDwJsonPath()
         if (configPath) {
