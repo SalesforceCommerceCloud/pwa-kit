@@ -309,6 +309,9 @@
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "Could not save shipping address."
+  },
   "checkout.label.user_registration": {
     "defaultMessage": "Create an account for a faster checkout"
   },
@@ -456,6 +459,9 @@
   },
   "checkout_payment.error.cannot_save_payment": {
     "defaultMessage": "Could not save payment method. Please try again."
+  },
+  "checkout_payment.error.registration_failed": {
+    "defaultMessage": "We couldn’t send a verification code. You can continue as a guest."
   },
   "checkout_payment.heading.billing_address": {
     "defaultMessage": "Billing Address"
@@ -1603,6 +1609,9 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.error.phone_not_saved": {
+    "defaultMessage": "We could not save your phone number. You can continue checking out."
   },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."

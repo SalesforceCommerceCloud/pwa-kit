@@ -877,6 +877,12 @@
       "value": "Place Order"
     }
   ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "Could not save shipping address."
+    }
+  ],
   "checkout.label.user_registration": [
     {
       "type": 0,
@@ -1241,6 +1247,12 @@
     {
       "type": 0,
       "value": "Could not save payment method. Please try again."
+    }
+  ],
+  "checkout_payment.error.registration_failed": [
+    {
+      "type": 0,
+      "value": "We couldn’t send a verification code. You can continue as a guest."
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -3811,6 +3823,12 @@
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.error.phone_not_saved": [
+    {
+      "type": 0,
+      "value": "We could not save your phone number. You can continue checking out."
     }
   ],
   "shipping_address.error.update_failed": [
