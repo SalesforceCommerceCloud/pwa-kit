@@ -19,7 +19,7 @@
  *
  * @param {Object} basket - The current basket object
  * @param {Object} product - The product object
- * @param {Function} getRemainingAvailableBonusProductsForProduct - The utility function to get remaining bonus data (not used for rule-based)
+ * @param {Function} getRemainingAvailableBonusProductsForProduct - The utility function to get remaining bonus data
  * @param {string} promotionId - The promotion ID for this bonus product
  * @returns {Function} - Function that returns remaining bonus quantity or null
  */

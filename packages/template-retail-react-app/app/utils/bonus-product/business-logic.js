@@ -62,9 +62,12 @@ export const isRuleBasedPromotion = (bonusDiscountLineItem) => {
         return false
     }
 
-    // Rule-based indicator: bonusProducts array is empty or doesn't exist
+    // Rule-based indicator: has a valid promotionId AND bonusProducts array is empty or doesn't exist
+    const hasPromotionId = Boolean(bonusDiscountLineItem.promotionId)
     const bonusProducts = bonusDiscountLineItem.bonusProducts || []
-    return bonusProducts.length === 0
+    const hasEmptyBonusProducts = bonusProducts.length === 0
+
+    return hasPromotionId && hasEmptyBonusProducts
 }
 
 /**
