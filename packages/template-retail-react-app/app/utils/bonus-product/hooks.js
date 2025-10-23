@@ -12,7 +12,7 @@ import {
     getAvailableBonusItemsForProduct,
     getRemainingAvailableBonusProductsForProduct
 } from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
-import {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
 import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 
