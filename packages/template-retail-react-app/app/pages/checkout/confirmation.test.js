@@ -290,4 +290,87 @@ describe('Account form', () => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
         })
     })
+
+    test('save delivery addresses but does not save pickup addresses when store locator is enabled', async () => {
+        const savedAddresses = []
+        const mockOrderWithPickup = {
+            ...mockOrder,
+            shipments: [
+                {
+                    ...mockOrder.shipments[0],
+                    shipmentId: 'delivery-shipment',
+                    shippingAddress: {
+                        address1: '456 Delivery St',
+                        city: 'Vancouver',
+                        countryCode: 'CA',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        phone: '(604) 555-1234',
+                        postalCode: 'V6B 1A1',
+                        stateCode: 'BC'
+                    },
+                    shippingMethod: {
+                        id: 'standard-delivery',
+                        name: 'Standard Delivery'
+                    }
+                },
+                {
+                    shipmentId: 'pickup-shipment',
+                    shippingAddress: {
+                        address1: '789 Store Location Ave',
+                        city: 'Burnaby',
+                        countryCode: 'CA',
+                        firstName: 'Store',
+                        lastName: 'Pickup',
+                        phone: '(604) 555-5678',
+                        postalCode: 'V5H 2E2',
+                        stateCode: 'BC'
+                    },
+                    shippingMethod: {
+                        id: '005',
+                        name: 'Store Pickup',
+                        c_storePickupEnabled: true
+                    },
+                    c_fromStoreId: 'store-123'
+                }
+            ]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderWithPickup))
+            }),
+            rest.post('*/customers', (_, res, ctx) => {
+                return res(ctx.status(200), ctx.json(mockCustomer))
+            }),
+            rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+                savedAddresses.push(req.body)
+                return res(ctx.status(200))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {isGuest: true}
+        })
+
+        const createAccountButton = await screen.findByRole('button', {name: /create account/i})
+        const password = screen.getByLabelText('Password')
+        await user.type(password, 'P4ssword!')
+        await user.click(createAccountButton)
+
+        await waitFor(() => {
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
+        })
+
+        // Verify that only one address was saved (the delivery address, not the pickup address)
+        expect(savedAddresses).toHaveLength(1)
+        expect(savedAddresses[0].address1).toBe('456 Delivery St')
+        expect(savedAddresses[0].city).toBe('Vancouver')
+
+        // Verify the pickup address was NOT saved
+        const hasPickupAddress = savedAddresses.some(
+            (addr) => addr.address1 === '789 Store Location Ave'
+        )
+        expect(hasPickupAddress).toBe(false)
+    })
 })

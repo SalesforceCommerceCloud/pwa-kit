@@ -45,10 +45,11 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false,
     containerStyles = {},
-    isRemoving = false
+    isRemoving = false,
+    pickupInStore = false
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
-        useDerivedProduct(product)
+        useDerivedProduct(product, false, false, pickupInStore)
     const {currency: activeCurrency} = useCurrency()
     return (
         <Box
@@ -141,7 +142,8 @@ ProductItem.propTypes = {
     secondaryActions: PropTypes.node,
     deliveryActions: PropTypes.node,
     containerStyles: PropTypes.object,
-    isRemoving: PropTypes.bool
+    isRemoving: PropTypes.bool,
+    pickupInStore: PropTypes.bool
 }
 
 export default ProductItem

@@ -267,6 +267,102 @@ export function generateComponentImportStatement(
 }
 
 /**
+ * Loads configuration from environment variables or dw.json file if it exists
+ * Priority: Environment variables > dw.json file
+ *
+ * @returns {Object} Configuration object with SFCC settings
+ */
+export function loadConfig() {
+    let dwConfig = {}
+
+    // Attempt to load dw.json - first from PWA_STOREFRONT_APP_PATH, then from current working directory, then from global path
+    try {
+        const configFromStorefrontPath = process.env.PWA_STOREFRONT_APP_PATH
+            ? path.join(process.env.PWA_STOREFRONT_APP_PATH, 'dw.json')
+            : null
+        const configFromCwdPath = path.join(process.cwd(), 'dw.json')
+        const configFromGlobalPath = global.DW_JSON_PATH
+
+        const configPath =
+            configFromStorefrontPath && fs.existsSync(configFromStorefrontPath)
+                ? configFromStorefrontPath
+                : configFromCwdPath && fs.existsSync(configFromCwdPath)
+                ? configFromCwdPath
+                : configFromGlobalPath && fs.existsSync(configFromGlobalPath)
+                ? configFromGlobalPath
+                : null
+        if (configPath) {
+            const fileContent = fs.readFileSync(configPath, 'utf-8')
+            dwConfig = JSON.parse(fileContent)
+        }
+    } catch (error) {
+        logMCPMessage(`Failed to parse dw.json: ${error.message}`)
+    }
+
+    // Get hostname first to derive a fallback organizationId
+    const hostname = process.env.SFCC_HOSTNAME || dwConfig['hostname']
+
+    // Extract instance ID from hostname pattern: https://zzrf-001.dx.commercecloud.salesforce.com
+    const hostnameMatch = hostname?.match(
+        /https?:\/\/([a-z0-9-]+)\.dx\.commercecloud\.salesforce\.com/
+    )
+    const derivedInstanceId = hostnameMatch ? hostnameMatch[1].replace(/-/g, '_') : null
+    const derivedOrganizationId = derivedInstanceId ? `f_ecom_${derivedInstanceId}` : null
+
+    // Merge with environment variables (environment variables take precedence if both exist)
+    return {
+        hostname: hostname,
+        instanceId: process.env.SFCC_INSTANCE_ID || dwConfig['instance-id'] || derivedInstanceId,
+        organizationId: process.env.SFCC_ORG_ID || dwConfig['org-id'] || derivedOrganizationId,
+        clientId: process.env.SFCC_CLIENT_ID || dwConfig['client-id'],
+        clientSecret: process.env.SFCC_CLIENT_SECRET || dwConfig['client-secret'],
+        shortCode: process.env.SFCC_SHORT_CODE || dwConfig['short-code']
+    }
+}
+
+/**
+ * Obtains OAuth access token from Salesforce Commerce Cloud
+ * @param {string} clientId - The OAuth client ID
+ * @param {string} clientSecret - The OAuth client secret
+ * @param {string} oauthScope - The OAuth scope for the token
+ * @returns {Promise<Response>} The fetch response containing the OAuth token
+ */
+export async function getOAuthToken(clientId, clientSecret, oauthScope) {
+    const accountManagerHost = process.env.SFCC_LOGIN_URL || 'account.demandware.com'
+    const oauthTokenUrl = `https://${accountManagerHost}/dwsso/oauth2/access_token`
+
+    const response = await fetch(oauthTokenUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        },
+        body: `grant_type=client_credentials&scope=${encodeURIComponent(oauthScope)}`
+    })
+    return response
+}
+
+/**
+ * Calls the custom API DX endpoint
+ * @param {string} accessToken - The OAuth access token for authentication
+ * @param {string} customApiHost - The hostname for the custom API DX endpoint
+ * @param {string} organizationId - The organization ID for the API request
+ * @returns {Promise<Response>} The fetch response containing custom API data
+ */
+export async function callCustomApiDxEndpoint(accessToken, customApiHost, organizationId) {
+    const customApiBase = `https://${customApiHost}/dx/custom-apis/v1/organizations/${organizationId}/endpoints`
+
+    const response = await fetch(customApiBase, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    return response
+}
+
+/**
  * Auto-detects the node_modules directory path
  * @param {string} [startPath] - Optional starting path for detection
  * @returns {string|null} The absolute path to node_modules or null if not found

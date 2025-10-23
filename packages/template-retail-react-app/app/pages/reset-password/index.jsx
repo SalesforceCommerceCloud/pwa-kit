@@ -6,9 +6,9 @@
  */
 
 import React, {useEffect} from 'react'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
@@ -55,6 +55,12 @@ const ResetPassword = () => {
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Reset Password"
+                    id="reset_password.title.reset_password"
+                />
+            </Heading>
             <Seo title="Reset password" description="Reset customer password" />
             <Container
                 paddingTop={16}
