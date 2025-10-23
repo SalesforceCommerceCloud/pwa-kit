@@ -89,6 +89,7 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading, derivedData} = useCurrentBasket()
+
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 

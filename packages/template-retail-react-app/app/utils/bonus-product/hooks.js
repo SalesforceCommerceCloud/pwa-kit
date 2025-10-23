@@ -119,6 +119,7 @@ export const useBasketProductsWithPromotions = (basket) => {
  */
 export const useAvailableBonusItemsForProduct = (productId) => {
     const {data: basket} = useCurrentBasket()
+
     const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
@@ -143,8 +144,9 @@ export const useAvailableBonusItemsForProduct = (productId) => {
 
     // Build ruleBasedProductsMap for discovery functions
     const ruleBasedProductsMap = useMemo(() => {
-        if (!ruleBasedProducts || ruleBasedProducts.length === 0 || !ruleBasedPromotions[0])
+        if (!ruleBasedProducts || ruleBasedProducts.length === 0 || !ruleBasedPromotions[0]) {
             return {}
+        }
         return {
             [ruleBasedPromotions[0]]: ruleBasedProducts
         }
@@ -160,9 +162,12 @@ export const useAvailableBonusItemsForProduct = (productId) => {
               )
             : []
 
+    // Only include rule-based loading state if we're actually fetching rule-based products
+    const finalIsLoading = isLoading || (ruleBasedPromotions.length > 0 && isLoadingRuleBased)
+
     return {
         data: availableBonusItems,
-        isLoading: isLoading || isLoadingRuleBased,
+        isLoading: finalIsLoading,
         hasPromotionData: Object.keys(productsWithPromotions || {}).length > 0
     }
 }
@@ -175,6 +180,7 @@ export const useAvailableBonusItemsForProduct = (productId) => {
  */
 export const useRemainingAvailableBonusProductsForProduct = (productId) => {
     const {data: basket} = useCurrentBasket()
+
     const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
@@ -199,8 +205,9 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
 
     // Build ruleBasedProductsMap for discovery functions
     const ruleBasedProductsMap = useMemo(() => {
-        if (!ruleBasedProducts || ruleBasedProducts.length === 0 || !ruleBasedPromotions[0])
+        if (!ruleBasedProducts || ruleBasedProducts.length === 0 || !ruleBasedPromotions[0]) {
             return {}
+        }
         return {
             [ruleBasedPromotions[0]]: ruleBasedProducts
         }
@@ -216,9 +223,12 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
               )
             : []
 
+    // Only include rule-based loading state if we're actually fetching rule-based products
+    const finalIsLoading = isLoading || (ruleBasedPromotions.length > 0 && isLoadingRuleBased)
+
     return {
         data: remainingBonusProducts,
-        isLoading: isLoading || isLoadingRuleBased,
+        isLoading: finalIsLoading,
         hasPromotionData: Object.keys(productsWithPromotions || {}).length > 0
     }
 }

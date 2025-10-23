@@ -59,7 +59,9 @@ export const useBonusProductData = (modalData) => {
 
     // Convert rule-based products to the same format as list-based bonusProducts
     const ruleBasedBonusProducts = useMemo(() => {
-        if (!ruleBasedProducts || ruleBasedProducts.length === 0) return []
+        if (!ruleBasedProducts || ruleBasedProducts.length === 0) {
+            return []
+        }
         return ruleBasedProducts.map((product) => ({
             productId: product.productId,
             productName: product.productName
@@ -76,10 +78,11 @@ export const useBonusProductData = (modalData) => {
         const allProducts = [...listBasedProducts, ...ruleBasedBonusProducts]
 
         // Deduplicate by productId
-        return allProducts.filter(
-            (product, index, self) =>
-                index === self.findIndex((p) => p.productId === product.productId)
-        )
+        return allProducts
+            .filter(
+                (product, index, self) =>
+                    index === self.findIndex((p) => p.productId === product.productId)
+            )
     }, [bonusProducts, ruleBasedBonusProducts])
 
     const productIds = useMemo(() => {
@@ -195,6 +198,9 @@ export const useBonusProductData = (modalData) => {
         }
     }
 
+    // Only include rule-based loading state if we're actually fetching rule-based products
+    const finalIsLoading = isLoading || (ruleBasedPromotions.length > 0 && isLoadingRuleBased)
+
     return {
         bonusProducts,
         bonusLineItemIds,
@@ -204,7 +210,7 @@ export const useBonusProductData = (modalData) => {
         productIds,
         productData,
         productById,
-        isLoading: isLoading || isLoadingRuleBased,
+        isLoading: finalIsLoading,
         computeBonusMeta,
         normalizeProduct,
         ruleBasedPromotions,
