@@ -124,7 +124,7 @@ If `dw.json` doesn't live under your PWA Kit project directory, then update your
 }
 ```
 This is the priority when fetching dw.json locally:
-  1. DW_JSON_PATH arg from settings (if set)
+  1. dw.json path supplied from mcp settings args (if set)
   2. PWA_STOREFRONT_APP_PATH/dw.json 
   3. PWA_STOREFRONT_APP_PATH/../dw.json 
   4. PWA_STOREFRONT_APP_PATH/../../dw.json
