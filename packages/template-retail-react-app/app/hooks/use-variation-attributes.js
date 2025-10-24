@@ -12,7 +12,7 @@ import {useLocation} from 'react-router-dom'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 
 // Utils
-import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
+import {updateSearchParams, addParamPrefix} from '@salesforce/retail-react-app/app/utils/url'
 import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
 /**
@@ -55,12 +55,7 @@ export const buildVariantValueHref = ({
     const [allParams, productParams] = existingParams
 
     // Prefix the params if needed
-    const prefixedParams = urlParamPrefix
-        ? Object.entries(newParams).reduce((acc, [key, value]) => {
-              acc[`${urlParamPrefix}${key}`] = value
-              return acc
-          }, {})
-        : newParams
+    const prefixedParams = addParamPrefix(newParams, urlParamPrefix)
 
     if (isProductPartOfSet || isProductPartOfBundle) {
         updateSearchParams(productParams, prefixedParams)
