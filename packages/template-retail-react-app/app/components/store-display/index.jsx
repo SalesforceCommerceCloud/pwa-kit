@@ -231,11 +231,11 @@ const StoreDisplay = ({
                         )}
                     </Flex>
                     {showDistance && Boolean(store.distance) && Boolean(store.distanceUnit) ? (
-                        <Flex align="stretch" gap={3} mt={2} w="100%">
-                            <Box flex="1" minW={0}>
+                        <Flex align="stretch" gap={3} mt={2} w="100%" flexWrap="wrap">
+                            <Box flex="1" minW="120px">
                                 <StoreDistance store={store} textSize={textSize} intl={intl} />
                             </Box>
-                            <Box flex="1" minW={0}>
+                            <Box flex="1" minW="150px">
                                 {showContactInfo && (
                                     <StoreContactInfo
                                         store={store}
@@ -246,7 +246,7 @@ const StoreDisplay = ({
                                     />
                                 )}
                             </Box>
-                            <Box flex="1" minW={0}>
+                            <Box flex="1" minW="150px">
                                 {showStoreHours && store.storeHours && (
                                     <StoreHoursAccordion
                                         store={store}
@@ -259,8 +259,8 @@ const StoreDisplay = ({
                             </Box>
                         </Flex>
                     ) : (
-                        <Flex align="stretch" gap={3} mt={2} w="100%">
-                            <Box flex="1" minW={0}>
+                        <Flex align="stretch" gap={3} mt={2} w="100%" flexWrap="wrap">
+                            <Box flex="1" minW="150px">
                                 {showContactInfo && (
                                     <StoreContactInfo
                                         store={store}
@@ -271,7 +271,7 @@ const StoreDisplay = ({
                                     />
                                 )}
                             </Box>
-                            <Box flex="1" minW={0}>
+                            <Box flex="1" minW="150px">
                                 {showStoreHours && store.storeHours && (
                                     <StoreHoursAccordion
                                         store={store}
