@@ -21,6 +21,9 @@ export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 // Constants for customer orders searching.
 export const DEFAULT_ORDERS_SEARCH_PARAMS = {limit: 10, offset: 0, sort: 'best-matches', refine: []}
 
+// Constants for bonus product searching.
+export const DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS = {limit: 25, offset: 0}
+
 // Constants for Search Component
 export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'

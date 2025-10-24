@@ -93,7 +93,7 @@ const BonusProductItem = ({
             viewType: 'small'
         })
         return defaultSmallImage
-    }, [productData, product, productName])
+    }, [productData, product])
 
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
