@@ -118,6 +118,23 @@ export const useBasketProductsWithPromotions = (basket) => {
 }
 
 /**
+ * Hook to extract rule-based promotion IDs from bonus discount line items.
+ *
+ * @param {Array} bonusDiscountLineItems - Array of bonus discount line items
+ * @returns {Array} Array of rule-based promotion IDs
+ */
+export const useRuleBasedPromotionIds = (bonusDiscountLineItems) => {
+    return useMemo(() => {
+        return (
+            bonusDiscountLineItems
+                ?.filter((bli) => isRuleBasedPromotion(bli))
+                .map((bli) => bli.promotionId)
+                .filter(Boolean) || []
+        )
+    }, [bonusDiscountLineItems])
+}
+
+/**
  * Hook to get available bonus items for a product using enhanced promotion data.
  *
  * @param {string} productId - The product ID to find available bonus items for
@@ -129,14 +146,7 @@ export const useAvailableBonusItemsForProduct = (productId) => {
     const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
-    const ruleBasedPromotions = useMemo(() => {
-        return (
-            basket?.bonusDiscountLineItems
-                ?.filter((bli) => isRuleBasedPromotion(bli))
-                .map((bli) => bli.promotionId)
-                .filter(Boolean) || []
-        )
-    }, [basket])
+    const ruleBasedPromotions = useRuleBasedPromotionIds(basket?.bonusDiscountLineItems)
 
     // Fetch rule-based products for the first rule-based promotion
     // Note: Currently only supports one rule-based promotion at a time
@@ -190,14 +200,7 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
     const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
-    const ruleBasedPromotions = useMemo(() => {
-        return (
-            basket?.bonusDiscountLineItems
-                ?.filter((bli) => isRuleBasedPromotion(bli))
-                .map((bli) => bli.promotionId)
-                .filter(Boolean) || []
-        )
-    }, [basket])
+    const ruleBasedPromotions = useRuleBasedPromotionIds(basket?.bonusDiscountLineItems)
 
     // Fetch rule-based products for the first rule-based promotion
     // Note: Currently only supports one rule-based promotion at a time

@@ -11,6 +11,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
+import {useRuleBasedPromotionIds} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
 
 export const useBonusProductData = (modalData) => {
     const {data: basket} = useCurrentBasket()
@@ -39,12 +40,7 @@ export const useBonusProductData = (modalData) => {
     }, [basket, bonusLineItemIds])
 
     // Identify rule-based promotions and fetch their products
-    const ruleBasedPromotions = useMemo(() => {
-        return bonusProducts
-            .filter((bli) => isRuleBasedPromotion(bli))
-            .map((bli) => bli.promotionId)
-            .filter(Boolean)
-    }, [bonusProducts])
+    const ruleBasedPromotions = useRuleBasedPromotionIds(bonusProducts)
 
     // Fetch rule-based products for all rule-based promotions
     // Note: This fetches for the first promotion. If multiple rule-based promotions exist,
