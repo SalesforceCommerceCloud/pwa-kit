@@ -37,7 +37,8 @@ export const absoluteUrl = (path, appOrigin) => {
  * // Returns {modal_color: 'red', modal_size: 'M'}
  */
 export const addParamPrefix = (params, prefix) => {
-    if (!prefix) return params
+    if (!params || typeof params !== 'object') return params
+    if (!prefix || typeof prefix !== 'string') return params
     return Object.entries(params).reduce((acc, [key, value]) => {
         acc[`${prefix}${key}`] = value
         return acc

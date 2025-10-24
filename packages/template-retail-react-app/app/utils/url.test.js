@@ -16,7 +16,8 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath,
-    serverSafeEncode
+    serverSafeEncode,
+    addParamPrefix
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -377,6 +378,26 @@ describe('rebuildPathWithParams test', () => {
         const updatedUrl = rebuildPathWithParams(url, {pid: undefined})
         expect(updatedUrl).toBe('/en/product/25501032M?color=black&size=M')
     })
+
+    test('adds prefixed params when prefix is provided', () => {
+        const url = '/en/product/25501032M?color=black&size=M'
+        const updatedUrl = rebuildPathWithParams(url, {color: 'red', size: 'L'}, 'modal_')
+        expect(updatedUrl).toBe(
+            '/en/product/25501032M?color=black&size=M&modal_color=red&modal_size=L'
+        )
+    })
+
+    test('updates existing prefixed params', () => {
+        const url = '/en/product/25501032M?modal_color=black&modal_size=M'
+        const updatedUrl = rebuildPathWithParams(url, {color: 'red', size: 'L'}, 'modal_')
+        expect(updatedUrl).toBe('/en/product/25501032M?modal_color=red&modal_size=L')
+    })
+
+    test('adds params without prefix when prefix is not provided', () => {
+        const url = '/en/product/25501032M'
+        const updatedUrl = rebuildPathWithParams(url, {color: 'red', size: 'L'})
+        expect(updatedUrl).toBe('/en/product/25501032M?color=red&size=L')
+    })
 })
 
 describe('removeQueryParamsFromPath test', () => {
@@ -384,6 +405,30 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toBe('/en/product/25501032M?something=123')
+    })
+
+    test('removes prefixed params when prefix is provided', () => {
+        const url = '/en/product/25501032M?modal_color=black&modal_size=M&something=123'
+        const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'], 'modal_')
+        expect(updatedUrl).toBe('/en/product/25501032M?something=123')
+    })
+
+    test('does not remove unprefixed params when prefix is provided', () => {
+        const url = '/en/product/25501032M?color=black&modal_color=red&modal_size=M'
+        const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'], 'modal_')
+        expect(updatedUrl).toBe('/en/product/25501032M?color=black')
+    })
+
+    test('removes only specified prefixed params', () => {
+        const url = '/en/product/25501032M?modal_color=black&modal_size=M&modal_pid=123'
+        const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'], 'modal_')
+        expect(updatedUrl).toBe('/en/product/25501032M?modal_pid=123')
+    })
+
+    test('handles empty result after removing all params', () => {
+        const url = '/en/product/25501032M?modal_color=black&modal_size=M'
+        const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'], 'modal_')
+        expect(updatedUrl).toBe('/en/product/25501032M')
     })
 })
 
@@ -474,5 +519,107 @@ describe('serverSafeEncode', () => {
         // Decode should give us original string
         const decoded = decodeURIComponent(encoded)
         expect(decoded).toBe(input)
+    })
+})
+
+describe('addParamPrefix', () => {
+    test('adds prefix to all parameter keys', () => {
+        const params = {color: 'red', size: 'M', pid: '12345'}
+        const result = addParamPrefix(params, 'modal_')
+        expect(result).toEqual({
+            modal_color: 'red',
+            modal_size: 'M',
+            modal_pid: '12345'
+        })
+    })
+
+    test('returns original params when prefix is empty string', () => {
+        const params = {color: 'red', size: 'M'}
+        const result = addParamPrefix(params, '')
+        expect(result).toBe(params)
+    })
+
+    test('returns original params when prefix is null', () => {
+        const params = {color: 'red', size: 'M'}
+        const result = addParamPrefix(params, null)
+        expect(result).toBe(params)
+    })
+
+    test('returns original params when prefix is undefined', () => {
+        const params = {color: 'red', size: 'M'}
+        const result = addParamPrefix(params, undefined)
+        expect(result).toBe(params)
+    })
+
+    test('returns params when params is null', () => {
+        const result = addParamPrefix(null, 'modal_')
+        expect(result).toBeNull()
+    })
+
+    test('returns params when params is undefined', () => {
+        const result = addParamPrefix(undefined, 'modal_')
+        expect(result).toBeUndefined()
+    })
+
+    test('returns params when params is not an object', () => {
+        const result = addParamPrefix('not an object', 'modal_')
+        expect(result).toBe('not an object')
+    })
+
+    test('handles empty params object', () => {
+        const params = {}
+        const result = addParamPrefix(params, 'modal_')
+        expect(result).toEqual({})
+    })
+
+    test('handles single parameter', () => {
+        const params = {color: 'blue'}
+        const result = addParamPrefix(params, 'modal_')
+        expect(result).toEqual({modal_color: 'blue'})
+    })
+
+    test('handles params with special characters in values', () => {
+        const params = {color: 'red&blue', size: 'M/L'}
+        const result = addParamPrefix(params, 'modal_')
+        expect(result).toEqual({
+            modal_color: 'red&blue',
+            modal_size: 'M/L'
+        })
+    })
+
+    test('handles different prefix formats', () => {
+        const params = {color: 'red'}
+        const result1 = addParamPrefix(params, 'modal_')
+        const result2 = addParamPrefix(params, 'prefix-')
+        const result3 = addParamPrefix(params, 'x')
+
+        expect(result1).toEqual({modal_color: 'red'})
+        expect(result2).toEqual({'prefix-color': 'red'})
+        expect(result3).toEqual({xcolor: 'red'})
+    })
+
+    test('preserves parameter values of different types', () => {
+        const params = {
+            string: 'value',
+            number: 123,
+            boolean: true,
+            nullValue: null,
+            undefinedValue: undefined
+        }
+        const result = addParamPrefix(params, 'modal_')
+        expect(result).toEqual({
+            modal_string: 'value',
+            modal_number: 123,
+            modal_boolean: true,
+            modal_nullValue: null,
+            modal_undefinedValue: undefined
+        })
+    })
+
+    test('does not mutate original params object', () => {
+        const params = {color: 'red', size: 'M'}
+        const originalParams = {...params}
+        addParamPrefix(params, 'modal_')
+        expect(params).toEqual(originalParams)
     })
 })
