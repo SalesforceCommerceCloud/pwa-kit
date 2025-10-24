@@ -7,10 +7,11 @@
 - Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
 - When registering a guest user on the confirmation page only save the delivery addresses to the new account
 [#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
+- Improve mobile layout for StoreDisplay component [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
 
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
-- Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248) [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
+- Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
 - Added warning modal for guest users when toggling between multi ship and ship to one address. [#3280](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3280) [#3302](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3302)
 - Fix the invalid address error that could occur when consolidating a pickup shipment into the default shipment `me` on checkout. [#3333](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3333)
 - Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
