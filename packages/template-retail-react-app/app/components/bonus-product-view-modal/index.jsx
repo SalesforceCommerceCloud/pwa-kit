@@ -72,6 +72,7 @@ const BonusProductViewModal = ({
         }
     }, [productViewModalData.product, productViewModalData.isFetching])
 
+    // Use the stable product reference to prevent flashing during fetches
     const stableProductViewModalData = React.useMemo(
         () => ({
             ...productViewModalData,
