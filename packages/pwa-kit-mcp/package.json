@@ -53,9 +53,9 @@
   "devDependencies": {
     "@babel/node": "^7.22.5",
     "@playwright/test": "^1.49.0",
-    "@salesforce/pwa-kit-dev": "3.14.0-dev",
+    "@salesforce/pwa-kit-dev": "3.13.0",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.14.0-dev",
+    "internal-lib-build": "3.13.0",
     "nodemon": "^2.0.22"
   },
   "engines": {
