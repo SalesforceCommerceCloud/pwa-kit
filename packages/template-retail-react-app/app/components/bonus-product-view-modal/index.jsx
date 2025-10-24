@@ -62,28 +62,6 @@ const BonusProductViewModal = ({
 
     const productViewModalData = useProductViewModal(safeProduct, {keepPreviousData: true})
 
-    // Keep a stable reference to the last successfully loaded product
-    // This prevents constant re-renders while fetching
-    const lastLoadedProductRef = React.useRef(productViewModalData.product)
-
-    React.useLayoutEffect(() => {
-        if (productViewModalData.product && !productViewModalData.isFetching) {
-            lastLoadedProductRef.current = productViewModalData.product
-        }
-    }, [productViewModalData.product, productViewModalData.isFetching])
-
-    // Use the stable product reference to prevent flashing during fetches
-    const stableProductViewModalData = React.useMemo(
-        () => ({
-            ...productViewModalData,
-            product:
-                productViewModalData.isFetching && lastLoadedProductRef.current
-                    ? lastLoadedProductRef.current
-                    : productViewModalData.product
-        }),
-        [productViewModalData.product, productViewModalData.isFetching]
-    )
-
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {data: basket} = useCurrentBasket()
     const navigate = useNavigation()
@@ -118,7 +96,7 @@ const BonusProductViewModal = ({
                     id: 'bonus_product_view_modal.modal_label',
                     defaultMessage: 'Bonus product selection modal for {productName}'
                 },
-                {productName: stableProductViewModalData?.product?.name}
+                {productName: productViewModalData?.product?.name}
             ),
             viewCart: formatMessage({
                 id: 'bonus_product_view_modal.button.view_cart',
@@ -129,7 +107,7 @@ const BonusProductViewModal = ({
                 defaultMessage: '← Back to Selection'
             })
         }),
-        [intl, stableProductViewModalData?.product?.name, formatMessage]
+        [intl, productViewModalData?.product?.name, formatMessage]
     )
 
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
@@ -252,7 +230,7 @@ const BonusProductViewModal = ({
 
     // Clean product data and pre-filter variants based on available bonus products
     const productToRender = useMemo(() => {
-        const baseProduct = stableProductViewModalData.product || safeProduct
+        const baseProduct = productViewModalData.product || safeProduct
 
         // Always provide a fallback product for testing scenarios
         if (!baseProduct) {
@@ -378,12 +356,7 @@ const BonusProductViewModal = ({
         }
 
         return finalProduct
-    }, [
-        stableProductViewModalData.product,
-        safeProduct,
-        hasPromotionData,
-        availableBonusProductIds
-    ])
+    }, [productViewModalData.product, safeProduct, hasPromotionData, availableBonusProductIds])
 
     // Calculate max order quantity for UI - reuse the same calculation from the header
     const maxOrderQuantity = Math.max(0, finalMaxBonusItems - finalSelectedBonusItems)
@@ -445,8 +418,7 @@ const BonusProductViewModal = ({
                     }
                     pb={productViewModalTheme.layout.body.paddingBottom}
                 >
-                    {(stableProductViewModalData.isFetching &&
-                        !stableProductViewModalData.product) ||
+                    {(productViewModalData.isFetching && !productViewModalData.product) ||
                     !productToRender ? (
                         <Box p={8} textAlign="center">
                             <Text>Loading product details...</Text>
