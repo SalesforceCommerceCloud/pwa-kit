@@ -398,6 +398,12 @@ describe('rebuildPathWithParams test', () => {
         const updatedUrl = rebuildPathWithParams(url, {color: 'red', size: 'L'})
         expect(updatedUrl).toBe('/en/product/25501032M?color=red&size=L')
     })
+
+    test('adds prefixed params to URL with no existing query params', () => {
+        const url = '/product/123'
+        const updatedUrl = rebuildPathWithParams(url, {color: 'red'}, 'modal_')
+        expect(updatedUrl).toBe('/product/123?modal_color=red')
+    })
 })
 
 describe('removeQueryParamsFromPath test', () => {
