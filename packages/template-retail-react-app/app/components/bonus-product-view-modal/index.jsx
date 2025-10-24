@@ -62,18 +62,6 @@ const BonusProductViewModal = ({
 
     const productViewModalData = useProductViewModal(safeProduct)
 
-    // Keep stable promotions to prevent flashing when variant changes
-    const stablePromotionsRef = React.useRef(null)
-    
-    // Update refs in useLayoutEffect to follow React rules and avoid render-phase mutations
-    React.useLayoutEffect(() => {
-        if (productViewModalData.product?.productPromotions && !productViewModalData.isFetching) {
-            stablePromotionsRef.current = productViewModalData.product.productPromotions
-        }
-    }, [productViewModalData.product?.productPromotions, productViewModalData.isFetching])
-
-    // Keep a stable reference to the last successfully loaded product
-    // This prevents constant re-renders while fetching
     const lastLoadedProductRef = React.useRef(productViewModalData.product)
     
     React.useLayoutEffect(() => {
@@ -82,22 +70,13 @@ const BonusProductViewModal = ({
         }
     }, [productViewModalData.product, productViewModalData.isFetching])
 
-    // Use the stable product reference to prevent flashing during fetches
     const stableProductViewModalData = React.useMemo(
         () => ({
             ...productViewModalData,
             product:
                 productViewModalData.isFetching && lastLoadedProductRef.current
-                    ? {
-                          ...lastLoadedProductRef.current,
-                          productPromotions: stablePromotionsRef.current
-                      }
-                    : {
-                          ...productViewModalData.product,
-                          productPromotions:
-                              stablePromotionsRef.current ??
-                              productViewModalData.product?.productPromotions
-                      }
+                    ? lastLoadedProductRef.current
+                    : productViewModalData.product
         }),
         [productViewModalData.product, productViewModalData.isFetching]
     )
