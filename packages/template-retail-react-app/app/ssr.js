@@ -51,7 +51,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -359,7 +359,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        // Allow scripts from Runtime Admin soak environment
+                        'https://runtime-admin-soak.mobify-storefront.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -367,11 +369,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com'
+                        '*.salesforce-scrt.com',
+                        // Connect to Runtime Admin soak environment
+                        'https://runtime-admin-soak.mobify-storefront.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com'
+                    ],
+                    'frame-ancestors': [
+                        // Allow storefront to be iframed by Runtime Admin domains
+                        'https://runtime.commercecloud.com',
+                        'https://runtime-admin-soak.mobify-storefront.com'
                     ]
                 }
             }
