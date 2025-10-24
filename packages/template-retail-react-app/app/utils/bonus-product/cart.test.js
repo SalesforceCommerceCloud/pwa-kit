@@ -255,6 +255,70 @@ describe('Bonus Product Cart Utilities', () => {
             expect(result).toEqual([])
         })
 
+        describe('Different Product Variants Sharing Same Promotion', () => {
+            test('distributes bonus products without duplication when different variants qualify for same promotion', () => {
+                const basketWithDifferentVariants = {
+                    bonusDiscountLineItems: [
+                        {
+                            id: 'bonus-123',
+                            promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                            maxBonusItems: 4,
+                            bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}]
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'shirt-small-item',
+                            productId: 'shirt-small',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'shirt-large-item',
+                            productId: 'shirt-large',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'tie-item-1',
+                            productId: 'red-tie',
+                            bonusProductLineItem: true,
+                            bonusDiscountLineItemId: 'bonus-123',
+                            quantity: 4
+                        }
+                    ]
+                }
+
+                const productsWithPromotions = {
+                    'shirt-small': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    },
+                    'shirt-large': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    }
+                }
+
+                const firstVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[0],
+                    productsWithPromotions
+                )
+                const secondVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[1],
+                    productsWithPromotions
+                )
+
+                // Each variant should get 2 ties (no duplication)
+                expect(firstVariantResult[0].quantity).toBe(2)
+                expect(secondVariantResult[0].quantity).toBe(2)
+
+                // Total should equal actual bonus products in cart
+                const totalAllocated = firstVariantResult[0].quantity + secondVariantResult[0].quantity
+                expect(totalAllocated).toBe(4)
+            })
+        })
+
         describe('Composite Sorting: Store Pickup Priority', () => {
             const basketWithShipments = {
                 bonusDiscountLineItems: [

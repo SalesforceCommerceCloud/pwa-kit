@@ -72,9 +72,14 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
  * - Individual item capacity (calculated from promotion rules and item quantity)
  * - First-come-first-served allocation order (based on cart item position)
  *
+ * This function handles both same-productId and different-productId scenarios:
+ * - Same productId (e.g., same product added twice): Allocates based on same productId
+ * - Different productIds qualifying for same promotion (e.g., different variants): Allocates based on shared promotions
+ *
  * @param {Object} basket - The current basket data
  * @param {Object} targetCartItem - The specific cart item to get bonus products for
  * @param {Object} productsWithPromotions - Products data with promotion info
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Array<Object>} Array of bonus products allocated to this specific cart item
  */
 export const getBonusProductsForSpecificCartItem = (
@@ -89,27 +94,90 @@ export const getBonusProductsForSpecificCartItem = (
 
     const productId = targetCartItem.productId
 
-    // Get all available bonus products for this productId using existing function
-    const allBonusProducts = getBonusProductsInCartForProduct(
+    // Get promotion IDs for the target product
+    const targetPromotionIds = getPromotionIdsForProduct(
         basket,
         productId,
         productsWithPromotions,
         ruleBasedQualifyingProductsMap
     )
 
-    if (allBonusProducts.length === 0) {
+    if (targetPromotionIds.length === 0) {
         return []
     }
 
-    // Find all qualifying cart items (non-bonus items with same productId)
+    // Find ALL qualifying cart items that share ANY of the same promotions
+    // This includes items with the same productId AND items with different productIds
+    // that qualify for the same promotion (e.g., different product variants)
     const qualifyingCartItems =
-        basket.productItems?.filter(
-            (item) => item.productId === productId && !item.bonusProductLineItem
-        ) || []
+        basket.productItems?.filter((item) => {
+            // Skip bonus products
+            if (item.bonusProductLineItem) {
+                return false
+            }
 
-    if (qualifyingCartItems.length <= 1) {
-        // If only one qualifying item, it gets all bonus products
-        return allBonusProducts
+            // Get promotion IDs for this cart item
+            const itemPromotionIds = getPromotionIdsForProduct(
+                basket,
+                item.productId,
+                productsWithPromotions,
+                ruleBasedQualifyingProductsMap
+            )
+
+            // Check if this item shares any promotions with the target item
+            return itemPromotionIds.some((promId) => targetPromotionIds.includes(promId))
+        }) || []
+
+    if (qualifyingCartItems.length === 0) {
+        return []
+    }
+
+    // Get matching bonus discount line items for the target promotions
+    const matchingDiscountItems =
+        basket.bonusDiscountLineItems?.filter((bonusItem) => {
+            return targetPromotionIds.includes(bonusItem.promotionId)
+        }) || []
+
+    if (matchingDiscountItems.length === 0) {
+        return []
+    }
+
+    // Get the discount line item IDs
+    const discountLineItemIds = matchingDiscountItems.map((item) => item.id)
+
+    // Find ALL bonus products in cart that match these discount line item IDs
+    const bonusProductsInCart =
+        basket.productItems?.filter((item) => {
+            return (
+                item.bonusProductLineItem &&
+                discountLineItemIds.includes(item.bonusDiscountLineItemId)
+            )
+        }) || []
+
+    if (bonusProductsInCart.length === 0) {
+        return []
+    }
+
+    // If only one qualifying item (this item), it gets all bonus products
+    if (qualifyingCartItems.length === 1) {
+        // Aggregate quantities for products with the same productId
+        const productQuantityMap = new Map()
+        bonusProductsInCart.forEach((item) => {
+            const existingQuantity = productQuantityMap.get(item.productId) || 0
+            productQuantityMap.set(item.productId, existingQuantity + (item.quantity || 0))
+        })
+
+        // Convert back to array format with aggregated quantities
+        const result = []
+        productQuantityMap.forEach((quantity, productId) => {
+            const sampleItem = bonusProductsInCart.find((item) => item.productId === productId)
+            result.push({
+                ...sampleItem,
+                quantity: quantity
+            })
+        })
+
+        return result
     }
 
     // Calculate total qualifying quantity across all items
@@ -122,18 +190,6 @@ export const getBonusProductsForSpecificCartItem = (
         return []
     }
 
-    // Get promotion data to understand per-item capacity
-    const promotionIds = getPromotionIdsForProduct(
-        basket,
-        productId,
-        productsWithPromotions,
-        ruleBasedQualifyingProductsMap
-    )
-    const matchingDiscountItems =
-        basket.bonusDiscountLineItems?.filter((bonusItem) => {
-            return promotionIds.includes(bonusItem.promotionId)
-        }) || []
-
     // Calculate total available capacity from promotion rules
     const totalPromotionCapacity = matchingDiscountItems.reduce(
         (sum, item) => sum + (item.maxBonusItems || 0),
@@ -141,12 +197,13 @@ export const getBonusProductsForSpecificCartItem = (
     )
 
     // Create a flattened list of individual bonus product items for allocation
+    // Use the actual cart items, not aggregated data
     const bonusItemsToAllocate = []
-    allBonusProducts.forEach((aggregatedItem) => {
-        // Create individual items based on quantity
-        for (let i = 0; i < (aggregatedItem.quantity || 1); i++) {
+    bonusProductsInCart.forEach((cartItem) => {
+        // Create individual items based on quantity in cart
+        for (let i = 0; i < (cartItem.quantity || 1); i++) {
             bonusItemsToAllocate.push({
-                ...aggregatedItem,
+                ...cartItem,
                 quantity: 1 // Each item represents 1 unit
             })
         }
