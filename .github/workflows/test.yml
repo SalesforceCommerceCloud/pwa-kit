@@ -84,6 +84,12 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
+      # Running `git commit`, for example, requires these user.name and user.email to be set
+      - name: Configure Git
+        run: |-
+          git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
+          git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
+
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
