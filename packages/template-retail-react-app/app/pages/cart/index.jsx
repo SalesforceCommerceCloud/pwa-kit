@@ -133,8 +133,11 @@ const Cart = () => {
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
 
     // Bonus Product Logic
-    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} =
-        useBasketProductsWithPromotions(basket)
+    const {
+        data: productsWithPromotions,
+        ruleBasedQualifyingProductsMap,
+        isLoading: isPromotionDataLoading
+    } = useBasketProductsWithPromotions(basket)
     const bonusProductViewModal = useBonusProductViewModal()
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
 
@@ -936,8 +939,12 @@ const Cart = () => {
         // Check if this product has bonus products associated with it
         // If it does, hide the delivery group selector
         const hasBonusProducts =
-            getBonusProductsForSpecificCartItem(basket, productItem, productsWithPromotions)
-                .length > 0
+            getBonusProductsForSpecificCartItem(
+                basket,
+                productItem,
+                productsWithPromotions,
+                ruleBasedQualifyingProductsMap
+            ).length > 0
 
         if (hasBonusProducts) {
             return null
@@ -1057,6 +1064,9 @@ const Cart = () => {
                                                     }
                                                     basket={basket}
                                                     productsWithPromotions={productsWithPromotions}
+                                                    ruleBasedQualifyingProductsMap={
+                                                        ruleBasedQualifyingProductsMap
+                                                    }
                                                     isPromotionDataLoading={isPromotionDataLoading}
                                                     renderProductItem={(
                                                         productItem,

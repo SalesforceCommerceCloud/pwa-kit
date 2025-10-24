@@ -86,7 +86,8 @@ export const AddToCartModal = () => {
         : 0
 
     // Bonus product logic
-    const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
+    const {data: productsWithPromotions, ruleBasedQualifyingProductsMap} =
+        useBasketProductsWithPromotions(basket)
     // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
     const {bonusDiscountLineItems = []} = basket || {}
 
@@ -324,7 +325,8 @@ export const AddToCartModal = () => {
                                         shouldShowBonusProductSelection(
                                             basket,
                                             product?.id,
-                                            productsWithPromotions
+                                            productsWithPromotions,
+                                            ruleBasedQualifyingProductsMap
                                         )
 
                                     if (!shouldShowBonusSelection) {
@@ -336,7 +338,9 @@ export const AddToCartModal = () => {
                                         getRemainingAvailableBonusProductsForProduct(
                                             basket,
                                             product?.id,
-                                            productsWithPromotions
+                                            productsWithPromotions,
+                                            {},
+                                            ruleBasedQualifyingProductsMap
                                         )
 
                                     // Only render if there is remaining capacity across the collection
@@ -353,7 +357,8 @@ export const AddToCartModal = () => {
                                     const promotionIds = getPromotionIdsForProduct(
                                         basket,
                                         product?.id,
-                                        productsWithPromotions
+                                        productsWithPromotions,
+                                        ruleBasedQualifyingProductsMap
                                     )
 
                                     // Find the first bonusDiscountLineItem that matches any of the promotionIds

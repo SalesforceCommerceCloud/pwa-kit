@@ -57,3 +57,60 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
         ...rest
     }
 }
+
+/**
+ * Hook to fetch qualifying products for a rule-based bonus promotion.
+ *
+ * For rule-based bonus promotions, we need to determine which specific product variants
+ * qualify for the promotion. This hook uses the productSearch endpoint with the promotion ID
+ * to fetch all products that qualify (excluding bonus products).
+ *
+ * Uses refinement parameters:
+ * - pmid=${promotionId} - Filters products by promotion ID
+ * - pmpt=qualifying - Filters to only show qualifying products (excludes bonus products)
+ *
+ * @param {string} promotionId - The promotion ID to fetch qualifying products for
+ * @param {Object} options - Additional options
+ * @param {boolean} [options.enabled=true] - Whether to fetch products
+ * @param {number} [options.limit=200] - Maximum number of products to return
+ * @returns {Object} Object with qualifyingProductIds Set and loading state
+ *
+ * @example
+ * const {qualifyingProductIds, isLoading} = useRuleBasedQualifyingProducts('my-promotion-id')
+ * // qualifyingProductIds is a Set of product IDs that qualify for the promotion
+ * if (qualifyingProductIds.has('variant-123')) {
+ *   // variant-123 qualifies for this promotion
+ * }
+ */
+export const useRuleBasedQualifyingProducts = (promotionId, {enabled = true, limit = 200} = {}) => {
+    // Build refine array with promotion ID and qualifying product type filter
+    const refine = useMemo(() => [`pmid=${promotionId}`, 'pmpt=qualifying'], [promotionId])
+
+    const {data, isLoading, error, ...rest} = useProductSearch(
+        {
+            parameters: {
+                refine,
+                limit,
+                offset: 0
+            }
+        },
+        {
+            enabled: enabled && Boolean(promotionId)
+        }
+    )
+
+    // Convert the hits array to a Set of product IDs for fast lookup
+    const qualifyingProductIds = useMemo(() => {
+        if (!data?.hits) return new Set()
+        return new Set(data.hits.map((hit) => hit.productId).filter(Boolean))
+    }, [data])
+
+    return {
+        qualifyingProductIds,
+        products: data?.hits || [],
+        total: data?.total || 0,
+        isLoading,
+        error,
+        ...rest
+    }
+}
