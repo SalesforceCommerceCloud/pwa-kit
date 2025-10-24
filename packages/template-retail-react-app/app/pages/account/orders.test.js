@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,7 +15,9 @@ import {
 import {
     mockCustomerBaskets,
     mockOrderHistory,
-    mockOrderProducts
+    mockOrderProducts,
+    mockStore,
+    mockMultiShipmentOrder
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -234,5 +236,74 @@ describe('Handles order with missing or partial data gracefully', () => {
         expect(screen.queryByText(/billing address/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/payment method/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/shipping address/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('Order with multiple shipments (pickup and delivery)', () => {
+    let orderNo
+
+    beforeEach(async () => {
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockMultiShipmentOrder))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({...mockOrderHistory, data: [mockMultiShipmentOrder]})
+                )
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            }),
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+
+        orderNo = mockMultiShipmentOrder.orderNo
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults(`/account/orders/${orderNo}`)
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+    })
+
+    test('should render order details page with multiple shipments', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display pickup address section', async () => {
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping method and address sections', async () => {
+        expect(await screen.findByRole('heading', {name: /^shipping method$/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /^shipping address$/i})
+        ).toBeInTheDocument()
+    })
+
+    test('should display delivery address details', async () => {
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+        expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Boston/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping method name', async () => {
+        expect(await screen.findByText(/Ground/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking number', async () => {
+        expect(await screen.findByText(/TRACK123456/i)).toBeInTheDocument()
+    })
+
+    test('should display both payment method and billing address', async () => {
+        expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
     })
 })

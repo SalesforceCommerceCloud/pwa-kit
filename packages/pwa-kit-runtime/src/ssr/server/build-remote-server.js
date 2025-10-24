@@ -52,6 +52,7 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
@@ -417,6 +418,7 @@ export const RemoteServerFactory = {
         this._setupProxying(app, options)
 
         this._setupSlasPrivateClientProxy(app, options)
+        this._setupHybridProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -426,6 +428,12 @@ export const RemoteServerFactory = {
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
+    },
+
+    _setupHybridProxy(app, options) {
+        if (options.hybridProxy?.enabled) {
+            app.use(hybridProxy(options))
+        }
     },
 
     /**

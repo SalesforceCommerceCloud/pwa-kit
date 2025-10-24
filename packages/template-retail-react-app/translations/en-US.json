@@ -50,11 +50,23 @@
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
   },
+  "account_order_detail.heading.pickup_address": {
+    "defaultMessage": "Pickup Address"
+  },
+  "account_order_detail.heading.pickup_address_number": {
+    "defaultMessage": "Pickup Address {number}"
+  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
+  "account_order_detail.heading.shipping_address_number": {
+    "defaultMessage": "Shipping Address {number}"
+  },
   "account_order_detail.heading.shipping_method": {
     "defaultMessage": "Shipping Method"
+  },
+  "account_order_detail.heading.shipping_method_number": {
+    "defaultMessage": "Shipping Method {number}"
   },
   "account_order_detail.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -62,8 +74,8 @@
   "account_order_detail.label.ordered_date": {
     "defaultMessage": "Ordered: {date}"
   },
-  "account_order_detail.label.pending_tracking_number": {
-    "defaultMessage": "Pending"
+  "account_order_detail.label.pickup_from_store": {
+    "defaultMessage": "Pick up from Store {storeId}"
   },
   "account_order_detail.label.tracking_number": {
     "defaultMessage": "Tracking Number"

@@ -17,4 +17,12 @@ describe('update-global-agent-options', () => {
         expect(Object.keys(to.options)).toHaveLength(AGENT_OPTIONS_TO_COPY.length)
         expect(to.options).not.toHaveProperty('random')
     })
+
+    test('does not copy keys not in from.options', () => {
+        let from = {options: {}}
+        let to = {options: {existingKey: 'existingValue'}}
+        // from.options is empty, so no AGENT_OPTIONS_TO_COPY keys should be added
+        updateGlobalAgentOptions(from, to)
+        expect(to.options).toEqual({existingKey: 'existingValue'})
+    })
 })
