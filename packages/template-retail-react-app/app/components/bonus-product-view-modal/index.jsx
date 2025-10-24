@@ -81,8 +81,16 @@ const BonusProductViewModal = ({
             ...productViewModalData,
             product:
                 productViewModalData.isFetching && lastLoadedProductRef.current
-                    ? {...lastLoadedProductRef.current, productPromotions: stablePromotionsRef.current}
-                    : {...productViewModalData.product, productPromotions: stablePromotionsRef.current || productViewModalData.product?.productPromotions}
+                    ? {
+                          ...lastLoadedProductRef.current,
+                          productPromotions: stablePromotionsRef.current
+                      }
+                    : {
+                          ...productViewModalData.product,
+                          productPromotions:
+                              stablePromotionsRef.current ||
+                              productViewModalData.product?.productPromotions
+                      }
         }),
         [productViewModalData.product, productViewModalData.isFetching]
     )
