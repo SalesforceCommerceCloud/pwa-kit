@@ -7,6 +7,7 @@
 - Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
 - When registering a guest user on the confirmation page only save the delivery addresses to the new account
 [#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
+- Improve mobile layout for StoreDisplay component [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
 
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
