@@ -1,4 +1,4 @@
-## v0.4.0 (Oct 24, 2025)
+## 0.4.0-preview-0 (Oct 24, 2025)
 - Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359), [#3379] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3379)
 - Create page and component tools integrate their responses into agent IDE [#3377](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3377)
 - Added Hooks Recommendation tool [#3388](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3388)
