@@ -60,7 +60,7 @@ const BonusProductViewModal = ({
         }
     }, [product])
 
-    const productViewModalData = useProductViewModal(safeProduct)
+    const productViewModalData = useProductViewModal(safeProduct, {urlParamPrefix: 'modal_'})
 
     // Keep a stable reference to the last successfully loaded product
     // This prevents constant re-renders while fetching
@@ -463,6 +463,7 @@ const BonusProductViewModal = ({
                             showReviews={true}
                             showVariationAttributes={true}
                             alignItems="stretch"
+                            urlParamPrefix={stableProductViewModalData.urlParamPrefix}
                             imageGalleryFooter={
                                 onReturnToSelection ? (
                                     <HideOnMobile>{BackToSelectionButton}</HideOnMobile>

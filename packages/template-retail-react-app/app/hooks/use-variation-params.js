@@ -14,7 +14,8 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
 export const useVariationParams = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    urlParamPrefix = ''
 ) => {
     const {variationAttributes = [], variationValues = {}} = product
 
@@ -27,7 +28,8 @@ export const useVariationParams = (
     const variationParams = variationAttributes
         .map(({id}) => id)
         .reduce((acc, key) => {
-            let value = params.get(`${key}`) || variationValues?.[key]
+            const paramKey = urlParamPrefix ? `${urlParamPrefix}${key}` : key
+            let value = params.get(paramKey) || variationValues?.[key]
             return value ? {...acc, [key]: value} : acc
         }, {})
 

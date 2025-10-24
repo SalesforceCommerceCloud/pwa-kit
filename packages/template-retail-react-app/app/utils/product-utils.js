@@ -212,11 +212,13 @@ export const filterImageGroups = (imageGroups = [], filters) => {
  * @param {Product} product
  * @param {object} opts
  * @param {string} opts.swatchViewType - The `viewTypeId` for the swatch image. Defaults to `swatch`.
+ * @param {string} opts.urlParamPrefix - Optional prefix for URL parameters (e.g., 'modal_')
  *
  * @returns {VariationAttributes[]} decoratedVariationAttributes
  */
 export const getDecoratedVariationAttributes = (product, opts = {}) => {
     const swatchViewType = opts.swatchViewType || 'swatch'
+    const urlParamPrefix = opts.urlParamPrefix
 
     return product?.variationAttributes?.map((variationAttribute) => ({
         ...variationAttribute,
@@ -231,7 +233,8 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
                 })?.[0]?.images[0],
                 href: rebuildPathWithParams(
                     productUrlBuilder({id: product.productId}),
-                    variationValues
+                    variationValues,
+                    urlParamPrefix
                 )
             }
         })

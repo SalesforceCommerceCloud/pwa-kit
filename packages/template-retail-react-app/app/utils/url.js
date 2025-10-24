@@ -28,10 +28,28 @@ export const absoluteUrl = (path, appOrigin) => {
 }
 
 /**
+ * Adds a prefix to parameter keys in an object.
+ * @param {object} params - The parameters to prefix
+ * @param {string} prefix - The prefix to add (e.g., 'modal_')
+ * @returns {object} Parameters with prefixed keys
+ * @example
+ * addParamPrefix({color: 'red', size: 'M'}, 'modal_')
+ * // Returns {modal_color: 'red', modal_size: 'M'}
+ */
+export const addParamPrefix = (params, prefix) => {
+    if (!prefix) return params
+    return Object.entries(params).reduce((acc, [key, value]) => {
+        acc[`${prefix}${key}`] = value
+        return acc
+    }, {})
+}
+
+/**
  * Modifies a given url by adding/updating query parameters.
  *
  * @param {string} url - The base url of the output url set.
  * @param {object} extraParams - A key values pairing used to add static search param values.
+ * @param {string} [paramPrefix] - Optional prefix to add to parameter keys (e.g., 'modal_')
  * @returns {string} A URL with additional params
  * @example
  * import {rebuildPathWithParams} from '/path/to/utils/url'
@@ -44,11 +62,12 @@ export const absoluteUrl = (path, appOrigin) => {
  * // Returns
  * // '/en-GB/product/25501032M?color=JJ2SKXX&size=9MD'
  */
-export const rebuildPathWithParams = (url, extraParams) => {
+export const rebuildPathWithParams = (url, extraParams, paramPrefix) => {
     const [pathname, search] = url.split('?')
     const params = new URLSearchParams(search)
 
-    updateSearchParams(params, extraParams)
+    const prefixedParams = addParamPrefix(extraParams, paramPrefix)
+    updateSearchParams(params, prefixedParams)
 
     // Clean up any trailing `=` for params without values.
     const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '')
@@ -244,12 +263,13 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
  * // returns
  * // '/en-GB/cart?abc=12'
  */
-export const removeQueryParamsFromPath = (path, keys) => {
+export const removeQueryParamsFromPath = (path, keys, paramPrefix) => {
     const [pathname, search] = path.split('?')
     const params = new URLSearchParams(search)
     keys.forEach((key) => {
-        if (params.has(key)) {
-            params.delete(key)
+        const prefixedKey = paramPrefix ? `${paramPrefix}${key}` : key
+        if (params.has(prefixedKey)) {
+            params.delete(prefixedKey)
         }
     })
 

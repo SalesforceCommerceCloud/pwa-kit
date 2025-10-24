@@ -40,6 +40,7 @@ export const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} product
  * @param {Object} params
  * @param {Object} location
+ * @param {string} urlParamPrefix - Optional prefix for URL parameters
  * @returns {String} a product url for the current variation value.
  */
 export const buildVariantValueHref = ({
@@ -48,15 +49,24 @@ export const buildVariantValueHref = ({
     newParams,
     productId,
     isProductPartOfSet,
-    isProductPartOfBundle
+    isProductPartOfBundle,
+    urlParamPrefix = ''
 }) => {
     const [allParams, productParams] = existingParams
 
+    // Prefix the params if needed
+    const prefixedParams = urlParamPrefix
+        ? Object.entries(newParams).reduce((acc, [key, value]) => {
+            acc[`${urlParamPrefix}${key}`] = value
+            return acc
+        }, {})
+        : newParams
+
     if (isProductPartOfSet || isProductPartOfBundle) {
-        updateSearchParams(productParams, newParams)
+        updateSearchParams(productParams, prefixedParams)
         allParams.set(productId, productParams.toString())
     } else {
-        updateSearchParams(allParams, newParams)
+        updateSearchParams(allParams, prefixedParams)
     }
 
     return `${pathname}?${allParams.toString()}`
@@ -88,17 +98,21 @@ export const isVariantValueOrderable = (product, variationParams) => {
  * an updated orderable flag.
  *
  * @param {Object} product
+ * @param {boolean} isProductPartOfSet
+ * @param {boolean} isProductPartOfBundle
+ * @param {string} urlParamPrefix - Optional prefix for URL parameters
  * @returns {Array} a decorated variation attributes list.
  *
  */
 export const useVariationAttributes = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    urlParamPrefix = ''
 ) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
+    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle, urlParamPrefix)
     const existingParams = usePDPSearchParams(product.id)
     const isBundleChildVariant = isProductPartOfBundle && product?.type?.variant
 
@@ -138,12 +152,13 @@ export const useVariationAttributes = (
                             newParams: params,
                             productId: product.id,
                             isProductPartOfSet,
-                            isProductPartOfBundle
+                            isProductPartOfBundle,
+                            urlParamPrefix
                         }),
                         orderable: isVariantValueOrderable(product, params)
                     }
                 })
             })),
-        [location.search, product]
+        [location.search, product, urlParamPrefix]
     )
 }

@@ -18,18 +18,22 @@ import {useProduct} from '@salesforce/commerce-sdk-react'
  * This hook is responsible for fetching a product detail based on the variation selection
  * and managing the variation params on the url when the modal is open/close
  * @param initialProduct - the initial product when the modal is first open
+ * @param options - Optional configuration
+ * @param options.urlParamPrefix - Optional prefix for URL parameters (e.g., 'modal_')
  * @returns object
  */
-export const useProductViewModal = (initialProduct) => {
+export const useProductViewModal = (initialProduct, {urlParamPrefix = ''} = {}) => {
     const location = useLocation()
     const history = useHistory()
     const intl = useIntl()
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
-    const variant = useVariant(product)
+    const variant = useVariant(product, false, false, urlParamPrefix)
+
+    const productId = (variant || product)?.productId
 
     const {data: currentProduct, isFetching} = useProduct(
-        {parameters: {id: (variant || product)?.productId}},
+        {parameters: {id: productId}},
         {
             placeholderData: initialProduct,
             select: (data) => {
@@ -53,28 +57,32 @@ export const useProductViewModal = (initialProduct) => {
     )
 
     useEffect(() => {
-        if (currentProduct) setProduct(currentProduct)
+        if (currentProduct) {
+            setProduct(currentProduct)
+        }
     }, [currentProduct])
-
-    const cleanUpVariantParams = () => {
-        const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
-        const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
-
-        history.replace({search: updatedParams})
-    }
 
     useEffect(() => {
         // when the modal is first mounted,
         // clean up the params in case there are variant params not related to current product
+        const cleanUpVariantParams = () => {
+            const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
+            const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove, urlParamPrefix)
+            history.replace({search: updatedParams})
+        }
+
         cleanUpVariantParams()
         return () => {
             cleanUpVariantParams()
         }
+        // Only run on mount and unmount - urlParamPrefix is stable
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {
         product,
         variant,
-        isFetching
+        isFetching,
+        urlParamPrefix
     }
 }
