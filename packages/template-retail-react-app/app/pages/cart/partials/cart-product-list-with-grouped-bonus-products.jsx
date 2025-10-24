@@ -18,6 +18,7 @@ import {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/
  * @param {Array} props.nonBonusProducts - Array of non-bonus products
  * @param {Object} props.basket - The current basket data
  * @param {Object} props.productsWithPromotions - Products with promotion data
+ * @param {Object} props.ruleBasedQualifyingProductsMap - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @param {boolean} props.isPromotionDataLoading - Whether promotion data is loading
  * @param {Function} props.renderProductItem - Function to render individual product items
  * @param {Function} props.getPromotionCalloutText - Function to get promotion text
@@ -28,6 +29,7 @@ const CartProductListWithGroupedBonusProducts = ({
     nonBonusProducts,
     basket,
     productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {},
     isPromotionDataLoading,
     renderProductItem,
     getPromotionCalloutText,
@@ -62,7 +64,8 @@ const CartProductListWithGroupedBonusProducts = ({
                 const shouldShowBonusSelection = shouldShowBonusProductSelection(
                     basket,
                     qualifyingProduct.productId,
-                    productsWithPromotions
+                    productsWithPromotions,
+                    ruleBasedQualifyingProductsMap
                 )
 
                 // If not eligible for bonus product selection, render as simple card
@@ -80,12 +83,15 @@ const CartProductListWithGroupedBonusProducts = ({
                     const bonusProductsForThisProduct = getBonusProductsForSpecificCartItem(
                         basket,
                         qualifyingProduct,
-                        productsWithPromotions
+                        productsWithPromotions,
+                        ruleBasedQualifyingProductsMap
                     )
                     const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(
                         basket,
                         qualifyingProduct.productId,
-                        productsWithPromotions
+                        productsWithPromotions,
+                        {},
+                        ruleBasedQualifyingProductsMap
                     )
 
                     const hasBonusProductsInCart = bonusProductsForThisProduct.length > 0
@@ -206,6 +212,7 @@ CartProductListWithGroupedBonusProducts.propTypes = {
         )
     }).isRequired,
     productsWithPromotions: PropTypes.object,
+    ruleBasedQualifyingProductsMap: PropTypes.object,
     isPromotionDataLoading: PropTypes.bool.isRequired,
     renderProductItem: PropTypes.func.isRequired,
     getPromotionCalloutText: PropTypes.func.isRequired,

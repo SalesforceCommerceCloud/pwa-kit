@@ -80,7 +80,8 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
 export const getBonusProductsForSpecificCartItem = (
     basket,
     targetCartItem,
-    productsWithPromotions
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
 ) => {
     if (!basket || !targetCartItem || !productsWithPromotions) {
         return []
@@ -92,7 +93,8 @@ export const getBonusProductsForSpecificCartItem = (
     const allBonusProducts = getBonusProductsInCartForProduct(
         basket,
         productId,
-        productsWithPromotions
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
     )
 
     if (allBonusProducts.length === 0) {
@@ -121,7 +123,12 @@ export const getBonusProductsForSpecificCartItem = (
     }
 
     // Get promotion data to understand per-item capacity
-    const promotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const promotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
     const matchingDiscountItems =
         basket.bonusDiscountLineItems?.filter((bonusItem) => {
             return promotionIds.includes(bonusItem.promotionId)
@@ -219,15 +226,26 @@ export const getBonusProductsForSpecificCartItem = (
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to find bonus products for
  * @param {Object} productsWithPromotions - Products data with promotion info
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Array<Object>} Array of bonus products in cart with aggregated quantities
  */
-export const getBonusProductsInCartForProduct = (basket, productId, productsWithPromotions) => {
+export const getBonusProductsInCartForProduct = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     if (!basket || !productId || !productsWithPromotions) {
         return []
     }
 
     // Get promotion IDs using enhanced product data
-    const productPromotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const productPromotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (productPromotionIds.length === 0) {
         return []

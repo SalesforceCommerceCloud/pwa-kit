@@ -14,7 +14,10 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 import {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
 import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
-import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
+import {
+    useRuleBasedBonusProducts,
+    useRuleBasedQualifyingProducts
+} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 
 /**
  * Maximum number of rule-based bonus products to fetch from the API.
@@ -76,9 +79,10 @@ export const useProductPromotionIds = (productId) => {
 /**
  * Hook to get multiple products with promotion data for basket items.
  * This fetches all products in the basket with their promotion data in a single request.
+ * Also fetches qualifying products for rule-based promotions to determine variant eligibility.
  *
  * @param {Object} basket - The current basket data
- * @returns {Object} Object containing products with promotion data and loading state
+ * @returns {Object} Object containing products with promotion data, qualifying products map, and loading state
  */
 export const useBasketProductsWithPromotions = (basket) => {
     // Get all unique product IDs from basket
@@ -89,7 +93,7 @@ export const useBasketProductsWithPromotions = (basket) => {
         {
             parameters: {
                 ids: uniqueProductIds,
-                expand: ['promotions', 'prices'],
+                expand: ['promotions', 'prices', 'variations'],
                 perPricebook: true,
                 allImages: false // We don't need images for promotion data
             }
@@ -108,9 +112,40 @@ export const useBasketProductsWithPromotions = (basket) => {
         }
     )
 
+    // Identify rule-based promotions in the basket
+    const ruleBasedPromotionIds = useMemo(() => {
+        return (
+            basket?.bonusDiscountLineItems
+                ?.filter((bli) => isRuleBasedPromotion(bli))
+                .map((bli) => bli.promotionId)
+                .filter(Boolean) || []
+        )
+    }, [basket?.bonusDiscountLineItems])
+
+    // Fetch qualifying products for each rule-based promotion
+    // Note: For simplicity, we're fetching for the first rule-based promotion
+    // In a production scenario, you might want to fetch for all rule-based promotions
+    const firstRuleBasedPromotionId = ruleBasedPromotionIds[0] || null
+
+    const {qualifyingProductIds: ruleBasedQualifyingIds, isLoading: isLoadingQualifying} =
+        useRuleBasedQualifyingProducts(firstRuleBasedPromotionId, {
+            enabled: Boolean(firstRuleBasedPromotionId)
+        })
+
+    // Build a map of promotionId -> Set of qualifying product IDs
+    const ruleBasedQualifyingProductsMap = useMemo(() => {
+        if (!firstRuleBasedPromotionId || !ruleBasedQualifyingIds) {
+            return {}
+        }
+        return {
+            [firstRuleBasedPromotionId]: ruleBasedQualifyingIds
+        }
+    }, [firstRuleBasedPromotionId, ruleBasedQualifyingIds])
+
     return {
         data: productsResult || {},
-        isLoading: isPending,
+        ruleBasedQualifyingProductsMap,
+        isLoading: isPending || isLoadingQualifying,
         hasPromotionData: Object.values(productsResult || {}).some(
             (product) => product.productPromotions && product.productPromotions.length > 0
         )
@@ -143,7 +178,11 @@ export const useRuleBasedPromotionIds = (bonusDiscountLineItems) => {
 export const useAvailableBonusItemsForProduct = (productId) => {
     const {data: basket} = useCurrentBasket()
 
-    const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
+    const {
+        data: productsWithPromotions,
+        ruleBasedQualifyingProductsMap,
+        isLoading
+    } = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
     const ruleBasedPromotions = useRuleBasedPromotionIds(basket?.bonusDiscountLineItems)
@@ -174,7 +213,8 @@ export const useAvailableBonusItemsForProduct = (productId) => {
                   basket,
                   productId,
                   productsWithPromotions,
-                  ruleBasedProductsMap
+                  ruleBasedProductsMap,
+                  ruleBasedQualifyingProductsMap
               )
             : []
 
@@ -197,7 +237,11 @@ export const useAvailableBonusItemsForProduct = (productId) => {
 export const useRemainingAvailableBonusProductsForProduct = (productId) => {
     const {data: basket} = useCurrentBasket()
 
-    const {data: productsWithPromotions, isLoading} = useBasketProductsWithPromotions(basket)
+    const {
+        data: productsWithPromotions,
+        ruleBasedQualifyingProductsMap,
+        isLoading
+    } = useBasketProductsWithPromotions(basket)
 
     // Identify rule-based promotions and fetch their products
     const ruleBasedPromotions = useRuleBasedPromotionIds(basket?.bonusDiscountLineItems)
@@ -228,7 +272,8 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
                   basket,
                   productId,
                   productsWithPromotions,
-                  ruleBasedProductsMap
+                  ruleBasedProductsMap,
+                  ruleBasedQualifyingProductsMap
               )
             : []
 

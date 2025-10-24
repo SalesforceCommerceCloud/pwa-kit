@@ -12,7 +12,8 @@ describe('Bonus Product Cart Utilities', () => {
         bonusDiscountLineItems: [
             {
                 id: 'bonus-123',
-                promotionId: 'BonusProductOnOrderOfAmountAbove250'
+                promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                bonusProducts: [{productId: 'bonus-product-1'}] // List-based promotion
             }
         ],
         productItems: [
@@ -64,7 +65,8 @@ describe('Bonus Product Cart Utilities', () => {
                 {
                     id: 'bonus-123',
                     promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                    maxBonusItems: 4 // 4 total ties available
+                    maxBonusItems: 4, // 4 total ties available
+                    bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based promotion
                 }
             ],
             productItems: [
@@ -259,7 +261,8 @@ describe('Bonus Product Cart Utilities', () => {
                     {
                         id: 'bonus-123',
                         promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 4
+                        maxBonusItems: 4,
+                        bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                     }
                 ],
                 shipments: [
@@ -528,7 +531,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         // No shipments array
@@ -583,7 +587,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -647,7 +652,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -709,7 +715,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -802,7 +809,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -849,7 +857,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [],
@@ -888,7 +897,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -928,7 +938,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 0 // Zero max items
+                                maxBonusItems: 0, // Zero max items
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -980,7 +991,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1054,7 +1066,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1128,7 +1141,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1234,7 +1248,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 10
+                                maxBonusItems: 10,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1373,7 +1388,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1512,7 +1528,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: numItems * 2
+                                maxBonusItems: numItems * 2,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: largeShipments,

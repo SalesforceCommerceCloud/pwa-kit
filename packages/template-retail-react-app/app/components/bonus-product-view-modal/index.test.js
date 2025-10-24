@@ -130,7 +130,8 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
 
 // Mock bonus product hooks
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product/hooks', () => ({
-    useBonusProductCounts: jest.fn()
+    useBonusProductCounts: jest.fn(),
+    useRuleBasedPromotionIds: jest.fn(() => [])
 }))
 
 // Mock bonus product cart helpers

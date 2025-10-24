@@ -78,15 +78,26 @@ export const isRuleBasedPromotion = (bonusDiscountLineItem) => {
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to check
  * @param {Object} productsWithPromotions - Object mapping productId to product data with promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {boolean} True if product has automatic promotions only
  */
-export const isAutomaticPromotion = (basket, productId, productsWithPromotions) => {
+export const isAutomaticPromotion = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     if (!basket || !productId || !productsWithPromotions) {
         return false
     }
 
     // Get promotion IDs for this product
-    const promotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const promotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (promotionIds.length === 0) {
         return false
@@ -110,9 +121,15 @@ export const isAutomaticPromotion = (basket, productId, productsWithPromotions) 
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to check
  * @param {Object} productsWithPromotions - Object mapping productId to product data with promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {boolean} Whether the product should show bonus product selection
  */
-export const shouldShowBonusProductSelection = (basket, productId, productsWithPromotions) => {
+export const shouldShowBonusProductSelection = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     // First check if the product is eligible for bonus products
     const isEligible = isProductEligibleForBonusProducts(productId, productsWithPromotions)
     if (!isEligible) {
@@ -128,7 +145,12 @@ export const shouldShowBonusProductSelection = (basket, productId, productsWithP
 
     // Finally check if this is an automatic promotion
     // Automatic promotions don't need selection UI since products are added automatically
-    const isAutomatic = isAutomaticPromotion(basket, productId, productsWithPromotions)
+    const isAutomatic = isAutomaticPromotion(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
     if (isAutomatic) {
         return false
     }

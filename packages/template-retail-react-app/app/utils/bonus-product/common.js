@@ -40,28 +40,82 @@ export const getPromotionCalloutText = (product, promotionId) => {
 /**
  * Gets promotion IDs for a product from enhanced product promotion data.
  *
+ * This function handles both list-based and rule-based bonus product promotions:
+ * - List-based: Uses priceAdjustments on cart items to verify eligibility
+ * - Rule-based: Uses ruleBasedQualifyingProductsMap to check if variant qualifies
+ *
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to find promotion IDs for
  * @param {Object} productsWithPromotions - Products data fetched with promotion info
- * @returns {Array<string>} Array of promotion IDs for the product
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId -> Set of qualifying productIds for rule-based promotions
+ * @returns {Array<string>} Array of promotion IDs that this product actually qualifies for
  */
-export const getPromotionIdsForProduct = (basket, productId, productsWithPromotions) => {
+export const getPromotionIdsForProduct = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     if (!basket || !productId || !productsWithPromotions) {
         return []
     }
 
-    // Get promotion IDs from the enhanced product data (using productPromotions)
+    // Get potential promotion IDs from the enhanced product data (using productPromotions)
     const productWithPromotions = productsWithPromotions[productId]
-    if (productWithPromotions?.productPromotions) {
-        const promotionIds = productWithPromotions.productPromotions
-            .map((promotion) => promotion.promotionId)
-            .filter((id) => id != null)
-
-        return promotionIds
+    if (!productWithPromotions?.productPromotions) {
+        return []
     }
 
-    // If no enhanced product data is available, return empty array
-    return []
+    const potentialPromotionIds = productWithPromotions.productPromotions
+        .map((promotion) => promotion.promotionId)
+        .filter((id) => id != null)
+
+    // Filter promotion IDs based on actual eligibility
+    return potentialPromotionIds.filter((promotionId) => {
+        // Find the bonus discount line item for this promotion
+        const bonusDiscountItem = basket.bonusDiscountLineItems?.find(
+            (item) => item.promotionId === promotionId
+        )
+
+        if (!bonusDiscountItem) {
+            return false
+        }
+
+        // Determine if this is a rule-based promotion (empty bonusProducts array)
+        const isRuleBased =
+            !bonusDiscountItem.bonusProducts || bonusDiscountItem.bonusProducts.length === 0
+
+        if (isRuleBased) {
+            // For rule-based promotions: Check if this productId is in the qualifying products set
+            const qualifyingProductIds = ruleBasedQualifyingProductsMap[promotionId]
+
+            if (qualifyingProductIds) {
+                // First, check if the variant ID itself qualifies
+                let qualifies = qualifyingProductIds.has(productId)
+
+                // If not, check if the master product qualifies (fallback for variants)
+                if (!qualifies && productWithPromotions) {
+                    const masterProductId = productWithPromotions.master?.masterId
+
+                    if (masterProductId && masterProductId !== productId) {
+                        qualifies = qualifyingProductIds.has(masterProductId)
+                    }
+                }
+
+                return qualifies
+            }
+            // If we don't have qualifying products data yet, return false to be safe
+            return false
+        } else {
+            // For list-based promotions: Check if cart item has priceAdjustment with this promotionId
+            const cartItem = basket.productItems?.find((item) => item.productId === productId)
+            if (cartItem?.priceAdjustments) {
+                return cartItem.priceAdjustments.some((adj) => adj.promotionId === promotionId)
+            }
+            // If no priceAdjustments, assume it qualifies (backward compatibility)
+            return true
+        }
+    })
 }
 
 /**

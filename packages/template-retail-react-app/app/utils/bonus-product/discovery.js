@@ -75,20 +75,27 @@ const processBonusProducts = (discountItem, ruleBasedProductsMap, additionalFiel
  * @param {string} productId - The product ID to find available bonus items for
  * @param {Object} productsWithPromotions - Products data with promotion info
  * @param {Object} [ruleBasedProductsMap={}] - Map of promotionId to products array for rule-based promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Array<Object>} Array of available bonus discount line items
  */
 export const getAvailableBonusItemsForProduct = (
     basket,
     productId,
     productsWithPromotions,
-    ruleBasedProductsMap = {}
+    ruleBasedProductsMap = {},
+    ruleBasedQualifyingProductsMap = {}
 ) => {
     if (!basket || !productId || !productsWithPromotions) {
         return []
     }
 
     // Get promotion IDs using enhanced product data
-    const productPromotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const productPromotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (productPromotionIds.length === 0) {
         return []
@@ -129,13 +136,15 @@ export const getAvailableBonusItemsForProduct = (
  * @param {string} productId - The product ID to find remaining bonus products for
  * @param {Object} productsWithPromotions - Products data with promotion info
  * @param {Object} [ruleBasedProductsMap={}] - Map of promotionId to products array for rule-based promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Object} Object containing bonusItems array and aggregated statistics
  */
 export const getRemainingAvailableBonusProductsForProduct = (
     basket,
     productId,
     productsWithPromotions,
-    ruleBasedProductsMap = {}
+    ruleBasedProductsMap = {},
+    ruleBasedQualifyingProductsMap = {}
 ) => {
     if (!basket || !productId || !productsWithPromotions) {
         return {
@@ -147,7 +156,12 @@ export const getRemainingAvailableBonusProductsForProduct = (
     }
 
     // Get promotion IDs for this product
-    const productPromotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const productPromotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (productPromotionIds.length === 0) {
         return {

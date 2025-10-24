@@ -198,13 +198,18 @@ describe('Bonus Product Discovery', () => {
             ]
         }
 
+        const mockRuleBasedQualifyingProductsMap = {
+            'rule-based-promo': new Set(['prod-456']) // prod-456 qualifies for the promotion
+        }
+
         describe('getAvailableBonusItemsForProduct with rule-based products', () => {
             test('returns rule-based products from ruleBasedProductsMap', () => {
                 const result = discoveryUtils.getAvailableBonusItemsForProduct(
                     mockRuleBasedBasket,
                     'prod-456',
                     mockProductsForRuleBased,
-                    mockRuleBasedProductsMap
+                    mockRuleBasedProductsMap,
+                    mockRuleBasedQualifyingProductsMap
                 )
 
                 expect(result).toHaveLength(3)
@@ -258,11 +263,17 @@ describe('Bonus Product Discovery', () => {
                     }
                 }
 
+                const mixedQualifyingMap = {
+                    'list-based-promo': new Set(['prod-789']),
+                    'rule-based-promo': new Set(['prod-789'])
+                }
+
                 const result = discoveryUtils.getAvailableBonusItemsForProduct(
                     mixedBasket,
                     'prod-789',
                     mixedProducts,
-                    mockRuleBasedProductsMap
+                    mockRuleBasedProductsMap,
+                    mixedQualifyingMap
                 )
 
                 expect(result).toHaveLength(4) // 1 list-based + 3 rule-based
@@ -279,7 +290,8 @@ describe('Bonus Product Discovery', () => {
                     mockRuleBasedBasket,
                     'prod-456',
                     mockProductsForRuleBased,
-                    mockRuleBasedProductsMap
+                    mockRuleBasedProductsMap,
+                    mockRuleBasedQualifyingProductsMap
                 )
 
                 expect(result.bonusItems).toHaveLength(3)
@@ -307,7 +319,8 @@ describe('Bonus Product Discovery', () => {
                     basketWithBonusItems,
                     'prod-456',
                     mockProductsForRuleBased,
-                    mockRuleBasedProductsMap
+                    mockRuleBasedProductsMap,
+                    mockRuleBasedQualifyingProductsMap
                 )
 
                 expect(result.bonusItems).toEqual([])
@@ -352,11 +365,17 @@ describe('Bonus Product Discovery', () => {
                     }
                 }
 
+                const mixedQualifyingMap = {
+                    'list-based-promo': new Set(['prod-789']),
+                    'rule-based-promo': new Set(['prod-789'])
+                }
+
                 const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
                     mixedBasket,
                     'prod-789',
                     mixedProducts,
-                    mockRuleBasedProductsMap
+                    mockRuleBasedProductsMap,
+                    mixedQualifyingMap
                 )
 
                 // List-based has 1 remaining, rule-based has 3 remaining
@@ -670,11 +689,16 @@ describe('Bonus Product Discovery', () => {
                 ]
             }
 
+            const qualifyingMap = {
+                CategoryBonusRule: new Set(['qualifying-product-Y'])
+            }
+
             const result = discoveryUtils.getAvailableBonusItemsForProduct(
                 realRuleBasedBasket,
                 'qualifying-product-Y',
                 realProducts,
-                ruleBasedProductsMap
+                ruleBasedProductsMap,
+                qualifyingMap
             )
 
             expect(result).toHaveLength(3)
@@ -751,11 +775,17 @@ describe('Bonus Product Discovery', () => {
                 ]
             }
 
+            const qualifyingMap = {
+                ListBasedPromo: new Set(['qualifying-prod-1']),
+                RuleBasedPromo: new Set(['qualifying-prod-1'])
+            }
+
             const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
                 complexBasket,
                 'qualifying-prod-1',
                 complexProducts,
-                ruleBasedMap
+                ruleBasedMap,
+                qualifyingMap
             )
 
             // List-based: 2 max, 1 selected = 1 remaining
@@ -838,11 +868,17 @@ describe('Bonus Product Discovery', () => {
                 RulePromo: [{productId: 'rule-prod-1'}, {productId: 'rule-prod-2'}]
             }
 
+            const qualifyingMap = {
+                ListPromo: new Set(['qualifying']),
+                RulePromo: new Set(['qualifying'])
+            }
+
             const result = discoveryUtils.getRemainingAvailableBonusProductsForProduct(
                 fullBasket,
                 'qualifying',
                 fullProducts,
-                ruleMap
+                ruleMap,
+                qualifyingMap
             )
 
             expect(result.bonusItems).toEqual([])
