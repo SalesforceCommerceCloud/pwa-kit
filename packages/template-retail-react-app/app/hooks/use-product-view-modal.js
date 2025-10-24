@@ -18,9 +18,10 @@ import {useProduct} from '@salesforce/commerce-sdk-react'
  * This hook is responsible for fetching a product detail based on the variation selection
  * and managing the variation params on the url when the modal is open/close
  * @param initialProduct - the initial product when the modal is first open
+ * @param queryOptions - optional React Query options to pass to useProduct
  * @returns object
  */
-export const useProductViewModal = (initialProduct) => {
+export const useProductViewModal = (initialProduct, queryOptions = {}) => {
     const location = useLocation()
     const history = useHistory()
     const intl = useIntl()
@@ -32,6 +33,7 @@ export const useProductViewModal = (initialProduct) => {
         {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
+            ...queryOptions,
             select: (data) => {
                 // if the product id is the same as the initial product id,
                 // then merge the data with the initial product to be able to show correct quantity in the modal

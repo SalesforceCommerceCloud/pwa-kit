@@ -60,7 +60,7 @@ const BonusProductViewModal = ({
         }
     }, [product])
 
-    const productViewModalData = useProductViewModal(safeProduct)
+    const productViewModalData = useProductViewModal(safeProduct, {keepPreviousData: true})
 
     // Keep a stable reference to the last successfully loaded product
     // This prevents constant re-renders while fetching
