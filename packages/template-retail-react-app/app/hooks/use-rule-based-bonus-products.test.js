@@ -11,43 +11,14 @@ import PropTypes from 'prop-types'
 import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
-// Mock fetch globally
-const mockFetch = jest.fn()
-global.fetch = mockFetch
-
-// Helper function to create a complete mock response
-const createMockResponse = (data, options = {}) => ({
-    ok: options.ok !== undefined ? options.ok : true,
-    status: options.status || 200,
-    statusText: options.statusText || 'OK',
-    headers: new Map(),
-    json: async () => data,
-    text: async () => (typeof data === 'string' ? data : JSON.stringify(data)),
-    clone: function () {
-        return this
-    }
-})
+// Mock useProductSearch hook
+const mockUseProductSearch = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useCommerceApi: jest.fn(() => ({
-            shopperSearch: {
-                clientConfig: {
-                    parameters: {
-                        siteId: 'site-1',
-                        locale: 'en-GB',
-                        currency: 'USD',
-                        organizationId: 'f_ecom_zzrf_001',
-                        shortCode: 'test-shortcode'
-                    }
-                }
-            }
-        })),
-        useAccessToken: jest.fn(() => ({
-            getTokenWhenReady: jest.fn().mockResolvedValue('mock-token')
-        }))
+        useProductSearch: (...args) => mockUseProductSearch(...args)
     }
 })
 
@@ -84,8 +55,7 @@ MockComponent.propTypes = {
 describe('useRuleBasedBonusProducts', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        // Reset fetch mock before each test
-        mockFetch.mockClear()
+        mockUseProductSearch.mockClear()
     })
 
     test('fetches products successfully using useProductSearch', async () => {
@@ -97,7 +67,11 @@ describe('useRuleBasedBonusProducts', () => {
             total: 2
         }
 
-        mockFetch.mockResolvedValueOnce(createMockResponse(mockData))
+        mockUseProductSearch.mockReturnValue({
+            data: mockData,
+            isLoading: false,
+            error: null
+        })
 
         renderWithProviders(<MockComponent promotionId="test-promotion-id" />)
 
@@ -108,62 +82,50 @@ describe('useRuleBasedBonusProducts', () => {
             expect(screen.getByTestId('product-product-2')).toHaveTextContent('Bonus Product 2')
         })
 
-        // Verify fetch was called
-        expect(mockFetch).toHaveBeenCalled()
-
-        // Get the actual call arguments
-        const fetchCall = mockFetch.mock.calls[0]
-        const firstArg = fetchCall[0]
-
-        // The first argument might be a URL string or a Request object
-        // If it's a Request object, get the URL from it
-        const url = typeof firstArg === 'string' ? firstArg : firstArg.url
-
-        // Check the URL contains the expected parameters
-        expect(url).toMatch(/refine=pmid%3Dtest-promotion-id/)
-
-        // Verify fetch was called with correct authorization
-        expect(mockFetch).toHaveBeenCalled()
+        // Verify useProductSearch was called with correct parameters
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[0].parameters.refine).toEqual(['pmid=test-promotion-id', 'pmpt=bonus'])
+        expect(call[0].parameters.limit).toBe(25)
+        expect(call[0].parameters.offset).toBe(0)
     })
 
     test('does not fetch when enabled is false', async () => {
+        mockUseProductSearch.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: null
+        })
+
         renderWithProviders(<MockComponent promotionId="test-promotion-id" enabled={false} />)
 
-        // Wait a bit for React Query to settle
-        await waitFor(
-            () => {
-                // When disabled, the component should eventually show products-count or stay in loading
-                // But fetch should never be called
-                expect(mockFetch).not.toHaveBeenCalled()
-            },
-            {timeout: 100}
-        )
+        await waitFor(() => {
+            expect(screen.getByTestId('products-count')).toHaveTextContent('0')
+        })
 
-        // Give it a bit more time to ensure it settles to the correct state
-        await new Promise((resolve) => setTimeout(resolve, 50))
-
-        // Most importantly, verify fetch was never called
-        expect(mockFetch).not.toHaveBeenCalled()
+        // Verify useProductSearch was called with enabled: false
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[1].enabled).toBe(false)
     })
 
     test('does not fetch when promotionId is missing', async () => {
+        mockUseProductSearch.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: null
+        })
+
         renderWithProviders(<MockComponent promotionId="" />)
 
-        // Wait a bit for React Query to settle
-        await waitFor(
-            () => {
-                // When promotionId is empty, the query is disabled
-                // fetch should never be called
-                expect(mockFetch).not.toHaveBeenCalled()
-            },
-            {timeout: 100}
-        )
+        await waitFor(() => {
+            expect(screen.getByTestId('products-count')).toHaveTextContent('0')
+        })
 
-        // Give it a bit more time to ensure it settles to the correct state
-        await new Promise((resolve) => setTimeout(resolve, 50))
-
-        // Most importantly, verify fetch was never called
-        expect(mockFetch).not.toHaveBeenCalled()
+        // Verify useProductSearch was called with enabled: false (because promotionId is empty)
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[1].enabled).toBe(false)
     })
 
     test('includes pagination parameters when provided', async () => {
@@ -172,7 +134,11 @@ describe('useRuleBasedBonusProducts', () => {
             total: 100
         }
 
-        mockFetch.mockResolvedValueOnce(createMockResponse(mockData))
+        mockUseProductSearch.mockReturnValue({
+            data: mockData,
+            isLoading: false,
+            error: null
+        })
 
         renderWithProviders(
             <MockComponent promotionId="test-promotion-id" limit={50} offset={25} />
@@ -182,29 +148,21 @@ describe('useRuleBasedBonusProducts', () => {
             expect(screen.getByTestId('products-total')).toHaveTextContent('100')
         })
 
-        // Verify fetch was called
-        expect(mockFetch).toHaveBeenCalled()
-
-        // Get the actual call arguments
-        const fetchCall = mockFetch.mock.calls[0]
-        const firstArg = fetchCall[0]
-
-        // The first argument might be a URL string or a Request object
-        const url = typeof firstArg === 'string' ? firstArg : firstArg.url
-
-        // Check the URL contains the expected parameters
-        expect(url).toMatch(/limit=50/)
-        expect(url).toMatch(/offset=25/)
+        // Verify useProductSearch was called with correct parameters
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[0].parameters.limit).toBe(50)
+        expect(call[0].parameters.offset).toBe(25)
     })
 
     test('handles API errors gracefully', async () => {
-        mockFetch.mockResolvedValueOnce(
-            createMockResponse('Internal Server Error', {
-                ok: false,
-                status: 500,
-                statusText: 'Internal Server Error'
-            })
-        )
+        const mockError = new Error('HTTP error! status: 500')
+
+        mockUseProductSearch.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: mockError
+        })
 
         renderWithProviders(<MockComponent promotionId="test-promotion-id" />)
 
@@ -216,13 +174,11 @@ describe('useRuleBasedBonusProducts', () => {
     })
 
     test('shows loading state', async () => {
-        // Mock a slow fetch to keep loading state
-        mockFetch.mockImplementationOnce(
-            () =>
-                new Promise((resolve) =>
-                    setTimeout(() => resolve(createMockResponse({hits: [], total: 0})), 1000)
-                )
-        )
+        mockUseProductSearch.mockReturnValue({
+            data: undefined,
+            isLoading: true,
+            error: null
+        })
 
         renderWithProviders(<MockComponent promotionId="test-promotion-id" />)
 
@@ -232,7 +188,11 @@ describe('useRuleBasedBonusProducts', () => {
     })
 
     test('returns empty array when no products found', async () => {
-        mockFetch.mockResolvedValueOnce(createMockResponse({hits: [], total: 0}))
+        mockUseProductSearch.mockReturnValue({
+            data: {hits: [], total: 0},
+            isLoading: false,
+            error: null
+        })
 
         renderWithProviders(<MockComponent promotionId="test-promotion-id" />)
 
@@ -248,7 +208,11 @@ describe('useRuleBasedBonusProducts', () => {
             total: 1
         }
 
-        mockFetch.mockResolvedValueOnce(createMockResponse(mockData))
+        mockUseProductSearch.mockReturnValue({
+            data: mockData,
+            isLoading: false,
+            error: null
+        })
 
         renderWithProviders(<MockComponent promotionId="test-promotion-id" />)
 
@@ -256,19 +220,11 @@ describe('useRuleBasedBonusProducts', () => {
             expect(screen.getByTestId('products-count')).toHaveTextContent('1')
         })
 
-        // Verify fetch was called
-        expect(mockFetch).toHaveBeenCalled()
-
-        // Get the actual call arguments
-        const fetchCall = mockFetch.mock.calls[0]
-        const firstArg = fetchCall[0]
-
-        // The first argument might be a URL string or a Request object
-        const url = typeof firstArg === 'string' ? firstArg : firstArg.url
-
-        // Check the URL contains the default parameters
-        expect(url).toMatch(/limit=25/)
-        expect(url).toMatch(/offset=0/)
+        // Verify useProductSearch was called with default parameters
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[0].parameters.limit).toBe(25)
+        expect(call[0].parameters.offset).toBe(0)
     })
 
     test('handles different promotionIds correctly', async () => {
@@ -280,7 +236,11 @@ describe('useRuleBasedBonusProducts', () => {
             total: 2
         }
 
-        mockFetch.mockResolvedValueOnce(createMockResponse(mockDataPromo1))
+        mockUseProductSearch.mockReturnValue({
+            data: mockDataPromo1,
+            isLoading: false,
+            error: null
+        })
 
         renderWithProviders(<MockComponent promotionId="promotion-1" />)
 
@@ -291,17 +251,9 @@ describe('useRuleBasedBonusProducts', () => {
             expect(screen.getByTestId('product-promo1-product-2')).toBeInTheDocument()
         })
 
-        // Verify fetch was called
-        expect(mockFetch).toHaveBeenCalled()
-
-        // Get the actual call arguments
-        const fetchCall = mockFetch.mock.calls[0]
-        const firstArg = fetchCall[0]
-
-        // The first argument might be a URL string or a Request object
-        const url = typeof firstArg === 'string' ? firstArg : firstArg.url
-
-        // Check the URL contains the expected promotion ID
-        expect(url).toMatch(/refine=pmid%3Dpromotion-1/)
+        // Verify useProductSearch was called with correct promotion ID
+        expect(mockUseProductSearch).toHaveBeenCalled()
+        const call = mockUseProductSearch.mock.calls[0]
+        expect(call[0].parameters.refine).toEqual(['pmid=promotion-1', 'pmpt=bonus'])
     })
 })
