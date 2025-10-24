@@ -65,7 +65,7 @@ const BonusProductViewModal = ({
     // Keep a stable reference to the last successfully loaded product
     // This prevents constant re-renders while fetching
     const lastLoadedProductRef = React.useRef(productViewModalData.product)
-    
+
     React.useLayoutEffect(() => {
         if (productViewModalData.product && !productViewModalData.isFetching) {
             lastLoadedProductRef.current = productViewModalData.product
