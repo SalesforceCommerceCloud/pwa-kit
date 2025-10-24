@@ -17,6 +17,12 @@ import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus
 import {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 
 /**
+ * Maximum number of rule-based bonus products to fetch from the API.
+ * This is the API limit for the productSearch endpoint.
+ */
+const RULE_BASED_BONUS_PRODUCTS_API_LIMIT = 50
+
+/**
  * React hooks for bonus product data fetching and state management.
  *
  * This module provides React hooks that integrate with the Commerce SDK and other
@@ -138,7 +144,7 @@ export const useAvailableBonusItemsForProduct = (productId) => {
         ruleBasedPromotions[0] || '',
         {
             enabled: ruleBasedPromotions.length > 0,
-            limit: 50
+            limit: RULE_BASED_BONUS_PRODUCTS_API_LIMIT
         }
     )
 
@@ -199,7 +205,7 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
         ruleBasedPromotions[0] || '',
         {
             enabled: ruleBasedPromotions.length > 0,
-            limit: 50
+            limit: RULE_BASED_BONUS_PRODUCTS_API_LIMIT
         }
     )
 

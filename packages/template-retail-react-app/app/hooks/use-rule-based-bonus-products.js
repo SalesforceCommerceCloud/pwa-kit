@@ -7,6 +7,7 @@
 
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 import {useMemo} from 'react'
+import {DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Hook to fetch rule-based bonus products using ShopperSearch productSearch endpoint.
@@ -21,8 +22,8 @@ import {useMemo} from 'react'
  * @param {string} promotionId - The promotion ID to fetch bonus products for
  * @param {Object} options - Additional options
  * @param {boolean} [options.enabled=true] - Whether to fetch products
- * @param {number} [options.limit=25] - Maximum number of products to return
- * @param {number} [options.offset=0] - Offset for pagination
+ * @param {number} [options.limit] - Maximum number of products to return (defaults to DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS.limit)
+ * @param {number} [options.offset] - Offset for pagination (defaults to DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS.offset)
  * @returns {Object} React Query result with products data
  *
  * @example
@@ -39,8 +40,8 @@ export const useRuleBasedBonusProducts = (promotionId, {enabled = true, limit, o
         {
             parameters: {
                 refine,
-                limit: limit || 25,
-                offset: offset || 0
+                limit: limit || DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS.limit,
+                offset: offset || DEFAULT_BONUS_PRODUCT_SEARCH_PARAMS.offset
             }
         },
         {
