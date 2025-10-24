@@ -43,7 +43,12 @@ export const useDerivedProduct = (
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle, urlParamPrefix)
     const isStandardProduct = product?.type?.item
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle, urlParamPrefix)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        urlParamPrefix
+    )
     const variationAttributes = useVariationAttributes(
         product,
         isProductPartOfSet,

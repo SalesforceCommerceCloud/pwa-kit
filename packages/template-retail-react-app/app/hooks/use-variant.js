@@ -26,7 +26,12 @@ export const useVariant = (
     urlParamPrefix = ''
 ) => {
     const {variants = []} = product
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle, urlParamPrefix)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        urlParamPrefix
+    )
 
     // Get a filtered array of variants. The resulting array will only have variants
     // which have all the current variation params values set.

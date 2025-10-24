@@ -57,9 +57,9 @@ export const buildVariantValueHref = ({
     // Prefix the params if needed
     const prefixedParams = urlParamPrefix
         ? Object.entries(newParams).reduce((acc, [key, value]) => {
-            acc[`${urlParamPrefix}${key}`] = value
-            return acc
-        }, {})
+              acc[`${urlParamPrefix}${key}`] = value
+              return acc
+          }, {})
         : newParams
 
     if (isProductPartOfSet || isProductPartOfBundle) {
@@ -112,7 +112,12 @@ export const useVariationAttributes = (
 ) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle, urlParamPrefix)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        urlParamPrefix
+    )
     const existingParams = usePDPSearchParams(product.id)
     const isBundleChildVariant = isProductPartOfBundle && product?.type?.variant
 

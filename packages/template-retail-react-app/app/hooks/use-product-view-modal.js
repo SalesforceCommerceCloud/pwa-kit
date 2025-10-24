@@ -66,8 +66,15 @@ export const useProductViewModal = (initialProduct, {urlParamPrefix = ''} = {}) 
         // when the modal is first mounted,
         // clean up the params in case there are variant params not related to current product
         const cleanUpVariantParams = () => {
-            const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
-            const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove, urlParamPrefix)
+            const paramToRemove = [
+                ...(product?.variationAttributes?.map(({id}) => id) ?? []),
+                'pid'
+            ]
+            const updatedParams = removeQueryParamsFromPath(
+                `${location.search}`,
+                paramToRemove,
+                urlParamPrefix
+            )
             history.replace({search: updatedParams})
         }
 
@@ -76,7 +83,6 @@ export const useProductViewModal = (initialProduct, {urlParamPrefix = ''} = {}) 
             cleanUpVariantParams()
         }
         // Only run on mount and unmount - urlParamPrefix is stable
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {
