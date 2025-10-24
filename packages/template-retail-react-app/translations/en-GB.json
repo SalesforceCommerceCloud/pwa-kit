@@ -1514,8 +1514,14 @@
   "search.suggestions.didYouMean": {
     "defaultMessage": "Did you mean"
   },
+  "search.suggestions.popular": {
+    "defaultMessage": "Popular Searches"
+  },
   "search.suggestions.products": {
     "defaultMessage": "Products"
+  },
+  "search.suggestions.recent": {
+    "defaultMessage": "Recent Searches"
   },
   "search.suggestions.viewAll": {
     "defaultMessage": "View All"

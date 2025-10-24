@@ -3621,10 +3621,22 @@
       "value": "Did you mean"
     }
   ],
+  "search.suggestions.popular": [
+    {
+      "type": 0,
+      "value": "Popular Searches"
+    }
+  ],
   "search.suggestions.products": [
     {
       "type": 0,
       "value": "Products"
+    }
+  ],
+  "search.suggestions.recent": [
+    {
+      "type": 0,
+      "value": "Recent Searches"
     }
   ],
   "search.suggestions.viewAll": [

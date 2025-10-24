@@ -95,7 +95,7 @@ The MCP server supports two ways to configure your Salesforce Commerce Cloud cre
 
 #### Option 1: dw.json Configuration File (Recommended)
 
-Create a `dw.json` file under your project root directory with your SFCC credentials:
+Create a `dw.json` file under your PWA Kit project directory with your SFCC credentials:
 
 ```json
 {
@@ -108,7 +108,7 @@ Create a `dw.json` file under your project root directory with your SFCC credent
 }
 ```
 
-If `dw.json` doesn't live directly under your project root directory, then update your `mcp.json` to point to the `dw.json` file path:
+If `dw.json` doesn't live under your PWA Kit project directory, then update your `mcp.json` to point to the `dw.json` file path:
 
 ```json
 {
@@ -123,6 +123,11 @@ If `dw.json` doesn't live directly under your project root directory, then updat
   }
 }
 ```
+This is the priority when fetching dw.json locally:
+  1. dw.json path supplied from mcp settings args (if set)
+  2. PWA_STOREFRONT_APP_PATH/dw.json 
+  3. PWA_STOREFRONT_APP_PATH/../dw.json 
+  4. PWA_STOREFRONT_APP_PATH/../../dw.json
 
 #### Option 2: Environment Variables
 
