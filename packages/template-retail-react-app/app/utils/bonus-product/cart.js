@@ -67,6 +67,37 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
 }
 
 /**
+ * Helper function to aggregate bonus product quantities by productId.
+ * Takes an array of bonus product items (potentially with duplicate productIds)
+ * and returns an array with aggregated quantities.
+ *
+ * @param {Array<Object>} bonusItems - Array of bonus product items from cart
+ * @returns {Array<Object>} Array of bonus products with aggregated quantities
+ * @private
+ */
+const aggregateBonusProductQuantities = (bonusItems) => {
+    const productQuantityMap = new Map()
+    
+    bonusItems.forEach((item) => {
+        const existingQuantity = productQuantityMap.get(item.productId) || 0
+        productQuantityMap.set(item.productId, existingQuantity + (item.quantity || 0))
+    })
+
+    const result = []
+    productQuantityMap.forEach((quantity, productId) => {
+        const sampleItem = bonusItems.find((item) => item.productId === productId)
+        if (sampleItem) {
+            result.push({
+                ...sampleItem,
+                quantity: quantity
+            })
+        }
+    })
+
+    return result
+}
+
+/**
  * Gets bonus products allocated to a specific cart item using capacity-based sequential allocation.
  * This function distributes available bonus products across qualifying cart items based on:
  * - Individual item capacity (calculated from promotion rules and item quantity)
@@ -160,24 +191,7 @@ export const getBonusProductsForSpecificCartItem = (
 
     // If only one qualifying item (this item), it gets all bonus products
     if (qualifyingCartItems.length === 1) {
-        // Aggregate quantities for products with the same productId
-        const productQuantityMap = new Map()
-        bonusProductsInCart.forEach((item) => {
-            const existingQuantity = productQuantityMap.get(item.productId) || 0
-            productQuantityMap.set(item.productId, existingQuantity + (item.quantity || 0))
-        })
-
-        // Convert back to array format with aggregated quantities
-        const result = []
-        productQuantityMap.forEach((quantity, productId) => {
-            const sampleItem = bonusProductsInCart.find((item) => item.productId === productId)
-            result.push({
-                ...sampleItem,
-                quantity: quantity
-            })
-        })
-
-        return result
+        return aggregateBonusProductQuantities(bonusProductsInCart)
     }
 
     // Calculate total qualifying quantity across all items
@@ -256,25 +270,7 @@ export const getBonusProductsForSpecificCartItem = (
     const targetAllocation = allocations.get(targetCartItem.itemId) || []
 
     // Re-aggregate quantities for the same productId
-    const productQuantityMap = new Map()
-    targetAllocation.forEach((item) => {
-        const existingQuantity = productQuantityMap.get(item.productId) || 0
-        productQuantityMap.set(item.productId, existingQuantity + 1)
-    })
-
-    // Convert back to array format with aggregated quantities
-    const result = []
-    productQuantityMap.forEach((quantity, productId) => {
-        const sampleItem = targetAllocation.find((item) => item.productId === productId)
-        if (sampleItem) {
-            result.push({
-                ...sampleItem,
-                quantity: quantity
-            })
-        }
-    })
-
-    return result
+    return aggregateBonusProductQuantities(targetAllocation)
 }
 
 /**
