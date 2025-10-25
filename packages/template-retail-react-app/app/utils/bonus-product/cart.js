@@ -77,7 +77,7 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
  */
 const aggregateBonusProductQuantities = (bonusItems) => {
     const productQuantityMap = new Map()
-    
+
     bonusItems.forEach((item) => {
         const existingQuantity = productQuantityMap.get(item.productId) || 0
         productQuantityMap.set(item.productId, existingQuantity + (item.quantity || 0))

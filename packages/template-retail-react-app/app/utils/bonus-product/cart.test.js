@@ -314,7 +314,8 @@ describe('Bonus Product Cart Utilities', () => {
                 expect(secondVariantResult[0].quantity).toBe(2)
 
                 // Total should equal actual bonus products in cart
-                const totalAllocated = firstVariantResult[0].quantity + secondVariantResult[0].quantity
+                const totalAllocated =
+                    firstVariantResult[0].quantity + secondVariantResult[0].quantity
                 expect(totalAllocated).toBe(4)
             })
         })
