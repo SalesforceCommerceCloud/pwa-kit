@@ -27,10 +27,6 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
-    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
-}))
-
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
     useCustomerId: jest.fn(() => 'test-customer-id'),
@@ -106,7 +102,9 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
             product.productPromotions?.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
         )
     }),
-    shouldShowBonusProductSelection: jest.fn(() => true)
+    shouldShowBonusProductSelection: jest.fn(() => true),
+    getPromotionIdsForProduct: jest.fn(() => ['promo-123']),
+    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
 }))
 
 const MOCK_PRODUCT = {

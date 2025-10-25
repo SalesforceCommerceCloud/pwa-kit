@@ -16,7 +16,10 @@ import {
     getRemainingAvailableBonusProductsForProduct,
     findAvailableBonusDiscountLineItemIds
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
-import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
+import {
+    useBonusProductCounts,
+    useRuleBasedPromotionIds
+} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
@@ -41,6 +44,19 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useCustomerProductLists: jest.fn(() => ({data: null})),
     useShopperCustomersMutation: jest.fn(() => ({
         mutateAsync: jest.fn()
+    })),
+    useProductSearch: jest.fn(() => ({
+        data: null,
+        isLoading: false,
+        error: null
+    })),
+    useCommerceApi: jest.fn(() => ({
+        shopperSearch: {
+            productSearch: jest.fn()
+        }
+    })),
+    useAccessToken: jest.fn(() => ({
+        getTokenWhenReady: jest.fn().mockResolvedValue('mock-token')
     })),
     CommerceApiProvider: ({children}) => children
 }))
@@ -117,7 +133,8 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
 
 // Mock bonus product hooks
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product/hooks', () => ({
-    useBonusProductCounts: jest.fn()
+    useBonusProductCounts: jest.fn(),
+    useRuleBasedPromotionIds: jest.fn(() => [])
 }))
 
 // Mock bonus product cart helpers
@@ -170,6 +187,9 @@ beforeEach(() => {
         finalSelectedBonusItems: 2,
         finalMaxBonusItems: 5
     })
+
+    // Mock useRuleBasedPromotionIds to return empty array by default
+    useRuleBasedPromotionIds.mockReturnValue([])
 
     // Mock findAvailableBonusDiscountLineItemIds to return array of pairs
     findAvailableBonusDiscountLineItemIds.mockReturnValue([['bonus-1', 1]])

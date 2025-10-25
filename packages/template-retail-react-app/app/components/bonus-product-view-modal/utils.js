@@ -14,25 +14,67 @@
  * Creates a function to get the remaining bonus quantity for a specific product.
  * This is a factory function that creates the getRemainingBonusQuantity function with the necessary dependencies.
  *
+ * For rule-based promotions, we use the promotionId directly from the basket to calculate remaining capacity.
+ * This avoids issues with productSearch data that doesn't have productPromotions.
+ *
  * @param {Object} basket - The current basket object
  * @param {Object} product - The product object
  * @param {Function} getRemainingAvailableBonusProductsForProduct - The utility function to get remaining bonus data
+ * @param {string} promotionId - The promotion ID for this bonus product
  * @returns {Function} - Function that returns remaining bonus quantity or null
  */
 export const createGetRemainingBonusQuantity = (
     basket,
     product,
-    getRemainingAvailableBonusProductsForProduct
+    getRemainingAvailableBonusProductsForProduct,
+    promotionId
 ) => {
     return () => {
-        if (basket && product) {
-            const bonusData = getRemainingAvailableBonusProductsForProduct(basket, product.id, {
-                [product.id]: product
-            })
-            // Return remaining capacity: total allowed - already in cart
-            return bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems
+        if (!basket || !product) {
+            return null
         }
-        return null
+
+        // If we have a promotionId, use it directly to calculate remaining capacity
+        // This works for both list-based and rule-based promotions
+        // IMPORTANT: Sum up ALL bonusDiscountLineItems with this promotionId (one per qualifying product)
+        if (promotionId && basket.bonusDiscountLineItems) {
+            // Find all bonus discount line items for this promotion
+            const promotionBonusItems = basket.bonusDiscountLineItems.filter(
+                (item) => item.promotionId === promotionId
+            )
+
+            if (promotionBonusItems.length > 0) {
+                // Sum up max items for this promotion (e.g., 3 qualifying products × 2 bonus each = 6 total)
+                const maxBonusItems = promotionBonusItems.reduce(
+                    (sum, item) => sum + (item.maxBonusItems || 0),
+                    0
+                )
+
+                // Get IDs of all bonus discount line items for this promotion
+                const promotionBonusLineItemIds = promotionBonusItems
+                    .map((item) => item.id)
+                    .filter(Boolean)
+
+                // Count selected items for this promotion (all bonus items with this promotion's bonusDiscountLineItemIds)
+                const selectedQuantity =
+                    basket.productItems
+                        ?.filter(
+                            (cartItem) =>
+                                cartItem.bonusProductLineItem &&
+                                promotionBonusLineItemIds.includes(cartItem.bonusDiscountLineItemId)
+                        )
+                        .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
+
+                return Math.max(0, maxBonusItems - selectedQuantity)
+            }
+        }
+
+        // Fallback: use the discovery function (for legacy/list-based without promotionId)
+        const bonusData = getRemainingAvailableBonusProductsForProduct(basket, product.id, {
+            [product.id]: product
+        })
+
+        return Math.max(0, bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems)
     }
 }
 

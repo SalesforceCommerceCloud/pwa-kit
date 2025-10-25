@@ -89,6 +89,7 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading, derivedData} = useCurrentBasket()
+
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
@@ -127,14 +128,16 @@ const Cart = () => {
         updateShipmentsWithoutMethods,
         getItemsForShipment,
         findOrCreatePickupShipment,
-        findOrCreateDeliveryShipment,
         moveItemsToPickupShipment
     } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
 
     // Bonus Product Logic
-    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} =
-        useBasketProductsWithPromotions(basket)
+    const {
+        data: productsWithPromotions,
+        ruleBasedQualifyingProductsMap,
+        isLoading: isPromotionDataLoading
+    } = useBasketProductsWithPromotions(basket)
     const bonusProductViewModal = useBonusProductViewModal()
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
 
@@ -873,13 +876,6 @@ const Cart = () => {
         return result
     }, [basket?.shipments, basket?.productItems, storeData])
 
-    // Get all qualifying products (non-bonus) for bonus product grouping
-    const allQualifyingProducts = useMemo(() => {
-        return (
-            basket?.productItems?.filter((productItem) => !productItem.bonusProductLineItem) || []
-        )
-    }, [basket?.productItems])
-
     // Helper function to get shipment info for a product
     const getShipmentInfoForProduct = (productItem) => {
         const shipment = basket?.shipments?.find((s) => s.shipmentId === productItem.shipmentId)
@@ -943,8 +939,12 @@ const Cart = () => {
         // Check if this product has bonus products associated with it
         // If it does, hide the delivery group selector
         const hasBonusProducts =
-            getBonusProductsForSpecificCartItem(basket, productItem, productsWithPromotions)
-                .length > 0
+            getBonusProductsForSpecificCartItem(
+                basket,
+                productItem,
+                productsWithPromotions,
+                ruleBasedQualifyingProductsMap
+            ).length > 0
 
         if (hasBonusProducts) {
             return null
@@ -1064,6 +1064,9 @@ const Cart = () => {
                                                     }
                                                     basket={basket}
                                                     productsWithPromotions={productsWithPromotions}
+                                                    ruleBasedQualifyingProductsMap={
+                                                        ruleBasedQualifyingProductsMap
+                                                    }
                                                     isPromotionDataLoading={isPromotionDataLoading}
                                                     renderProductItem={(
                                                         productItem,
