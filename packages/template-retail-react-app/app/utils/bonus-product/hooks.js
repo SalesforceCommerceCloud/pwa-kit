@@ -142,10 +142,14 @@ export const useBasketProductsWithPromotions = (basket) => {
         }
     }, [firstRuleBasedPromotionId, ruleBasedQualifyingIds])
 
+    // Only consider isLoadingQualifying if there are actually rule-based promotions
+    const hasRuleBasedPromotions = ruleBasedPromotionIds.length > 0
+    const finalIsLoading = isPending || (hasRuleBasedPromotions && isLoadingQualifying)
+
     return {
         data: productsResult || {},
         ruleBasedQualifyingProductsMap,
-        isLoading: isPending || isLoadingQualifying,
+        isLoading: finalIsLoading,
         hasPromotionData: Object.values(productsResult || {}).some(
             (product) => product.productPromotions && product.productPromotions.length > 0
         )
