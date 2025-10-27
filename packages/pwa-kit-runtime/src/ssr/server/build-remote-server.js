@@ -718,6 +718,7 @@ export const RemoteServerFactory = {
                 target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {[slasPrivateProxyPath]: ''},
+                selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,

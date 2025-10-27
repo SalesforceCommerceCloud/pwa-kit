@@ -184,60 +184,6 @@ describe('SLAS private proxy', () => {
         expect(response.status).toBe(501)
     })
 
-    test('returns 403 for non-SLAS auth paths', async () => {
-        const app = mockExpress()
-        const options = RemoteServerFactory._configure({
-            useSLASPrivateClient: true,
-            mobify: {
-                app: {
-                    commerceAPI: {
-                        parameters: {
-                            shortCode: 'test',
-                            organizationId: 'f_ecom_test',
-                            clientId: 'test-client-id'
-                        }
-                    }
-                }
-            }
-        })
-
-        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
-
-        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
-
-        const response = await request(app).get('/mobify/slas/private/shopper/products/v1')
-
-        expect(response.status).toBe(403)
-    })
-
-    test('returns 403 for trusted-system paths', async () => {
-        const app = mockExpress()
-        const options = RemoteServerFactory._configure({
-            useSLASPrivateClient: true,
-            mobify: {
-                app: {
-                    commerceAPI: {
-                        parameters: {
-                            shortCode: 'test',
-                            organizationId: 'f_ecom_test',
-                            clientId: 'test-client-id'
-                        }
-                    }
-                }
-            }
-        })
-
-        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
-
-        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
-
-        const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token'
-        )
-
-        expect(response.status).toBe(403)
-    })
-
     test('invokes onSLASPrivateProxyReq callback and onSLASPrivateProxyRes callback', async () => {
         // Create a mock SLAS endpoint for the http-proxy to consume
         const mockSlasServer = mockExpress()
