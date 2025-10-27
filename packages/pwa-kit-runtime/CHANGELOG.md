@@ -1,5 +1,5 @@
 ## v3.10.1 (Oct 27, 2025)
-- Add extensibility hooks for SLAS private client proxy with `onSLASPrivateProxyReq` and `onSLASPrivateProxyRes` callbacks ; original PR :[#3411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3411)
+- Add extensibility hooks for SLAS private client proxy with `onSLASPrivateProxyReq` and `onSLASPrivateProxyRes` callbacks [#3436](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3436); original PR :[#3411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3411)
 
 ## v3.10.0 (May 22, 2025)
 
