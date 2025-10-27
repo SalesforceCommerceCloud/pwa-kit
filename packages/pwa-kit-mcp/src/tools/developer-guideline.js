@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {EmptyJsonSchema} from '../utils/utils'
-import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
+import {PWA_KIT_DESCRIPTIVE_NAME, SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS} from '../utils/constants'
 
 const guidelinesText = `# Salesforce Commerce Composable Storefront Development Guidelines
 
@@ -152,12 +152,16 @@ The \`mutation.mutate(args)\` function is used to execute the mutation. It accep
         headers: { ['X-Custom-Header']: 'test' }
     })}> Send Request </button>
   \`\`\`
-  
+
 ## Quality Standards
 - Maintain consistent code formatting using project standards.
 - Write comprehensive test coverage.
 - Ensure components are accessible and mobile-friendly.
 - Follow security best practices for all code.
+
+
+## After Code Generation
+${SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS}
 `
 
 export default {

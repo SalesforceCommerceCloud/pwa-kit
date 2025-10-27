@@ -10,7 +10,6 @@ import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 import {z} from 'zod'
 import {
     CreateAppGuidelinesTool,
-    CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
@@ -68,7 +67,6 @@ class PwaStorefrontMCPServerHighLevel {
             return _origTool(name, description, inputSchema, wrappedHandler)
         }
 
-        this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
         this.exploreCommerceAPITool = new ExploreCommerceAPITool()
@@ -104,12 +102,6 @@ class PwaStorefrontMCPServerHighLevel {
             InstallAgentRulesTool.description,
             InstallAgentRulesTool.inputSchema,
             InstallAgentRulesTool.fn
-        )
-        this.server.tool(
-            this.createNewComponentTool.name,
-            this.createNewComponentTool.description,
-            this.createNewComponentTool.inputSchema,
-            this.createNewComponentTool.handler
         )
         this.server.tool(
             CreateNewPageTool.name,
