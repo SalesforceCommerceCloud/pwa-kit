@@ -12,6 +12,7 @@ import {
     transformShippingMethods,
     getSelectedShippingMethodId,
     isShippingMethodValid,
+    isPayPalPaymentMethodType,
     createPaymentInstrumentBody
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
@@ -486,8 +487,8 @@ describe('sf-payments-utils', () => {
     })
 
     describe('transformAddressDetails', () => {
-        test('transforms complete address with full name', () => {
-            const addressDetails = {
+        test('transforms complete addresses with full names', () => {
+            const billingDetails = {
                 name: 'John Michael Doe',
                 phone: '+1234567890',
                 address: {
@@ -500,9 +501,21 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const shippingDetails = {
+                name: 'Jane Smith',
+                phone: '+0987654321',
+                address: {
+                    line1: '456 Shipping Ave',
+                    city: 'Los Angeles',
+                    state: 'CA',
+                    postalCode: '90001',
+                    country: 'US'
+                }
+            }
 
-            expect(result).toEqual({
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            expect(result.billingAddress).toEqual({
                 firstName: 'John Michael',
                 lastName: 'Doe',
                 address1: '123 Main St',
@@ -513,10 +526,21 @@ describe('sf-payments-utils', () => {
                 countryCode: 'US',
                 phone: '+1234567890'
             })
+            expect(result.shippingAddress).toEqual({
+                firstName: 'Jane',
+                lastName: 'Smith',
+                address1: '456 Shipping Ave',
+                address2: null,
+                city: 'Los Angeles',
+                stateCode: 'CA',
+                postalCode: '90001',
+                countryCode: 'US',
+                phone: '+0987654321'
+            })
         })
 
-        test('handles single word name', () => {
-            const addressDetails = {
+        test('handles single word name in billing address', () => {
+            const billingDetails = {
                 name: 'Madonna',
                 address: {
                     line1: '456 Oak Ave',
@@ -527,14 +551,7 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
-
-            expect(result.firstName).toBe('')
-            expect(result.lastName).toBe('Madonna')
-        })
-
-        test('handles two-word name', () => {
-            const addressDetails = {
+            const shippingDetails = {
                 name: 'Jane Smith',
                 address: {
                     line1: '789 Elm St',
@@ -545,14 +562,25 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const result = transformAddressDetails(billingDetails, shippingDetails)
 
-            expect(result.firstName).toBe('Jane')
-            expect(result.lastName).toBe('Smith')
+            expect(result.billingAddress.firstName).toBe('')
+            expect(result.billingAddress.lastName).toBe('Madonna')
         })
 
-        test('handles missing name', () => {
-            const addressDetails = {
+        test('handles missing name in shipping address', () => {
+            const billingDetails = {
+                name: 'John Doe',
+                address: {
+                    line1: '123 Main St',
+                    city: 'San Francisco',
+                    state: 'CA',
+                    postalCode: '94102',
+                    country: 'US'
+                }
+            }
+
+            const shippingDetails = {
                 address: {
                     line1: '321 Pine St',
                     city: 'Boston',
@@ -562,14 +590,14 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const result = transformAddressDetails(billingDetails, shippingDetails)
 
-            expect(result.firstName).toBeNull()
-            expect(result.lastName).toBeNull()
+            expect(result.shippingAddress.firstName).toBeNull()
+            expect(result.shippingAddress.lastName).toBeNull()
         })
 
         test('handles missing line2', () => {
-            const addressDetails = {
+            const billingDetails = {
                 name: 'Bob Johnson',
                 address: {
                     line1: '555 Broadway',
@@ -580,14 +608,25 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const shippingDetails = {
+                name: 'Jane Doe',
+                address: {
+                    line1: '123 Main St',
+                    city: 'Seattle',
+                    state: 'WA',
+                    postalCode: '98101',
+                    country: 'US'
+                }
+            }
 
-            expect(result.address2).toBeNull()
-            expect(result.address1).toBe('555 Broadway')
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            expect(result.billingAddress.address2).toBeNull()
+            expect(result.billingAddress.address1).toBe('555 Broadway')
         })
 
         test('handles missing phone', () => {
-            const addressDetails = {
+            const billingDetails = {
                 name: 'Alice Cooper',
                 address: {
                     line1: '777 Rock Blvd',
@@ -598,13 +637,24 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const shippingDetails = {
+                name: 'Jane Doe',
+                address: {
+                    line1: '123 Main St',
+                    city: 'Detroit',
+                    state: 'MI',
+                    postalCode: '48201',
+                    country: 'US'
+                }
+            }
 
-            expect(result.phone).toBeNull()
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            expect(result.billingAddress.phone).toBeNull()
         })
 
         test('handles international address', () => {
-            const addressDetails = {
+            const billingDetails = {
                 name: 'Pierre Dubois',
                 phone: '+33123456789',
                 address: {
@@ -617,11 +667,106 @@ describe('sf-payments-utils', () => {
                 }
             }
 
-            const result = transformAddressDetails(addressDetails)
+            const shippingDetails = {
+                name: 'Marie Curie',
+                address: {
+                    line1: '5 Rue de Lyon',
+                    city: 'Paris',
+                    state: 'IDF',
+                    postalCode: '75001',
+                    country: 'FR'
+                }
+            }
 
-            expect(result.countryCode).toBe('FR')
-            expect(result.firstName).toBe('Pierre')
-            expect(result.lastName).toBe('Dubois')
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            expect(result.billingAddress.countryCode).toBe('FR')
+            expect(result.billingAddress.firstName).toBe('Pierre')
+            expect(result.billingAddress.lastName).toBe('Dubois')
+        })
+
+        test('uses shipping as billing when billing details are incomplete (PayPal case)', () => {
+            const billingDetails = {
+                // Missing name and city - incomplete
+                address: {
+                    line1: '123 Billing St',
+                    state: 'CA',
+                    postalCode: '94102',
+                    country: 'US'
+                }
+            }
+
+            const shippingDetails = {
+                name: 'Jane Smith',
+                phone: '+0987654321',
+                address: {
+                    line1: '456 Shipping Ave',
+                    city: 'Los Angeles',
+                    state: 'CA',
+                    postalCode: '90001',
+                    country: 'US'
+                }
+            }
+
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            expect(result).toHaveProperty('billingAddress')
+            expect(result).toHaveProperty('shippingAddress')
+            // Billing address should use shipping details
+            expect(result.billingAddress).toEqual({
+                firstName: 'Jane',
+                lastName: 'Smith',
+                address1: '456 Shipping Ave',
+                address2: null,
+                city: 'Los Angeles',
+                stateCode: 'CA',
+                postalCode: '90001',
+                countryCode: 'US',
+                phone: '+0987654321'
+            })
+            expect(result.shippingAddress).toEqual({
+                firstName: 'Jane',
+                lastName: 'Smith',
+                address1: '456 Shipping Ave',
+                address2: null,
+                city: 'Los Angeles',
+                stateCode: 'CA',
+                postalCode: '90001',
+                countryCode: 'US',
+                phone: '+0987654321'
+            })
+        })
+
+        test('uses shipping as billing when billing details missing name', () => {
+            const billingDetails = {
+                // Missing name - incomplete
+                address: {
+                    line1: '123 Billing St',
+                    city: 'San Francisco',
+                    state: 'CA',
+                    postalCode: '94102',
+                    country: 'US'
+                }
+            }
+
+            const shippingDetails = {
+                name: 'Jane Smith',
+                phone: '+0987654321',
+                address: {
+                    line1: '456 Shipping Ave',
+                    city: 'Los Angeles',
+                    state: 'CA',
+                    postalCode: '90001',
+                    country: 'US'
+                }
+            }
+
+            const result = transformAddressDetails(billingDetails, shippingDetails)
+
+            // Should use shipping for billing since name is missing
+            expect(result.billingAddress.firstName).toBe('Jane')
+            expect(result.billingAddress.lastName).toBe('Smith')
+            expect(result.billingAddress.city).toBe('Los Angeles')
         })
     })
 
@@ -881,6 +1026,26 @@ describe('sf-payments-utils', () => {
         })
     })
 
+    describe('isPayPalPaymentMethodType', () => {
+        test('returns true for paypal payment method type', () => {
+            const result = isPayPalPaymentMethodType('paypal')
+
+            expect(result).toBe(true)
+        })
+
+        test('returns true for venmo payment method type', () => {
+            const result = isPayPalPaymentMethodType('venmo')
+
+            expect(result).toBe(true)
+        })
+
+        test('returns false for card payment method type', () => {
+            const result = isPayPalPaymentMethodType('card')
+
+            expect(result).toBe(false)
+        })
+    })
+
     describe('createPaymentInstrumentBody', () => {
         test('creates payment instrument body with all parameters', () => {
             const result = createPaymentInstrumentBody(99.99, 'card', 'us-west-1')
@@ -937,6 +1102,17 @@ describe('sf-payments-utils', () => {
             const result = createPaymentInstrumentBody(0, 'card', 'default')
 
             expect(result.amount).toBe(0)
+        })
+
+        test('includes shippingPreference when provided', () => {
+            const result = createPaymentInstrumentBody(
+                100.0,
+                'paypal',
+                'us-west-1',
+                'GET_FROM_FILE'
+            )
+
+            expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
         })
     })
 })

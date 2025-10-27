@@ -17,31 +17,47 @@ export const getSFPaymentsInstrument = (basketOrOrder) => {
 }
 
 /**
- * Transform address details from payment provider format to basket format.
+ * Transform billing and shipping address details from payment provider format to basket format.
+ * Determines the appropriate source for billing address (PayPal/Venmo may not provide complete billing details).
  * Handles name splitting and address field mapping.
- * @param {Object} addressDetails - Address details from payment provider
- * @returns {Object} Transformed address for basket API
+ * @param {Object} billingDetails - Billing details from payment provider
+ * @param {Object} shippingDetails - Shipping details from payment provider
+ * @returns {Object} Object containing { billingAddress, shippingAddress }
  */
-export const transformAddressDetails = (addressDetails) => {
-    const address = {
-        firstName: null,
-        lastName: null,
-        address1: addressDetails.address.line1,
-        address2: addressDetails.address.line2 || null,
-        city: addressDetails.address.city,
-        stateCode: addressDetails.address.state,
-        postalCode: addressDetails.address.postalCode,
-        countryCode: addressDetails.address.country,
-        phone: addressDetails.phone || null
+export const transformAddressDetails = (billingDetails, shippingDetails) => {
+    // Helper function to transform a single address
+    const transformSingleAddress = (addressDetails) => {
+        const address = {
+            firstName: null,
+            lastName: null,
+            address1: addressDetails.address.line1,
+            address2: addressDetails.address.line2 || null,
+            city: addressDetails.address.city,
+            stateCode: addressDetails.address.state,
+            postalCode: addressDetails.address.postalCode,
+            countryCode: addressDetails.address.country,
+            phone: addressDetails.phone || null
+        }
+
+        if (addressDetails.name) {
+            const names = addressDetails.name.split(' ')
+            address.firstName = names.slice(0, -1).join(' ')
+            address.lastName = names.slice(-1).join(' ')
+        }
+
+        return address
     }
 
-    if (addressDetails.name) {
-        const names = addressDetails.name.split(' ')
-        address.firstName = names.slice(0, -1).join(' ')
-        address.lastName = names.slice(-1).join(' ')
-    }
+    // For PayPal/Venmo, billing address might not be available or incomplete
+    // Use shipping address as billing address if billing details are missing or incomplete
+    const billingAddr = billingDetails?.address
+    const hasBillingDetails = billingDetails?.name && billingAddr?.city
+    const billingSource = hasBillingDetails ? billingDetails : shippingDetails
 
-    return address
+    return {
+        billingAddress: transformSingleAddress(billingSource),
+        shippingAddress: transformSingleAddress(shippingDetails)
+    }
 }
 
 /**
@@ -99,6 +115,15 @@ export const isShippingMethodValid = (currentBasket, updatedShippingMethods) => 
     return updatedShippingMethods.applicableShippingMethods.some(
         (method) => method.id === currentShippingMethodId
     )
+}
+
+/**
+ * Checks if the payment method type uses PayPal to render and complete payments
+ * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @returns {boolean} Whether the payment method type uses PayPal
+ */
+export const isPayPalPaymentMethodType = (paymentMethodType) => {
+    return paymentMethodType === 'paypal' || paymentMethodType === 'venmo'
 }
 
 /**

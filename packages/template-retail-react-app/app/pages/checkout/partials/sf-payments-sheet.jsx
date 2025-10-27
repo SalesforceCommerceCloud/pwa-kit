@@ -27,7 +27,11 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
 import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
-import {STATUS_SUCCESS, useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {
+    STATUS_SUCCESS,
+    useSFPayments,
+    useAutomaticCapture
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {
     ToggleCard,
@@ -75,7 +79,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     })
 
     const zoneId = useShopperConfiguration('zoneId')
-    const cardCaptureAutomatic = useShopperConfiguration('cardCaptureAutomatic')
+    const cardCaptureAutomatic = useAutomaticCapture()
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -347,7 +351,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     createIntentFunction: createPaymentInstrument
                 },
                 options: {
-                    useManualCapture: !(cardCaptureAutomatic ?? true),
+                    useManualCapture: !cardCaptureAutomatic,
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                 }
             }

@@ -10,6 +10,7 @@ import {render, screen, waitFor, act, renderHook} from '@testing-library/react'
 import {
     useSFPayments,
     useSFPaymentsEnabled,
+    useAutomaticCapture,
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
     STATUS_SUCCESS,
@@ -548,5 +549,38 @@ describe('useSFPaymentsEnabled hook', () => {
 
         expect(result.current).toBe(false)
         expect(mockUseShopperConfiguration).toHaveBeenCalledWith('SalesforcePaymentsAllowed')
+    })
+})
+
+describe('useAutomaticCapture hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns true when cardCaptureAutomatic is true', () => {
+        mockUseShopperConfiguration.mockReturnValue(true)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
+    })
+
+    test('returns false when cardCaptureAutomatic is false', () => {
+        mockUseShopperConfiguration.mockReturnValue(false)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
+    })
+
+    test('returns true (default) when cardCaptureAutomatic is undefined', () => {
+        mockUseShopperConfiguration.mockReturnValue(undefined)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
     })
 })

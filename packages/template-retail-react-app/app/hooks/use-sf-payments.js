@@ -92,3 +92,12 @@ export const useSFPayments = () => {
 export const useSFPaymentsEnabled = () => {
     return useShopperConfiguration('SalesforcePaymentsAllowed') === true
 }
+
+/**
+ * Custom hook to get the card capture mode for Salesforce Payments
+ * @returns {boolean} True if automatic capture is enabled (default), false if manual capture
+ */
+export const useAutomaticCapture = () => {
+    const cardCaptureAutomatic = useShopperConfiguration('cardCaptureAutomatic')
+    return cardCaptureAutomatic ?? true
+}

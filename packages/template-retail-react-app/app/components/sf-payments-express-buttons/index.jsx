@@ -22,7 +22,8 @@ import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/us
 import {
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
-    useSFPayments
+    useSFPayments,
+    useAutomaticCapture
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
@@ -31,7 +32,8 @@ import {
     transformAddressDetails,
     transformShippingMethods,
     getSelectedShippingMethodId,
-    createPaymentInstrumentBody
+    createPaymentInstrumentBody,
+    isPayPalPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 const SFPaymentsExpressButtons = ({
@@ -58,7 +60,7 @@ const SFPaymentsExpressButtons = ({
         }
     })
 
-    const cardCaptureAutomatic = useShopperConfiguration('cardCaptureAutomatic')
+    const cardCaptureAutomatic = useAutomaticCapture()
     const zoneId = useShopperConfiguration('zoneId')
 
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
@@ -245,7 +247,7 @@ const SFPaymentsExpressButtons = ({
                 paymentMethodType = mapPaymentMethodType(type)
 
                 // For non-PayPal payment methods, prepare basket immediately
-                if (paymentMethodType !== 'paypal' && paymentMethodType !== 'venmo') {
+                if (!isPayPalPaymentMethodType(paymentMethodType)) {
                     try {
                         expressBasket.current = await prepareBasket()
                     } catch (e) {
@@ -263,7 +265,7 @@ const SFPaymentsExpressButtons = ({
                 paymentMethodType = mapPaymentMethodType(evt.detail.selectedPaymentMethod)
 
                 // For non-PayPal payment methods, prepare basket immediately
-                if (paymentMethodType !== 'paypal' && paymentMethodType !== 'venmo') {
+                if (!isPayPalPaymentMethodType(paymentMethodType)) {
                     prepareBasket()
                         .then((basket) => {
                             expressBasket.current = basket
@@ -376,25 +378,19 @@ const SFPaymentsExpressButtons = ({
                     (async () => {
                         startConfirming(expressBasket.current)
 
-                        // For PayPal/Venmo, billing address might not be available or incomplete in evt.detail.billingDetails
-                        // Use shipping address as billing address if billing details are missing or incomplete
-                        const billingAddr = evt.detail.billingDetails?.address
-                        const hasBillingDetails =
-                            evt.detail.billingDetails?.name && billingAddr?.city
-                        const billingSource = hasBillingDetails
-                            ? evt.detail.billingDetails
-                            : evt.detail.shippingDetails
+                        // Transform both billing and shipping addresses
+                        const {billingAddress, shippingAddress} = transformAddressDetails(
+                            evt.detail.billingDetails,
+                            evt.detail.shippingDetails
+                        )
 
                         // Update billing address in basket
-                        const billingAddress = transformAddressDetails(billingSource)
-
                         await updateBillingAddressForBasket({
                             parameters: {basketId: expressBasket.current.basketId},
                             body: billingAddress
                         })
 
                         // Next update shipping address in basket
-                        const shippingAddress = transformAddressDetails(evt.detail.shippingDetails)
 
                         const updatedBasket = await updateShippingAddressForShipment.mutateAsync({
                             parameters: {
@@ -406,7 +402,7 @@ const SFPaymentsExpressButtons = ({
                         })
 
                         // For Stripe, create SF Payments basket payment instrument before creating order
-                        if (paymentMethodType !== 'paypal' && paymentMethodType !== 'venmo') {
+                        if (!isPayPalPaymentMethodType(paymentMethodType)) {
                             await addPaymentInstrumentToBasket({
                                 parameters: {basketId: updatedBasket.basketId},
                                 body: createPaymentInstrumentBody(
@@ -662,7 +658,7 @@ const SFPaymentsExpressButtons = ({
                     emailAddressRequired: true,
                     billingAddressRequired: true,
                     phoneNumberRequired: true,
-                    useManualCapture: !(cardCaptureAutomatic ?? true),
+                    useManualCapture: !cardCaptureAutomatic,
                     maximumButtonCount
                 }
             }
