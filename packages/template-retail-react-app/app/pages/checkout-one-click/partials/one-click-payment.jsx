@@ -218,7 +218,7 @@ const Payment = ({
             if (!isRegistered || !hasSaved || alreadyApplied) return
             autoAppliedRef.current = true
             const preferred =
-                customer.paymentInstruments.find((pi) => pi.preferred === true) ||
+                customer.paymentInstruments.find((pi) => pi.default === true) ||
                 customer.paymentInstruments[0]
             try {
                 setIsApplyingSavedPayment(true)
@@ -335,19 +335,15 @@ const Payment = ({
     })
 
     const handleEditPayment = async () => {
-        if (appliedPayment) {
-            // After removal, set the radio selection (but don't apply to basket yet)
-            const savedId = appliedPayment?.customerPaymentInstrumentId
-            if (savedId) {
-                onSelectedPaymentMethodChange?.(savedId)
-            } else if (customer?.paymentInstruments?.length > 0) {
-                // Default to first saved method in the radio selection
-                onSelectedPaymentMethodChange?.(customer.paymentInstruments[0].paymentInstrumentId)
-            } else {
-                // No saved methods, default to new card form
-                onSelectedPaymentMethodChange?.('cc')
-            }
-        }
+        // Prefer the customer's default saved instrument in edit mode. If none,
+        // fall back to the applied payment, then the first saved, then 'cc'.
+        const defaultSaved = customer?.paymentInstruments?.find((pi) => pi.default === true)
+        const preferredId =
+            defaultSaved?.paymentInstrumentId ||
+            appliedPayment?.customerPaymentInstrumentId ||
+            customer?.paymentInstruments?.[0]?.paymentInstrumentId ||
+            'cc'
+        onSelectedPaymentMethodChange?.(preferredId)
         onIsEditingChange?.(true)
         goToStep(STEPS.PAYMENT)
     }
