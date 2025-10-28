@@ -35,7 +35,10 @@ import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/u
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
-import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
+import {
+    useSFPaymentsEnabled,
+    useSFPayments
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -54,6 +57,7 @@ import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 const ProductViewHeader = ({
     name,
@@ -171,6 +175,7 @@ const ProductView = forwardRef(
         } = useAddToCartModalContext()
         const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
         const theme = useTheme()
+        const {confirmingBasket} = useSFPayments()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -199,7 +204,7 @@ const ProductView = forwardRef(
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
-        const sfPaymentsEnabled = useShopperConfiguration('SalesforcePaymentsAllowed') === true
+        const sfPaymentsEnabled = useSFPaymentsEnabled()
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -929,6 +934,9 @@ const ProductView = forwardRef(
                 >
                     {renderActionButtons()}
                 </Box>
+
+                {/* Loading overlay during express payment confirmation */}
+                {confirmingBasket && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
             </Flex>
         )
     }

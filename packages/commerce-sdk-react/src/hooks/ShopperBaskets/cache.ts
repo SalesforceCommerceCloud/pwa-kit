@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBasketsTypes, ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsV2Types, ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {
     ApiClients,
     Argument,
@@ -26,7 +26,7 @@ import {CLIENT_KEYS} from '../../constant'
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
-type Basket = ShopperBasketsTypes.Basket
+type Basket = ShopperBasketsV2Types.Basket
 /** Data returned by `getCustomerBaskets` */
 type CustomerBasketsResult = ShopperCustomersTypes.BasketsResult
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */

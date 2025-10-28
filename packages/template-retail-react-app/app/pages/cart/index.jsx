@@ -37,12 +37,14 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import CartProductListWithGroupedBonusProducts from '@salesforce/retail-react-app/app/pages/cart/partials/cart-product-list-with-grouped-bonus-products'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
 import {DELIVERY_OPTIONS} from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 // Bonus Product Utilities
 import {
@@ -89,6 +91,7 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading, derivedData} = useCurrentBasket()
+    const {confirmingBasket} = useSFPayments()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
@@ -1477,6 +1480,9 @@ const Cart = () => {
                     promotionId={bonusProductViewModal.data.promotionId}
                 />
             )}
+
+            {/* Loading overlay during express payment confirmation */}
+            {confirmingBasket && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
         </Box>
     )
 }

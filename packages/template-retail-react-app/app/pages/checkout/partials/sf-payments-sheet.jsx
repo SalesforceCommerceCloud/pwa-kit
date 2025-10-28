@@ -9,6 +9,7 @@ import React, {useState, useMemo, useEffect, useRef, forwardRef, useImperativeHa
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {useQueryClient} from '@tanstack/react-query'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 import {
     Box,
@@ -24,9 +25,13 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
-import {useConfigurations} from '@salesforce/commerce-sdk-react'
+import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
-import {STATUS_SUCCESS, useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {
+    STATUS_SUCCESS,
+    useSFPayments,
+    useAutomaticCapture
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {
     ToggleCard,
@@ -37,13 +42,18 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
-import {buildTheme} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
+import {
+    buildTheme,
+    getSFPaymentsInstrument,
+    createPaymentInstrumentBody
+} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
-    const {onRequiresPayButtonChange} = props
+    const {onRequiresPayButtonChange, onCreateOrder, onError} = props
     const intl = useIntl()
     const formatMessage = intl.formatMessage
     const queryClient = useQueryClient()
+    const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
     const isPickupOnly =
@@ -68,14 +78,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
     })
 
-    const {data: shopperConfigurations} = useConfigurations()
-
-    // Helper function to get configuration value by id
-    const getConfigurationValue = (id, defaultValue = null) => {
-        if (!shopperConfigurations?.configurations) return defaultValue
-        const config = shopperConfigurations.configurations.find((c) => c.id === id)
-        return config ? config.value : defaultValue
-    }
+    const zoneId = useShopperConfiguration('zoneId')
+    const cardCaptureAutomatic = useAutomaticCapture()
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -112,11 +116,57 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const config = useRef(null)
     const checkoutComponent = useRef(null)
     const paymentMethodType = useRef(null)
+    const currentBasket = useRef(null)
 
     const handlePaymentMethodSelected = (evt) => {
         paymentMethodType.current = evt.detail.selectedPaymentMethod
         if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
             onRequiresPayButtonChange(evt.detail.requiresPayButton)
+        }
+    }
+
+    const handlePaymentButtonApprove = async () => {
+        try {
+            const updatedOrder = await createAndUpdateOrder()
+            // Clear the ref after successful order creation
+            currentBasket.current = null
+            navigate(`/checkout/confirmation/${updatedOrder.orderNo}`)
+        } catch (error) {
+            const message = formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+            onError(message)
+        }
+    }
+
+    const handlePaymentButtonCancel = async () => {
+        const basketToCleanup = currentBasket.current
+        if (!basketToCleanup) {
+            return
+        }
+        await removeSFPaymentsInstruments(basketToCleanup)
+        // Clear the ref after cleanup
+        currentBasket.current = null
+        const message = formatMessage({
+            id: 'checkout.message.generic_error',
+            defaultMessage: 'An unexpected error occurred during checkout.'
+        })
+        onError(message)
+    }
+
+    const removeSFPaymentsInstruments = async (basketToUpdate) => {
+        // Find any existing Salesforce Payments instrument in the basket
+        const sfPaymentsInstrument = getSFPaymentsInstrument(basketToUpdate)
+
+        // Remove Salesforce Payments instrument if it exists
+        if (sfPaymentsInstrument) {
+            await removePaymentInstrumentFromBasket({
+                parameters: {
+                    basketId: basketToUpdate.basketId,
+                    paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
+                }
+            })
         }
     }
 
@@ -139,27 +189,52 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }
 
     const createPaymentInstrument = async () => {
-        const updatedBasket = await onBillingSubmit()
+        let updatedBasket = await onBillingSubmit()
 
-        if (!updatedBasket) {
-            throw new Error('Billing form errors')
-        }
+        // Remove any existing Salesforce Payments instruments first
+        await removeSFPaymentsInstruments(updatedBasket)
 
-        const basketPaymentInstrument = {
-            paymentMethodId: 'Salesforce Payments',
-            amount: updatedBasket.orderTotal,
-            paymentReferenceRequest: {
-                paymentMethodType: paymentMethodType.current,
-                zoneId: getConfigurationValue('zoneId', 'default')
-            }
-        }
-        return await addPaymentInstrumentToBasket({
+        updatedBasket = await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: basketPaymentInstrument
+            body: createPaymentInstrumentBody(
+                updatedBasket.orderTotal,
+                paymentMethodType.current,
+                zoneId,
+                'SET_PROVIDED_ADDRESS'
+            )
         })
+
+        // Store the updated basket for potential cleanup on cancel
+        currentBasket.current = updatedBasket
+
+        // Find SF Payments payment instrument
+        const updatedBasketPaymentInstrument = getSFPaymentsInstrument(updatedBasket)
+
+        return {
+            id: updatedBasketPaymentInstrument.paymentReference?.paymentReferenceId
+        }
     }
 
-    const confirmPayment = async (createOrder) => {
+    const createAndUpdateOrder = async () => {
+        // Create order from the basket
+        const order = await onCreateOrder()
+
+        // Find SF Payments payment instrument in created order
+        const orderPaymentInstrument = getSFPaymentsInstrument(order)
+
+        // Update order payment instrument to create payment
+        const updatedOrder = await updatePaymentInstrumentForOrder({
+            parameters: {
+                orderNo: order.orderNo,
+                paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
+            },
+            body: createPaymentInstrumentBody(order.orderTotal, paymentMethodType.current, zoneId)
+        })
+
+        return updatedOrder
+    }
+
+    const confirmPayment = async () => {
         // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
         // submit, `undefined` is returned.
         const updatedBasket = await onBillingSubmit()
@@ -170,47 +245,25 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         startConfirming(updatedBasket)
 
-        // Create SF Payments basket payment instrument before creating order
-        // TODO: add payment reference request
-        const basketPaymentInstrument = {
-            paymentMethodId: 'Salesforce Payments',
-            amount: updatedBasket.orderTotal
-        }
+        // Remove any existing Salesforce Payments instruments first
+        await removeSFPaymentsInstruments(updatedBasket)
 
+        // Create SF Payments basket payment instrument before creating order
         await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: basketPaymentInstrument
+            body: createPaymentInstrumentBody(
+                updatedBasket.orderTotal,
+                paymentMethodType.current,
+                zoneId
+            )
         })
-
-        // Create order from the basket
-        const order = await createOrder()
-
-        // Find SF Payments payment instrument in created order
-        let orderPaymentInstrument = order.paymentInstruments.find(
-            (pi) => pi.paymentMethodId === 'Salesforce Payments'
-        )
 
         try {
             // Update order payment instrument to create payment
-            const updatedOrder = await updatePaymentInstrumentForOrder({
-                parameters: {
-                    orderNo: order.orderNo,
-                    paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
-                },
-                body: {
-                    paymentMethodId: 'Salesforce Payments',
-                    amount: order.orderTotal,
-                    paymentReferenceRequest: {
-                        paymentMethodType: paymentMethodType.current,
-                        zoneId: getConfigurationValue('zoneId', 'default')
-                    }
-                }
-            })
+            const updatedOrder = await createAndUpdateOrder()
 
             // Find updated SF Payments payment instrument in updated order
-            orderPaymentInstrument = updatedOrder.paymentInstruments.find(
-                (pi) => pi.paymentInstrumentId === orderPaymentInstrument.paymentInstrumentId
-            )
+            const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
 
             // Track created payment intent
             const paymentIntent = {
@@ -253,7 +306,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             }
 
             // Update the redirect return URL to include the related order no
-            config.current.options.returnUrl += '?orderNo=' + order.orderNo
+            config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
@@ -269,7 +322,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // TODO: only invalidate order queries
             queryClient.invalidateQueries()
             // Finally return the created order
-            return order
+            return updatedOrder
         } finally {
             // Remove tracked basket being confirmed
             endConfirming()
@@ -286,13 +339,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }))
 
     useEffect(() => {
-        if (
-            sfp &&
-            metadata &&
-            containerElementRef.current &&
-            paymentConfig &&
-            shopperConfigurations
-        ) {
+        if (sfp && metadata && containerElementRef.current && paymentConfig) {
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
@@ -304,7 +351,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     createIntentFunction: createPaymentInstrument
                 },
                 options: {
-                    useManualCapture: !getConfigurationValue('cardCaptureAutomatic', true),
+                    useManualCapture: !cardCaptureAutomatic,
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                 }
             }
@@ -323,6 +370,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             paymentElement.addEventListener('load', handlePaymentMethodSelected)
             paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected)
+            paymentElement.addEventListener('sfppaymentbuttonapprove', handlePaymentButtonApprove)
+            paymentElement.addEventListener('sfppaymentcancelled', handlePaymentButtonCancel)
 
             checkoutComponent.current = sfp.checkout(
                 metadata,
@@ -338,7 +387,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
-    }, [sfp, metadata, containerElementRef.current, paymentConfig, shopperConfigurations])
+    }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
 
     return (
         <ToggleCard
@@ -427,7 +476,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 SFPaymentsSheet.displayName = 'SFPaymentsSheet'
 
 SFPaymentsSheet.propTypes = {
-    onRequiresPayButtonChange: PropTypes.func
+    onRequiresPayButtonChange: PropTypes.func,
+    onCreateOrder: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired
 }
 
 export default SFPaymentsSheet

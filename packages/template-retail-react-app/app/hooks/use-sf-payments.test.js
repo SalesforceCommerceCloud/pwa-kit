@@ -6,9 +6,11 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor, act} from '@testing-library/react'
+import {render, screen, waitFor, act, renderHook} from '@testing-library/react'
 import {
     useSFPayments,
+    useSFPaymentsEnabled,
+    useAutomaticCapture,
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
     STATUS_SUCCESS,
@@ -21,6 +23,7 @@ const mockUseScript = jest.fn()
 const mockGetConfig = jest.fn()
 const mockUseAppOrigin = jest.fn()
 const mockFetch = jest.fn()
+const mockUseShopperConfiguration = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
     __esModule: true,
@@ -33,6 +36,10 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
     useAppOrigin: () => mockUseAppOrigin()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => ({
+    useShopperConfiguration: (configId) => mockUseShopperConfiguration(configId)
 }))
 
 // Mock SFPayments class
@@ -509,5 +516,71 @@ describe('useSFPayments hook', () => {
                 {timeout: 2000}
             )
         })
+    })
+})
+
+describe('useSFPaymentsEnabled hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns true when SalesforcePaymentsAllowed is true', () => {
+        mockUseShopperConfiguration.mockReturnValue(true)
+
+        const {result} = renderHook(() => useSFPaymentsEnabled())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('SalesforcePaymentsAllowed')
+    })
+
+    test('returns false when SalesforcePaymentsAllowed is false', () => {
+        mockUseShopperConfiguration.mockReturnValue(false)
+
+        const {result} = renderHook(() => useSFPaymentsEnabled())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('SalesforcePaymentsAllowed')
+    })
+
+    test('returns false when SalesforcePaymentsAllowed is undefined', () => {
+        mockUseShopperConfiguration.mockReturnValue(undefined)
+
+        const {result} = renderHook(() => useSFPaymentsEnabled())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('SalesforcePaymentsAllowed')
+    })
+})
+
+describe('useAutomaticCapture hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns true when cardCaptureAutomatic is true', () => {
+        mockUseShopperConfiguration.mockReturnValue(true)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
+    })
+
+    test('returns false when cardCaptureAutomatic is false', () => {
+        mockUseShopperConfiguration.mockReturnValue(false)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
+    })
+
+    test('returns true (default) when cardCaptureAutomatic is undefined', () => {
+        mockUseShopperConfiguration.mockReturnValue(undefined)
+
+        const {result} = renderHook(() => useAutomaticCapture())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
     })
 })
