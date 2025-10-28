@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {act} from '@testing-library/react'
-import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsV2Types, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
     assertInvalidateQuery,
@@ -32,9 +32,9 @@ jest.mock('../../auth/index.ts', () => {
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
-type Basket = ShopperBasketsTypes.Basket
+type Basket = ShopperBasketsV2Types.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
-type ProductItem = ShopperBasketsTypes.ProductItem
+type ProductItem = ShopperBasketsV2Types.ProductItem
 
 /** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
 const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(

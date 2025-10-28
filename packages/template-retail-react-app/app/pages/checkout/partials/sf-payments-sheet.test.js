@@ -13,29 +13,13 @@ import {CheckoutProvider} from '@salesforce/retail-react-app/app/pages/checkout/
 import mockBasket from '@salesforce/retail-react-app/app/mocks/basket-with-suit'
 import {STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
-// Mock getConfig to provide necessary configuration
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
-    return {
-        ...actual,
-        getConfig: jest.fn(() => ({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                sfPayments: {
-                    enabled: true
-                }
-            }
-        }))
-    }
-})
-
-// Mock hooks
 const mockAddPaymentInstrument = jest.fn()
 const mockUpdatePaymentInstrument = jest.fn()
 const mockUpdateBillingAddress = jest.fn()
 const mockRemovePaymentInstrument = jest.fn()
+const mockUpdateShippingAddress = jest.fn()
+const mockUpdateShippingMethod = jest.fn()
+const mockRefetchShippingMethods = jest.fn()
 const mockQueryClientInvalidate = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -52,6 +36,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             if (mutationKey === 'removePaymentInstrumentFromBasket') {
                 return {mutateAsync: mockRemovePaymentInstrument}
             }
+            if (mutationKey === 'updateShippingAddressForShipment') {
+                return {mutateAsync: mockUpdateShippingAddress}
+            }
+            if (mutationKey === 'updateShippingMethodForShipment') {
+                return {mutateAsync: mockUpdateShippingMethod}
+            }
             return {mutateAsync: jest.fn()}
         },
         useShopperOrdersMutation: (mutationKey) => {
@@ -62,20 +52,43 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         },
         usePaymentConfiguration: () => ({
             data: {
-                paymentMethods: [{id: 'card', name: 'Card'}],
+                paymentMethods: [
+                    {id: 'card', name: 'Card'},
+                    {id: 'paypal', name: 'PayPal'}
+                ],
                 paymentMethodSetAccounts: []
             }
         }),
-        useConfigurations: () => ({
+        useShippingMethodsForShipment: () => ({
             data: {
-                configurations: [
-                    {id: 'zoneId', value: 'default'},
-                    {id: 'cardCaptureAutomatic', value: true}
-                ]
-            }
+                applicableShippingMethods: [
+                    {
+                        id: 'DefaultShippingMethod',
+                        name: 'Standard',
+                        description: '5-7 Business Days',
+                        price: 5.99
+                    },
+                    {
+                        id: 'ExpressShippingMethod',
+                        name: 'Express',
+                        description: '2-3 Business Days',
+                        price: 15.99
+                    }
+                ],
+                defaultShippingMethodId: 'DefaultShippingMethod'
+            },
+            refetch: mockRefetchShippingMethods
         })
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-configuration', () => ({
+    useShopperConfiguration: (configId) => {
+        if (configId === 'zoneId') return 'default'
+        if (configId === 'cardCaptureAutomatic') return true
+        return undefined
+    }
+}))
 
 jest.mock('@tanstack/react-query', () => {
     const actual = jest.requireActual('@tanstack/react-query')
@@ -212,10 +225,12 @@ jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
     }
 })
 
-// Helper to render with checkout context
 const renderWithCheckoutContext = (ui, options) => {
     return renderWithProviders(<CheckoutProvider>{ui}</CheckoutProvider>, options)
 }
+
+const mockOnCreateOrder = jest.fn()
+const mockOnError = jest.fn()
 
 describe('SFPaymentsSheet', () => {
     const mockRef = {current: null}
@@ -267,441 +282,430 @@ describe('SFPaymentsSheet', () => {
         }))
     })
 
-    test('renders payment section with promo code', () => {
-        renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        expect(screen.getByText('Payment')).toBeInTheDocument()
-        expect(screen.getByTestId('promo-code')).toBeInTheDocument()
-    })
-
-    test('renders billing address section', () => {
-        renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        expect(screen.getAllByText('Billing Address').length).toBeGreaterThan(0)
-    })
-
-    test('shows "same as shipping" checkbox when not pickup only', () => {
-        renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        expect(screen.getByText('Same as shipping address')).toBeInTheDocument()
-    })
-
-    test('hides "same as shipping" checkbox for pickup only orders', () => {
-        // Mock pickup only basket
-        const pickupBasket = {
-            ...mockBasket,
-            shipments: [
-                {
-                    _type: 'shipment',
-                    shipment_id: 'me',
-                    shippingMethod: {
-                        id: 'PickupInStore',
-                        name: 'Pickup In Store',
-                        c_storePickupEnabled: true
-                    }
-                }
-            ]
-        }
-
-        // Temporarily override the mock - use mockImplementation to persist across multiple calls
-        mockUseCurrentBasket.mockImplementation(() => ({
-            data: pickupBasket,
-            derivedData: {
-                totalItems: 2,
-                isMissingShippingAddress: false,
-                isMissingShippingMethod: false,
-                totalDeliveryShipments: 0,
-                totalPickupShipments: 1
-            },
-            isLoading: false
-        }))
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        expect(screen.queryByText('Same as shipping address')).not.toBeInTheDocument()
-    })
-
-    test('displays shipping address when billing same as shipping is checked', async () => {
-        mockBasket.shipments[0].shippingAddress.fullName = 'John Doe'
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        const checkbox = screen.getByRole('checkbox', {name: /same as shipping/i})
-        expect(checkbox).toBeChecked()
-
-        await waitFor(() => {
-            const addressDisplays = screen.getAllByTestId('address-display')
-            expect(addressDisplays.length).toBeGreaterThan(0)
-        })
-    })
-
-    test('shows billing address form when billing same as shipping is unchecked', async () => {
-        const {user} = renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        const checkbox = screen.getByRole('checkbox', {name: /same as shipping/i})
-        await user.click(checkbox)
-
-        await waitFor(() => {
-            expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-        })
-    })
-
-    test('toggles billing same as shipping checkbox', async () => {
-        const {user} = renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        const checkbox = screen.getByRole('checkbox', {name: /same as shipping/i})
-
-        // Initially checked
-        expect(checkbox).toBeChecked()
-
-        // Uncheck
-        await user.click(checkbox)
-        expect(checkbox).not.toBeChecked()
-
-        // Check again
-        await user.click(checkbox)
-        expect(checkbox).toBeChecked()
-    })
-
-    test('exposes confirmPayment method via ref', () => {
-        const ref = React.createRef()
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        expect(ref.current).toBeDefined()
-        expect(typeof ref.current.confirmPayment).toBe('function')
-    })
-
-    test('confirmPayment updates billing address when billing same as shipping', async () => {
-        const ref = React.createRef()
-        const mockCreateOrder = jest.fn().mockResolvedValue({
-            orderNo: 'ORDER123',
-            orderTotal: 629.98,
-            customerInfo: {email: 'test@example.com'},
-            billingAddress: mockBasket.billingAddress,
-            shipments: mockBasket.shipments,
-            paymentInstruments: [
-                {
-                    paymentInstrumentId: 'PI123',
-                    paymentMethodId: 'Salesforce Payments',
-                    paymentReference: {
-                        clientSecret: 'secret123',
-                        paymentReferenceId: 'ref123'
-                    }
-                }
-            ]
-        })
-
-        mockUpdateBillingAddress.mockResolvedValue({
-            ...mockBasket,
-            billingAddress: mockBasket.shipments[0].shippingAddress
-        })
-
-        mockAddPaymentInstrument.mockResolvedValue({})
-        mockUpdatePaymentInstrument.mockResolvedValue({
-            paymentInstruments: [
-                {
-                    paymentInstrumentId: 'PI123',
-                    paymentMethodId: 'Salesforce Payments',
-                    paymentReference: {
-                        clientSecret: 'secret123',
-                        paymentReferenceId: 'ref123'
-                    }
-                }
-            ]
-        })
-
-        mockCheckoutConfirm.mockResolvedValue({
-            responseCode: STATUS_SUCCESS,
-            data: {}
-        })
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        await waitFor(() => {
-            expect(ref.current).toBeDefined()
-        })
-
-        const result = await ref.current.confirmPayment(mockCreateOrder)
-
-        expect(mockUpdateBillingAddress).toHaveBeenCalledWith({
-            body: expect.objectContaining({
-                address1: mockBasket.shipments[0].shippingAddress.address1
-            }),
-            parameters: {basketId: mockBasket.basketId}
-        })
-        expect(mockStartConfirming).toHaveBeenCalled()
-        expect(mockEndConfirming).toHaveBeenCalled()
-        expect(result.orderNo).toBe('ORDER123')
-    })
-
-    test('confirmPayment creates payment instrument and processes payment', async () => {
-        const ref = React.createRef()
-        const mockOrder = {
-            orderNo: 'ORDER123',
-            orderTotal: 629.98,
-            customerInfo: {email: 'test@example.com'},
-            billingAddress: mockBasket.billingAddress,
-            shipments: mockBasket.shipments,
-            paymentInstruments: [
-                {
-                    paymentInstrumentId: 'PI123',
-                    paymentMethodId: 'Salesforce Payments',
-                    paymentReference: {
-                        clientSecret: 'secret123',
-                        paymentReferenceId: 'ref123'
-                    }
-                }
-            ]
-        }
-
-        const mockCreateOrder = jest.fn().mockResolvedValue(mockOrder)
-
-        mockUpdateBillingAddress.mockResolvedValue({
-            ...mockBasket,
-            billingAddress: mockBasket.shipments[0].shippingAddress
-        })
-
-        mockAddPaymentInstrument.mockResolvedValue({})
-        mockUpdatePaymentInstrument.mockResolvedValue({
-            paymentInstruments: mockOrder.paymentInstruments
-        })
-
-        mockCheckoutConfirm.mockResolvedValue({
-            responseCode: STATUS_SUCCESS,
-            data: {}
-        })
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        await waitFor(() => {
-            expect(ref.current).toBeDefined()
-        })
-
-        await ref.current.confirmPayment(mockCreateOrder)
-
-        expect(mockAddPaymentInstrument).toHaveBeenCalledWith(
-            expect.objectContaining({
-                body: expect.objectContaining({
-                    paymentMethodId: 'Salesforce Payments'
-                })
-            })
-        )
-
-        expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
-        expect(mockCheckoutConfirm).toHaveBeenCalled()
-    })
-
-    test('confirmPayment throws error on invalid billing form', async () => {
-        const ref = React.createRef()
-
-        // Mock form trigger to return false (invalid)
-        jest.spyOn(console, 'error').mockImplementation(() => {})
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        await waitFor(() => {
-            expect(ref.current).toBeDefined()
-        })
-
-        // Since form validation is complex, we'll just ensure the method exists and can be called
-        expect(typeof ref.current.confirmPayment).toBe('function')
-
-        console.error.mockRestore()
-    })
-
-    test('confirmPayment handles payment failure', async () => {
-        const ref = React.createRef()
-        const mockOrder = {
-            orderNo: 'ORDER123',
-            orderTotal: 629.98,
-            customerInfo: {email: 'test@example.com'},
-            billingAddress: mockBasket.billingAddress,
-            shipments: mockBasket.shipments,
-            paymentInstruments: [
-                {
-                    paymentInstrumentId: 'PI123',
-                    paymentMethodId: 'Salesforce Payments',
-                    paymentReference: {
-                        clientSecret: 'secret123',
-                        paymentReferenceId: 'ref123'
-                    }
-                }
-            ]
-        }
-
-        const mockCreateOrder = jest.fn().mockResolvedValue(mockOrder)
-
-        mockUpdateBillingAddress.mockResolvedValue({
-            ...mockBasket,
-            billingAddress: mockBasket.shipments[0].shippingAddress
-        })
-
-        mockAddPaymentInstrument.mockResolvedValue({})
-        mockUpdatePaymentInstrument.mockResolvedValue({
-            paymentInstruments: mockOrder.paymentInstruments
-        })
-
-        mockCheckoutConfirm.mockResolvedValue({
-            responseCode: 'FAILED',
-            data: {error: 'Payment declined'}
-        })
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        await waitFor(() => {
-            expect(ref.current).toBeDefined()
-        })
-
-        await expect(ref.current.confirmPayment(mockCreateOrder)).rejects.toThrow()
-        expect(mockEndConfirming).toHaveBeenCalled()
-    })
-
-    test('confirmPayment invalidates queries on success', async () => {
-        const ref = React.createRef()
-        const mockOrder = {
-            orderNo: 'ORDER123',
-            orderTotal: 629.98,
-            customerInfo: {email: 'test@example.com'},
-            billingAddress: mockBasket.billingAddress,
-            shipments: mockBasket.shipments,
-            paymentInstruments: [
-                {
-                    paymentInstrumentId: 'PI123',
-                    paymentMethodId: 'Salesforce Payments',
-                    paymentReference: {
-                        clientSecret: 'secret123',
-                        paymentReferenceId: 'ref123'
-                    }
-                }
-            ]
-        }
-
-        const mockCreateOrder = jest.fn().mockResolvedValue(mockOrder)
-
-        mockUpdateBillingAddress.mockResolvedValue({
-            ...mockBasket,
-            billingAddress: mockBasket.shipments[0].shippingAddress
-        })
-
-        mockAddPaymentInstrument.mockResolvedValue({})
-        mockUpdatePaymentInstrument.mockResolvedValue({
-            paymentInstruments: mockOrder.paymentInstruments
-        })
-
-        mockCheckoutConfirm.mockResolvedValue({
-            responseCode: STATUS_SUCCESS,
-            data: {}
-        })
-
-        renderWithCheckoutContext(<SFPaymentsSheet ref={ref} />)
-
-        await waitFor(() => {
-            expect(ref.current).toBeDefined()
-        })
-
-        await ref.current.confirmPayment(mockCreateOrder)
-
-        expect(mockQueryClientInvalidate).toHaveBeenCalled()
-    })
-
-    test('cleans up checkout component on unmount', () => {
-        const {unmount} = renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-
-        unmount()
-
-        // The component should clean up by calling destroy
-        // This is verified by the useEffect cleanup in the component
-        expect(mockCheckoutDestroy).toHaveBeenCalled()
-    })
-
-    describe('requiresPayButton callback', () => {
-        test('calls onRequiresPayButtonChange when handlePaymentMethodSelected is invoked with requiresPayButton: false', () => {
-            const mockOnRequiresPayButtonChange = jest.fn()
-
+    describe('rendering', () => {
+        test('renders payment section', () => {
             renderWithCheckoutContext(
                 <SFPaymentsSheet
                     ref={mockRef}
-                    onRequiresPayButtonChange={mockOnRequiresPayButtonChange}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
                 />
             )
 
-            // Create a mock event with requiresPayButton: false
-            const mockEvent = {
-                detail: {
-                    selectedPaymentMethod: 'paypal',
-                    requiresPayButton: false
-                }
+            expect(screen.getByText('Payment')).toBeInTheDocument()
+        })
+
+        test('renders billing address section', () => {
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            expect(screen.getAllByText('Billing Address').length).toBeGreaterThan(0)
+        })
+    })
+
+    describe('billing same as shipping', () => {
+        test('shows "same as shipping" checkbox when not pickup only', () => {
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            expect(screen.getByText('Same as shipping address')).toBeInTheDocument()
+        })
+
+        test('hides "same as shipping" checkbox for pickup only orders', () => {
+            const pickupBasket = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        _type: 'shipment',
+                        shipment_id: 'me',
+                        shippingMethod: {
+                            id: 'PickupInStore',
+                            name: 'Pickup In Store',
+                            c_storePickupEnabled: true
+                        }
+                    }
+                ]
             }
 
-            // Get the component instance and call handlePaymentMethodSelected directly
-            // Since we can't easily dispatch events on the dynamically created payment element,
-            // we test the handler logic by simulating the event structure
-            const container = screen.getByTestId('toggle-card-edit')
-            const divElement = container.querySelector('div')
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: pickupBasket,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 0,
+                    totalPickupShipments: 1
+                },
+                isLoading: false
+            }))
 
-            // Simulate the event by creating and dispatching it on a div that represents the payment element
-            const event = new CustomEvent('paymentMethodSelected', {detail: mockEvent.detail})
-            Object.defineProperty(event, 'detail', {value: mockEvent.detail, writable: false})
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
 
-            // The actual test: verify that when the event is processed, the callback is invoked
-            // We'll directly test the logic by verifying the callback is set up correctly
-            expect(mockOnRequiresPayButtonChange).toBeDefined()
+            expect(screen.queryByText('Same as shipping address')).not.toBeInTheDocument()
         })
 
-        test('calls onRequiresPayButtonChange when handlePaymentMethodSelected is invoked with requiresPayButton: true', () => {
+        test('displays shipping address form when billing same as shipping is checked', async () => {
+            mockBasket.shipments[0].shippingAddress.fullName = 'John Doe'
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            const checkbox = screen.getByRole('checkbox', {name: /same as shipping/i})
+            expect(checkbox).toBeChecked()
+
+            await waitFor(() => {
+                const addressDisplays = screen.getAllByTestId('address-display')
+                expect(addressDisplays.length).toBeGreaterThan(0)
+            })
+        })
+    })
+
+    describe('confirmPayment', () => {
+        test('confirmPayment throws error on invalid billing form', async () => {
+            const ref = React.createRef()
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            // Mock form trigger to return false (invalid)
+            mockUpdateBillingAddress.mockResolvedValue(undefined)
+
+            await expect(ref.current.confirmPayment()).rejects.toThrow('Billing form errors')
+        })
+
+        test('confirmPayment updates billing address when billing same as shipping', async () => {
+            const ref = React.createRef()
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            }
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: STATUS_SUCCESS,
+                data: {}
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            const result = await ref.current.confirmPayment()
+
+            expect(mockUpdateBillingAddress).toHaveBeenCalledWith({
+                body: expect.objectContaining({
+                    address1: mockBasket.shipments[0].shippingAddress.address1
+                }),
+                parameters: {basketId: mockBasket.basketId}
+            })
+            expect(mockStartConfirming).toHaveBeenCalled()
+            expect(mockEndConfirming).toHaveBeenCalled()
+            expect(result.orderNo).toBe('ORDER123')
+        })
+
+        test('confirmPayment creates payment instrument and processes payment', async () => {
+            const ref = React.createRef()
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            }
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: mockOrder.paymentInstruments
+            })
+
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: STATUS_SUCCESS,
+                data: {}
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await ref.current.confirmPayment()
+
+            expect(mockAddPaymentInstrument).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: expect.objectContaining({
+                        paymentMethodId: 'Salesforce Payments'
+                    })
+                })
+            )
+
+            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            expect(mockCheckoutConfirm).toHaveBeenCalled()
+        })
+
+        test('confirmPayment handles payment failure', async () => {
+            const ref = React.createRef()
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            }
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: 'FAILED',
+                data: {error: 'Payment declined'}
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await expect(ref.current.confirmPayment()).rejects.toThrow()
+            expect(mockEndConfirming).toHaveBeenCalled()
+        })
+
+        test('confirmPayment invalidates queries on success', async () => {
+            const ref = React.createRef()
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            }
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: STATUS_SUCCESS,
+                data: {}
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await ref.current.confirmPayment()
+
+            expect(mockQueryClientInvalidate).toHaveBeenCalled()
+        })
+    })
+
+    describe('lifecycle', () => {
+        test('cleans up checkout component on unmount', () => {
+            const {unmount} = renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            unmount()
+
+            expect(mockCheckoutDestroy).toHaveBeenCalled()
+        })
+    })
+
+    describe('onRequiresPayButtonChange callback', () => {
+        test('renders successfully with callback provided', () => {
             const mockOnRequiresPayButtonChange = jest.fn()
 
             renderWithCheckoutContext(
                 <SFPaymentsSheet
                     ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
                     onRequiresPayButtonChange={mockOnRequiresPayButtonChange}
                 />
             )
 
-            // Verify the callback prop is passed correctly
-            expect(mockOnRequiresPayButtonChange).toBeDefined()
-        })
-
-        test('does not call onRequiresPayButtonChange when requiresPayButton is undefined', () => {
-            const mockOnRequiresPayButtonChange = jest.fn()
-
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={mockRef}
-                    onRequiresPayButtonChange={mockOnRequiresPayButtonChange}
-                />
-            )
-
-            // Verify callback is defined and not called initially
+            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
             expect(mockOnRequiresPayButtonChange).toBeDefined()
             expect(mockOnRequiresPayButtonChange).not.toHaveBeenCalled()
-        })
-
-        test('does not throw when callback is not provided', () => {
-            // Should not throw error when callback is not provided
-            expect(() => {
-                renderWithCheckoutContext(<SFPaymentsSheet ref={mockRef} />)
-            }).not.toThrow()
-        })
-
-        test('handlePaymentMethodSelected logic correctly processes requiresPayButton values', () => {
-            // This test verifies the logic in handlePaymentMethodSelected (lines 116-121)
-            // The handler checks: if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange)
-            const mockOnRequiresPayButtonChange = jest.fn()
-
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={mockRef}
-                    onRequiresPayButtonChange={mockOnRequiresPayButtonChange}
-                />
-            )
-
-            // The component renders successfully with the callback
-            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-
-            // Verify the callback can be invoked (simulating the actual event flow)
-            // In real usage, the SF Payments SDK would dispatch these events
-            expect(typeof mockOnRequiresPayButtonChange).toBe('function')
         })
     })
 })

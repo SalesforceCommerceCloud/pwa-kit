@@ -10,6 +10,8 @@ import {useQuery} from '@tanstack/react-query'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
+
 export const EXPRESS_BUY_NOW = 0
 export const EXPRESS_PAY_NOW = 1
 
@@ -81,4 +83,21 @@ export const useSFPayments = () => {
         startConfirming,
         endConfirming
     }
+}
+
+/**
+ * Custom hook to check if Salesforce Payments is enabled
+ * @returns {boolean} True if Salesforce Payments is enabled, false otherwise
+ */
+export const useSFPaymentsEnabled = () => {
+    return useShopperConfiguration('SalesforcePaymentsAllowed') === true
+}
+
+/**
+ * Custom hook to get the card capture mode for Salesforce Payments
+ * @returns {boolean} True if automatic capture is enabled (default), false if manual capture
+ */
+export const useAutomaticCapture = () => {
+    const cardCaptureAutomatic = useShopperConfiguration('cardCaptureAutomatic')
+    return cardCaptureAutomatic ?? true
 }

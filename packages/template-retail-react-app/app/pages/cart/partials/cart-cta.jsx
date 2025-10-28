@@ -16,10 +16,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
-import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
+import {useSFPaymentsEnabled} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const CartCta = () => {
-    const sfPaymentsEnabled = useShopperConfiguration('SalesforcePaymentsAllowed') === true
+    const sfPaymentsEnabled = useSFPaymentsEnabled()
 
     return (
         <Fragment>
