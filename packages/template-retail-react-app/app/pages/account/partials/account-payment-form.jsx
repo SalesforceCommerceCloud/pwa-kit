@@ -9,6 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
+import Field from '@salesforce/retail-react-app/app/components/field'
 
 /**
  * AccountPaymentForm
@@ -22,6 +23,13 @@ const AccountPaymentForm = ({form, onSubmit, children}) => {
                 <Box>
                     <Stack spacing={6}>
                         <CreditCardFields form={form} />
+                        <Field
+                            name="default"
+                            label="Set as default"
+                            type="checkbox"
+                            defaultValue={false}
+                            control={form.control}
+                        />
                         {children && <Box pt={2}>{children}</Box>}
                     </Stack>
                 </Box>
