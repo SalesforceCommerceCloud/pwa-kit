@@ -27,8 +27,10 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 
 /**
  * Gets the qualifying product ID(s) for a bonus product from the bonusDiscountLineItems collection.
- * This function matches bonus discount line items with qualifying products in the cart
- * using the promotionId field.
+ * 
+ * This function uses the qualifyingProductItemId field from the SCAPI API when available,
+ * which provides a direct link from bonus products to the products that triggered them.
+ * Falls back to promotion-based matching for backward compatibility.
  *
  * @param {Object} basket - The current basket/cart object
  * @param {string} bonusDiscountLineItemId - The ID of the bonus discount line item to find qualifying products for
@@ -39,7 +41,27 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
         return []
     }
 
-    // Find the specific bonus discount line item
+    // Find bonus products that reference this discount line item
+    const bonusProductsWithQualifyingIds = basket.productItems.filter(
+        (item) =>
+            item.bonusProductLineItem &&
+            item.bonusDiscountLineItemId === bonusDiscountLineItemId &&
+            item.qualifyingProductItemId // Has the API field
+    )
+
+    // If we have qualifying product item IDs from the API, use them directly
+    if (bonusProductsWithQualifyingIds.length > 0) {
+        // Map qualifying item IDs to product IDs
+        const qualifyingItemIds = bonusProductsWithQualifyingIds.map(
+            (item) => item.qualifyingProductItemId
+        )
+        const qualifyingProducts = basket.productItems.filter((item) =>
+            qualifyingItemIds.includes(item.itemId)
+        )
+        return qualifyingProducts.map((product) => product.productId)
+    }
+
+    // Fallback: Use legacy promotion-based matching for backward compatibility
     const bonusDiscountLineItem = basket.bonusDiscountLineItems.find(
         (item) => item.id === bonusDiscountLineItemId
     )
@@ -67,7 +89,34 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
 }
 
 /**
+ * Gets bonus products directly linked to a specific cart item using the API's qualifyingProductItemId field.
+ * This is a simplified version that uses the direct relationship provided by the SCAPI API.
+ * 
+ * @param {Object} basket - The current basket data
+ * @param {Object} targetCartItem - The specific cart item to get bonus products for
+ * @returns {Array<Object>} Array of bonus products linked to this cart item
+ */
+export const getBonusProductsForCartItemDirect = (basket, targetCartItem) => {
+    if (!basket?.productItems || !targetCartItem?.itemId) {
+        return []
+    }
+
+    // Direct lookup using qualifyingProductItemId from API
+    const directlyLinkedBonusProducts = basket.productItems.filter(
+        (item) =>
+            item.bonusProductLineItem === true &&
+            item.qualifyingProductItemId === targetCartItem.itemId
+    )
+
+    return directlyLinkedBonusProducts
+}
+
+/**
  * Gets bonus products allocated to a specific cart item using capacity-based sequential allocation.
+ * 
+ * OPTIMIZED: First attempts to use the qualifyingProductItemId field from the API for direct matching.
+ * Falls back to legacy allocation algorithm for backward compatibility.
+ * 
  * This function distributes available bonus products across qualifying cart items based on:
  * - Individual item capacity (calculated from promotion rules and item quantity)
  * - First-come-first-served allocation order (based on cart item position)
@@ -86,6 +135,31 @@ export const getBonusProductsForSpecificCartItem = (
         return []
     }
 
+    // OPTIMIZED PATH: Use direct API field if available
+    const directBonusProducts = getBonusProductsForCartItemDirect(basket, targetCartItem)
+    
+    // If we have direct matches from the API, use them (most accurate)
+    if (directBonusProducts.length > 0) {
+        // Aggregate quantities for same productId
+        const productQuantityMap = new Map()
+        directBonusProducts.forEach((item) => {
+            const existingQuantity = productQuantityMap.get(item.productId) || 0
+            productQuantityMap.set(item.productId, existingQuantity + (item.quantity || 0))
+        })
+
+        // Convert back to array format
+        const result = []
+        productQuantityMap.forEach((quantity, productId) => {
+            const sampleItem = directBonusProducts.find((item) => item.productId === productId)
+            result.push({
+                ...sampleItem,
+                quantity: quantity
+            })
+        })
+        return result
+    }
+
+    // LEGACY PATH: Fall back to allocation algorithm for backward compatibility
     const productId = targetCartItem.productId
 
     // Get all available bonus products for this productId using existing function
@@ -277,6 +351,9 @@ export const getBonusProductsInCartForProduct = (basket, productId, productsWith
 
 /**
  * Gets the qualifying product ID(s) for a bonus product that's already in the cart.
+ * 
+ * OPTIMIZED: Uses the qualifyingProductItemId field from the API for direct lookup.
+ * Falls back to promotion-based matching for backward compatibility.
  *
  * @param {Object} basket - The current basket data
  * @param {string} bonusProductId - The product ID of the bonus product in the cart
@@ -293,14 +370,34 @@ export const getQualifyingProductForBonusProductInCart = (
         return []
     }
 
-    // Find the bonus product in the cart
-    const bonusProduct = basket.productItems.find(
+    // Find all bonus product items with this productId
+    const bonusProducts = basket.productItems.filter(
         (item) => item.productId === bonusProductId && item.bonusProductLineItem === true
     )
 
-    if (!bonusProduct) {
+    if (bonusProducts.length === 0) {
         return []
     }
+
+    // OPTIMIZED PATH: Use API field if available
+    const bonusProductsWithQualifyingIds = bonusProducts.filter(
+        (item) => item.qualifyingProductItemId
+    )
+
+    if (bonusProductsWithQualifyingIds.length > 0) {
+        // Map qualifying item IDs to product IDs using direct API field
+        const qualifyingItemIds = bonusProductsWithQualifyingIds.map(
+            (item) => item.qualifyingProductItemId
+        )
+        const qualifyingProducts = basket.productItems.filter((item) =>
+            qualifyingItemIds.includes(item.itemId)
+        )
+        // Return unique product IDs
+        return [...new Set(qualifyingProducts.map((product) => product.productId))]
+    }
+
+    // LEGACY PATH: Fall back to promotion-based matching
+    const bonusProduct = bonusProducts[0]
 
     // Get promotion IDs from the bonus product using enhanced data
     const bonusPromotionIds = getPromotionIdsForProduct(

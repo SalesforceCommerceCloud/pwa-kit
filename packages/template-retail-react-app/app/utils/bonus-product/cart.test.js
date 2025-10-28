@@ -39,6 +39,104 @@ describe('Bonus Product Cart Utilities', () => {
             const result = cartUtils.getQualifyingProductIdForBonusItem(mockBasket, 'non-existent')
             expect(result).toEqual([])
         })
+
+        test('uses qualifyingProductItemId from API when available', () => {
+            const basketWithApiField = {
+                ...mockBasket,
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'regular-product-1',
+                        bonusProductLineItem: false,
+                        priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    },
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-123',
+                        qualifyingProductItemId: 'item-1', // API field present
+                        quantity: 1
+                    }
+                ]
+            }
+            const result = cartUtils.getQualifyingProductIdForBonusItem(
+                basketWithApiField,
+                'bonus-123'
+            )
+            expect(result).toEqual(['regular-product-1'])
+        })
+
+        test('falls back to promotion matching when qualifyingProductItemId is not present', () => {
+            // This is the original test scenario - no qualifyingProductItemId field
+            const result = cartUtils.getQualifyingProductIdForBonusItem(mockBasket, 'bonus-123')
+            expect(result).toEqual(['regular-product-1'])
+        })
+    })
+
+    describe('getBonusProductsForCartItemDirect', () => {
+        test('returns bonus products directly linked via qualifyingProductItemId', () => {
+            const basketWithApiField = {
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'regular-product-1',
+                        bonusProductLineItem: false
+                    },
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        bonusProductLineItem: true,
+                        qualifyingProductItemId: 'item-1',
+                        quantity: 1
+                    },
+                    {
+                        itemId: 'bonus-item-2',
+                        productId: 'bonus-product-2',
+                        bonusProductLineItem: true,
+                        qualifyingProductItemId: 'item-1',
+                        quantity: 2
+                    }
+                ]
+            }
+            const targetCartItem = basketWithApiField.productItems[0]
+            const result = cartUtils.getBonusProductsForCartItemDirect(
+                basketWithApiField,
+                targetCartItem
+            )
+            expect(result).toHaveLength(2)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[1].productId).toBe('bonus-product-2')
+        })
+
+        test('returns empty array when no bonus products link to the cart item', () => {
+            const basketWithApiField = {
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'regular-product-1',
+                        bonusProductLineItem: false
+                    },
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        bonusProductLineItem: true,
+                        qualifyingProductItemId: 'other-item-id'
+                    }
+                ]
+            }
+            const targetCartItem = basketWithApiField.productItems[0]
+            const result = cartUtils.getBonusProductsForCartItemDirect(
+                basketWithApiField,
+                targetCartItem
+            )
+            expect(result).toEqual([])
+        })
+
+        test('handles missing basket or cart item gracefully', () => {
+            expect(cartUtils.getBonusProductsForCartItemDirect(null, {})).toEqual([])
+            expect(cartUtils.getBonusProductsForCartItemDirect({}, null)).toEqual([])
+        })
     })
 
     describe('getBonusProductsInCartForProduct', () => {
@@ -59,6 +157,52 @@ describe('Bonus Product Cart Utilities', () => {
         })
     })
     describe('getBonusProductsForSpecificCartItem', () => {
+        test('uses optimized path with qualifyingProductItemId when available', () => {
+            const basketWithApiField = {
+                productItems: [
+                    {
+                        itemId: 'suit-item-1',
+                        productId: 'suit-product-1',
+                        quantity: 1,
+                        bonusProductLineItem: false
+                    },
+                    {
+                        itemId: 'tie-item-1',
+                        productId: 'red-tie',
+                        bonusProductLineItem: true,
+                        qualifyingProductItemId: 'suit-item-1',
+                        quantity: 2
+                    },
+                    {
+                        itemId: 'tie-item-2',
+                        productId: 'blue-tie',
+                        bonusProductLineItem: true,
+                        qualifyingProductItemId: 'suit-item-1',
+                        quantity: 1
+                    }
+                ]
+            }
+            const targetCartItem = basketWithApiField.productItems[0]
+            const productsWithPromotions = {
+                'suit-product-1': {
+                    productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                }
+            }
+
+            const result = cartUtils.getBonusProductsForSpecificCartItem(
+                basketWithApiField,
+                targetCartItem,
+                productsWithPromotions
+            )
+
+            // Should return both bonus products with aggregated quantities
+            expect(result).toHaveLength(2)
+            const redTie = result.find((item) => item.productId === 'red-tie')
+            const blueTie = result.find((item) => item.productId === 'blue-tie')
+            expect(redTie.quantity).toBe(2)
+            expect(blueTie.quantity).toBe(1)
+        })
+
         const extendedBasket = {
             bonusDiscountLineItems: [
                 {

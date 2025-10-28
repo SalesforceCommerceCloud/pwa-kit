@@ -14,9 +14,14 @@ import {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/
 
 /**
  * Fragment component that renders cart items with bonus products grouped with their qualifying products
+ * 
+ * OPTIMIZATION: This component now uses the qualifyingProductItemId field from the SCAPI API
+ * when available for direct and accurate bonus product matching. Falls back to legacy 
+ * promotion-based matching for backward compatibility.
+ * 
  * @param {Object} props - Component props
  * @param {Array} props.nonBonusProducts - Array of non-bonus products
- * @param {Object} props.basket - The current basket data
+ * @param {Object} props.basket - The current basket data (may include qualifyingProductItemId on bonus items)
  * @param {Object} props.productsWithPromotions - Products with promotion data
  * @param {boolean} props.isPromotionDataLoading - Whether promotion data is loading
  * @param {Function} props.renderProductItem - Function to render individual product items
