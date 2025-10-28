@@ -419,7 +419,7 @@ const SFPaymentsExpressButtons = ({
             const createIntentFunction = async () => {
                 try {
                     // For PayPal/Venmo, prepare basket here since createIntentFunction is called after button click
-                    if (paymentMethodType === 'paypal' || paymentMethodType === 'venmo') {
+                    if (isPayPalPaymentMethodType(paymentMethodType)) {
                         if (!expressBasket.current) {
                             try {
                                 expressBasket.current = await prepareBasket()
@@ -436,7 +436,7 @@ const SFPaymentsExpressButtons = ({
                     }
 
                     let updatedPaymentInstrument
-                    if (paymentMethodType === 'paypal' || paymentMethodType === 'venmo') {
+                    if (isPayPalPaymentMethodType(paymentMethodType)) {
                         // Remove any leftover Salesforce Payments payment instrument from basket
                         const sfPaymentsInstrument = getSFPaymentsInstrument(expressBasket.current)
                         if (sfPaymentsInstrument) {
@@ -590,7 +590,7 @@ const SFPaymentsExpressButtons = ({
             const onApproveEvent = async () => {
                 try {
                     let order
-                    if (paymentMethodType === 'paypal' || paymentMethodType === 'venmo') {
+                    if (isPayPalPaymentMethodType(paymentMethodType)) {
                         // Create order and update payment instrument
                         order = await createOrderAndUpdatePayment(
                             expressBasket.current.basketId,
