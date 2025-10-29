@@ -45,7 +45,14 @@ const CCRadioGroup = ({
             <RadioCardGroup value={value} onChange={onPaymentIdChange}>
                 <Stack spacing={4}>
                     <SimpleGrid columns={[1, 1, 2]} spacing={4}>
-                        {customer.paymentInstruments?.map((payment) => {
+                        {(customer.paymentInstruments
+                            ? [...customer.paymentInstruments].sort((a, b) => {
+                                  const ad = a?.default ? 1 : 0
+                                  const bd = b?.default ? 1 : 0
+                                  return bd - ad
+                              })
+                            : []
+                        ).map((payment) => {
                             const CardIcon = getCreditCardIcon(payment.paymentCard?.cardType)
                             return (
                                 <RadioCard

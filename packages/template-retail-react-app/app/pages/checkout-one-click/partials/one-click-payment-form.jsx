@@ -54,15 +54,17 @@ const PaymentForm = ({
     const {formatMessage} = useIntl()
     const [showAllPaymentInstruments, setShowAllPaymentInstruments] = useState(false)
 
-    const savedCount = savedPaymentInstruments?.length || 0
+    const sortedSaved = (savedPaymentInstruments || [])
+        .slice()
+        .sort((a, b) => (b?.default ? 1 : 0) - (a?.default ? 1 : 0))
+    const savedCount = sortedSaved.length
     const totalItems = savedCount + 2 // saved + credit card + paypal
     const viewCount = showAllPaymentInstruments
         ? totalItems
         : INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
 
     const displayedSavedCount = Math.min(savedCount, viewCount)
-    const displayedSavedPaymentInstruments =
-        savedPaymentInstruments?.slice(0, displayedSavedCount) || []
+    const displayedSavedPaymentInstruments = sortedSaved.slice(0, displayedSavedCount)
 
     const showCreditCard = viewCount > displayedSavedCount
     const displayedAfterCC = displayedSavedCount + (showCreditCard ? 1 : 0)
