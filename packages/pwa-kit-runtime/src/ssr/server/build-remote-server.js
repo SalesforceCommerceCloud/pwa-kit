@@ -1276,7 +1276,13 @@ export const RemoteServerFactory = {
             .setFramework(new ExpressFramework())
             .setHandler(new DefaultHandler())
             .setResolver(new CallbackResolver())
-            .addAdapter(new ApiGatewayV1Adapter({lowercaseRequestHeaders: true}))
+            .addAdapter(
+                new ApiGatewayV1Adapter({
+                    // Preserve the original aws-serverless-express behavior
+                    lowercaseRequestHeaders: true,
+                    throwOnChunkedTransfer: false
+                })
+            )
             .build()
 
         const handler = (event, context, callback) => {
