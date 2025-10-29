@@ -14,7 +14,7 @@ It allows AI agents to query context-aware services like this server to help dev
 
 ## What is PWA-Kit-MCP?
 
-PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new components and pages, and support site validation through performance and accessibility testing.
+PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new pages, and support site validation through performance and accessibility testing.
 
 _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
@@ -28,9 +28,6 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 
 * **`pwakit_create_storefront`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
-
-* **`pwakit_create_component`**:
-  Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
 * **`pwakit_create_page`**:
   Interactive tool to generate a new PWA storefront page with custom routing and components.
@@ -189,7 +186,7 @@ Then send JSON-RPC requests like:
 
 ```json
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
-{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_sample_component", "arguments": {}}}
+{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "pwakit_get_dev_guidelines", "arguments": {}}}
 ```
 
 ---
