@@ -16,6 +16,7 @@ import {
     InstallAgentRulesTool,
     ExploreCommerceAPITool,
     HooksRecommendationTool,
+    ComponentsRecommendationTool,
     CustomApiTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
@@ -71,6 +72,7 @@ class PwaStorefrontMCPServerHighLevel {
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
         this.exploreCommerceAPITool = new ExploreCommerceAPITool()
         this.hooksRecommendationTool = new HooksRecommendationTool()
+        this.componentsRecommendationTool = new ComponentsRecommendationTool()
         this.setupTools()
     }
 
@@ -120,6 +122,12 @@ class PwaStorefrontMCPServerHighLevel {
             this.hooksRecommendationTool.description,
             this.hooksRecommendationTool.inputSchema,
             this.hooksRecommendationTool.handler
+        )
+        this.server.tool(
+            this.componentsRecommendationTool.name,
+            this.componentsRecommendationTool.description,
+            this.componentsRecommendationTool.inputSchema,
+            this.componentsRecommendationTool.handler
         )
         this.server.tool(
             CustomApiTool.name,
