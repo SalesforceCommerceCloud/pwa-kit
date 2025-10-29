@@ -30,7 +30,12 @@ export const useProductViewModal = (initialProduct, queryOptions = {}) => {
     const variant = useVariant(product)
 
     const {data: currentProduct, isFetching} = useProduct(
-        {parameters: {id: (variant || product)?.productId}},
+        {
+            parameters: {
+                id: (variant || product)?.productId,
+                allImages: true
+            }
+        },
         {
             placeholderData: initialProduct,
             ...queryOptions,
