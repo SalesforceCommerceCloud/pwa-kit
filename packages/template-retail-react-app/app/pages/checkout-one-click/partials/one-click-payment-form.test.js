@@ -226,6 +226,25 @@ describe('PaymentForm Component', () => {
             expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
         })
 
+        test('orders saved payment methods with default first', () => {
+            const savedWithDefault = [
+                {...mockSavedPaymentInstruments[0]},
+                {...mockSavedPaymentInstruments[1], default: true}
+            ]
+
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={savedWithDefault}
+                    selectedPaymentMethod={savedWithDefault[1].paymentInstrumentId}
+                />
+            )
+
+            const radios = screen.getAllByRole('radio')
+            expect(radios[0]).toHaveAttribute('value', savedWithDefault[1].paymentInstrumentId)
+        })
+
         test('handles saved payment method selection', () => {
             const mockOnPaymentMethodChange = jest.fn()
 

@@ -29,6 +29,18 @@
       "value": "Retry"
     }
   ],
+  "account.payments.badge.default": [
+    {
+      "type": 0,
+      "value": "Default"
+    }
+  ],
+  "account.payments.checkbox.make_default": [
+    {
+      "type": 0,
+      "value": "Make default"
+    }
+  ],
   "account.payments.error.payment_method_remove_failed": [
     {
       "type": 0,
@@ -41,10 +53,22 @@
       "value": "Unable to save payment method"
     }
   ],
+  "account.payments.error.set_default_failed": [
+    {
+      "type": 0,
+      "value": "Unable to set default payment method"
+    }
+  ],
   "account.payments.heading.payment_methods": [
     {
       "type": 0,
       "value": "Payment Methods"
+    }
+  ],
+  "account.payments.info.default_payment_updated": [
+    {
+      "type": 0,
+      "value": "Default payment method updated"
     }
   ],
   "account.payments.info.payment_method_removed": [

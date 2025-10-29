@@ -54,7 +54,8 @@ const basePaymentInstrument: ShopperCustomersTypes.CustomerPaymentInstrument = {
     paymentBankAccount: {},
     paymentCard: {cardType: 'fake'},
     paymentInstrumentId: 'paymentInstrumentId',
-    paymentMethodId: 'paymentMethodId'
+    paymentMethodId: 'paymentMethodId',
+    default: false
 }
 const baseCustomer: RequireKeys<
     ShopperCustomersTypes.Customer,
@@ -175,6 +176,50 @@ describe('ShopperCustomers mutations', () => {
             await waitAndExpectSuccess(() => result.current.mutation)
             expect(result.current.mutation.data).toBeUndefined()
             assertRemoveQuery(result.current.query)
+        })
+        test('`updateCustomerPaymentInstrument` updates cache on success', async () => {
+            // 0. Setup
+            const customer = baseCustomer
+            const oldData = basePaymentInstrument
+            const newData: ShopperCustomersTypes.CustomerPaymentInstrument = {
+                ...basePaymentInstrument,
+                default: true
+            }
+            const options = createOptions<'updateCustomerPaymentInstrument'>({
+                // Only updating default flag for this test
+                default: true as any
+            })
+
+            mockQueryEndpoint(customersEndpoint, customer) // getCustomer
+            mockQueryEndpoint(customersEndpoint, oldData) // getCustomerPaymentInstrument
+            mockMutationEndpoints(customersEndpoint, newData) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomer refetch
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerPaymentInstrument refetch
+
+            const {result} = renderHookWithProviders(() => ({
+                customer: queries.useCustomer(queryOptions),
+                mutation: useShopperCustomersMutation('updateCustomerPaymentInstrument'),
+                query: queries.useCustomerPaymentInstrument(queryOptions)
+            }))
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(() => result.current.customer)
+            await waitAndExpectSuccess(() => result.current.query)
+            expect(result.current.customer.data).toEqual(customer)
+            expect(result.current.query.data).toEqual(oldData)
+
+            // 2. Do update mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(() => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(newData)
+            // query updated
+            assertUpdateQuery(result.current.query, newData)
+            // customer cache updated (instrument replaced)
+            const expectedCustomer = {
+                ...customer,
+                paymentInstruments: [newData]
+            }
+            assertUpdateQuery(result.current.customer, expectedCustomer as any)
         })
         test('`removeCustomerAddress` updates cache on success', async () => {
             // 0. Setup

@@ -14,14 +14,26 @@
   "account.payments.action.retry": {
     "defaultMessage": "Retry"
   },
+  "account.payments.badge.default": {
+    "defaultMessage": "Default"
+  },
+  "account.payments.checkbox.make_default": {
+    "defaultMessage": "Make default"
+  },
   "account.payments.error.payment_method_remove_failed": {
     "defaultMessage": "Unable to remove payment method"
   },
   "account.payments.error.payment_method_save_failed": {
     "defaultMessage": "Unable to save payment method"
   },
+  "account.payments.error.set_default_failed": {
+    "defaultMessage": "Unable to set default payment method"
+  },
   "account.payments.heading.payment_methods": {
     "defaultMessage": "Payment Methods"
+  },
+  "account.payments.info.default_payment_updated": {
+    "defaultMessage": "Default payment method updated"
   },
   "account.payments.info.payment_method_removed": {
     "defaultMessage": "Payment method removed"
