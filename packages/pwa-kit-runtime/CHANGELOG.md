@@ -3,6 +3,7 @@
 - Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
 - Add extensibility hooks for SLAS private client proxy with `onSLASPrivateProxyReq` and `onSLASPrivateProxyRes` callbacks [#3411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3411)
 - Remove exception when transfer-encoding: chunked [#3439](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3439)
+- Fix chunked encoding option name [#3440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3440)
 
 ## v3.13.0 (Sep 25, 2025)
 

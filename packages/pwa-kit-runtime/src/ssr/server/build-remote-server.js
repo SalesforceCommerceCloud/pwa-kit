@@ -1280,7 +1280,7 @@ export const RemoteServerFactory = {
                 new ApiGatewayV1Adapter({
                     // Preserve the original aws-serverless-express behavior
                     lowercaseRequestHeaders: true,
-                    throwOnChunkedTransfer: false
+                    throwOnChunkedTransferEncoding: false
                 })
             )
             .build()
