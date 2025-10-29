@@ -54,7 +54,8 @@ const basePaymentInstrument: ShopperCustomersTypes.CustomerPaymentInstrument = {
     paymentBankAccount: {},
     paymentCard: {cardType: 'fake'},
     paymentInstrumentId: 'paymentInstrumentId',
-    paymentMethodId: 'paymentMethodId'
+    paymentMethodId: 'paymentMethodId',
+    default: false
 }
 const baseCustomer: RequireKeys<
     ShopperCustomersTypes.Customer,
