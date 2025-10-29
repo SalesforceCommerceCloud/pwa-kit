@@ -32,10 +32,10 @@ import path from 'path'
  * const code = 'example';
  * \`\`\`
  * `;
- * const result = hooksCatalogAsJson(markdown);
+ * const result = catalogAsJson(markdown);
  * // Returns: [{ name: 'Example Section', summary: 'This is a summary', snippet: "const code = 'example';" }]
  */
-export function hooksCatalogAsJson(markdown) {
+export function catalogAsJson(markdown) {
     const sections = markdown.split('### ').slice(1)
     return sections.map((section) => {
         const [beforeCode, codeBlock] = section.split('```')
@@ -63,5 +63,15 @@ export function hooksCatalogAsJson(markdown) {
 export async function loadHooksCatalog() {
     const resolvedCatalogPath = path.resolve(__dirname, '../data/hook-catalog.md')
     const catalogRaw = await fs.readFile(resolvedCatalogPath, 'utf8')
-    return hooksCatalogAsJson(catalogRaw)
+    return catalogAsJson(catalogRaw)
+}
+
+/**
+ * Load the component catalog from the given path or the default path.
+ * @returns {Promise<Array<{name: string, summary: string, snippet: string}>>}
+ */
+export async function loadComponentsCatalog() {
+    const resolvedCatalogPath = path.resolve(__dirname, '../data/component-catalog.md')
+    const catalogRaw = await fs.readFile(resolvedCatalogPath, 'utf8')
+    return catalogAsJson(catalogRaw)
 }

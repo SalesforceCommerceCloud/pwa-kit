@@ -1,4 +1,4 @@
-Note: This hooks catalog file uses the subset of markdown parsable by hooksCatalogAsJson.
+Note: This hooks catalog file uses the subset of markdown parsable by catalogAsJson.
 
 ### useAccessToken
 

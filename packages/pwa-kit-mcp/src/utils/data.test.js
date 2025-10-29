@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {hooksCatalogAsJson, loadHooksCatalog} from './data'
+import {catalogAsJson, loadHooksCatalog, loadComponentsCatalog} from './data'
 import fs from 'fs/promises'
 
 // Mock fs/promises
 jest.mock('fs/promises')
 
-describe('hooksCatalogAsJson', () => {
+describe('catalogAsJson', () => {
     it('should convert markdown with single section to JSON', () => {
         const markdown = `
 ### useProducts
@@ -20,7 +20,7 @@ This hook fetches product data from the API.
 const {data, isLoading} = useProducts({ids: ['123']})
 \`\`\`
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(1)
         expect(result[0]).toEqual({
@@ -48,7 +48,7 @@ Manage shopping basket.
 const {basket, addToBasket} = useBasket()
 \`\`\`
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(2)
         expect(result[0]).toEqual({
@@ -74,7 +74,7 @@ Returns results with metadata.
 const {data} = useProductSearch({query: 'shoes', limit: 20})
 \`\`\`
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(1)
         expect(result[0].name).toBe('useProductSearch')
@@ -98,7 +98,7 @@ useEffect(() => {
 }, [user])
 \`\`\`
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(1)
         expect(result[0].snippet).toContain('const {login, logout, user} = useAuth()')
@@ -119,7 +119,7 @@ const {items, addItem} = useWishlist()
 This text after the code block should be ignored.
 And so should this.
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(1)
         expect(result[0].summary).toBe('Manage customer wishlist.')
@@ -133,7 +133,7 @@ Get application configuration.
 
 No code block provided for this one.
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(1)
         expect(result[0].name).toBe('useConfig')
@@ -158,7 +158,7 @@ Example with TypeScript syntax.
 const value: string = 'test'
 \`\`\`
 `
-        const result = hooksCatalogAsJson(markdown)
+        const result = catalogAsJson(markdown)
 
         expect(result).toHaveLength(2)
         expect(result[0].snippet).toBe('def example():\n    return "test"')
@@ -196,5 +196,41 @@ const {data} = useProduct()
         fs.readFile.mockRejectedValue(new Error('ENOENT: file not found'))
 
         await expect(loadHooksCatalog()).rejects.toThrow('ENOENT: file not found')
+    })
+})
+
+describe('loadComponentsCatalog', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('should load and parse catalog from default path', async () => {
+        const mockMarkdown = `### ProductTile
+
+Component for displaying product information.
+
+\`\`\`jsx
+<ProductTile product={product} />
+\`\`\`
+`
+        fs.readFile.mockResolvedValue(mockMarkdown)
+
+        const result = await loadComponentsCatalog()
+
+        expect(fs.readFile).toHaveBeenCalledWith(
+            expect.stringContaining('component-catalog.md'),
+            'utf8'
+        )
+        expect(result).toHaveLength(1)
+        expect(result[0]).toEqual({
+            name: 'ProductTile',
+            summary: 'Component for displaying product information.',
+            snippet: '<ProductTile product={product} />'
+        })
+    })
+    it('should throw error when file cannot be read', async () => {
+        fs.readFile.mockRejectedValue(new Error('ENOENT: file not found'))
+
+        await expect(loadComponentsCatalog()).rejects.toThrow('ENOENT: file not found')
     })
 })
