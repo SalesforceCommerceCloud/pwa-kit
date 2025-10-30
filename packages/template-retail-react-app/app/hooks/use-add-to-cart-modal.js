@@ -404,11 +404,14 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount: totalItems}
+                                        {
+                                            itemAccumulatedCount: totalItems
+                                        }
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
                                     {productSubTotal &&
+                                        currency &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
                                             currency: currency
@@ -470,11 +473,14 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount: totalItems}
+                                {
+                                    itemAccumulatedCount: totalItems
+                                }
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">
                             {productSubTotal &&
+                                currency &&
                                 intl.formatNumber(productSubTotal, {
                                     style: 'currency',
                                     currency: currency
