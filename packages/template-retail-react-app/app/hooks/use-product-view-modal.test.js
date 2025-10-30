@@ -102,7 +102,7 @@ describe('useProductViewModal hook', () => {
 
         const toggleButton = screen.getByText(/Toggle the content/)
         fireEvent.click(toggleButton)
-        
+
         await waitFor(() => {
             expect(screen.getByText('750518699578M')).toBeInTheDocument()
         })
@@ -123,18 +123,18 @@ describe('useProductViewModal hook', () => {
                 </IntlProvider>
             </Router>
         )
-        
+
         const toggleButton = screen.getByText(/Toggle the content/)
-        
+
         // Show the content
         fireEvent.click(toggleButton)
-        
+
         // URL params should remain unchanged (no URL management)
         expect(history.location.search).toBe('?color=red&size=M')
-        
+
         // Hide the content
         fireEvent.click(toggleButton)
-        
+
         // URL params should still be unchanged
         expect(history.location.search).toBe('?color=red&size=M')
     })

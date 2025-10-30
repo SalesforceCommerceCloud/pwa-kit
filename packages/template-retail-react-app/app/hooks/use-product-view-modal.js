@@ -15,7 +15,7 @@ import {useProduct} from '@salesforce/commerce-sdk-react'
  * This hook is responsible for fetching a product detail based on the current product/variant.
  * Note: This hook does NOT manage URL params. It expects the modal to manage variation selection
  * via React state passed through controlledVariationValues in the hooks chain.
- * 
+ *
  * @param initialProduct - the initial product when the modal is first open
  * @param queryOptions - optional React Query options to pass to useProduct
  * @returns object containing product data and loading state

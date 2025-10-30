@@ -23,6 +23,10 @@ export const useVariationParams = (
 ) => {
     const {variationAttributes = [], variationValues = {}} = product
 
+    // Always call hooks first (hooks must be called unconditionally)
+    const [allParams, productParams] = usePDPSearchParams(product.id)
+    const params = isProductPartOfSet || isProductPartOfBundle ? productParams : allParams
+
     // If controlled values are provided, use those instead of URL params
     if (controlledVariationValues !== null) {
         return variationAttributes
@@ -32,9 +36,6 @@ export const useVariationParams = (
                 return value ? {...acc, [key]: value} : acc
             }, {})
     }
-
-    const [allParams, productParams] = usePDPSearchParams(product.id)
-    const params = isProductPartOfSet || isProductPartOfBundle ? productParams : allParams
 
     // Using all the variation attribute id from the array generated below, get
     // the value if there is one from the location search params and add it to the

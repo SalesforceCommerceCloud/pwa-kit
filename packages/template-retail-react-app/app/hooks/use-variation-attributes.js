@@ -124,11 +124,11 @@ export const useVariationAttributes = (
             }
         })
     }
-    
+
     // In controlled mode, we don't depend on location.search
     const isControlled = controlledVariationValues !== null
     const memoKey = isControlled ? product : [location.search, product]
-    
+
     return useMemo(
         () =>
             variationAttributes.map((variationAttribute) => ({
@@ -145,7 +145,7 @@ export const useVariationAttributes = (
                         [variationAttribute.id]: value.value
                     }
 
-                    return {
+                    const baseValue = {
                         ...value,
                         image: getVariantValueSwatch(product, value),
                         // In controlled mode, don't provide href (use callback instead)
@@ -161,6 +161,16 @@ export const useVariationAttributes = (
                               }),
                         orderable: isVariantValueOrderable(product, params)
                     }
+
+                    // Add onClick handler for controlled mode
+                    if (isControlled && onVariationChange) {
+                        baseValue.onClick = (e) => {
+                            e.preventDefault()
+                            onVariationChange(variationAttribute.id, value.value)
+                        }
+                    }
+
+                    return baseValue
                 })
             })),
         Array.isArray(memoKey) ? memoKey : [memoKey]
