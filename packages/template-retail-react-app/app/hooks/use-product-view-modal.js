@@ -32,7 +32,13 @@ export const useProductViewModal = (
     const [product, setProduct] = useState(initialProduct)
 
     // Compute the variant based on controlled variation values
-    const variant = useVariant(product, false, false, controlledVariationValues)
+    // Note: If product is already a variant (no variants array), useVariant returns undefined
+    const computedVariant = useVariant(product, false, false, controlledVariationValues)
+
+    // Only use computed variant if we have controlled variations AND product has variants array
+    // Otherwise use the product as-is (it might already be a variant from cart)
+    const variant =
+        controlledVariationValues !== null && product?.variants?.length > 0 ? computedVariant : null
 
     const {data: currentProduct, isFetching} = useProduct(
         {parameters: {id: (variant || product)?.productId}},

@@ -10,12 +10,12 @@ import {useState, useEffect, useCallback} from 'react'
 /**
  * Custom hook for managing controlled variation state in modals.
  * Provides React state-based variation management (instead of URL parameters).
- * 
+ *
  * Features:
  * - Manages variation selection state
  * - Auto-selects single-value variation attributes
  * - Provides callback for handling variation changes
- * 
+ *
  * @param {Object} product - The product object with variationAttributes
  * @returns {Object} - { controlledVariationValues, handleVariationChange }
  */
@@ -55,4 +55,3 @@ export const useControlledVariations = (product) => {
         handleVariationChange
     }
 }
-
