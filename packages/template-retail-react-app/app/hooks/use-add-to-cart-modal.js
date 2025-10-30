@@ -380,7 +380,8 @@ export const AddToCartModal = () => {
                                         basket?.bonusDiscountLineItems?.find((bli) => {
                                             return (
                                                 promotionIds.includes(bli.promotionId) &&
-                                                (bonusSelectionMap[bli.id] || 0) < (bli.maxBonusItems || 0)
+                                                (bonusSelectionMap[bli.id] || 0) <
+                                                    (bli.maxBonusItems || 0)
                                             )
                                         })
 
