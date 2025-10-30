@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect} from 'react'
 
 /**
  * Custom hook for managing controlled variation state in modals.
@@ -43,12 +43,12 @@ export const useControlledVariations = (product) => {
     }, [product?.variationAttributes, controlledVariationValues])
 
     // Handle variation changes in controlled mode
-    const handleVariationChange = useCallback((attributeId, value) => {
+    const handleVariationChange = (attributeId, value) => {
         setControlledVariationValues((prev) => ({
             ...prev,
             [attributeId]: value
         }))
-    }, [])
+    }
 
     return {
         controlledVariationValues,
