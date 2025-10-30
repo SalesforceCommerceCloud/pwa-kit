@@ -48,8 +48,7 @@ import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-s
 import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
-    findAllBonusProductItemsToRemove,
-    getBonusProductsForSpecificCartItem
+    findAllBonusProductItemsToRemove
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -939,12 +938,11 @@ const Cart = () => {
         // Check if this product has bonus products associated with it
         // If it does, hide the delivery group selector
         const hasBonusProducts =
-            getBonusProductsForSpecificCartItem(
-                basket,
-                productItem,
-                productsWithPromotions,
-                ruleBasedQualifyingProductsMap
-            ).length > 0
+            basket?.productItems?.some(
+                (item) =>
+                    item.bonusProductLineItem &&
+                    item.qualifyingProductItemId === productItem.itemId
+            ) || false
 
         if (hasBonusProducts) {
             return null
