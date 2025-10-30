@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -90,6 +90,19 @@ export const AddToCartModal = () => {
         useBasketProductsWithPromotions(basket)
     // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
     const {bonusDiscountLineItems = []} = basket || {}
+
+    // Build a map of selected bonus products per bonusDiscountLineItem for efficient lookup
+    // This avoids repeated filtering through productItems for each bonusDiscountLineItem
+    const bonusSelectionMap = useMemo(() => {
+        const map = {}
+        basket?.productItems?.forEach((cartItem) => {
+            if (cartItem.bonusProductLineItem && cartItem.bonusDiscountLineItemId) {
+                const id = cartItem.bonusDiscountLineItemId
+                map[id] = (map[id] || 0) + (cartItem.quantity || 0)
+            }
+        })
+        return map
+    }, [basket?.productItems])
 
     if (!isOpen) {
         return null
@@ -361,11 +374,16 @@ export const AddToCartModal = () => {
                                         ruleBasedQualifyingProductsMap
                                     )
 
-                                    // Find the first bonusDiscountLineItem that matches any of the promotionIds
+                                    // Find a bonusDiscountLineItem that has remaining capacity
+                                    // This ensures we don't pass a fully-allocated bonusDiscountLineItem to SelectBonusProductsCard
                                     const matchingBonusDiscountLineItem =
-                                        basket?.bonusDiscountLineItems?.find((bli) =>
-                                            promotionIds.includes(bli.promotionId)
-                                        )
+                                        basket?.bonusDiscountLineItems?.find((bli) => {
+                                            return (
+                                                promotionIds.includes(bli.promotionId) &&
+                                                (bonusSelectionMap[bli.id] || 0) <
+                                                    (bli.maxBonusItems || 0)
+                                            )
+                                        })
 
                                     // If no matching bonusDiscountLineItem found, don't render
                                     if (!matchingBonusDiscountLineItem) {

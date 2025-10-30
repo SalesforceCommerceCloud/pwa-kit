@@ -1013,3 +1013,91 @@ test('renders SelectBonusProductsCard with hideSelectionCounter=true in add-to-c
     expect(bonusProductsCard).toBeInTheDocument()
     expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })
+
+test('selects bonusDiscountLineItem with remaining capacity when first one is fully allocated', () => {
+    // This test covers the specific bug fix where adding the same qualifying product
+    // multiple times should find a bonusDiscountLineItem with remaining capacity
+    const MOCK_PRODUCT_WITH_BONUS = {
+        ...MOCK_PRODUCT,
+        id: 'test-product-123',
+        productPromotions: [
+            {
+                promotionId: 'promo-123',
+                calloutMsg: "Buy one men's suit, get 2 free ties"
+            }
+        ]
+    }
+
+    const MOCK_DATA_WITH_BONUS = {
+        product: MOCK_PRODUCT_WITH_BONUS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_WITH_BONUS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    // Mock basket with multiple bonusDiscountLineItems for same promotion
+    // The first one is fully allocated (2/2), the second has capacity (0/2)
+    const mockBasketWithMultipleBonusItems = {
+        data: {
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-line-item-1',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                },
+                {
+                    id: 'bonus-line-item-2',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                }
+            ],
+            productItems: [
+                // Two bonus products selected for the first bonusDiscountLineItem
+                {
+                    productId: 'bonus-product-1',
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-line-item-1',
+                    quantity: 1
+                },
+                {
+                    productId: 'bonus-product-2',
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-line-item-1',
+                    quantity: 1
+                }
+                // No bonus products selected for bonus-line-item-2 yet
+            ],
+            productSubTotal: 191.99,
+            currency: 'USD'
+        },
+        derivedData: {
+            totalItems: 3
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasketWithMultipleBonusItems)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_WITH_BONUS,
+                onClose: jest.fn()
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    // Verify that the SelectBonusProductsCard is still rendered
+    // This proves that the component found bonus-line-item-2 (which has capacity)
+    // instead of stopping at bonus-line-item-1 (which is fully allocated)
+    const bonusProductsCard = screen.getByTestId('select-bonus-products-card')
+    expect(bonusProductsCard).toBeInTheDocument()
+    expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
+})
