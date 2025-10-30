@@ -16,43 +16,17 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useIntl} from 'react-intl'
 
 /**
  * A Modal that contains Product View
  */
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
-    // Controlled variation values state for modal (doesn't use URL params)
-    const [controlledVariationValues, setControlledVariationValues] = React.useState({})
+    // Use custom hook for controlled variation management
+    const {controlledVariationValues, handleVariationChange} = useControlledVariations(product)
 
     const productViewModalData = useProductViewModal(product, controlledVariationValues)
-
-    // Auto-select variation attributes with only one value
-    React.useEffect(() => {
-        if (!productViewModalData.product?.variationAttributes) return
-
-        const autoSelections = {}
-        productViewModalData.product.variationAttributes.forEach((attr) => {
-            if (attr.values?.length === 1 && !controlledVariationValues[attr.id]) {
-                autoSelections[attr.id] = attr.values[0].value
-            }
-        })
-
-        if (Object.keys(autoSelections).length > 0) {
-            setControlledVariationValues((prev) => ({
-                ...prev,
-                ...autoSelections
-            }))
-        }
-    }, [productViewModalData.product?.variationAttributes, controlledVariationValues])
-
-    // Handle variation changes in controlled mode
-    const handleVariationChange = React.useCallback((attributeId, value) => {
-        setControlledVariationValues((prev) => ({
-            ...prev,
-            [attributeId]: value
-        }))
-    }, [])
 
     const intl = useIntl()
     const label = intl.formatMessage(

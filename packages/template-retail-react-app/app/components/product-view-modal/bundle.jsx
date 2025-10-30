@@ -20,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import ImageGallery, {
     Skeleton as ImageGallerySkeleton
@@ -38,8 +39,8 @@ const BundleProductViewModal = ({
     showDeliveryOptions,
     ...props
 }) => {
-    // Controlled variation values state for modal (doesn't use URL params)
-    const [controlledVariationValues, setControlledVariationValues] = React.useState({})
+    // Use custom hook for controlled variation management
+    const {controlledVariationValues, handleVariationChange} = useControlledVariations(bundle)
 
     const productViewModalData = useProductViewModal(bundle, controlledVariationValues)
     const {variationParams} = useDerivedProduct(
@@ -55,33 +56,6 @@ const BundleProductViewModal = ({
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(
         productViewModalData?.product?.quantity
     )
-
-    // Auto-select variation attributes with only one value
-    React.useEffect(() => {
-        if (!productViewModalData.product?.variationAttributes) return
-
-        const autoSelections = {}
-        productViewModalData.product.variationAttributes.forEach((attr) => {
-            if (attr.values?.length === 1 && !controlledVariationValues[attr.id]) {
-                autoSelections[attr.id] = attr.values[0].value
-            }
-        })
-
-        if (Object.keys(autoSelections).length > 0) {
-            setControlledVariationValues((prev) => ({
-                ...prev,
-                ...autoSelections
-            }))
-        }
-    }, [productViewModalData.product?.variationAttributes, controlledVariationValues])
-
-    // Handle variation changes in controlled mode
-    const handleVariationChange = React.useCallback((attributeId, value) => {
-        setControlledVariationValues((prev) => ({
-            ...prev,
-            [attributeId]: value
-        }))
-    }, [])
     const trueIfMobile = useBreakpointValue({base: true, lg: false})
 
     let childProductIds = productViewModalData.product?.bundledProductItems
