@@ -170,8 +170,11 @@ const BonusProductViewModal = ({
                     // addItemToNewOrExistingBasket returns the basket directly
                     const updatedBasket = result
 
-                    // Check if there are still remaining bonus products available
-                    const hasRemainingBonusProducts = checkForRemainingBonusProducts(updatedBasket)
+                    // Check if there are still remaining bonus products available for THIS promotion
+                    const hasRemainingBonusProducts = checkForRemainingBonusProducts(
+                        updatedBasket,
+                        promotionId
+                    )
 
                     if (hasRemainingBonusProducts && onReturnToSelection) {
                         // Return to SelectBonusProductModal if there are remaining bonus products
