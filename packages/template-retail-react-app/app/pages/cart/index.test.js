@@ -2088,10 +2088,22 @@ describe('Unavailable products tests', function () {
 })
 
 test('shows error toast when updating cart item fails', async () => {
+    // Suppress console.error for this test
+    jest.spyOn(console, 'error').mockImplementation(jest.fn())
+
     // Mock the update item API to fail
     global.server.use(
         rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
-            return res(ctx.status(500))
+            return res(
+                ctx.delay(0),
+                ctx.status(500),
+                ctx.json({
+                    fault: {
+                        type: 'InternalServerError',
+                        message: 'An internal server error occurred.'
+                    }
+                })
+            )
         })
     )
 
@@ -2108,6 +2120,9 @@ test('shows error toast when updating cart item fails', async () => {
 
     // Wait for the error toast to appear
     await waitFor(() => expect(screen.getByText(/something went wrong/i)).toBeInTheDocument())
+
+    // Restore console.error
+    console.error.mockRestore()
 })
 
 describe('Selected inventory ID tests', function () {

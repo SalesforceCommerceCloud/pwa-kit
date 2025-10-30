@@ -6,28 +6,39 @@
  */
 
 import {useEffect, useState} from 'react'
-import {removeQueryParamsFromPath} from '@salesforce/retail-react-app/app/utils/url'
-import {useHistory, useLocation} from 'react-router-dom'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useProduct} from '@salesforce/commerce-sdk-react'
+import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 
 /**
- * This hook is responsible for fetching a product detail based on the variation selection
- * and managing the variation params on the url when the modal is open/close
+ * This hook is responsible for fetching a product detail based on the current product/variant.
+ * Note: This hook does NOT manage URL params. It expects the modal to manage variation selection
+ * via React state passed through controlledVariationValues in the hooks chain.
+ *
  * @param initialProduct - the initial product when the modal is first open
+ * @param controlledVariationValues - optional controlled variation values from modal state
  * @param queryOptions - optional React Query options to pass to useProduct
- * @returns object
+ * @returns object containing product data and loading state
  */
-export const useProductViewModal = (initialProduct, queryOptions = {}) => {
-    const location = useLocation()
-    const history = useHistory()
+export const useProductViewModal = (
+    initialProduct,
+    controlledVariationValues = null,
+    queryOptions = {}
+) => {
     const intl = useIntl()
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
-    const variant = useVariant(product)
+
+    // Compute the variant based on controlled variation values
+    // Note: If product is already a variant (no variants array), useVariant returns undefined
+    const computedVariant = useVariant(product, false, false, controlledVariationValues)
+
+    // Only use computed variant if we have controlled variations AND product has variants array
+    // Otherwise use the product as-is (it might already be a variant from cart)
+    const variant =
+        controlledVariationValues !== null && product?.variants?.length > 0 ? computedVariant : null
 
     const {data: currentProduct, isFetching} = useProduct(
         {parameters: {id: (variant || product)?.productId}},
@@ -58,25 +69,8 @@ export const useProductViewModal = (initialProduct, queryOptions = {}) => {
         if (currentProduct) setProduct(currentProduct)
     }, [currentProduct])
 
-    const cleanUpVariantParams = () => {
-        const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
-        const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
-
-        history.replace({search: updatedParams})
-    }
-
-    useEffect(() => {
-        // when the modal is first mounted,
-        // clean up the params in case there are variant params not related to current product
-        cleanUpVariantParams()
-        return () => {
-            cleanUpVariantParams()
-        }
-    }, [])
-
     return {
         product,
-        variant,
         isFetching
     }
 }

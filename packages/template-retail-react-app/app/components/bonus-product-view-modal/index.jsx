@@ -21,6 +21,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -60,7 +61,12 @@ const BonusProductViewModal = ({
         }
     }, [product])
 
-    const productViewModalData = useProductViewModal(safeProduct, {keepPreviousData: true})
+    // Use custom hook for controlled variation management
+    const {controlledVariationValues, handleVariationChange} = useControlledVariations(safeProduct)
+
+    const productViewModalData = useProductViewModal(safeProduct, controlledVariationValues, {
+        keepPreviousData: true
+    })
 
     // Keep a stable reference to the last successfully loaded product
     // This prevents constant re-renders while fetching
@@ -474,6 +480,8 @@ const BonusProductViewModal = ({
                                     <HideOnMobile>{BackToSelectionButton}</HideOnMobile>
                                 ) : null
                             }
+                            controlledVariationValues={controlledVariationValues}
+                            onVariationChange={handleVariationChange}
                             {...props}
                         />
                     )}

@@ -16,3 +16,4 @@ export {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
 export {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-derived-product'
 export {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 export {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
+export {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
