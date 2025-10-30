@@ -20,7 +20,6 @@ import {
 } from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
-import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import ImageGallery, {
     Skeleton as ImageGallerySkeleton
@@ -39,17 +38,8 @@ const BundleProductViewModal = ({
     showDeliveryOptions,
     ...props
 }) => {
-    // Use custom hook for controlled variation management
-    const {controlledVariationValues, handleVariationChange} = useControlledVariations(bundle)
-
-    const productViewModalData = useProductViewModal(bundle, controlledVariationValues)
-    const {variationParams} = useDerivedProduct(
-        bundle,
-        false,
-        false,
-        false,
-        controlledVariationValues
-    )
+    const productViewModalData = useProductViewModal(bundle)
+    const {variationParams} = useDerivedProduct(bundle, false, false, false)
     const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
@@ -130,8 +120,6 @@ const BundleProductViewModal = ({
                                     }}
                                     childProductOrderability={childProductOrderability}
                                     setSelectedBundleQuantity={setSelectedBundleQuantity}
-                                    controlledVariationValues={controlledVariationValues}
-                                    onVariationChange={handleVariationChange}
                                     {...props}
                                 />
                             </Box>

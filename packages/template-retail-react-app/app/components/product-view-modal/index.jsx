@@ -16,17 +16,13 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
-import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useIntl} from 'react-intl'
 
 /**
  * A Modal that contains Product View
  */
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
-    // Use custom hook for controlled variation management
-    const {controlledVariationValues, handleVariationChange} = useControlledVariations(product)
-
-    const productViewModalData = useProductViewModal(product, controlledVariationValues)
+    const productViewModalData = useProductViewModal(product)
 
     const intl = useIntl()
     const label = intl.formatMessage(
@@ -48,8 +44,6 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                         imageSize="sm"
                         product={productViewModalData.product}
                         isLoading={productViewModalData.isFetching}
-                        controlledVariationValues={controlledVariationValues}
-                        onVariationChange={handleVariationChange}
                         {...props}
                     />
                 </ModalBody>
