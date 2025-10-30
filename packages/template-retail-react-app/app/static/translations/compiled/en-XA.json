@@ -69,6 +69,34 @@
       "value": "]"
     }
   ],
+  "account.payments.badge.default": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƒȧȧŭŭŀŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.checkbox.make_default": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿȧȧķḗḗ ḓḗḗƒȧȧŭŭŀŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account.payments.error.payment_method_remove_failed": [
     {
       "type": 0,
@@ -97,6 +125,20 @@
       "value": "]"
     }
   ],
+  "account.payments.error.set_default_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şḗḗŧ ḓḗḗƒȧȧŭŭŀŧ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account.payments.heading.payment_methods": [
     {
       "type": 0,
@@ -105,6 +147,20 @@
     {
       "type": 0,
       "value": "Ƥȧȧẏḿḗḗƞŧ Ḿḗḗŧħǿǿḓş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.info.default_payment_updated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƒȧȧŭŭŀŧ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ŭŭƥḓȧȧŧḗḗḓ"
     },
     {
       "type": 0,
