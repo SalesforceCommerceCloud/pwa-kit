@@ -38,14 +38,50 @@ const BundleProductViewModal = ({
     showDeliveryOptions,
     ...props
 }) => {
+    // Controlled variation values state for modal (doesn't use URL params)
+    const [controlledVariationValues, setControlledVariationValues] = React.useState({})
+
     const productViewModalData = useProductViewModal(bundle)
-    const {variationParams} = useDerivedProduct(bundle)
+    const {variationParams} = useDerivedProduct(
+        bundle,
+        false,
+        false,
+        false,
+        controlledVariationValues
+    )
     const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(
         productViewModalData?.product?.quantity
     )
+
+    // Auto-select variation attributes with only one value
+    React.useEffect(() => {
+        if (!productViewModalData.product?.variationAttributes) return
+
+        const autoSelections = {}
+        productViewModalData.product.variationAttributes.forEach((attr) => {
+            if (attr.values?.length === 1 && !controlledVariationValues[attr.id]) {
+                autoSelections[attr.id] = attr.values[0].value
+            }
+        })
+
+        if (Object.keys(autoSelections).length > 0) {
+            setControlledVariationValues((prev) => ({
+                ...prev,
+                ...autoSelections
+            }))
+        }
+    }, [productViewModalData.product?.variationAttributes, controlledVariationValues])
+
+    // Handle variation changes in controlled mode
+    const handleVariationChange = React.useCallback((attributeId, value) => {
+        setControlledVariationValues((prev) => ({
+            ...prev,
+            [attributeId]: value
+        }))
+    }, [])
     const trueIfMobile = useBreakpointValue({base: true, lg: false})
 
     let childProductIds = productViewModalData.product?.bundledProductItems
@@ -120,6 +156,8 @@ const BundleProductViewModal = ({
                                     }}
                                     childProductOrderability={childProductOrderability}
                                     setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                    controlledVariationValues={controlledVariationValues}
+                                    onVariationChange={handleVariationChange}
                                     {...props}
                                 />
                             </Box>

@@ -60,7 +60,40 @@ const BonusProductViewModal = ({
         }
     }, [product])
 
-    const productViewModalData = useProductViewModal(safeProduct, {keepPreviousData: true})
+    // Controlled variation values state for modal (doesn't use URL params)
+    const [controlledVariationValues, setControlledVariationValues] = React.useState({})
+
+    const productViewModalData = useProductViewModal(safeProduct, {
+        keepPreviousData: true
+    })
+
+    // Auto-select variation attributes with only one value
+    React.useEffect(() => {
+        if (!productViewModalData.product?.variationAttributes) return
+
+        const autoSelections = {}
+        productViewModalData.product.variationAttributes.forEach((attr) => {
+            // Only auto-select if there's exactly one value and it's not already selected
+            if (attr.values?.length === 1 && !controlledVariationValues[attr.id]) {
+                autoSelections[attr.id] = attr.values[0].value
+            }
+        })
+
+        if (Object.keys(autoSelections).length > 0) {
+            setControlledVariationValues((prev) => ({
+                ...prev,
+                ...autoSelections
+            }))
+        }
+    }, [productViewModalData.product?.variationAttributes, controlledVariationValues])
+
+    // Handle variation changes in controlled mode
+    const handleVariationChange = React.useCallback((attributeId, value) => {
+        setControlledVariationValues((prev) => ({
+            ...prev,
+            [attributeId]: value
+        }))
+    }, [])
 
     // Keep a stable reference to the last successfully loaded product
     // This prevents constant re-renders while fetching
@@ -471,6 +504,8 @@ const BonusProductViewModal = ({
                                     <HideOnMobile>{BackToSelectionButton}</HideOnMobile>
                                 ) : null
                             }
+                            controlledVariationValues={controlledVariationValues}
+                            onVariationChange={handleVariationChange}
                             {...props}
                         />
                     )}

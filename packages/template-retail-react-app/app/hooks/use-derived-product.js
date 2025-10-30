@@ -28,7 +28,9 @@ export const useDerivedProduct = (
     product,
     isProductPartOfSet = false,
     isProductPartOfBundle = false,
-    pickupInStore = false
+    pickupInStore = false,
+    controlledVariationValues = null,
+    onVariationChange = null
 ) => {
     const showLoading = !product
     const isProductABundle = product?.type?.bundle
@@ -40,13 +42,25 @@ export const useDerivedProduct = (
     // used for product bundles when there are multiple products
     const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
     const intl = useIntl()
-    const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
+    const variant = useVariant(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        controlledVariationValues
+    )
     const isStandardProduct = product?.type?.item
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        controlledVariationValues
+    )
     const variationAttributes = useVariationAttributes(
         product,
         isProductPartOfSet,
-        isProductPartOfBundle
+        isProductPartOfBundle,
+        controlledVariationValues,
+        onVariationChange
     )
     const [quantity, setQuantity] = useState(initialQuantity)
     const {selectedStore} = useSelectedStore()

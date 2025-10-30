@@ -150,7 +150,9 @@ const ProductView = forwardRef(
             showDeliveryOptions = true,
             customButtons = [],
             maxOrderQuantity = null,
-            imageGalleryFooter = null
+            imageGalleryFooter = null,
+            controlledVariationValues = null,
+            onVariationChange = null
         },
         ref
     ) => {
@@ -183,7 +185,14 @@ const ProductView = forwardRef(
             unfulfillable,
             isSelectedStoreOutOfStock,
             selectedStore
-        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle, pickupInStore)
+        } = useDerivedProduct(
+            product,
+            isProductPartOfSet,
+            isProductPartOfBundle,
+            pickupInStore,
+            controlledVariationValues,
+            onVariationChange
+        )
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
@@ -630,6 +639,11 @@ const ProductView = forwardRef(
                                                 },
                                                 {variantType: name}
                                             )}
+                                            handleChange={
+                                                onVariationChange
+                                                    ? (value) => onVariationChange(id, value)
+                                                    : undefined
+                                            }
                                         >
                                             {swatches}
                                         </SwatchGroup>
@@ -930,7 +944,9 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    alignItems: PropTypes.string
+    alignItems: PropTypes.string,
+    controlledVariationValues: PropTypes.object,
+    onVariationChange: PropTypes.func
 }
 
 export default ProductView

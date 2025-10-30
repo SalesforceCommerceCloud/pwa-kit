@@ -10,13 +10,28 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
 /*
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
+ * @param {Object} product - The product object
+ * @param {boolean} isProductPartOfSet - Whether the product is part of a set
+ * @param {boolean} isProductPartOfBundle - Whether the product is part of a bundle
+ * @param {Object} controlledVariationValues - Optional controlled variation values (skips URL reading)
  */
 export const useVariationParams = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    controlledVariationValues = null
 ) => {
     const {variationAttributes = [], variationValues = {}} = product
+
+    // If controlled values are provided, use those instead of URL params
+    if (controlledVariationValues !== null) {
+        return variationAttributes
+            .map(({id}) => id)
+            .reduce((acc, key) => {
+                let value = controlledVariationValues[key] || variationValues?.[key]
+                return value ? {...acc, [key]: value} : acc
+            }, {})
+    }
 
     const [allParams, productParams] = usePDPSearchParams(product.id)
     const params = isProductPartOfSet || isProductPartOfBundle ? productParams : allParams
