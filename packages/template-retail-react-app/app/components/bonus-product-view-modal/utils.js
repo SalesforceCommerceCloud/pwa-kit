@@ -83,15 +83,21 @@ export const createGetRemainingBonusQuantity = (
  * This function examines the bonus discount line items to see if any still have capacity.
  *
  * @param {Object} updatedBasket - The updated basket object after adding items
+ * @param {string} promotionId - Optional promotion ID to check only bonusDiscountLineItems for a specific promotion
  * @returns {boolean} - True if there are remaining bonus products available, false otherwise
  */
-export const checkForRemainingBonusProducts = (updatedBasket) => {
+export const checkForRemainingBonusProducts = (updatedBasket, promotionId) => {
     if (!updatedBasket?.bonusDiscountLineItems) {
         return false
     }
 
+    // Filter bonus discount line items by promotionId if provided
+    const bonusItemsToCheck = promotionId
+        ? updatedBasket.bonusDiscountLineItems.filter((item) => item.promotionId === promotionId)
+        : updatedBasket.bonusDiscountLineItems
+
     // Check if any bonus discount line items still have available capacity
-    return updatedBasket.bonusDiscountLineItems.some((discountItem) => {
+    return bonusItemsToCheck.some((discountItem) => {
         const maxBonusItems = discountItem.maxBonusItems || 0
 
         // Calculate how many bonus products are already in cart for this specific discount item

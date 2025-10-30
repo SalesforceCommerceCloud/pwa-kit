@@ -320,10 +320,11 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
         const user = userEvent.setup()
 
         // Mock successful add to cart with remaining bonus products
+        // The promotionId must match what's passed to BonusProductViewModal
         const updatedBasket = {
             bonusDiscountLineItems: [
-                {id: 'bonus-1', maxBonusItems: 2},
-                {id: 'bonus-2', maxBonusItems: 1}
+                {id: 'bonus-1', promotionId: 'test-promo', maxBonusItems: 2},
+                {id: 'bonus-2', promotionId: 'test-promo', maxBonusItems: 1}
             ],
             productItems: [
                 {
@@ -362,10 +363,11 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
         const user = userEvent.setup()
 
         // Mock successful add to cart with no remaining bonus products
+        // All bonusDiscountLineItems for this promotion are fully allocated
         const updatedBasket = {
             bonusDiscountLineItems: [
-                {id: 'bonus-1', maxBonusItems: 2},
-                {id: 'bonus-2', maxBonusItems: 1}
+                {id: 'bonus-1', promotionId: 'test-promo', maxBonusItems: 2},
+                {id: 'bonus-2', promotionId: 'test-promo', maxBonusItems: 1}
             ],
             productItems: [
                 {
