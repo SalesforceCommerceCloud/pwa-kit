@@ -2098,9 +2098,10 @@ test('shows error toast when updating cart item fails', async () => {
                 ctx.delay(0),
                 ctx.status(500),
                 ctx.json({
-                    type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/internal-server-error',
-                    title: 'Internal Server Error',
-                    detail: 'An internal server error occurred.'
+                    fault: {
+                        type: 'InternalServerError',
+                        message: 'An internal server error occurred.'
+                    }
                 })
             )
         })

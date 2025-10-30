@@ -25,7 +25,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     // Controlled variation values state for modal (doesn't use URL params)
     const [controlledVariationValues, setControlledVariationValues] = React.useState({})
 
-    const productViewModalData = useProductViewModal(product)
+    const productViewModalData = useProductViewModal(product, controlledVariationValues)
 
     // Auto-select variation attributes with only one value
     React.useEffect(() => {

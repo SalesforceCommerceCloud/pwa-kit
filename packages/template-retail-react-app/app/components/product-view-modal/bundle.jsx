@@ -41,7 +41,7 @@ const BundleProductViewModal = ({
     // Controlled variation values state for modal (doesn't use URL params)
     const [controlledVariationValues, setControlledVariationValues] = React.useState({})
 
-    const productViewModalData = useProductViewModal(bundle)
+    const productViewModalData = useProductViewModal(bundle, controlledVariationValues)
     const {variationParams} = useDerivedProduct(
         bundle,
         false,

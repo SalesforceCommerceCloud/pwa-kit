@@ -145,7 +145,7 @@ export const useVariationAttributes = (
                         [variationAttribute.id]: value.value
                     }
 
-                    const baseValue = {
+                    return {
                         ...value,
                         image: getVariantValueSwatch(product, value),
                         // In controlled mode, don't provide href (use callback instead)
@@ -161,16 +161,6 @@ export const useVariationAttributes = (
                               }),
                         orderable: isVariantValueOrderable(product, params)
                     }
-
-                    // Add onClick handler for controlled mode
-                    if (isControlled && onVariationChange) {
-                        baseValue.onClick = (e) => {
-                            e.preventDefault()
-                            onVariationChange(variationAttribute.id, value.value)
-                        }
-                    }
-
-                    return baseValue
                 })
             })),
         Array.isArray(memoKey) ? memoKey : [memoKey]

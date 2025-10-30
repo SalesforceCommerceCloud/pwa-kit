@@ -10,6 +10,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useProduct} from '@salesforce/commerce-sdk-react'
+import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 
 /**
  * This hook is responsible for fetching a product detail based on the current product/variant.
@@ -17,16 +18,24 @@ import {useProduct} from '@salesforce/commerce-sdk-react'
  * via React state passed through controlledVariationValues in the hooks chain.
  *
  * @param initialProduct - the initial product when the modal is first open
+ * @param controlledVariationValues - optional controlled variation values from modal state
  * @param queryOptions - optional React Query options to pass to useProduct
  * @returns object containing product data and loading state
  */
-export const useProductViewModal = (initialProduct, queryOptions = {}) => {
+export const useProductViewModal = (
+    initialProduct,
+    controlledVariationValues = null,
+    queryOptions = {}
+) => {
     const intl = useIntl()
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
 
+    // Compute the variant based on controlled variation values
+    const variant = useVariant(product, false, false, controlledVariationValues)
+
     const {data: currentProduct, isFetching} = useProduct(
-        {parameters: {id: product?.productId}},
+        {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
             ...queryOptions,

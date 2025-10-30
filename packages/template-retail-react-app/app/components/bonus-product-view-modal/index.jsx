@@ -63,7 +63,7 @@ const BonusProductViewModal = ({
     // Controlled variation values state for modal (doesn't use URL params)
     const [controlledVariationValues, setControlledVariationValues] = React.useState({})
 
-    const productViewModalData = useProductViewModal(safeProduct, {
+    const productViewModalData = useProductViewModal(safeProduct, controlledVariationValues, {
         keepPreviousData: true
     })
 
