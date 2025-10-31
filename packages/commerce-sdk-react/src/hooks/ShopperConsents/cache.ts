@@ -27,4 +27,3 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     }
 }
-

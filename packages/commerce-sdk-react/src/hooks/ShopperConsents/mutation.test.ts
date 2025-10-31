@@ -91,7 +91,7 @@ describe('Shopper Consents mutations', () => {
 describe('Cache update behavior', () => {
     describe('updateSubscription', () => {
         beforeEach(() => nock.cleanAll())
-        
+
         test('invalidates `getSubscriptions` query', async () => {
             mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             mockMutationEndpoints(consentsEndpoint, {})
@@ -133,7 +133,7 @@ describe('Cache update behavior', () => {
             mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             mockMutationEndpoints(consentsEndpoint, {})
             mockQueryEndpoint(consentsEndpoint, updatedResponse) // Refetch returns updated data
-            
+
             const {result} = renderHookWithProviders(() => {
                 return {
                     query: queries.useSubscriptions(queryOptions),
@@ -155,7 +155,7 @@ describe('Cache update behavior', () => {
                 })
             )
             await waitAndExpectSuccess(() => result.current.mutation)
-            
+
             // Wait for refetch to complete
             await waitAndExpectSuccess(() => result.current.query)
             // After refetch, data should be updated
@@ -165,7 +165,7 @@ describe('Cache update behavior', () => {
 
     describe('updateSubscriptions', () => {
         beforeEach(() => nock.cleanAll())
-        
+
         test('invalidates `getSubscriptions` query', async () => {
             mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             mockMutationEndpoints(consentsEndpoint, {})
@@ -223,14 +223,14 @@ describe('Cache update behavior', () => {
             mockQueryEndpoint(consentsEndpoint, staleResponse)
             mockMutationEndpoints(consentsEndpoint, {})
             mockQueryEndpoint(consentsEndpoint, freshResponse) // Refetch returns fresh data
-            
+
             const {result} = renderHookWithProviders(() => {
                 return {
                     query: queries.useSubscriptions(queryOptions),
                     mutation: useShopperConsentsMutation('updateSubscriptions')
                 }
             })
-            
+
             // Initial fetch - get stale data
             await waitAndExpectSuccess(() => result.current.query)
             expect(result.current.query.data?.data).toHaveLength(1)
@@ -258,7 +258,7 @@ describe('Cache update behavior', () => {
                 })
             )
             await waitAndExpectSuccess(() => result.current.mutation)
-            
+
             // Wait for automatic refetch
             await waitAndExpectSuccess(() => result.current.query)
             // Should have fresh data, not stale
@@ -267,4 +267,3 @@ describe('Cache update behavior', () => {
         })
     })
 })
-

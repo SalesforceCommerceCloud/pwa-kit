@@ -29,4 +29,3 @@ describe('Shopper Consents hooks', () => {
         expect([...unimplemented]).toEqual([])
     })
 })
-

@@ -40,10 +40,7 @@ export const useSubscriptions = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(
-        netOptions.parameters,
-        ShopperConsents.paramKeys[methodName]
-    )
+    const parameters = pickValidParams(netOptions.parameters, ShopperConsents.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
 
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -62,4 +59,3 @@ export const useSubscriptions = (
         requiredParameters
     })
 }
-

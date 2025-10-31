@@ -69,4 +69,3 @@ describe('Shopper Consents query hooks', () => {
         await waitAndExpectError(() => result.current)
     })
 })
-

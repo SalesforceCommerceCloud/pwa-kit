@@ -65,7 +65,9 @@ export function useShopperConsentsMutation<Mutation extends ShopperConsentsMutat
     return useMutation({
         client,
         method: (opts: Options) => (client[mutation] as ApiMethod<Options, Data>)(opts),
-        getCacheUpdates: getCacheUpdates as unknown as CacheUpdateGetter<MergedOptions<Client, Options>, Data>
+        getCacheUpdates: getCacheUpdates as unknown as CacheUpdateGetter<
+            MergedOptions<Client, Options>,
+            Data
+        >
     })
 }
-
