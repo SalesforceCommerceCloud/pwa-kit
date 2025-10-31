@@ -225,11 +225,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0
             if (hasBasketItem) {
-                mergeBasket.mutate({
+                // Mirror legacy checkout flow header and await completion
+                await mergeBasket.mutateAsync({
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     parameters: {
                         createDestinationBasket: true
                     }
                 })
+                // Make sure UI reflects merged state before proceeding
+                await currentBasketQuery.refetch()
             }
 
             // Update basket with email after successful OTP verification
@@ -266,6 +272,38 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             return {success: false, error: message}
         }
     }
+
+    // Post-auth recovery: if user is already registered (after redirect-based auth),
+    // attempt a one-time merge to carry over any guest items.
+    const hasAttemptedRecoveryRef = useRef(false)
+    useEffect(() => {
+        const attemptRecovery = async () => {
+            if (hasAttemptedRecoveryRef.current) return
+            if (!isRegistered) return
+            const hasBasketItem = basket?.productItems?.length > 0
+            if (!hasBasketItem) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
+            try {
+                await mergeBasket.mutateAsync({
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
+                    }
+                })
+                await currentBasketQuery.refetch()
+            } catch (_e) {
+                // no-op
+            } finally {
+                hasAttemptedRecoveryRef.current = true
+            }
+        }
+        attemptRecovery()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isRegistered])
 
     // Custom form submit handler to prevent default form submission for registered users
     const handleFormSubmit = async (event) => {
