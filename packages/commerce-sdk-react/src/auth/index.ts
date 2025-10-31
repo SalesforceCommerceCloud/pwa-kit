@@ -1268,38 +1268,54 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        
+        const slasClient = this.client
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
         const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
-        const res = await (helpers as unknown as Helpers).authorizePasswordless({
-            slasClient: this.client,
-            credentials: {
-                clientSecret: this.clientSecret
+        const options = {
+            headers: {
+                Authorization: ''
             },
             parameters: {
-                ...(callbackURI && {callbackURI}),
-                ...(usid && {usid}),
-                userid: parameters.userid,
-                mode: finalMode,
                 ...(parameters.register_customer !== undefined && {
-                    // Helper expects camelCase 'registerCustomer'
-                    registerCustomer:
+                    register_customer:
                         typeof parameters.register_customer === 'boolean'
-                            ? Boolean(parameters.register_customer)
+                            ? String(parameters.register_customer)
                             : parameters.register_customer
-                }),
-                // Helper expects camelCase registration fields in parameters; it maps to body internally
-                ...(parameters.last_name && {lastName: parameters.last_name}),
+                })
+            },
+            body: {
+                user_id: parameters.userid,
+                mode: finalMode,
+                // Include usid and site as required by SLAS
+                ...(usid && {usid}),
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                ...(callbackURI && {callback_uri: callbackURI}),
+                ...(parameters.last_name && {last_name: parameters.last_name}),
                 ...(parameters.email && {email: parameters.email}),
-                ...(parameters.first_name && {firstName: parameters.first_name}),
-                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
+                ...(parameters.first_name && {first_name: parameters.first_name}),
+                ...(parameters.phone_number && {phone_number: parameters.phone_number})
             }
-        } as any)
-        if (res && res.status && res.status !== 200) {
-            const errorData = await res.json()
-            throw new Error(`${res.status} ${String(errorData.message)}`)
+        } as {
+            headers?: {[key: string]: string}
+            parameters?: Record<string, string>
+            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType & helpers.CustomRequestBody
         }
+
+        // Use Basic auth header when using private client
+        if (this.clientSecret) {
+            options.headers = options.headers || {}
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        } else {
+            // If not using private client, avoid sending Authorization header
+            delete options.headers
+        }
+
+        const res = await slasClient.authorizePasswordlessCustomer(options)
         return res
     }
 

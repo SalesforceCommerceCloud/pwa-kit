@@ -91,6 +91,7 @@ const Payment = ({
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpDismissedRef = useRef(false)
+    const activeBasketIdRef = useRef(null)
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -185,14 +186,34 @@ const Payment = ({
             // Allow auth storage to settle before SCAPI calls
             await auth.refreshAccessToken()
 
-            await recoverBasketAfterAuth({
+            // Immediately mark OTP completed and close modal to prevent a brief re-open on remounts
+            otpDismissedRef.current = true
+            setEnableUserRegistration?.(false)
+            onOtpClose()
+
+            const newBasketId = await recoverBasketAfterAuth({
                 preLoginItems: basket?.productItems || [],
-                shipmentSnapshot: basket?.shipments?.[0] || null,
+                shipment: basket?.shipments?.[0] || null,
                 doMerge: true
             })
-            otpDismissedRef.current = true
+            if (newBasketId) {
+                activeBasketIdRef.current = newBasketId
+            }
             // Ensure save-for-future is selected after successful registration
             setShouldSavePaymentMethod(true)
+
+            // If user typed a new card and nothing is applied yet, apply it to the new basket id
+            try {
+                const values = paymentMethodForm?.getValues?.()
+                const hasEnteredCard = values?.number && values?.holder && values?.expiry
+                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
+                if (hasEnteredCard && !hasApplied && newBasketId) {
+                    await onPaymentSubmit(values, newBasketId)
+                    await currentBasketQuery.refetch()
+                }
+            } catch (_e) {
+                // best-effort; user can still place order manually
+            }
 
             showToast({
                 variant: 'subtle',
@@ -214,7 +235,7 @@ const Payment = ({
                 isClosable: true
             })
 
-            onOtpClose()
+            // modal already closed right after auth
         } catch (error) {
             let message = formatMessage(API_ERROR_MESSAGE)
             if (error.response) {
@@ -235,8 +256,9 @@ const Payment = ({
     const handleSendEmailOtp = async (email) => {
         try {
             await authorizePasswordlessLogin.mutateAsync({
+                // Pass fields at top-level. The helper maps to query/body correctly.
                 userid: email,
-                callbackURI: `${callbackURL}?mode=otp_email`,
+                callbackURI: callbackURL,
                 register_customer: true,
                 last_name: email,
                 email: email
@@ -300,7 +322,7 @@ const Payment = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
-    const onPaymentSubmit = async (formValue) => {
+    const onPaymentSubmit = async (formValue, forcedBasketId) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
         // month and year to submit them as individual fields.
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
@@ -322,7 +344,7 @@ const Payment = ({
         }
 
         return addPaymentInstrumentToBasket({
-            parameters: {basketId: basket?.basketId},
+            parameters: {basketId: forcedBasketId || activeBasketIdRef.current || basket?.basketId},
             body: paymentInstrument
         })
     }
@@ -338,7 +360,10 @@ const Payment = ({
             const isRegistered = customer?.isRegistered
             const hasSaved = customer?.paymentInstruments?.length > 0
             const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
-            if (!isRegistered || !hasSaved || alreadyApplied) return
+            // If the shopper is currently typing a new card, skip auto-apply of saved
+            const entered = paymentMethodForm?.getValues?.()
+            const hasEnteredCard = entered?.number && entered?.holder && entered?.expiry
+            if (!isRegistered || !hasSaved || alreadyApplied || hasEnteredCard) return
             autoAppliedRef.current = true
             const preferred =
                 customer.paymentInstruments.find((pi) => pi.default === true) ||
@@ -346,7 +371,7 @@ const Payment = ({
             try {
                 setIsApplyingSavedPayment(true)
                 await addPaymentInstrumentToBasket({
-                    parameters: {basketId: basket?.basketId},
+                    parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                     body: {
                         paymentMethodId: 'CREDIT_CARD',
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
@@ -394,7 +419,7 @@ const Payment = ({
         } else {
             setIsApplyingSavedPayment(true)
             await addPaymentInstrumentToBasket({
-                parameters: {basketId: basket?.basketId},
+                parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                 body: {
                     paymentMethodId: 'CREDIT_CARD',
                     customerPaymentInstrumentId: paymentInstrumentId
@@ -423,7 +448,7 @@ const Payment = ({
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId}
+            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
         })
     }
 
@@ -431,7 +456,7 @@ const Payment = ({
         try {
             await removePaymentInstrumentFromBasket({
                 parameters: {
-                    basketId: basket.basketId,
+                    basketId: activeBasketIdRef.current || basket.basketId,
                     paymentInstrumentId: appliedPayment.paymentInstrumentId
                 }
             })
@@ -445,7 +470,7 @@ const Payment = ({
     const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
         try {
             if (!appliedPayment) {
-                await onPaymentSubmit(paymentFormValues)
+                await onPaymentSubmit(paymentFormValues, activeBasketIdRef.current)
             }
 
             // Update billing address
