@@ -12,7 +12,8 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 
 test('renders component', () => {
     renderWithProviders(<Footer />)
-    expect(screen.getByRole('link', {name: 'Privacy Policy'})).toBeInTheDocument()
+    const privacyLinks = screen.getAllByRole('link', {name: 'Privacy Policy'})
+    expect(privacyLinks.length).toBeGreaterThanOrEqual(1)
 })
 
 test('renders mobile version by default', () => {

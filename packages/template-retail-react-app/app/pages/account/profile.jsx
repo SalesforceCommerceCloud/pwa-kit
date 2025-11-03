@@ -36,6 +36,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import MarketingConsentCard from '@salesforce/retail-react-app/app/components/marketing-consent-card'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -357,6 +358,7 @@ const AccountDetail = () => {
             <Stack spacing={4}>
                 <ProfileCard allowPasswordChange={!isExternal} />
                 {!isExternal && <PasswordCard />}
+                <MarketingConsentCard />
             </Stack>
         </Stack>
     )

@@ -17,3 +17,4 @@ export {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-deri
 export {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 export {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 export {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
+export {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
