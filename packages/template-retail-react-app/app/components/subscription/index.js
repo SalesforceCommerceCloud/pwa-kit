@@ -7,4 +7,3 @@
 export {default as SubscribeForm} from './subscribe-form'
 export {default as SubscribeMarketingConsent} from './subscribe-marketing-consent'
 export {default} from './subscribe-marketing-consent'
-

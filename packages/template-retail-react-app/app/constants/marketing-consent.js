@@ -26,4 +26,3 @@ export const CONSENT_TAGS = {
     REGISTRATION: 'registration',
     FOOTER: 'footer'
 }
-

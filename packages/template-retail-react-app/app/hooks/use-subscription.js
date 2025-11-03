@@ -6,7 +6,10 @@
  */
 
 import {useCallback, useMemo, useState} from 'react'
-import {CONSENT_CHANNELS, CONSENT_STATUS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
+import {
+    CONSENT_CHANNELS,
+    CONSENT_STATUS
+} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {useIntl} from 'react-intl'
 
@@ -102,4 +105,3 @@ export const useSubscription = ({
 }
 
 export default useSubscription
-

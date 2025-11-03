@@ -33,4 +33,3 @@ SubscribeMarketingConsent.propTypes = {
 }
 
 export default SubscribeMarketingConsent
-

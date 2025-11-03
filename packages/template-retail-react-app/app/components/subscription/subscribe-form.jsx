@@ -17,16 +17,25 @@ import {
     Alert,
     AlertIcon,
     AlertDescription,
-    Link
+    Link,
+    useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl, FormattedMessage} from 'react-intl'
 import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
-import {createStylesContext} from '@chakra-ui/react'
-
-const [, useStyles] = createStylesContext('Footer')
 
 const SubscribeForm = ({subscription, ...otherProps}) => {
-    const styles = useStyles()
+    // Use SubscribeForm's own theme config instead of Footer's context
+    const subscribeFormStyles = useMultiStyleConfig('SubscribeForm')
+
+    // Map SubscribeForm theme parts to Footer's expected structure
+    const styles = {
+        subscribe: subscribeFormStyles.container,
+        subscribeHeading: subscribeFormStyles.heading,
+        subscribeMessage: subscribeFormStyles.message,
+        subscribeField: subscribeFormStyles.field,
+        subscribeButtonContainer: subscribeFormStyles.buttonContainer,
+        socialIcons: subscribeFormStyles.socialIcons
+    }
     const intl = useIntl()
     const {state, actions} = subscription
 
@@ -112,7 +121,7 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                         {...styles.subscribeField}
                     />
                 </InputGroup>
-                
+
                 <Text fontSize="xs" color="gray.600" mt={2}>
                     <FormattedMessage
                         id="footer.subscribe.disclaimer"
@@ -156,4 +165,3 @@ SubscribeForm.propTypes = {
 }
 
 export default SubscribeForm
-

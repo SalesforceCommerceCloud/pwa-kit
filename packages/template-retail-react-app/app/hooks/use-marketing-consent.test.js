@@ -6,7 +6,7 @@
  */
 
 import {renderHook} from '@testing-library/react'
-import {useMarketingConsent} from './use-marketing-consent'
+import {useMarketingConsent} from '@salesforce/retail-react-app/../../app/hooks/use-marketing-consent'
 import {
     useSubscriptions,
     useShopperConsentsMutation,
@@ -70,7 +70,7 @@ describe('useMarketingConsent', () => {
             ...mockUseQueryResult,
             data: mockSubscriptionsData
         })
-        useShopperConsentsMutation.mockImplementation((mutationType) => {
+        useShopperConsentsMutation.mockImplementation(() => {
             return mockUseMutationResult
         })
     })

@@ -2615,6 +2615,202 @@
       "value": "]"
     }
   ],
+  "consent_card.button.save_preferences": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧṽḗḗ Ƥřḗḗƒḗḗřḗḗƞƈḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.button.saving": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧṽīƞɠ..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħǿǿǿǿşḗḗ ħǿǿẇ ẏǿǿŭŭ'ḓ ŀīķḗḗ ŧǿǿ ħḗḗȧȧř ƒřǿǿḿ ŭŭş ȧȧƀǿǿŭŭŧ ƥřǿǿḓŭŭƈŧş, şḗḗřṽīƈḗḗş, ȧȧƞḓ şƥḗḗƈīȧȧŀ ǿǿƒƒḗḗřş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.description.email_newsletter": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƈḗḗīṽḗḗ ǿǿŭŭř ẇḗḗḗḗķŀẏ ƞḗḗẇşŀḗḗŧŧḗḗř ẇīŧħ ƥřǿǿḓŭŭƈŧ ŭŭƥḓȧȧŧḗḗş ȧȧƞḓ ŧīƥş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.description.promotional_offers": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɠḗḗŧ ḗḗẋƈŀŭŭşīṽḗḗ ḓḗḗȧȧŀş ȧȧƞḓ şƥḗḗƈīȧȧŀ ƥřǿǿḿǿǿŧīǿǿƞş ṽīȧȧ ḗḗḿȧȧīŀ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.description.sms_alerts": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƈḗḗīṽḗḗ ǿǿřḓḗḗř ŭŭƥḓȧȧŧḗḗş ȧȧƞḓ īḿƥǿǿřŧȧȧƞŧ ȧȧŀḗḗřŧş ṽīȧȧ ŞḾŞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.disclaimer": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ƈȧȧƞ ŭŭƥḓȧȧŧḗḗ ŧħḗḗşḗḗ ƥřḗḗƒḗḗřḗḗƞƈḗḗş ȧȧŧ ȧȧƞẏ ŧīḿḗḗ. Ḿḗḗşşȧȧɠḗḗ ȧȧƞḓ ḓȧȧŧȧȧ řȧȧŧḗḗş ḿȧȧẏ ȧȧƥƥŀẏ ƒǿǿř ŞḾŞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.error.email_required": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḿȧȧīŀ ȧȧḓḓřḗḗşş īş řḗḗɋŭŭīřḗḗḓ ŧǿǿ ḿȧȧƞȧȧɠḗḗ şŭŭƀşƈřīƥŧīǿǿƞş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.error.update_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ŭŭƥḓȧȧŧḗḗ ƥřḗḗƒḗḗřḗḗƞƈḗḗş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.info.preferences_updated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿḿḿŭŭƞīƈȧȧŧīǿǿƞ ƥřḗḗƒḗḗřḗḗƞƈḗḗş ŭŭƥḓȧȧŧḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.label.email_newsletter": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḿȧȧīŀ Ƞḗḗẇşŀḗḗŧŧḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.label.promotional_offers": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥřǿǿḿǿǿŧīǿǿƞȧȧŀ Ǿƒƒḗḗřş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.label.sms_alerts": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ŞḾŞ Ȧŀḗḗřŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.title.marketing_preferences": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿȧȧřķḗḗŧīƞɠ Ƥřḗḗƒḗḗřḗḗƞƈḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "contact_info.action.sign_out": [
     {
       "type": 0,
@@ -3507,6 +3703,34 @@
       "value": "]"
     }
   ],
+  "footer.error.enter_valid_email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.error.generic_error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ ƥřǿǿƈḗḗşş ŧħḗḗ şŭŭƀşƈřīƥŧīǿǿƞ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.link.about_us": [
     {
       "type": 0,
@@ -3689,6 +3913,36 @@
       "value": "]"
     }
   ],
+  "footer.subscribe.disclaimer": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓẏ şŭŭƀşƈřīƀīƞɠ, ẏǿǿŭŭ ȧȧɠřḗḗḗḗ ŧǿǿ ǿǿŭŭř "
+    },
+    {
+      "type": 1,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " ȧȧƞḓ "
+    },
+    {
+      "type": 1,
+      "value": "privacy"
+    },
+    {
+      "type": 0,
+      "value": "."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.subscribe.email.assistive_msg": [
     {
       "type": 0,
@@ -3703,6 +3957,20 @@
       "value": "]"
     }
   ],
+  "footer.subscribe.email.placeholder_text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ẏǿǿŭŭ@ḗḗḿȧȧīŀ.ƈǿǿḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.subscribe.heading.first_to_know": [
     {
       "type": 0,
@@ -3711,6 +3979,20 @@
     {
       "type": 0,
       "value": "Ɓḗḗ ŧħḗḗ ƒīřşŧ ŧǿǿ ķƞǿǿẇ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.success_confirmation": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħȧȧƞķş ƒǿǿř şŭŭƀşƈřīƀīƞɠ!"
     },
     {
       "type": 0,
