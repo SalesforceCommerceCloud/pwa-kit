@@ -18,6 +18,7 @@ import {useMemo} from 'react'
  *
  * @param {Object} options - Configuration options
  * @param {boolean} options.enabled - Whether to enable the subscriptions query (defaults to true)
+ * @param {Array<string>} options.tags - Optional array of tags to filter subscriptions (all included)
  * @returns {Object} Object containing:
  *   - data: The consent subscription data
  *   - isLoading: Whether the query is loading
@@ -70,11 +71,13 @@ import {useMemo} from 'react'
  * // Check if subscription has a channel
  * const hasEmailChannel = hasChannel('marketing-email', 'email')
  */
-export const useMarketingConsent = ({enabled = true} = {}) => {
+export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
     // Query hook to get current subscriptions
     const subscriptionsQuery = useSubscriptions(
         {
-            parameters: {}
+            parameters: {
+                ...(tags.length > 0 && {tags: tags.join(',')})
+            }
         },
         {
             enabled

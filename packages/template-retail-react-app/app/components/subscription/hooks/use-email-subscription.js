@@ -19,7 +19,7 @@ import {useIntl} from 'react-intl'
  * This allows marketers to configure subscriptions in Business Manager without code changes.
  * 
  * @param {Object} options
- * @param {string} options.tag - The consent tag to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER)
+ * @param {string|Array<string>} options.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER or [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER])
  * @returns {Object} Email subscription state and actions
  * @returns {Object} return.state - Current form state
  * @returns {string} return.state.email - Current email value
@@ -39,13 +39,19 @@ import {useIntl} from 'react-intl'
  * })
  */
 export const useEmailSubscription = ({tag} = {}) => {
+    // Normalize tag to array for API call
+    const tags = useMemo(() => {
+        if (!tag) return []
+        return Array.isArray(tag) ? tag : [tag]
+    }, [tag])
+
     const {
         data: subscriptionsData,
         isLoading: isFetchingSubscriptions,
         updateSubscriptions,
         isUpdating,
         getSubscriptionsByTagAndChannel
-    } = useMarketingConsent()
+    } = useMarketingConsent({tags})
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -54,13 +60,19 @@ export const useEmailSubscription = ({tag} = {}) => {
     const [message, setMessage] = useState(null)
     const [messageType, setMessageType] = useState('success')
 
-    // Find all subscriptions that match the tag and email channel
+    // Find all subscriptions that match the tag(s) and email channel
+    // Since the API already filters by tags, we need to match against any of the provided tags
     const matchingSubscriptions = useMemo(() => {
-        if (!tag || !subscriptionsData) {
+        if (tags.length === 0 || !subscriptionsData) {
             return []
         }
-        return getSubscriptionsByTagAndChannel(tag, CONSENT_CHANNELS.EMAIL)
-    }, [tag, subscriptionsData, getSubscriptionsByTagAndChannel])
+        const allSubscriptions = subscriptionsData?.data || []
+        return allSubscriptions.filter((sub) => {
+            const hasEmailChannel = sub.channels?.has(CONSENT_CHANNELS.EMAIL)
+            const hasAnyTag = tags.some((t) => sub.tags?.has(t))
+            return hasEmailChannel && hasAnyTag
+        })
+    }, [tags, subscriptionsData])
 
     const messages = useMemo(
         () => ({
@@ -98,9 +110,10 @@ export const useEmailSubscription = ({tag} = {}) => {
 
         // Check if there are any matching subscriptions
         if (matchingSubscriptions.length === 0) {
+            const tagList = tags.join(', ')
             console.error(
-                `[useEmailSubscription] No subscriptions found for tag "${tag}" and channel "email". ` +
-                `Please configure subscriptions in Business Manager with tag="${tag}".`
+                `[useEmailSubscription] No subscriptions found for tag(s) "${tagList}" and channel "email". ` +
+                `Please configure subscriptions in Business Manager with one of these tags: ${tagList}.`
             )
             setMessage(messages.error.no_subscriptions)
             setMessageType('error')

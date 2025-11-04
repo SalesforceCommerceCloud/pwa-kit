@@ -129,6 +129,41 @@ describe('useMarketingConsent', () => {
 
             expect(useSubscriptions).toHaveBeenCalledWith({parameters: {}}, {enabled: true})
         })
+
+        test('passes tags parameter when provided as array', () => {
+            renderHook(() => useMarketingConsent({tags: ['homepage_banner', 'footer']}))
+
+            expect(useSubscriptions).toHaveBeenCalledWith(
+                {parameters: {tags: 'homepage_banner,footer'}},
+                {enabled: true}
+            )
+        })
+
+        test('passes single tag parameter when provided', () => {
+            renderHook(() => useMarketingConsent({tags: ['homepage_banner']}))
+
+            expect(useSubscriptions).toHaveBeenCalledWith(
+                {parameters: {tags: 'homepage_banner'}},
+                {enabled: true}
+            )
+        })
+
+        test('handles empty tags array', () => {
+            renderHook(() => useMarketingConsent({tags: []}))
+
+            expect(useSubscriptions).toHaveBeenCalledWith({parameters: {}}, {enabled: true})
+        })
+
+        test('combines tags and enabled options', () => {
+            renderHook(() =>
+                useMarketingConsent({tags: ['homepage_banner', 'footer'], enabled: false})
+            )
+
+            expect(useSubscriptions).toHaveBeenCalledWith(
+                {parameters: {tags: 'homepage_banner,footer'}},
+                {enabled: false}
+            )
+        })
     })
 
     describe('Helper functions', () => {

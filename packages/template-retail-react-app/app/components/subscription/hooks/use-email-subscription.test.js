@@ -108,15 +108,20 @@ describe('useEmailSubscription', () => {
             expect(typeof result.current.actions.submit).toBe('function')
         })
 
-        test('fetches matching subscriptions based on tag', () => {
+        test('passes tags to useMarketingConsent when tag is a string', () => {
             renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
                 wrapper: createWrapper()
             })
 
-            expect(mockGetSubscriptionsByTagAndChannel).toHaveBeenCalledWith(
-                'homepage_banner',
-                'email'
-            )
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner']})
+        })
+
+        test('passes tags to useMarketingConsent when tag is an array', () => {
+            renderHook(() => useEmailSubscription({tag: ['homepage_banner', 'footer']}), {
+                wrapper: createWrapper()
+            })
+
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner', 'footer']})
         })
 
         test('returns matching subscriptions count', () => {
@@ -240,8 +245,14 @@ describe('useEmailSubscription', () => {
             expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
         })
 
-        test('logs developer-friendly error message', async () => {
-            mockGetSubscriptionsByTagAndChannel.mockReturnValue([])
+        test('logs developer-friendly error message with single tag', async () => {
+            useMarketingConsent.mockReturnValue({
+                data: {data: []},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
             const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
                 wrapper: createWrapper()
             })
@@ -258,7 +269,38 @@ describe('useEmailSubscription', () => {
                 expect.stringContaining('[useEmailSubscription] No subscriptions found')
             )
             expect(console.error).toHaveBeenCalledWith(
-                expect.stringContaining('tag="homepage_banner"')
+                expect.stringContaining('tag(s) "homepage_banner"')
+            )
+        })
+
+        test('logs developer-friendly error message with multiple tags', async () => {
+            useMarketingConsent.mockReturnValue({
+                data: {data: []},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+            const {result} = renderHook(
+                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                {
+                    wrapper: createWrapper()
+                }
+            )
+
+            act(() => {
+                result.current.actions.setEmail('test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringContaining('[useEmailSubscription] No subscriptions found')
+            )
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringContaining('tag(s) "homepage_banner, footer"')
             )
         })
     })
@@ -354,9 +396,15 @@ describe('useEmailSubscription', () => {
         })
 
         test('handles single subscription in bulk update', async () => {
-            mockGetSubscriptionsByTagAndChannel.mockReturnValue([mockMatchingSubscriptions[0]])
+            useMarketingConsent.mockReturnValue({
+                data: {data: [mockMatchingSubscriptions[0]]},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'registration'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
                 wrapper: createWrapper()
             })
 
@@ -496,24 +544,73 @@ describe('useEmailSubscription', () => {
     })
 
     describe('Tag filtering', () => {
-        test('filters subscriptions by different tags', () => {
-            mockGetSubscriptionsByTagAndChannel.mockReturnValue([
+        test('filters subscriptions by single tag', () => {
+            const mockCheckoutSubscriptions = [
                 {
                     subscriptionId: 'checkout-updates',
                     channels: new Set(['email']),
                     tags: new Set(['checkout_page'])
                 }
-            ])
+            ]
+
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockCheckoutSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
 
             const {result} = renderHook(() => useEmailSubscription({tag: 'checkout_page'}), {
                 wrapper: createWrapper()
             })
 
-            expect(mockGetSubscriptionsByTagAndChannel).toHaveBeenCalledWith('checkout_page', 'email')
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['checkout_page']})
             expect(result.current.state.matchingSubscriptionsCount).toBe(1)
         })
 
+        test('filters subscriptions by multiple tags', () => {
+            const mockMultiTagSubscriptions = [
+                {
+                    subscriptionId: 'marketing-email',
+                    channels: new Set(['email']),
+                    tags: new Set(['homepage_banner'])
+                },
+                {
+                    subscriptionId: 'footer-newsletter',
+                    channels: new Set(['email']),
+                    tags: new Set(['footer'])
+                }
+            ]
+
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockMultiTagSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+
+            const {result} = renderHook(
+                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                {
+                    wrapper: createWrapper()
+                }
+            )
+
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner', 'footer']})
+            expect(result.current.state.matchingSubscriptionsCount).toBe(2)
+        })
+
         test('updates matching subscriptions when data changes', () => {
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockMatchingSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+
             const {result, rerender} = renderHook(
                 ({tag}) => useEmailSubscription({tag}),
                 {
@@ -524,10 +621,17 @@ describe('useEmailSubscription', () => {
 
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
 
-            mockGetSubscriptionsByTagAndChannel.mockReturnValue([mockMatchingSubscriptions[0]])
+            // Mock with only one subscription for the second render
+            useMarketingConsent.mockReturnValue({
+                data: {data: [mockMatchingSubscriptions[0]]},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
             rerender({tag: 'registration'})
 
-            expect(result.current.state.matchingSubscriptionsCount).toBe(1)
+            expect(result.current.state.matchingSubscriptionsCount).toBe(0) // 'registration' tag not in our mock data
         })
     })
 
