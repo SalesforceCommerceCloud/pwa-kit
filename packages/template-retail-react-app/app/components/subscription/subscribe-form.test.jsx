@@ -13,6 +13,8 @@ const mockSubscriptionState = {
     state: {
         email: '',
         isLoading: false,
+        isFetching: false,
+        matchingSubscriptionsCount: 2,
         feedback: null
     },
     actions: {
@@ -156,6 +158,28 @@ describe('SubscribeForm', () => {
         expect(mockSubmit).not.toHaveBeenCalled()
     })
 
+    test('does not call submit when Enter is pressed while fetching', async () => {
+        const mockSubmit = jest.fn()
+        const subscription = {
+            state: {
+                ...mockSubscriptionState.state,
+                isFetching: true
+            },
+            actions: {
+                ...mockSubscriptionState.actions,
+                submit: mockSubmit
+            }
+        }
+
+        const {user} = renderWithProviders(<SubscribeForm subscription={subscription} />)
+        const emailInput = screen.getByLabelText(/email address for newsletter/i)
+
+        await user.type(emailInput, 'test@example.com')
+        await user.keyboard('{Enter}')
+
+        expect(mockSubmit).not.toHaveBeenCalled()
+    })
+
     test('displays loading state on button', () => {
         const subscription = {
             state: {
@@ -176,6 +200,21 @@ describe('SubscribeForm', () => {
             state: {
                 ...mockSubscriptionState.state,
                 isLoading: true
+            },
+            actions: mockSubscriptionState.actions
+        }
+
+        renderWithProviders(<SubscribeForm subscription={subscription} />)
+        const emailInput = screen.getByLabelText(/email address for newsletter/i)
+
+        expect(emailInput).toBeDisabled()
+    })
+
+    test('disables email input when fetching subscriptions', () => {
+        const subscription = {
+            state: {
+                ...mockSubscriptionState.state,
+                isFetching: true
             },
             actions: mockSubscriptionState.actions
         }
@@ -246,5 +285,39 @@ describe('SubscribeForm', () => {
         )
 
         expect(screen.getByTestId('custom-subscribe-form')).toBeInTheDocument()
+    })
+
+    test('shows spinner overlay when fetching subscriptions', () => {
+        const subscription = {
+            state: {
+                ...mockSubscriptionState.state,
+                isFetching: true
+            },
+            actions: mockSubscriptionState.actions
+        }
+
+        renderWithProviders(<SubscribeForm subscription={subscription} />)
+
+        // Check for spinner - it should be visible
+        const spinner = document.querySelector('[class*="spinner"]')
+        expect(spinner).toBeInTheDocument()
+    })
+
+    test('does not show spinner when not fetching', () => {
+        renderWithProviders(<SubscribeForm subscription={mockSubscriptionState} />)
+
+        // Spinner should not be present
+        const spinner = document.querySelector('[class*="spinner"]')
+        expect(spinner).not.toBeInTheDocument()
+    })
+
+    test('form is interactive when not fetching and not loading', () => {
+        renderWithProviders(<SubscribeForm subscription={mockSubscriptionState} />)
+
+        const emailInput = screen.getByLabelText(/email address for newsletter/i)
+        const submitButton = screen.getByRole('button', {name: /sign up/i})
+
+        expect(emailInput).not.toBeDisabled()
+        expect(submitButton).not.toBeDisabled()
     })
 })

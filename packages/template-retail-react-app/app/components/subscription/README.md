@@ -1,32 +1,53 @@
 # Marketing Consent Subscription Component
 
-This directory contains components for managing email subscriptions via the Salesforce Commerce Cloud ShopperConsents API v1.1.3.
+This directory contains components and hooks for managing marketing subscriptions via the Salesforce Commerce Cloud ShopperConsents API v1.1.3.
 
 ## Overview
 
-The subscription system allows customers to opt into marketing communications (email/SMS) directly from the footer. It integrates with the ShopperConsents API to manage consent preferences.
+The subscription system allows customers to opt into marketing communications from various UI locations (footer, checkout, registration, etc.). It dynamically fetches and subscribes to **all subscriptions** matching a given consent tag and channel.
+
+**Key Features:**
+- **Dynamic & Flexible**: Marketers configure subscriptions in Business Manager - no code changes needed
+- **Tag-Based**: Uses consent tags (e.g., `CONSENT_TAGS.HOMEPAGE_BANNER`) to group subscriptions by UI location
+- **Bulk Operations**: Opts users into ALL matching subscriptions in a single API call
+- **Channel-Aware**: Automatically filters subscriptions by channel (e.g., email, SMS)
+
+Currently supports **email subscriptions**. SMS and other channels can be added by creating additional channel-specific hooks.
+
+## Directory Structure
+
+```
+/app/components/subscription/
+├── hooks/
+│   ├── index.js                          # Hook exports
+│   └── use-email-subscription.js         # Email subscription logic
+├── index.js                              # Component exports
+├── subscribe-marketing-consent.jsx       # Container component
+├── subscribe-form.jsx                    # Presentational form component
+└── README.md                             # This file
+```
 
 ## Components
 
 ### `SubscribeMarketingConsent`
-Main component that connects the subscription form to the consent API.
+Main component that connects the subscription form to the consent API. Dynamically subscribes users to ALL subscriptions matching the provided tag and email channel.
 
 **Props:**
-- `subscriptionId` (string, default: 'newsletter') - The subscription ID configured in your B2C Commerce consent management
-- `channel` (string, default: 'email') - The channel to subscribe to ('email' or 'sms')
+- `tag` (string, **required**) - The consent tag to filter subscriptions by (from `CONSENT_TAGS`)
 
 **Example:**
 ```jsx
 import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
-// Default usage (email newsletter)
-<SubscribeMarketingConsent />
+// Footer newsletter signup
+<SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
 
-// Custom subscription
-<SubscribeMarketingConsent 
-  subscriptionId="promotional-offers" 
-  channel="email" 
-/>
+// Registration page opt-ins
+<SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
+
+// Checkout page opt-ins
+<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT_PAGE} />
 ```
 
 ### `SubscribeForm`
@@ -42,19 +63,61 @@ Presentational component that renders the subscription form UI.
 
 ## Hooks
 
-### `useSubscription`
-Custom hook that manages subscription form state and API calls.
+### `useEmailSubscription`
+Channel-specific hook for managing email subscription form state and API calls. **Dynamically fetches** all subscriptions matching the provided tag and email channel, then subscribes to ALL matching subscriptions on submit.
+
+**Location:** `app/components/subscription/hooks/use-email-subscription.js`
 
 **Parameters:**
-- `subscriptionId` (string) - The subscription ID to opt into
-- `channel` (string) - The channel ('email' or 'sms')
+- `tag` (string, **required**) - The consent tag to filter subscriptions by
 
 **Returns:**
-- `state` - Form state (email, isLoading, feedback)
-- `actions` - Form actions (setEmail, submit)
+- `state` - Form state
+  - `email` (string) - Current email value
+  - `isLoading` (boolean) - Whether submission is in progress
+  - `isFetching` (boolean) - Whether subscriptions are being fetched
+  - `matchingSubscriptionsCount` (number) - Number of subscriptions found
+  - `feedback` (object) - User feedback message and type
+- `actions` - Available actions
+  - `setEmail` (function) - Update email value
+  - `submit` (function) - Submit the subscription (opts into ALL matching subscriptions)
+
+**How It Works:**
+1. On mount: Fetches ALL subscriptions from API
+2. Filters by: `tag` AND `channel='email'`
+3. On submit: Creates bulk update for ALL matching subscriptions
+4. Single API call opts user into multiple subscriptions at once
+
+**Example:**
+```jsx
+import {useEmailSubscription} from './hooks'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
+
+const MyComponent = () => {
+  const {state, actions} = useEmailSubscription({
+    tag: CONSENT_TAGS.HOMEPAGE_BANNER
+  })
+  
+  console.log(`Will subscribe to ${state.matchingSubscriptionsCount} subscription(s)`)
+  
+  return (
+    <>
+      {state.isFetching && <Spinner />}
+      <input 
+        value={state.email}
+        onChange={(e) => actions.setEmail(e.target.value)}
+        disabled={state.isLoading || state.isFetching}
+      />
+      <button onClick={actions.submit}>Subscribe</button>
+    </>
+  )
+}
+```
 
 ### `useMarketingConsent`
-Base hook that wraps the ShopperConsents API (defined in `app/hooks/use-marketing-consent.js`).
+Base hook that wraps the ShopperConsents API. This is a global hook used by all channel-specific subscription hooks.
+
+**Location:** `app/hooks/use-marketing-consent.js`
 
 **Returns:**
 - `data` - Subscription data
@@ -63,6 +126,32 @@ Base hook that wraps the ShopperConsents API (defined in `app/hooks/use-marketin
 - `isUpdating` - Loading state
 - `getSubscriptionStatus` - Helper to check opt-in/opt-out status
 - `hasChannel` - Helper to check if subscription includes a channel
+
+## Validation Utilities
+
+### Location: `app/utils/subscription-validators.js`
+
+This module provides reusable validation functions for different contact point types:
+
+**Functions:**
+- `validateEmail(email)` - Validates email format
+- `validatePhone(phone)` - Validates phone number (E.164 format)
+- `createValidator(regex)` - Factory for custom validators
+
+**Example:**
+```javascript
+import {validateEmail} from '@salesforce/retail-react-app/app/utils/subscription-validators'
+
+const result = validateEmail('user@example.com')
+// { valid: true }
+
+const badResult = validateEmail('invalid')
+// { valid: false, error: 'invalid_format' }
+```
+
+**Error Codes:**
+- `required` - Value is empty or missing
+- `invalid_format` - Value doesn't match expected format
 
 ## Constants
 
@@ -76,11 +165,37 @@ Defined in `app/constants/marketing-consent.js`:
 
 ### 1. B2C Commerce Consent Management
 
-You need to configure subscription types in Business Manager:
+You need to configure subscriptions in Business Manager with appropriate tags:
 
 1. Navigate to **Merchant Tools > Site Preferences > Consent Management**
-2. Create a subscription with ID matching your `subscriptionId` prop (e.g., 'newsletter')
-3. Configure the channels (email/SMS) and tags as needed
+2. Create subscriptions with meaningful IDs (e.g., 'weekly-newsletter', 'promotional-offers')
+3. **Configure tags** for each subscription to match your UI locations:
+   - `homepage_banner` - For footer/homepage subscriptions  
+   - `registration` - For signup page opt-ins
+   - `checkout_page` - For checkout page opt-ins
+   - `user_profile` - For account settings
+4. Configure the channels (email/SMS) for each subscription
+5. Set the subscription status to **Active**
+
+**Example Configuration:**
+```
+Subscription ID: weekly-newsletter
+Tags: homepage_banner
+Channels: email
+Status: Active
+
+Subscription ID: promotional-offers  
+Tags: homepage_banner
+Channels: email
+Status: Active
+
+Subscription ID: order-updates
+Tags: checkout_page
+Channels: email, sms
+Status: Active
+```
+
+With this setup, the footer (using `CONSENT_TAGS.HOMEPAGE_BANNER`) will automatically subscribe users to BOTH `weekly-newsletter` AND `promotional-offers` when they submit their email.
 
 ### 2. API Configuration
 
@@ -89,26 +204,43 @@ The component uses the ShopperConsents API which requires:
 - Guest or registered customer session
 - Proper CORS and API permissions
 
-### 3. Subscription ID
+### 3. Consent Tags
 
-**Important:** The default `subscriptionId` is set to `'newsletter'`. You should either:
-- Configure a 'newsletter' subscription in Business Manager, OR
-- Override the `subscriptionId` prop to match your configured subscription
-
-Example:
-```jsx
-<SubscribeMarketingConsent subscriptionId="your-configured-id" />
+**Important:** Consent tags define WHERE subscriptions appear in your UI. The constants are defined in:
+```javascript
+// app/constants/marketing-consent.js
+export const CONSENT_TAGS = {
+    HOMEPAGE_BANNER: 'homepage_banner',
+    USER_PROFILE: 'user_profile',
+    CHECKOUT_PAGE: 'checkout_page',
+    REGISTRATION: 'registration',
+    FOOTER: 'footer'
+}
 ```
 
-## Integration in Footer
+**If no subscriptions match the tag:**
+- The form will show an error message
+- Dev console will log: `"No subscriptions found for tag..."`
+- Check Business Manager configuration
 
-The component is integrated in `app/components/footer/index.jsx`:
+## Integration Examples
 
+### Footer
 ```jsx
 import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
-// Used in footer
-<SubscribeMarketingConsent />
+<SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
+```
+
+### Registration Page
+```jsx
+<SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
+```
+
+### Checkout Page
+```jsx
+<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT_PAGE} />
 ```
 
 ## API Version
@@ -134,21 +266,113 @@ Test the subscription flow:
 
 ## Customization
 
-### Change Subscription ID
-```jsx
-<SubscribeMarketingConsent subscriptionId="promotional-emails" />
+### Add Subscriptions to a Tag
+Simply configure new subscriptions in Business Manager with the same tag. The component will automatically pick them up - no code changes needed!
+
+**Example:** Add a new "Flash Sales" subscription to the footer:
+1. In Business Manager, create subscription ID: `flash-sales`
+2. Set tag: `homepage_banner`
+3. Set channel: `email`
+4. Activate the subscription
+5. Footer now subscribes users to 3 subscriptions (if you had 2 before)
+
+### Add SMS or Other Channel Support
+
+To add support for SMS or other channels, follow this pattern:
+
+1. **Create a new channel-specific hook** at `app/components/subscription/hooks/use-sms-subscription.js`:
+
+```javascript
+import {useCallback, useMemo, useState} from 'react'
+import {CONSENT_CHANNELS, CONSENT_STATUS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
+import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
+import {validatePhone} from '@salesforce/retail-react-app/app/utils/subscription-validators'
+import {useIntl} from 'react-intl'
+
+export const useSmsSubscription = ({subscriptionId = 'sms-alerts'} = {}) => {
+    const {updateSubscription, isUpdating} = useMarketingConsent()
+    const {formatMessage} = useIntl()
+    
+    const [phone, setPhone] = useState('')
+    const [message, setMessage] = useState(null)
+    const [messageType, setMessageType] = useState('success')
+    
+    const messages = useMemo(() => ({
+        success_confirmation: formatMessage({
+            id: 'subscription.sms.success',
+            defaultMessage: 'Thanks for subscribing to SMS alerts!'
+        }),
+        error: {
+            enter_valid_phone: formatMessage({
+                id: 'subscription.sms.error.invalid',
+                defaultMessage: 'Enter a valid phone number.'
+            }),
+            generic_error: formatMessage({
+                id: 'subscription.sms.error.generic',
+                defaultMessage: "We couldn't process the subscription. Try again."
+            })
+        }
+    }), [formatMessage])
+    
+    const handleSignUp = useCallback(async () => {
+        const validation = validatePhone(phone)
+        
+        if (!validation.valid) {
+            setMessage(messages.error.enter_valid_phone)
+            setMessageType('error')
+            return
+        }
+        
+        try {
+            setMessage(null)
+            
+            await updateSubscription({
+                subscriptionId,
+                contactPointValue: phone,
+                channel: CONSENT_CHANNELS.SMS,
+                status: CONSENT_STATUS.OPT_IN
+            })
+            
+            setMessage(messages.success_confirmation)
+            setMessageType('success')
+            setPhone('')
+        } catch (err) {
+            console.error('SMS subscription error:', err)
+            setMessage(messages.error.generic_error)
+            setMessageType('error')
+        }
+    }, [phone, updateSubscription, subscriptionId, messages])
+    
+    return {
+        state: {
+            phone,
+            isLoading: isUpdating,
+            feedback: {message, type: messageType}
+        },
+        actions: {
+            setPhone,
+            submit: handleSignUp
+        }
+    }
+}
 ```
 
-### Add SMS Subscription
-```jsx
-<SubscribeMarketingConsent 
-  subscriptionId="sms-alerts" 
-  channel="sms" 
-/>
+2. **Export the new hook** from `app/components/subscription/hooks/index.js`:
+
+```javascript
+export {useEmailSubscription} from './use-email-subscription'
+export {useSmsSubscription} from './use-sms-subscription'
 ```
 
-### Custom Error Handling
-Modify `app/hooks/use-subscription.js` to customize error messages and behavior.
+3. **Create a new component or modify existing** to use the SMS hook
+
+This architecture keeps each channel's validation and logic separate while sharing the common API wrapper (`useMarketingConsent`).
+
+### Custom Validation
+Modify validators in `app/utils/subscription-validators.js` to customize validation rules.
+
+### Custom Error Messages
+Override internationalization keys in your locale files to customize user-facing messages.
 
 ## Internationalization
 
@@ -180,6 +404,30 @@ All user-facing text is internationalized. Add translations in your locale files
 - Ensure subscription is active in Business Manager
 
 ### Email validation fails
-- The component uses standard email regex validation
-- Customize in `use-subscription.js` if needed
+- The component uses standard email regex validation defined in `app/utils/subscription-validators.js`
+- Customize the `validateEmail` function or `EMAIL_REGEX` constant if you need different validation rules
+
+## Architecture Benefits
+
+This architecture provides several advantages:
+
+1. **Separation of Concerns**
+   - Validation logic in `/utils` (reusable across the app)
+   - API wrapper in `/hooks` (global, reusable)
+   - Channel-specific logic in component `/hooks` (focused, maintainable)
+
+2. **Extensibility**
+   - Easy to add new channels without modifying existing code
+   - Each channel hook is independent and testable
+   - Shared validation utilities prevent duplication
+
+3. **Colocation**
+   - Subscription-specific hooks live with the subscription component
+   - Easy to find and understand the complete feature
+   - Follows React best practices for component organization
+
+4. **Type Safety & Clarity**
+   - Each hook has a clear, honest API (no unused parameters)
+   - Type-specific state names (email/phone/etc.) instead of generic names
+   - Reduces confusion and potential bugs
 

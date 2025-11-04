@@ -6,7 +6,7 @@
  */
 
 import {renderHook} from '@testing-library/react'
-import {useMarketingConsent} from '@salesforce/retail-react-app/../../app/hooks/use-marketing-consent'
+import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {
     useSubscriptions,
     useShopperConsentsMutation,
@@ -28,16 +28,25 @@ const mockSubscriptionsData = {
         {
             subscriptionId: 'marketing-email',
             channels: new Set(['email']),
+            tags: new Set(['homepage_banner', 'footer']),
             contactPointValue: 'customer@example.com'
         },
         {
             subscriptionId: 'marketing-sms',
             channels: new Set(['sms']),
+            tags: new Set(['checkout_page']),
             contactPointValue: '+15551234567'
         },
         {
             subscriptionId: 'newsletter',
             channels: new Set(['email', 'push']),
+            tags: new Set(['homepage_banner', 'registration']),
+            contactPointValue: 'customer@example.com'
+        },
+        {
+            subscriptionId: 'promotional-offers',
+            channels: new Set(['email']),
+            tags: new Set(['homepage_banner']),
             contactPointValue: 'customer@example.com'
         }
     ]
@@ -192,9 +201,10 @@ describe('useMarketingConsent', () => {
 
                 const subscriptions =
                     result.current.getSubscriptionsByContact('customer@example.com')
-                expect(subscriptions).toHaveLength(2)
+                expect(subscriptions).toHaveLength(3)
                 expect(subscriptions[0].subscriptionId).toBe('marketing-email')
                 expect(subscriptions[1].subscriptionId).toBe('newsletter')
+                expect(subscriptions[2].subscriptionId).toBe('promotional-offers')
             })
 
             test('returns empty array when no subscriptions match', () => {
@@ -202,6 +212,106 @@ describe('useMarketingConsent', () => {
 
                 const subscriptions =
                     result.current.getSubscriptionsByContact('nonexistent@example.com')
+                expect(subscriptions).toHaveLength(0)
+            })
+        })
+
+        describe('getSubscriptionsByTagAndChannel', () => {
+            test('returns subscriptions matching both tag and channel', () => {
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'homepage_banner',
+                    'email'
+                )
+                expect(subscriptions).toHaveLength(3)
+                expect(subscriptions[0].subscriptionId).toBe('marketing-email')
+                expect(subscriptions[1].subscriptionId).toBe('newsletter')
+                expect(subscriptions[2].subscriptionId).toBe('promotional-offers')
+            })
+
+            test('filters out subscriptions with wrong channel', () => {
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'homepage_banner',
+                    'sms'
+                )
+                expect(subscriptions).toHaveLength(0)
+            })
+
+            test('filters out subscriptions with wrong tag', () => {
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'checkout_page',
+                    'email'
+                )
+                expect(subscriptions).toHaveLength(0)
+            })
+
+            test('returns subscriptions matching tag across multiple channels', () => {
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'checkout_page',
+                    'sms'
+                )
+                expect(subscriptions).toHaveLength(1)
+                expect(subscriptions[0].subscriptionId).toBe('marketing-sms')
+            })
+
+            test('returns empty array when no subscriptions match both criteria', () => {
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'nonexistent_tag',
+                    'email'
+                )
+                expect(subscriptions).toHaveLength(0)
+            })
+
+            test('handles subscriptions without tags property', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: {
+                        data: [
+                            {
+                                subscriptionId: 'no-tags-sub',
+                                channels: new Set(['email'])
+                            }
+                        ]
+                    }
+                })
+
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'homepage_banner',
+                    'email'
+                )
+                expect(subscriptions).toHaveLength(0)
+            })
+
+            test('handles subscriptions without channels property', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: {
+                        data: [
+                            {
+                                subscriptionId: 'no-channels-sub',
+                                tags: new Set(['homepage_banner'])
+                            }
+                        ]
+                    }
+                })
+
+                const {result} = renderHook(() => useMarketingConsent())
+
+                const subscriptions = result.current.getSubscriptionsByTagAndChannel(
+                    'homepage_banner',
+                    'email'
+                )
                 expect(subscriptions).toHaveLength(0)
             })
         })

@@ -496,20 +496,14 @@
   "consent_card.description": {
     "defaultMessage": "Choose how you'd like to hear from us about products, services, and special offers."
   },
-  "consent_card.description.email_newsletter": {
-    "defaultMessage": "Receive our weekly newsletter with product updates and tips"
-  },
-  "consent_card.description.promotional_offers": {
-    "defaultMessage": "Get exclusive deals and special promotions via email"
-  },
-  "consent_card.description.sms_alerts": {
-    "defaultMessage": "Receive order updates and important alerts via SMS"
-  },
   "consent_card.disclaimer": {
     "defaultMessage": "You can update these preferences at any time. Message and data rates may apply for SMS."
   },
   "consent_card.error.email_required": {
     "defaultMessage": "Email address is required to manage subscriptions."
+  },
+  "consent_card.error.no_subscriptions": {
+    "defaultMessage": "No subscriptions available to update."
   },
   "consent_card.error.update_failed": {
     "defaultMessage": "Failed to update preferences. Please try again."
@@ -517,14 +511,8 @@
   "consent_card.info.preferences_updated": {
     "defaultMessage": "Communication preferences updated"
   },
-  "consent_card.label.email_newsletter": {
-    "defaultMessage": "Email Newsletter"
-  },
-  "consent_card.label.promotional_offers": {
-    "defaultMessage": "Promotional Offers"
-  },
-  "consent_card.label.sms_alerts": {
-    "defaultMessage": "SMS Alerts"
+  "consent_card.message.no_subscriptions": {
+    "defaultMessage": "No marketing preferences are currently available."
   },
   "consent_card.title.marketing_preferences": {
     "defaultMessage": "Marketing Preferences"
@@ -716,6 +704,9 @@
   },
   "footer.error.generic_error": {
     "defaultMessage": "We couldn't process the subscription. Try again."
+  },
+  "footer.error.no_subscriptions": {
+    "defaultMessage": "No subscriptions available. Please try again later."
   },
   "footer.link.about_us": {
     "defaultMessage": "About Us"

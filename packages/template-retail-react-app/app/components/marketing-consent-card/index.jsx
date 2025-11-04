@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {forwardRef, useEffect, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -23,7 +23,8 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {
     CONSENT_STATUS,
-    CONSENT_CHANNELS
+    CONSENT_CHANNELS,
+    CONSENT_TAGS
 } from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 /**
@@ -50,7 +51,9 @@ Skeleton.displayName = 'Skeleton'
 
 /**
  * Marketing Consent Card Component
- * Allows customers to manage their marketing communication preferences
+ * Dynamically displays all subscriptions configured with the USER_PROFILE tag in Business Manager.
+ * Automatically detects which channels (email/SMS) each subscription supports and uses the
+ * customer's registered contact information.
  */
 const MarketingConsentCard = () => {
     const {formatMessage} = useIntl()
@@ -61,46 +64,44 @@ const MarketingConsentCard = () => {
         data: subscriptionsData,
         updateSubscriptions,
         isUpdating,
+        isFetching,
         getSubscriptionStatus,
         error: consentError
     } = useMarketingConsent()
 
     const [error, setError] = useState(null)
+    const [localPreferences, setLocalPreferences] = useState({})
 
-    // Local state for managing subscription preferences during editing
-    const [localPreferences, setLocalPreferences] = useState({
-        emailNewsletter: false,
-        emailPromotions: false,
-        smsAlerts: false
-    })
+    // Get all subscriptions matching USER_PROFILE tag
+    const profileSubscriptions = useMemo(() => {
+        const allSubscriptions = subscriptionsData?.data || []
+        return allSubscriptions.filter((sub) => sub.tags?.has(CONSENT_TAGS.USER_PROFILE))
+    }, [subscriptionsData])
 
-    // Subscription IDs - these should match your Business Manager configuration
-    const SUBSCRIPTION_IDS = {
-        EMAIL_NEWSLETTER: 'newsletter',
-        EMAIL_PROMOTIONS: 'promotional-offers',
-        SMS_ALERTS: 'sms-alerts'
-    }
-
-    // Update local preferences when data loads
+    // Initialize local preferences from fetched subscription statuses
     useEffect(() => {
-        if (subscriptionsData && customer?.email) {
-            setLocalPreferences({
-                emailNewsletter:
-                    getSubscriptionStatus(
-                        SUBSCRIPTION_IDS.EMAIL_NEWSLETTER,
-                        CONSENT_CHANNELS.EMAIL
-                    ) === CONSENT_STATUS.OPT_IN,
-                emailPromotions:
-                    getSubscriptionStatus(
-                        SUBSCRIPTION_IDS.EMAIL_PROMOTIONS,
-                        CONSENT_CHANNELS.EMAIL
-                    ) === CONSENT_STATUS.OPT_IN,
-                smsAlerts:
-                    getSubscriptionStatus(SUBSCRIPTION_IDS.SMS_ALERTS, CONSENT_CHANNELS.SMS) ===
-                    CONSENT_STATUS.OPT_IN
-            })
-        }
-    }, [subscriptionsData, customer?.email])
+        if (!profileSubscriptions.length || !customer?.email) return
+
+        const initialPreferences = {}
+        profileSubscriptions.forEach((sub) => {
+            // Check if opted in for EMAIL channel
+            if (sub.channels?.has(CONSENT_CHANNELS.EMAIL)) {
+                const emailStatus = getSubscriptionStatus(sub.subscriptionId, CONSENT_CHANNELS.EMAIL)
+                initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.EMAIL}`] =
+                    emailStatus === CONSENT_STATUS.OPT_IN
+            }
+
+            // Check if opted in for SMS channel (only if customer has phone)
+            const customerPhone = customer.phoneMobile || customer.phoneHome
+            if (customerPhone && sub.channels?.has(CONSENT_CHANNELS.SMS)) {
+                const smsStatus = getSubscriptionStatus(sub.subscriptionId, CONSENT_CHANNELS.SMS)
+                initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.SMS}`] =
+                    smsStatus === CONSENT_STATUS.OPT_IN
+            }
+        })
+
+        setLocalPreferences(initialPreferences)
+    }, [profileSubscriptions, customer?.email, customer?.phoneMobile, customer?.phoneHome, getSubscriptionStatus])
 
     const handleSubmit = async () => {
         if (!customer?.email) {
@@ -116,39 +117,53 @@ const MarketingConsentCard = () => {
         try {
             setError(null)
 
-            // Build the subscriptions array to update
-            const subscriptions = [
-                {
-                    subscriptionId: SUBSCRIPTION_IDS.EMAIL_NEWSLETTER,
-                    channel: CONSENT_CHANNELS.EMAIL,
-                    status: localPreferences.emailNewsletter
-                        ? CONSENT_STATUS.OPT_IN
-                        : CONSENT_STATUS.OPT_OUT,
-                    contactPointValue: customer.email
-                },
-                {
-                    subscriptionId: SUBSCRIPTION_IDS.EMAIL_PROMOTIONS,
-                    channel: CONSENT_CHANNELS.EMAIL,
-                    status: localPreferences.emailPromotions
-                        ? CONSENT_STATUS.OPT_IN
-                        : CONSENT_STATUS.OPT_OUT,
-                    contactPointValue: customer.email
-                }
-            ]
+            const customerPhone = customer.phoneMobile || customer.phoneHome
+            const subscriptionsToUpdate = []
 
-            // Only add SMS if customer has a phone number
-            if (customer.phoneHome) {
-                subscriptions.push({
-                    subscriptionId: SUBSCRIPTION_IDS.SMS_ALERTS,
-                    channel: CONSENT_CHANNELS.SMS,
-                    status: localPreferences.smsAlerts
-                        ? CONSENT_STATUS.OPT_IN
-                        : CONSENT_STATUS.OPT_OUT,
-                    contactPointValue: customer.phoneHome
-                })
+            // Build updates for all profile subscriptions based on their supported channels
+            profileSubscriptions.forEach((sub) => {
+                // Handle EMAIL channel if subscription supports it
+                if (sub.channels?.has(CONSENT_CHANNELS.EMAIL)) {
+                    const prefKey = `${sub.subscriptionId}_${CONSENT_CHANNELS.EMAIL}`
+                    subscriptionsToUpdate.push({
+                        subscriptionId: sub.subscriptionId,
+                        channel: CONSENT_CHANNELS.EMAIL,
+                        status: localPreferences[prefKey]
+                            ? CONSENT_STATUS.OPT_IN
+                            : CONSENT_STATUS.OPT_OUT,
+                        contactPointValue: customer.email
+                    })
+                }
+
+                // Handle SMS channel if subscription supports it AND customer has phone
+                if (customerPhone && sub.channels?.has(CONSENT_CHANNELS.SMS)) {
+                    const prefKey = `${sub.subscriptionId}_${CONSENT_CHANNELS.SMS}`
+                    subscriptionsToUpdate.push({
+                        subscriptionId: sub.subscriptionId,
+                        channel: CONSENT_CHANNELS.SMS,
+                        status: localPreferences[prefKey]
+                            ? CONSENT_STATUS.OPT_IN
+                            : CONSENT_STATUS.OPT_OUT,
+                        contactPointValue: customerPhone
+                    })
+                }
+            })
+
+            if (subscriptionsToUpdate.length === 0) {
+                console.warn(
+                    '[MarketingConsentCard] No subscriptions found to update. Check Business Manager configuration for tag:',
+                    CONSENT_TAGS.USER_PROFILE
+                )
+                setError(
+                    formatMessage({
+                        defaultMessage: 'No subscriptions available to update.',
+                        id: 'consent_card.error.no_subscriptions'
+                    })
+                )
+                return
             }
 
-            await updateSubscriptions(subscriptions)
+            await updateSubscriptions(subscriptionsToUpdate)
 
             toast({
                 title: formatMessage({
@@ -159,7 +174,7 @@ const MarketingConsentCard = () => {
                 isClosable: true
             })
         } catch (err) {
-            console.error('Failed to update consent preferences:', err)
+            console.error('[MarketingConsentCard] Failed to update consent preferences:', err)
             setError(
                 formatMessage({
                     defaultMessage: 'Failed to update preferences. Please try again.',
@@ -204,93 +219,70 @@ const MarketingConsentCard = () => {
                     />
                 </Text>
 
-                <Stack spacing={4}>
-                    <FormControl>
-                        <Checkbox
-                            id="email-newsletter"
-                            isChecked={localPreferences.emailNewsletter}
-                            onChange={(e) =>
-                                setLocalPreferences({
-                                    ...localPreferences,
-                                    emailNewsletter: e.target.checked
-                                })
-                            }
-                        >
-                            <Box>
-                                <Text fontWeight="medium">
-                                    <FormattedMessage
-                                        defaultMessage="Email Newsletter"
-                                        id="consent_card.label.email_newsletter"
-                                    />
-                                </Text>
-                                <Text fontSize="sm" color="gray.600">
-                                    <FormattedMessage
-                                        defaultMessage="Receive our weekly newsletter with product updates and tips"
-                                        id="consent_card.description.email_newsletter"
-                                    />
-                                </Text>
-                            </Box>
-                        </Checkbox>
-                    </FormControl>
+                {isFetching ? (
+                    <Stack spacing={4}>
+                        <Skeleton height="48px" />
+                        <Skeleton height="48px" />
+                    </Stack>
+                ) : profileSubscriptions.length === 0 ? (
+                    <Alert status="info">
+                        <AlertIcon color="blue.500" boxSize={4} />
+                        <Text fontSize="sm" ml={3}>
+                            <FormattedMessage
+                                defaultMessage="No marketing preferences are currently available."
+                                id="consent_card.message.no_subscriptions"
+                            />
+                        </Text>
+                    </Alert>
+                ) : (
+                    <Stack spacing={4}>
+                        {profileSubscriptions.map((sub) => {
+                            const customerPhone = customer.phoneMobile || customer.phoneHome
+                            const supportsEmail = sub.channels?.has(CONSENT_CHANNELS.EMAIL)
+                            const supportsSms = sub.channels?.has(CONSENT_CHANNELS.SMS)
 
-                    <FormControl>
-                        <Checkbox
-                            id="email-promotions"
-                            isChecked={localPreferences.emailPromotions}
-                            onChange={(e) =>
-                                setLocalPreferences({
-                                    ...localPreferences,
-                                    emailPromotions: e.target.checked
-                                })
-                            }
-                        >
-                            <Box>
-                                <Text fontWeight="medium">
-                                    <FormattedMessage
-                                        defaultMessage="Promotional Offers"
-                                        id="consent_card.label.promotional_offers"
-                                    />
-                                </Text>
-                                <Text fontSize="sm" color="gray.600">
-                                    <FormattedMessage
-                                        defaultMessage="Get exclusive deals and special promotions via email"
-                                        id="consent_card.description.promotional_offers"
-                                    />
-                                </Text>
-                            </Box>
-                        </Checkbox>
-                    </FormControl>
+                            // Determine which channel to show
+                            // Prefer EMAIL if available, otherwise SMS (if customer has phone)
+                            const showEmailOption = supportsEmail && customer?.email
+                            const showSmsOption = supportsSms && customerPhone && !showEmailOption
 
-                    {customer.phoneHome && (
-                        <FormControl>
-                            <Checkbox
-                                id="sms-alerts"
-                                isChecked={localPreferences.smsAlerts}
-                                onChange={(e) =>
-                                    setLocalPreferences({
-                                        ...localPreferences,
-                                        smsAlerts: e.target.checked
-                                    })
-                                }
-                            >
-                                <Box>
-                                    <Text fontWeight="medium">
-                                        <FormattedMessage
-                                            defaultMessage="SMS Alerts"
-                                            id="consent_card.label.sms_alerts"
-                                        />
-                                    </Text>
-                                    <Text fontSize="sm" color="gray.600">
-                                        <FormattedMessage
-                                            defaultMessage="Receive order updates and important alerts via SMS"
-                                            id="consent_card.description.sms_alerts"
-                                        />
-                                    </Text>
-                                </Box>
-                            </Checkbox>
-                        </FormControl>
-                    )}
-                </Stack>
+                            if (!showEmailOption && !showSmsOption) {
+                                // Skip subscriptions where customer doesn't have required contact info
+                                return null
+                            }
+
+                            const channel = showEmailOption ? CONSENT_CHANNELS.EMAIL : CONSENT_CHANNELS.SMS
+                            const prefKey = `${sub.subscriptionId}_${channel}`
+                            const isChecked = localPreferences[prefKey] || false
+
+                            return (
+                                <FormControl key={`${sub.subscriptionId}-${channel}`}>
+                                    <Checkbox
+                                        id={`${sub.subscriptionId}-${channel}`}
+                                        isChecked={isChecked}
+                                        onChange={(e) =>
+                                            setLocalPreferences({
+                                                ...localPreferences,
+                                                [prefKey]: e.target.checked
+                                            })
+                                        }
+                                    >
+                                        <Box>
+                                            <Text fontWeight="medium">
+                                                {sub.name || sub.subscriptionId}
+                                            </Text>
+                                            {sub.description && (
+                                                <Text fontSize="sm" color="gray.600">
+                                                    {sub.description}
+                                                </Text>
+                                            )}
+                                        </Box>
+                                    </Checkbox>
+                                </FormControl>
+                            )
+                        })}
+                    </Stack>
+                )}
 
                 <Text fontSize="xs" color="gray.600">
                     <FormattedMessage

@@ -7,29 +7,33 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import SubscribeForm from './subscribe-form'
-import useSubscription from '@salesforce/retail-react-app/app/hooks/use-subscription'
-import {CONSENT_CHANNELS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
+import {useEmailSubscription} from './hooks'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 /**
- * Marketing consent subscription component for the footer
- * This component integrates the subscription form with the ShopperConsents API
+ * Marketing consent subscription component for email subscriptions.
+ * This component dynamically fetches all subscriptions matching a given consent tag
+ * and email channel, then opts the user into ALL matching subscriptions.
+ * 
+ * This allows marketers to configure subscriptions in Business Manager without code changes.
  *
  * @param {Object} props
- * @param {string} props.subscriptionId - The subscription ID configured in your consent management
- * @param {string} props.channel - The channel to subscribe to (email or sms)
+ * @param {string} props.tag - The consent tag to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER)
+ * 
+ * @example
+ * // In footer
+ * <SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
+ * 
+ * // On registration page
+ * <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
  */
-const SubscribeMarketingConsent = ({
-    subscriptionId = 'newsletter',
-    channel = CONSENT_CHANNELS.EMAIL,
-    ...props
-}) => {
-    const {state, actions} = useSubscription({subscriptionId, channel})
+const SubscribeMarketingConsent = ({tag = CONSENT_TAGS.FOOTER, ...props}) => {
+    const {state, actions} = useEmailSubscription({tag})
     return <SubscribeForm subscription={{state, actions}} {...props} />
 }
 
 SubscribeMarketingConsent.propTypes = {
-    subscriptionId: PropTypes.string,
-    channel: PropTypes.oneOf(['email', 'sms'])
+    tag: PropTypes.string.isRequired
 }
 
 export default SubscribeMarketingConsent

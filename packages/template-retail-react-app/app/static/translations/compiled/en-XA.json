@@ -2657,48 +2657,6 @@
       "value": "]"
     }
   ],
-  "consent_card.description.email_newsletter": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗƈḗḗīṽḗḗ ǿǿŭŭř ẇḗḗḗḗķŀẏ ƞḗḗẇşŀḗḗŧŧḗḗř ẇīŧħ ƥřǿǿḓŭŭƈŧ ŭŭƥḓȧȧŧḗḗş ȧȧƞḓ ŧīƥş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "consent_card.description.promotional_offers": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɠḗḗŧ ḗḗẋƈŀŭŭşīṽḗḗ ḓḗḗȧȧŀş ȧȧƞḓ şƥḗḗƈīȧȧŀ ƥřǿǿḿǿǿŧīǿǿƞş ṽīȧȧ ḗḗḿȧȧīŀ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "consent_card.description.sms_alerts": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗƈḗḗīṽḗḗ ǿǿřḓḗḗř ŭŭƥḓȧȧŧḗḗş ȧȧƞḓ īḿƥǿǿřŧȧȧƞŧ ȧȧŀḗḗřŧş ṽīȧȧ ŞḾŞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "consent_card.disclaimer": [
     {
       "type": 0,
@@ -2721,6 +2679,20 @@
     {
       "type": 0,
       "value": "Ḗḿȧȧīŀ ȧȧḓḓřḗḗşş īş řḗḗɋŭŭīřḗḗḓ ŧǿǿ ḿȧȧƞȧȧɠḗḗ şŭŭƀşƈřīƥŧīǿǿƞş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "consent_card.error.no_subscriptions": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ şŭŭƀşƈřīƥŧīǿǿƞş ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ ŭŭƥḓȧȧŧḗḗ."
     },
     {
       "type": 0,
@@ -2755,42 +2727,14 @@
       "value": "]"
     }
   ],
-  "consent_card.label.email_newsletter": [
+  "consent_card.message.no_subscriptions": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ḗḿȧȧīŀ Ƞḗḗẇşŀḗḗŧŧḗḗř"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "consent_card.label.promotional_offers": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥřǿǿḿǿǿŧīǿǿƞȧȧŀ Ǿƒƒḗḗřş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "consent_card.label.sms_alerts": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ŞḾŞ Ȧŀḗḗřŧş"
+      "value": "Ƞǿǿ ḿȧȧřķḗḗŧīƞɠ ƥřḗḗƒḗḗřḗḗƞƈḗḗş ȧȧřḗḗ ƈŭŭřřḗḗƞŧŀẏ ȧȧṽȧȧīŀȧȧƀŀḗḗ."
     },
     {
       "type": 0,
@@ -3725,6 +3669,20 @@
     {
       "type": 0,
       "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ ƥřǿǿƈḗḗşş ŧħḗḗ şŭŭƀşƈřīƥŧīǿǿƞ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.error.no_subscriptions": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ şŭŭƀşƈřīƥŧīǿǿƞş ȧȧṽȧȧīŀȧȧƀŀḗḗ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ŀȧȧŧḗḗř."
     },
     {
       "type": 0,

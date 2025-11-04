@@ -18,6 +18,7 @@ import {
     AlertIcon,
     AlertDescription,
     Link,
+    Spinner,
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -71,8 +72,11 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
         defaultMessage: 'Privacy Policy'
     })
 
+    // Check if we're still loading subscription data
+    const isFetchingSubscriptions = state?.isFetching
+
     return (
-        <Box {...styles.subscribe} {...otherProps}>
+        <Box {...styles.subscribe} {...otherProps} position="relative">
             <Heading as="h2" {...styles.subscribeHeading}>
                 {messages.heading}
             </Heading>
@@ -87,6 +91,31 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                     <AlertIcon />
                     <AlertDescription>{state.feedback.message}</AlertDescription>
                 </Alert>
+            )}
+
+            {/* Show spinner overlay while fetching subscriptions */}
+            {isFetchingSubscriptions && (
+                <Box
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    right="0"
+                    bottom="0"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    bg="whiteAlpha.800"
+                    zIndex="1"
+                    borderRadius="base"
+                >
+                    <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="blue.600"
+                        size="lg"
+                    />
+                </Box>
             )}
 
             <Box>
@@ -112,11 +141,11 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                         value={state?.email || ''}
                         onChange={(e) => actions?.setEmail?.(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !state?.isLoading) {
+                            if (e.key === 'Enter' && !state?.isLoading && !isFetchingSubscriptions) {
                                 actions?.submit?.()
                             }
                         }}
-                        disabled={state?.isLoading}
+                        disabled={state?.isLoading || isFetchingSubscriptions}
                         id="subscribe-email"
                         {...styles.subscribeField}
                     />
@@ -152,10 +181,12 @@ SubscribeForm.propTypes = {
         state: PropTypes.shape({
             email: PropTypes.string,
             isLoading: PropTypes.bool,
+            isFetching: PropTypes.bool,
             feedback: PropTypes.shape({
                 message: PropTypes.string,
                 type: PropTypes.oneOf(['success', 'error'])
-            })
+            }),
+            matchingSubscriptionsCount: PropTypes.number
         }),
         actions: PropTypes.shape({
             setEmail: PropTypes.func,

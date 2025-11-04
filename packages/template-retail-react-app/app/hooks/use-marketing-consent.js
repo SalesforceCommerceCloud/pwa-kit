@@ -28,6 +28,7 @@ import {useMemo} from 'react'
  *   - updateError: Any error from update mutations
  *   - getSubscriptionStatus: Helper to get status for a specific subscription and channel
  *   - hasChannel: Helper to check if a subscription has a specific channel
+ *   - getSubscriptionsByTagAndChannel: Helper to filter subscriptions by tag and channel
  *
  * @example
  * // Basic usage
@@ -128,10 +129,26 @@ export const useMarketingConsent = ({enabled = true} = {}) => {
             return subscriptions.filter((sub) => sub.contactPointValue === contactPointValue)
         }
 
+        /**
+         * Get subscriptions filtered by tag and channel
+         * Useful for finding all subscriptions that should be opted into for a specific UI location
+         * @param {string} tag - The tag to filter by (e.g., 'homepage_banner', 'footer')
+         * @param {string} channel - The channel type ('email', 'sms', etc.)
+         * @returns {Array} Array of subscription objects matching the tag and channel
+         */
+        const getSubscriptionsByTagAndChannel = (tag, channel) => {
+            return subscriptions.filter((sub) => {
+                const hasTag = sub.tags && sub.tags.has(tag)
+                const hasChannelMatch = sub.channels && sub.channels.has(channel)
+                return hasTag && hasChannelMatch
+            })
+        }
+
         return {
             getSubscriptionStatus,
             hasChannel,
-            getSubscriptionsByContact
+            getSubscriptionsByContact,
+            getSubscriptionsByTagAndChannel
         }
     }, [subscriptionsQuery.data])
 

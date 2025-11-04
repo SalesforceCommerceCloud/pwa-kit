@@ -26,6 +26,7 @@ import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const [StylesProvider] = createStylesContext('Footer')
@@ -124,13 +125,13 @@ const Footer = ({...otherProps}) => {
                                 links={makeOurCompanyLinks()}
                             />
                             <Box>
-                                <SubscribeMarketingConsent />
+                                <SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
                             </Box>
                         </SimpleGrid>
                     </HideOnMobile>
 
                     <HideOnDesktop>
-                        <SubscribeMarketingConsent />
+                        <SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
                     </HideOnDesktop>
 
                     {showLocaleSelector && (

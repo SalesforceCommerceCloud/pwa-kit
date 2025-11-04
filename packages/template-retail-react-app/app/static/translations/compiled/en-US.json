@@ -1337,24 +1337,6 @@
       "value": "Choose how you'd like to hear from us about products, services, and special offers."
     }
   ],
-  "consent_card.description.email_newsletter": [
-    {
-      "type": 0,
-      "value": "Receive our weekly newsletter with product updates and tips"
-    }
-  ],
-  "consent_card.description.promotional_offers": [
-    {
-      "type": 0,
-      "value": "Get exclusive deals and special promotions via email"
-    }
-  ],
-  "consent_card.description.sms_alerts": [
-    {
-      "type": 0,
-      "value": "Receive order updates and important alerts via SMS"
-    }
-  ],
   "consent_card.disclaimer": [
     {
       "type": 0,
@@ -1365,6 +1347,12 @@
     {
       "type": 0,
       "value": "Email address is required to manage subscriptions."
+    }
+  ],
+  "consent_card.error.no_subscriptions": [
+    {
+      "type": 0,
+      "value": "No subscriptions available to update."
     }
   ],
   "consent_card.error.update_failed": [
@@ -1379,22 +1367,10 @@
       "value": "Communication preferences updated"
     }
   ],
-  "consent_card.label.email_newsletter": [
+  "consent_card.message.no_subscriptions": [
     {
       "type": 0,
-      "value": "Email Newsletter"
-    }
-  ],
-  "consent_card.label.promotional_offers": [
-    {
-      "type": 0,
-      "value": "Promotional Offers"
-    }
-  ],
-  "consent_card.label.sms_alerts": [
-    {
-      "type": 0,
-      "value": "SMS Alerts"
+      "value": "No marketing preferences are currently available."
     }
   ],
   "consent_card.title.marketing_preferences": [
@@ -1825,6 +1801,12 @@
     {
       "type": 0,
       "value": "We couldn't process the subscription. Try again."
+    }
+  ],
+  "footer.error.no_subscriptions": [
+    {
+      "type": 0,
+      "value": "No subscriptions available. Please try again later."
     }
   ],
   "footer.link.about_us": [
