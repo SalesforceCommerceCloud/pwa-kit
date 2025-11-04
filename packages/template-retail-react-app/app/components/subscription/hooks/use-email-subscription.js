@@ -6,7 +6,10 @@
  */
 
 import {useCallback, useMemo, useState} from 'react'
-import {CONSENT_CHANNELS, CONSENT_STATUS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
+import {
+    CONSENT_CHANNELS,
+    CONSENT_STATUS
+} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {validateEmail} from '@salesforce/retail-react-app/app/utils/subscription-validators'
 import {useIntl} from 'react-intl'
@@ -15,9 +18,9 @@ import {useIntl} from 'react-intl'
  * Hook for managing email subscription form state and submission.
  * This hook dynamically fetches all subscriptions matching a given tag and email channel,
  * then opts the user into ALL matching subscriptions when they submit their email.
- * 
+ *
  * This allows marketers to configure subscriptions in Business Manager without code changes.
- * 
+ *
  * @param {Object} options
  * @param {string|Array<string>} options.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER or [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER])
  * @returns {Object} Email subscription state and actions
@@ -32,7 +35,7 @@ import {useIntl} from 'react-intl'
  * @returns {Object} return.actions - Available actions
  * @returns {Function} return.actions.setEmail - Update email value
  * @returns {Function} return.actions.submit - Submit the subscription
- * 
+ *
  * @example
  * const {state, actions} = useEmailSubscription({
  *   tag: CONSENT_TAGS.HOMEPAGE_BANNER
@@ -49,8 +52,7 @@ export const useEmailSubscription = ({tag} = {}) => {
         data: subscriptionsData,
         isLoading: isFetchingSubscriptions,
         updateSubscriptions,
-        isUpdating,
-        getSubscriptionsByTagAndChannel
+        isUpdating
     } = useMarketingConsent({tags})
 
     const intl = useIntl()
@@ -68,8 +70,11 @@ export const useEmailSubscription = ({tag} = {}) => {
         }
         const allSubscriptions = subscriptionsData?.data || []
         return allSubscriptions.filter((sub) => {
-            const hasEmailChannel = sub.channels?.has(CONSENT_CHANNELS.EMAIL)
-            const hasAnyTag = tags.some((t) => sub.tags?.has(t))
+            // Handle both Set and Array formats for channels and tags
+            const hasEmailChannel =
+                sub.channels?.has?.(CONSENT_CHANNELS.EMAIL) ||
+                sub.channels?.includes?.(CONSENT_CHANNELS.EMAIL)
+            const hasAnyTag = tags.some((t) => sub.tags?.has?.(t) || sub.tags?.includes?.(t))
             return hasEmailChannel && hasAnyTag
         })
     }, [tags, subscriptionsData])
@@ -113,7 +118,7 @@ export const useEmailSubscription = ({tag} = {}) => {
             const tagList = tags.join(', ')
             console.error(
                 `[useEmailSubscription] No subscriptions found for tag(s) "${tagList}" and channel "email". ` +
-                `Please configure subscriptions in Business Manager with one of these tags: ${tagList}.`
+                    `Please configure subscriptions in Business Manager with one of these tags: ${tagList}.`
             )
             setMessage(messages.error.no_subscriptions)
             setMessageType('error')

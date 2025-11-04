@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SubscribeForm from './subscribe-form'
+import SubscribeForm from '@salesforce/retail-react-app/../../app/components/subscription/subscribe-form'
 
 const mockSubscriptionState = {
     state: {
@@ -72,7 +72,7 @@ describe('SubscribeForm', () => {
         // Verify the input and button exist within an input group
         const emailInput = screen.getByLabelText(/email address for newsletter/i)
         const submitButton = screen.getByRole('button', {name: /sign up/i})
-        
+
         // Verify both elements are in the document and properly structured
         expect(emailInput).toBeInTheDocument()
         expect(submitButton).toBeInTheDocument()

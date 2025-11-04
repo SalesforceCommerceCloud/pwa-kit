@@ -141,7 +141,11 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                         value={state?.email || ''}
                         onChange={(e) => actions?.setEmail?.(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !state?.isLoading && !isFetchingSubscriptions) {
+                            if (
+                                e.key === 'Enter' &&
+                                !state?.isLoading &&
+                                !isFetchingSubscriptions
+                            ) {
                                 actions?.submit?.()
                             }
                         }}

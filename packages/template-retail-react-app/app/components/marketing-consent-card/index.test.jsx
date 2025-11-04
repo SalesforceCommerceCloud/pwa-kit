@@ -8,7 +8,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import MarketingConsentCard from './index'
+import MarketingConsentCard from '@salesforce/retail-react-app/../../app/components/marketing-consent-card/index'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {
@@ -97,9 +97,7 @@ describe('MarketingConsentCard', () => {
             renderWithProviders(<MarketingConsentCard />)
 
             expect(screen.getByText(/marketing preferences/i)).toBeInTheDocument()
-            expect(
-                screen.getByText(/choose how you'd like to hear from us/i)
-            ).toBeInTheDocument()
+            expect(screen.getByText(/choose how you'd like to hear from us/i)).toBeInTheDocument()
         })
 
         it('displays only subscriptions with USER_PROFILE tag', () => {
@@ -195,7 +193,6 @@ describe('MarketingConsentCard', () => {
         })
 
         it('uses phoneMobile if available, otherwise phoneHome', async () => {
-            const user = userEvent.setup()
             useCurrentCustomer.mockReturnValue({
                 data: {
                     ...mockCustomer,
@@ -207,7 +204,7 @@ describe('MarketingConsentCard', () => {
             renderWithProviders(<MarketingConsentCard />)
 
             const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await user.click(saveButton)
+            await userEvent.click(saveButton)
 
             await waitFor(() => {
                 expect(mockUpdateSubscriptions).toHaveBeenCalledWith(
@@ -225,7 +222,6 @@ describe('MarketingConsentCard', () => {
 
     describe('Checkbox Interactions', () => {
         it('allows toggling subscription preferences', async () => {
-            const user = userEvent.setup()
             renderWithProviders(<MarketingConsentCard />)
 
             const newsletterCheckbox = screen.getByRole('checkbox', {name: /email newsletter/i})
@@ -234,11 +230,11 @@ describe('MarketingConsentCard', () => {
             expect(newsletterCheckbox).not.toBeChecked()
 
             // Toggle on
-            await user.click(newsletterCheckbox)
+            await userEvent.click(newsletterCheckbox)
             expect(newsletterCheckbox).toBeChecked()
 
             // Toggle off
-            await user.click(newsletterCheckbox)
+            await userEvent.click(newsletterCheckbox)
             expect(newsletterCheckbox).not.toBeChecked()
         })
 
@@ -258,18 +254,17 @@ describe('MarketingConsentCard', () => {
 
     describe('Submission', () => {
         it('submits all subscriptions with correct channels and contact info', async () => {
-            const user = userEvent.setup()
             renderWithProviders(<MarketingConsentCard />)
 
             const newsletterCheckbox = screen.getByRole('checkbox', {name: /email newsletter/i})
             const smsCheckbox = screen.getByRole('checkbox', {name: /sms alerts/i})
 
             // Toggle some checkboxes
-            await user.click(newsletterCheckbox) // Opt in
-            await user.click(smsCheckbox) // Opt in
+            await userEvent.click(newsletterCheckbox) // Opt in
+            await userEvent.click(smsCheckbox) // Opt in
 
             const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await user.click(saveButton)
+            await userEvent.click(saveButton)
 
             await waitFor(() => {
                 expect(mockUpdateSubscriptions).toHaveBeenCalledTimes(1)
@@ -301,13 +296,12 @@ describe('MarketingConsentCard', () => {
         })
 
         it('shows success toast after successful update', async () => {
-            const user = userEvent.setup()
             mockUpdateSubscriptions.mockResolvedValueOnce({})
 
             renderWithProviders(<MarketingConsentCard />)
 
             const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await user.click(saveButton)
+            await userEvent.click(saveButton)
 
             await waitFor(() => {
                 expect(screen.getByText(/communication preferences updated/i)).toBeInTheDocument()
@@ -315,7 +309,6 @@ describe('MarketingConsentCard', () => {
         })
 
         it('shows error message if customer has no email', async () => {
-            const user = userEvent.setup()
             useCurrentCustomer.mockReturnValue({
                 data: {
                     ...mockCustomer,
@@ -326,7 +319,7 @@ describe('MarketingConsentCard', () => {
             renderWithProviders(<MarketingConsentCard />)
 
             const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await user.click(saveButton)
+            await userEvent.click(saveButton)
 
             await waitFor(() => {
                 expect(
@@ -337,13 +330,12 @@ describe('MarketingConsentCard', () => {
         })
 
         it('shows error message if update fails', async () => {
-            const user = userEvent.setup()
             mockUpdateSubscriptions.mockRejectedValueOnce(new Error('API Error'))
 
             renderWithProviders(<MarketingConsentCard />)
 
             const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await user.click(saveButton)
+            await userEvent.click(saveButton)
 
             await waitFor(() => {
                 expect(
@@ -370,7 +362,6 @@ describe('MarketingConsentCard', () => {
         })
 
         it('warns and shows error if no subscriptions to update', async () => {
-            const user = userEvent.setup()
             const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
 
             useMarketingConsent.mockReturnValue({
@@ -421,4 +412,3 @@ describe('MarketingConsentCard', () => {
         })
     })
 })
-

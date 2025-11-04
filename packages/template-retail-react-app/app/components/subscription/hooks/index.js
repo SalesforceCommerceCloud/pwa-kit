@@ -7,4 +7,3 @@
 
 export {useEmailSubscription} from './use-email-subscription'
 // Future: export {useSmsSubscription} from './use-sms-subscription'
-

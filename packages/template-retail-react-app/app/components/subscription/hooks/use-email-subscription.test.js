@@ -8,7 +8,7 @@
 import React from 'react'
 import {renderHook, act, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import {useEmailSubscription} from './use-email-subscription'
+import {useEmailSubscription} from '@salesforce/retail-react-app/../../app/components/subscription/hooks/use-email-subscription'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 
 // Mock dependencies
@@ -17,7 +17,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-marketing-consent')
 // Create a wrapper component that provides IntlProvider with mocked formatMessage
 const createWrapper = () => {
     // eslint-disable-next-line react/prop-types
-    return ({children}) => (
+    const Wrapper = ({children}) => (
         <IntlProvider
             locale="en-US"
             defaultLocale="en-US"
@@ -28,13 +28,15 @@ const createWrapper = () => {
             {children}
         </IntlProvider>
     )
+    Wrapper.displayName = 'IntlWrapper'
+    return Wrapper
 }
 
 // Mock formatMessage globally to ensure it returns plain strings
 const originalFormatMessage = IntlProvider.prototype.formatMessage
 beforeAll(() => {
     // Mock formatMessage on IntlProvider
-    IntlProvider.prototype.formatMessage = function(msg) {
+    IntlProvider.prototype.formatMessage = function (msg) {
         return msg.defaultMessage || msg.id
     }
 })
@@ -602,6 +604,73 @@ describe('useEmailSubscription', () => {
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
         })
 
+        test('handles subscriptions with array-based channels and tags (API format)', () => {
+            // Test that the logic works with arrays instead of Sets
+            // This is the actual format the API returns
+            const mockArrayFormatSubscriptions = [
+                {
+                    subscriptionId: 'marketing-email',
+                    channels: ['email'], // Array instead of Set
+                    tags: ['homepage_banner'] // Array instead of Set
+                },
+                {
+                    subscriptionId: 'footer-newsletter',
+                    channels: ['email'],
+                    tags: ['footer']
+                }
+            ]
+
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockArrayFormatSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+
+            const {result} = renderHook(
+                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                {
+                    wrapper: createWrapper()
+                }
+            )
+
+            expect(result.current.state.matchingSubscriptionsCount).toBe(2)
+        })
+
+        test('handles mixed Set and array formats', () => {
+            // Test robustness with mixed formats
+            const mockMixedFormatSubscriptions = [
+                {
+                    subscriptionId: 'marketing-email',
+                    channels: ['email'], // Array
+                    tags: new Set(['homepage_banner']) // Set
+                },
+                {
+                    subscriptionId: 'footer-newsletter',
+                    channels: new Set(['email']), // Set
+                    tags: ['footer'] // Array
+                }
+            ]
+
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockMixedFormatSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+
+            const {result} = renderHook(
+                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                {
+                    wrapper: createWrapper()
+                }
+            )
+
+            expect(result.current.state.matchingSubscriptionsCount).toBe(2)
+        })
+
         test('updates matching subscriptions when data changes', () => {
             useMarketingConsent.mockReturnValue({
                 data: {data: mockMatchingSubscriptions},
@@ -611,13 +680,10 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
 
-            const {result, rerender} = renderHook(
-                ({tag}) => useEmailSubscription({tag}),
-                {
-                    initialProps: {tag: 'homepage_banner'},
-                    wrapper: createWrapper()
-                }
-            )
+            const {result, rerender} = renderHook(({tag}) => useEmailSubscription({tag}), {
+                initialProps: {tag: 'homepage_banner'},
+                wrapper: createWrapper()
+            })
 
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
 
@@ -692,8 +758,8 @@ describe('useEmailSubscription', () => {
 
             for (const email of validEmails) {
                 const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
-                wrapper: createWrapper()
-            })
+                    wrapper: createWrapper()
+                })
 
                 act(() => {
                     result.current.actions.setEmail(email)

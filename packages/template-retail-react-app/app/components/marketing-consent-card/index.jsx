@@ -86,7 +86,10 @@ const MarketingConsentCard = () => {
         profileSubscriptions.forEach((sub) => {
             // Check if opted in for EMAIL channel
             if (sub.channels?.has(CONSENT_CHANNELS.EMAIL)) {
-                const emailStatus = getSubscriptionStatus(sub.subscriptionId, CONSENT_CHANNELS.EMAIL)
+                const emailStatus = getSubscriptionStatus(
+                    sub.subscriptionId,
+                    CONSENT_CHANNELS.EMAIL
+                )
                 initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.EMAIL}`] =
                     emailStatus === CONSENT_STATUS.OPT_IN
             }
@@ -101,7 +104,13 @@ const MarketingConsentCard = () => {
         })
 
         setLocalPreferences(initialPreferences)
-    }, [profileSubscriptions, customer?.email, customer?.phoneMobile, customer?.phoneHome, getSubscriptionStatus])
+    }, [
+        profileSubscriptions,
+        customer?.email,
+        customer?.phoneMobile,
+        customer?.phoneHome,
+        getSubscriptionStatus
+    ])
 
     const handleSubmit = async () => {
         if (!customer?.email) {
@@ -251,7 +260,9 @@ const MarketingConsentCard = () => {
                                 return null
                             }
 
-                            const channel = showEmailOption ? CONSENT_CHANNELS.EMAIL : CONSENT_CHANNELS.SMS
+                            const channel = showEmailOption
+                                ? CONSENT_CHANNELS.EMAIL
+                                : CONSENT_CHANNELS.SMS
                             const prefKey = `${sub.subscriptionId}_${channel}`
                             const isChecked = localPreferences[prefKey] || false
 

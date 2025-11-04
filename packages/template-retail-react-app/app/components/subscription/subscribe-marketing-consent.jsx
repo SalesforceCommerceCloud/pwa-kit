@@ -6,24 +6,27 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import SubscribeForm from './subscribe-form'
-import {useEmailSubscription} from './hooks'
+import SubscribeForm from '@salesforce/retail-react-app/app/components/subscription/subscribe-form'
+import {useEmailSubscription} from '@salesforce/retail-react-app/app/components/subscription/hooks'
 import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 /**
  * Marketing consent subscription component for email subscriptions.
  * This component dynamically fetches all subscriptions matching a given consent tag
  * and email channel, then opts the user into ALL matching subscriptions.
- * 
+ *
  * This allows marketers to configure subscriptions in Business Manager without code changes.
  *
  * @param {Object} props
- * @param {string} props.tag - The consent tag to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER)
- * 
+ * @param {string|Array<string>} props.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER or [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER])
+ *
  * @example
  * // In footer
  * <SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
- * 
+ *
+ * // Multiple tags
+ * <SubscribeMarketingConsent tag={[CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER]} />
+ *
  * // On registration page
  * <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
  */
@@ -33,7 +36,7 @@ const SubscribeMarketingConsent = ({tag = CONSENT_TAGS.FOOTER, ...props}) => {
 }
 
 SubscribeMarketingConsent.propTypes = {
-    tag: PropTypes.string.isRequired
+    tag: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 }
 
 export default SubscribeMarketingConsent
