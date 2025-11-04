@@ -10,7 +10,7 @@ import {
     useShopperConsentsMutation,
     ShopperConsentsMutations
 } from '@salesforce/commerce-sdk-react'
-import {useMemo} from 'react'
+import {useMemo, useEffect} from 'react'
 
 /**
  * A hook for managing customer marketing consent subscriptions.
@@ -91,6 +91,33 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
     const updateSubscriptionsMutation = useShopperConsentsMutation(
         ShopperConsentsMutations.UpdateSubscriptions
     )
+
+    // Log warning if no subscriptions found after initial fetch
+    useEffect(() => {
+        // Only check after the query has completed loading
+        if (!subscriptionsQuery.isLoading && enabled) {
+            const subscriptions = subscriptionsQuery.data?.data || []
+            const hasError = subscriptionsQuery.error
+
+            // Warn if there's an error or no subscriptions found
+            if (hasError || subscriptions.length === 0) {
+                const tagFilter = tags.length > 0 ? ` (filtered by tags: ${tags.join(', ')})` : ''
+                console.warn(
+                    `[useMarketingConsent] Marketing Consent feature was enabled, but no subscriptions were found${tagFilter}. ` +
+                        'Check that the prerequisite setup was completed in Business Manager.'
+                )
+                if (hasError) {
+                    console.error('[useMarketingConsent] API Error:', subscriptionsQuery.error)
+                }
+            }
+        }
+    }, [
+        subscriptionsQuery.isLoading,
+        subscriptionsQuery.data,
+        subscriptionsQuery.error,
+        enabled,
+        tags
+    ])
 
     // Helper functions
     const helpers = useMemo(() => {

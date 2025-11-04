@@ -70,11 +70,12 @@ export const useEmailSubscription = ({tag} = {}) => {
         }
         const allSubscriptions = subscriptionsData?.data || []
         return allSubscriptions.filter((sub) => {
-            // Handle both Set and Array formats for channels and tags
-            const hasEmailChannel =
-                sub.channels?.has?.(CONSENT_CHANNELS.EMAIL) ||
-                sub.channels?.includes?.(CONSENT_CHANNELS.EMAIL)
-            const hasAnyTag = tags.some((t) => sub.tags?.has?.(t) || sub.tags?.includes?.(t))
+            // Check if channel (singular) matches email
+            const hasEmailChannel = sub.channel === CONSENT_CHANNELS.EMAIL
+
+            // Check if tags array includes any of the requested tags
+            const hasAnyTag = tags.some((t) => sub.tags?.includes?.(t))
+
             return hasEmailChannel && hasAnyTag
         })
     }, [tags, subscriptionsData])

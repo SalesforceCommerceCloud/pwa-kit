@@ -8,7 +8,7 @@
 import React from 'react'
 import {renderHook, act, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import {useEmailSubscription} from '@salesforce/retail-react-app/../../app/components/subscription/hooks/use-email-subscription'
+import {useEmailSubscription} from '@salesforce/retail-react-app/app/components/subscription/hooks/use-email-subscription'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 
 // Mock dependencies
@@ -63,13 +63,13 @@ describe('useEmailSubscription', () => {
     const mockMatchingSubscriptions = [
         {
             subscriptionId: 'weekly-newsletter',
-            channels: new Set(['email']),
-            tags: new Set(['homepage_banner'])
+            channel: 'email',
+            tags: ['homepage_banner']
         },
         {
             subscriptionId: 'promotional-offers',
-            channels: new Set(['email']),
-            tags: new Set(['homepage_banner'])
+            channel: 'email',
+            tags: ['homepage_banner']
         }
     ]
 
@@ -550,8 +550,8 @@ describe('useEmailSubscription', () => {
             const mockCheckoutSubscriptions = [
                 {
                     subscriptionId: 'checkout-updates',
-                    channels: new Set(['email']),
-                    tags: new Set(['checkout_page'])
+                    channel: 'email',
+                    tags: ['checkout_page']
                 }
             ]
 
@@ -575,13 +575,13 @@ describe('useEmailSubscription', () => {
             const mockMultiTagSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channels: new Set(['email']),
-                    tags: new Set(['homepage_banner'])
+                    channel: 'email',
+                    tags: ['homepage_banner']
                 },
                 {
                     subscriptionId: 'footer-newsletter',
-                    channels: new Set(['email']),
-                    tags: new Set(['footer'])
+                    channel: 'email',
+                    tags: ['footer']
                 }
             ]
 
@@ -604,24 +604,25 @@ describe('useEmailSubscription', () => {
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
         })
 
-        test('handles subscriptions with array-based channels and tags (API format)', () => {
-            // Test that the logic works with arrays instead of Sets
-            // This is the actual format the API returns
-            const mockArrayFormatSubscriptions = [
+        test('handles subscriptions with actual API format (channel as string, tags as array)', () => {
+            // Test that the logic works with the actual API format:
+            // - channel (singular) as string
+            // - tags as array
+            const mockApiFormatSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channels: ['email'], // Array instead of Set
-                    tags: ['homepage_banner'] // Array instead of Set
+                    channel: 'email', // String (singular)
+                    tags: ['homepage_banner'] // Array
                 },
                 {
                     subscriptionId: 'footer-newsletter',
-                    channels: ['email'],
+                    channel: 'email',
                     tags: ['footer']
                 }
             ]
 
             useMarketingConsent.mockReturnValue({
-                data: {data: mockArrayFormatSubscriptions},
+                data: {data: mockApiFormatSubscriptions},
                 isLoading: false,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false,
@@ -638,23 +639,18 @@ describe('useEmailSubscription', () => {
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
         })
 
-        test('handles mixed Set and array formats', () => {
-            // Test robustness with mixed formats
-            const mockMixedFormatSubscriptions = [
+        test('handles subscriptions with multiple tags in array', () => {
+            // Test that subscriptions can have multiple tags
+            const mockMultipleTagsSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channels: ['email'], // Array
-                    tags: new Set(['homepage_banner']) // Set
-                },
-                {
-                    subscriptionId: 'footer-newsletter',
-                    channels: new Set(['email']), // Set
-                    tags: ['footer'] // Array
+                    channel: 'email',
+                    tags: ['homepage_banner', 'HOMEPAGE_BANNER', 'footer'] // Multiple tags
                 }
             ]
 
             useMarketingConsent.mockReturnValue({
-                data: {data: mockMixedFormatSubscriptions},
+                data: {data: mockMultipleTagsSubscriptions},
                 isLoading: false,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false,
@@ -668,7 +664,44 @@ describe('useEmailSubscription', () => {
                 }
             )
 
-            expect(result.current.state.matchingSubscriptionsCount).toBe(2)
+            // Should match because subscription has both tags
+            expect(result.current.state.matchingSubscriptionsCount).toBe(1)
+        })
+
+        test('filters out non-email channel subscriptions', () => {
+            // Test that SMS and other channels are excluded
+            const mockMixedChannelSubscriptions = [
+                {
+                    subscriptionId: 'email-newsletter',
+                    channel: 'email',
+                    tags: ['homepage_banner']
+                },
+                {
+                    subscriptionId: 'sms-alerts',
+                    channel: 'sms',
+                    tags: ['homepage_banner']
+                },
+                {
+                    subscriptionId: 'push-notifications',
+                    channel: 'push',
+                    tags: ['homepage_banner']
+                }
+            ]
+
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockMixedChannelSubscriptions},
+                isLoading: false,
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+
+            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+                wrapper: createWrapper()
+            })
+
+            // Should only match the email subscription, not SMS or push
+            expect(result.current.state.matchingSubscriptionsCount).toBe(1)
         })
 
         test('updates matching subscriptions when data changes', () => {
