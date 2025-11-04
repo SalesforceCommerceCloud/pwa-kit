@@ -51,7 +51,7 @@ Skeleton.displayName = 'Skeleton'
 
 /**
  * Marketing Consent Card Component
- * Dynamically displays all subscriptions configured with the USER_PROFILE tag in Business Manager.
+ * Dynamically displays all subscriptions configured with the ACCOUNT tag in Business Manager.
  * Automatically detects which channels (email/SMS) each subscription supports and uses the
  * customer's registered contact information.
  */
@@ -72,10 +72,10 @@ const MarketingConsentCard = () => {
     const [error, setError] = useState(null)
     const [localPreferences, setLocalPreferences] = useState({})
 
-    // Get all subscriptions matching USER_PROFILE tag
+    // Get all subscriptions matching ACCOUNT tag
     const profileSubscriptions = useMemo(() => {
         const allSubscriptions = subscriptionsData?.data || []
-        return allSubscriptions.filter((sub) => sub.tags?.has(CONSENT_TAGS.USER_PROFILE))
+        return allSubscriptions.filter((sub) => sub.tags?.has(CONSENT_TAGS.ACCOUNT))
     }, [subscriptionsData])
 
     // Initialize local preferences from fetched subscription statuses
@@ -161,7 +161,7 @@ const MarketingConsentCard = () => {
             if (subscriptionsToUpdate.length === 0) {
                 console.warn(
                     '[MarketingConsentCard] No subscriptions found to update. Check Business Manager configuration for tag:',
-                    CONSENT_TAGS.USER_PROFILE
+                    CONSENT_TAGS.ACCOUNT
                 )
                 setError(
                     formatMessage({

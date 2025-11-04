@@ -64,12 +64,12 @@ describe('useEmailSubscription', () => {
         {
             subscriptionId: 'weekly-newsletter',
             channel: 'email',
-            tags: ['homepage_banner']
+            tags: ['email_capture']
         },
         {
             subscriptionId: 'promotional-offers',
             channel: 'email',
-            tags: ['homepage_banner']
+            tags: ['email_capture']
         }
     ]
 
@@ -90,7 +90,7 @@ describe('useEmailSubscription', () => {
 
     describe('Initial state', () => {
         test('returns correct initial state', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -102,7 +102,7 @@ describe('useEmailSubscription', () => {
         })
 
         test('provides setEmail and submit actions', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -111,23 +111,23 @@ describe('useEmailSubscription', () => {
         })
 
         test('passes tags to useMarketingConsent when tag is a string', () => {
-            renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
-            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner']})
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['email_capture']})
         })
 
         test('passes tags to useMarketingConsent when tag is an array', () => {
-            renderHook(() => useEmailSubscription({tag: ['homepage_banner', 'footer']}), {
+            renderHook(() => useEmailSubscription({tag: ['email_capture', 'account']}), {
                 wrapper: createWrapper()
             })
 
-            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner', 'footer']})
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['email_capture', 'account']})
         })
 
         test('returns matching subscriptions count', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -146,7 +146,7 @@ describe('useEmailSubscription', () => {
 
     describe('setEmail action', () => {
         test('updates email state', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -158,7 +158,7 @@ describe('useEmailSubscription', () => {
         })
 
         test('allows email to be cleared', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -176,7 +176,7 @@ describe('useEmailSubscription', () => {
 
     describe('submit action - validation', () => {
         test('shows error for empty email', async () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -190,7 +190,7 @@ describe('useEmailSubscription', () => {
         })
 
         test('shows error for invalid email format', async () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -209,7 +209,7 @@ describe('useEmailSubscription', () => {
 
         test('accepts valid email format', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -255,7 +255,7 @@ describe('useEmailSubscription', () => {
                 isUpdating: false,
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -271,7 +271,7 @@ describe('useEmailSubscription', () => {
                 expect.stringContaining('[useEmailSubscription] No subscriptions found')
             )
             expect(console.error).toHaveBeenCalledWith(
-                expect.stringContaining('tag(s) "homepage_banner"')
+                expect.stringContaining('tag(s) "email_capture"')
             )
         })
 
@@ -284,7 +284,7 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
             const {result} = renderHook(
-                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                () => useEmailSubscription({tag: ['email_capture', 'account']}),
                 {
                     wrapper: createWrapper()
                 }
@@ -302,7 +302,7 @@ describe('useEmailSubscription', () => {
                 expect.stringContaining('[useEmailSubscription] No subscriptions found')
             )
             expect(console.error).toHaveBeenCalledWith(
-                expect.stringContaining('tag(s) "homepage_banner, footer"')
+                expect.stringContaining('tag(s) "email_capture, account"')
             )
         })
     })
@@ -310,7 +310,7 @@ describe('useEmailSubscription', () => {
     describe('submit action - successful bulk subscription', () => {
         test('calls updateSubscriptions with ALL matching subscriptions', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -340,7 +340,7 @@ describe('useEmailSubscription', () => {
 
         test('logs subscription details to console', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -360,7 +360,7 @@ describe('useEmailSubscription', () => {
 
         test('shows success message after successful submission', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -380,7 +380,7 @@ describe('useEmailSubscription', () => {
 
         test('clears email field after successful submission', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -406,7 +406,7 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -432,7 +432,7 @@ describe('useEmailSubscription', () => {
     describe('submit action - failed subscription', () => {
         test('shows generic error message when API call fails', async () => {
             mockUpdateSubscriptions.mockRejectedValue(new Error('API Error'))
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -454,7 +454,7 @@ describe('useEmailSubscription', () => {
 
         test('does not clear email field on failure', async () => {
             mockUpdateSubscriptions.mockRejectedValue(new Error('API Error'))
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -474,7 +474,7 @@ describe('useEmailSubscription', () => {
         test('logs error to console when submission fails', async () => {
             const mockError = new Error('Network error')
             mockUpdateSubscriptions.mockRejectedValue(mockError)
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -505,7 +505,7 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
 
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -521,7 +521,7 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
 
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -529,7 +529,7 @@ describe('useEmailSubscription', () => {
         })
 
         test('isLoading is false when not updating', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -537,7 +537,7 @@ describe('useEmailSubscription', () => {
         })
 
         test('isFetching is false when not loading', () => {
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -551,7 +551,7 @@ describe('useEmailSubscription', () => {
                 {
                     subscriptionId: 'checkout-updates',
                     channel: 'email',
-                    tags: ['checkout_page']
+                    tags: ['checkout']
                 }
             ]
 
@@ -563,11 +563,11 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
 
-            const {result} = renderHook(() => useEmailSubscription({tag: 'checkout_page'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'checkout'}), {
                 wrapper: createWrapper()
             })
 
-            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['checkout_page']})
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['checkout']})
             expect(result.current.state.matchingSubscriptionsCount).toBe(1)
         })
 
@@ -576,12 +576,12 @@ describe('useEmailSubscription', () => {
                 {
                     subscriptionId: 'marketing-email',
                     channel: 'email',
-                    tags: ['homepage_banner']
+                    tags: ['email_capture']
                 },
                 {
-                    subscriptionId: 'footer-newsletter',
+                    subscriptionId: 'account-newsletter',
                     channel: 'email',
-                    tags: ['footer']
+                    tags: ['account']
                 }
             ]
 
@@ -594,13 +594,13 @@ describe('useEmailSubscription', () => {
             })
 
             const {result} = renderHook(
-                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                () => useEmailSubscription({tag: ['email_capture', 'account']}),
                 {
                     wrapper: createWrapper()
                 }
             )
 
-            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['homepage_banner', 'footer']})
+            expect(useMarketingConsent).toHaveBeenCalledWith({tags: ['email_capture', 'account']})
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
         })
 
@@ -612,12 +612,12 @@ describe('useEmailSubscription', () => {
                 {
                     subscriptionId: 'marketing-email',
                     channel: 'email', // String (singular)
-                    tags: ['homepage_banner'] // Array
+                    tags: ['email_capture'] // Array
                 },
                 {
-                    subscriptionId: 'footer-newsletter',
+                    subscriptionId: 'account-newsletter',
                     channel: 'email',
-                    tags: ['footer']
+                    tags: ['account']
                 }
             ]
 
@@ -630,7 +630,7 @@ describe('useEmailSubscription', () => {
             })
 
             const {result} = renderHook(
-                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                () => useEmailSubscription({tag: ['email_capture', 'account']}),
                 {
                     wrapper: createWrapper()
                 }
@@ -645,7 +645,7 @@ describe('useEmailSubscription', () => {
                 {
                     subscriptionId: 'marketing-email',
                     channel: 'email',
-                    tags: ['homepage_banner', 'HOMEPAGE_BANNER', 'footer'] // Multiple tags
+                    tags: ['email_capture', 'account', 'checkout'] // Multiple tags
                 }
             ]
 
@@ -658,7 +658,7 @@ describe('useEmailSubscription', () => {
             })
 
             const {result} = renderHook(
-                () => useEmailSubscription({tag: ['homepage_banner', 'footer']}),
+                () => useEmailSubscription({tag: ['email_capture', 'account']}),
                 {
                     wrapper: createWrapper()
                 }
@@ -674,17 +674,17 @@ describe('useEmailSubscription', () => {
                 {
                     subscriptionId: 'email-newsletter',
                     channel: 'email',
-                    tags: ['homepage_banner']
+                    tags: ['email_capture']
                 },
                 {
                     subscriptionId: 'sms-alerts',
                     channel: 'sms',
-                    tags: ['homepage_banner']
+                    tags: ['email_capture']
                 },
                 {
                     subscriptionId: 'push-notifications',
                     channel: 'push',
-                    tags: ['homepage_banner']
+                    tags: ['email_capture']
                 }
             ]
 
@@ -696,7 +696,7 @@ describe('useEmailSubscription', () => {
                 getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
             })
 
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -714,7 +714,7 @@ describe('useEmailSubscription', () => {
             })
 
             const {result, rerender} = renderHook(({tag}) => useEmailSubscription({tag}), {
-                initialProps: {tag: 'homepage_banner'},
+                initialProps: {tag: 'email_capture'},
                 wrapper: createWrapper()
             })
 
@@ -745,7 +745,7 @@ describe('useEmailSubscription', () => {
             })
             mockGetSubscriptionsByTagAndChannel.mockReturnValue([])
 
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -754,7 +754,7 @@ describe('useEmailSubscription', () => {
 
         test('clears previous feedback messages before submission', async () => {
             mockUpdateSubscriptions.mockResolvedValue({})
-            const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
 
@@ -790,7 +790,7 @@ describe('useEmailSubscription', () => {
             ]
 
             for (const email of validEmails) {
-                const {result} = renderHook(() => useEmailSubscription({tag: 'homepage_banner'}), {
+                const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                     wrapper: createWrapper()
                 })
 

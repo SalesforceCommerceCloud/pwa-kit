@@ -35,7 +35,7 @@ const mockSubscriptionsData = {
             subscriptionId: 'newsletter',
             name: 'Email Newsletter',
             description: 'Receive our weekly newsletter',
-            tags: new Set([CONSENT_TAGS.USER_PROFILE]),
+            tags: new Set([CONSENT_TAGS.ACCOUNT]),
             channels: new Set([CONSENT_CHANNELS.EMAIL]),
             status: CONSENT_STATUS.OPT_OUT
         },
@@ -43,7 +43,7 @@ const mockSubscriptionsData = {
             subscriptionId: 'promotional-offers',
             name: 'Promotional Offers',
             description: 'Get exclusive deals',
-            tags: new Set([CONSENT_TAGS.USER_PROFILE]),
+            tags: new Set([CONSENT_TAGS.ACCOUNT]),
             channels: new Set([CONSENT_CHANNELS.EMAIL]),
             status: CONSENT_STATUS.OPT_IN
         },
@@ -51,15 +51,15 @@ const mockSubscriptionsData = {
             subscriptionId: 'sms-alerts',
             name: 'SMS Alerts',
             description: 'Receive order updates via SMS',
-            tags: new Set([CONSENT_TAGS.USER_PROFILE]),
+            tags: new Set([CONSENT_TAGS.ACCOUNT]),
             channels: new Set([CONSENT_CHANNELS.SMS]),
             status: CONSENT_STATUS.OPT_OUT
         },
         {
-            subscriptionId: 'homepage-banner',
-            name: 'Homepage Banner',
+            subscriptionId: 'email-capture',
+            name: 'Email Capture',
             description: 'Different tag',
-            tags: new Set([CONSENT_TAGS.HOMEPAGE_BANNER]),
+            tags: new Set([CONSENT_TAGS.EMAIL_CAPTURE]),
             channels: new Set([CONSENT_CHANNELS.EMAIL]),
             status: CONSENT_STATUS.OPT_OUT
         }
@@ -100,13 +100,13 @@ describe('MarketingConsentCard', () => {
             expect(screen.getByText(/choose how you'd like to hear from us/i)).toBeInTheDocument()
         })
 
-        it('displays only subscriptions with USER_PROFILE tag', () => {
+        it('displays only subscriptions with ACCOUNT tag', () => {
             renderWithProviders(<MarketingConsentCard />)
 
             expect(screen.getByText('Email Newsletter')).toBeInTheDocument()
             expect(screen.getByText('Promotional Offers')).toBeInTheDocument()
             expect(screen.getByText('SMS Alerts')).toBeInTheDocument()
-            expect(screen.queryByText('Homepage Banner')).not.toBeInTheDocument()
+            expect(screen.queryByText('Email Capture')).not.toBeInTheDocument()
         })
 
         it('displays subscription descriptions', () => {
@@ -135,7 +135,7 @@ describe('MarketingConsentCard', () => {
             expect(screen.queryByText('Promotional Offers')).not.toBeInTheDocument()
         })
 
-        it('shows info message when no subscriptions match USER_PROFILE tag', () => {
+        it('shows info message when no subscriptions match ACCOUNT tag', () => {
             useMarketingConsent.mockReturnValue({
                 ...useMarketingConsent(),
                 data: {data: []}
@@ -155,7 +155,7 @@ describe('MarketingConsentCard', () => {
                 subscriptionId: 'dual-channel',
                 name: 'Dual Channel Sub',
                 description: 'Supports both',
-                tags: new Set([CONSENT_TAGS.USER_PROFILE]),
+                tags: new Set([CONSENT_TAGS.ACCOUNT]),
                 channels: new Set([CONSENT_CHANNELS.EMAIL, CONSENT_CHANNELS.SMS]),
                 status: CONSENT_STATUS.OPT_OUT
             }

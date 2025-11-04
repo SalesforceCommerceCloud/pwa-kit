@@ -20,9 +20,8 @@ export const CONSENT_CHANNELS = {
 // Marketing consent tags, as configured by an administrator.
 // These tags allow you to organize subscriptions by where they appear in the UI
 export const CONSENT_TAGS = {
-    HOMEPAGE_BANNER: 'homepage_banner',
-    USER_PROFILE: 'user_profile',
-    CHECKOUT_PAGE: 'checkout_page',
+    ACCOUNT: 'account',
+    CHECKOUT: 'checkout',
     REGISTRATION: 'registration',
-    FOOTER: 'footer'
+    EMAIL_CAPTURE: 'email_capture'
 }

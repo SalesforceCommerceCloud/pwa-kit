@@ -18,19 +18,19 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
  * This allows marketers to configure subscriptions in Business Manager without code changes.
  *
  * @param {Object} props
- * @param {string|Array<string>} props.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER or [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER])
+ * @param {string|Array<string>} props.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.EMAIL_CAPTURE or [CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT])
  *
  * @example
  * // In footer
- * <SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
+ * <SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
  *
  * // Multiple tags
- * <SubscribeMarketingConsent tag={[CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER]} />
+ * <SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
  *
  * // On registration page
  * <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
  */
-const SubscribeMarketingConsent = ({tag = CONSENT_TAGS.FOOTER, ...props}) => {
+const SubscribeMarketingConsent = ({tag = CONSENT_TAGS.EMAIL_CAPTURE, ...props}) => {
     const {state, actions} = useEmailSubscription({tag})
     return <SubscribeForm subscription={{state, actions}} {...props} />
 }

@@ -8,7 +8,7 @@ The subscription system allows customers to opt into marketing communications fr
 
 **Key Features:**
 - **Dynamic & Flexible**: Marketers configure subscriptions in Business Manager - no code changes needed
-- **Tag-Based**: Uses consent tags (e.g., `CONSENT_TAGS.HOMEPAGE_BANNER`) to group subscriptions by UI location
+- **Tag-Based**: Uses consent tags (e.g., `CONSENT_TAGS.EMAIL_CAPTURE`) to group subscriptions by UI location
 - **Bulk Operations**: Opts users into ALL matching subscriptions in a single API call
 - **Channel-Aware**: Automatically filters subscriptions by channel (e.g., email, SMS)
 
@@ -41,13 +41,13 @@ import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/componen
 import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 // Footer newsletter signup
-<SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
+<SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
 
 // Registration page opt-ins
 <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
 
 // Checkout page opt-ins
-<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT_PAGE} />
+<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT} />
 ```
 
 ### `SubscribeForm`
@@ -95,7 +95,7 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
 
 const MyComponent = () => {
   const {state, actions} = useEmailSubscription({
-    tag: CONSENT_TAGS.HOMEPAGE_BANNER
+    tag: CONSENT_TAGS.EMAIL_CAPTURE
   })
   
   console.log(`Will subscribe to ${state.matchingSubscriptionsCount} subscription(s)`)
@@ -170,32 +170,32 @@ You need to configure subscriptions in Business Manager with appropriate tags:
 1. Navigate to **Merchant Tools > Site Preferences > Consent Management**
 2. Create subscriptions with meaningful IDs (e.g., 'weekly-newsletter', 'promotional-offers')
 3. **Configure tags** for each subscription to match your UI locations:
-   - `homepage_banner` - For footer/homepage subscriptions  
+   - `email_capture` - For footer/homepage email capture subscriptions  
+   - `account` - For account settings/user profile subscriptions
+   - `checkout` - For checkout page opt-ins
    - `registration` - For signup page opt-ins
-   - `checkout_page` - For checkout page opt-ins
-   - `user_profile` - For account settings
 4. Configure the channels (email/SMS) for each subscription
 5. Set the subscription status to **Active**
 
 **Example Configuration:**
 ```
 Subscription ID: weekly-newsletter
-Tags: homepage_banner
+Tags: email_capture
 Channels: email
 Status: Active
 
 Subscription ID: promotional-offers  
-Tags: homepage_banner
+Tags: email_capture, account
 Channels: email
 Status: Active
 
 Subscription ID: order-updates
-Tags: checkout_page
+Tags: checkout
 Channels: email, sms
 Status: Active
 ```
 
-With this setup, the footer (using `CONSENT_TAGS.HOMEPAGE_BANNER`) will automatically subscribe users to BOTH `weekly-newsletter` AND `promotional-offers` when they submit their email.
+With this setup, the footer (using `CONSENT_TAGS.EMAIL_CAPTURE` and `CONSENT_TAGS.ACCOUNT`) will automatically subscribe users to BOTH `weekly-newsletter` AND `promotional-offers` when they submit their email.
 
 ### 2. API Configuration
 
@@ -210,11 +210,10 @@ The component uses the ShopperConsents API which requires:
 ```javascript
 // app/constants/marketing-consent.js
 export const CONSENT_TAGS = {
-    HOMEPAGE_BANNER: 'homepage_banner',
-    USER_PROFILE: 'user_profile',
-    CHECKOUT_PAGE: 'checkout_page',
+    ACCOUNT: 'account',
+    CHECKOUT: 'checkout',
     REGISTRATION: 'registration',
-    FOOTER: 'footer'
+    EMAIL_CAPTURE: 'email_capture'
 }
 ```
 
@@ -230,7 +229,7 @@ export const CONSENT_TAGS = {
 import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
 import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
-<SubscribeMarketingConsent tag={CONSENT_TAGS.HOMEPAGE_BANNER} />
+<SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
 ```
 
 ### Registration Page
@@ -240,7 +239,7 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
 
 ### Checkout Page
 ```jsx
-<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT_PAGE} />
+<SubscribeMarketingConsent tag={CONSENT_TAGS.CHECKOUT} />
 ```
 
 ## API Version
@@ -271,7 +270,7 @@ Simply configure new subscriptions in Business Manager with the same tag. The co
 
 **Example:** Add a new "Flash Sales" subscription to the footer:
 1. In Business Manager, create subscription ID: `flash-sales`
-2. Set tag: `homepage_banner`
+2. Set tag: `email_capture`
 3. Set channel: `email`
 4. Activate the subscription
 5. Footer now subscribes users to 3 subscriptions (if you had 2 before)

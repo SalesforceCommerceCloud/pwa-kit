@@ -126,7 +126,7 @@ const Footer = ({...otherProps}) => {
                             />
                             <Box>
                                 <SubscribeMarketingConsent
-                                    tag={[CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER]}
+                                    tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]}
                                 />
                             </Box>
                         </SimpleGrid>
@@ -134,7 +134,7 @@ const Footer = ({...otherProps}) => {
 
                     <HideOnDesktop>
                         <SubscribeMarketingConsent
-                            tag={[CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER]}
+                            tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]}
                         />
                     </HideOnDesktop>
 

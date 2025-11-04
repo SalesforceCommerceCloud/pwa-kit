@@ -22,7 +22,7 @@ import {useIntl} from 'react-intl'
  * This allows marketers to configure subscriptions in Business Manager without code changes.
  *
  * @param {Object} options
- * @param {string|Array<string>} options.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.HOMEPAGE_BANNER or [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.FOOTER])
+ * @param {string|Array<string>} options.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.EMAIL_CAPTURE or [CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT])
  * @returns {Object} Email subscription state and actions
  * @returns {Object} return.state - Current form state
  * @returns {string} return.state.email - Current email value
@@ -38,7 +38,7 @@ import {useIntl} from 'react-intl'
  *
  * @example
  * const {state, actions} = useEmailSubscription({
- *   tag: CONSENT_TAGS.HOMEPAGE_BANNER
+ *   tag: CONSENT_TAGS.EMAIL_CAPTURE
  * })
  */
 export const useEmailSubscription = ({tag} = {}) => {
