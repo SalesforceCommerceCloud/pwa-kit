@@ -41,7 +41,7 @@ import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/componen
 import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 // Footer newsletter signup
-<SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
+<SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
 
 // Registration page opt-ins
 <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
@@ -185,7 +185,7 @@ Channels: email
 Status: Active
 
 Subscription ID: promotional-offers  
-Tags: email_capture, account
+Tags: email_capture
 Channels: email
 Status: Active
 
@@ -195,7 +195,7 @@ Channels: email, sms
 Status: Active
 ```
 
-With this setup, the footer (using `CONSENT_TAGS.EMAIL_CAPTURE` and `CONSENT_TAGS.ACCOUNT`) will automatically subscribe users to BOTH `weekly-newsletter` AND `promotional-offers` when they submit their email.
+With this setup, the footer (using `CONSENT_TAGS.EMAIL_CAPTURE`) will automatically subscribe users to all subscriptions tagged with `email_capture` when they submit their email.
 
 ### 2. API Configuration
 
@@ -229,7 +229,7 @@ export const CONSENT_TAGS = {
 import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
 import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
-<SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
+<SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
 ```
 
 ### Registration Page

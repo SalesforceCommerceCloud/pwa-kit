@@ -22,7 +22,7 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
  *
  * @example
  * // In footer
- * <SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />
+ * <SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
  *
  * // Multiple tags
  * <SubscribeMarketingConsent tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]} />

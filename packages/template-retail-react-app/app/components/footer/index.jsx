@@ -125,17 +125,13 @@ const Footer = ({...otherProps}) => {
                                 links={makeOurCompanyLinks()}
                             />
                             <Box>
-                                <SubscribeMarketingConsent
-                                    tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]}
-                                />
+                                <SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
                             </Box>
                         </SimpleGrid>
                     </HideOnMobile>
 
                     <HideOnDesktop>
-                        <SubscribeMarketingConsent
-                            tag={[CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT]}
-                        />
+                        <SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
                     </HideOnDesktop>
 
                     {showLocaleSelector && (

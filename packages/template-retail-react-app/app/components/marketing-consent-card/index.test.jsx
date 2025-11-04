@@ -8,7 +8,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import MarketingConsentCard from '@salesforce/retail-react-app/../../app/components/marketing-consent-card/index'
+import MarketingConsentCard from '@salesforce/retail-react-app/app/components/marketing-consent-card/index'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {

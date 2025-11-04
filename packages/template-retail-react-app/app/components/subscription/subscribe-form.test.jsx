@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SubscribeForm from '@salesforce/retail-react-app/../../app/components/subscription/subscribe-form'
+import SubscribeForm from '@salesforce/retail-react-app/app/components/subscription/subscribe-form'
 
 const mockSubscriptionState = {
     state: {
