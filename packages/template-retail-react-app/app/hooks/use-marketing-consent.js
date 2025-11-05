@@ -19,6 +19,7 @@ import {useMemo, useEffect} from 'react'
  * @param {Object} options - Configuration options
  * @param {boolean} options.enabled - Whether to enable the subscriptions query (defaults to true)
  * @param {Array<string>} options.tags - Optional array of tags to filter subscriptions (all included)
+ * @param {string} options.expand - Optional expand parameter (e.g., 'consentStatus' for logged-in user status on profile page)
  * @returns {Object} Object containing:
  *   - data: The consent subscription data
  *   - isLoading: Whether the query is loading
@@ -71,12 +72,13 @@ import {useMemo, useEffect} from 'react'
  * // Check if subscription has a channel
  * const hasEmailChannel = hasChannel('marketing-email', 'email')
  */
-export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
+export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) => {
     // Query hook to get current subscriptions
     const subscriptionsQuery = useSubscriptions(
         {
             parameters: {
-                ...(tags.length > 0 && {tags: tags.join(',')})
+                ...(tags.length > 0 && {tags: tags.join(',')}),
+                ...(expand && {expand})
             }
         },
         {
@@ -127,14 +129,29 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
          * Get the opt-in/opt-out status for a specific subscription and channel
          * @param {string} subscriptionId - The subscription ID
          * @param {string} channel - The channel type ('email', 'sms', etc.)
+         * @param {string} contactPointValue - Optional contact point (email/phone) to check status for specific contact
          * @returns {string|null} The consent status ('opt_in', 'opt_out') or null if not found
          */
-        const getSubscriptionStatus = (subscriptionId, channel) => {
+        const getSubscriptionStatus = (subscriptionId, channel, contactPointValue) => {
             const subscription = subscriptions.find((sub) => sub.subscriptionId === subscriptionId)
             if (!subscription) return null
 
-            // If the subscription has the channel in its channels array, it's opted in
-            // Otherwise, it's opted out or not set
+            // If expanded with status data and contactPointValue is provided, use the actual status
+            if (subscription.status && contactPointValue) {
+                const statusEntry = subscription.status.find(
+                    (s) => s.channel === channel && s.contactPointValue === contactPointValue
+                )
+                if (statusEntry) {
+                    return statusEntry.status
+                }
+            }
+
+            // Fall back to defaultStatus if available (for logged-in users without explicit status)
+            if (subscription.defaultStatus) {
+                return subscription.defaultStatus
+            }
+
+            // Legacy fallback: check if channel exists in channels array
             const hasChannelInArray =
                 subscription.channels && subscription.channels.includes(channel)
             return hasChannelInArray ? 'opt_in' : 'opt_out'

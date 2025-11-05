@@ -66,7 +66,7 @@ const MarketingConsentCard = () => {
         isUpdating,
         isFetching,
         getSubscriptionStatus
-    } = useMarketingConsent()
+    } = useMarketingConsent({expand: 'consentStatus'})
 
     const [error, setError] = useState(null)
     const [localPreferences, setLocalPreferences] = useState({})
@@ -87,7 +87,8 @@ const MarketingConsentCard = () => {
             if (sub.channels?.includes(CONSENT_CHANNELS.EMAIL)) {
                 const emailStatus = getSubscriptionStatus(
                     sub.subscriptionId,
-                    CONSENT_CHANNELS.EMAIL
+                    CONSENT_CHANNELS.EMAIL,
+                    customer.email
                 )
                 initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.EMAIL}`] =
                     emailStatus === CONSENT_STATUS.OPT_IN
@@ -96,7 +97,11 @@ const MarketingConsentCard = () => {
             // Check if opted in for SMS channel (only if customer has phone)
             const customerPhone = customer.phoneMobile || customer.phoneHome
             if (customerPhone && sub.channels?.includes(CONSENT_CHANNELS.SMS)) {
-                const smsStatus = getSubscriptionStatus(sub.subscriptionId, CONSENT_CHANNELS.SMS)
+                const smsStatus = getSubscriptionStatus(
+                    sub.subscriptionId,
+                    CONSENT_CHANNELS.SMS,
+                    customerPhone
+                )
                 initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.SMS}`] =
                     smsStatus === CONSENT_STATUS.OPT_IN
             }

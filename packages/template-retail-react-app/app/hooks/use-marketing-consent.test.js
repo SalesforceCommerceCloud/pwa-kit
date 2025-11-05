@@ -52,6 +52,50 @@ const mockSubscriptionsData = {
     ]
 }
 
+const mockExpandedSubscriptionsData = {
+    data: [
+        {
+            subscriptionId: 'marketing-email',
+            channels: ['email'],
+            tags: ['homepage_banner', 'footer'],
+            defaultStatus: 'opt_out',
+            status: [
+                {
+                    channel: 'email',
+                    contactPointValue: 'customer@example.com',
+                    status: 'opt_in'
+                }
+            ]
+        },
+        {
+            subscriptionId: 'marketing-sms',
+            channels: ['sms'],
+            tags: ['checkout_page'],
+            defaultStatus: 'opt_out',
+            status: [
+                {
+                    channel: 'sms',
+                    contactPointValue: '+15551234567',
+                    status: 'opt_out'
+                }
+            ]
+        },
+        {
+            subscriptionId: 'newsletter',
+            channels: ['email', 'push'],
+            tags: ['homepage_banner', 'registration'],
+            defaultStatus: 'opt_out',
+            status: [
+                {
+                    channel: 'email',
+                    contactPointValue: 'customer@example.com',
+                    status: 'opt_in'
+                }
+            ]
+        }
+    ]
+}
+
 const mockEmptySubscriptionsData = {
     data: []
 }
@@ -164,6 +208,42 @@ describe('useMarketingConsent', () => {
                 {enabled: false}
             )
         })
+
+        test('passes expand parameter when provided as string', () => {
+            renderHook(() => useMarketingConsent({expand: 'consentStatus'}))
+
+            expect(useSubscriptions).toHaveBeenCalledWith(
+                {parameters: {expand: 'consentStatus'}},
+                {enabled: true}
+            )
+        })
+
+        test('does not pass expand parameter when not provided', () => {
+            renderHook(() => useMarketingConsent())
+
+            expect(useSubscriptions).toHaveBeenCalledWith({parameters: {}}, {enabled: true})
+        })
+
+        test('does not pass expand parameter when set to undefined', () => {
+            renderHook(() => useMarketingConsent({expand: undefined}))
+
+            expect(useSubscriptions).toHaveBeenCalledWith({parameters: {}}, {enabled: true})
+        })
+
+        test('combines expand, tags, and enabled options', () => {
+            renderHook(() =>
+                useMarketingConsent({
+                    tags: ['account'],
+                    expand: 'consentStatus',
+                    enabled: true
+                })
+            )
+
+            expect(useSubscriptions).toHaveBeenCalledWith(
+                {parameters: {tags: 'account', expand: 'consentStatus'}},
+                {enabled: true}
+            )
+        })
     })
 
     describe('Helper functions', () => {
@@ -207,6 +287,93 @@ describe('useMarketingConsent', () => {
 
                 const status = result.current.getSubscriptionStatus('marketing-email', 'email')
                 expect(status).toBeNull()
+            })
+
+            test('returns actual status from expanded data when contactPointValue provided', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: mockExpandedSubscriptionsData
+                })
+
+                const {result} = renderHook(() =>
+                    useMarketingConsent({expand: 'consentStatus'})
+                )
+
+                // marketing-email has status: 'opt_in' for email channel
+                const status = result.current.getSubscriptionStatus(
+                    'marketing-email',
+                    'email',
+                    'customer@example.com'
+                )
+                expect(status).toBe('opt_in')
+            })
+
+            test('returns actual opt_out status from expanded data', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: mockExpandedSubscriptionsData
+                })
+
+                const {result} = renderHook(() =>
+                    useMarketingConsent({expand: 'consentStatus'})
+                )
+
+                // marketing-sms has status: 'opt_out' for sms channel
+                const status = result.current.getSubscriptionStatus(
+                    'marketing-sms',
+                    'sms',
+                    '+15551234567'
+                )
+                expect(status).toBe('opt_out')
+            })
+
+            test('falls back to defaultStatus when status not found in expanded data', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: {
+                        data: [
+                            {
+                                subscriptionId: 'test-sub',
+                                channels: ['email'],
+                                defaultStatus: 'opt_out',
+                                status: []
+                            }
+                        ]
+                    }
+                })
+
+                const {result} = renderHook(() =>
+                    useMarketingConsent({expand: 'consentStatus'})
+                )
+
+                const status = result.current.getSubscriptionStatus(
+                    'test-sub',
+                    'email',
+                    'different@example.com'
+                )
+                expect(status).toBe('opt_out')
+            })
+
+            test('uses defaultStatus when no status array and no contactPointValue', () => {
+                useSubscriptions.mockReturnValue({
+                    ...mockUseQueryResult,
+                    data: {
+                        data: [
+                            {
+                                subscriptionId: 'test-sub',
+                                channels: ['email'],
+                                defaultStatus: 'opt_in'
+                            }
+                        ]
+                    }
+                })
+
+                const {result} = renderHook(() =>
+                    useMarketingConsent({expand: 'consentStatus'})
+                )
+
+                const status = result.current.getSubscriptionStatus('test-sub', 'email')
+                expect(status).toBe('opt_in')
             })
         })
 

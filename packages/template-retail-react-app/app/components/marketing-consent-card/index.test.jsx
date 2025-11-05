@@ -37,7 +37,14 @@ const mockSubscriptionsData = {
             description: 'Receive our weekly newsletter',
             tags: [CONSENT_TAGS.ACCOUNT],
             channels: [CONSENT_CHANNELS.EMAIL],
-            status: CONSENT_STATUS.OPT_OUT
+            defaultStatus: CONSENT_STATUS.OPT_OUT,
+            status: [
+                {
+                    channel: CONSENT_CHANNELS.EMAIL,
+                    contactPointValue: mockCustomer.email,
+                    status: CONSENT_STATUS.OPT_OUT
+                }
+            ]
         },
         {
             subscriptionId: 'promotional-offers',
@@ -45,7 +52,14 @@ const mockSubscriptionsData = {
             description: 'Get exclusive deals',
             tags: [CONSENT_TAGS.ACCOUNT],
             channels: [CONSENT_CHANNELS.EMAIL],
-            status: CONSENT_STATUS.OPT_IN
+            defaultStatus: CONSENT_STATUS.OPT_OUT,
+            status: [
+                {
+                    channel: CONSENT_CHANNELS.EMAIL,
+                    contactPointValue: mockCustomer.email,
+                    status: CONSENT_STATUS.OPT_IN
+                }
+            ]
         },
         {
             subscriptionId: 'sms-alerts',
@@ -53,7 +67,14 @@ const mockSubscriptionsData = {
             description: 'Receive order updates via SMS',
             tags: [CONSENT_TAGS.ACCOUNT],
             channels: [CONSENT_CHANNELS.SMS],
-            status: CONSENT_STATUS.OPT_OUT
+            defaultStatus: CONSENT_STATUS.OPT_OUT,
+            status: [
+                {
+                    channel: CONSENT_CHANNELS.SMS,
+                    contactPointValue: mockCustomer.phoneMobile,
+                    status: CONSENT_STATUS.OPT_OUT
+                }
+            ]
         },
         {
             subscriptionId: 'email-capture',
@@ -61,16 +82,38 @@ const mockSubscriptionsData = {
             description: 'Different tag',
             tags: [CONSENT_TAGS.EMAIL_CAPTURE],
             channels: [CONSENT_CHANNELS.EMAIL],
-            status: CONSENT_STATUS.OPT_OUT
+            defaultStatus: CONSENT_STATUS.OPT_OUT,
+            status: [
+                {
+                    channel: CONSENT_CHANNELS.EMAIL,
+                    contactPointValue: mockCustomer.email,
+                    status: CONSENT_STATUS.OPT_OUT
+                }
+            ]
         }
     ]
 }
 
 const mockUpdateSubscriptions = jest.fn()
-const mockGetSubscriptionStatus = jest.fn((subscriptionId, channel) => {
+const mockGetSubscriptionStatus = jest.fn((subscriptionId, channel, contactPointValue) => {
     const sub = mockSubscriptionsData.data.find((s) => s.subscriptionId === subscriptionId)
     if (!sub) return null
-    return sub.channels.includes(channel) ? sub.status : CONSENT_STATUS.OPT_OUT
+    
+    // Check if subscription has status array (expanded data)
+    if (sub.status && Array.isArray(sub.status) && contactPointValue) {
+        const statusEntry = sub.status.find(
+            (s) => s.channel === channel && s.contactPointValue === contactPointValue
+        )
+        if (statusEntry) return statusEntry.status
+    }
+    
+    // Fall back to defaultStatus
+    if (sub.defaultStatus) {
+        return sub.defaultStatus
+    }
+    
+    // Final fallback
+    return CONSENT_STATUS.OPT_OUT
 })
 
 describe('MarketingConsentCard', () => {
