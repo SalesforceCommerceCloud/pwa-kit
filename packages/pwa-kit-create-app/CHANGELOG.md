@@ -1,5 +1,5 @@
 
-## v3.14.0-dev (Sep 26, 2025)
+## v3.14.0 (Nov 04, 2025)
 - Prompt text for Site ID should match actual validation: Site ID may contain uppercase or lowercase letters, numbers, hyphens, or underscores. - Updated Site ID validator regex to allow both uppercase and lowercase letters for improved compatibility, clarity. [#3410] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3410)
 - Added Hybrid Proxy support configuration for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
 
