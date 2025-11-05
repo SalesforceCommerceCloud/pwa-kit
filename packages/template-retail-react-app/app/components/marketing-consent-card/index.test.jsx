@@ -98,7 +98,7 @@ const mockUpdateSubscriptions = jest.fn()
 const mockGetSubscriptionStatus = jest.fn((subscriptionId, channel, contactPointValue) => {
     const sub = mockSubscriptionsData.data.find((s) => s.subscriptionId === subscriptionId)
     if (!sub) return null
-    
+
     // Check if subscription has status array (expanded data)
     if (sub.status && Array.isArray(sub.status) && contactPointValue) {
         const statusEntry = sub.status.find(
@@ -106,12 +106,12 @@ const mockGetSubscriptionStatus = jest.fn((subscriptionId, channel, contactPoint
         )
         if (statusEntry) return statusEntry.status
     }
-    
+
     // Fall back to defaultStatus
     if (sub.defaultStatus) {
         return sub.defaultStatus
     }
-    
+
     // Final fallback
     return CONSENT_STATUS.OPT_OUT
 })

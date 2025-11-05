@@ -295,9 +295,7 @@ describe('useMarketingConsent', () => {
                     data: mockExpandedSubscriptionsData
                 })
 
-                const {result} = renderHook(() =>
-                    useMarketingConsent({expand: 'consentStatus'})
-                )
+                const {result} = renderHook(() => useMarketingConsent({expand: 'consentStatus'}))
 
                 // marketing-email has status: 'opt_in' for email channel
                 const status = result.current.getSubscriptionStatus(
@@ -314,9 +312,7 @@ describe('useMarketingConsent', () => {
                     data: mockExpandedSubscriptionsData
                 })
 
-                const {result} = renderHook(() =>
-                    useMarketingConsent({expand: 'consentStatus'})
-                )
+                const {result} = renderHook(() => useMarketingConsent({expand: 'consentStatus'}))
 
                 // marketing-sms has status: 'opt_out' for sms channel
                 const status = result.current.getSubscriptionStatus(
@@ -342,9 +338,7 @@ describe('useMarketingConsent', () => {
                     }
                 })
 
-                const {result} = renderHook(() =>
-                    useMarketingConsent({expand: 'consentStatus'})
-                )
+                const {result} = renderHook(() => useMarketingConsent({expand: 'consentStatus'}))
 
                 const status = result.current.getSubscriptionStatus(
                     'test-sub',
@@ -368,9 +362,7 @@ describe('useMarketingConsent', () => {
                     }
                 })
 
-                const {result} = renderHook(() =>
-                    useMarketingConsent({expand: 'consentStatus'})
-                )
+                const {result} = renderHook(() => useMarketingConsent({expand: 'consentStatus'}))
 
                 const status = result.current.getSubscriptionStatus('test-sub', 'email')
                 expect(status).toBe('opt_in')
