@@ -27,26 +27,26 @@ const mockSubscriptionsData = {
     data: [
         {
             subscriptionId: 'marketing-email',
-            channels: new Set(['email']),
-            tags: new Set(['homepage_banner', 'footer']),
+            channels: ['email'],
+            tags: ['homepage_banner', 'footer'],
             contactPointValue: 'customer@example.com'
         },
         {
             subscriptionId: 'marketing-sms',
-            channels: new Set(['sms']),
-            tags: new Set(['checkout_page']),
+            channels: ['sms'],
+            tags: ['checkout_page'],
             contactPointValue: '+15551234567'
         },
         {
             subscriptionId: 'newsletter',
-            channels: new Set(['email', 'push']),
-            tags: new Set(['homepage_banner', 'registration']),
+            channels: ['email', 'push'],
+            tags: ['homepage_banner', 'registration'],
             contactPointValue: 'customer@example.com'
         },
         {
             subscriptionId: 'promotional-offers',
-            channels: new Set(['email']),
-            tags: new Set(['homepage_banner']),
+            channels: ['email'],
+            tags: ['homepage_banner'],
             contactPointValue: 'customer@example.com'
         }
     ]
@@ -313,7 +313,7 @@ describe('useMarketingConsent', () => {
                         data: [
                             {
                                 subscriptionId: 'no-tags-sub',
-                                channels: new Set(['email'])
+                                channels: ['email']
                             }
                         ]
                     }
@@ -335,7 +335,7 @@ describe('useMarketingConsent', () => {
                         data: [
                             {
                                 subscriptionId: 'no-channels-sub',
-                                tags: new Set(['homepage_banner'])
+                                tags: ['homepage_banner']
                             }
                         ]
                     }

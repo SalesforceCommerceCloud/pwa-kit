@@ -133,10 +133,10 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
             const subscription = subscriptions.find((sub) => sub.subscriptionId === subscriptionId)
             if (!subscription) return null
 
-            // If the subscription has the channel in its channels set, it's opted in
+            // If the subscription has the channel in its channels array, it's opted in
             // Otherwise, it's opted out or not set
-            const hasChannelSet = subscription.channels && subscription.channels.has(channel)
-            return hasChannelSet ? 'opt_in' : 'opt_out'
+            const hasChannelInArray = subscription.channels && subscription.channels.includes(channel)
+            return hasChannelInArray ? 'opt_in' : 'opt_out'
         }
 
         /**
@@ -147,7 +147,7 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
          */
         const hasChannel = (subscriptionId, channel) => {
             const subscription = subscriptions.find((sub) => sub.subscriptionId === subscriptionId)
-            return subscription?.channels?.has(channel) || false
+            return subscription?.channels?.includes(channel) || false
         }
 
         /**
@@ -168,8 +168,8 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
          */
         const getSubscriptionsByTagAndChannel = (tag, channel) => {
             return subscriptions.filter((sub) => {
-                const hasTag = sub.tags && sub.tags.has(tag)
-                const hasChannelMatch = sub.channels && sub.channels.has(channel)
+                const hasTag = sub.tags && sub.tags.includes(tag)
+                const hasChannelMatch = sub.channels && sub.channels.includes(channel)
                 return hasTag && hasChannelMatch
             })
         }

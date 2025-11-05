@@ -63,12 +63,12 @@ describe('useEmailSubscription', () => {
     const mockMatchingSubscriptions = [
         {
             subscriptionId: 'weekly-newsletter',
-            channel: 'email',
+            channels: ['email'],
             tags: ['email_capture']
         },
         {
             subscriptionId: 'promotional-offers',
-            channel: 'email',
+            channels: ['email'],
             tags: ['email_capture']
         }
     ]
@@ -550,7 +550,7 @@ describe('useEmailSubscription', () => {
             const mockCheckoutSubscriptions = [
                 {
                     subscriptionId: 'checkout-updates',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['checkout']
                 }
             ]
@@ -575,12 +575,12 @@ describe('useEmailSubscription', () => {
             const mockMultiTagSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['email_capture']
                 },
                 {
                     subscriptionId: 'account-newsletter',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['account']
                 }
             ]
@@ -604,19 +604,19 @@ describe('useEmailSubscription', () => {
             expect(result.current.state.matchingSubscriptionsCount).toBe(2)
         })
 
-        test('handles subscriptions with actual API format (channel as string, tags as array)', () => {
+        test('handles subscriptions with actual API format (channels and tags as arrays)', () => {
             // Test that the logic works with the actual API format:
-            // - channel (singular) as string
+            // - channels (plural) as array
             // - tags as array
             const mockApiFormatSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channel: 'email', // String (singular)
+                    channels: ['email'], // Array
                     tags: ['email_capture'] // Array
                 },
                 {
                     subscriptionId: 'account-newsletter',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['account']
                 }
             ]
@@ -644,7 +644,7 @@ describe('useEmailSubscription', () => {
             const mockMultipleTagsSubscriptions = [
                 {
                     subscriptionId: 'marketing-email',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['email_capture', 'account', 'checkout'] // Multiple tags
                 }
             ]
@@ -673,17 +673,17 @@ describe('useEmailSubscription', () => {
             const mockMixedChannelSubscriptions = [
                 {
                     subscriptionId: 'email-newsletter',
-                    channel: 'email',
+                    channels: ['email'],
                     tags: ['email_capture']
                 },
                 {
                     subscriptionId: 'sms-alerts',
-                    channel: 'sms',
+                    channels: ['sms'],
                     tags: ['email_capture']
                 },
                 {
                     subscriptionId: 'push-notifications',
-                    channel: 'push',
+                    channels: ['push'],
                     tags: ['email_capture']
                 }
             ]
