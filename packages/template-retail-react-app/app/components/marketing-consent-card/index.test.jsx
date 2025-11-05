@@ -356,21 +356,6 @@ describe('MarketingConsentCard', () => {
             expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
         })
 
-        it('shows error message if update fails', async () => {
-            mockUpdateSubscriptions.mockRejectedValueOnce(new Error('API Error'))
-
-            renderWithProviders(<MarketingConsentCard />)
-
-            const saveButton = screen.getByRole('button', {name: /save preferences/i})
-            await userEvent.click(saveButton)
-
-            await waitFor(() => {
-                expect(
-                    screen.getByText(/failed to update preferences. please try again/i)
-                ).toBeInTheDocument()
-            })
-        })
-
         it('shows loading state while submitting', async () => {
             useMarketingConsent.mockReturnValue({
                 data: mockSubscriptionsData,
@@ -408,15 +393,84 @@ describe('MarketingConsentCard', () => {
     })
 
     describe('Error Handling', () => {
-        it('displays API error from useMarketingConsent', () => {
-            useMarketingConsent.mockReturnValue({
-                ...useMarketingConsent(),
-                error: {message: 'Failed to fetch subscriptions'}
+        describe('Fetch Errors (getting subscriptions)', () => {
+            it('shows friendly message instead of raw "403 Forbidden" error', () => {
+                useMarketingConsent.mockReturnValue({
+                    ...useMarketingConsent(),
+                    data: {data: []}, // Empty subscriptions when error occurs
+                    error: {message: '403 Forbidden'} // Raw error message from API
+                })
+
+                renderWithProviders(<MarketingConsentCard />)
+
+                // Should show friendly message instead of raw error
+                expect(
+                    screen.getByText(/no marketing preferences are currently available/i)
+                ).toBeInTheDocument()
+
+                // Should NOT display the raw error message
+                expect(screen.queryByText(/403 Forbidden/i)).not.toBeInTheDocument()
             })
 
-            renderWithProviders(<MarketingConsentCard />)
+            it('shows friendly message instead of raw "Network Error"', () => {
+                useMarketingConsent.mockReturnValue({
+                    ...useMarketingConsent(),
+                    data: {data: []},
+                    error: {message: 'Network Error: Failed to fetch'}
+                })
 
-            expect(screen.getByText(/failed to fetch subscriptions/i)).toBeInTheDocument()
+                renderWithProviders(<MarketingConsentCard />)
+
+                // Should show friendly message
+                expect(
+                    screen.getByText(/no marketing preferences are currently available/i)
+                ).toBeInTheDocument()
+
+                // Should NOT display the raw error message
+                expect(screen.queryByText(/Network Error/i)).not.toBeInTheDocument()
+                expect(screen.queryByText(/Failed to fetch/i)).not.toBeInTheDocument()
+            })
+        })
+
+        describe('Update Errors (saving subscriptions)', () => {
+            it('shows friendly error message when update fails', async () => {
+                mockUpdateSubscriptions.mockRejectedValueOnce(new Error('API Error'))
+
+                renderWithProviders(<MarketingConsentCard />)
+
+                const saveButton = screen.getByRole('button', {name: /save preferences/i})
+                await userEvent.click(saveButton)
+
+                await waitFor(() => {
+                    // Should show friendly, localized error message
+                    expect(
+                        screen.getByText(/failed to update preferences. please try again/i)
+                    ).toBeInTheDocument()
+                })
+            })
+
+            it('does not display raw update error messages to user', async () => {
+                // Mock a detailed error that should not be shown to the user
+                mockUpdateSubscriptions.mockRejectedValueOnce(
+                    new Error('Internal Server Error: Database connection failed')
+                )
+
+                renderWithProviders(<MarketingConsentCard />)
+
+                const saveButton = screen.getByRole('button', {name: /save preferences/i})
+                await userEvent.click(saveButton)
+
+                await waitFor(() => {
+                    // Should show friendly message
+                    expect(
+                        screen.getByText(/failed to update preferences. please try again/i)
+                    ).toBeInTheDocument()
+                })
+
+                // Should NOT show the raw error details
+                expect(screen.queryByText(/Internal Server Error/i)).not.toBeInTheDocument()
+                expect(screen.queryByText(/Database connection failed/i)).not.toBeInTheDocument()
+            })
         })
     })
 

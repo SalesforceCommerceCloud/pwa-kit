@@ -65,8 +65,7 @@ const MarketingConsentCard = () => {
         updateSubscriptions,
         isUpdating,
         isFetching,
-        getSubscriptionStatus,
-        error: consentError
+        getSubscriptionStatus
     } = useMarketingConsent()
 
     const [error, setError] = useState(null)
@@ -212,11 +211,11 @@ const MarketingConsentCard = () => {
                     </Heading>
                 </Skeleton>
 
-                {(error || consentError) && (
+                {error && (
                     <Alert status="error">
                         <AlertIcon color="red.500" boxSize={4} />
                         <Text fontSize="sm" ml={3}>
-                            {error || consentError?.message}
+                            {error}
                         </Text>
                     </Alert>
                 )}
