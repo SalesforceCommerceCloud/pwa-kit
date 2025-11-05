@@ -39,7 +39,8 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {useAccountCreatedToast} from '@salesforce/retail-react-app/app/hooks/use-account-created-toast'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
@@ -83,7 +84,7 @@ export const AuthModal = ({
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const toast = useToast()
-    const {showToast, PasskeyModal} = useAccountCreatedToast()
+    const {showToast, passkeyModal} = usePasskeyRegistration()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
@@ -243,34 +244,13 @@ export const AuthModal = ({
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
-            toast({
-                variant: 'subtle',
-                title: `${formatMessage(
-                    {
-                        defaultMessage: 'Welcome {name},',
-                        id: 'auth_modal.info.welcome_user'
-                    },
-                    {
-                        name: customer.data?.firstName || ''
-                    }
-                )}`,
-                description: `${formatMessage({
-                    defaultMessage: "You're now signed in.",
-                    id: 'auth_modal.description.now_signed_in'
-                })}`,
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
-            })
-
             // Execute action to be performed on successful login
             onLoginSuccess()
         }
 
         if (registering) {
-            // Show toast notification for successful registration
+            // Show account created toast with create passkey button
             showToast()
-
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
@@ -343,7 +323,7 @@ export const AuthModal = ({
             </ModalContent>
         </Modal>
 
-        <PasskeyModal />
+        <PasskeyRegistrationModal {...passkeyModal} />
         </>
     )
 }

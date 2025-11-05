@@ -26,9 +26,9 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
- * Modal for creating a new passkey with a nickname
+ * Modal for registering a new passkey with a nickname
  */
-const CreatePasskeyModal = ({isOpen, onClose}) => {
+const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const {formatMessage} = useIntl()
     const [passkeyNickname, setPasskeyNickname] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -131,9 +131,9 @@ const CreatePasskeyModal = ({isOpen, onClose}) => {
     )
 }
 
-CreatePasskeyModal.propTypes = {
+PasskeyRegistrationModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired
 }
 
-export default CreatePasskeyModal
+export default PasskeyRegistrationModal

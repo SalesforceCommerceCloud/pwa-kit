@@ -17,7 +17,8 @@ import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import {useAccountCreatedToast} from '@salesforce/retail-react-app/app/hooks/use-account-created-toast'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const Registration = () => {
@@ -29,7 +30,7 @@ const Registration = () => {
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
-    const {showToast, PasskeyModal} = useAccountCreatedToast()
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const submitForm = async (data) => {
         const body = {
@@ -86,7 +87,7 @@ const Registration = () => {
                     clickSignIn={() => navigate('/login')}
                 />
             </Container>
-            <PasskeyModal />
+            <PasskeyRegistrationModal {...passkeyModal} />
         </Box>
     )
 }

@@ -52,7 +52,8 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {useAccountCreatedToast} from '@salesforce/retail-react-app/app/hooks/use-account-created-toast'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 
 // Constants
 import {
@@ -84,7 +85,7 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
-    const {showToast, PasskeyModal} = useAccountCreatedToast()
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -587,7 +588,7 @@ const CheckoutConfirmation = () => {
                     </Box>
                 </Stack>
             </Container>
-            <PasskeyModal />
+            <PasskeyRegistrationModal {...passkeyModal} />
         </Box>
     )
 }

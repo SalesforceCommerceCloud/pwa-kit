@@ -12,13 +12,12 @@ import {
     useDisclosure,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import CreatePasskeyModal from '@salesforce/retail-react-app/app/components/create-passkey-modal'
 
 /**
- * Custom hook to show account creation success toast with passkey promotion
- * @returns {Object} Object containing showToast function and PasskeyModal component
+ * Custom hook to manage passkey registration prompt (toast and modal)
+ * @returns {Object} Object containing showToast function and passkey modal state
  */
-export const useAccountCreatedToast = () => {
+export const usePasskeyRegistration = () => {
     const toast = useToast()
     const passkeyModal = useDisclosure()
 
@@ -55,12 +54,11 @@ export const useAccountCreatedToast = () => {
         })
     }
 
-    const PasskeyModal = () => (
-        <CreatePasskeyModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
-    )
-
     return {
         showToast,
-        PasskeyModal
+        passkeyModal: {
+            isOpen: passkeyModal.isOpen,
+            onClose: passkeyModal.onClose
+        }
     }
 }
