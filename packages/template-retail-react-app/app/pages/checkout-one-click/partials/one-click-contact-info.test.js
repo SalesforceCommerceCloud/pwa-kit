@@ -22,7 +22,7 @@ const mockAuthHelperFunctions = {
 }
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
-const mockMergeBasket = {mutate: jest.fn()}
+const mockMergeBasket = {mutate: jest.fn(), mutateAsync: jest.fn()}
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -50,7 +50,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
         derivedData: {
             hasBasket: true,
             totalItems: 1
-        }
+        },
+        refetch: jest.fn()
     })
 }))
 
