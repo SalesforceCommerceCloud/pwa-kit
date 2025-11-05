@@ -39,6 +39,7 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
+import {useAccountCreatedToast} from '@salesforce/retail-react-app/app/hooks/use-account-created-toast'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
@@ -82,6 +83,7 @@ export const AuthModal = ({
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const toast = useToast()
+    const {showToast, PasskeyModal} = useAccountCreatedToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
@@ -266,6 +268,9 @@ export const AuthModal = ({
         }
 
         if (registering) {
+            // Show toast notification for successful registration
+            showToast()
+
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
@@ -275,15 +280,16 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
-        <Modal
-            size="sm"
-            closeOnOverlayClick={false}
-            data-testid="sf-auth-modal"
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onClose}
-            {...props}
-        >
+        <>
+            <Modal
+                size="sm"
+                closeOnOverlayClick={false}
+                data-testid="sf-auth-modal"
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onClose={onClose}
+                {...props}
+            >
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton
@@ -336,6 +342,9 @@ export const AuthModal = ({
                 </ModalBody>
             </ModalContent>
         </Modal>
+
+        <PasskeyModal />
+        </>
     )
 }
 

@@ -52,6 +52,7 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {useAccountCreatedToast} from '@salesforce/retail-react-app/app/hooks/use-account-created-toast'
 
 // Constants
 import {
@@ -83,6 +84,7 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
+    const {showToast, PasskeyModal} = useAccountCreatedToast()
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -158,6 +160,9 @@ const CheckoutConfirmation = () => {
 
             // Save the shipping address from this order, should not block account creation
             await saveShippingAddress(registerData.customerId)
+
+            // Show account created toast
+            showToast()
 
             navigate(`/account`)
         } catch (error) {
@@ -582,6 +587,7 @@ const CheckoutConfirmation = () => {
                     </Box>
                 </Stack>
             </Container>
+            <PasskeyModal />
         </Box>
     )
 }
