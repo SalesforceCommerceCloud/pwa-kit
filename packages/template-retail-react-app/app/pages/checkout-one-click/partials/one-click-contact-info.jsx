@@ -78,6 +78,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const fields = useLoginFields({form})
     const emailRef = useRef()
+    // Single-flight guard for OTP authorization to avoid duplicate sends
+    const otpSendPromiseRef = useRef(null)
 
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
@@ -164,25 +166,36 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
+        // Reuse in-flight request (single-flight) across blur and submit
+        if (otpSendPromiseRef.current) {
+            return otpSendPromiseRef.current
+        }
+
         form.clearErrors('global')
         setIsCheckingEmail(true)
-        try {
-            await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
-                callbackURI: `${callbackURL}?mode=otp_email`
-            })
-            // Only open modal if API call succeeds
-            onOtpModalOpen()
-            return {isRegistered: true}
-        } catch (error) {
-            // Keep continue button visible if email is valid (for unregistered users)
-            if (isValidEmail(email)) {
-                setShowContinueButton(true)
+
+        otpSendPromiseRef.current = (async () => {
+            try {
+                await authorizePasswordlessLogin.mutateAsync({
+                    userid: email,
+                    callbackURI: `${callbackURL}?mode=otp_email`
+                })
+                // Only open modal if API call succeeds
+                onOtpModalOpen()
+                return {isRegistered: true}
+            } catch (error) {
+                // Keep continue button visible if email is valid (for unregistered users)
+                if (isValidEmail(email)) {
+                    setShowContinueButton(true)
+                }
+                return {isRegistered: false}
+            } finally {
+                setIsCheckingEmail(false)
+                otpSendPromiseRef.current = null
             }
-            return {isRegistered: false}
-        } finally {
-            setIsCheckingEmail(false)
-        }
+        })()
+
+        return otpSendPromiseRef.current
     }
 
     // Handle OTP modal close
@@ -299,8 +312,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 return
             }
 
-            // If modal is not open, we need to check if user is registered
-            // This handles cases where blur event didn't trigger or user clicked without tabbing out
+            // If modal is not open, we need to check if user is registered.
+            // Use single-flight guard to avoid duplicate OTP sends when blur just fired.
             const result = await handleSendEmailOtp(formData.email)
 
             // Check if OTP modal is now open (after the API call)
