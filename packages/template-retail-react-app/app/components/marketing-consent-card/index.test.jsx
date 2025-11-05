@@ -135,6 +135,14 @@ describe('MarketingConsentCard', () => {
         })
     })
 
+    describe('Initialization', () => {
+        it('calls useMarketingConsent with expand parameter set to consentStatus', () => {
+            renderWithProviders(<MarketingConsentCard />)
+
+            expect(useMarketingConsent).toHaveBeenCalledWith({expand: 'consentStatus'})
+        })
+    })
+
     describe('Rendering', () => {
         it('renders the card with heading', () => {
             renderWithProviders(<MarketingConsentCard />)
@@ -319,6 +327,149 @@ describe('MarketingConsentCard', () => {
             // Based on mockSubscriptionsData statuses
             expect(newsletterCheckbox).not.toBeChecked() // OPT_OUT
             expect(promotionsCheckbox).toBeChecked() // OPT_IN
+        })
+
+        it('checkbox is checked when subscription status is opt_in from expanded data', () => {
+            const customMockData = {
+                data: [
+                    {
+                        subscriptionId: 'opted-in-sub',
+                        name: 'Opted In Subscription',
+                        tags: [CONSENT_TAGS.ACCOUNT],
+                        channels: [CONSENT_CHANNELS.EMAIL],
+                        defaultStatus: CONSENT_STATUS.OPT_OUT,
+                        status: [
+                            {
+                                channel: CONSENT_CHANNELS.EMAIL,
+                                contactPointValue: mockCustomer.email,
+                                status: CONSENT_STATUS.OPT_IN
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            const customGetStatus = jest.fn((subscriptionId, channel, contactPointValue) => {
+                const sub = customMockData.data.find((s) => s.subscriptionId === subscriptionId)
+                if (!sub) return null
+                if (sub.status && Array.isArray(sub.status) && contactPointValue) {
+                    const statusEntry = sub.status.find(
+                        (s) => s.channel === channel && s.contactPointValue === contactPointValue
+                    )
+                    if (statusEntry) return statusEntry.status
+                }
+                return sub.defaultStatus || CONSENT_STATUS.OPT_OUT
+            })
+
+            useMarketingConsent.mockReturnValue({
+                ...useMarketingConsent(),
+                data: customMockData,
+                getSubscriptionStatus: customGetStatus
+            })
+
+            renderWithProviders(<MarketingConsentCard />)
+
+            const checkbox = screen.getByRole('checkbox', {name: /opted in subscription/i})
+            expect(checkbox).toBeChecked()
+        })
+
+        it('checkbox is unchecked when subscription status is opt_out from expanded data', () => {
+            const customMockData = {
+                data: [
+                    {
+                        subscriptionId: 'opted-out-sub',
+                        name: 'Opted Out Subscription',
+                        tags: [CONSENT_TAGS.ACCOUNT],
+                        channels: [CONSENT_CHANNELS.EMAIL],
+                        defaultStatus: CONSENT_STATUS.OPT_OUT,
+                        status: [
+                            {
+                                channel: CONSENT_CHANNELS.EMAIL,
+                                contactPointValue: mockCustomer.email,
+                                status: CONSENT_STATUS.OPT_OUT
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            const customGetStatus = jest.fn((subscriptionId, channel, contactPointValue) => {
+                const sub = customMockData.data.find((s) => s.subscriptionId === subscriptionId)
+                if (!sub) return null
+                if (sub.status && Array.isArray(sub.status) && contactPointValue) {
+                    const statusEntry = sub.status.find(
+                        (s) => s.channel === channel && s.contactPointValue === contactPointValue
+                    )
+                    if (statusEntry) return statusEntry.status
+                }
+                return sub.defaultStatus || CONSENT_STATUS.OPT_OUT
+            })
+
+            useMarketingConsent.mockReturnValue({
+                ...useMarketingConsent(),
+                data: customMockData,
+                getSubscriptionStatus: customGetStatus
+            })
+
+            renderWithProviders(<MarketingConsentCard />)
+
+            const checkbox = screen.getByRole('checkbox', {name: /opted out subscription/i})
+            expect(checkbox).not.toBeChecked()
+        })
+
+        it('uses defaultStatus when no explicit status in expanded data', () => {
+            const customMockData = {
+                data: [
+                    {
+                        subscriptionId: 'default-optin-sub',
+                        name: 'Default Opt-In Subscription',
+                        tags: [CONSENT_TAGS.ACCOUNT],
+                        channels: [CONSENT_CHANNELS.EMAIL],
+                        defaultStatus: CONSENT_STATUS.OPT_IN,
+                        status: [] // Empty status array
+                    }
+                ]
+            }
+
+            const customGetStatus = jest.fn((subscriptionId, channel, contactPointValue) => {
+                const sub = customMockData.data.find((s) => s.subscriptionId === subscriptionId)
+                if (!sub) return null
+                if (sub.status && sub.status.length > 0) {
+                    const statusEntry = sub.status.find(
+                        (s) => s.channel === channel && s.contactPointValue === contactPointValue
+                    )
+                    if (statusEntry) return statusEntry.status
+                }
+                return sub.defaultStatus
+            })
+
+            useMarketingConsent.mockReturnValue({
+                ...useMarketingConsent(),
+                data: customMockData,
+                getSubscriptionStatus: customGetStatus
+            })
+
+            renderWithProviders(<MarketingConsentCard />)
+
+            const checkbox = screen.getByRole('checkbox', {
+                name: /default opt-in subscription/i
+            })
+            expect(checkbox).toBeChecked() // Should use defaultStatus: OPT_IN
+        })
+
+        it('reflects different statuses for multiple subscriptions correctly', () => {
+            renderWithProviders(<MarketingConsentCard />)
+
+            const newsletterCheckbox = screen.getByRole('checkbox', {name: /email newsletter/i})
+            const promotionsCheckbox = screen.getByRole('checkbox', {
+                name: /promotional offers/i
+            })
+            const smsCheckbox = screen.getByRole('checkbox', {name: /sms alerts/i})
+
+            // Verify all three have different states based on their status data
+            expect(newsletterCheckbox).not.toBeChecked() // OPT_OUT from status array
+            expect(promotionsCheckbox).toBeChecked() // OPT_IN from status array
+            expect(smsCheckbox).not.toBeChecked() // OPT_OUT from status array
         })
     })
 
