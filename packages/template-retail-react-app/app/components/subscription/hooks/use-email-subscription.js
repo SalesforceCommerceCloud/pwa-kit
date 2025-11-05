@@ -72,10 +72,10 @@ export const useEmailSubscription = ({tag} = {}) => {
         return allSubscriptions.filter((sub) => {
             // Check if channels array includes email
             const hasEmailChannel = sub.channels?.includes(CONSENT_CHANNELS.EMAIL)
-            
+
             // Check if tags array includes any of the requested tags
             const hasAnyTag = tags.some((t) => sub.tags?.includes(t))
-            
+
             return hasEmailChannel && hasAnyTag
         })
     }, [tags, subscriptionsData])

@@ -35,32 +35,32 @@ const mockSubscriptionsData = {
             subscriptionId: 'newsletter',
             name: 'Email Newsletter',
             description: 'Receive our weekly newsletter',
-            tags: new Set([CONSENT_TAGS.ACCOUNT]),
-            channels: new Set([CONSENT_CHANNELS.EMAIL]),
+            tags: [CONSENT_TAGS.ACCOUNT],
+            channels: [CONSENT_CHANNELS.EMAIL],
             status: CONSENT_STATUS.OPT_OUT
         },
         {
             subscriptionId: 'promotional-offers',
             name: 'Promotional Offers',
             description: 'Get exclusive deals',
-            tags: new Set([CONSENT_TAGS.ACCOUNT]),
-            channels: new Set([CONSENT_CHANNELS.EMAIL]),
+            tags: [CONSENT_TAGS.ACCOUNT],
+            channels: [CONSENT_CHANNELS.EMAIL],
             status: CONSENT_STATUS.OPT_IN
         },
         {
             subscriptionId: 'sms-alerts',
             name: 'SMS Alerts',
             description: 'Receive order updates via SMS',
-            tags: new Set([CONSENT_TAGS.ACCOUNT]),
-            channels: new Set([CONSENT_CHANNELS.SMS]),
+            tags: [CONSENT_TAGS.ACCOUNT],
+            channels: [CONSENT_CHANNELS.SMS],
             status: CONSENT_STATUS.OPT_OUT
         },
         {
             subscriptionId: 'email-capture',
             name: 'Email Capture',
             description: 'Different tag',
-            tags: new Set([CONSENT_TAGS.EMAIL_CAPTURE]),
-            channels: new Set([CONSENT_CHANNELS.EMAIL]),
+            tags: [CONSENT_TAGS.EMAIL_CAPTURE],
+            channels: [CONSENT_CHANNELS.EMAIL],
             status: CONSENT_STATUS.OPT_OUT
         }
     ]
@@ -70,7 +70,7 @@ const mockUpdateSubscriptions = jest.fn()
 const mockGetSubscriptionStatus = jest.fn((subscriptionId, channel) => {
     const sub = mockSubscriptionsData.data.find((s) => s.subscriptionId === subscriptionId)
     if (!sub) return null
-    return sub.channels.has(channel) ? sub.status : CONSENT_STATUS.OPT_OUT
+    return sub.channels.includes(channel) ? sub.status : CONSENT_STATUS.OPT_OUT
 })
 
 describe('MarketingConsentCard', () => {
@@ -155,8 +155,8 @@ describe('MarketingConsentCard', () => {
                 subscriptionId: 'dual-channel',
                 name: 'Dual Channel Sub',
                 description: 'Supports both',
-                tags: new Set([CONSENT_TAGS.ACCOUNT]),
-                channels: new Set([CONSENT_CHANNELS.EMAIL, CONSENT_CHANNELS.SMS]),
+                tags: [CONSENT_TAGS.ACCOUNT],
+                channels: [CONSENT_CHANNELS.EMAIL, CONSENT_CHANNELS.SMS],
                 status: CONSENT_STATUS.OPT_OUT
             }
 
@@ -192,7 +192,7 @@ describe('MarketingConsentCard', () => {
             expect(screen.queryByText('SMS Alerts')).not.toBeInTheDocument()
         })
 
-        it('uses phoneMobile if available, otherwise phoneHome', async () => {
+        it('uses phoneMobile if available (preferred over phoneHome)', async () => {
             useCurrentCustomer.mockReturnValue({
                 data: {
                     ...mockCustomer,
@@ -213,6 +213,33 @@ describe('MarketingConsentCard', () => {
                             subscriptionId: 'sms-alerts',
                             channel: CONSENT_CHANNELS.SMS,
                             contactPointValue: '+15551111111' // phoneMobile preferred
+                        })
+                    ])
+                )
+            })
+        })
+
+        it('falls back to phoneHome when phoneMobile is not available', async () => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    ...mockCustomer,
+                    phoneMobile: null,
+                    phoneHome: '+15552222222'
+                }
+            })
+
+            renderWithProviders(<MarketingConsentCard />)
+
+            const saveButton = screen.getByRole('button', {name: /save preferences/i})
+            await userEvent.click(saveButton)
+
+            await waitFor(() => {
+                expect(mockUpdateSubscriptions).toHaveBeenCalledWith(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            subscriptionId: 'sms-alerts',
+                            channel: CONSENT_CHANNELS.SMS,
+                            contactPointValue: '+15552222222' // phoneHome used as fallback
                         })
                     ])
                 )

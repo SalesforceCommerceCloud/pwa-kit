@@ -135,7 +135,8 @@ export const useMarketingConsent = ({enabled = true, tags = []} = {}) => {
 
             // If the subscription has the channel in its channels array, it's opted in
             // Otherwise, it's opted out or not set
-            const hasChannelInArray = subscription.channels && subscription.channels.includes(channel)
+            const hasChannelInArray =
+                subscription.channels && subscription.channels.includes(channel)
             return hasChannelInArray ? 'opt_in' : 'opt_out'
         }
 

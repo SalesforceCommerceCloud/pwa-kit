@@ -75,7 +75,7 @@ const MarketingConsentCard = () => {
     // Get all subscriptions matching ACCOUNT tag
     const profileSubscriptions = useMemo(() => {
         const allSubscriptions = subscriptionsData?.data || []
-        return allSubscriptions.filter((sub) => sub.tags?.has(CONSENT_TAGS.ACCOUNT))
+        return allSubscriptions.filter((sub) => sub.tags?.includes(CONSENT_TAGS.ACCOUNT))
     }, [subscriptionsData])
 
     // Initialize local preferences from fetched subscription statuses
@@ -85,7 +85,7 @@ const MarketingConsentCard = () => {
         const initialPreferences = {}
         profileSubscriptions.forEach((sub) => {
             // Check if opted in for EMAIL channel
-            if (sub.channels?.has(CONSENT_CHANNELS.EMAIL)) {
+            if (sub.channels?.includes(CONSENT_CHANNELS.EMAIL)) {
                 const emailStatus = getSubscriptionStatus(
                     sub.subscriptionId,
                     CONSENT_CHANNELS.EMAIL
@@ -96,7 +96,7 @@ const MarketingConsentCard = () => {
 
             // Check if opted in for SMS channel (only if customer has phone)
             const customerPhone = customer.phoneMobile || customer.phoneHome
-            if (customerPhone && sub.channels?.has(CONSENT_CHANNELS.SMS)) {
+            if (customerPhone && sub.channels?.includes(CONSENT_CHANNELS.SMS)) {
                 const smsStatus = getSubscriptionStatus(sub.subscriptionId, CONSENT_CHANNELS.SMS)
                 initialPreferences[`${sub.subscriptionId}_${CONSENT_CHANNELS.SMS}`] =
                     smsStatus === CONSENT_STATUS.OPT_IN
@@ -132,7 +132,7 @@ const MarketingConsentCard = () => {
             // Build updates for all profile subscriptions based on their supported channels
             profileSubscriptions.forEach((sub) => {
                 // Handle EMAIL channel if subscription supports it
-                if (sub.channels?.has(CONSENT_CHANNELS.EMAIL)) {
+                if (sub.channels?.includes(CONSENT_CHANNELS.EMAIL)) {
                     const prefKey = `${sub.subscriptionId}_${CONSENT_CHANNELS.EMAIL}`
                     subscriptionsToUpdate.push({
                         subscriptionId: sub.subscriptionId,
@@ -145,7 +145,7 @@ const MarketingConsentCard = () => {
                 }
 
                 // Handle SMS channel if subscription supports it AND customer has phone
-                if (customerPhone && sub.channels?.has(CONSENT_CHANNELS.SMS)) {
+                if (customerPhone && sub.channels?.includes(CONSENT_CHANNELS.SMS)) {
                     const prefKey = `${sub.subscriptionId}_${CONSENT_CHANNELS.SMS}`
                     subscriptionsToUpdate.push({
                         subscriptionId: sub.subscriptionId,
@@ -247,8 +247,8 @@ const MarketingConsentCard = () => {
                     <Stack spacing={4}>
                         {profileSubscriptions.map((sub) => {
                             const customerPhone = customer.phoneMobile || customer.phoneHome
-                            const supportsEmail = sub.channels?.has(CONSENT_CHANNELS.EMAIL)
-                            const supportsSms = sub.channels?.has(CONSENT_CHANNELS.SMS)
+                            const supportsEmail = sub.channels?.includes(CONSENT_CHANNELS.EMAIL)
+                            const supportsSms = sub.channels?.includes(CONSENT_CHANNELS.SMS)
 
                             // Determine which channel to show
                             // Prefer EMAIL if available, otherwise SMS (if customer has phone)
