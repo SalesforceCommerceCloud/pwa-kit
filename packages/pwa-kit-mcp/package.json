@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-mcp",
-  "version": "0.4.0",
+  "version": "0.5.0-dev",
   "private": false,
   "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
   "main": "dist/server/server.js",
@@ -54,9 +54,9 @@
   "devDependencies": {
     "@babel/node": "^7.22.5",
     "@playwright/test": "^1.49.0",
-    "@salesforce/pwa-kit-dev": "3.14.0",
+    "@salesforce/pwa-kit-dev": "3.15.0-dev",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.14.0",
+    "internal-lib-build": "3.15.0-dev",
     "nodemon": "^2.0.22"
   },
   "engines": {
