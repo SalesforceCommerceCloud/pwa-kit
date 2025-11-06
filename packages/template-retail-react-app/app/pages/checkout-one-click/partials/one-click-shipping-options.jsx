@@ -31,6 +31,7 @@ import {
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
@@ -196,21 +197,23 @@ export default function ShippingOptions() {
         )
     }
 
-    // Note that this card is disabled when there is no shipping address as well as no shipping method.
-    // We do this because we apply the default shipping method to the basket before checkout - so when
-    // landing on checkout the first time will put you at the first step (contact info), but the shipping
-    // method step would appear filled out already. This fix attempts to avoid any confusion in the UI.
+    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
+    // Note: For multiship, we render per-shipment method selectors and do not auto-advance.
     return (
         <ToggleCard
             id="step-2"
             title={formatMessage({
                 defaultMessage: 'Shipping & Gift Options',
-                id: 'shipping_options.title.shipping_gift_options'
+                id: 'shipping_options.title.shipping_method'
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
             isLoading={form.formState.isSubmitting || effectiveIsLoading}
             disabled={
-                selectedShippingMethod == null || !selectedShippingAddress || effectiveIsLoading
+                (!hasMultipleDeliveryShipments &&
+                    (selectedShippingMethod == null || !selectedShippingAddress)) ||
+                effectiveIsLoading
             }
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
@@ -219,76 +222,19 @@ export default function ShippingOptions() {
             })}
         >
             <ToggleCardEdit>
-                <form
-                    onSubmit={form.handleSubmit(submitForm)}
-                    data-testid="sf-checkout-shipping-options-form"
-                >
-                    <Stack spacing={6}>
-                        {shippingMethods?.applicableShippingMethods && (
-                            <Controller
-                                name="shippingMethodId"
-                                control={form.control}
-                                defaultValue=""
-                                render={({field: {value, onChange}}) => (
-                                    <RadioGroup
-                                        name="shipping-options-radiogroup"
-                                        value={value}
-                                        onChange={onChange}
-                                    >
-                                        <Stack spacing={5}>
-                                            {shippingMethods.applicableShippingMethods.map(
-                                                (opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
-                                                        <Flex justify="space-between" w="full">
-                                                            <Box>
-                                                                <Text>{opt.name}</Text>
-                                                                <Text
-                                                                    fontSize="sm"
-                                                                    color="gray.600"
-                                                                >
-                                                                    {opt.description}
-                                                                </Text>
-                                                            </Box>
-                                                            <Text fontWeight="bold">
-                                                                <FormattedNumber
-                                                                    value={opt.price}
-                                                                    style="currency"
-                                                                    currency={currency}
-                                                                />
-                                                            </Text>
-                                                        </Flex>
-
-                                                        {opt.shippingPromotions?.map((promo) => {
-                                                            return (
-                                                                <Text
-                                                                    key={promo.promotionId}
-                                                                    fontSize="sm"
-                                                                    color="green.600"
-                                                                >
-                                                                    {promo.calloutMsg}
-                                                                </Text>
-                                                            )
-                                                        })}
-                                                    </Radio>
-                                                )
-                                            )}
-                                        </Stack>
-                                    </RadioGroup>
-                                )}
+                {hasMultipleDeliveryShipments ? (
+                    <Stack spacing={8}>
+                        {deliveryShipments.map((shipment, idx) => (
+                            <ShipmentMethods
+                                key={shipment.shipmentId}
+                                index={idx + 1}
+                                shipment={shipment}
+                                currency={currency}
                             />
-                        )}
-
-                        <Box>
-                            <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                                <FormattedMessage
-                                    defaultMessage="Do you want to send this as a gift?"
-                                    id="shipping_options.action.send_as_a_gift"
-                                />
-                            </Button>
-                        </Box>
+                        ))}
                         <Box>
                             <Container variant="form">
-                                <Button w="full" type="submit">
+                                <Button w="full" onClick={() => goToNextStep()}>
                                     <FormattedMessage
                                         defaultMessage="Continue to Payment"
                                         id="shipping_options.button.continue_to_payment"
@@ -297,10 +243,86 @@ export default function ShippingOptions() {
                             </Container>
                         </Box>
                     </Stack>
-                </form>
+                ) : (
+                    <form
+                        onSubmit={form.handleSubmit(submitForm)}
+                        data-testid="sf-checkout-shipping-options-form"
+                    >
+                        <Stack spacing={6}>
+                            {shippingMethods?.applicableShippingMethods && (
+                                <Controller
+                                    name="shippingMethodId"
+                                    control={form.control}
+                                    defaultValue=""
+                                    render={({field: {value, onChange}}) => (
+                                        <RadioGroup
+                                            name="shipping-options-radiogroup"
+                                            value={value}
+                                            onChange={onChange}
+                                        >
+                                            <Stack spacing={5}>
+                                                {shippingMethods.applicableShippingMethods.map(
+                                                    (opt) => (
+                                                        <Radio value={opt.id} key={opt.id}>
+                                                            <Flex justify="space-between" w="full">
+                                                                <Box>
+                                                                    <Text>{opt.name}</Text>
+                                                                    <Text fontSize="sm" color="gray.600">
+                                                                        {opt.description}
+                                                                    </Text>
+                                                                </Box>
+                                                                <Text fontWeight="bold">
+                                                                    <FormattedNumber
+                                                                        value={opt.price}
+                                                                        style="currency"
+                                                                        currency={currency}
+                                                                    />
+                                                                </Text>
+                                                            </Flex>
+                                                            {opt.shippingPromotions?.map((promo) => (
+                                                                <Text
+                                                                    key={promo.promotionId}
+                                                                    fontSize="sm"
+                                                                    color="green.600"
+                                                                >
+                                                                    {promo.calloutMsg}
+                                                                </Text>
+                                                            ))}
+                                                        </Radio>
+                                                    )
+                                                )}
+                                            </Stack>
+                                        </RadioGroup>
+                                    )}
+                                />
+                            )}
+                            <Box>
+                                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
+                                    <FormattedMessage
+                                        defaultMessage="Do you want to send this as a gift?"
+                                        id="shipping_options.action.send_as_a_gift"
+                                    />
+                                </Button>
+                            </Box>
+                            <Box>
+                                <Container variant="form">
+                                    <Button w="full" type="submit">
+                                        <FormattedMessage
+                                            defaultMessage="Continue to Payment"
+                                            id="shipping_options.button.continue_to_payment"
+                                        />
+                                    </Button>
+                                </Container>
+                            </Box>
+                        </Stack>
+                    </form>
+                )}
             </ToggleCardEdit>
 
-            {!effectiveIsLoading && selectedShippingMethod && selectedShippingAddress && (
+            {!hasMultipleDeliveryShipments &&
+                !effectiveIsLoading &&
+                selectedShippingMethod &&
+                selectedShippingAddress && (
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
@@ -351,5 +373,114 @@ export default function ShippingOptions() {
                 </ToggleCardSummary>
             )}
         </ToggleCard>
+    )
+}
+
+const ShipmentMethods = ({shipment, index, currency}) => {
+    const {formatMessage} = useIntl()
+    const {data: basket} = useCurrentBasket()
+    const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const {data: methods} = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: shipment.shipmentId
+            }
+        },
+        {enabled: Boolean(basket?.basketId && shipment?.shipmentId)}
+    )
+    const [selected, setSelected] = useState(
+        shipment?.shippingMethod?.id || methods?.defaultShippingMethodId
+    )
+
+    useEffect(() => {
+        const defaultId = shipment?.shippingMethod?.id || methods?.defaultShippingMethodId
+        if (!selected && defaultId) {
+            setSelected(defaultId)
+            updateShippingMethod.mutateAsync({
+                parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
+                body: {id: defaultId}
+            })
+        }
+    }, [methods, shipment?.shippingMethod?.id])
+
+    const address = shipment?.shippingAddress
+    const addressLine = address
+        ? `${address.firstName} ${address.lastName}, ${address.address1}, ${address.city}, ${address.stateCode}, ${address.postalCode}`
+        : ''
+
+    return (
+        <Box>
+            <Text fontWeight="bold" mb={2}>
+                {formatMessage(
+                    {
+                        defaultMessage: 'Shipment {index}:',
+                        id: 'shipping_options.label.shipment_number'
+                    },
+                    {index}
+                )}
+            </Text>
+            {addressLine && (
+                <Text color="gray.700" mb={3}>
+                    {addressLine}
+                </Text>
+            )}
+
+            {methods?.applicableShippingMethods && (
+                <RadioGroup
+                    name={`shipping-options-${shipment.shipmentId}`}
+                    value={selected}
+                    onChange={async (val) => {
+                        setSelected(val)
+                        await updateShippingMethod.mutateAsync({
+                            parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
+                            body: {id: val}
+                        })
+                    }}
+                >
+                    <Stack spacing={5}>
+                        {methods.applicableShippingMethods.map((opt) => (
+                            <Radio value={opt.id} key={opt.id}>
+                                <Flex justify="space-between" w="full">
+                                    <Box>
+                                        <Text>{opt.name}</Text>
+                                        <Text fontSize="sm" color="gray.600">
+                                            {opt.description}
+                                        </Text>
+                                    </Box>
+                                    <Text fontWeight="bold">
+                                        <FormattedNumber
+                                            value={opt.price}
+                                            style="currency"
+                                            currency={currency}
+                                        />
+                                    </Text>
+                                </Flex>
+                                {opt.shippingPromotions?.map((promo) => (
+                                    <Text key={promo.promotionId} fontSize="sm" color="green.600">
+                                        {promo.calloutMsg}
+                                    </Text>
+                                ))}
+                            </Radio>
+                        ))}
+                    </Stack>
+                </RadioGroup>
+            )}
+
+            <Box mt={4}>
+                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
+                    <FormattedMessage
+                        defaultMessage="Send as a gift (gift wrapping)"
+                        id="shipping_options.action.send_as_gift_wrapping"
+                    />
+                </Button>
+                <Text fontSize="sm" color="gray.500">
+                    <FormattedMessage
+                        defaultMessage="You can enable or disable notifications at any time."
+                        id="shipping_options.help.notifications"
+                    />
+                </Text>
+            </Box>
+        </Box>
     )
 }

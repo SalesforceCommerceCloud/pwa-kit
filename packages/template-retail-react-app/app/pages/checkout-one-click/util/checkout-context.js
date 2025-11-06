@@ -10,6 +10,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutContext = React.createContext()
 
@@ -50,6 +51,16 @@ export const CheckoutProvider = ({children}) => {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
+        }
+
+        // Ensure multiship entry point is visible when applicable
+        const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+        const hasMultipleProductItems = (basket?.productItems?.length || 0) > 1
+        if (multishipEnabled && hasMultipleProductItems) {
+            const isPickupOrder =
+                STORE_LOCATOR_IS_ENABLED &&
+                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         }
 
         setStep(step)

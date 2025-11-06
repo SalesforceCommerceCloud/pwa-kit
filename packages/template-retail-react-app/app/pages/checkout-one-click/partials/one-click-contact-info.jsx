@@ -273,38 +273,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
-    // Post-auth recovery: if user is already registered (after redirect-based auth),
-    // attempt a one-time merge to carry over any guest items.
-    const hasAttemptedRecoveryRef = useRef(false)
-    useEffect(() => {
-        const attemptRecovery = async () => {
-            if (hasAttemptedRecoveryRef.current) return
-            if (!isRegistered) return
-            const hasBasketItem = basket?.productItems?.length > 0
-            if (!hasBasketItem) {
-                hasAttemptedRecoveryRef.current = true
-                return
-            }
-            try {
-                await mergeBasket.mutateAsync({
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    parameters: {
-                        createDestinationBasket: true
-                    }
-                })
-                await currentBasketQuery.refetch()
-            } catch (_e) {
-                // no-op
-            } finally {
-                hasAttemptedRecoveryRef.current = true
-            }
-        }
-        attemptRecovery()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isRegistered])
-
     // Custom form submit handler to prevent default form submission for registered users
     const handleFormSubmit = async (event) => {
         event.preventDefault()
