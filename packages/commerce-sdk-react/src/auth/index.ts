@@ -1268,7 +1268,6 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
-        
         const slasClient = this.client
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
@@ -1301,7 +1300,8 @@ class Auth {
         } as {
             headers?: {[key: string]: string}
             parameters?: Record<string, string>
-            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType & helpers.CustomRequestBody
+            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType &
+                helpers.CustomRequestBody
         }
 
         // Use Basic auth header when using private client
