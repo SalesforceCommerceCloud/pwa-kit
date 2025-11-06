@@ -32,6 +32,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 const mockMutate = jest.fn()
 const mockDelete = jest.fn()
 const mockUseConfigurations = jest.fn()
+const mockUpdate = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const original = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -42,6 +43,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             }
             if (action === 'deleteCustomerPaymentInstrument') {
                 return {mutateAsync: mockDelete}
+            }
+            if (action === 'updateCustomerPaymentInstrument') {
+                return {mutateAsync: mockUpdate}
             }
             return original.useShopperCustomersMutation(action)
         },
@@ -478,6 +482,86 @@ describe('AccountPayments', () => {
         expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
         expect(screen.getByText('Visa')).toBeInTheDocument()
         expect(screen.getByText('Mastercard')).toBeInTheDocument()
+    })
+
+    test('shows Default badge for default instrument and hides checkbox', () => {
+        const customer = {
+            ...mockCustomer,
+            paymentInstruments: [
+                {...mockCustomer.paymentInstruments[0], default: true},
+                mockCustomer.paymentInstruments[1]
+            ]
+        }
+        mockUseCurrentCustomer.mockReturnValue({data: customer, isLoading: false, error: null})
+
+        renderWithProviders(<AccountPayments />)
+
+        expect(screen.getByText(/^Default$/i)).toBeInTheDocument()
+        // No checkbox on default card
+        const allCheckboxes = screen.getAllByRole('checkbox')
+        expect(allCheckboxes).toHaveLength(1)
+    })
+
+    test('clicking Make default opens confirmation modal with brand and last4', async () => {
+        mockUseCurrentCustomer.mockReturnValue({data: mockCustomer, isLoading: false, error: null})
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        // Click first Make default checkbox
+        const checkbox = screen.getAllByRole('checkbox')[0]
+        await user.click(checkbox)
+
+        // Modal shows
+        expect(screen.getByText(/set default payment method/i)).toBeInTheDocument()
+        expect(
+            screen.getByText(/visa\s*\.{3}\s*1234\s*will be the default at checkout\./i)
+        ).toBeInTheDocument()
+    })
+
+    test('confirming modal calls update mutation and shows success toast', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockUpdate.mockResolvedValueOnce({})
+
+        const {user} = renderWithProviders(<AccountPayments />)
+        const checkbox = screen.getAllByRole('checkbox')[0]
+        await user.click(checkbox)
+        await user.click(screen.getByRole('button', {name: /set default/i}))
+
+        await waitFor(() => expect(mockUpdate).toHaveBeenCalled())
+        expect(mockRefetch).toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+    })
+
+    test('shows error toast when update default fails', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockUpdate.mockRejectedValueOnce(new Error('update failed'))
+
+        const {user} = renderWithProviders(<AccountPayments />)
+        const checkbox = screen.getAllByRole('checkbox')[0]
+        await user.click(checkbox)
+        await user.click(screen.getByRole('button', {name: /set default/i}))
+
+        await waitFor(() => expect(mockUpdate).toHaveBeenCalled())
+        expect(mockToast).toHaveBeenCalled()
+        const toastArg = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArg.status).toBe('error')
+        expect(mockRefetch).not.toHaveBeenCalled()
     })
 
     test('handles the isLoading state for the shopper configuration API', () => {

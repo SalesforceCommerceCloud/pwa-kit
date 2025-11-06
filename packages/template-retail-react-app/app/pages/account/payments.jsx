@@ -15,7 +15,9 @@ import {
     Stack,
     Text,
     SimpleGrid,
-    Flex
+    Flex,
+    Badge,
+    Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
@@ -30,7 +32,7 @@ import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useConfigurations} from '@salesforce/commerce-sdk-react'
-import {SHOPPER_CONFIGURATION_IDS} from '@salesforce/commerce-sdk-react/constant'
+import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 
 export const SALESFORCE_PAYMENTS_ALLOWED = 'SalesforcePaymentsAllowed'
 
@@ -59,6 +61,8 @@ const AccountPayments = () => {
     const [isAdding, setIsAdding] = useState(false)
     const [formKey, setFormKey] = useState(0)
     const addPaymentForm = useForm()
+    const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false)
+    const [pendingDefaultPayment, setPendingDefaultPayment] = useState(null)
     const {
         data: configurations,
         isLoading: isLoadingConfigurations,
@@ -69,6 +73,9 @@ const AccountPayments = () => {
     )
     const deleteCustomerPaymentInstrument = useShopperCustomersMutation(
         'deleteCustomerPaymentInstrument'
+    )
+    const updateCustomerPaymentInstrument = useShopperCustomersMutation(
+        'updateCustomerPaymentInstrument'
     )
 
     const isSalesforcePaymentsEnabled = configurations?.configurations?.find(
@@ -121,13 +128,56 @@ const AccountPayments = () => {
             cardType: '',
             holder: '',
             expiry: '',
-            securityCode: ''
+            securityCode: '',
+            default: false
         })
         // Force form subtree remount to clear any internal state
         setFormKey((k) => k + 1)
         setIsAdding(true)
     }
     const closeAdd = () => setIsAdding(false)
+
+    const openDefaultModal = (payment) => {
+        setPendingDefaultPayment(payment)
+        setIsDefaultModalOpen(true)
+    }
+    const closeDefaultModal = () => {
+        setIsDefaultModalOpen(false)
+        setPendingDefaultPayment(null)
+    }
+
+    const confirmSetDefault = async () => {
+        if (!pendingDefaultPayment) return
+        try {
+            await updateCustomerPaymentInstrument.mutateAsync({
+                parameters: {
+                    customerId: customer?.customerId,
+                    paymentInstrumentId: pendingDefaultPayment.paymentInstrumentId
+                },
+                body: {default: true}
+            })
+            showToast({
+                title: formatMessage({
+                    defaultMessage: 'Default payment method updated',
+                    id: 'account.payments.info.default_payment_updated'
+                }),
+                status: 'success',
+                isClosable: true
+            })
+            await refetch()
+        } catch (e) {
+            showToast({
+                title: formatMessage({
+                    defaultMessage: 'Unable to set default payment method',
+                    id: 'account.payments.error.set_default_failed'
+                }),
+                status: 'error',
+                isClosable: true
+            })
+        } finally {
+            closeDefaultModal()
+        }
+    }
 
     const removePayment = async (paymentInstrumentId) => {
         try {
@@ -361,8 +411,38 @@ const AccountPayments = () => {
                                 key={payment.paymentInstrumentId}
                                 onRemove={() => removePayment(payment.paymentInstrumentId)}
                                 borderColor="gray.200"
+                                footerLeft={
+                                    !payment.default ? (
+                                        <Checkbox
+                                            onChange={(e) => {
+                                                if (e.target.checked) openDefaultModal(payment)
+                                                e.target.checked = false
+                                            }}
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Make default"
+                                                id="account.payments.checkbox.make_default"
+                                            />
+                                        </Checkbox>
+                                    ) : null
+                                }
                             >
                                 <Stack spacing={3} flex="1">
+                                    {payment.default && (
+                                        <Badge
+                                            position="absolute"
+                                            fontSize="xs"
+                                            right={4}
+                                            variant="solid"
+                                            bg="gray.100"
+                                            color="gray.900"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Default"
+                                                id="account.payments.badge.default"
+                                            />
+                                        </Badge>
+                                    )}
                                     <Flex align="center" gap={2}>
                                         {CardIcon && <CardIcon layerStyle="ccIcon" />}
                                         <Text fontWeight="semibold">
@@ -385,6 +465,33 @@ const AccountPayments = () => {
                         )
                     })}
                 </SimpleGrid>
+                <ConfirmationModal
+                    isOpen={isDefaultModalOpen}
+                    onOpen={() => setIsDefaultModalOpen(true)}
+                    onClose={closeDefaultModal}
+                    dialogTitle={{
+                        defaultMessage: 'Set default payment method?',
+                        id: 'account.payments.modal.title.set_default'
+                    }}
+                    confirmationMessage={{
+                        defaultMessage: '{brand} ... {last4} will be the default at checkout.',
+                        id: 'account.payments.modal.message.set_default'
+                    }}
+                    confirmationMessageValues={{
+                        brand: pendingDefaultPayment?.paymentCard?.cardType || '',
+                        last4: pendingDefaultPayment?.paymentCard?.numberLastDigits || ''
+                    }}
+                    primaryActionLabel={{
+                        defaultMessage: 'Set Default',
+                        id: 'account.payments.modal.action.set_default'
+                    }}
+                    alternateActionLabel={{
+                        defaultMessage: 'Cancel',
+                        id: 'account.payments.modal.action.cancel'
+                    }}
+                    onPrimaryAction={confirmSetDefault}
+                    onAlternateAction={closeDefaultModal}
+                />
             </Stack>
         </Container>
     )

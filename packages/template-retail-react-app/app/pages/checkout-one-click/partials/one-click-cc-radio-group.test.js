@@ -107,6 +107,30 @@ describe('CCRadioGroup Component', () => {
     })
 
     describe('Rendering', () => {
+        test('sorts default payment instrument to the top of the list', () => {
+            // Arrange: mark the second instrument as default
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    paymentInstruments: [
+                        {...mockPaymentInstruments[0]},
+                        {...mockPaymentInstruments[1], default: true}
+                    ]
+                }
+            })
+
+            render(
+                <CCRadioGroup
+                    form={mockForm}
+                    value=""
+                    onPaymentIdChange={jest.fn()}
+                    togglePaymentEdit={jest.fn()}
+                />
+            )
+
+            // The first rendered radio card should be the default one (payment-2)
+            const cards = screen.getAllByTestId(/^radio-card-payment-/)
+            expect(cards[0]).toHaveAttribute('data-testid', 'radio-card-payment-2')
+        })
         test('renders radio group with payment instruments', () => {
             render(
                 <CCRadioGroup
