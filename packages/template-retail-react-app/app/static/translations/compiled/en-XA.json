@@ -1071,6 +1071,20 @@
       "value": "]"
     }
   ],
+  "auth_modal.description.now_signed_in_simple": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ȧȧřḗḗ ƞǿǿẇ şīɠƞḗḗḓ īƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
@@ -2523,20 +2537,6 @@
     {
       "type": 0,
       "value": "Ƈǿǿŭŭŀḓ ƞǿǿŧ şȧȧṽḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_payment.error.registration_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ’ŧ şḗḗƞḓ ȧȧ ṽḗḗřīƒīƈȧȧŧīǿǿƞ ƈǿǿḓḗḗ. Ẏǿǿŭŭ ƈȧȧƞ ƈǿǿƞŧīƞŭŭḗḗ ȧȧş ȧȧ ɠŭŭḗḗşŧ."
     },
     {
       "type": 0,

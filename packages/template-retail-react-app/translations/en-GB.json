@@ -213,6 +213,9 @@
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in."
   },
+  "auth_modal.description.now_signed_in_simple": {
+    "defaultMessage": "You are now signed in."
+  },
   "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
@@ -471,9 +474,6 @@
   },
   "checkout_payment.error.cannot_save_payment": {
     "defaultMessage": "Could not save payment method. Please try again."
-  },
-  "checkout_payment.error.registration_failed": {
-    "defaultMessage": "We couldn’t send a verification code. You can continue as a guest."
   },
   "checkout_payment.heading.billing_address": {
     "defaultMessage": "Billing Address"

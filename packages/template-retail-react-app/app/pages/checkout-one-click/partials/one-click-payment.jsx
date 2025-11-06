@@ -514,8 +514,6 @@ const Payment = ({
                                         }}
                                     />
                                 )}
-
-                                {/* OTP logic moved into UserRegistration */}
                             </Stack>
                         </>
                     ) : null}
@@ -543,8 +541,6 @@ const Payment = ({
                                 <PaymentCardSummary payment={appliedPayment} />
                             </Stack>
                         )}
-
-                        {/* Guest save-for-future moved into UserRegistration */}
 
                         <Divider borderColor="gray.100" />
 
