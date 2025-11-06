@@ -65,6 +65,7 @@ const CheckoutOneClick = () => {
 
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
+    const {data: currentCustomer} = useCurrentCustomer()
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
@@ -202,12 +203,14 @@ const CheckoutOneClick = () => {
                     parameters: {customerId: customerId}
                 })
             } catch (error) {
-                showError(
-                    formatMessage({
-                        id: 'checkout_payment.error.cannot_save_payment',
-                        defaultMessage: 'Could not save payment method. Please try again.'
-                    })
-                )
+                if (shouldSavePaymentMethod) {
+                    showError(
+                        formatMessage({
+                            id: 'checkout_payment.error.cannot_save_payment',
+                            defaultMessage: 'Could not save payment method. Please try again.'
+                        })
+                    )
+                }
             }
         }
 
@@ -249,7 +252,13 @@ const CheckoutOneClick = () => {
             {
                 // For existing registered users, save payment instrument if they checked the save box
                 // Only save if we have full card details (i.e., user entered a new card)
-                if (shouldSavePaymentMethod && order.paymentInstruments?.[0] && fullCardDetails) {
+                if (
+                    currentCustomer?.isRegistered &&
+                    !registeredUserChoseGuest &&
+                    shouldSavePaymentMethod &&
+                    order.paymentInstruments?.[0] &&
+                    fullCardDetails
+                ) {
                     const paymentInstrument = order.paymentInstruments[0]
                     await savePaymentInstrumentForRegisteredUser(
                         order.customerInfo.customerId,
@@ -258,33 +267,22 @@ const CheckoutOneClick = () => {
                     )
                 }
 
-                // For newly registered guests, persist shipping address to customer when billing same as shipping
-                try {
-                    const customerId = order.customerInfo?.customerId
-                    const shipping = order?.shipments?.[0]?.shippingAddress
-                    if (customerId && shipping) {
-                        // Whitelist fields and strip non-customer fields (e.g., id, _type)
-                        const {
-                            addressId: _ignoreAddressId,
-                            creationDate: _ignoreCreation,
-                            lastModified: _ignoreModified,
-                            preferred: _ignorePreferred,
-                            address1,
-                            address2,
-                            city,
-                            countryCode,
-                            firstName,
-                            lastName,
-                            phone,
-                            postalCode,
-                            stateCode
-                        } = shipping || {}
-
-                        await createCustomerAddress.mutateAsync({
-                            parameters: {customerId},
-                            body: {
-                                addressId: nanoid(),
-                                preferred: true,
+                // For newly registered guests only, persist shipping address when billing same as shipping
+                if (
+                    enableUserRegistration &&
+                    currentCustomer?.isRegistered &&
+                    !registeredUserChoseGuest
+                ) {
+                    try {
+                        const customerId = order.customerInfo?.customerId
+                        const shipping = order?.shipments?.[0]?.shippingAddress
+                        if (customerId && shipping) {
+                            // Whitelist fields and strip non-customer fields (e.g., id, _type)
+                            const {
+                                addressId: _ignoreAddressId,
+                                creationDate: _ignoreCreation,
+                                lastModified: _ignoreModified,
+                                preferred: _ignorePreferred,
                                 address1,
                                 address2,
                                 city,
@@ -294,24 +292,42 @@ const CheckoutOneClick = () => {
                                 phone,
                                 postalCode,
                                 stateCode
-                            }
-                        })
-                        // Also persist billing phone as phoneHome
-                        const phoneHome = order?.billingAddress?.phone
-                        if (phoneHome) {
-                            await updateCustomer.mutateAsync({
+                            } = shipping || {}
+
+                            await createCustomerAddress.mutateAsync({
                                 parameters: {customerId},
-                                body: {phoneHome}
+                                body: {
+                                    addressId: nanoid(),
+                                    preferred: true,
+                                    address1,
+                                    address2,
+                                    city,
+                                    countryCode,
+                                    firstName,
+                                    lastName,
+                                    phone,
+                                    postalCode,
+                                    stateCode
+                                }
                             })
+                            // Also persist billing phone as phoneHome
+                            const phoneHome = order?.billingAddress?.phone
+                            if (phoneHome) {
+                                await updateCustomer.mutateAsync({
+                                    parameters: {customerId},
+                                    body: {phoneHome}
+                                })
+                            }
                         }
+                    } catch (_e) {
+                        // Only surface error if shopper opted to register/save details; otherwise fail silently
+                        showError(
+                            formatMessage({
+                                id: 'checkout.error.cannot_save_address',
+                                defaultMessage: 'Could not save shipping address.'
+                            })
+                        )
                     }
-                } catch (_e) {
-                    showError(
-                        formatMessage({
-                            id: 'checkout.error.cannot_save_address',
-                            defaultMessage: 'Could not save shipping address.'
-                        })
-                    )
                 }
             }
 

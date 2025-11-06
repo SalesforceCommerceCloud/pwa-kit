@@ -114,6 +114,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onOpen: onOtpModalOpen,
         onClose: onOtpModalClose
     } = useDisclosure()
+    // Only run post-auth recovery for OTP flows initiated from this Contact Info step
+    const otpFromContactRef = useRef(false)
 
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
@@ -183,6 +185,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
+                otpFromContactRef.current = true
                 return {isRegistered: true}
             } catch (error) {
                 // Keep continue button visible if email is valid (for unregistered users)
@@ -296,8 +299,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         const attemptRecovery = async () => {
             if (hasAttemptedRecoveryRef.current) return
             if (!isRegistered) return
-            // Only run recovery merge for returning users
-            if (!wasRegisteredAtMountRef.current) {
+            // Only when this page initiated OTP (returning shopper login)
+            if (!otpFromContactRef.current) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
+            // Skip if shopper was already registered when the component mounted
+            if (wasRegisteredAtMountRef.current) {
                 hasAttemptedRecoveryRef.current = true
                 return
             }

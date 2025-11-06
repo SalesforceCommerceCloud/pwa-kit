@@ -97,7 +97,7 @@ describe('useBasketRecovery', () => {
         await act(async () => {
             await result.current.recoverBasketAfterAuth({
                 preLoginItems: [],
-                shipmentSnapshot,
+                shipment: shipmentSnapshot,
                 doMerge: true
             })
         })
@@ -144,7 +144,7 @@ describe('useBasketRecovery', () => {
         await act(async () => {
             await result.current.recoverBasketAfterAuth({
                 preLoginItems,
-                shipmentSnapshot,
+                shipment: shipmentSnapshot,
                 doMerge: true
             })
         })
@@ -190,7 +190,7 @@ describe('useBasketRecovery', () => {
         await act(async () => {
             await result.current.recoverBasketAfterAuth({
                 preLoginItems: [],
-                shipmentSnapshot,
+                shipment: shipmentSnapshot,
                 doMerge: true
             })
         })
@@ -229,7 +229,7 @@ describe('useBasketRecovery', () => {
         await act(async () => {
             await result.current.recoverBasketAfterAuth({
                 preLoginItems,
-                shipmentSnapshot,
+                shipment: shipmentSnapshot,
                 doMerge: true
             })
         })

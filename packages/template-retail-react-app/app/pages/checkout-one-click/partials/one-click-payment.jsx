@@ -16,12 +16,7 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {
-    useShopperBasketsMutation,
-    useCustomerType,
-    useAuthHelper,
-    AuthHelpers
-} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -44,13 +39,7 @@ import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/componen
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {FormattedNumber} from 'react-intl'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
-import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
-import useBasketRecovery from '@salesforce/retail-react-app/app/hooks/use-basket-recovery'
+
 const Payment = ({
     paymentMethodForm,
     billingAddressForm,
@@ -65,9 +54,6 @@ const Payment = ({
     onSelectedPaymentMethodChange,
     onIsEditingChange
 }) => {
-    const appOrigin = useAppOrigin()
-    const auth = useAuthContext()
-    const {recoverBasketAfterAuth} = useBasketRecovery()
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -86,16 +72,7 @@ const Payment = ({
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
 
-    // Passwordless OTP for guest registration
-    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
-    const otpDismissedRef = useRef(false)
     const activeBasketIdRef = useRef(null)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
 
     // Use props for parent-managed state with fallback defaults
     const currentSelectedPaymentMethod =
@@ -175,123 +152,13 @@ const Payment = ({
         }
     }, [shouldSavePaymentMethod, onSavePreferenceChange])
 
-    // Removed: OTP is sent via handleSendEmailOtp on checkbox action to avoid double requests
-
-    const handleOtpVerification = async (otpCode) => {
-        try {
-            await loginPasswordless.mutateAsync({
-                pwdlessLoginToken: otpCode,
-                register_customer: true
-            })
-            // Allow auth storage to settle before SCAPI calls
-            await auth.refreshAccessToken()
-
-            // Immediately mark OTP completed and close modal to prevent a brief re-open on remounts
-            otpDismissedRef.current = true
-            setEnableUserRegistration?.(false)
-            onOtpClose()
-
-            const newBasketId = await recoverBasketAfterAuth({
-                preLoginItems: basket?.productItems || [],
-                shipment: basket?.shipments?.[0] || null,
-                doMerge: true
-            })
-            if (newBasketId) {
-                activeBasketIdRef.current = newBasketId
-            }
-            // Ensure save-for-future is selected after successful registration
-            setShouldSavePaymentMethod(true)
-
-            // If user typed a new card and nothing is applied yet, apply it to the new basket id
-            try {
-                const values = paymentMethodForm?.getValues?.()
-                const hasEnteredCard = values?.number && values?.holder && values?.expiry
-                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
-                if (hasEnteredCard && !hasApplied && newBasketId) {
-                    await onPaymentSubmit(values, newBasketId)
-                    await currentBasketQuery.refetch()
-                }
-            } catch (_e) {
-                // best-effort; user can still place order manually
-            }
-
-            showToast({
-                variant: 'subtle',
-                title: `${formatMessage(
-                    {
-                        defaultMessage: 'Welcome {name},',
-                        id: 'auth_modal.info.welcome_user'
-                    },
-                    {
-                        name: customer.data?.firstName || ''
-                    }
-                )}`,
-                description: `${formatMessage({
-                    defaultMessage: "You're now signed in.",
-                    id: 'auth_modal.description.now_signed_in'
-                })}`,
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
-            })
-
-            // modal already closed right after auth
-        } catch (error) {
-            let message = formatMessage(API_ERROR_MESSAGE)
-            if (error.response) {
-                const json = await error.response.json()
-                if (/the login is already in use/i.test(json.detail)) {
-                    message = formatMessage({
-                        id: 'checkout_confirmation.message.already_has_account',
-                        defaultMessage: 'This email already has an account.'
-                    })
-                }
-            }
-
-            showError(message)
-        }
-        return {success: true}
-    }
-
-    const handleSendEmailOtp = async (email) => {
-        try {
-            await authorizePasswordlessLogin.mutateAsync({
-                // Pass fields at top-level. The helper maps to query/body correctly.
-                userid: email,
-                callbackURI: callbackURL,
-                register_customer: true,
-                last_name: email,
-                email: email
-            })
-        } catch (error) {
-            showToast({
-                title: formatMessage({
-                    id: 'checkout_payment.error.registration_failed',
-                    defaultMessage:
-                        'We couldn’t send a verification code. You can continue as a guest.'
-                }),
-                status: 'error'
-            })
-        }
-    }
-
-    // Handles user registration checkbox toggle
+    // Handles user registration checkbox toggle (OTP handled by UserRegistration)
     const onUserRegistrationToggle = async (checked) => {
         setEnableUserRegistration(checked)
         if (checked && isGuest) {
-            if (otpDismissedRef.current) return
             // Default preferences for newly registering guest
             setBillingSameAsShipping(true)
             setShouldSavePaymentMethod(true)
-            const email = basket?.customerInfo?.email
-            if (email) {
-                try {
-                    await handleSendEmailOtp(email)
-                } catch (_e) {
-                    // ignore send errors; user can still proceed as guest
-                }
-                onOtpOpen()
-            }
         }
     }
 
@@ -612,24 +479,43 @@ const Payment = ({
                                             // Disable until there is either an applied payment or a valid form
                                             !appliedPayment && !paymentMethodForm.formState.isValid
                                         }
+                                        onSavePreferenceChange={onSavePreferenceChange}
+                                        onRegistered={async (newBasketId) => {
+                                            if (newBasketId) {
+                                                activeBasketIdRef.current = newBasketId
+                                            }
+                                            setShouldSavePaymentMethod(true)
+                                            try {
+                                                const values = paymentMethodForm?.getValues?.()
+                                                const hasEnteredCard =
+                                                    values?.number &&
+                                                    values?.holder &&
+                                                    values?.expiry
+                                                const hasApplied =
+                                                    (currentBasketQuery?.data?.paymentInstruments
+                                                        ?.length || 0) > 0
+                                                if (hasEnteredCard && !hasApplied && newBasketId) {
+                                                    await onPaymentSubmit(values, newBasketId)
+                                                    await currentBasketQuery.refetch()
+                                                }
+                                            } catch (_e) {
+                                                // non-blocking
+                                            }
+                                            showToast({
+                                                variant: 'subtle',
+                                                title: formatMessage({
+                                                    defaultMessage: 'You are now signed in.',
+                                                    id: 'auth_modal.description.now_signed_in_simple'
+                                                }),
+                                                status: 'success',
+                                                position: 'top-right',
+                                                isClosable: true
+                                            })
+                                        }}
                                     />
                                 )}
 
-                                {/* OTP modal shown when guest opts to create an account */}
-                                <OtpAuth
-                                    isOpen={isOtpOpen}
-                                    onClose={onOtpClose}
-                                    form={{
-                                        // Minimal interface used by OtpAuth: get/set value
-                                        getValues: (name) =>
-                                            name === 'email'
-                                                ? basket?.customerInfo?.email
-                                                : undefined,
-                                        setValue: () => {}
-                                    }}
-                                    handleSendEmailOtp={handleSendEmailOtp}
-                                    handleOtpVerification={handleOtpVerification}
-                                />
+                                {/* OTP logic moved into UserRegistration */}
                             </Stack>
                         </>
                     ) : null}
@@ -658,14 +544,7 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        {/* Guest only: offer save for future use */}
-                        {isGuest && newPaymentInstruments.length > 0 && (
-                            <SavePaymentMethod
-                                paymentInstrument={newPaymentInstruments[0]}
-                                onSaved={onPaymentMethodSaved}
-                                checked={shouldSavePaymentMethod}
-                            />
-                        )}
+                        {/* Guest save-for-future moved into UserRegistration */}
 
                         <Divider borderColor="gray.100" />
 
@@ -687,6 +566,37 @@ const Payment = ({
                                 setEnableUserRegistration={setEnableUserRegistration}
                                 isGuestCheckout={registeredUserChoseGuest}
                                 isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
+                                onSavePreferenceChange={onSavePreferenceChange}
+                                onRegistered={async (newBasketId) => {
+                                    if (newBasketId) {
+                                        activeBasketIdRef.current = newBasketId
+                                    }
+                                    setShouldSavePaymentMethod(true)
+                                    try {
+                                        const values = paymentMethodForm?.getValues?.()
+                                        const hasEnteredCard =
+                                            values?.number && values?.holder && values?.expiry
+                                        const hasApplied =
+                                            (currentBasketQuery?.data?.paymentInstruments?.length ||
+                                                0) > 0
+                                        if (hasEnteredCard && !hasApplied && newBasketId) {
+                                            await onPaymentSubmit(values, newBasketId)
+                                            await currentBasketQuery.refetch()
+                                        }
+                                    } catch (_e) {
+                                        // non-blocking
+                                    }
+                                    showToast({
+                                        variant: 'subtle',
+                                        title: formatMessage({
+                                            defaultMessage: 'You are now signed in.',
+                                            id: 'auth_modal.description.now_signed_in_simple'
+                                        }),
+                                        status: 'success',
+                                        position: 'top-right',
+                                        isClosable: true
+                                    })
+                                }}
                             />
                         )}
                     </Stack>

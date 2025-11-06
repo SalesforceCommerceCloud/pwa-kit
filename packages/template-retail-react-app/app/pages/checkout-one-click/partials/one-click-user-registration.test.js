@@ -5,129 +5,123 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCustomerType, useAuthHelper} from '@salesforce/commerce-sdk-react'
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 
-const renderWithProviders = (component) => {
-    return render(
-        <IntlProvider locale="en" messages={{}}>
-            {component}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const original = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...original,
+        useCustomerType: jest.fn(),
+        useAuthHelper: jest.fn()
+    }
+})
+jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () =>
+    jest.fn(() => ({refreshAccessToken: jest.fn().mockResolvedValue(undefined)}))
+)
+
+jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
+    // eslint-disable-next-line react/prop-types
+    const MockOtpAuth = function ({isOpen, handleOtpVerification}) {
+        return isOpen ? (
+            <button onClick={() => handleOtpVerification('otp-123')} data-testid="otp-verify">
+                Verify OTP
+            </button>
+        ) : null
+    }
+    return MockOtpAuth
+})
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
+    useAppOrigin: () => 'http://localhost:3000'
+}))
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: () => ({app: {login: {passwordless: {callbackURI: '/callback'}}}})
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-basket-recovery', () => () => ({
+    recoverBasketAfterAuth: jest.fn(async () => 'basket-new-123')
+}))
+
+const setup = (overrides = {}) => {
+    const defaultBasket = {
+        customerInfo: {email: 'test@example.com'},
+        productItems: [{productId: 'sku-1', quantity: 1}],
+        shipments: [{shippingAddress: {address1: '123 Main'}, shippingMethod: {id: 'Ground'}}]
+    }
+    useCurrentBasket.mockReturnValue({data: overrides.basket ?? defaultBasket})
+    useCustomerType.mockReturnValue({isGuest: overrides.isGuest ?? true})
+    useAuthContext.mockReturnValue({refreshAccessToken: jest.fn().mockResolvedValue(undefined)})
+
+    const authorizePasswordlessLogin = {mutateAsync: jest.fn().mockResolvedValue({})}
+    const loginPasswordless = {mutateAsync: jest.fn().mockResolvedValue({})}
+    useAuthHelper.mockImplementation((helper) => {
+        if (helper && helper.name && /AuthorizePasswordless/i.test(helper.name)) {
+            return authorizePasswordlessLogin
+        }
+        if (helper && helper.name && /LoginPasswordlessUser/i.test(helper.name)) {
+            return loginPasswordless
+        }
+        return {mutateAsync: jest.fn()}
+    })
+
+    const props = {
+        enableUserRegistration: overrides.enable ?? false,
+        setEnableUserRegistration: overrides.setEnable ?? jest.fn(),
+        isGuestCheckout: overrides.isGuestCheckout ?? false,
+        isDisabled: overrides.isDisabled ?? false,
+        onSavePreferenceChange: overrides.onSavePref ?? jest.fn(),
+        onRegistered: overrides.onRegistered ?? jest.fn()
+    }
+
+    const utils = render(
+        <IntlProvider locale="en-GB" messages={{}}>
+            <UserRegistration {...props} />
         </IntlProvider>
     )
+    return {utils, props, authorizePasswordlessLogin, loginPasswordless}
 }
 
 describe('UserRegistration', () => {
-    const mockSetEnableUserRegistration = jest.fn()
-
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
-    test('renders the form when isGuestCheckout is false', () => {
-        renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={false}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={false}
-            />
-        )
-
-        expect(screen.getByText('Save for Future Use')).toBeInTheDocument()
-        expect(screen.getByText(/Create an account for a faster checkout/)).toBeInTheDocument()
-        expect(screen.getByRole('checkbox')).toBeInTheDocument()
+    test('opt-in triggers save preference and opens OTP for guest', async () => {
+        const user = userEvent.setup()
+        const {props} = setup()
+        // Toggle on
+        await user.click(screen.getByRole('checkbox', {name: /Create an account/i}))
+        expect(props.setEnableUserRegistration).toHaveBeenCalledWith(true)
+        expect(props.onSavePreferenceChange).toHaveBeenCalledWith(true)
+        // Modal appears (mocked), verify OTP triggers onRegistered callback
+        const otpButton = await screen.findByTestId('otp-verify')
+        await user.click(otpButton)
+        await waitFor(() => {
+            expect(props.onRegistered).toHaveBeenCalledWith('basket-new-123')
+        })
     })
 
-    test('hides the form when isGuestCheckout is true', () => {
-        renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={false}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={true}
-            />
-        )
-
-        expect(screen.queryByText('Save for Future Use')).not.toBeInTheDocument()
-        expect(screen.queryByText(/When you place your order/)).not.toBeInTheDocument()
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    test('does not send OTP when shopper is not a guest', async () => {
+        const user = userEvent.setup()
+        const {authorizePasswordlessLogin} = setup({isGuest: false})
+        await user.click(screen.getByRole('checkbox', {name: /Create an account/i}))
+        expect(authorizePasswordlessLogin.mutateAsync).not.toHaveBeenCalled()
     })
 
-    test('checkbox state reflects enableUserRegistration prop', () => {
-        renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={true}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={false}
-            />
-        )
-
-        const checkbox = screen.getByRole('checkbox')
-        expect(checkbox).toBeChecked()
-    })
-
-    test('checkbox is rendered with correct initial state', () => {
-        renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={false}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={false}
-            />
-        )
-
-        const checkbox = screen.getByRole('checkbox')
-        expect(checkbox).toBeInTheDocument()
-        expect(checkbox).not.toBeChecked()
-    })
-
-    test('form is hidden regardless of enableUserRegistration when isGuestCheckout is true', () => {
-        // Test with enableUserRegistration = true
-        const {rerender} = renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={true}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={true}
-            />
-        )
-
-        expect(screen.queryByText('Save for Future Use')).not.toBeInTheDocument()
-
-        // Test with enableUserRegistration = false
-        rerender(
-            <IntlProvider locale="en" messages={{}}>
-                <UserRegistration
-                    enableUserRegistration={false}
-                    setEnableUserRegistration={mockSetEnableUserRegistration}
-                    isGuestCheckout={true}
-                />
-            </IntlProvider>
-        )
-
-        expect(screen.queryByText('Save for Future Use')).not.toBeInTheDocument()
-    })
-
-    test('form shows when isGuestCheckout is false regardless of enableUserRegistration', () => {
-        // Test with enableUserRegistration = true
-        const {rerender} = renderWithProviders(
-            <UserRegistration
-                enableUserRegistration={true}
-                setEnableUserRegistration={mockSetEnableUserRegistration}
-                isGuestCheckout={false}
-            />
-        )
-
-        expect(screen.getByText('Save for Future Use')).toBeInTheDocument()
-
-        // Test with enableUserRegistration = false
-        rerender(
-            <IntlProvider locale="en" messages={{}}>
-                <UserRegistration
-                    enableUserRegistration={false}
-                    setEnableUserRegistration={mockSetEnableUserRegistration}
-                    isGuestCheckout={false}
-                />
-            </IntlProvider>
-        )
-
-        expect(screen.getByText('Save for Future Use')).toBeInTheDocument()
+    test('toggling off updates save preference', async () => {
+        const user = userEvent.setup()
+        // Start with enabled, then toggle off
+        const {props} = setup({enable: true})
+        const cb = screen.getByRole('checkbox', {name: /Create an account/i})
+        expect(cb).toBeChecked()
+        await user.click(cb) // off
+        expect(props.onSavePreferenceChange).toHaveBeenCalledWith(false)
     })
 })
+// end
