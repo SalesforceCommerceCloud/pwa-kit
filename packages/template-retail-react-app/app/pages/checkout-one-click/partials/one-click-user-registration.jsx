@@ -140,7 +140,6 @@ export default function UserRegistration({
                             pwdlessLoginToken: otpCode,
                             register_customer: true
                         })
-                        await auth.refreshAccessToken()
                         const newBasketId = await recoverBasketAfterAuth({
                             preLoginItems: basket?.productItems || [],
                             shipment: basket?.shipments?.[0] || null,
