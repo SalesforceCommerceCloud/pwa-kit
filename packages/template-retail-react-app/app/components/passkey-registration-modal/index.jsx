@@ -44,24 +44,28 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         setError(null)
         
         // THE API CALL TO /oauth2/webauthn/register/authorize SHOULD BE REPLACED BY A COMMERCE SDK CALL
+        // For now these are hardcoded values to make passkey registration work with a locally running SLAS
         // Makes a request to the SLAS API on a local server
         try {
+            const clientId = 'd6ae9df8-e13f-48f4-a413-b9820d9a39bc'
+            const clientIdSecret = '9MBWoGTfPmUsm9ityrAN'
+            const tenant_id = 'bldm_stg'
+            const callbackUri = 'http://localhost:9010/callback'
             const params = new URLSearchParams()
             params.append('channel_id', commerceAPI.parameters.siteId)
             params.append('user_id', customer.email)
             params.append('mode', 'callback')
-            params.append('client_id', commerceAPI.parameters.clientId)
-            params.append('callback_uri', webauthnConfig.callbackURI)
-            
-            console.log('Body', params.toString())
+            params.append('client_id', clientId)
+            params.append('callback_uri', callbackUri)
+            console.log('Body', params)
 
             const response = await fetch(
-                `http://localhost:9020/api/v1/organizations/${commerceAPI.parameters.organizationId}/oauth2/webauthn/register/authorize`,
+                `http://localhost:9020/api/v1/organizations/${tenant_id}/oauth2/webauthn/register/authorize`,
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Basic ${btoa(`${commerceAPI.parameters.clientId}:${process.env.CLIENT_SECRET || '9MBWoGTfPmUsm9ityrAN'}`)}`
+                        'Authorization': `Basic ${btoa(`${clientId}:${clientIdSecret}`)}`
                     },
                     body: params.toString()
                 }
