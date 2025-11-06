@@ -43,6 +43,7 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         color={isSelected ? 'white' : 'gray.900'}
                         onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
                         aria-checked={isSelected}
+                        role="checkbox"
                         variant="outline"
                         marginBottom={0}
                         marginRight={0}

@@ -73,7 +73,7 @@ AppConfig.freeze = () => {}
 
 const isServerSide = typeof window === 'undefined'
 
-// Recommended settings for PWA-Kit usages.
+// Recommended settings for PWA-Kit usage.
 // NOTE: they will be applied on both server and client side.
 const options = {
     queryClientConfig: {

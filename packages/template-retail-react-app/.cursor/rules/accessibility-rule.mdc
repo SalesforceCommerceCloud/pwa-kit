@@ -1,0 +1,8 @@
+---
+description: Check and verify accessibility on local project
+globs:
+alwaysApply: false
+---
+To check accessibility of a project, use the accessibility rules defined in ./cursor-accessibility-mdc/ directory.
+Run an automated scan for the entire codebase within the project and check for any violations.
+Show the scanned results in summary and detailed violations if any.

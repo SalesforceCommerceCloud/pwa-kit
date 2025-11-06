@@ -38,7 +38,14 @@ const TEST_COMPONENTS = {
 }
 
 test('Page throws if used outside of a Page component', () => {
-    expect(() => render(<Component component={SAMPLE_COMPONENT} />)).toThrow()
+    // Mock console.error to suppress React error boundary warnings
+    const originalError = console.error
+    console.error = jest.fn()
+
+    expect(() => {
+        render(<Component component={SAMPLE_COMPONENT} />)
+    }).toThrow()
+    console.error = originalError
 })
 
 test('Page renders correct component', () => {
@@ -55,7 +62,7 @@ test('Page renders correct component', () => {
     // Component are in document.
     expect(container.querySelectorAll('.component')?.length).toBe(1)
 
-    // Prodived components are in document. (Note: Sub-regions/components aren't rendered because that is
+    // Provided components are in document. (Note: Sub-regions/components aren't rendered because that is
     // the responsibility of the component definition.)
     expect(container.querySelectorAll('.carousel')?.length).toBe(1)
 })

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable no-import-assign */
+
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
@@ -16,7 +16,8 @@ import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import * as constants from '@salesforce/retail-react-app/app/constants'
+import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('../../hooks/use-update-shopper-context', () => ({
@@ -24,37 +25,40 @@ jest.mock('../../hooks/use-update-shopper-context', () => ({
 }))
 
 let windowSpy
-let originalValue
-beforeAll(() => {
-    jest.spyOn(console, 'log').mockImplementation(jest.fn())
-    jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())
-    originalValue = constants.ACTIVE_DATA_ENABLED
-})
 
-afterAll(() => {
-    console.log.mockRestore()
-    console.groupCollapsed.mockRestore()
-    constants.ACTIVE_DATA_ENABLED = originalValue
-})
-beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get')
-})
-
-afterEach(() => {
-    console.log.mockClear()
-    console.groupCollapsed.mockClear()
-    windowSpy.mockRestore()
-})
-
-const mockUpdateDNT = jest.fn()
+const mockUpdateDnt = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useDNT: () => ({selectedDnt: undefined, updateDNT: mockUpdateDNT})
+        useDNT: () => ({selectedDnt: undefined, updateDnt: mockUpdateDnt})
     }
 })
 
+beforeEach(() => {
+    windowSpy = jest.spyOn(window, 'window', 'get')
+    prependHandlersToServer([
+        {
+            path: '*/baskets/:basketId/customer',
+            method: 'put',
+            res: () => {
+                return {
+                    ...mockCustomerBaskets.baskets[0],
+                    customerInfo: {
+                        customerId: 'abmuc2wupJxeoRxuo3wqYYmbhI',
+                        email: 'shopperUpdate@salesforce-test.com'
+                    }
+                }
+            }
+        }
+    ])
+})
+
+afterEach(() => {
+    windowSpy.mockRestore()
+    jest.restoreAllMocks()
+    jest.resetModules()
+})
 describe('App', () => {
     const site = {
         ...mockConfig.app.sites[0],
@@ -88,46 +92,44 @@ describe('App', () => {
         })
     })
 
-    test('Active Data component is not rendered', async () => {
-        constants.ACTIVE_DATA_ENABLED = false
-        useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
-            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-                <p>Any children here</p>
-            </App>
-        )
-        await waitFor(() =>
-            expect(document.getElementById('headActiveData')).not.toBeInTheDocument()
-        )
-        await waitFor(() => expect(document.getElementById('dwanalytics')).not.toBeInTheDocument())
-        await waitFor(() => expect(document.getElementById('dwac')).not.toBeInTheDocument())
-        expect(screen.getByText('Any children here')).toBeInTheDocument()
-    })
-
-    test('Active Data component is rendered appropriately', async () => {
-        constants.ACTIVE_DATA_ENABLED = true
-        useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
-            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-                <p>Any children here</p>
-            </App>
-        )
-        await waitFor(() => expect(document.getElementById('headActiveData')).toBeInTheDocument())
-        await waitFor(() => expect(document.getElementById('dwanalytics')).toBeInTheDocument())
-        await waitFor(() => expect(document.getElementById('dwac')).toBeInTheDocument())
-        expect(screen.getByText('Any children here')).toBeInTheDocument()
-    })
-
     test('The localized hreflang links exist in the html head', () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
         renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages} />
         )
 
+        // expected locales for hrefLang
+        const hrefLangLocales = mockConfig.app.sites[0].l10n.supportedLocales.map(
+            (locale) => locale.id
+        )
         const helmet = Helmet.peek()
         const hreflangLinks = helmet.linkTags.filter((link) => link.rel === 'alternate')
-
         const hasGeneralLocale = ({hrefLang}) => hrefLang === DEFAULT_LOCALE.slice(0, 2)
+
+        hrefLangLocales.forEach((supportedLocale) => {
+            expect(
+                hreflangLinks.some(
+                    (link) => link.hrefLang.toLowerCase() === supportedLocale.toLowerCase()
+                )
+            ).toBe(true)
+            expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
+        })
+
+        // localeRefs takes locale alias into consideration
+        const localeRefs = mockConfig.app.sites[0].l10n.supportedLocales.map(
+            (locale) => locale.alias || locale.id
+        )
+
+        localeRefs.forEach((localeRef) => {
+            expect(hreflangLinks.some((link) => link.href.includes(localeRef))).toBe(true)
+            // expecting href does not contain search query params in the href since it is a canonical url
+            expect(
+                hreflangLinks.some((link) => {
+                    const urlObj = new URL(link.href)
+                    return urlObj.search.length > 0
+                })
+            ).toBe(false)
+        })
 
         // `length + 2` because one for a general locale and the other with x-default value
         expect(hreflangLinks).toHaveLength(resultUseMultiSite.site.l10n.supportedLocales.length + 2)

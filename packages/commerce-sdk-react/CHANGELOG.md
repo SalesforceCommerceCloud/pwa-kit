@@ -1,12 +1,51 @@
-## v3.2.0-dev (Oct 29, 2024)
+## v4.3.0-dev (Nov 05, 2025)
+
+## v4.2.0 (Nov 04, 2025)
+
+- Upgrade to commerce-sdk-isomorphic v4.0.1 [#3449](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3449)
+- Prevent headers from being overriden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
+
+## v4.1.0 (Sep 25, 2025)
+
+## v4.0.0 (Sep 04, 2025)
+
+- [Breaking] Upgrade to commerce-sdk-isomorphic v4.0.0 [#2879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2879)
+- [Breaking] Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- Update USID expiry to match SLAS refresh token expiry [#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
+- [Bugfix] Skip deleting dwsid on shopper login if hybrid auth is enabled for current site. [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Update Auth class and CommerceApiProvider to support custom headers in SCAPI requests [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+
+## v3.4.0 (Jul 22, 2025)
+
+- Optionally disable auth init in CommerceApiProvider [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629)
+- Now compatible with either React 17 and 18 [#2506](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2506)
+- Gracefully handle missing SDK Clients in CommerceApiProvider [#2539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2539)
+- Refactor commerce-sdk-react to allow injecting ApiClients [#2519](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2519)
+- Upgrade to commerce-sdk-isomorphic v3.4.0 [#2866](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2866)
+
+
+## v3.3.0 (May 22, 2025)
+
+- Fix inconsistency between dwsid and access token for guest login when hybrid authentication is enabled [#2397](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2397)
+- Invalidate cache instead of removing cache when triggering logout [#2323](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2323)
+- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+- Allow custom parameters/body to be passed to SLAS authorize/authenticate calls via commerce-sdk-react auth helpers [#2358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2358)
+
+## v3.2.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.2.0 (Feb 18, 2025)
+
 - Allow cookies for ShopperLogin API [#2190](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2190
 - Fix refresh token TTL warning from firing when override is not provided [#2114](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2114)
 - Readme updates for private clients [#2212](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2212)
-
 - Update CacheUpdateMatrix for mergeBasket mutation [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 - Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 - DNT interface improvement [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+- Add `authorizeIDP`, `loginIDPUser`, `authorizePasswordless`, `getPasswordLessAccessToken`, `getPasswordResetToken`, and `resetPassword` wrapper functions to support Social Login, Passwordless Login, and Password Reset [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+
 
 ## v3.1.0 (Oct 28, 2024)
 

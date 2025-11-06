@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const AxeBuilder = require('@axe-core/playwright')
+const {expect} = require('@playwright/test')
+
 const {types} = require('util')
 const fs = require('fs')
 const promisify = require('util').promisify
@@ -31,7 +34,102 @@ const getCreditCardExpiry = (yearsFromNow = 5) => {
         (new Date().getFullYear() % 100) + parseInt(yearsFromNow)
     }`
 }
+/**
+ * Helper function to create simplified violation objects for snapshots
+ *
+ * @param {Array} violations - Array of axe-core violations
+ * @returns {Array} - Array of simplified violation objects
+ */
+function simplifyViolations(violations) {
+    return violations.map((violation) => ({
+        id: violation.id,
+        // Severity of violation (critical, serious, moderate, minor)
+        impact: violation.impact,
+        description: violation.description,
+        help: violation.help,
+        helpUrl: violation.helpUrl,
+        nodes: violation.nodes.map((node) => ({
+            // Simplify the HTML to make it more stable for snapshots
+            html: sanitizeHtml(node.html),
+            // Include the important failure information
+            failureSummary: node.failureSummary,
+            // Simplify target selectors for stability
+            // #app-header[data-v-12345] > .navigation[data-testid="main-nav"] => #app-header > .navigation
+            // Also handle Chakra UI dynamic selectors like #popover-trigger-:r5l4v:
+            target: node.target.map(
+                (t) =>
+                    t
+                        .split(/\[.*?\]/)
+                        .join('') // Remove data attributes
+                        .replace(/#([^-\s]+(?:-[^:]*)?):([^"\s]*)/g, '#$1-...') // Remove Chakra UI dynamic IDs
+                        .replace(/\.css-[a-zA-Z0-9]+/g, '.css-...') // Simplify Chakra UI CSS classes
+            )
+        }))
+    }))
+}
+/**
+ * Helper function to strip dynamic content from HTML to make snapshots more stable
+ *
+ * @param {string} html - HTML string
+ * @returns {string} - HTML string with dynamic content removed
+ */
+function sanitizeHtml(html) {
+    return (
+        html
+            // Remove IDs which may change
+            .replace(/id="[^"]*"/g, 'id="..."')
+            // Remove data attributes which may change
+            .replace(/data-[a-zA-Z0-9-]+="[^"]*"/g, '')
+            // Simplify classes which may change
+            .replace(/class="[^"]*"/g, 'class="..."')
+            // Remove inline styles which may change
+            .replace(/style="[^"]*"/g, '')
+            // Remove content of script tags
+            .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '<script>...</script>')
+            // Dynamic values - keep stable part:
+            // Before: aria-controls="popover-content-:rn:"
+            // After:  aria-controls="popover-content-..."
+            .replace(
+                /(aria-(?:controls|describedby|labelledby|owns))="([^:]*?)(?::[^"]*)?"/g,
+                '$1="$2..."'
+            )
+            // Trim whitespace
+            .trim()
+    )
+}
+/**
+ * Runs an accessibility analysis on the current page
+ *
+ * @param {Page} page - Playwright page object
+ * @param {string|string[]} snapshotName - Name for the snapshot file
+ * @param {Object} options - Optional configuration
+ * @param {string[]} options.exclude - CSS selectors to exclude from scan
+ */
+async function runAccessibilityTest(page, snapshotName, options = {}) {
+    const {exclude = []} = options
 
+    // Create AxeBuilder instance
+    let axeBuilder = new AxeBuilder({page})
+
+    // Add exclusions if provided
+    if (exclude.length > 0) {
+        axeBuilder = axeBuilder.exclude(exclude)
+    }
+
+    // Run the accessibility audit
+    const accessibilityScanResults = await axeBuilder.analyze()
+
+    // console.log(`Found ${accessibilityScanResults.violations.length} accessibility violations`)
+
+    // Create simplified versions of violations for more stable snapshots
+    const simplifiedViolations = simplifyViolations(accessibilityScanResults.violations)
+
+    // Convert to JSON string for stable snapshot comparison
+    const violationsJson = JSON.stringify(simplifiedViolations, null, 2)
+
+    // Compare with snapshot - using string comparison instead of object comparison
+    expect(violationsJson).toMatchSnapshot(snapshotName)
+}
 /**
  * Generates a random string of given length containing uppercase letters, lowercase letters and numbers.
  * @param {number} length Length of generated string required.
@@ -91,10 +189,21 @@ const generateUserCredentials = function () {
     return user
 }
 
+/**
+ * Utility function for delays
+ * @param {number} ms - Number of milliseconds to sleep
+ * @returns {Promise<void>} - Promise that resolves after the specified delay
+ */
+const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 module.exports = {
     isPrompt,
     mkdirIfNotExists,
     diffArrays,
     getCreditCardExpiry,
-    generateUserCredentials
+    generateUserCredentials,
+    runAccessibilityTest,
+    sleep
 }

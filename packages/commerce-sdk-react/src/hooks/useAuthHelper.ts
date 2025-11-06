@@ -21,10 +21,16 @@ import {updateCache} from './utils'
  * @enum
  */
 export const AuthHelpers = {
+    AuthorizePasswordless: 'authorizePasswordless',
+    LoginPasswordlessUser: 'getPasswordLessAccessToken',
+    AuthorizeIDP: 'authorizeIDP',
+    GetPasswordResetToken: 'getPasswordResetToken',
+    LoginIDPUser: 'loginIDPUser',
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
     Logout: 'logout',
     Register: 'register',
+    ResetPassword: 'resetPassword',
     UpdateCustomerPassword: 'updateCustomerPassword'
 } as const
 /**
@@ -53,6 +59,8 @@ type CacheUpdateMatrix = {
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
  * Avaliable helpers:
+ * - authorizeIDP
+ * - loginIDPUser
  * - loginRegisteredUserB2C
  * - loginGuestUser
  * - logout
@@ -99,7 +107,7 @@ const cacheUpdateMatrix: CacheUpdateMatrix = {
     loginGuestUser: noop,
     logout() {
         return {
-            remove: [{queryKey: ['/commerce-sdk-react']}]
+            invalidate: [{queryKey: ['/commerce-sdk-react']}]
         }
     },
     register: noop,

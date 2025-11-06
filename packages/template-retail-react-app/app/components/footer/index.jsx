@@ -31,6 +31,7 @@ import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -39,6 +40,7 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -51,7 +53,7 @@ const Footer = ({...otherProps}) => {
     })
     const makeOurCompanyLinks = () => {
         const links = []
-        if (STORE_LOCATOR_IS_ENABLED)
+        if (storeLocatorEnabled)
             links.push({
                 href: '/store-locator',
                 text: intl.formatMessage({
@@ -157,6 +159,10 @@ const Footer = ({...otherProps}) => {
                                         window.location = newUrl
                                     }}
                                     variant="filled"
+                                    aria-label={intl.formatMessage({
+                                        id: 'footer.locale_selector.assistive_msg',
+                                        defaultMessage: 'Select Language'
+                                    })}
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
@@ -201,7 +207,7 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     return (
         <Box {...styles.subscribe} {...otherProps}>
-            <Heading as="h1" {...styles.subscribeHeading}>
+            <Heading as="h2" {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
                     defaultMessage: 'Be the first to know'
@@ -228,7 +234,16 @@ const Subscribe = ({...otherProps}) => {
                             })}
                         </Button>
                     </InputRightElement>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                    <Input
+                        type="email"
+                        placeholder="you@email.com"
+                        aria-label={intl.formatMessage({
+                            id: 'footer.subscribe.email.assistive_msg',
+                            defaultMessage: 'Email address for newsletter'
+                        })}
+                        id="subscribe-email"
+                        {...styles.subscribeField}
+                    />
                 </InputGroup>
             </Box>
 

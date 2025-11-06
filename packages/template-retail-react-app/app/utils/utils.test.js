@@ -72,8 +72,8 @@ describe('boldString & Capitalize test', () => {
     })
 
     test('capitalize capitalizes a string', () => {
-        const stringToCapitlize = utils.capitalize('capitalize string test')
-        expect(stringToCapitlize).toBe('Capitalize String Test')
+        const stringToCapitalize = utils.capitalize('capitalize string test')
+        expect(stringToCapitalize).toBe('Capitalize String Test')
     })
 })
 
@@ -178,5 +178,28 @@ describe('keysToCamel', () => {
                 sub3: [{subSub_3: 'changed', sub3Sub4: 'unchanged'}]
             }
         })
+    })
+})
+
+describe('buildRedirectURI', function () {
+    test('returns full URI with valid appOrigin and redirectPath', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = '/redirect'
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('https://example.com/redirect')
+    })
+
+    test('returns full URI with valid appOrigin and redirectPath missing /', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = 'redirect'
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('https://example.com/redirect')
+    })
+
+    test('returns empty string when redirectPath is not passed in', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = ''
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('')
     })
 })

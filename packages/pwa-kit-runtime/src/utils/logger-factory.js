@@ -20,6 +20,24 @@ export class PWAKitLogger {
     }
 
     /**
+     * Given an object, serialize those properties that are Error.
+     * Why? We found that Error objects are shown as empty object in our logs
+     * JSON.stringify({err: new Error()}) => shown as {err: {}}
+     */
+    #serializeError(object) {
+        const obj = {...object}
+        Object.entries(obj).forEach(([key, value]) => {
+            if (obj[key] instanceof Error) {
+                const {name, message, stack} = value
+                obj[key] = {name, message, stack}
+                // This is intentionally simplistic implementation.
+                // If we want a more robust solution, we can look into 3PP like `serialize-error`.
+            }
+        })
+        return obj
+    }
+
+    /**
      * Formats the log message.
      *
      * @param {string} message - The log message.
@@ -38,7 +56,9 @@ export class PWAKitLogger {
         }
 
         return `${finalNamespace} ${level.toUpperCase()} ${message}${
-            additionalProperties ? ` ${JSON.stringify(additionalProperties)}` : ''
+            additionalProperties
+                ? ` ${JSON.stringify(this.#serializeError(additionalProperties))}`
+                : ''
         }`
     }
 

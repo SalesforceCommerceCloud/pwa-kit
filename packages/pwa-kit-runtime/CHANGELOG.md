@@ -1,6 +1,38 @@
-## v3.9.0-dev (Oct 29, 2024)
+## v3.15.0-dev (Nov 05, 2025)
+
+## v3.14.0 (Nov 04, 2025)
+- Replace aws-serverless-express with @h4ad/serverless-adapter [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+- Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
+- Add extensibility hooks for SLAS private client proxy with `onSLASPrivateProxyReq` and `onSLASPrivateProxyRes` callbacks [#3411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3411)
+- Remove exception when transfer-encoding: chunked [#3439](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3439)
+- Fix chunked encoding option name [#3440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3440)
+
+## v3.13.0 (Sep 25, 2025)
+
+## v3.12.0 (Sep 04, 2025)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Disallow the SLAS private client proxy from handling trusted system on behalf of requests [#3042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3042)
+- Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
+
+
+## v3.11.0 (Jul 22, 2025)
+- Fix the logger so that it will now print out details of the given Error object [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
+- Only allow requests for `/shopper/auth/` through the SLAS private client proxy. Also stop the proxy from swallowing SLAS errors [#2608](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2608)
+
+## v3.10.0 (May 22, 2025)
+
+## v3.9.2 (Mar 08, 2025)
+- Disable CloudWatch metrics sender retries [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304) 
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+- Remove forced garbage collection on each invocation. Set `FORCE_GC=true` for the old behavior. [#2285](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2285)
+
+## v3.9.0 (Feb 18, 2025)
 - Fix stale service worker file that could cause requests to still use old Content-Security-Policy [#2191](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2191)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+- Support Social Login, Passwordless Login, and Password Reset: update the default value for `applySLASPrivateClientToEndpoints` option [#2250](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2250)
 
 ## v3.8.0 (Oct 28, 2024)
 - Add proxy handling for trusted agent on behalf of (TAOB) requests [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)

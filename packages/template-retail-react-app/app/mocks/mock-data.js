@@ -218,6 +218,45 @@ export const mockedRegisteredCustomerWithNoAddress = {
     previousVisitTime: '2021-04-14T13:38:29.778Z'
 }
 
+export const mockedRegisteredCustomerWithNoNumber = {
+    addresses: [],
+    authType: 'registered',
+    creationDate: '2021-03-31T13:32:42.000Z',
+    customerId: 'customerid',
+    customerNo: '00149004',
+    email: 'customer@test.com',
+    enabled: true,
+    lastLoginTime: '2021-04-14T13:38:29.778Z',
+    lastModified: '2021-04-14T13:38:29.778Z',
+    firstName: 'Testing',
+    lastName: 'Tester',
+    phoneHome: '',
+    lastVisitTime: '2021-04-14T13:38:29.778Z',
+    login: 'customer@test.com',
+    paymentInstruments: [
+        {
+            creationDate: '2021-04-01T14:34:56.000Z',
+            lastModified: '2021-04-01T14:34:56.000Z',
+            paymentBankAccount: {},
+            paymentCard: {
+                cardType: 'Master Card',
+                creditCardExpired: false,
+                expirationMonth: 1,
+                expirationYear: 2030,
+                holder: 'Test McTester',
+                maskedNumber: '************5454',
+                numberLastDigits: '5454',
+                validFromMonth: 1,
+                validFromYear: 2020
+            },
+            paymentInstrumentId: 'testcard1',
+            paymentMethodId: 'CREDIT_CARD'
+        }
+    ],
+    previousLoginTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
+}
+
 export const mockedGuestCustomer = {
     authType: 'guest',
     customerId: 'customerid',
@@ -5671,4 +5710,153 @@ export const mockPasswordUpdateFalure = {
     type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/update-password',
     detail: 'The update password request is invalid. Customer\u0027s current password is not valid',
     errorMessage: 'Customer\u0027s current password is not valid'
+}
+
+export const mockBasketWithBonusProducts = {
+    baskets: [
+        {
+            ...mockCustomerBaskets.baskets[0],
+            productItems: [
+                {
+                    adjustedTax: 2.93,
+                    basePrice: 61.43,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                    itemText: 'Belted Cardigan With Studs',
+                    price: 61.43,
+                    priceAfterItemDiscount: 61.43,
+                    priceAfterOrderDiscount: 61.43,
+                    productId: '701642889830M',
+                    productName: 'Belted Cardigan With Studs',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: 2.93,
+                    taxBasis: 61.43,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: 0,
+                    basePrice: 0,
+                    bonusProductLineItem: true,
+                    gift: false,
+                    itemId: '5b1a03848f0807f99f37ea93e4',
+                    itemText: 'Free Gift with Purchase',
+                    price: 0,
+                    priceAfterItemDiscount: 0,
+                    priceAfterOrderDiscount: 0,
+                    productId: '013742335262M',
+                    productName: 'Free Gift with Purchase',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: 0,
+                    taxBasis: 0,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ]
+        }
+    ],
+    total: 1
+}
+
+export const mockStore = {
+    data: [
+        {
+            id: '00001',
+            name: 'Downtown Store',
+            address1: '100 Market St',
+            city: 'San Francisco',
+            stateCode: 'CA',
+            postalCode: '94105',
+            phone: '(415) 555-0001'
+        }
+    ]
+}
+
+export const mockMultiShipmentOrder = {
+    ...mockOrderHistory.data[0],
+    orderNo: '00099003',
+    productItems: [
+        {
+            ...mockOrderHistory.data[0].productItems[0],
+            shipmentId: 'pickup1',
+            itemId: 'item1'
+        },
+        {
+            ...mockOrderHistory.data[0].productItems[1],
+            shipmentId: 'delivery1',
+            itemId: 'item2'
+        }
+    ],
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 1.5,
+            adjustedShippingTotalTax: 0,
+            gift: false,
+            merchandizeTotalTax: 1.5,
+            productSubTotal: 30.0,
+            productTotal: 30.0,
+            shipmentId: 'pickup1',
+            shipmentTotal: 30.0,
+            shippingAddress: {
+                address1: '100 Market St',
+                city: 'San Francisco',
+                countryCode: 'US',
+                firstName: 'Downtown Store',
+                fullName: 'Downtown Store',
+                id: 'pickup1addr',
+                lastName: 'pickup',
+                phone: '(415) 555-0001',
+                postalCode: '94105',
+                stateCode: 'CA'
+            },
+            shippingMethod: {
+                description: 'Pickup in store',
+                id: '005',
+                name: 'Store Pickup',
+                price: 0,
+                c_storePickupEnabled: true
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 0,
+            shippingTotalTax: 0,
+            taxTotal: 1.5,
+            c_fromStoreId: '00001'
+        },
+        {
+            adjustedMerchandizeTotalTax: 1.65,
+            adjustedShippingTotalTax: 0.3,
+            gift: false,
+            merchandizeTotalTax: 1.65,
+            productSubTotal: 32.98,
+            productTotal: 32.98,
+            shipmentId: 'delivery1',
+            shipmentTotal: 38.97,
+            shippingAddress: {
+                address1: '123 Main St',
+                city: 'Boston',
+                countryCode: 'US',
+                firstName: 'John',
+                fullName: 'John Doe',
+                id: 'delivery1addr',
+                lastName: 'Doe',
+                phone: '6175551234',
+                postalCode: '02101',
+                stateCode: 'MA'
+            },
+            shippingMethod: {
+                description: 'Order received within 7-10 business days',
+                id: '001',
+                name: 'Ground',
+                c_estimatedArrivalTime: '7-10 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 5.99,
+            shippingTotalTax: 0.3,
+            taxTotal: 1.95,
+            trackingNumber: 'TRACK123456'
+        }
+    ]
 }

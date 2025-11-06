@@ -1,0 +1,235 @@
+# 🚀 PWA Kit MCP Server
+
+An MCP server that enhances the entire development lifecycle of PWA Kit storefront apps — from project creation and management to AI-assisted coding, testing, and implementation of best practices — all within your IDE.
+
+## 🔍 What is MCP?
+
+**Model Context Protocol (MCP)** is an open protocol that enables secure, structured communication between host applications (like [Cursor IDE](https://www.cursor.so/) or other AI development tools) and external tools or data sources.
+
+It allows AI agents to query context-aware services like this server to help developers build better software, faster.
+
+
+👉 **[Read more at modelcontextprotocol.io](https://modelcontextprotocol.io/)**
+
+
+## What is PWA-Kit-MCP?
+
+PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new pages, and support site validation through performance and accessibility testing.
+
+_NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
+
+## Important
+
+Feature is available as a developer preview. Feature isn’t generally available unless or until Salesforce announces its general availability in documentation or in press releases or public statements. All commands, parameters, and other features are subject to change or deprecation at any time, with or without notice. Don't implement functionality developed with these commands or tools.
+
+## 🧰 Features
+
+The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
+
+* **`pwakit_create_storefront`**:
+  Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
+
+* **`pwakit_create_page`**:
+  Interactive tool to generate a new PWA storefront page with custom routing and components.
+
+* **`pwakit_get_dev_guidelines`**:
+  Provides best practices and guidance for building PWA Kit storefronts.
+
+* **`pwakit_recommend_hooks`**:
+  Interactive tool to help developers identify and integrate hooks that solve specific use cases.
+
+* **`pwakit_run_site_test`**:
+  Runs performance and accessibility audits on a provided site URL.
+  *Example: `https://pwa-kit.mobify-storefront.com`*
+
+* **`pwakit_install_agent_rules`**:
+  Adds an Agent Guidelines rule file to your project that helps the AI make better use of the PWA Kit MCP Server.
+  *Example: `Install the Agent MCP Tool Usage Guidelines`*
+
+* **`pwakit_explore_scapi_shop_api`**:
+  Explore and document the out of box SCAPI API endpoints, parameters, and usage examples.
+  *Example: `How do I get a product?`*
+  
+* **`scapi_custom_api_discovery`**:
+  Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
+  *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
+  
+  *Custom API DX Endpoint Documentation*: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
+
+
+
+## ▶️ Running the MCP Server
+
+### 🖥️ From Cursor IDE
+
+1. Open **Cursor**.
+
+2. Navigate to **Settings > Cursor Settings...**
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
+
+3. Go to **Tools & Integrations > MCP Tools > New MCP Server**
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
+
+4. Update your `mcp.json` like this (edit the placeholders as needed):
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+_NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
+
+### 🔧 Configuration Options
+
+The MCP server supports two ways to configure your Salesforce Commerce Cloud credentials:
+
+#### Option 1: dw.json Configuration File (Recommended)
+
+Create a `dw.json` file under your PWA Kit project directory with your SFCC credentials:
+
+```json
+{
+  "hostname": "https://your-instance.dx.commercecloud.salesforce.com",
+  "instance-id": "your-instance-id",
+  "client-id": "your-client-id",
+  "client-secret": "your-client-secret",
+  "org-id": "your-org-id",
+  "short-code": "your-short-code"
+}
+```
+
+If `dw.json` doesn't live under your PWA Kit project directory, then update your `mcp.json` to point to the `dw.json` file path:
+
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp", "--dw-json", "/path/to/your/dw.json"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+This is the priority when fetching dw.json locally:
+  1. dw.json path supplied from mcp settings args (if set)
+  2. PWA_STOREFRONT_APP_PATH/dw.json 
+  3. PWA_STOREFRONT_APP_PATH/../dw.json 
+  4. PWA_STOREFRONT_APP_PATH/../../dw.json
+
+#### Option 2: Environment Variables
+
+Use environment variables to set SFCC credentials:
+
+```
+SFCC_HOSTNAME=https://your-instance.dx.commercecloud.salesforce.com
+SFCC_ORG_ID=your-org-id
+SFCC_SHORT_CODE=your-short-code
+SFCC_INSTANCE_ID=your-instance-id
+SFCC_CLIENT_ID=your-client-id
+SFCC_CLIENT_SECRET=your-client-secret
+```
+
+**Note:** Environment variables take precedence over`dw.json` values if both are provided.
+
+## 📊 Telemetry
+
+The server collects minimal, anonymous usage data to improve reliability and the developer experience.
+
+- **What's included**:
+  - Server lifecycle events: started, stopped, errors (`SERVER_STATUS`).
+  - Tool usage: tool name, run time, success/error (`TOOL_CALLED`).
+- **What’s not included**:
+  - No source code, file contents, prompts, or secrets are collected by default.
+- **How to disable/opt out**:
+  - Add `--no-telemetry` to your `args`.
+
+**Beta:** Telemetry for the PWA Kit MCP server is in beta and subject to change. Event names, payloads, and destinations may change without notice; the feature may be modified or removed.
+
+These are the available flags that you can pass to the `args` option. 
+
+| Flag Name | Description | Required? | Notes |
+| -----------------| -------| ------- | ----- |
+| `"-y", "@salesforce/pwa-kit-mcp"` | Tells `npx` to automatically install the `@salesforce/pwa-kit-mcp` package instead of asking permission. | Yes | Don't change this. |
+| `"--dw-json", "/path/to/dw.json"` | Path to a `dw.json` configuration file containing SFCC credentials. Use this flag if `dw.json` does not live under your project root directory. | No | Alternative to environment variables. |
+| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it. |
+
+
+
+Once saved, Cursor will:
+
+* Launch the MCP server
+* Connect to it as a client
+* Display the available tools in the UI and how you can invoke them
+
+You can return to **MCP Tools** anytime to enable or disable specific tools or servers.
+
+### 🧪 From Other MCP Clients
+
+We currently only support Cursor IDE, but if you wish to try it out with your AI agent enabled IDE, you can manually run the server be following the below steps. **NOTE:** This server communicates via **stdio**, so it is important to ensure your IDE can communicate in this manner.
+
+```bash
+cd {{dir-to-mcp}}
+npm run start
+```
+
+Then send JSON-RPC requests like:
+
+```json
+{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
+{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "pwakit_get_dev_guidelines", "arguments": {}}}
+```
+
+---
+
+## 👩‍💻 Development
+
+If you are actively developing features for the MCP server and want to get immediate feedback during testing, follow the below steps.
+
+1. Update your Cursor IDE MCP server configuration so that you are referencing the local server. This can be done by opening the "View: Open MCP Settings" 
+from the command pallet and editing your `pwa-kit` entry to look like the entry below.
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "node",
+      "args": [
+        "{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js",
+        "--dw-json",
+        "{{path-to-dw.json}}"
+      ],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+
+2. Ensure that your server is built and will rebuild whenever changes are made you by running the following command in the `/pwa-kit-mcp` folder:
+```bash
+npm run build:watch
+```
+
+The server logs to `stderr` and communicates using MCP via `stdio`. You can view these logs in the `Output` section (shift + command + U) and filtering
+the output on "MCP Logs".
+
+
+### 🔹 File & Folder Overview
+
+| Location       | Purpose                                                               |
+| -------------- | --------------------------------------------------------------------- |
+| `package.json` | Node.js dependencies and project scripts                              |
+| `mcp.json`     | MCP client configuration (used by Cursor or other IDEs)               |
+| `src/server/`  | Main server entry point (`server.js`)                                 |
+| `src/tools/`   | Contains all MCP tools like `create-storefront-app`, `site-test`, etc. |
+| `src/utils/`   | Shared utility functions                                              |

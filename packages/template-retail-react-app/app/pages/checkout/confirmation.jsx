@@ -22,9 +22,20 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {nanoid} from 'nanoid'
+import {
+    useOrder,
+    useProducts,
+    useAuthHelper,
+    AuthHelpers,
+    useShopperCustomersMutation
+} from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
+
+// Components
 import Link from '@salesforce/retail-react-app/app/components/link'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import PostCheckoutRegistrationFields from '@salesforce/retail-react-app/app/components/forms/post-checkout-registration-fields'
@@ -34,9 +45,19 @@ import CartItemVariantImage from '@salesforce/retail-react-app/app/components/it
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import MultiShipOrderSummary from '@salesforce/retail-react-app/app/components/multiship/multiship-order-summary'
+import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/partials/shipment-details'
+
+// Hooks
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+
+// Constants
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -45,6 +66,7 @@ const CheckoutConfirmation = () => {
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const register = useAuthHelper(AuthHelpers.Register)
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const {data: order} = useOrder(
         {
             parameters: {orderNo}
@@ -56,8 +78,13 @@ const CheckoutConfirmation = () => {
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
-    const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
+    const productItemsMap = (products?.data || []).reduce(
+        (map, item) => ({...map, [item.id]: item}),
+        {}
+    )
     const form = useForm()
+
+    const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
     useEffect(() => {
         form.reset({
@@ -75,17 +102,62 @@ const CheckoutConfirmation = () => {
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
     const submitForm = async (data) => {
+        // Save the unique delivery addresses, excluding pickup shipments
+        const saveShippingAddress = async (customerId) => {
+            try {
+                const storeLocatorEnabled =
+                    getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+
+                const deliveryShipments = (order.shipments || []).filter((shipment) => {
+                    if (!shipment.shippingAddress) return false
+                    if (storeLocatorEnabled && isPickupShipment(shipment)) return false
+                    return true
+                })
+
+                const uniqueAddresses = []
+                deliveryShipments.forEach((shipment) => {
+                    const address = shipment.shippingAddress
+                    const isDuplicate = uniqueAddresses.some((existingAddr) =>
+                        areAddressesEqual(existingAddr, address)
+                    )
+                    if (!isDuplicate) {
+                        uniqueAddresses.push(address)
+                    }
+                })
+
+                for (let i = 0; i < uniqueAddresses.length; i++) {
+                    const shippingAddress = uniqueAddresses[i]
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const {id, _type, ...shippingAddressWithoutId} = shippingAddress
+                    const bodyShippingAddress = {
+                        addressId: nanoid(),
+                        ...shippingAddressWithoutId
+                    }
+                    await createCustomerAddress.mutateAsync({
+                        body: bodyShippingAddress,
+                        parameters: {customerId: customerId}
+                    })
+                }
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         try {
             const body = {
                 customer: {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    login: data.email
+                    login: data.email,
+                    phoneHome: order.billingAddress.phone
                 },
                 password: data.password
             }
-            await register.mutateAsync(body)
+            const registerData = await register.mutateAsync(body)
+
+            // Save the shipping address from this order, should not block account creation
+            await saveShippingAddress(registerData.customerId)
 
             navigate(`/account`)
         } catch (error) {
@@ -130,7 +202,7 @@ const CheckoutConfirmation = () => {
                 <Stack spacing={4}>
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
-                            <Heading align="center" fontSize={['2xl']}>
+                            <Heading as="h1" align="center" fontSize={['2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Thank you for your order!"
                                     id="checkout_confirmation.heading.thank_you_for_order"
@@ -218,47 +290,8 @@ const CheckoutConfirmation = () => {
                         </Box>
                     )}
 
-                    <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
-                        <Container variant="form">
-                            <Stack spacing={6}>
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Delivery Details"
-                                        id="checkout_confirmation.heading.delivery_details"
-                                    />
-                                </Heading>
-
-                                <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Shipping Address"
-                                                id="checkout_confirmation.heading.shipping_address"
-                                            />
-                                        </Heading>
-                                        <AddressDisplay
-                                            address={order.shipments[0].shippingAddress}
-                                        />
-                                    </Stack>
-
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Shipping Method"
-                                                id="checkout_confirmation.heading.shipping_method"
-                                            />
-                                        </Heading>
-                                        <Box>
-                                            <Text>{order.shipments[0].shippingMethod.name}</Text>
-                                            <Text>
-                                                {order.shipments[0].shippingMethod.description}
-                                            </Text>
-                                        </Box>
-                                    </Stack>
-                                </SimpleGrid>
-                            </Stack>
-                        </Container>
-                    </Box>
+                    {/* Shipment Details */}
+                    <ShipmentDetails shipments={order.shipments} />
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
@@ -286,56 +319,67 @@ const CheckoutConfirmation = () => {
                                     </Text>
 
                                     <Stack spacing={5} align="flex-start">
-                                        <Stack
-                                            spacing={5}
-                                            align="flex-start"
-                                            width="full"
-                                            divider={<Divider />}
-                                        >
-                                            {order.productItems?.map((product, idx) => {
-                                                const productDetail =
-                                                    productItemsMap?.[product.productId] || {}
-                                                const variant = {
-                                                    ...product,
-                                                    ...productDetail,
-                                                    price: product.price
-                                                }
+                                        {hasMultipleShipments ? (
+                                            <MultiShipOrderSummary
+                                                order={order}
+                                                productItemsMap={productItemsMap}
+                                                currency={currency}
+                                            />
+                                        ) : (
+                                            <Stack
+                                                spacing={5}
+                                                align="flex-start"
+                                                width="full"
+                                                divider={<Divider />}
+                                            >
+                                                {order.productItems?.map((product, idx) => {
+                                                    const productDetail =
+                                                        productItemsMap?.[product.productId] || {}
+                                                    const variant = {
+                                                        ...product,
+                                                        ...productDetail,
+                                                        price: product.price
+                                                    }
 
-                                                return (
-                                                    <ItemVariantProvider
-                                                        key={product.productId}
-                                                        index={idx}
-                                                        variant={variant}
-                                                    >
-                                                        <Flex width="full" alignItems="flex-start">
-                                                            <CartItemVariantImage
-                                                                width="80px"
-                                                                mr={2}
-                                                            />
-                                                            <Stack
-                                                                spacing={1}
-                                                                marginTop="-3px"
-                                                                flex={1}
+                                                    return (
+                                                        <ItemVariantProvider
+                                                            key={product.productId}
+                                                            index={idx}
+                                                            variant={variant}
+                                                        >
+                                                            <Flex
+                                                                width="full"
+                                                                alignItems="flex-start"
                                                             >
-                                                                <CartItemVariantName />
-                                                                <Flex
-                                                                    width="full"
-                                                                    justifyContent="space-between"
-                                                                    alignItems="flex-end"
+                                                                <CartItemVariantImage
+                                                                    width="80px"
+                                                                    mr={2}
+                                                                />
+                                                                <Stack
+                                                                    spacing={1}
+                                                                    marginTop="-3px"
+                                                                    flex={1}
                                                                 >
-                                                                    <CartItemVariantAttributes
-                                                                        includeQuantity
-                                                                    />
-                                                                    <CartItemVariantPrice
-                                                                        currency={currency}
-                                                                    />
-                                                                </Flex>
-                                                            </Stack>
-                                                        </Flex>
-                                                    </ItemVariantProvider>
-                                                )
-                                            })}
-                                        </Stack>
+                                                                    <CartItemVariantName />
+                                                                    <Flex
+                                                                        width="full"
+                                                                        justifyContent="space-between"
+                                                                        alignItems="flex-end"
+                                                                    >
+                                                                        <CartItemVariantAttributes
+                                                                            includeQuantity
+                                                                        />
+                                                                        <CartItemVariantPrice
+                                                                            currency={currency}
+                                                                        />
+                                                                    </Flex>
+                                                                </Stack>
+                                                            </Flex>
+                                                        </ItemVariantProvider>
+                                                    )
+                                                })}
+                                            </Stack>
+                                        )}
 
                                         <Stack w="full" py={4} borderY="1px" borderColor="gray.200">
                                             <Flex justify="space-between">

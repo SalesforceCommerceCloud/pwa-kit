@@ -141,14 +141,14 @@ NestedAccordion.propTypes = {
     item: PropTypes.object.isRequired,
     /**
      * An array of `AccordionItem` components that will be displayed after all
-     * of the child items. Alternatively you can pass a function that will recieve
+     * of the child items. Alternatively you can pass a function that will receive
      * the current item and it's depth, your should return an `AccordionItem` or
      * array of `AccordionItem`'s.
      */
     itemsAfter: PropTypes.oneOfType([PropTypes.array, PropTypes.func]),
     /**
      * An array of `AccordionItem` components that will be displayed before all
-     * of the child items. Alternatively you can pass a function that will recieve
+     * of the child items. Alternatively you can pass a function that will receive
      * the current item and it's depth, your should return an `AccordionItem` or
      * array of `AccordionItem`'s.
      */

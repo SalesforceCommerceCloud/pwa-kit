@@ -19,10 +19,21 @@ import {
     Text,
     VStack,
     Fade,
+    Stack,
+    Radio,
+    RadioGroup,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+
+// Constants
+const DELIVERY_OPTIONS = {
+    DELIVERY: 'delivery',
+    PICKUP: 'pickup'
+}
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -84,7 +95,8 @@ ProductViewHeader.propTypes = {
     category: PropTypes.array,
     priceData: PropTypes.object,
     product: PropTypes.object,
-    isProductPartOfBundle: PropTypes.bool
+    isProductPartOfBundle: PropTypes.bool,
+    showDeliveryOptions: PropTypes.bool
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -114,11 +126,33 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            validateOrderability = (variant, product, quantity, stockLevel) => {
+                if (isProductLoading) return false
+
+                // If product has variations, a variant must be selected
+                if (product?.variationAttributes?.length > 0 && !variant) {
+                    return false
+                }
+
+                // Check if product (either variant or standard) is orderable and if quantity is valid
+                return (
+                    (variant?.orderable || product?.inventory?.orderable) &&
+                    quantity > 0 &&
+                    quantity <= stockLevel
+                )
+            },
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            selectedBundleParentQuantity = 1,
+            pickupInStore = false,
+            setPickupInStore = () => {},
+            onOpenStoreLocator = () => {},
+            showDeliveryOptions = true,
+            customButtons = [],
+            maxOrderQuantity = null,
+            imageGalleryFooter = null,
+            controlledVariationValues = null,
+            onVariationChange = null
         },
         ref
     ) => {
@@ -126,6 +160,8 @@ const ProductView = forwardRef(
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
+        const storeLocatorEnabled =
+            getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
@@ -146,15 +182,27 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity,
             isOutOfStock,
-            unfulfillable
-        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
+            unfulfillable,
+            isSelectedStoreOutOfStock,
+            selectedStore
+        } = useDerivedProduct(
+            product,
+            isProductPartOfSet,
+            isProductPartOfBundle,
+            pickupInStore,
+            controlledVariationValues,
+            onVariationChange
+        )
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        const isProductASet = product?.type.set
-        const isProductABundle = product?.type.bundle
+        const isProductASet = product?.type?.set
+        const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
+        const [pickupEnabled, setPickupEnabled] = useState(false)
+        const storeName = selectedStore?.name
+        const inventoryId = selectedStore?.inventoryId
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -203,7 +251,7 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
+            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
             const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
@@ -272,7 +320,7 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const itemsAdded = await addToCart([{product, variant, quantity}])
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
@@ -343,6 +391,19 @@ const ProductView = forwardRef(
                 )
             }
 
+            // Add custom buttons if provided
+            if (customButtons && customButtons.length > 0) {
+                customButtons.forEach((customButton, index) => {
+                    buttons.push(
+                        React.cloneElement(customButton, {
+                            key: `custom-button-${index}`,
+                            width: customButton.props.width || '100%',
+                            marginBottom: customButton.props.marginBottom || 4
+                        })
+                    )
+                })
+            }
+
             return buttons
         }
 
@@ -370,7 +431,7 @@ const ProductView = forwardRef(
             if (
                 !isProductASet &&
                 !isProductABundle &&
-                validateOrderability(variant, quantity, stockLevel)
+                validateOrderability(variant, product, quantity, stockLevel)
             ) {
                 toggleShowOptionsMessage(false)
             }
@@ -381,6 +442,12 @@ const ProductView = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
+
+        useEffect(() => {
+            if ((isProductPartOfBundle || isProductPartOfSet) && product && product.type?.item) {
+                onVariantSelected(product, null, childOfBundleQuantity || quantity)
+            }
+        }, [product, childOfBundleQuantity, quantity, isProductPartOfBundle, isProductPartOfSet])
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
@@ -398,6 +465,18 @@ const ProductView = forwardRef(
                 }))
             }
         }, [showInventoryMessage, inventoryMessage])
+
+        // Auto-switch off pickup in store when product becomes unavailable at selected store
+        useEffect(() => {
+            setPickupEnabled(!!selectedStore?.inventoryId)
+            if (pickupInStore && isSelectedStoreOutOfStock) {
+                setPickupInStore(false)
+            }
+        }, [selectedStore])
+
+        const handleDeliveryOptionChange = (value) => {
+            setPickupInStore(value === DELIVERY_OPTIONS.PICKUP)
+        }
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -440,11 +519,27 @@ const ProductView = forwardRef(
                             ) : (
                                 <ImageGallerySkeleton />
                             )}
+                            {/* Custom footer content (e.g., Back to Selection button) */}
+                            {imageGalleryFooter && (
+                                <Box mt={6} mb={2}>
+                                    {imageGalleryFooter}
+                                </Box>
+                            )}
                         </Box>
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack align="stretch" spacing={8} flex={1}>
+                    <VStack
+                        align="stretch"
+                        spacing={8}
+                        flex={1}
+                        pb={[
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            4
+                        ]}
+                    >
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
@@ -544,6 +639,11 @@ const ProductView = forwardRef(
                                                 },
                                                 {variantType: name}
                                             )}
+                                            handleChange={
+                                                onVariationChange
+                                                    ? (value) => onVariationChange(id, value)
+                                                    : undefined
+                                            }
                                         >
                                             {swatches}
                                         </SwatchGroup>
@@ -567,6 +667,7 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
+                                        {...(maxOrderQuantity != null && {max: maxOrderQuantity})}
                                         onChange={(stringValue, numberValue) => {
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
@@ -641,12 +742,148 @@ const ProductView = forwardRef(
                                     </Text>
                                 </Fade>
                             )}
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
+                            <Box>
+                                {showDeliveryOptions && (
+                                    <>
+                                        <Box mb={4}>
+                                            <Text fontWeight={600} mb={3}>
+                                                <FormattedMessage
+                                                    defaultMessage="Delivery:"
+                                                    id="product_view.label.delivery"
+                                                />
+                                            </Text>
+                                            <RadioGroup
+                                                value={
+                                                    pickupInStore
+                                                        ? DELIVERY_OPTIONS.PICKUP
+                                                        : DELIVERY_OPTIONS.DELIVERY
+                                                }
+                                                onChange={handleDeliveryOptionChange}
+                                                mb={1}
+                                            >
+                                                <Stack direction="column" spacing={2}>
+                                                    <Radio
+                                                        value={DELIVERY_OPTIONS.DELIVERY}
+                                                        isDisabled={disableButton}
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Ship to Address"
+                                                            id="product_view.label.ship_to_address"
+                                                        />
+                                                    </Radio>
+                                                    {storeLocatorEnabled && (
+                                                        <Radio
+                                                            value={DELIVERY_OPTIONS.PICKUP}
+                                                            isDisabled={
+                                                                !pickupEnabled ||
+                                                                (storeName &&
+                                                                    inventoryId &&
+                                                                    isSelectedStoreOutOfStock)
+                                                            }
+                                                        >
+                                                            <FormattedMessage
+                                                                defaultMessage="Pick Up in Store"
+                                                                id="product_view.label.pickup_in_store"
+                                                            />
+                                                        </Radio>
+                                                    )}
+                                                </Stack>
+                                            </RadioGroup>
+                                        </Box>
+
+                                        {storeLocatorEnabled && (
+                                            <>
+                                                {storeName && inventoryId && (
+                                                    <Text
+                                                        color="black"
+                                                        fontWeight={600}
+                                                        mb={2}
+                                                        data-testid="store-stock-status-msg"
+                                                    >
+                                                        {!isSelectedStoreOutOfStock
+                                                            ? intl.formatMessage(
+                                                                  {
+                                                                      id: 'product_view.status.in_stock_at_store',
+                                                                      defaultMessage:
+                                                                          'In stock at {storeName}'
+                                                                  },
+                                                                  {
+                                                                      storeName: (
+                                                                          <Link
+                                                                              as="button"
+                                                                              color="blue.600"
+                                                                              textDecoration="underline"
+                                                                              onClick={
+                                                                                  onOpenStoreLocator
+                                                                              }
+                                                                          >
+                                                                              {storeName}
+                                                                          </Link>
+                                                                      )
+                                                                  }
+                                                              )
+                                                            : intl.formatMessage(
+                                                                  {
+                                                                      id: 'product_view.status.out_of_stock_at_store',
+                                                                      defaultMessage:
+                                                                          'Out of Stock at {storeName}'
+                                                                  },
+                                                                  {
+                                                                      storeName: (
+                                                                          <Link
+                                                                              as="button"
+                                                                              color="blue.600"
+                                                                              textDecoration="underline"
+                                                                              onClick={
+                                                                                  onOpenStoreLocator
+                                                                              }
+                                                                          >
+                                                                              {storeName}
+                                                                          </Link>
+                                                                      )
+                                                                  }
+                                                              )}
+                                                    </Text>
+                                                )}
+
+                                                {/* Show label if pickup is disabled due to no store/inventoryId */}
+                                                {!pickupEnabled && !storeName && !inventoryId && (
+                                                    <Text
+                                                        color="black"
+                                                        fontWeight={600}
+                                                        mb={3}
+                                                        data-testid="pickup-select-store-msg"
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="Pick up in "
+                                                            id="product_view.label.pickup_in_select_store_prefix"
+                                                        />{' '}
+                                                        <Link
+                                                            as="button"
+                                                            color="blue.600"
+                                                            textDecoration="underline"
+                                                            onClick={onOpenStoreLocator}
+                                                        >
+                                                            <FormattedMessage
+                                                                defaultMessage="Select Store"
+                                                                id="product_view.label.select_store_link"
+                                                            />
+                                                        </Link>
+                                                    </Text>
+                                                )}
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                                <Box
+                                    display={
+                                        isProductPartOfSet
+                                            ? 'block'
+                                            : ['none', 'none', 'none', 'block']
+                                    }
+                                >
+                                    {renderActionButtons()}
+                                </Box>
                             </Box>
                         </Box>
                     </VStack>
@@ -698,7 +935,18 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    selectedBundleParentQuantity: PropTypes.number,
+    pickupInStore: PropTypes.bool,
+    setPickupInStore: PropTypes.func,
+    onOpenStoreLocator: PropTypes.func,
+    showDeliveryOptions: PropTypes.bool,
+    customButtons: PropTypes.array,
+    promotionId: PropTypes.string,
+    maxOrderQuantity: PropTypes.number,
+    imageGalleryFooter: PropTypes.node,
+    alignItems: PropTypes.string,
+    controlledVariationValues: PropTypes.object,
+    onVariationChange: PropTypes.func
 }
 
 export default ProductView

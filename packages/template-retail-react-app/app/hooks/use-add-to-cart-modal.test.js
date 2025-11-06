@@ -15,9 +15,97 @@ import {rest} from 'msw'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundleItemsAdded
+    mockBundleItemsAdded,
+    mockBundleWithStandardProducts,
+    mockBundleItemsWithStandardProducts,
+    mockBasketWithStandardProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useCurrentBasket as mockUseCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn()
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-wish-list', () => ({
+    useWishList: jest.fn(() => ({
+        data: {
+            id: 'test-wishlist-id',
+            customerProductListItems: []
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn(() => jest.fn())
+}))
+
+// Mock SelectBonusProductsCard to verify props being passed
+
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card',
+    () =>
+        // eslint-disable-next-line react/prop-types
+        function MockSelectBonusProductsCard({hideSelectionCounter}) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const React = require('react')
+            return React.createElement(
+                'div',
+                {
+                    'data-testid': 'select-bonus-products-card',
+                    'data-hide-selection-counter': hideSelectionCounter
+                },
+                'Mock Bonus Products Card'
+            )
+        }
+)
+
+// Mock bonus product utilities
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
+    getRemainingAvailableBonusProductsForProduct: jest.fn(() => ({
+        bonusItems: [
+            {
+                bonusDiscountLineItemId: 'bonus-line-item-1',
+                promotionId: 'promo-123'
+            }
+        ],
+        aggregatedMaxBonusItems: 2,
+        aggregatedSelectedItems: 0
+    })),
+    useBasketProductsWithPromotions: jest.fn(() => ({
+        data: {
+            'test-product-123': {
+                productPromotions: [
+                    {
+                        promotionId: 'promo-123',
+                        calloutMsg: "Buy one men's suit, get 2 free ties"
+                    }
+                ]
+            }
+        }
+    })),
+    getPromotionCalloutText: jest.fn((product, promotionId) => {
+        return (
+            product.productPromotions?.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
+        )
+    }),
+    shouldShowBonusProductSelection: jest.fn(() => true),
+    getPromotionIdsForProduct: jest.fn(() => ['promo-123']),
+    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
+}))
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -570,6 +658,57 @@ const MOCK_PRODUCT = {
     c_size: '9LG',
     c_width: 'Z'
 }
+
+// Mock data for testing individual products with missing image data
+const MOCK_PRODUCT_NO_IMAGE_LINK = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Test product image',
+                    disBaseLink: 'https://example.com/image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_PRODUCT_NO_IMAGE_GROUPS = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
+// Mock data for testing bundle products with missing image data
+const MOCK_BUNDLE_NO_IMAGE_LINK = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Bundle product image',
+                    disBaseLink: 'https://example.com/bundle-image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_BUNDLE_NO_IMAGE_GROUPS = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
 beforeEach(() => {
     jest.resetModules()
     global.server.use(
@@ -577,6 +716,11 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
+    mockUseCurrentBasket.mockReturnValue({
+        data: {},
+        derivedData: {},
+        currency: 'USD'
+    })
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -669,4 +813,291 @@ test('renders product bundle', () => {
             expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
         })
     })
+})
+
+test('renders individual product image correctly when there is no image link', async () => {
+    const MOCK_DATA_NO_IMAGE = {
+        product: MOCK_PRODUCT_NO_IMAGE_LINK,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_LINK,
+                variant: MOCK_PRODUCT.variants[0], // Provide a variant to avoid undefined errors
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders individual product image when image object is not provided', async () => {
+    const MOCK_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image correctly when there is no image link', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE = {
+        product: MOCK_BUNDLE_NO_IMAGE_LINK,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image when image object is not provided', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_BUNDLE_NO_IMAGE_GROUPS,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('displays standard products in bundle without variation attributes', async () => {
+    const modalData = {
+        product: mockBundleWithStandardProducts,
+        itemsAdded: mockBundleItemsWithStandardProducts,
+        selectedQuantity: 1
+    }
+
+    // Mock the basket data to include currency at the top level
+    const mockBasket = {
+        data: mockBasketWithStandardProducts,
+        derivedData: {
+            totalItems: 2
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasket)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                onClose: jest.fn(),
+                data: modalData
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByText('Standard Product (2)')).toBeInTheDocument()
+
+    expect(screen.queryByText(/Color:/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Size:/)).not.toBeInTheDocument()
+})
+
+test('renders SelectBonusProductsCard with hideSelectionCounter=true in add-to-cart modal', () => {
+    // Mock product with bonus products eligibility
+    const MOCK_PRODUCT_WITH_BONUS = {
+        ...MOCK_PRODUCT,
+        id: 'test-product-123',
+        productPromotions: [
+            {
+                promotionId: 'promo-123',
+                calloutMsg: "Buy one men's suit, get 2 free ties"
+            }
+        ]
+    }
+
+    const MOCK_DATA_WITH_BONUS = {
+        product: MOCK_PRODUCT_WITH_BONUS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_WITH_BONUS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    // Mock basket with bonus discount line items
+    const mockBasketWithBonusItems = {
+        data: {
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-line-item-1',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                }
+            ],
+            productSubTotal: 191.99,
+            currency: 'USD'
+        },
+        derivedData: {
+            totalItems: 1
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasketWithBonusItems)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_WITH_BONUS,
+                onClose: jest.fn()
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    // Verify that the SelectBonusProductsCard is rendered with hideSelectionCounter=true
+    const bonusProductsCard = screen.getByTestId('select-bonus-products-card')
+    expect(bonusProductsCard).toBeInTheDocument()
+    expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
+})
+
+test('selects bonusDiscountLineItem with remaining capacity when first one is fully allocated', () => {
+    // This test covers the specific bug fix where adding the same qualifying product
+    // multiple times should find a bonusDiscountLineItem with remaining capacity
+    const MOCK_PRODUCT_WITH_BONUS = {
+        ...MOCK_PRODUCT,
+        id: 'test-product-123',
+        productPromotions: [
+            {
+                promotionId: 'promo-123',
+                calloutMsg: "Buy one men's suit, get 2 free ties"
+            }
+        ]
+    }
+
+    const MOCK_DATA_WITH_BONUS = {
+        product: MOCK_PRODUCT_WITH_BONUS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_WITH_BONUS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    // Mock basket with multiple bonusDiscountLineItems for same promotion
+    // The first one is fully allocated (2/2), the second has capacity (0/2)
+    const mockBasketWithMultipleBonusItems = {
+        data: {
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-line-item-1',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                },
+                {
+                    id: 'bonus-line-item-2',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                }
+            ],
+            productItems: [
+                // Two bonus products selected for the first bonusDiscountLineItem
+                {
+                    productId: 'bonus-product-1',
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-line-item-1',
+                    quantity: 1
+                },
+                {
+                    productId: 'bonus-product-2',
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-line-item-1',
+                    quantity: 1
+                }
+                // No bonus products selected for bonus-line-item-2 yet
+            ],
+            productSubTotal: 191.99,
+            currency: 'USD'
+        },
+        derivedData: {
+            totalItems: 3
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasketWithMultipleBonusItems)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_WITH_BONUS,
+                onClose: jest.fn()
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    // Verify that the SelectBonusProductsCard is still rendered
+    // This proves that the component found bonus-line-item-2 (which has capacity)
+    // instead of stopping at bonus-line-item-1 (which is fully allocated)
+    const bonusProductsCard = screen.getByTestId('select-bonus-products-card')
+    expect(bonusProductsCard).toBeInTheDocument()
+    expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })

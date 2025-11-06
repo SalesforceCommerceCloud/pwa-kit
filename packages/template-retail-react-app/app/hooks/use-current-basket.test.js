@@ -53,13 +53,37 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 const MockComponent = () => {
     const {
         data: currentBasket,
-        derivedData: {hasBasket, totalItems}
+        derivedData: {
+            hasBasket,
+            totalItems,
+            shipmentIdToTotalItems,
+            totalDeliveryShipments,
+            totalPickupShipments,
+            pickupStoreIds,
+            isMissingShippingAddress,
+            isMissingShippingMethod,
+            totalShippingCost
+        }
     } = useCurrentBasket()
     return (
         <div>
             <div data-testid="basket-id">{currentBasket?.basketId}</div>
             <div data-testid="total-items">{totalItems}</div>
             <div data-testid="has-basket">{hasBasket.toString()}</div>
+            <div data-testid="shipment-items">
+                {shipmentIdToTotalItems &&
+                    Object.entries(shipmentIdToTotalItems).map(([sid, qty]) => (
+                        <div key={sid} data-testid={`shipment-${sid}-qty`}>
+                            {qty}
+                        </div>
+                    ))}
+            </div>
+            <div data-testid="delivery-shipments">{totalDeliveryShipments}</div>
+            <div data-testid="pickup-shipments">{totalPickupShipments}</div>
+            <div data-testid="pickup-store-ids">{JSON.stringify(pickupStoreIds)}</div>
+            <div data-testid="needs-address">{isMissingShippingAddress.toString()}</div>
+            <div data-testid="needs-shipping-method">{isMissingShippingMethod.toString()}</div>
+            <div data-testid="total-shipping-cost">{totalShippingCost}</div>
         </div>
     )
 }
@@ -86,5 +110,17 @@ describe('useCurrentBasket', function () {
         expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
         expect(screen.getByTestId('total-items').innerHTML).toBe('2')
         expect(screen.getByTestId('has-basket').innerHTML).toBeTruthy()
+        // shipmentIdToTotalItems should aggregate quantities per shipment
+        // In mockCustomerBaskets, one product item with quantity 2 in shipment "me"
+        expect(screen.getByTestId('shipment-me-qty').innerHTML).toBe('2')
+        // For the mock, shipments array has one shipment and it is delivery (no pickup method)
+        expect(screen.getByTestId('delivery-shipments').innerHTML).toBe('1')
+        expect(screen.getByTestId('pickup-shipments').innerHTML).toBe('0')
+        // New derived field: pickupStoreIds should be empty for delivery-only mock data
+        expect(screen.getByTestId('pickup-store-ids').innerHTML).toBe('[]')
+        // New derived fields for checkout step logic
+        expect(screen.getByTestId('needs-address').innerHTML).toBe('true')
+        expect(screen.getByTestId('needs-shipping-method').innerHTML).toBe('true')
+        expect(screen.getByTestId('total-shipping-cost').innerHTML).toBe('0')
     })
 })

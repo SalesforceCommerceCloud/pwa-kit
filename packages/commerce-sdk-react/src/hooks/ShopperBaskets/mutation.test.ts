@@ -22,6 +22,7 @@ import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
 import * as queries from './query'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -29,9 +30,11 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
+type ProductItem = ShopperBasketsTypes.ProductItem
 
 /** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
 const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
@@ -52,8 +55,9 @@ const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
 const customersEndpoint = '/customer/shopper-customers/'
 const CUSTOMER_ID = 'customer_id'
-// Can't use `makeOptions()` here because it's Shopper Customers, not Shopper Baskets
-const getCustomerBasketsOptions: Argument<ApiClients['shopperCustomers']['getCustomerBaskets']> = {
+const getCustomerBasketsOptions: Argument<
+    NonNullable<ApiClients['shopperCustomers']>['getCustomerBaskets']
+> = {
     parameters: {
         customerId: CUSTOMER_ID
     }
@@ -116,7 +120,11 @@ const testMap: TestMap = {
         {shipmentId: 'shipmentId'}
     ),
     addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
-    addItemToBasket: createOptions<'addItemToBasket'>([], {}),
+    addItemToBasket: createOptions<'addItemToBasket'>(
+        [{productId: 'test-product', price: 10, quantity: 1}] as ProductItem[] &
+            Record<`c_${string}`, any>,
+        {}
+    ),
     addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
     createBasket: createOptions<'createBasket'>({}, {}),
     mergeBasket: createOptions<'mergeBasket'>(undefined, {}),
@@ -137,7 +145,11 @@ const testMap: TestMap = {
         {}
     ),
     updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
-    updateItemsInBasket: createOptions<'updateItemsInBasket'>([], {}),
+    updateItemsInBasket: createOptions<'updateItemsInBasket'>(
+        [{productId: 'test-product', price: 10, quantity: 1}] as ProductItem[] &
+            Record<`c_${string}`, any>,
+        {}
+    ),
     updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
         {},
         {paymentInstrumentId: 'paymentInstrumentId'}
@@ -155,7 +167,10 @@ const createTestCase = ['createBasket', createOptions<'createBasket'>({}, {})] a
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 const addPriceBooksToBasketTestCase = [
     'addPriceBooksToBasket',
-    createOptions<'addPriceBooksToBasket'>([], {})
+    createOptions<'addPriceBooksToBasket'>(
+        ['price-book-1'] as string[] & Record<`c_${string}`, any>,
+        {}
+    )
 ] as const
 const addTaxesForBasketTestCase = [
     'addTaxesForBasket',

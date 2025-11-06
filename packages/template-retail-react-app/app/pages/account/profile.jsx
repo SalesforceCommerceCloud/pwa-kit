@@ -6,6 +6,7 @@
  */
 
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -31,7 +32,8 @@ import FormActionButtons from '@salesforce/retail-react-app/app/components/forms
 import {
     useShopperCustomersMutation,
     useAuthHelper,
-    AuthHelpers
+    AuthHelpers,
+    useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
@@ -60,7 +62,7 @@ const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
 
 Skeleton.displayName = 'Skeleton'
 
-const ProfileCard = () => {
+const ProfileCard = ({allowPasswordChange = false}) => {
     const {formatMessage} = useIntl()
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
@@ -141,6 +143,7 @@ const ProfileCard = () => {
                 </Skeleton>
             }
             editing={isEditing}
+            disableEdit={!allowPasswordChange}
             isLoading={form.formState.isSubmitting}
             onEdit={isRegistered ? () => setIsEditing(true) : undefined}
             layerStyle="cardBordered"
@@ -226,6 +229,10 @@ const ProfileCard = () => {
             </ToggleCardSummary>
         </ToggleCard>
     )
+}
+
+ProfileCard.propTypes = {
+    allowPasswordChange: PropTypes.bool
 }
 
 const PasswordCard = () => {
@@ -336,6 +343,8 @@ const AccountDetail = () => {
         headingRef?.current?.focus()
     }, [])
 
+    const {isExternal} = useCustomerType()
+
     return (
         <Stack data-testid="account-detail-page" spacing={6}>
             <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
@@ -346,8 +355,8 @@ const AccountDetail = () => {
             </Heading>
 
             <Stack spacing={4}>
-                <ProfileCard />
-                <PasswordCard />
+                <ProfileCard allowPasswordChange={!isExternal} />
+                {!isExternal && <PasswordCard />}
             </Stack>
         </Stack>
     )

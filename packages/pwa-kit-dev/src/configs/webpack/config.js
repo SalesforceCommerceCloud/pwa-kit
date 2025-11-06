@@ -18,6 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+import {getEnvBasePath, bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
@@ -37,6 +38,12 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+
+if (process.env.PWA_KIT_SSR_SOURCE_MAP) {
+    console.warn(
+        'PWA_KIT_SSR_SOURCE_MAP env variable will be deprecated for source-map in the next major release. Please use PWA_KIT_SOURCE_MAP'
+    )
+}
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -119,18 +126,6 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = () => {
     return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
-}
-
-const getPublicPathEntryPoint = () => {
-    return resolve(
-        projectDir,
-        'node_modules',
-        '@salesforce',
-        'pwa-kit-dev',
-        'ssr',
-        'server',
-        'public-path'
-    )
 }
 
 const findDepInStack = (pkg) => {
@@ -397,6 +392,7 @@ const enableReactRefresh = (config) => {
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
     const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
+    const hmrBasePath = `${getEnvBasePath()}${bundleBasePath}/development/`
 
     return {
         ...config,
@@ -406,15 +402,14 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: [
-                'webpack-hot-middleware/client?path=/__mrt/hmr',
-                getPublicPathEntryPoint(),
-                getAppEntryPoint()
-            ]
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
+        },
+        output: {
+            ...config.output,
+            publicPath: hmrBasePath
         },
         plugins: [
             ...config.plugins,
-
             new webpack.HotModuleReplacementPlugin(),
             new ReactRefreshWebpackPlugin({
                 overlay: false
@@ -433,10 +428,24 @@ const client =
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: CLIENT,
                 // use source map to make debugging easier
-                devtool: mode === development ? 'source-map' : false,
+                devtool:
+                    mode === development || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'source-map'
+                        : false,
                 entry: {
                     main: getAppEntryPoint()
                 },
+                // Exclude OpenTelemetry packages from client bundle (server-only)
+                externals: [
+                    {
+                        '@opentelemetry/api': 'commonjs @opentelemetry/api',
+                        '@opentelemetry/core': 'commonjs @opentelemetry/core',
+                        '@opentelemetry/sdk-trace-node': 'commonjs @opentelemetry/sdk-trace-node',
+                        '@opentelemetry/sdk-trace-base': 'commonjs @opentelemetry/sdk-trace-base',
+                        '@opentelemetry/propagator-b3': 'commonjs @opentelemetry/propagator-b3',
+                        '@opentelemetry/resources': 'commonjs @opentelemetry/resources'
+                    }
+                ],
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
@@ -466,8 +475,22 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
+            // Exclude OpenTelemetry packages from client bundle (server-only)
+            externals: [
+                {
+                    '@opentelemetry/api': 'commonjs @opentelemetry/api',
+                    '@opentelemetry/core': 'commonjs @opentelemetry/core',
+                    '@opentelemetry/sdk-trace-node': 'commonjs @opentelemetry/sdk-trace-node',
+                    '@opentelemetry/sdk-trace-base': 'commonjs @opentelemetry/sdk-trace-base',
+                    '@opentelemetry/propagator-b3': 'commonjs @opentelemetry/propagator-b3',
+                    '@opentelemetry/resources': 'commonjs @opentelemetry/resources'
+                }
+            ],
             // use source map to make debugging easier
-            devtool: mode === development ? 'source-map' : false,
+            devtool:
+                mode === development || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                    ? 'source-map'
+                    : false,
             plugins: [
                 ...config.plugins,
                 analyzeBundle && getBundleAnalyzerPlugin(CLIENT_OPTIONAL)
@@ -486,7 +509,10 @@ const renderer =
                 name: SERVER,
                 entry: '@salesforce/pwa-kit-react-sdk/ssr/server/react-rendering.js',
                 // use eval-source-map for server-side debugging
-                devtool: mode === development && INSPECT ? 'eval-source-map' : false,
+                devtool:
+                    (mode === development && INSPECT) || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'eval-source-map'
+                        : false,
                 output: {
                     path: buildDir,
 
@@ -519,7 +545,8 @@ const ssr = (() => {
             .extend((config) => {
                 return {
                     ...config,
-                    ...(process.env.PWA_KIT_SSR_SOURCE_MAP === 'true'
+                    ...(process.env.PWA_KIT_SSR_SOURCE_MAP === 'true' ||
+                    process.env.PWA_KIT_SOURCE_MAP === 'true'
                         ? {devtool: 'source-map'}
                         : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -558,7 +585,10 @@ const requestProcessor =
                     libraryTarget: 'commonjs2'
                 },
                 // use eval-source-map for server-side debugging
-                devtool: mode === development && INSPECT ? 'eval-source-map' : false,
+                devtool:
+                    (mode === development && INSPECT) || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'eval-source-map'
+                        : false,
                 plugins: [
                     ...config.plugins,
                     analyzeBundle && getBundleAnalyzerPlugin(REQUEST_PROCESSOR)

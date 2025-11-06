@@ -10,7 +10,8 @@ import {validatePassword} from '@salesforce/retail-react-app/app/utils/password-
 export default function useUpdatePasswordFields({
     form: {
         control,
-        formState: {errors}
+        formState: {errors},
+        getValues
     },
     prefix = ''
 }) {
@@ -83,6 +84,32 @@ export default function useUpdatePasswordFields({
                 }
             },
             error: errors[`${prefix}password`],
+            control
+        },
+        confirmPassword: {
+            name: `${prefix}confirmPassword`,
+            label: formatMessage({
+                defaultMessage: 'Confirm New Password',
+                id: 'use_update_password_fields.label.confirm_new_password'
+            }),
+            type: 'password',
+            autoComplete: 'new-password',
+            defaultValue: '',
+            rules: {
+                required: formatMessage({
+                    defaultMessage: 'Please confirm your password.',
+                    id: 'use_update_password_fields.error.required_confirm_password'
+                }),
+                validate: {
+                    matches: (val) =>
+                        val === getValues(`${prefix}password`) ||
+                        formatMessage({
+                            defaultMessage: 'Passwords do not match.',
+                            id: 'use_update_password_fields.error.password_mismatch'
+                        })
+                }
+            },
+            error: errors[`${prefix}confirmPassword`],
             control
         }
     }

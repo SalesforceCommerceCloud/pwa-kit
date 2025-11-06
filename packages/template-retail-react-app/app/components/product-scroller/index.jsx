@@ -30,7 +30,7 @@ const ProductScroller = forwardRef(
             products,
             isLoading,
             scrollProps,
-            itemWidth = {base: '70%', md: '40%', lg: 'calc(33.33% - 10px)'},
+            itemWidth = {base: '70%', md: '40%', lg: 'calc(25% - 15px)'},
             productTileProps,
             ...props
         },

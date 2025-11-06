@@ -28,8 +28,9 @@ import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/produc
 import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundledProductItemsVariant
-} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
+    mockBundledProductItemsVariant,
+    mockBundleItemsWithMixedProducts
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 const imageGroups = [
     {
@@ -791,6 +792,15 @@ describe('getDisplayVariationValues', function () {
             Width: 'M'
         })
     })
+
+    test('returns empty object when variationAttributes are not provided', () => {
+        const selectedValues = {
+            color: 'TAUPETX',
+            size: '065'
+        }
+        const result = getDisplayVariationValues(undefined, selectedValues)
+        expect(result).toEqual({})
+    })
 })
 
 describe('getPriceData', function () {
@@ -1004,5 +1014,38 @@ describe('getUpdateBundleChildArray', () => {
             modifiedChildProductSelections
         )
         expect(result).toEqual([])
+    })
+
+    test('handles mixed bundle with standard and variant products', () => {
+        const mixedProductSelections = mockBundleItemsWithMixedProducts
+
+        const bundleWithMixedProducts = {
+            bundledProductItems: [
+                {
+                    itemId: 'standard-item-1',
+                    productId: 'standard-product-1',
+                    quantity: 1
+                },
+                {
+                    itemId: 'variant-item-1',
+                    productId: 'variant-1-id', // Current product ID in bundle
+                    quantity: 2
+                }
+            ]
+        }
+
+        const result = getUpdateBundleChildArray(bundleWithMixedProducts, mixedProductSelections)
+
+        // The function should return an update for the variant item because:
+        // - Bundle has productId: 'variant-1-id'
+        // - Selection has variant with productId: 'variant-2-id'
+        // - These are different, so an update is needed
+        expect(result).toEqual([
+            {
+                itemId: 'variant-item-1',
+                productId: 'variant-2-id',
+                quantity: 2
+            }
+        ])
     })
 })

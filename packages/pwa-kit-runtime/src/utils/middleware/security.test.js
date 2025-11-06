@@ -10,6 +10,12 @@ import {
 } from '../../ssr/server/constants'
 import {defaultPwaKitSecurityHeaders} from './security'
 
+jest.mock('../ssr-config', () => {
+    return {
+        getConfig: () => {}
+    }
+})
+
 describe('Content-Security-Policy enforcement', () => {
     let res
 
@@ -42,10 +48,11 @@ describe('Content-Security-Policy enforcement', () => {
         defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
-            "connect-src 'self' localhost:*",
+            "connect-src 'self' localhost:* *.salesforce-scrt.com",
+            'frame-src *.site.com',
             'frame-ancestors localhost:*',
             "img-src 'self' data:",
-            "script-src 'self' 'unsafe-eval' localhost:*"
+            "script-src 'self' 'unsafe-eval' localhost:* *.site.com"
         ])
     })
     test('adds required directives for production', () => {
@@ -53,10 +60,10 @@ describe('Content-Security-Policy enforcement', () => {
         defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
-            "connect-src 'self' https://runtime.commercecloud.com",
+            "connect-src 'self' https://runtime.commercecloud.com *.salesforce-scrt.com",
             'frame-ancestors https://runtime.commercecloud.com',
             "img-src 'self' data:",
-            "script-src 'self' 'unsafe-eval' https://runtime.commercecloud.com",
+            "script-src 'self' 'unsafe-eval' https://runtime.commercecloud.com *.site.com",
             'upgrade-insecure-requests'
         ])
     })
@@ -64,8 +71,11 @@ describe('Content-Security-Policy enforcement', () => {
         defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
         expectDirectives([
-            "connect-src test:* 'self' localhost:*",
-            "script-src 'unsafe-eval' test:* 'self' localhost:*"
+            "connect-src test:* 'self' localhost:* *.salesforce-scrt.com",
+            "script-src 'unsafe-eval' test:* 'self' localhost:* *.site.com",
+            'frame-src *.site.com',
+            'frame-ancestors localhost:*',
+            "img-src 'self' data:"
         ])
     })
     test('allows other CSP directives', () => {

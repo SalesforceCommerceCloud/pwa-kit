@@ -9,16 +9,23 @@ import {
     ShopperLogin,
     ShopperCustomers,
     ShopperLoginTypes,
-    ShopperCustomersTypes
+    ShopperCustomersTypes,
+    FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
 import {
-    MOBIFY_PATH,
-    SLAS_PRIVATE_PROXY_PATH,
+    getParentOrigin,
+    isOriginTrusted,
+    onClient,
+    getDefaultCookieAttributes,
+    isAbsoluteUrl,
+    stringToBase64,
+    extractCustomParameters
+} from '../utils'
+import {
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG,
@@ -30,20 +37,24 @@ import {
 import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
-type TrustedAgentTokenRequest = ShopperLoginTypes.TrustedAgentTokenRequest
+type TrustedAgentTokenRequest = ShopperLoginTypes.getTrustedAgentAccessTokenBodyType
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
-    fetchOptions?: ShopperLoginTypes.FetchOptions
+    headers?: Record<string, string>
+    privateClientProxyEndpoint?: string
+    fetchOptions?: FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    passwordlessLoginCallbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
+    hybridAuthEnabled?: boolean
 }
 
 interface JWTHeaders {
@@ -55,6 +66,40 @@ interface SlasJwtPayload extends JwtPayload {
     sub: string
     isb: string
     dnt: string
+}
+
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
+
+/**
+ * Body type for loginRegisteredUserB2C - aligns with register function pattern
+ */
+type LoginRegisteredUserB2CBody = {
+    username: string
+    password: string
+    customParameters?: helpers.CustomRequestBody
+}
+
+type LoginIDPUserParams = {
+    redirectURI?: string
+    code: string
+    usid?: string
+}
+
+type AuthorizeIDPParams = {
+    redirectURI: string
+    hint: string
+    usid?: string
+    [key: string]: any // Allow custom parameters
+}
+
+type AuthorizePasswordlessParams = {
+    callbackURI?: string
+    userid: string
+    mode?: string
+}
+
+type GetPasswordLessAccessTokenParams = {
+    pwdlessLoginToken: string
 }
 
 /**
@@ -78,6 +123,8 @@ type AuthDataKeys =
     | 'access_token_sfra'
     | typeof DNT_COOKIE_NAME
     | typeof DWSID_COOKIE_NAME
+    | 'code_verifier'
+    | 'uido'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -176,6 +223,14 @@ const DATA_MAP: AuthDataMap = {
     dwsid: {
         storageType: 'cookie',
         key: DWSID_COOKIE_NAME
+    },
+    code_verifier: {
+        storageType: 'local',
+        key: 'code_verifier'
+    },
+    uido: {
+        storageType: 'local',
+        key: 'uido'
     }
 }
 
@@ -201,19 +256,24 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
+    private passwordlessLoginCallbackURI: string
     private refreshTokenRegisteredCookieTTL: number | undefined
     private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
         | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
         | undefined
 
-    constructor(config: AuthConfig) {
-        // Special endpoint for injecting SLAS private client secret.
-        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
-        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+    private hybridAuthEnabled: boolean
 
+    constructor(config: AuthConfig) {
+        // Special proxy endpoint for injecting SLAS private client secret.
+        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
         this.client = new ShopperLogin({
-            proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
+            proxy: config.enablePWAKitPrivateClient
+                ? config.privateClientProxyEndpoint
+                : config.proxy,
+            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -231,6 +291,7 @@ class Auth {
         })
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
+            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -279,7 +340,7 @@ class Auth {
          * priority and we ignore whatever was set for clientSecret. This prints a warning about the clientSecret
          * being ignored.
          *
-         * If both enablePWAKitPrivateClient and clientSecret are falsey, we are in SLAS public client mode.
+         * If both enablePWAKitPrivateClient and clientSecret are falsy, we are in SLAS public client mode.
          */
         if (config.enablePWAKitPrivateClient && config.clientSecret) {
             this.logWarning(SLAS_SECRET_OVERRIDE_MSG)
@@ -294,6 +355,13 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        this.isPrivate = !!this.clientSecret
+
+        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
+        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+
+        this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
 
     get(name: AuthDataKeys) {
@@ -414,10 +482,10 @@ class Auth {
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
-            token_type: this.get('token_type'),
+            token_type: this.get('token_type') as 'Bearer',
             usid: this.get('usid'),
             customer_type: this.get('customer_type') as CustomerType,
-            refresh_token_expires_in: this.get('refresh_token_expires_in')
+            refresh_token_expires_in: Number(this.get('refresh_token_expires_in'))
         }
     }
 
@@ -461,13 +529,43 @@ class Auth {
                 return ''
             }
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
+
+            /**
+             * This if block is only executed in a hybrid setup when the cc-at cookie is set.
+             * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
+             * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
+             * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
+             * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
+             * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
+             * a few hours are insignificant compared tothe overall validty of the refreshToken.
+             */
+            const refreshTokenExpiresIn = isGuest
+                ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                refreshTokenExpiresIn,
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
+
+            /**
+             * The usid cookie always set when session bridging in a hybrid setup. This makes resetting the usid
+             * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
+             * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
+             */
+            const usidCookieValue = this.get('usid')
+            if (!usidCookieValue || usidCookieValue !== usid) {
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            }
+
             this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
-            // SFRA -> PWA access token cookie handoff is succesful so we clear the SFRA made cookies.
+            // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
             // We don't want these cookies to persist and continue overriding what is in local store.
             this.clearSFRAAuthToken()
         }
@@ -501,6 +599,14 @@ class Auth {
      * registered shopper refresh-token and restores session and basket on SFRA.
      */
     private clearECOMSession() {
+        /**
+         * If `hybridAuthEnabled` is true, dwsid cookie must not be cleared.
+         * This makes sure the session-bridged dwsid, received from `/oauth2/token` call on shopper login
+         * is NOT cleared and can be used to maintain the server affinity.
+         */
+        if (this.hybridAuthEnabled) {
+            return
+        }
         const {key, storageType} = DATA_MAP[DWSID_COOKIE_NAME]
         const store = this.stores[storageType]
         store.delete(key)
@@ -522,13 +628,21 @@ class Auth {
     }
 
     /**
-     * Retrieves our refresh token cookie ttl value
+     * Retrieves our refresh token cookie ttl value from the following sources in order:
+     * 1. Override value (if set)
+     * 2. SLAS response value (if set)
+     * 3. Default value (if no override or SLAS response value is set)
      */
     private getRefreshTokenCookieTTLValue(
-        overrideValue: number | undefined,
-        responseValue: number | undefined,
-        defaultValue: number
+        refreshTokenExpiresInSLASValue: number | undefined,
+        isGuest: boolean
     ): number {
+        const overrideValue = isGuest
+            ? this.refreshTokenGuestCookieTTL
+            : this.refreshTokenRegisteredCookieTTL
+        const defaultValue = isGuest
+            ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+            : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
         // Check if overrideValue is valid
         // if not, log warning and fall back to responseValue or defaultValue
         const isOverrideValid =
@@ -538,7 +652,7 @@ class Auth {
         }
 
         // Return the first valid value: overrideValue (if valid), responseValue, or defaultValue
-        return isOverrideValid ? overrideValue : responseValue || defaultValue
+        return isOverrideValid ? overrideValue : refreshTokenExpiresInSLASValue || defaultValue
     }
 
     /**
@@ -546,6 +660,8 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
+        // Delete the SFRA auth token cookie if it exists
+        this.clearSFRAAuthToken()
         this.set('access_token', res.access_token)
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
@@ -553,25 +669,24 @@ class Auth {
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
-        this.set('usid', res.usid)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const overrideValue = isGuest
-            ? this.refreshTokenGuestCookieTTL
-            : this.refreshTokenRegisteredCookieTTL
-        const responseValue = res.refresh_token_expires_in as number | undefined
-        const defaultValue = isGuest
-            ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-            : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-            overrideValue,
-            responseValue,
-            defaultValue
+            res.refresh_token_expires_in,
+            isGuest
         )
+        if (res.access_token) {
+            const {uido} = this.parseSlasJWT(res.access_token)
+            this.set('uido', uido)
+        }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         this.set(refreshTokenKey, res.refresh_token, {
+            expires: expiresDate
+        })
+
+        this.set('usid', res.usid, {
             expires: expiresDate
         })
     }
@@ -585,16 +700,16 @@ class Auth {
             try {
                 return await this.queueRequest(
                     () =>
-                        helpers.refreshAccessToken(
-                            this.client,
-                            {
+                        helpers.refreshAccessToken({
+                            slasClient: this.client,
+                            parameters: {
                                 refreshToken,
                                 dnt: dntPref
                             },
-                            {
+                            credentials: {
                                 clientSecret: this.clientSecret
                             }
-                        ),
+                        }),
                     !!refreshTokenGuest
                 )
             } catch (error) {
@@ -717,9 +832,37 @@ class Auth {
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+
+            /**
+             * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
+             * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
+             * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
+             * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
+             * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
+             * a few hours are insignificant compared tothe overall validty of the refreshToken.
+             */
+            const refreshTokenExpiresIn = isGuest
+                ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                refreshTokenExpiresIn,
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
+
+            /**
+             * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
+             * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
+             * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
+             */
+            const usidCookieValue = this.get('usid')
+            if (!usidCookieValue || usidCookieValue !== usid) {
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            }
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
@@ -753,32 +896,34 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginGuestUser.
      *
      */
-    async loginGuestUser() {
+    async loginGuestUser(parameters?: helpers.CustomQueryParameters) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = true
-        const guestPrivateArgs = [
-            this.client,
-            {
+        const guestPrivateArgs = {
+            slasClient: this.client,
+            parameters: {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            {clientSecret: this.clientSecret}
-        ] as const
-        const guestPublicArgs = [
-            this.client,
-            {
+            credentials: {clientSecret: this.clientSecret}
+        } as const
+        const guestPublicArgs = {
+            slasClient: this.client,
+            parameters: {
                 redirectURI: this.redirectURI,
                 dnt: dntPref,
-                ...(usid && {usid})
+                ...(usid && {usid}),
+                // custom parameters are sent only into the /authorize endpoint.
+                ...parameters
             }
-        ] as const
+        } as const
         const callback = this.clientSecret
-            ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
-            : () => helpers.loginGuestUser(...guestPublicArgs)
+            ? () => helpers.loginGuestUserPrivate({...guestPrivateArgs})
+            : () => helpers.loginGuestUser({...guestPublicArgs})
 
         try {
             return await this.queueRequest(callback, isGuest)
@@ -798,10 +943,9 @@ class Auth {
      *
      */
     async register(body: ShopperCustomersTypes.CustomerRegistration) {
-        const {
-            customer: {login},
-            password
-        } = body
+        const {customer, password, ...parameters} = body
+        const {login} = customer
+        const customParameters = extractCustomParameters(parameters)
 
         // login is optional field from isomorphic library
         // type CustomerRegistration
@@ -810,15 +954,21 @@ class Auth {
             throw new Error('Customer registration is missing login field.')
         }
 
+        // The registerCustomer endpoint currently does not support custom parameters
+        // so we make sure not to send any custom params here
         const res = await this.shopperCustomersClient.registerCustomer({
             headers: {
                 authorization: `Bearer ${this.get('access_token')}`
             },
-            body
+            body: {
+                customer,
+                password
+            }
         })
         await this.loginRegisteredUserB2C({
             username: login,
-            password
+            password,
+            customParameters
         })
         return res
     }
@@ -826,8 +976,10 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
+     * This method uses a body-based API similar to the register function for consistency.
+     * Supports custom parameters through the customParameters field.
      */
-    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+    async loginRegisteredUserB2C(body: LoginRegisteredUserB2CBody) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
@@ -835,18 +987,26 @@ class Auth {
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
-        const token = await helpers.loginRegisteredUserB2C(
-            this.client,
-            {
-                ...credentials,
+
+        // Extract fields from body parameter (aligned with register function pattern)
+        const {username, password, customParameters} = body
+
+        const loginParams: LoginRegisteredUserB2CCredentials = {
+            slasClient: this.client,
+            credentials: {
+                username,
+                password,
                 clientSecret: this.clientSecret
             },
-            {
+            parameters: {
                 redirectURI,
                 dnt: dntPref,
                 ...(usid && {usid})
-            }
-        )
+            },
+            body: customParameters
+        }
+
+        const token = await helpers.loginRegisteredUserB2C(loginParams)
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
@@ -968,9 +1128,12 @@ class Auth {
     async logout() {
         if (this.get('customer_type') === 'registered') {
             // Not awaiting on purpose because there isn't much we can do if this fails.
-            void helpers.logout(this.client, {
-                accessToken: this.get('access_token'),
-                refreshToken: this.get('refresh_token_registered')
+            void helpers.logout({
+                slasClient: this.client,
+                parameters: {
+                    accessToken: this.get('access_token'),
+                    refreshToken: this.get('refresh_token_registered')
+                }
             })
         }
         this.clearStorage()
@@ -1021,6 +1184,198 @@ class Auth {
     }
 
     /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
+     * Initiates OAuth2 authorization flow for Identity Provider (IDP) login.
+     *
+     */
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
+        const slasClient = this.client
+        const usid = this.get('usid')
+        const dntPref = this.getDnt({includeDefaults: true})
+
+        // Extract known parameters and get custom ones
+        const {redirectURI, hint, ...customParams} = parameters
+        const finalRedirectURI = redirectURI || this.redirectURI
+
+        const authorizeParams = {
+            ...customParams,
+            ...(usid && {usid}),
+            ...(dntPref && {dnt: dntPref}),
+            redirectURI: finalRedirectURI,
+            hint: hint || ''
+        }
+
+        const result = await helpers.authorizeIDP({
+            slasClient,
+            parameters: authorizeParams,
+            privateClient: this.isPrivate
+        })
+
+        // Store code verifier for later use in loginIDPUser
+        this.set('code_verifier', result.codeVerifier)
+
+        if (onClient()) {
+            window.location.assign(result.url)
+        } else {
+            console.warn('Something went wrong, this client side method is invoked on the server.')
+        }
+
+        return result
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser(parameters: LoginIDPUserParams) {
+        const codeVerifier = this.get('code_verifier')
+        const redirectURI = parameters.redirectURI || this.redirectURI
+        const usid = parameters.usid || this.get('usid')
+        const dntPref = this.getDnt({includeDefaults: true})
+
+        const token = await helpers.loginIDPUser({
+            slasClient: this.client,
+            credentials: {
+                codeVerifier,
+                clientSecret: this.clientSecret
+            },
+            parameters: {
+                redirectURI,
+                code: parameters.code,
+                dnt: dntPref,
+                ...(usid && {usid})
+            }
+        })
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        // Delete the code verifier once the user has logged in
+        this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     */
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const usid = this.get('usid')
+        const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
+        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+
+        const res = await helpers.authorizePasswordless({
+            slasClient: this.client,
+            credentials: {
+                clientSecret: this.clientSecret
+            },
+            parameters: {
+                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(usid && {usid}),
+                userid: parameters.userid,
+                mode: finalMode
+            }
+        })
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
+        return res
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     */
+    async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
+        const dntPref = this.getDnt({includeDefaults: true})
+        const token = await helpers.getPasswordLessAccessToken({
+            slasClient: this.client,
+            credentials: {
+                clientSecret: this.clientSecret
+            },
+            parameters: {
+                pwdlessLoginToken,
+                dnt: dntPref !== undefined ? String(dntPref) : undefined
+            }
+        })
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: getPasswordResetToken.
+     *
+     */
+    async getPasswordResetToken(parameters: ShopperLoginTypes.getPasswordResetTokenBodyType) {
+        const slasClient = this.client
+
+        const options = {
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                user_id: parameters.user_id,
+                mode: parameters.mode || 'callback',
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                callback_uri: parameters.callback_uri,
+                hint: parameters.hint || 'cross_device',
+                locale: parameters.locale,
+                idp_name: parameters.idp_name,
+                ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
+            }
+        }
+
+        // Only set authorization header if using private client
+        if (this.clientSecret) {
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        }
+
+        const res = await slasClient.getPasswordResetToken(options)
+        return res
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: resetPassword.
+     *
+     */
+    async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
+        const slasClient = this.client
+        const options = {
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                pwd_action_token: parameters.pwd_action_token,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                new_password: parameters.new_password,
+                hint: parameters.hint,
+                code_verifier: parameters.code_verifier
+            }
+        }
+
+        // Only set authorization header if using private client
+        if (this.clientSecret) {
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        }
+        // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const res = await this.client.resetPassword(options)
+        return res
+    }
+
+    /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
@@ -1035,6 +1390,7 @@ class Auth {
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isbParts = isb.split('::')
+        const uido = isbParts[0].split('uido:')[1]
         const isGuest = isbParts[1] === 'upn:Guest'
         const customerId = isGuest
             ? isbParts[3].replace('gcid:', '')
@@ -1055,7 +1411,8 @@ class Auth {
             dnt,
             loginId,
             isAgent,
-            agentId
+            agentId,
+            uido
         }
     }
 }

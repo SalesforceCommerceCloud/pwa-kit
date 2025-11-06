@@ -6,25 +6,109 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
+const {parseSettings} = require('./utils.js')
+
 module.exports = {
     app: {
+        // Enable the store locator and shop the store feature.
+        storeLocatorEnabled: true,
+        // Enable the multi-ship feature.
+        multishipEnabled: true,
+        // Enable partial hydration capabilities via Island component
+        {{#if answers.project.partialHydrationEnabled}}
+        partialHydrationEnabled: {{answers.project.partialHydrationEnabled}},
+        {{else}}
+        partialHydrationEnabled: false,
+        {{/if}}
+        // Commerce shopping agent configuration for embedded messaging service
+        // This enables an agentic shopping experience in the application
+        // This property accepts either a JSON string or a plain JavaScript object.
+        commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
+            enabled: 'false',
+            askAgentOnSearch: 'false',
+            embeddedServiceName: '',
+            embeddedServiceEndpoint: '',
+            scriptSourceUrl: '',
+            scrt2Url: '',
+            salesforceOrgId: '',
+            commerceOrgId: '',
+            siteId: '',
+            enableConversationContext: 'false',
+            conversationContext: []
+        },
         // Customize settings for your url
         url: {
+            {{#if answers.project.demo.enableDemoSettings}}
             // Determine where the siteRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
-            // site: 'none',
+            site: 'path',
+            // Determine where the localeRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
+            locale: 'path',
+            // This boolean value dictates whether default site or locale values are shown in the url. Defaults to: false
+            showDefaults: true,
+            {{else}}
+            // Determine where the siteRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
+            site: 'none',
             // Determine where the localeRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
             locale: 'none',
-            // This boolean value dictates whether default site or locale values are shown in the url. Defaults to: false
-            // showDefaults: true,
+            // This boolean value dictates whether or not default site or locale values are shown in the url. Defaults to: false
+            showDefaults: false,
+            {{/if}}
             // This boolean value dictates whether the plus sign (+) is interpreted as space for query param string. Defaults to: false
             interpretPlusSignAsSpace: false
+        },
+        login: {
+            passwordless: {
+                // Enables or disables passwordless login for the site. Defaults to: false
+                {{#if answers.project.demo.enableDemoSettings}}
+                enabled: true,
+                {{else}}
+                enabled: false,
+                {{/if}}
+                // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
+                // Required in 'callback' mode; if missing, passwordless login defaults to 'sms' mode, which requires Marketing Cloud configuration.
+                // If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
+                callbackURI:
+                    process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+                // The landing path for passwordless login
+                landingPath: '/passwordless-login-landing'
+            },
+            social: {
+                // Enables or disables social login for the site. Defaults to: false
+                {{#if answers.project.demo.enableDemoSettings}}
+                enabled: true,
+                {{else}}
+                enabled: false,
+                {{/if}}
+                // The third-party identity providers supported by your app. The PWA Kit supports Google and Apple by default.
+                // Additional IDPs will also need to be added to the IDP_CONFIG in the SocialLogin component.
+                idps: ['google', 'apple'],
+                // The redirect URI used after a successful social login authentication.
+                // This should be a relative path set up by the developer.
+                // If the env var `SOCIAL_LOGIN_REDIRECT_URI` is set, it will override the config value.
+                redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
+            },
+            resetPassword: {
+                // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
+                // If the env var `RESET_PASSWORD_CALLBACK_URI` is set, it will override the config value.
+                callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
+                // The landing path for reset password
+                landingPath: '/reset-password-landing'
+            }
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
         defaultSite: '{{answers.project.commerce.siteId}}',
         // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
+        {{#if answers.project.demo.enableDemoSettings}}
+        siteAliases: {
+            RefArch: 'us',
+            RefArchGlobal: 'global'
+        },
+        {{else}}
         // siteAliases: {
-        //     RefArch: 'us'
+        //    RefArch: 'us',
+        //    RefArchGlobal: 'global'
         // },
+        {{/if}}
         // The sites for your app, which is imported from sites.js
         sites,
         // Commerce api config
@@ -46,6 +130,11 @@ module.exports = {
             // By setting this to true, the Einstein activities generated by the environment will appear
             // in production environment reports
             isProduction: false
+        },
+        // Datacloud api config
+        dataCloudAPI: {
+            appSourceId: '{{answers.project.dataCloud.appSourceId}}',
+            tenantId: '{{answers.project.dataCloud.tenantId}}'
         }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack

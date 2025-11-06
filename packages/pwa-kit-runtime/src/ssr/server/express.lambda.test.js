@@ -20,6 +20,7 @@ const nock = require('nock')
 const https = require('https')
 const path = require('path')
 const zlib = require('zlib')
+const {ApiGatewayV1Adapter} = require('@h4ad/serverless-adapter/lib/adapters/aws')
 
 const {X_HEADERS_TO_REMOVE_ORIGIN} = require('../../utils/ssr-proxying')
 
@@ -40,6 +41,12 @@ const testPackageMobify = {
     }
 }
 
+jest.mock('../../utils/ssr-config', () => {
+    return {
+        getConfig: () => testPackageMobify
+    }
+})
+
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 
 /**
@@ -49,6 +56,50 @@ const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 const httpsAgent = new https.Agent({
     rejectUnauthorized: false
 })
+
+function createServerWithGCSpy() {
+    const route = jest.fn((req, res) => {
+        res.send('<html/>')
+    })
+
+    const options = {
+        buildDir: testFixtures,
+        mobify: testPackageMobify,
+        sslFilePath: path.join(testFixtures, 'localhost.pem'),
+        quiet: true,
+        port: TEST_PORT,
+        fetchAgents: {
+            https: httpsAgent
+        }
+    }
+
+    const {handler, server, app} = RemoteServerFactory.createHandler(options, (app) => {
+        app.get('/*', route)
+    })
+
+    const collectGarbage = jest.spyOn(app, '_collectGarbage')
+    const sendMetric = jest.spyOn(app, 'sendMetric')
+    return {route, handler, collectGarbage, sendMetric, server}
+}
+
+function createApiGatewayEvent() {
+    // Set up a fake event and a fake context for the Lambda call
+    const event = createEvent('aws:apiGateway', {
+        path: '/',
+        body: undefined
+    })
+
+    if (event.queryStringParameters) {
+        event.queryStringParameters = {}
+    }
+    // aws-serverless-express added this header
+    event.headers['x-apigateway-event'] = 'apig-event'
+
+    const context = AWSMockContext({
+        functionName: 'SSRTest'
+    })
+    return {event, context}
+}
 
 describe('SSRServer Lambda integration', () => {
     let savedEnvironment
@@ -76,9 +127,6 @@ describe('SSRServer Lambda integration', () => {
 
     afterEach(() => {
         nock.cleanAll()
-        if (server) {
-            server.close()
-        }
     })
 
     const fakeBinaryPayload = crypto.randomBytes(16)
@@ -275,9 +323,15 @@ describe('SSRServer Lambda integration', () => {
                 path: testCase.path,
                 body: undefined
             })
+            // aws-serverless-express added this header
+            event.headers['x-apigateway-event'] = 'apig-event'
 
+            // Check to make sure the adapter can handle the event
+            expect(new ApiGatewayV1Adapter().canHandle(event)).toBe(true)
+
+            // AWS API Gateway adapter expects queryStringParameters key to exist within the event
             if (event.queryStringParameters) {
-                delete event.queryStringParameters
+                event.queryStringParameters = {}
             }
 
             // Add a fake X-Amz-Cf-Id header
@@ -309,6 +363,7 @@ describe('SSRServer Lambda integration', () => {
 
                         // We expect a context property to have been set false
                         expect(context.callbackWaitsForEmptyEventLoop).toBe(false)
+                        expect(response.headers['date']).toBeDefined()
 
                         // Check the response
                         testCase.validate(response)
@@ -353,7 +408,7 @@ describe('SSRServer Lambda integration', () => {
         })
 
         if (event.queryStringParameters) {
-            delete event.queryStringParameters
+            event.queryStringParameters = {}
         }
 
         const context = AWSMockContext({
@@ -371,47 +426,40 @@ describe('SSRServer Lambda integration', () => {
         })
     })
 
-    test('Lambda reuse behaviour', () => {
-        const route = jest.fn((req, res) => {
-            res.send('<html/>')
-        })
+    test('Lambda reuse -- Default Behavior', () => {
+        const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
+        const {event, context} = createApiGatewayEvent()
+        server = new_server
 
-        const options = {
-            buildDir: testFixtures,
-            mobify: testPackageMobify,
-            sslFilePath: path.join(testFixtures, 'localhost.pem'),
-            quiet: true,
-            port: TEST_PORT,
-            fetchAgents: {
-                https: httpsAgent
-            }
-        }
+        const call = (event) =>
+            new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))
 
-        const {
-            app,
-            handler,
-            server: srv
-        } = RemoteServerFactory.createHandler(options, (app) => {
-            app.get('/*', route)
-        })
+        return Promise.resolve()
+            .then(() => call(event))
+            .then((response) => {
+                // First request - Lambda container created
+                expect(response.statusCode).toBe(200)
+                expect(collectGarbage.mock.calls).toHaveLength(0)
+                expect(route.mock.calls).toHaveLength(1)
+                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
+                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+            })
+            .then(() => call(event))
+            .then((response) => {
+                // Second call - Lambda container reused
+                expect(response.statusCode).toBe(200)
+                expect(collectGarbage.mock.calls).toHaveLength(0)
+                expect(route.mock.calls).toHaveLength(2)
+                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
+                expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
+            })
+    })
 
-        const collectGarbage = jest.spyOn(app, '_collectGarbage')
-        const sendMetric = jest.spyOn(app, 'sendMetric')
-        server = srv
-
-        // Set up a fake event and a fake context for the Lambda call
-        const event = createEvent('aws:apiGateway', {
-            path: '/',
-            body: undefined
-        })
-
-        if (event.queryStringParameters) {
-            delete event.queryStringParameters
-        }
-
-        const context = AWSMockContext({
-            functionName: 'SSRTest'
-        })
+    test('Lambda reuse -- with Forced Garbage Collection Enabled', () => {
+        process.env.FORCE_GC = 'true'
+        const {event, context} = createApiGatewayEvent()
+        const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
+        server = new_server
 
         const call = (event) =>
             new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))

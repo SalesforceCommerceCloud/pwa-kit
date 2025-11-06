@@ -1,0 +1,27 @@
+## 0.5.0-dev (Oct 24, 2025)
+- Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
+
+## 0.4.0 (Oct 24, 2025)
+- Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359), [#3379] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3379)
+- Create page and component tools integrate their responses into agent IDE [#3377](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3377)
+- Added Hooks Recommendation tool [#3388](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3388)
+- Added Agent Guidelines. [#3366](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3366)
+- Added Explore SCAPI SHOP API Tool  [#3385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3385)
+- Added Custom APIs Discovery. [##3387](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3387), [#3413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3413), [#3423](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3423)
+
+## v0.3.0 (Sep 25, 2025)
+- Added telemetry for MCP tools. [#3327](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3327)
+
+## v0.2.0 (Sep 4, 2025)
+- Normalize tool names; Add introduction section for PWA Kit MCP and resize the images on README. [#3239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3239)
+
+## v0.1.1 (Aug 11, 2025)
+- Add missing `shelljs` dependency. [#3053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3053)
+
+## v0.1.0 (Jun 26, 2025)
+- Clean up readme [#2954](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2954)
+- Add `create_app_guidelines` MCP tool  [#2663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2663)
+- Add `create_new_sample_component` MCP tool. [#2651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2651)
+- Add `create_app_guidelines` MCP tool. [#2599](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2599)
+- Add `run_site_test` MCP tool [#2989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2989) [#2645](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2645) [#3003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3003)
+- Add `create_sample_storefront_page` MCP tool [#2899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2899) [#3014](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3014)

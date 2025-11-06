@@ -12,12 +12,35 @@
  * To ensure that feature work correctly, we test our code with multi-site config in mind, so we created this mock config.
  * A single-site, single-locale config is a special case of multi-site case.
  */
+const commerceAgentSettings = {
+    enabled: 'false',
+    askAgentOnSearch: 'false',
+    embeddedServiceName: 'MIAW_Guided_Shopper_production',
+    embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
+    scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
+    scrt2Url: 'https://myorg.salesforce.com-scrt.com',
+    salesforceOrgId: '00DSB00000MJ7YH',
+    commerceOrgId: 'f_ecom_zzeu_052',
+    siteId: 'RefArchGlobal'
+}
+
 module.exports = {
     app: {
+        commerceAgent: commerceAgentSettings,
         url: {
             locale: 'path',
             site: 'path',
             showDefaults: true
+        },
+        login: {
+            passwordless: {
+                enabled: false,
+                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c'
+            },
+            social: {
+                enabled: false,
+                idps: ['google', 'apple']
+            }
         },
         siteAliases: {
             'site-1': 'uk',
@@ -85,7 +108,13 @@ module.exports = {
             // This is temporary and is meant as a placeholder until there is a mechanism for reading
             // the is_production property from an MRT target
             isProduction: false
-        }
+        },
+        dataCloudAPI: {
+            appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
+            tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
+        },
+        storeLocatorEnabled: true,
+        multishipEnabled: true
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],

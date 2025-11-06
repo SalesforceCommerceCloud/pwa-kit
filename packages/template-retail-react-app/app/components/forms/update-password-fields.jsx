@@ -37,6 +37,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
 
             <Stack spacing={3} pb={2}>
                 <Field {...fields.password} />
+                <Field {...fields.confirmPassword} />
                 <PasswordRequirements value={password} />
             </Stack>
         </Stack>

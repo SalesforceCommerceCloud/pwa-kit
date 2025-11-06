@@ -14,6 +14,7 @@ import {
     Container,
     Grid,
     GridItem,
+    Heading,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -22,8 +23,9 @@ import {
     useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -37,21 +39,49 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const idps = social?.idps
+    const isSocialEnabled = !!social?.enabled
+    const isPasswordlessEnabled = !!passwordless?.enabled
+    const {removeEmptyShipments} = useMultiship(basket)
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+
+    // cart has both pickup and delivery orders
+    const isDeliveryAndPickupOrder =
+        multishipEnabled &&
+        derivedData?.totalPickupShipments > 0 &&
+        derivedData?.totalDeliveryShipments > 0
+
+    // Check if there are pickup shipments
+    const hasPickupShipments = derivedData?.totalPickupShipments > 0
+
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
         }
     }, [error, step])
+
+    // Remove any empty shipments whenever navigating to the checkout page
+    // Using basketId ensures that the basket is in a valid state before removing empty shipments
+    useEffect(() => {
+        if (basket?.shipments?.length > 1) {
+            removeEmptyShipments(basket)
+        }
+    }, [basket?.basketId])
 
     const submitOrder = async () => {
         setIsLoading(true)
@@ -73,6 +103,9 @@ const Checkout = () => {
 
     return (
         <Box background="gray.50" flex="1">
+            <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
+                <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
+            </Heading>
             <Container
                 data-testid="sf-checkout-container"
                 maxWidth="container.xl"
@@ -89,12 +122,24 @@ const Checkout = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo />
-                            <ShippingAddress />
-                            <ShippingOptions />
+                            <ContactInfo
+                                isSocialEnabled={isSocialEnabled}
+                                isPasswordlessEnabled={isPasswordlessEnabled}
+                                idps={idps}
+                            />
+
+                            {isPickupOrderOnly ? (
+                                <PickupAddress />
+                            ) : (
+                                <>
+                                    {hasPickupShipments && <PickupAddress />}
+                                    <ShippingAddress />
+                                    <ShippingMethods />
+                                </>
+                            )}
                             <Payment />
 
-                            {step === 4 && (
+                            {step === 5 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -121,7 +166,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === 4 && (
+                        {step === 5 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -135,7 +180,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === 4 && (
+            {step === 5 && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

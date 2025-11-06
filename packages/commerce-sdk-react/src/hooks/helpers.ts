@@ -53,16 +53,16 @@ export const generateCustomEndpointOptions = (
     return {
         ...options,
         options: {
+            ...options.options,
             method: options.options?.method || 'GET',
             headers: {
                 Authorization: `Bearer ${access_token}`,
-                // Note the order of the following destructred objects is important.
-                // Priority assending order: global config < query/mutation config < mutate func args
+                // Note the order of the following de-structured objects is important.
+                // Priority in ascending order: global config < query/mutation config < mutate func args
                 ...globalHeaders,
                 ...options.options?.headers,
                 ...(args?.headers ? args.headers : {})
-            },
-            ...options.options
+            }
         },
         clientConfig: {
             ...globalClientConfig,

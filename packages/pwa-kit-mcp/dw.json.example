@@ -1,0 +1,8 @@
+{
+  "hostname": "https://your-instance.dx.commercecloud.salesforce.com",
+  "instance-id": "your_instance_id",
+  "client-id": "your-client-id-here",
+  "client-secret": "your-client-secret-here",
+  "org-id": "your_org_id",
+  "short-code": "your-short-code"
+}

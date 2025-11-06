@@ -1,0 +1,105 @@
+name: SalesforceCommerceCloud/pwa-kit/deploy_latest_release
+on:
+  # For testing - to be removed
+  push:
+    branches:
+      - 'deploy-demo-env-on-release'
+  # Run this workflow when a new Github release is published
+  release:
+    types: [released]
+
+jobs:
+  check-latest-release:
+    runs-on: ubuntu-latest
+    outputs:
+      IS_LATEST_RELEASE: ${{ steps.checkRelease.outputs.IS_LATEST_RELEASE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if latest release
+        uses: ./.github/actions/check_if_latest_release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Github Outputs
+        id: checkRelease
+        run: |-
+          IS_LATEST_RELEASE=$(echo ${{ env.IS_LATEST_RELEASE }})
+          if [ $IS_LATEST_RELEASE != "true" ]; then
+            echo "Deploy is not for the latest release. Stopping deployment"
+          fi
+          echo "IS_LATEST_RELEASE=$IS_LATEST_RELEASE" >> "$GITHUB_OUTPUT"
+
+  deploy-sites:
+    needs: check-latest-release
+    runs-on: ubuntu-latest
+    if: needs.check-latest-release.outputs.IS_LATEST_RELEASE == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - name: bug-bounty
+            project_key: retail-react-app-bug-bounty
+            target: testing
+            project: pwa-kit
+            mobify_user: MOBIFY_STG_CLIENT_USER
+            mobify_api_key: MOBIFY_STG_CLIENT_API_KEY
+            cloud_origin: https://cloud-testing.mobify-staging.com
+            flags: --wait
+          - name: demo-site
+            project_key: retail-react-app-demo-site
+            target: production
+            project: scaffold-pwa
+            mobify_user: MOBIFY_CLIENT_USER
+            mobify_api_key: MOBIFY_CLIENT_API_KEY
+            cloud_origin: https://cloud.mobify.com
+            flags: --wait
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        id: setup_node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Monorepo Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App Demo
+        id: generate_app
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: ${{ matrix.environment.project_key }}
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets[matrix.environment.mobify_user] }}
+          mobify_api_key: ${{ secrets[matrix.environment.mobify_api_key] }}
+
+      - name: Set bundle name
+        run: |-
+          TAG_NAME=$(echo ${{ github.event.release.tag_name }})
+          if [ "$TAG_NAME" ]; then
+            BUNDLE_NAME="tag ${{ github.event.release.tag_name }}"
+          else
+            BUNDLE_NAME="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
+          fi
+          echo "Setting bundle name as $BUNDLE_NAME"
+          echo "BUNDLE_NAME=$BUNDLE_NAME" >> $GITHUB_ENV
+
+      - name: Push Bundle to MRT (${{matrix.environment.name}})
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: ${{ steps.generate_app.outputs.project_path }}
+          TARGET: ${{ matrix.environment.target }}
+          PROJECT: ${{ matrix.environment.project }}
+          MESSAGE: ${{ env.BUNDLE_NAME }})
+          CLOUD_ORIGIN: ${{ matrix.environment.cloud_origin }}
+          FLAGS: ${{ matrix.environment.flags }}

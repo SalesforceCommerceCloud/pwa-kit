@@ -8,7 +8,7 @@ import React from 'react'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
-const ids = '701642889823M,25503045M'
+const ids = ['701642889823M', '25503045M']
 
 const UseShopperProducts = () => {
     const {

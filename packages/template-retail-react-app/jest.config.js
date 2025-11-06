@@ -18,8 +18,11 @@ module.exports = {
         '^@tanstack/react-query$':
             '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
-        '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs'
+        '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
+        '^@salesforce/cc-datacloud-typescript$':
+            '<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js'
     },
+    transformIgnorePatterns: ['/node_modules/(?!@salesforce/cc-datacloud-typescript)'],
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
         'app/**/*.{js,jsx}',

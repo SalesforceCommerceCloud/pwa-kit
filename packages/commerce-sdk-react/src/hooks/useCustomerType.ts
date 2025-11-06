@@ -7,14 +7,14 @@
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
 import useConfig from './useConfig'
-
-const onClient = typeof window !== 'undefined'
+import {onClient} from '../utils'
 
 export type CustomerType = null | 'guest' | 'registered'
 type useCustomerType = {
     customerType: CustomerType
     isGuest: boolean
     isRegistered: boolean
+    isExternal: boolean
 }
 
 /**
@@ -36,7 +36,7 @@ const useCustomerType = (): useCustomerType => {
     const config = useConfig()
     const auth = useAuthContext()
 
-    let customerType: string | null = onClient
+    let customerType: string | null = onClient()
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
           // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -50,10 +50,20 @@ const useCustomerType = (): useCustomerType => {
         customerType = null
     }
 
+    // The `uido` is a value within the `isb` claim of the SLAS access token that denotes the IDP origin of the user
+    // If `uido` is not equal to `slas` or `ecom`, the user is considered an external user
+    const uido: string | null = onClient()
+        ? // eslint-disable-next-line react-hooks/rules-of-hooks
+          useLocalStorage(`uido_${config.siteId}`)
+        : auth.get('uido')
+
+    const isExternal: boolean = customerType === 'registered' && uido !== 'slas' && uido !== 'ecom'
+
     return {
         customerType,
         isGuest,
-        isRegistered
+        isRegistered,
+        isExternal
     }
 }
 

@@ -9,7 +9,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
-import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance-marks'
 import logger from '../../../../utils/logger-instance'
 
 const STATE_KEY = '__reactQuery'
@@ -68,36 +68,34 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
+            res.__performanceTimer?.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.
             await ssrPrepass(appJSX)
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
+            res.__performanceTimer?.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
-                queries.map((q, i) => {
+                queries.map(async (q, i) => {
                     // always include the index to avoid duplicate entries
-                    const displayName = q.meta?.displayName ? `${q.meta?.displayName}:${i}` : `${i}`
-                    res.__performanceTimer.mark(
-                        `${PERFORMANCE_MARKS.reactQueryUseQuery}::${displayName}`,
-                        'start'
-                    )
-                    return q
-                        .fetch()
-                        .then((result) => {
-                            res.__performanceTimer.mark(
-                                `${PERFORMANCE_MARKS.reactQueryUseQuery}::${displayName}`,
-                                'end',
-                                {
-                                    detail: q.queryHash
-                                }
-                            )
-                            return result
+                    const displayName = q.meta?.displayName ? `${q.meta?.displayName}-${i}` : `${i}`
+                    const useQueryMarker = `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`
+                    res.__performanceTimer?.mark(useQueryMarker, 'start')
+
+                    try {
+                        const result = await q.fetch()
+                        return result
+                    } catch (err) {
+                        logger.error('Query during SSR results in an error', {
+                            namespace: 'with-react-query.doInitAppState',
+                            additionalProperties: {queryHash: q.queryHash, error: err}
                         })
-                        .catch(() => {
-                            // If there's an error in this fetch, react-query will log the error
-                            // On our end, simply catch any error and move on to the next query
+                        // Now we move on to the next query
+                    } finally {
+                        // Close the timer, regardless of the fetch result
+                        res.__performanceTimer?.mark(useQueryMarker, 'end', {
+                            detail: q.queryHash
                         })
+                    }
                 })
             )
 

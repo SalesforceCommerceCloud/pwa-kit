@@ -21,10 +21,10 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
             {searchQuery && <Text>Search Results for</Text>}
             {/* Category Title */}
             <Flex>
-                <Heading as="h2" size="lg" marginRight={2}>
+                <Heading as="h1" size="lg" marginRight={2}>
                     {`${category?.name || searchQuery || ''}`}
                 </Heading>
-                <Heading as="h2" size="lg" marginRight={2}>
+                <Heading as="h1" size="lg" marginRight={2}>
                     {!isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>}
                 </Heading>
             </Flex>

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -36,6 +36,15 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+
+import {
+    getRemainingAvailableBonusProductsForProduct,
+    useBasketProductsWithPromotions,
+    getPromotionCalloutText,
+    shouldShowBonusProductSelection,
+    getPromotionIdsForProduct
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -48,7 +57,6 @@ export const AddToCartModalProvider = ({children}) => {
     return (
         <AddToCartModalContext.Provider value={addToCartModal}>
             {children}
-            <AddToCartModal />
         </AddToCartModalContext.Provider>
     )
 }
@@ -73,7 +81,28 @@ export const AddToCartModal = () => {
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
-        : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+        : Array.isArray(itemsAdded)
+        ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+        : 0
+
+    // Bonus product logic
+    const {data: productsWithPromotions, ruleBasedQualifyingProductsMap} =
+        useBasketProductsWithPromotions(basket)
+    // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
+    const {bonusDiscountLineItems = []} = basket || {}
+
+    // Build a map of selected bonus products per bonusDiscountLineItem for efficient lookup
+    // This avoids repeated filtering through productItems for each bonusDiscountLineItem
+    const bonusSelectionMap = useMemo(() => {
+        const map = {}
+        basket?.productItems?.forEach((cartItem) => {
+            if (cartItem.bonusProductLineItem && cartItem.bonusDiscountLineItemId) {
+                const id = cartItem.bonusDiscountLineItemId
+                map[id] = (map[id] || 0) + (cartItem.quantity || 0)
+            }
+        })
+        return map
+    }, [basket?.productItems])
 
     if (!isOpen) {
         return null
@@ -133,7 +162,11 @@ export const AddToCartModal = () => {
                                     <Flex gridGap="4">
                                         <Box w="24" flex="none">
                                             <AspectRatio ratio="1">
-                                                <img src={bundleImage.link} alt={bundleImage.alt} />
+                                                {/* TODO: remove empty string fallback and use a placeholder image */}
+                                                <img
+                                                    src={bundleImage?.link || ''}
+                                                    alt={bundleImage?.alt || ''}
+                                                />
                                             </AspectRatio>
                                         </Box>
 
@@ -156,37 +189,43 @@ export const AddToCartModal = () => {
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
                                                     const variationAttributeValues =
-                                                        getDisplayVariationValues(
-                                                            product.variationAttributes,
-                                                            variant.variationValues
-                                                        )
+                                                        product.variationAttributes?.length &&
+                                                        variant?.variationValues
+                                                            ? getDisplayVariationValues(
+                                                                  product.variationAttributes,
+                                                                  variant?.variationValues
+                                                              )
+                                                            : {}
                                                     return (
-                                                        <Box key={variant.productId}>
+                                                        <Box key={variant?.productId || product.id}>
                                                             <Text
                                                                 color="gray.700"
                                                                 fontWeight="700"
                                                                 fontSize="sm"
                                                             >
-                                                                {product.name}{' '}
-                                                                {quantity > 1
-                                                                    ? `(${quantity})`
-                                                                    : ''}
+                                                                {(variant?.name || product.name) +
+                                                                    (quantity > 1
+                                                                        ? ` (${quantity})`
+                                                                        : '')}
                                                             </Text>
-                                                            <Box
-                                                                color="gray.600"
-                                                                fontSize="sm"
-                                                                fontWeight="500"
-                                                            >
-                                                                {Object.entries(
-                                                                    variationAttributeValues
-                                                                ).map(([name, value]) => {
-                                                                    return (
-                                                                        <Text key={value}>
-                                                                            {name}: {value}
-                                                                        </Text>
-                                                                    )
-                                                                })}
-                                                            </Box>
+                                                            {Object.keys(variationAttributeValues)
+                                                                .length > 0 && (
+                                                                <Box
+                                                                    color="gray.600"
+                                                                    fontSize="sm"
+                                                                    fontWeight="500"
+                                                                >
+                                                                    {Object.entries(
+                                                                        variationAttributeValues
+                                                                    ).map(([name, value]) => {
+                                                                        return (
+                                                                            <Text key={value}>
+                                                                                {name}: {value}
+                                                                            </Text>
+                                                                        )
+                                                                    })}
+                                                                </Box>
+                                                            )}
                                                         </Box>
                                                     )
                                                 })}
@@ -208,19 +247,26 @@ export const AddToCartModal = () => {
                                 itemsAdded.map(({product, variant, quantity}, index) => {
                                     const image = findImageGroupBy(product.imageGroups, {
                                         viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
+                                        selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
                                     const priceData = getPriceData(product, {quantity})
-                                    const variationAttributeValues = getDisplayVariationValues(
-                                        product.variationAttributes,
-                                        variant.variationValues
-                                    )
+                                    const variationAttributeValues =
+                                        variant && product.variationAttributes
+                                            ? getDisplayVariationValues(
+                                                  product.variationAttributes,
+                                                  variant?.variationValues
+                                              )
+                                            : {}
 
                                     return (
                                         <Flex
-                                            key={variant.productId}
+                                            key={
+                                                variant?.productId ||
+                                                product.productId ||
+                                                product.id
+                                            }
                                             justifyContent="space-between"
-                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                            marginBottom={index < itemsAdded.length - 1 ? 0 : 4}
                                             paddingBottom={4}
                                             borderBottomWidth={{base: '1px', lg: '0px'}}
                                             borderColor="gray.200"
@@ -230,7 +276,10 @@ export const AddToCartModal = () => {
                                             <Flex gridGap="4">
                                                 <Box w="24" flex="none">
                                                     <AspectRatio ratio="1">
-                                                        <img src={image.link} alt={image.alt} />
+                                                        <img
+                                                            src={image?.link || ''}
+                                                            alt={image?.alt || ''}
+                                                        />
                                                     </AspectRatio>
                                                 </Box>
 
@@ -278,6 +327,86 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
+
+                            {/* V4 Logic: Render SelectBonusProductsCard right after the product items */}
+                            {bonusDiscountLineItems &&
+                                bonusDiscountLineItems.length > 0 &&
+                                (() => {
+                                    // Check if this product should show bonus product selection
+                                    // This prevents bonus products added as regular items from showing bonus selection
+                                    const shouldShowBonusSelection =
+                                        shouldShowBonusProductSelection(
+                                            basket,
+                                            product?.id,
+                                            productsWithPromotions,
+                                            ruleBasedQualifyingProductsMap
+                                        )
+
+                                    if (!shouldShowBonusSelection) {
+                                        return null
+                                    }
+
+                                    // Compute aggregated remaining capacity based on the latest basket data
+                                    const remainingBonusProductsData =
+                                        getRemainingAvailableBonusProductsForProduct(
+                                            basket,
+                                            product?.id,
+                                            productsWithPromotions,
+                                            {},
+                                            ruleBasedQualifyingProductsMap
+                                        )
+
+                                    // Only render if there is remaining capacity across the collection
+                                    const hasCapacity =
+                                        remainingBonusProductsData?.aggregatedMaxBonusItems > 0 &&
+                                        remainingBonusProductsData?.aggregatedSelectedItems <
+                                            remainingBonusProductsData?.aggregatedMaxBonusItems
+
+                                    if (!hasCapacity) {
+                                        return null
+                                    }
+
+                                    // Get promotionIds for this product to find matching bonusDiscountLineItems
+                                    const promotionIds = getPromotionIdsForProduct(
+                                        basket,
+                                        product?.id,
+                                        productsWithPromotions,
+                                        ruleBasedQualifyingProductsMap
+                                    )
+
+                                    // Find a bonusDiscountLineItem that has remaining capacity
+                                    // This ensures we don't pass a fully-allocated bonusDiscountLineItem to SelectBonusProductsCard
+                                    const matchingBonusDiscountLineItem =
+                                        basket?.bonusDiscountLineItems?.find((bli) => {
+                                            return (
+                                                promotionIds.includes(bli.promotionId) &&
+                                                (bonusSelectionMap[bli.id] || 0) <
+                                                    (bli.maxBonusItems || 0)
+                                            )
+                                        })
+
+                                    // If no matching bonusDiscountLineItem found, don't render
+                                    if (!matchingBonusDiscountLineItem) {
+                                        return null
+                                    }
+
+                                    return (
+                                        <SelectBonusProductsCard
+                                            qualifyingProduct={{productId: product?.id}}
+                                            basket={basket}
+                                            productsWithPromotions={productsWithPromotions}
+                                            remainingBonusProductsData={remainingBonusProductsData}
+                                            isEligible={shouldShowBonusSelection}
+                                            getPromotionCalloutText={getPromotionCalloutText}
+                                            onSelectBonusProducts={() => {
+                                                // Close AddToCart modal first - the SelectBonusProductsCard will handle opening the bonus modal
+                                                if (onClose) onClose()
+                                            }}
+                                            bonusDiscountLineItem={matchingBonusDiscountLineItem}
+                                            hideSelectionCounter={true} // Hide "(0 of 2 selected)" from promotion text
+                                        />
+                                    )
+                                })()}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}
@@ -293,11 +422,14 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount: totalItems}
+                                        {
+                                            itemAccumulatedCount: totalItems
+                                        }
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
                                     {productSubTotal &&
+                                        currency &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
                                             currency: currency
@@ -327,6 +459,7 @@ export const AddToCartModal = () => {
                             </Stack>
                         </Box>
                     </Flex>
+
                     <Box padding="8" bgColor="gray.50">
                         <RecommendedProducts
                             title={
@@ -358,11 +491,14 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount: totalItems}
+                                {
+                                    itemAccumulatedCount: totalItems
+                                }
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">
                             {productSubTotal &&
+                                currency &&
                                 intl.formatNumber(productSubTotal, {
                                     style: 'currency',
                                     currency: currency

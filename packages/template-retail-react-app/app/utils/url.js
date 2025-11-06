@@ -23,6 +23,7 @@ import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/cons
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {
+    // absoluteUrl is not a react hook so we cannot use the useAppOrigin hook here
     return new URL(path, appOrigin || getAppOrigin()).toString()
 }
 
@@ -282,4 +283,32 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
     }
 
     return pathName
+}
+
+/**
+ * Encodes a string to work around server-side double-decoding issues.
+ *
+ * This function applies a second level of URL encoding to handle cases where the server
+ * performs double URL decoding, which can cause issues with special characters
+ * in address names and other URL parameters.
+ *
+ * This utility is centralized in one place so that if the server-side double-decoding
+ * issue is fixed in the future, we can easily revert all usages by simply changing
+ * this function to return the input unchanged or removing the encoding entirely.
+ *
+ * @param {string} input - The string that is double double-decoded on the server
+ * @returns {string} The encoded string
+ * @example
+ * import {serverSafeEncode} from '/path/to/utils/url'
+ *
+ * serverSafeEncode('My Address & Co.')
+ * // Returns: 'My%20Address%20%26%20Co.'
+ *
+ * @warning Only use this function when you know the server will double-decode
+ *          URL components. This is a workaround for server-side behavior that
+ *          is out of your control.
+ */
+export const serverSafeEncode = (input) => {
+    // WARNING: only use this because server double-decodes URL components
+    return encodeURIComponent(input)
 }

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -19,6 +19,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Chakra
 import {
@@ -46,14 +47,18 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import Island from '@salesforce/retail-react-app/app/components/island'
+
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {
     DntNotification,
     useDntNotification
 } from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {BonusProductSelectionModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -75,11 +80,13 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLED
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {Helmet} from 'react-helmet'
+import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
+import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -136,15 +143,16 @@ const App = (props) => {
     const authModal = useAuthModal()
     const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useStoreLocatorModal()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -194,7 +202,8 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, dataUpdatedAt: basketQueryLastUpdateTime} = useCurrentBasket()
+    const config = getConfig()
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
@@ -208,6 +217,10 @@ const App = (props) => {
             })
         }
     }, [basket?.currency])
+
+    const commerceAgentConfiguration = useMemo(() => {
+        return getCommerceAgentConfig()
+    }, [config.app.commerceAgent])
 
     useEffect(() => {
         // update the basket customer email
@@ -283,15 +296,6 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
-                <Helmet>
-                    {ACTIVE_DATA_ENABLED && (
-                        <script
-                            src={getAssetUrl('static/head-active_data.js')}
-                            id="headActiveData"
-                            type="text/javascript"
-                        ></script>
-                    )}
-                </Helmet>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
@@ -336,7 +340,12 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${buildUrl(location.pathname)}`}
+                                    href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                                        location: {
+                                            ...location,
+                                            search: ''
+                                        }
+                                    })}`}
                                     key={locale.id}
                                 />
                             ))}
@@ -344,111 +353,118 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${buildUrl(location.pathname)}`}
+                                href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                                    location: {
+                                        ...location,
+                                        search: ''
+                                    }
+                                })}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
 
+                        {commerceAgentConfiguration?.enabled === 'true' && (
+                            <ShopperAgent
+                                commerceAgentConfiguration={commerceAgentConfiguration}
+                                basketDoneLoading={basketQueryLastUpdateTime > 0}
+                            />
+                        )}
+
                         <ScrollToTop />
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <>
-                                        <AboveHeader />
-                                        <Header
-                                            onMenuClick={onOpen}
-                                            onLogoClick={onLogoClick}
-                                            onMyCartClick={onCartClick}
-                                            onMyAccountClick={onAccountClick}
-                                            onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
-                                        >
-                                            <HideOnDesktop>
-                                                <DrawerMenu
-                                                    isOpen={isOpen}
-                                                    onClose={onClose}
-                                                    onLogoClick={onLogoClick}
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                    itemsKey="categories"
-                                                    itemsCountKey="onlineSubCategoriesCount"
-                                                    itemComponent={DrawerMenuItemWithData}
-                                                />
-                                            </HideOnDesktop>
+                            {storeLocatorEnabled && (
+                                <StoreLocatorModal
+                                    isOpen={isStoreLocatorOpen}
+                                    onClose={onCloseStoreLocator}
+                                />
+                            )}
+                            <Island hydrateOn={'visible'}>
+                                <Box {...styles.headerWrapper}>
+                                    {!isCheckout ? (
+                                        <>
+                                            <AboveHeader />
+                                            <Header
+                                                onMenuClick={onOpen}
+                                                onLogoClick={onLogoClick}
+                                                onMyCartClick={onCartClick}
+                                                onMyAccountClick={onAccountClick}
+                                                onWishlistClick={onWishlistClick}
+                                                onStoreLocatorClick={onOpenStoreLocator}
+                                            >
+                                                <HideOnDesktop>
+                                                    <DrawerMenu
+                                                        isOpen={isOpen}
+                                                        onClose={onClose}
+                                                        onLogoClick={onLogoClick}
+                                                        root={
+                                                            categories?.[
+                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                            ]
+                                                        }
+                                                        itemsKey="categories"
+                                                        itemsCountKey="onlineSubCategoriesCount"
+                                                        itemComponent={DrawerMenuItemWithData}
+                                                    />
+                                                </HideOnDesktop>
 
-                                            <HideOnMobile>
-                                                <ListMenu
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                    itemsKey="categories"
-                                                    itemsCountKey="onlineSubCategoriesCount"
-                                                    contentComponent={ListMenuContentWithData}
-                                                />
-                                            </HideOnMobile>
-                                        </Header>
-                                    </>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
+                                                <HideOnMobile>
+                                                    <ListMenu
+                                                        root={
+                                                            categories?.[
+                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                            ]
+                                                        }
+                                                        itemsKey="categories"
+                                                        itemsCountKey="onlineSubCategoriesCount"
+                                                        contentComponent={ListMenuContentWithData}
+                                                    />
+                                                </HideOnMobile>
+                                            </Header>
+                                        </>
+                                    ) : (
+                                        <CheckoutHeader />
+                                    )}
+                                </Box>
+                            </Island>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                <BonusProductSelectionModalProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    <Island hydrateOn={'visible'}>
+                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    </Island>
 
-                                <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                    <AuthModal {...authModal} />
+                                    <DntNotification {...dntNotification} />
+                                </BonusProductSelectionModalProvider>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        type="text/javascript"
-                        src={getAssetUrl('static/dwanalytics-22.2.js')}
-                        id="dwanalytics"
-                        async="async"
-                        onLoad={trackPage}
-                    ></script>
-                )}
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        src={getAssetUrl('static/dwac-21.7.js')}
-                        type="text/javascript"
-                        id="dwac"
-                        async="async"
-                    ></script>
-                )}
             </StorefrontPreview>
         </Box>
     )

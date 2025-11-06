@@ -1,4 +1,27 @@
-## v3.9.0-dev (Oct 29, 2024)
+## v3.15.0-dev (Nov 05, 2025)
+
+## v3.14.0 (Nov 04, 2025)
+
+## v3.13.0 (Sep 25, 2025)
+- Opentelemetry integration for SSR tracing [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)
+- Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+
+## v3.12.0 (Sep 04, 2025)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+
+## v3.11.0 (Jul 22, 2025)
+- Fix the performance logging so that it'll capture all SSR queries, even those that result in errors [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
+
+## v3.10.0 (May 22, 2025)
+- Fix the performance logging util to use the correct delimiter for the server-timing header. [#2225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2295)
+
+## v3.9.2 (Mar 07, 2025)
+- Update PWA-Kit SDKs to v3.9.2 [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304)
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.9.0 (Feb 18, 2025)
 - Fix the performance logging util to not round duration. [#2199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2199)
 - Add RedirectWithStatus component, allowing finer grained control of rediriects and their status code [#2173](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2173)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)

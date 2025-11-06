@@ -6,15 +6,21 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
+import {defineMessage, useIntl} from 'react-intl'
 import {SimpleGrid, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useProfileFields from '@salesforce/retail-react-app/app/components/forms/useProfileFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
 const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})
+    const intl = useIntl()
+    const formTitleAriaLabel = defineMessage({
+        defaultMessage: 'Profile Form',
+        id: 'profile_fields.label.profile_form'
+    })
 
     return (
-        <Stack spacing={5}>
+        <Stack spacing={5} aria-label={intl.formatMessage(formTitleAriaLabel)}>
             <SimpleGrid columns={[1, 1, 1, 2]} spacing={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />

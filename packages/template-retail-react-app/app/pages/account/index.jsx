@@ -41,6 +41,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
@@ -94,11 +95,13 @@ const Account = () => {
     const [showLoading, setShowLoading] = useState(false)
 
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
+        dataCloud.sendViewPage(location.pathname)
     }, [location])
 
     const onSignoutClick = async () => {
@@ -121,6 +124,9 @@ const Account = () => {
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >
+            <Heading as="h1" srOnly>
+                <FormattedMessage defaultMessage="My Account" id="account.title.my_account" />
+            </Heading>
             <Seo title="My Account" description="Customer Account Page" />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}

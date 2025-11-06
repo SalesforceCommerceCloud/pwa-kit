@@ -7,8 +7,8 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl, FormattedMessage} from 'react-intl'
+import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
@@ -16,6 +16,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const Registration = () => {
@@ -24,6 +25,7 @@ const Registration = () => {
     const {isRegistered} = useCustomerType()
     const form = useForm()
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
 
@@ -54,10 +56,17 @@ const Registration = () => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
+        dataCloud.sendViewPage(pathname)
     }, [])
 
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Create Account"
+                    id="registration.title.create_account"
+                />
+            </Heading>
             <Seo title="Registration" description="Customer sign up" />
             <Container
                 paddingTop={16}

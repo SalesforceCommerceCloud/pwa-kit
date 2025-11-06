@@ -4,19 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
-    Button,
     Modal,
     ModalBody,
     ModalCloseButton,
     ModalContent,
     ModalOverlay,
-    Stack,
-    Text,
     useDisclosure,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -27,22 +24,31 @@ import {
     useCustomerId,
     useCustomerType,
     useCustomerBaskets,
-    useShopperCustomersMutation,
-    useShopperBasketsMutation,
-    ShopperCustomersMutations
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
+import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    PASSWORDLESS_ERROR_MESSAGES
+} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
+import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
-const LOGIN_VIEW = 'login'
-const REGISTER_VIEW = 'register'
-const PASSWORD_VIEW = 'password'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+
+export const LOGIN_VIEW = 'login'
+export const REGISTER_VIEW = 'register'
+export const PASSWORD_VIEW = 'password'
+export const EMAIL_VIEW = 'email'
 
 const LOGIN_ERROR = defineMessage({
     defaultMessage: "Something's not right with your email or password. Try again.",
@@ -51,11 +57,15 @@ const LOGIN_ERROR = defineMessage({
 
 export const AuthModal = ({
     initialView = LOGIN_VIEW,
+    initialEmail = '',
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
     isOpen,
     onOpen,
     onClose,
+    isPasswordlessEnabled = false,
+    isSocialEnabled = false,
+    idps = [],
     ...props
 }) => {
     const {formatMessage} = useIntl()
@@ -71,14 +81,17 @@ export const AuthModal = ({
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
-    const submittedEmail = useRef()
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
+    const appOrigin = useAppOrigin()
 
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
-    )
+    const {getPasswordResetToken} = usePasswordReset()
+    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
+        ? passwordlessConfigCallback
+        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -86,7 +99,23 @@ export const AuthModal = ({
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
-    const submitForm = async (data) => {
+    const handlePasswordlessLogin = async (email) => {
+        try {
+            const redirectPath = window.location.pathname + (window.location.search || '')
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+            })
+            setCurrentView(EMAIL_VIEW)
+        } catch (error) {
+            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
+    }
+
+    const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
         const onLoginSuccess = () => {
@@ -95,6 +124,12 @@ export const AuthModal = ({
 
         return {
             login: async (data) => {
+                if (isPasswordless) {
+                    const email = data.email
+                    await handlePasswordlessLogin(email)
+                    return
+                }
+
                 try {
                     await login.mutateAsync({
                         username: data.email,
@@ -148,16 +183,18 @@ export const AuthModal = ({
             },
             password: async (data) => {
                 try {
-                    const body = {
-                        login: data.email
-                    }
-                    await getResetPasswordToken.mutateAsync({body})
+                    await getPasswordResetToken(data.email)
                 } catch (e) {
-                    form.setError('global', {
-                        type: 'manual',
-                        message: formatMessage(API_ERROR_MESSAGE)
-                    })
+                    const message =
+                        e.response?.status === 400
+                            ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                            : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
                 }
+            },
+            email: async () => {
+                const email = form.getValues().email || initialEmail
+                await handlePasswordlessLogin(email)
             }
         }[currentView](data)
     }
@@ -166,7 +203,6 @@ export const AuthModal = ({
     useEffect(() => {
         if (isOpen) {
             setCurrentView(initialView)
-            submittedEmail.current = undefined
             form.reset()
         }
     }, [isOpen])
@@ -182,9 +218,12 @@ export const AuthModal = ({
         fieldsRef?.[initialField]?.ref.focus()
     }, [form.control?.fieldsRef?.current])
 
-    // Clear form state when changing views
     useEffect(() => {
-        form.reset()
+        // we don't want to reset the form on email view
+        // because we want to pass the email to PasswordlessEmailConfirmation
+        if (currentView !== EMAIL_VIEW) {
+            form.reset()
+        }
     }, [currentView])
 
     useEffect(() => {
@@ -235,37 +274,6 @@ export const AuthModal = ({
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
-    const PasswordResetSuccess = () => (
-        <Stack justify="center" align="center" spacing={6}>
-            <BrandLogo width="60px" height="auto" />
-            <Text align="center" fontSize="md">
-                <FormattedMessage
-                    defaultMessage={'Password Reset'}
-                    id="auth_modal.password_reset_success.title.password_reset"
-                />
-            </Text>
-            <Stack spacing={6} pt={4}>
-                <Text align="center" fontSize="sm">
-                    <FormattedMessage
-                        defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
-                        id="auth_modal.password_reset_success.info.will_email_shortly"
-                        values={{
-                            email: submittedEmail.current,
-
-                            b: (chunks) => <b>{chunks}</b>
-                        }}
-                    />
-                </Text>
-
-                <Button onClick={onBackToSignInClick}>
-                    <FormattedMessage
-                        defaultMessage="Back to Sign In"
-                        id="auth_modal.password_reset_success.button.back_to_sign_in"
-                    />
-                </Button>
-            </Stack>
-        </Stack>
-    )
     return (
         <Modal
             size="sm"
@@ -288,9 +296,20 @@ export const AuthModal = ({
                     {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
                         <LoginForm
                             form={form}
-                            submitForm={submitForm}
+                            submitForm={(data) => {
+                                const shouldUsePasswordless =
+                                    isPasswordlessEnabled && !data.password
+                                return submitForm(data, shouldUsePasswordless)
+                            }}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                            clickForgotPassword={() => setCurrentView(PASSWORD_VIEW)}
+                            //TODO: potentially remove this prop in the next major release since
+                            // we don't need to use this props anymore
+                            handlePasswordlessLoginClick={noop}
+                            handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                            isPasswordlessEnabled={isPasswordlessEnabled}
+                            isSocialEnabled={isSocialEnabled}
+                            idps={idps}
+                            setLoginType={noop}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
@@ -300,15 +319,19 @@ export const AuthModal = ({
                             clickSignIn={onBackToSignInClick}
                         />
                     )}
-                    {!form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
+                    {currentView === PASSWORD_VIEW && (
                         <ResetPasswordForm
                             form={form}
                             submitForm={submitForm}
                             clickSignIn={onBackToSignInClick}
                         />
                     )}
-                    {form.formState.isSubmitSuccessful && currentView === PASSWORD_VIEW && (
-                        <PasswordResetSuccess />
+                    {currentView === EMAIL_VIEW && (
+                        <PasswordlessEmailConfirmation
+                            form={form}
+                            submitForm={submitForm}
+                            email={form.getValues().email || initialEmail}
+                        />
                     )}
                 </ModalBody>
             </ModalContent>
@@ -317,26 +340,34 @@ export const AuthModal = ({
 }
 
 AuthModal.propTypes = {
-    initialView: PropTypes.oneOf([LOGIN_VIEW, REGISTER_VIEW, PASSWORD_VIEW]),
+    initialView: PropTypes.oneOf([LOGIN_VIEW, REGISTER_VIEW, PASSWORD_VIEW, EMAIL_VIEW]),
+    initialEmail: PropTypes.string,
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onLoginSuccess: PropTypes.func,
-    onRegistrationSuccess: PropTypes.func
+    onRegistrationSuccess: PropTypes.func,
+    isPasswordlessEnabled: PropTypes.bool,
+    isSocialEnabled: PropTypes.bool,
+    idps: PropTypes.arrayOf(PropTypes.string)
 }
 
 /**
  *
- * @param {('register'|'login'|'password')} initialView - the initial view for the modal
+ * @param {('register'|'login'|'password'|'email')} initialView - the initial view for the modal
  * @returns {Object} - Object props to be spread on to the AuthModal component
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {passwordless = {}, social = {}} = getConfig().app.login || {}
 
     return {
         initialView,
         isOpen,
         onOpen,
-        onClose
+        onClose,
+        isPasswordlessEnabled: !!passwordless?.enabled,
+        isSocialEnabled: !!social?.enabled,
+        idps: social?.idps
     }
 }

@@ -1,5 +1,29 @@
-## v3.9.0-dev (Oct 29, 2024)
-- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+## v3.15.0-dev (Nov 05, 2025)
+
+## v3.14.0 (Nov 04, 2025)
+
+## v3.13.0 (Sep 25, 2025)
+- Exclude opentelemetry packages from client side bundling [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)
+- Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+
+## v3.12.0 (Sep 04, 2025)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+
+## v3.11.0 (Jul 22, 2025)
+
+## v3.10.0 (May 22, 2025)
+- Support source map for both client and server on MRT [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2240)
+- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+
+## v3.9.2 (Mar 07, 2025)
+- Update PWA-Kit SDKs to v3.9.2 [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304)
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.9.0 (Feb 18, 2025)
+- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218) 
+- Set minimum target node version [#2241](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2241)
 
 ## v3.8.0 (Oct 28, 2024)
 

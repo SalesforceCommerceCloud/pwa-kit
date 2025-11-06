@@ -42,30 +42,52 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
+    getEnvBasePath,
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
     slasPrivateProxyPath
 } from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
-import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware} from 'http-proxy-middleware'
+import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
+import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
+import {ServerlessAdapter} from '@h4ad/serverless-adapter'
+import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
+import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
+import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
+import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
+import {is as typeis} from 'type-is'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
- * as binary by awsServerlessExpress when processing responses.
+ * as binary by serverless-adapter when processing responses.
  * We intentionally exclude all text/* values since we assume UTF8
  * encoding and there's no reason to bulk up the response by base64
  * encoding the result.
  *
  * We can use '*' in these types as a wildcard - see
  * https://www.npmjs.com/package/type-is#type--typeisismediatype-types
- *
  * @private
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
+
+export const isContentTypeBinary = (headers) => {
+    // Replicating the aws-serverless-express behavior
+    let contentType = headers['content-type'] || headers['Content-Type']
+    if (!contentType) {
+        return false
+    }
+    // Remove the encoding from the content type
+    contentType = contentType.split(';')[0]
+    return !!typeis(contentType, binaryMimeTypes)
+}
+
+export const isBinary = (headers) => {
+    return isContentTypeBinary(headers)
+}
 
 /**
  * Environment variables that must be set for the Express app to run remotely.
@@ -133,9 +155,22 @@ export const RemoteServerFactory = {
 
             // A regex for identifying which SLAS endpoints the custom SLAS private
             // client secret handler will inject an Authorization header.
-            // Do not modify unless a project wants to customize additional SLAS
-            // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
-            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            // To allow additional SLAS endpoints, users can override this value in
+            // their project's ssr.js.
+            applySLASPrivateClientToEndpoints:
+                /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+
+            // Custom callback to modify the SLAS private client proxy request. This callback is invoked
+            // after the built-in proxy request handling. Users can provide additional
+            // request modifications (e.g., custom headers).
+            // Signature: (proxyRequest, incomingRequest, res) => void
+            onSLASPrivateProxyReq: undefined,
+
+            // Custom callback to modify the SLAS private client proxy response. This callback is invoked
+            // after the built-in proxy response handling. Users can modify or replace
+            // the response buffer.
+            // Signature: (responseBuffer, proxyRes, req, res) => Buffer
+            onSLASPrivateProxyRes: undefined
         }
 
         options = Object.assign({}, defaults, options)
@@ -169,6 +204,12 @@ export const RemoteServerFactory = {
         // For test only – configure the SLAS private client secret proxy endpoint
         options.slasHostName = this._getSlasEndpoint(options)
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
+
+        // Add extra condition to regex to only allow SLAS endpoints
+        options.slasApiPath = /\/shopper\/auth\/.*/
+        options.applySLASPrivateClientToEndpoints = new RegExp(
+            `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
+        )
 
         return options
     },
@@ -354,6 +395,17 @@ export const RemoteServerFactory = {
         this._setCompression(app)
         this._setRequestId(app)
         // this._addEventContext(app)
+
+        // We want to remove any base paths that have made it this far.
+        // Base paths are used to route requests to the correct server.
+        // If the request has reached the server, it is no longer needed.
+        // Note: We use envBasePath as the feature flag for this middleware
+        // If envBasePath is `/`, '', or undefined when the server starts, we don't need to
+        // initialize this middleware.
+        if (getEnvBasePath()) {
+            this._setupBasePathMiddleware(app)
+        }
+
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -366,6 +418,7 @@ export const RemoteServerFactory = {
         this._setupProxying(app, options)
 
         this._setupSlasPrivateClientProxy(app, options)
+        this._setupHybridProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -375,6 +428,12 @@ export const RemoteServerFactory = {
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
+    },
+
+    _setupHybridProxy(app, options) {
+        if (options.hybridProxy?.enabled) {
+            app.use(hybridProxy(options))
+        }
     },
 
     /**
@@ -387,6 +446,8 @@ export const RemoteServerFactory = {
         const mixin = {
             options,
 
+            // Forcing a GC is no longer necessary, and will be
+            // skipped by default (unless FORCE_GC env-var is set).
             _collectGarbage() {
                 // Do global.gc in a separate 'then' handler so
                 // that all major variables are out of scope and
@@ -462,6 +523,131 @@ export const RemoteServerFactory = {
 
             next()
         })
+    },
+
+    /**
+     * @private
+     */
+    _setupBasePathMiddleware(app) {
+        // Cache the express route regexes to avoid re-calculating them on every request.
+        let expressRouteRegexes
+
+        /**
+         * Remove the base path from a path.
+         *
+         * If path is like '/basepath/something', this returns '/something'
+         * If path is exactly '/basepath', this returns '/'
+         * If path doesn't start with base path or if there is no base path defined,
+         * returns the unmodified path
+         *
+         * @param path {string} the path to remove the base path from
+         * @returns {string} the path with the base path removed
+         */
+        const removeBasePathFromPath = (path) => {
+            const basePath = getEnvBasePath()
+            if (!basePath) {
+                return path
+            }
+
+            if (path.startsWith(basePath + '/')) {
+                return path.substring(basePath.length)
+            } else if (path === basePath) {
+                return '/'
+            }
+            return path
+        }
+
+        /**
+         * Initializes a cache of regexes that correspond to the registered express routes
+         *
+         * This specifically omits the generic wildcard from the express routes where we
+         * want to remove the base path from since it is mapped to the app render. This is
+         * because routes sent to the render are handled by React Router
+         */
+        const initializeExpressRouteRegexes = () => {
+            const expressRoutes = app._router.stack
+                .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
+                .map((layer) => layer.route.path)
+
+            expressRouteRegexes = expressRoutes.map((route) => convertExpressRouteToRegex(route))
+        }
+
+        /**
+         * Very early request processing.
+         *
+         * If the server receives a request containing the base path, remove it before allowing
+         * the request through to the other express endpoints
+         *
+         * We scope base path removal to /mobify routes and routes defined by the express app
+         * (For example /callback or /worker.js)
+         * This is to avoid affecting React Router routes where a site id or locale might be present
+         * that is equal to the base path.
+         *
+         * For example, if you have a base path of /us and a site id of /us we don't want
+         * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
+         * React Router and the PWA multisite implementation.
+         *
+         * @param req {express.req} the incoming request - modified in-place
+         * @private
+         */
+        const removeBasePathMiddleware = (req, res, next) => {
+            const basePath = getEnvBasePath()
+
+            // Fast path: /mobify routes always get the base path removed
+            if (req.path.startsWith(`${basePath}/mobify`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+                return next()
+            }
+
+            // For other routes, only proceed if path actually starts with base path
+            if (!req.path.startsWith(basePath)) {
+                return next()
+            }
+
+            // Now we know path starts with base path, so we can remove it
+            const cleanPath = removeBasePathFromPath(req.path)
+
+            // Initialize express route regexes if needed
+            // We do this here since we want to ensure that any express route defined
+            // after the app is created, such as routes defined in ssr.js, are included.
+            if (!expressRouteRegexes) {
+                initializeExpressRouteRegexes()
+            }
+
+            // Next we check if the clean path matches any existing express routes
+            // (like /callback or /worker.js)
+            const matchesExpressRoute = expressRouteRegexes.some((routeRegex) => {
+                try {
+                    return routeRegex.test(cleanPath)
+                } catch (error) {
+                    logger.warn(
+                        `Invalid express route pattern: ${routeRegex}`,
+                        /* istanbul ignore next */
+                        {
+                            namespace: 'removeBasePathMiddleware',
+                            additionalProperties: {
+                                error: error
+                            }
+                        }
+                    )
+                    return false
+                }
+            })
+
+            // Only update URL if our clean path matches an Express route
+            // This leaves React Router paths (like /en-US/category) unchanged
+            if (matchesExpressRoute) {
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+            }
+            next()
+        }
+
+        app.use(removeBasePathMiddleware)
     },
 
     /**
@@ -669,7 +855,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app) {
+    _handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath) {
         app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
@@ -686,6 +872,17 @@ export const RemoteServerFactory = {
             return
         }
 
+        // This is the full path to the SLAS trusted-system endpoint
+        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
+        // matches this path as an early warning to developers that they should update their regex
+        // in ssr.js to exclude this path.
+        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
+        if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
+            throw new Error(
+                'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
+            )
+        }
+
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
@@ -699,11 +896,37 @@ export const RemoteServerFactory = {
 
         app.use(
             slasPrivateProxyPath,
+            (req, res, next) => {
+                // Check if the request should be blocked before it reaches the proxy
+                // We run this outside of the proxy middleware because modifying the response
+                // to send a 403 in the proxy causes issues with the response interceptor.
+                if (
+                    !req.path?.match(options.slasApiPath) ||
+                    req.path?.match(/\/oauth2\/trusted-system/)
+                ) {
+                    const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
+                    logger.error(message)
+                    return res.status(403).json({
+                        message: message
+                    })
+                }
+                next()
+            },
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
-                onProxyReq: (proxyRequest, incomingRequest) => {
+
+                // http-proxy-middleware uses the original incoming request path to determine
+                // both proxyRequest and incomingRequest paths.
+                // This cannot be modified by any express middleware
+                // So we need to use the built in pathRewrite to remove the base path
+                pathRewrite: (path) => {
+                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
+                    return path.replace(regex, '')
+                },
+                selfHandleResponse: true,
+                onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -712,49 +935,91 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    // By default, this regex matches only calls to SLAS /oauth2/token
-                    // (see option defaults at the top of this file).
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                    // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                        // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
+                        // so the SLAS private client is sent via this special header
+                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                    } else if (
+                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
+                    ) {
+                        // We pattern match and add client secrets only to endpoints that
+                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                        //
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                        // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
 
-                    // /oauth2/trusted-agent/token endpoint requires a different auth header
-                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
-                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                    }
-                },
-                onProxyRes: (proxyRes, req) => {
-                    if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
-                        logger.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
-                            {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {statusCode: proxyRes.statusCode}
-                            }
-                        )
-                        logger.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
-                            {namespace: '_setupSlasPrivateClientProxy'}
-                        )
-                        logger.error(
-                            `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
-                                'host'
-                            )}${req.originalUrl}`,
-                            {
+                    // Allow users to apply additional custom modifications to the proxy request
+                    if (typeof options.onSLASPrivateProxyReq === 'function') {
+                        try {
+                            options.onSLASPrivateProxyReq(proxyRequest, incomingRequest, res)
+                        } catch (error) {
+                            logger.error('Error in custom onSLASPrivateProxyReq callback', {
                                 namespace: '_setupSlasPrivateClientProxy',
                                 additionalProperties: {
-                                    protocol: req.protocol,
-                                    originalUrl: req.originalUrl
+                                    error: error
                                 }
-                            }
-                        )
+                            })
+                        }
                     }
-                }
+                },
+                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
+                    let workingBuffer = responseBuffer
+                    try {
+                        // If the passwordless login endpoint returns a 404, which corresponds to a user
+                        // email not being found, we mask it with a 200 OK response so that it is not
+                        // obvious that the user does not exist.
+                        // We do this to prevent user enumeration.
+                        if (
+                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
+                            proxyRes.statusCode === 404
+                        ) {
+                            res.statusCode = 200
+                            res.statusMessage = 'OK'
+
+                            // When a /passwordless/login endpoint response returns 200, it has no body
+                            // so we return an empty body here to match an actual 200 response.
+                            workingBuffer = Buffer.from('', 'utf8')
+                        }
+
+                        // Allow users to apply additional custom modifications to the proxy response
+                        if (typeof options.onSLASPrivateProxyRes === 'function') {
+                            try {
+                                const customBuffer = options.onSLASPrivateProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res
+                                )
+                                // Only use the custom buffer if it was returned
+                                if (customBuffer !== undefined) {
+                                    workingBuffer = customBuffer
+                                }
+                            } catch (error) {
+                                logger.error(
+                                    'Error in custom onSLASPrivateProxyRes callback',
+                                    /* istanbul ignore next */
+                                    {
+                                        namespace: '_setupSlasPrivateClientProxy',
+                                        additionalProperties: {
+                                            error: error
+                                        }
+                                    }
+                                )
+                            }
+                        }
+
+                        return workingBuffer
+                    } catch (error) {
+                        console.error(
+                            'There is an error processing the response from SLAS. Returning original response.',
+                            error
+                        )
+                        return workingBuffer
+                    }
+                })
             })
         )
     },
@@ -1004,7 +1269,21 @@ export const RemoteServerFactory = {
         // it indicates that the Lambda container has been reused.
         let lambdaContainerReused = false
 
-        const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
+        const serverlessAdapterHandler = ServerlessAdapter.new(app)
+            .setBinarySettings({
+                isBinary: isBinary
+            })
+            .setFramework(new ExpressFramework())
+            .setHandler(new DefaultHandler())
+            .setResolver(new CallbackResolver())
+            .addAdapter(
+                new ApiGatewayV1Adapter({
+                    // Preserve the original aws-serverless-express behavior
+                    lowercaseRequestHeaders: true,
+                    throwOnChunkedTransferEncoding: false
+                })
+            )
+            .build()
 
         const handler = (event, context, callback) => {
             // encode non ASCII request headers
@@ -1044,12 +1323,15 @@ export const RemoteServerFactory = {
             context.callbackWaitsForEmptyEventLoop = false
 
             if (lambdaContainerReused) {
-                // DESKTOP-434 If this Lambda container is being reused,
-                // clean up memory now, so that we start with low usage.
-                // These regular GC calls take about 80-100 mS each, as opposed
-                // to forced GC calls, which occur randomly and can take several
-                // hundred mS.
-                app._collectGarbage()
+                const forceGarbageCollection = process.env.FORCE_GC
+                if (forceGarbageCollection && forceGarbageCollection.toLowerCase() === 'true') {
+                    // DESKTOP-434 If this Lambda container is being reused,
+                    // clean up memory now, so that we start with low usage.
+                    // These regular GC calls take about 80-100 mS each, as opposed
+                    // to forced GC calls, which occur randomly and can take several
+                    // hundred mS.
+                    app._collectGarbage()
+                }
                 app.sendMetric('LambdaReused')
             } else {
                 // This is the first use of this container, so set the
@@ -1058,42 +1340,25 @@ export const RemoteServerFactory = {
                 app.sendMetric('LambdaCreated')
             }
 
-            // Proxy the request through to the server. When the response
-            // is done, context.succeed will be called with the response
-            // data.
-            awsServerlessExpress.proxy(
-                server,
-                event, // The incoming event
-                context, // The event context
-                'CALLBACK', // How the proxy signals completion
-                (err, response) => {
-                    // The 'response' parameter here is NOT the same response
-                    // object handled by ExpressJS code. The awsServerlessExpress
-                    // middleware works by sending an http.Request to the Express
-                    // server and parsing the HTTP response that it returns.
-                    // Wait util all pending metrics have been sent, and any pending
-                    // response caching to complete. We have to do this now, before
-                    // sending the response; there's no way to do it afterwards
-                    // because the Lambda container is frozen inside the callback.
-
-                    // We return this Promise, but the awsServerlessExpress object
-                    // doesn't make any use of it.
-                    return (
-                        app._requestMonitor
-                            ._waitForResponses()
-                            .then(() => app.metrics.flush())
-                            // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response, event)))
-                        // DON'T add any then() handlers here, after the callback.
-                        // They won't be called after the response is sent, but they
-                        // *might* be called if the Lambda container running this code
-                        // is reused, which can lead to odd and unpredictable
-                        // behaviour.
-                    )
-                }
-            )
+            const managedCallback = (err, response) => {
+                return (
+                    app._requestMonitor
+                        ._waitForResponses()
+                        .then(() => app.metrics.flush())
+                        // Now call the Lambda callback to complete the response
+                        .then(() => callback(err, processLambdaResponse(response, event)))
+                    // DON'T add any then() handlers here, after the callback.
+                    // They won't be called after the response is sent, but they
+                    // *might* be called if the Lambda container running this code
+                    // is reused, which can lead to odd and unpredictable
+                    // behaviour.
+                )
+            }
+            return serverlessAdapterHandler(event, context, managedCallback)
         }
-        return {handler, server, app}
+        // Upgrading to serverless-adapter removes the server property
+        // return a null server to maintain backwards compatibility
+        return {handler, server: null, app}
     },
 
     /**
@@ -1123,6 +1388,16 @@ export const RemoteServerFactory = {
      * @param {Boolean} [options.allowCookies] - This boolean value indicates
      * whether or not we strip cookies from requests and block setting of cookies. Defaults
      * to 'false'.
+     * @param {Boolean} [options.useSLASPrivateClient=false] - Enable the SLAS private client
+     * proxy handler. Requires PWA_KIT_SLAS_CLIENT_SECRET environment variable.
+     * @param {RegExp} [options.applySLASPrivateClientToEndpoints] - A regex pattern to match
+     * SLAS endpoints where the Authorization header should be injected.
+     * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
+     * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
+     * Use this to add custom headers or modify the proxy request.
+     * @param {function} [options.onSLASPrivateProxyRes] - Custom callback to modify SLAS private client
+     * proxy responses. Called after built-in response handling. Signature: (responseBuffer, proxyRes, req, res) => Buffer.
+     * Should return the modified buffer or undefined to use the existing buffer.
      */
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
@@ -1289,9 +1564,10 @@ const applyPatches = once((options) => {
     https.request = outgoingRequestHook(https.request, options)
     https.get = outgoingRequestHook(https.get, options)
 
-    // Patch the ExpressJS Response class's redirect function to suppress
-    // the creation of a body (DESKTOP-485). Including the body may
-    // trigger a parsing error in aws-serverless-express.
+    // We no longer use aws-serverless-express but to maintain compatibility with the old code, we still patch the redirect function.
+    // - Patch the ExpressJS Response class's redirect function to suppress
+    // - the creation of a body (DESKTOP-485). Including the body may
+    // - trigger a parsing error in aws-serverless-express.
     express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url
@@ -1303,6 +1579,9 @@ const applyPatches = once((options) => {
 
         // Duplicate behaviour in node_modules/express/lib/response.js
         const address = this.location(workingUrl).get('Location')
+
+        // aws-serverless-express would add a Content-Length header to the response even if there was no body
+        this.set('Content-Length', 0)
 
         // Send a minimal response with just a status and location
         this.status(workingStatus).location(address).end()

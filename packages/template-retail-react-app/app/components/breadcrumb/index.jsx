@@ -36,7 +36,7 @@ const Breadcrumb = ({categories, ...rest}) => {
     return (
         <ChakraBreadcrumb
             className="sf-breadcrumb"
-            {...styles.container}
+            sx={styles.container}
             separator={<ChevronRightIcon {...styles.icon} aria-hidden="true" />}
             {...rest}
         >
@@ -45,7 +45,7 @@ const Breadcrumb = ({categories, ...rest}) => {
                     <ChakraBreadcrumbLink
                         as={RouteLink}
                         to={categoryUrlBuilder(category, intl.locale)}
-                        {...styles.link}
+                        sx={styles.link}
                     >
                         {category.name}
                     </ChakraBreadcrumbLink>

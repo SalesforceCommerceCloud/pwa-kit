@@ -1,5 +1,45 @@
-## v3.9.0-dev (Oct 29, 2024)
+
+## v3.15.0-dev (Nov 05, 2025)
+
+## v3.14.0 (Nov 04, 2025)
+- Prompt text for Site ID should match actual validation: Site ID may contain uppercase or lowercase letters, numbers, hyphens, or underscores. - Updated Site ID validator regex to allow both uppercase and lowercase letters for improved compatibility, clarity. [#3410] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3410)
+- Added Hybrid Proxy support configuration for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
+
+## v3.13.0 (Sep 25, 2025)
+- This features introduces enhancements to the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+
+## v3.12.0 (Sep 04, 2025)
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Add BOPIS and MULTISHIP configuration defaults [#3142](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3142)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- Update _app-config generator template to include `hybridAuthEnabled` prop [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Update templates files to include sfdc_user_agent header for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+
+## v3.11.0 (Jul 22, 2025)
+- Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
+- Fix exiting before `program.json` content can be flushed [#2699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2699)
+- Add `program.json` + Support for Agent-Friendly CLI Input via stdio [#2662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2662)
+- Change the default ECOM instance in the generated application [#2610](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2610)
+- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+- Introduce the cursor rules to assist storefront project developers [#2578](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2578) [#2754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2754)
+- Add `StoreLocatorProvider` to the `AppConfig` template to support BOPIS [#2753](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2753)
+- Remove search constants overrides so more than 3 products at a time can be fetched [#2819](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2819)
+- Update Data Cloud configurations [#2843](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2843) [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Remove the need of redundant assets/cursor_rules [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
+
+## v3.10.0 (May 22, 2025)
+- Add Data Cloud API configuration to `default.js`. [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
+- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.9.0 (Feb 18, 2025)
+
+- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+- Update `default.js` template to include new login configurations [#2079](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+- Handle import error when ssr.js imports from template retail react app [#2270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2270)
 
 ## v3.8.0 (Oct 28, 2024)
 

@@ -17,10 +17,10 @@ const mockProductSearchItem = {
         {
             images: [
                 {
-                    alt: 'Charcoal Single Pleat Wool Suit, , large',
+                    alt: 'Charcoal Single Pleat Wool Suit, , medium',
                     disBaseLink:
-                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
                     title: 'Charcoal Single Pleat Wool Suit, '
                 },
                 {
@@ -36,10 +36,10 @@ const mockProductSearchItem = {
         {
             images: [
                 {
-                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, large',
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, medium',
                     disBaseLink:
-                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
-                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
                     title: 'Charcoal Single Pleat Wool Suit, Charcoal'
                 },
                 {
@@ -535,9 +535,9 @@ const mockStandardProductHit = {
     currency: 'GBP',
     hitType: 'product',
     image: {
-        alt: 'Laptop Briefcase with wheels (37L), , large',
+        alt: 'Laptop Briefcase with wheels (37L), , medium',
         disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7cb2d401/images/large/P0048_001.jpg',
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwcc8912f4/images/medium/P0048_001.jpg?sw=768&q=60',
         link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7cb2d401/images/large/P0048_001.jpg',
         title: 'Laptop Briefcase with wheels (37L), '
     },
@@ -578,9 +578,9 @@ const mockMasterProductHitWithOneVariant = {
     currency: 'GBP',
     hitType: 'master',
     image: {
-        alt: 'Black Flat Front Wool Suit, , large',
+        alt: 'Black Flat Front Wool Suit, , medium',
         disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3d8972fe/images/large/PG.52001DAN84Q.BLACKWL.PZ.jpg',
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5aa46219/images/medium/PG.52001DAN84Q.BLACKWL.PZ.jpg',
         link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3d8972fe/images/large/PG.52001DAN84Q.BLACKWL.PZ.jpg',
         title: 'Black Flat Front Wool Suit, '
     },
@@ -704,9 +704,9 @@ const mockMasterProductHitWithMultipleVariants = {
     currency: 'GBP',
     hitType: 'master',
     image: {
-        alt: 'Long Sleeve Embellished Boat Neck Top, , large',
+        alt: 'Long Sleeve Embellished Boat Neck Top, , medium',
         disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
         link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
         title: 'Long Sleeve Embellished Boat Neck Top, '
     },
@@ -714,9 +714,9 @@ const mockMasterProductHitWithMultipleVariants = {
         {
             images: [
                 {
-                    alt: 'Long Sleeve Embellished Boat Neck Top, , large',
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , medium',
                     disBaseLink:
-                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
                     link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
                     title: 'Long Sleeve Embellished Boat Neck Top, '
                 },
@@ -733,9 +733,9 @@ const mockMasterProductHitWithMultipleVariants = {
         {
             images: [
                 {
-                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, large',
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, medium',
                     disBaseLink:
-                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
                     link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
                     title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
                 },
@@ -762,9 +762,9 @@ const mockMasterProductHitWithMultipleVariants = {
         {
             images: [
                 {
-                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, large',
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, medium',
                     disBaseLink:
-                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg',
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc9ce7da9/images/medium/PG.10217069.JJ908XX.PZ.jpg',
                     link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg',
                     title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
                 },

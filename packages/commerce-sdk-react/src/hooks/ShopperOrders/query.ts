@@ -7,12 +7,14 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
-type Client = ApiClients['shopperOrders']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_ORDERS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Gets information for an order.
@@ -31,7 +33,7 @@ export const useOrder = (
 ): UseQueryResult<DataType<Client['getOrder']>> => {
     type Options = Argument<Client['getOrder']>
     type Data = DataType<Client['getOrder']>
-    const {shopperOrders: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getOrder'
     const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 
@@ -73,7 +75,7 @@ export const usePaymentMethodsForOrder = (
 ): UseQueryResult<DataType<Client['getPaymentMethodsForOrder']>> => {
     type Options = Argument<Client['getPaymentMethodsForOrder']>
     type Data = DataType<Client['getPaymentMethodsForOrder']>
-    const {shopperOrders: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPaymentMethodsForOrder'
     const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 
@@ -117,7 +119,7 @@ export const useTaxesFromOrder = (
 ): UseQueryResult<DataType<Client['getTaxesFromOrder']>> => {
     type Options = Argument<Client['getTaxesFromOrder']>
     type Data = DataType<Client['getTaxesFromOrder']>
-    const {shopperOrders: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getTaxesFromOrder'
     const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 

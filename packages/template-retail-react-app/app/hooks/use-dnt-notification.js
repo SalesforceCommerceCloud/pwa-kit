@@ -17,6 +17,7 @@ import {
     Heading,
     Stack,
     Text,
+    Box,
     Flex
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -24,7 +25,7 @@ import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
 export const DntNotification = ({isOpen, onOpen, onClose}) => {
-    const {selectedDnt, updateDNT} = useDNT()
+    const {selectedDnt, updateDnt} = useDNT()
     const {formatMessage} = useIntl()
     const location = useLocation()
 
@@ -37,7 +38,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
     }, [location, selectedDnt])
 
     const onCloseNotification = () => {
-        updateDNT(null)
+        updateDnt(null)
         onClose()
     }
 
@@ -51,7 +52,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 borderColor="gray.100"
                 boxShadow="md"
                 onClick={() => {
-                    updateDNT(true)
+                    updateDnt(true)
                     onClose()
                 }}
                 aria-label={formatMessage({
@@ -64,7 +65,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             </Button>
             <Button
                 onClick={() => {
-                    updateDNT(false)
+                    updateDnt(false)
                     onClose()
                 }}
                 boxShadow="md"
@@ -112,44 +113,45 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 }}
                 margin="0"
                 borderTopRadius="md"
-                boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
             >
-                <ModalCloseButton
-                    aria-label={formatMessage({
-                        id: 'dnt_notification.button.assistive_msg.close',
-                        defaultMessage: 'Close consent tracking form'
-                    })}
-                />
-                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
-                    <Heading as="h3" fontSize={25} width="100%">
-                        <FormattedMessage
-                            defaultMessage="Tracking Consent"
-                            id="dnt_notification.title"
-                        />
-                    </Heading>
-                    <HideOnDesktop>
-                        <Flex direction="column">
-                            {description}
-                            <Stack direction="column" spacing={4} mt={4} align="flex-end">
-                                {buttons}
-                            </Stack>
-                        </Flex>
-                    </HideOnDesktop>
-                    <HideOnMobile>
-                        <Flex align="center">
-                            {description}
-                            <Stack
-                                direction="row"
-                                spacing={4}
-                                mt={4}
-                                marginLeft={6}
-                                align="flex-end"
-                            >
-                                {buttons}
-                            </Stack>
-                        </Flex>
-                    </HideOnMobile>
-                </ModalBody>
+                <Box boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)">
+                    <ModalCloseButton
+                        aria-label={formatMessage({
+                            id: 'dnt_notification.button.assistive_msg.close',
+                            defaultMessage: 'Close consent tracking form'
+                        })}
+                    />
+                    <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
+                        <Heading as="h3" fontSize={25} width="100%">
+                            <FormattedMessage
+                                defaultMessage="Tracking Consent"
+                                id="dnt_notification.title"
+                            />
+                        </Heading>
+                        <HideOnDesktop>
+                            <Flex direction="column">
+                                {description}
+                                <Stack direction="column" spacing={4} mt={4} align="flex-end">
+                                    {buttons}
+                                </Stack>
+                            </Flex>
+                        </HideOnDesktop>
+                        <HideOnMobile>
+                            <Flex align="center">
+                                {description}
+                                <Stack
+                                    direction="row"
+                                    spacing={4}
+                                    mt={4}
+                                    marginLeft={6}
+                                    align="flex-end"
+                                >
+                                    {buttons}
+                                </Stack>
+                            </Flex>
+                        </HideOnMobile>
+                    </ModalBody>
+                </Box>
             </ModalContent>
         </Modal>
     )
