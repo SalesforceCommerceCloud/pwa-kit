@@ -59,6 +59,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const {isRegistered} = useCustomerType()
+    const wasRegisteredAtMountRef = useRef(isRegistered)
 
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
@@ -87,7 +88,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isBlurChecking, setIsBlurChecking] = useState(false)
-    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
     // Auto-focus the email field when the component mounts
@@ -233,6 +234,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
         try {
+            // Prevent post-auth recovery effect from also attempting merge in this flow
+            hasAttemptedRecoveryRef.current = true
             await loginPasswordless.mutateAsync({pwdlessLoginToken: otpCode})
 
             // Successful OTP verification - user is now logged in
@@ -293,6 +296,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         const attemptRecovery = async () => {
             if (hasAttemptedRecoveryRef.current) return
             if (!isRegistered) return
+            // Only run recovery merge for returning users
+            if (!wasRegisteredAtMountRef.current) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
             const hasBasketItem = basket?.productItems?.length > 0
             if (!hasBasketItem) {
                 hasAttemptedRecoveryRef.current = true
@@ -315,7 +323,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
         }
         attemptRecovery()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRegistered])
 
     // Custom form submit handler to prevent default form submission for registered users
