@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect, useRef} from 'react'
+import React, {useState, useMemo, useEffect, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -215,6 +215,37 @@ const Payment = ({
             body: paymentInstrument
         })
     }
+
+    const handleRegistrationSuccess = useCallback(
+        async (newBasketId) => {
+            if (newBasketId) {
+                activeBasketIdRef.current = newBasketId
+            }
+            setShouldSavePaymentMethod(true)
+            try {
+                const values = paymentMethodForm?.getValues?.()
+                const hasEnteredCard = values?.number && values?.holder && values?.expiry
+                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
+                if (hasEnteredCard && !hasApplied && newBasketId) {
+                    await onPaymentSubmit(values, newBasketId)
+                    await currentBasketQuery.refetch()
+                }
+            } catch (_e) {
+                // non-blocking
+            }
+            showToast({
+                variant: 'subtle',
+                title: formatMessage({
+                    defaultMessage: 'You are now signed in.',
+                    id: 'auth_modal.description.now_signed_in_simple'
+                }),
+                status: 'success',
+                position: 'top-right',
+                isClosable: true
+            })
+        },
+        [paymentMethodForm, currentBasketQuery, onPaymentSubmit, showToast, formatMessage]
+    )
 
     // Auto-select a saved payment instrument for registered customers (run at most once)
     const autoAppliedRef = useRef(false)
@@ -480,38 +511,7 @@ const Payment = ({
                                             !appliedPayment && !paymentMethodForm.formState.isValid
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}
-                                        onRegistered={async (newBasketId) => {
-                                            if (newBasketId) {
-                                                activeBasketIdRef.current = newBasketId
-                                            }
-                                            setShouldSavePaymentMethod(true)
-                                            try {
-                                                const values = paymentMethodForm?.getValues?.()
-                                                const hasEnteredCard =
-                                                    values?.number &&
-                                                    values?.holder &&
-                                                    values?.expiry
-                                                const hasApplied =
-                                                    (currentBasketQuery?.data?.paymentInstruments
-                                                        ?.length || 0) > 0
-                                                if (hasEnteredCard && !hasApplied && newBasketId) {
-                                                    await onPaymentSubmit(values, newBasketId)
-                                                    await currentBasketQuery.refetch()
-                                                }
-                                            } catch (_e) {
-                                                // non-blocking
-                                            }
-                                            showToast({
-                                                variant: 'subtle',
-                                                title: formatMessage({
-                                                    defaultMessage: 'You are now signed in.',
-                                                    id: 'auth_modal.description.now_signed_in_simple'
-                                                }),
-                                                status: 'success',
-                                                position: 'top-right',
-                                                isClosable: true
-                                            })
-                                        }}
+                                        onRegistered={handleRegistrationSuccess}
                                     />
                                 )}
                             </Stack>
@@ -563,36 +563,7 @@ const Payment = ({
                                 isGuestCheckout={registeredUserChoseGuest}
                                 isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
                                 onSavePreferenceChange={onSavePreferenceChange}
-                                onRegistered={async (newBasketId) => {
-                                    if (newBasketId) {
-                                        activeBasketIdRef.current = newBasketId
-                                    }
-                                    setShouldSavePaymentMethod(true)
-                                    try {
-                                        const values = paymentMethodForm?.getValues?.()
-                                        const hasEnteredCard =
-                                            values?.number && values?.holder && values?.expiry
-                                        const hasApplied =
-                                            (currentBasketQuery?.data?.paymentInstruments?.length ||
-                                                0) > 0
-                                        if (hasEnteredCard && !hasApplied && newBasketId) {
-                                            await onPaymentSubmit(values, newBasketId)
-                                            await currentBasketQuery.refetch()
-                                        }
-                                    } catch (_e) {
-                                        // non-blocking
-                                    }
-                                    showToast({
-                                        variant: 'subtle',
-                                        title: formatMessage({
-                                            defaultMessage: 'You are now signed in.',
-                                            id: 'auth_modal.description.now_signed_in_simple'
-                                        }),
-                                        status: 'success',
-                                        position: 'top-right',
-                                        isClosable: true
-                                    })
-                                }}
+                                onRegistered={handleRegistrationSuccess}
                             />
                         )}
                     </Stack>
