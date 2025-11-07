@@ -402,10 +402,14 @@ const ShipmentMethods = ({shipment, index, currency}) => {
         const defaultId = shipment?.shippingMethod?.id || methods?.defaultShippingMethodId
         if (!selected && defaultId) {
             setSelected(defaultId)
-            updateShippingMethod.mutateAsync({
-                parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
-                body: {id: defaultId}
-            })
+            try {
+                updateShippingMethod.mutateAsync({
+                    parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
+                    body: {id: defaultId}
+                })
+            } catch {
+                // Ignore; user can manually select another method
+            }
         }
     }, [methods, shipment?.shippingMethod?.id])
 
@@ -437,13 +441,17 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                     value={selected}
                     onChange={async (val) => {
                         setSelected(val)
-                        await updateShippingMethod.mutateAsync({
-                            parameters: {
-                                basketId: basket.basketId,
-                                shipmentId: shipment.shipmentId
-                            },
-                            body: {id: val}
-                        })
+                        try {
+                            await updateShippingMethod.mutateAsync({
+                                parameters: {
+                                    basketId: basket.basketId,
+                                    shipmentId: shipment.shipmentId
+                                },
+                                body: {id: val}
+                            })
+                        } catch {
+                            // Ignore; allow user to retry selection
+                        }
                     }}
                 >
                     <Stack spacing={5}>

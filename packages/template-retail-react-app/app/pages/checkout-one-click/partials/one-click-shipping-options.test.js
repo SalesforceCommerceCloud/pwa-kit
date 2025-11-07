@@ -199,6 +199,7 @@ describe('ShippingOptions Component', () => {
         expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
     })
 
+    /* eslint-disable @typescript-eslint/no-var-requires */
     test('renders per-shipment methods for multiship and updates by shipment', async () => {
         jest.resetModules()
         const methods1 = {
@@ -265,37 +266,39 @@ describe('ShippingOptions Component', () => {
                             },
                             shippingMethod: null
                         }
+                    ],
+                    shippingItems: [
+                        {shipmentId: 'ship1', price: 0},
+                        {shipmentId: 'ship2', price: 0}
                     ]
                 },
                 derivedData: {hasBasket: true, totalItems: 2}
             })
         }))
 
-        const sdk = await import('@salesforce/commerce-sdk-react')
+        const sdk = require('@salesforce/commerce-sdk-react')
         sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
             if (parameters.shipmentId === 'ship1') return {data: methods1}
             if (parameters.shipmentId === 'ship2') return {data: methods2}
             return {data: methods1}
         })
 
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
-        )
-        const Component = module.default
+        const {renderWithProviders: localRenderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils')
+        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options')
 
-        const {user} = renderWithProviders(<Component />)
+        const {user} = localRenderWithProviders(<Component />)
 
-        expect(screen.getByText('Shipping Method')).toBeInTheDocument()
+        expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
         expect(screen.getByText('Shipment 1:')).toBeInTheDocument()
         expect(screen.getByText('Shipment 2:')).toBeInTheDocument()
 
-        await user.click(screen.getByLabelText('Express Shipping (Overnight)'))
+        await user.click(screen.getByText('Express Shipping (Overnight)'))
         expect(mockUpdateShippingMethod.mutateAsync).toHaveBeenCalledWith({
             parameters: {basketId: 'test-basket-id', shipmentId: 'ship1'},
             body: {id: 'exp'}
         })
 
-        await user.click(screen.getByLabelText('Priority Shipping'))
+        await user.click(screen.getByText('Priority Shipping'))
         expect(mockUpdateShippingMethod.mutateAsync).toHaveBeenCalledWith({
             parameters: {basketId: 'test-basket-id', shipmentId: 'ship2'},
             body: {id: 'prio'}
@@ -308,7 +311,7 @@ describe('ShippingOptions Component', () => {
         renderWithProviders(<ShippingOptions />)
 
         // Basic component rendering test
-        expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+        expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
         expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
     })
 })

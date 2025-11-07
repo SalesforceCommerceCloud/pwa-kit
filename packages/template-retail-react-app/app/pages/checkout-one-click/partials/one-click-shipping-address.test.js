@@ -68,7 +68,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
         derivedData: {
             hasBasket: true,
             totalItems: 1
-        }
+        },
+        refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
     })
 }))
 
@@ -249,15 +250,14 @@ describe('ShippingAddress Component', () => {
                         }
                     ]
                 },
-                derivedData: {hasBasket: true, totalItems: 2}
+                derivedData: {hasBasket: true, totalItems: 2},
+                refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
             })
         }))
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
-        )
-        const Component = module.default
+        const {renderWithProviders: localRenderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils')
+        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address')
 
-        const {user} = renderWithProviders(<Component />)
+        const {user} = localRenderWithProviders(<Component />)
 
         const multishipLink = screen.getByRole('button', {
             name: 'Ship to multiple addresses'
