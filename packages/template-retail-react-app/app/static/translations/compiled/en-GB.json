@@ -3828,7 +3828,7 @@
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
-      "value": "Ship to Multiple Addresses"
+      "value": "Ship to multiple addresses"
     }
   ],
   "shipping_address.action.ship_to_single_address": [
@@ -3905,6 +3905,12 @@
       "value": "Your items will be shipped to multiple addresses."
     }
   ],
+  "shipping_address.summary.multiple_locations": [
+    {
+      "type": 0,
+      "value": "You are shipping to multiple locations."
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -3957,6 +3963,12 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
+    }
+  ],
+  "shipping_multi_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "Ship items to one address"
     }
   ],
   "shipping_multi_address.add_new_address.aria_label": [
@@ -4031,6 +4043,12 @@
       "value": "productName"
     }
   ],
+  "shipping_multi_address.label.note": [
+    {
+      "type": 0,
+      "value": "Note"
+    }
+  ],
   "shipping_multi_address.loading.message": [
     {
       "type": 0,
@@ -4041,6 +4059,18 @@
     {
       "type": 0,
       "value": "Loading addresses..."
+    }
+  ],
+  "shipping_multi_address.message.no_delivery_items": [
+    {
+      "type": 0,
+      "value": "There are no items to deliver. All items are pickup."
+    }
+  ],
+  "shipping_multi_address.message.pickup_items": [
+    {
+      "type": 0,
+      "value": "Some items are set for pickup and are not shown here. Only delivery items can be assigned to addresses."
     }
   ],
   "shipping_multi_address.no_addresses_available": [
@@ -4085,6 +4115,12 @@
       "value": "Do you want to send this as a gift?"
     }
   ],
+  "shipping_options.action.send_as_gift_wrapping": [
+    {
+      "type": 0,
+      "value": "Send as a gift (gift wrapping)"
+    }
+  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -4097,10 +4133,30 @@
       "value": "Free"
     }
   ],
+  "shipping_options.help.notifications": [
+    {
+      "type": 0,
+      "value": "You can enable or disable notifications at any time."
+    }
+  ],
   "shipping_options.label.no_method_selected": [
     {
       "type": 0,
       "value": "No shipping method selected"
+    }
+  ],
+  "shipping_options.label.shipment_number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "index"
+    },
+    {
+      "type": 0,
+      "value": ":"
     }
   ],
   "shipping_options.label.shipping_to": [
@@ -4120,6 +4176,12 @@
     }
   ],
   "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "Shipping & Gift Options"
+    }
+  ],
+  "shipping_options.title.shipping_method": [
     {
       "type": 0,
       "value": "Shipping & Gift Options"
@@ -4433,6 +4495,12 @@
     {
       "type": 0,
       "value": ":"
+    }
+  ],
+  "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "Change"
     }
   ],
   "toggle_card.action.edit": [
