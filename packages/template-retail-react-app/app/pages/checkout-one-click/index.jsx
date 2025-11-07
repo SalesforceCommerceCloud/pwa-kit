@@ -39,6 +39,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
@@ -78,10 +79,13 @@ const CheckoutOneClick = () => {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
     const [isEditingPayment, setIsEditingPayment] = useState(false)
 
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    // Compute shipment types
+    const pickupShipments = basket?.shipments?.filter((s) => isPickupShipment(s)) || []
+    const deliveryShipments =
+        basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    const hasPickupShipments = pickupShipments.length > 0
+    const hasDeliveryShipments = deliveryShipments.length > 0
+    const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
@@ -412,8 +416,9 @@ const CheckoutOneClick = () => {
                                 idps={idps}
                                 onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
-                            {!isPickupOrder && <ShippingOptions />}
+                            {hasPickupShipments && <PickupAddress />}
+                            {hasDeliveryShipments && <ShippingAddress />}
+                            {hasDeliveryShipments && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
