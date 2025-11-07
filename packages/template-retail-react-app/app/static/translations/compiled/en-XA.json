@@ -1071,6 +1071,20 @@
       "value": "]"
     }
   ],
+  "auth_modal.description.now_signed_in_simple": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ȧȧřḗḗ ƞǿǿẇ şīɠƞḗḗḓ īƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
@@ -1751,6 +1765,20 @@
     {
       "type": 0,
       "value": "Ƥŀȧȧƈḗḗ Ǿřḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿŭŭŀḓ ƞǿǿŧ şȧȧṽḗḗ şħīƥƥīƞɠ ȧȧḓḓřḗḗşş."
     },
     {
       "type": 0,

@@ -10,9 +10,16 @@ import {Checkbox, Text} from '@salesforce/retail-react-app/app/components/shared
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {FormattedMessage} from 'react-intl'
 
-export default function SavePaymentMethod({paymentInstrument, onSaved}) {
+export default function SavePaymentMethod({paymentInstrument, onSaved, checked}) {
     const [shouldSave, setShouldSave] = useState(false)
     const {data: customer} = useCurrentCustomer()
+
+    // Sync from parent when provided so we can preselect visually
+    React.useEffect(() => {
+        if (typeof checked === 'boolean') {
+            setShouldSave(checked)
+        }
+    }, [checked])
 
     // Just track the user's preference, don't call API yet
     const handleCheckboxChange = (e) => {
@@ -42,5 +49,7 @@ SavePaymentMethod.propTypes = {
     /** The payment instrument to potentially save */
     paymentInstrument: PropTypes.object,
     /** Callback when checkbox state changes - receives boolean value */
-    onSaved: PropTypes.func
+    onSaved: PropTypes.func,
+    /** Controlled checked prop to preselect visually */
+    checked: PropTypes.bool
 }

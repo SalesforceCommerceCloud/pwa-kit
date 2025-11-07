@@ -55,7 +55,6 @@ export default function ShippingAddress() {
     )
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
     const hasSavedPhoneRef = useRef(false)
-
     const productItemsCount = basket?.productItems?.length || 0
     const hasMultipleProductItems = productItemsCount > 1
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true

@@ -173,6 +173,17 @@ const ShippingAddressSelection = ({
         }
     }, [])
 
+    // After guest OTP success (customer becomes registered), default the address as preferred
+    useEffect(() => {
+        if (!isBillingAddress && customer?.isRegistered) {
+            try {
+                form.setValue('preferred', true, {shouldValidate: false, shouldDirty: true})
+            } catch (_e) {
+                // ignore
+            }
+        }
+    }, [customer?.isRegistered])
+
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
