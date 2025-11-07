@@ -7,13 +7,8 @@
 import React from 'react'
 import {defineMessages, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    Stack,
-    Text,
-    Flex,
-    Divider
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Stack, Text, Flex, Divider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
@@ -51,8 +46,19 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
     })
 
     // Group product items by shipment
-    const getItemsForShipment = (shipmentId) => {
-        return order.productItems.filter((item) => item.shipmentId === shipmentId)
+    const getItemsForShipment = (shipment) => {
+        const shipmentId = shipment.shipmentId || shipment.id
+        const items = (order.productItems || []).filter(
+            (item) => (item.shipmentId || item.shipment_id) === shipmentId
+        )
+        if (items.length > 0) return items
+        // Fallback: use items nested under shipment if present
+        const nested = shipment.productItems || shipment.productLineItems || []
+        return nested.map((pli) => ({
+            productId: pli.productId || pli.product_id || pli.id,
+            quantity: pli.quantity || pli.amount || 1,
+            price: pli.price || pli.basePrice || pli.itemTotal || undefined
+        }))
     }
 
     const renderItemGroup = (shipments, title) => {
@@ -65,10 +71,15 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                 </Text>
                 <Stack spacing={4}>
                     {shipments.map((shipment) => {
-                        const items = getItemsForShipment(shipment.shipmentId)
+                        const items = getItemsForShipment(shipment)
 
                         return (
                             <Box key={shipment.shipmentId}>
+                                {shipment.shippingAddress && (
+                                    <Box mb={2}>
+                                        <AddressDisplay address={shipment.shippingAddress} />
+                                    </Box>
+                                )}
                                 <Stack
                                     spacing={3}
                                     align="flex-start"
