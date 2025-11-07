@@ -213,6 +213,9 @@
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in."
   },
+  "auth_modal.description.now_signed_in_simple": {
+    "defaultMessage": "You are now signed in."
+  },
   "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "Something's not right with your email or password. Try again."
   },
@@ -320,6 +323,9 @@
   },
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
+  },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "Could not save shipping address."
   },
   "checkout.label.user_registration": {
     "defaultMessage": "Create an account for a faster checkout"
@@ -1615,6 +1621,9 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.error.phone_not_saved": {
+    "defaultMessage": "We could not save your phone number. You can continue checking out."
   },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."

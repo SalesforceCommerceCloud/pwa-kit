@@ -59,6 +59,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const {isRegistered} = useCustomerType()
+    const wasRegisteredAtMountRef = useRef(isRegistered)
 
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
@@ -78,6 +79,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const fields = useLoginFields({form})
     const emailRef = useRef()
+    // Single-flight guard for OTP authorization to avoid duplicate sends
+    const otpSendPromiseRef = useRef(null)
 
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
@@ -85,7 +88,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isBlurChecking, setIsBlurChecking] = useState(false)
-    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
     // Auto-focus the email field when the component mounts
@@ -111,6 +114,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onOpen: onOtpModalOpen,
         onClose: onOtpModalClose
     } = useDisclosure()
+    // Only run post-auth recovery for OTP flows initiated from this Contact Info step
+    const otpFromContactRef = useRef(false)
 
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
@@ -164,25 +169,37 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
+        // Reuse in-flight request (single-flight) across blur and submit
+        if (otpSendPromiseRef.current) {
+            return otpSendPromiseRef.current
+        }
+
         form.clearErrors('global')
         setIsCheckingEmail(true)
-        try {
-            await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
-                callbackURI: `${callbackURL}?mode=otp_email`
-            })
-            // Only open modal if API call succeeds
-            onOtpModalOpen()
-            return {isRegistered: true}
-        } catch (error) {
-            // Keep continue button visible if email is valid (for unregistered users)
-            if (isValidEmail(email)) {
-                setShowContinueButton(true)
+
+        otpSendPromiseRef.current = (async () => {
+            try {
+                await authorizePasswordlessLogin.mutateAsync({
+                    userid: email,
+                    callbackURI: `${callbackURL}?mode=otp_email`
+                })
+                // Only open modal if API call succeeds
+                onOtpModalOpen()
+                otpFromContactRef.current = true
+                return {isRegistered: true}
+            } catch (error) {
+                // Keep continue button visible if email is valid (for unregistered users)
+                if (isValidEmail(email)) {
+                    setShowContinueButton(true)
+                }
+                return {isRegistered: false}
+            } finally {
+                setIsCheckingEmail(false)
+                otpSendPromiseRef.current = null
             }
-            return {isRegistered: false}
-        } finally {
-            setIsCheckingEmail(false)
-        }
+        })()
+
+        return otpSendPromiseRef.current
     }
 
     // Handle OTP modal close
@@ -220,16 +237,24 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
         try {
+            // Prevent post-auth recovery effect from also attempting merge in this flow
+            hasAttemptedRecoveryRef.current = true
             await loginPasswordless.mutateAsync({pwdlessLoginToken: otpCode})
 
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0
             if (hasBasketItem) {
-                mergeBasket.mutate({
+                // Mirror legacy checkout flow header and await completion
+                await mergeBasket.mutateAsync({
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     parameters: {
                         createDestinationBasket: true
                     }
                 })
+                // Make sure UI reflects merged state before proceeding
+                await currentBasketQuery.refetch()
             }
 
             // Update basket with email after successful OTP verification
@@ -267,6 +292,47 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
+    // Post-auth recovery: if user is already registered (after redirect-based auth),
+    // attempt a one-time merge to carry over any guest items.
+    const hasAttemptedRecoveryRef = useRef(false)
+    useEffect(() => {
+        const attemptRecovery = async () => {
+            if (hasAttemptedRecoveryRef.current) return
+            if (!isRegistered) return
+            // Only when this page initiated OTP (returning shopper login)
+            if (!otpFromContactRef.current) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
+            // Skip if shopper was already registered when the component mounted
+            if (wasRegisteredAtMountRef.current) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
+            const hasBasketItem = basket?.productItems?.length > 0
+            if (!hasBasketItem) {
+                hasAttemptedRecoveryRef.current = true
+                return
+            }
+            try {
+                await mergeBasket.mutateAsync({
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
+                    }
+                })
+                await currentBasketQuery.refetch()
+            } catch (_e) {
+                // no-op
+            } finally {
+                hasAttemptedRecoveryRef.current = true
+            }
+        }
+        attemptRecovery()
+    }, [isRegistered])
+
     // Custom form submit handler to prevent default form submission for registered users
     const handleFormSubmit = async (event) => {
         event.preventDefault()
@@ -299,8 +365,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 return
             }
 
-            // If modal is not open, we need to check if user is registered
-            // This handles cases where blur event didn't trigger or user clicked without tabbing out
+            // If modal is not open, we need to check if user is registered.
+            // Use single-flight guard to avoid duplicate OTP sends when blur just fired.
             const result = await handleSendEmailOtp(formData.email)
 
             // Check if OTP modal is now open (after the API call)
