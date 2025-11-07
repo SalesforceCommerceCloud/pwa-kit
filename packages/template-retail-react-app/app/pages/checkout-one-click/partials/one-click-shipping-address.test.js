@@ -254,8 +254,13 @@ describe('ShippingAddress Component', () => {
                 refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
             })
         }))
-        const {renderWithProviders: localRenderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils')
-        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address')
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
 
         const {user} = localRenderWithProviders(<Component />)
 

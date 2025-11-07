@@ -283,8 +283,13 @@ describe('ShippingOptions Component', () => {
             return {data: methods1}
         })
 
-        const {renderWithProviders: localRenderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils')
-        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options')
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+        )
+        const Component = module.default
 
         const {user} = localRenderWithProviders(<Component />)
 
