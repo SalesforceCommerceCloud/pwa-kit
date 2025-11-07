@@ -8274,7 +8274,7 @@
     },
     {
       "type": 0,
-      "value": "Şħīƥ ŧǿǿ Ḿŭŭŀŧīƥŀḗḗ Ȧḓḓřḗḗşşḗḗş"
+      "value": "Şħīƥ ŧǿǿ ḿŭŭŀŧīƥŀḗḗ ȧȧḓḓřḗḗşşḗḗş"
     },
     {
       "type": 0,
@@ -8443,6 +8443,20 @@
       "value": "]"
     }
   ],
+  "shipping_address.summary.multiple_locations": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ȧȧřḗḗ şħīƥƥīƞɠ ŧǿǿ ḿŭŭŀŧīƥŀḗḗ ŀǿǿƈȧȧŧīǿǿƞş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -8563,6 +8577,20 @@
     {
       "type": 0,
       "value": "Ḗḓīŧ Şħīƥƥīƞɠ Ȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥ īŧḗḗḿş ŧǿǿ ǿǿƞḗḗ ȧȧḓḓřḗḗşş"
     },
     {
       "type": 0,
@@ -8705,6 +8733,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.label.note": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿŧḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.loading.message": [
     {
       "type": 0,
@@ -8727,6 +8769,34 @@
     {
       "type": 0,
       "value": "Ŀǿǿȧȧḓīƞɠ ȧȧḓḓřḗḗşşḗḗş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.message.no_delivery_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħḗḗřḗḗ ȧȧřḗḗ ƞǿǿ īŧḗḗḿş ŧǿǿ ḓḗḗŀīṽḗḗř. Ȧŀŀ īŧḗḗḿş ȧȧřḗḗ ƥīƈķŭŭƥ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.message.pickup_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗ īŧḗḗḿş ȧȧřḗḗ şḗḗŧ ƒǿǿř ƥīƈķŭŭƥ ȧȧƞḓ ȧȧřḗḗ ƞǿǿŧ şħǿǿẇƞ ħḗḗřḗḗ. Ǿƞŀẏ ḓḗḗŀīṽḗḗřẏ īŧḗḗḿş ƈȧȧƞ ƀḗḗ ȧȧşşīɠƞḗḗḓ ŧǿǿ ȧȧḓḓřḗḗşşḗḗş."
     },
     {
       "type": 0,
@@ -8817,6 +8887,34 @@
       "value": "]"
     }
   ],
+  "shipping_options.action.send_as_a_gift": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓǿǿ ẏǿǿŭŭ ẇȧȧƞŧ ŧǿǿ şḗḗƞḓ ŧħīş ȧȧş ȧȧ ɠīƒŧ?"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_options.action.send_as_gift_wrapping": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƞḓ ȧȧş ȧȧ ɠīƒŧ (ɠīƒŧ ẇřȧȧƥƥīƞɠ)"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -8845,6 +8943,20 @@
       "value": "]"
     }
   ],
+  "shipping_options.help.notifications": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ƈȧȧƞ ḗḗƞȧȧƀŀḗḗ ǿǿř ḓīşȧȧƀŀḗḗ ƞǿǿŧīƒīƈȧȧŧīǿǿƞş ȧȧŧ ȧȧƞẏ ŧīḿḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_options.label.no_method_selected": [
     {
       "type": 0,
@@ -8853,6 +8965,28 @@
     {
       "type": 0,
       "value": "Ƞǿǿ şħīƥƥīƞɠ ḿḗḗŧħǿǿḓ şḗḗŀḗḗƈŧḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_options.label.shipment_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥḿḗḗƞŧ "
+    },
+    {
+      "type": 1,
+      "value": "index"
+    },
+    {
+      "type": 0,
+      "value": ":"
     },
     {
       "type": 0,
@@ -8892,6 +9026,20 @@
     }
   ],
   "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥƥīƞɠ & Ɠīƒŧ Ǿƥŧīǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_options.title.shipping_method": [
     {
       "type": 0,
       "value": "["
@@ -9497,6 +9645,20 @@
     {
       "type": 0,
       "value": ":"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ"
     },
     {
       "type": 0,

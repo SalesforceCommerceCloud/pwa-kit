@@ -68,7 +68,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
         derivedData: {
             hasBasket: true,
             totalItems: 1
-        }
+        },
+        refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
     })
 }))
 
@@ -233,5 +234,43 @@ describe('ShippingAddress Component', () => {
 
         // Basic rendering test - component should render main elements
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
+    })
+
+    test('shows multiship header action and toggles to multi-address view', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    productItems: [{itemId: 'i1'}, {itemId: 'i2'}],
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingAddress: null
+                        }
+                    ]
+                },
+                derivedData: {hasBasket: true, totalItems: 2},
+                refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+            })
+        }))
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+
+        const {user} = localRenderWithProviders(<Component />)
+
+        const multishipLink = screen.getByRole('button', {
+            name: 'Ship to multiple addresses'
+        })
+        expect(multishipLink).toBeInTheDocument()
+
+        await user.click(multishipLink)
+
+        expect(screen.getByRole('button', {name: 'Ship items to one address'})).toBeInTheDocument()
     })
 })
