@@ -39,7 +39,7 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {isServer, setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
@@ -241,13 +241,16 @@ export const AuthModal = ({
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
+            // To simplify testing I trigger the register passkey flow from login
+            // In reality this should be triggered only upon registration.
+            setSessionJSONItem('newAccountCreated', true)
             // Execute action to be performed on successful login
             onLoginSuccess()
         }
 
         if (registering) {
             // Set flag for passkey toast on account page
-            sessionStorage.setItem('newAccountCreated', 'true')
+            setSessionJSONItem('newAccountCreated', true)
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }

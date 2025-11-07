@@ -44,7 +44,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import {isHydrated, getSessionJSONItem, clearSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
 import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 
@@ -105,10 +105,10 @@ const Account = () => {
     
     // Show passkey toast if user just registered (from any source)
     useEffect(() => {
-        if (sessionStorage.getItem('newAccountCreated')) {
+        if (getSessionJSONItem('newAccountCreated')) {
             showToast()
             // Clear flag immediately
-            sessionStorage.removeItem('newAccountCreated')
+            clearSessionJSONItem('newAccountCreated')
         }
     }, [])
     

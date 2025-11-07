@@ -52,6 +52,7 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Constants
 import {
@@ -160,7 +161,7 @@ const CheckoutConfirmation = () => {
             await saveShippingAddress(registerData.customerId)
 
             // Set flag for passkey toast on account page
-            sessionStorage.setItem('newAccountCreated', 'true')
+            setSessionJSONItem('newAccountCreated', true)
 
             navigate(`/account`)
         } catch (error) {
