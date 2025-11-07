@@ -28,11 +28,14 @@ jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () =>
 
 jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     // eslint-disable-next-line react/prop-types
-    const MockOtpAuth = function ({isOpen, handleOtpVerification}) {
+    const MockOtpAuth = function ({isOpen, handleOtpVerification, isGuestRegistration}) {
         return isOpen ? (
-            <button onClick={() => handleOtpVerification('otp-123')} data-testid="otp-verify">
-                Verify OTP
-            </button>
+            <>
+                <div data-testid={isGuestRegistration ? 'otp-guest' : 'otp-returning'} />
+                <button onClick={() => handleOtpVerification('otp-123')} data-testid="otp-verify">
+                    Verify OTP
+                </button>
+            </>
         ) : null
     }
     return MockOtpAuth
@@ -99,6 +102,8 @@ describe('UserRegistration', () => {
         await user.click(screen.getByRole('checkbox', {name: /Create an account/i}))
         expect(props.setEnableUserRegistration).toHaveBeenCalledWith(true)
         expect(props.onSavePreferenceChange).toHaveBeenCalledWith(true)
+        // Guest registration OTP modal should render with guest flag
+        expect(await screen.findByTestId('otp-guest')).toBeInTheDocument()
         // Modal appears (mocked), verify OTP triggers onRegistered callback
         const otpButton = await screen.findByTestId('otp-verify')
         await user.click(otpButton)

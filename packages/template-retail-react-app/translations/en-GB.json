@@ -21,37 +21,37 @@
     "defaultMessage": "Make default"
   },
   "account.payments.error.payment_method_remove_failed": {
-    "defaultMessage": "Unable to remove payment method"
+    "defaultMessage": "We couldn't remove the payment method. Try again."
   },
   "account.payments.error.payment_method_save_failed": {
-    "defaultMessage": "Unable to save payment method"
+    "defaultMessage": "We couldn't save the payment method. Try again."
   },
   "account.payments.error.set_default_failed": {
-    "defaultMessage": "Unable to set default payment method"
+    "defaultMessage": "We couldnt make the payment method as default. Try again."
   },
   "account.payments.heading.payment_methods": {
     "defaultMessage": "Payment Methods"
   },
   "account.payments.info.default_payment_updated": {
-    "defaultMessage": "Default payment method updated"
+    "defaultMessage": "Payment method was made as default."
   },
   "account.payments.info.payment_method_removed": {
-    "defaultMessage": "Payment method removed"
+    "defaultMessage": "Payment method was removed."
   },
   "account.payments.info.payment_method_saved": {
-    "defaultMessage": "New payment method saved"
+    "defaultMessage": "New payment method was saved."
   },
   "account.payments.message.error": {
-    "defaultMessage": "Error loading payment methods. Please try again."
+    "defaultMessage": "We couldn't load the payment methods. Try again."
   },
   "account.payments.message.loading": {
     "defaultMessage": "Loading payment methods..."
   },
   "account.payments.placeholder.heading": {
-    "defaultMessage": "No Saved Payments"
+    "defaultMessage": "No Saved Payment Methods"
   },
   "account.payments.placeholder.text": {
-    "defaultMessage": "Add a new payment method for faster checkout."
+    "defaultMessage": "Add a new payment method to check out faster."
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
@@ -154,7 +154,7 @@
     "defaultMessage": "Order History"
   },
   "account_payments.button.add_payment": {
-    "defaultMessage": "Add Payment"
+    "defaultMessage": "Add Payment Method"
   },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
@@ -328,19 +328,19 @@
     "defaultMessage": "Could not save shipping address."
   },
   "checkout.label.user_registration": {
-    "defaultMessage": "Create an account for a faster checkout"
+    "defaultMessage": "Create an account to check out faster"
   },
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
   },
   "checkout.message.user_registration": {
-    "defaultMessage": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
+    "defaultMessage": "Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
   },
   "checkout.payment.save_payment_method": {
     "defaultMessage": "Save this payment method for future use"
   },
   "checkout.title.user_registration": {
-    "defaultMessage": "Save for Future Use"
+    "defaultMessage": "Save Checkout Info for Future Use"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
@@ -1234,26 +1234,35 @@
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
   },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "Cancel"
+  },
   "otp.button.checkout_as_guest": {
-    "defaultMessage": "Checkout as a guest"
+    "defaultMessage": "Checkout as a Guest"
   },
   "otp.button.resend_code": {
-    "defaultMessage": "Resend code"
+    "defaultMessage": "Resend Code"
   },
   "otp.button.resend_timer": {
-    "defaultMessage": "Resend code in {timer}s"
+    "defaultMessage": "Resend code in {timer} seconds..."
   },
   "otp.error.invalid_code": {
-    "defaultMessage": "Invalid or expired code. Please try again."
+    "defaultMessage": "The code is invalid or expired. Click Resend Code and try again."
   },
-  "otp.message.enter_code_for_account": {
-    "defaultMessage": "To use your account information enter the code sent to your email."
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the 6-digit code below."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "To log in to your account, enter the code sent to your email."
   },
   "otp.message.verifying": {
     "defaultMessage": "Verifying code..."
   },
   "otp.title.confirm_its_you": {
     "defaultMessage": "Confirm it's you"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "Create an account"
   },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
