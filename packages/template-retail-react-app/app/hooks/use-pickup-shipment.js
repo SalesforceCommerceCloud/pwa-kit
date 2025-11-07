@@ -68,11 +68,19 @@ export const usePickupShipment = (basket) => {
      * @returns {Promise<Object>} The updated shipment response
      */
     const updatePickupShipment = async (basketId, storeInfo, options = {}) => {
-        const defaultPickupShippingMethodId = '005'
-        const {pickupShippingMethodId = defaultPickupShippingMethodId} = options
+        let {pickupShippingMethodId} = options
 
         if (!storeInfo?.inventoryId) {
             return
+        }
+
+        if (!pickupShippingMethodId) {
+            const {data: fetchedShippingMethods} = await refetchShippingMethods()
+            pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
+        }
+
+        if (!pickupShippingMethodId) {
+            throw new Error('No pickup shipping method available for this site')
         }
 
         // Update shipment to ensure pickup configuration

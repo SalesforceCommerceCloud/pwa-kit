@@ -275,8 +275,29 @@ const Payment = ({
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
                     }
                 })
-                // After auto-apply, if we already have a shipping address, submit billing so we can advance
-                if (selectedShippingAddress) {
+                if (isPickupOrder) {
+                    try {
+                        const saved = customer?.paymentInstruments?.find(
+                            (pi) => pi.paymentInstrumentId === preferred.paymentInstrumentId
+                        )
+                        const addr = saved?.billingAddress
+                        if (addr) {
+                            const {
+                                addressId,
+                                creationDate,
+                                lastModified,
+                                preferred,
+                                ...cleaned
+                            } = addr
+                            await updateBillingAddressForBasket({
+                                body: cleaned,
+                                parameters: {basketId: activeBasketIdRef.current || basket.basketId}
+                            })
+                        }
+                } catch {
+                        // ignore; user can enter billing manually
+                    }
+                } else if (selectedShippingAddress) {
                     await onBillingSubmit()
                     // Ensure basket is refreshed with payment & billing
                     await currentBasketQuery.refetch()
@@ -324,6 +345,29 @@ const Payment = ({
                 }
             })
             await currentBasketQuery.refetch()
+            if (isPickupOrder) {
+                try {
+                    const saved = customer?.paymentInstruments?.find(
+                        (pi) => pi.paymentInstrumentId === paymentInstrumentId
+                    )
+                    const addr = saved?.billingAddress
+                    if (addr) {
+                        const {
+                            addressId,
+                            creationDate,
+                            lastModified,
+                            preferred,
+                            ...cleaned
+                        } = addr
+                        await updateBillingAddressForBasket({
+                            body: cleaned,
+                            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
+                        })
+                        await currentBasketQuery.refetch()
+                    }
+                } catch {
+                }
+            }
             setIsApplyingSavedPayment(false)
             onSelectedPaymentMethodChange?.(paymentInstrumentId)
         }
