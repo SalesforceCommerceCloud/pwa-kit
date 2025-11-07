@@ -39,8 +39,6 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
@@ -84,7 +82,6 @@ export const AuthModal = ({
     const [currentView, setCurrentView] = useState(initialView)
     const form = useForm()
     const toast = useToast()
-    const {showToast, passkeyModal} = usePasskeyRegistration()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
@@ -249,8 +246,8 @@ export const AuthModal = ({
         }
 
         if (registering) {
-            // Show account created toast with create passkey button
-            showToast()
+            // Set flag for passkey toast on account page
+            sessionStorage.setItem('newAccountCreated', 'true')
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
@@ -322,8 +319,6 @@ export const AuthModal = ({
                 </ModalBody>
             </ModalContent>
         </Modal>
-
-        <PasskeyRegistrationModal {...passkeyModal} />
         </>
     )
 }

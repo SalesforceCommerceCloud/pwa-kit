@@ -45,6 +45,8 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -96,8 +98,20 @@ const Account = () => {
 
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
+    
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const {buildUrl} = useMultiSite()
+    
+    // Show passkey toast if user just registered (from any source)
+    useEffect(() => {
+        if (sessionStorage.getItem('newAccountCreated')) {
+            showToast()
+            // Clear flag immediately
+            sessionStorage.removeItem('newAccountCreated')
+        }
+    }, [])
+    
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -243,6 +257,7 @@ const Account = () => {
                     </Route>
                 </Switch>
             </Grid>
+            <PasskeyRegistrationModal {...passkeyModal} />
         </Box>
     )
 }

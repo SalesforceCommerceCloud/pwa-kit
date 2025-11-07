@@ -52,8 +52,6 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-modal'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 
 // Constants
 import {
@@ -85,7 +83,6 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
-    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -162,8 +159,8 @@ const CheckoutConfirmation = () => {
             // Save the shipping address from this order, should not block account creation
             await saveShippingAddress(registerData.customerId)
 
-            // Show account created toast
-            showToast()
+            // Set flag for passkey toast on account page
+            sessionStorage.setItem('newAccountCreated', 'true')
 
             navigate(`/account`)
         } catch (error) {
@@ -588,7 +585,6 @@ const CheckoutConfirmation = () => {
                     </Box>
                 </Stack>
             </Container>
-            <PasskeyRegistrationModal {...passkeyModal} />
         </Box>
     )
 }
