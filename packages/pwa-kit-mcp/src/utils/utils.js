@@ -7,9 +7,11 @@
 import fs from 'fs'
 import fsPromises from 'fs/promises'
 import path from 'path'
+import os from 'os'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
+import {execSync} from 'child_process'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -483,5 +485,245 @@ function checkCommerceSDKInNodeModules(nodeModulesPath) {
         }
     }
 
+    return null
+}
+
+/**
+ * Recursively searches for a file in a directory using native OS commands for better performance
+ * Falls back to JS implementation if OS commands fail
+ * @param {string} dir - Directory to search in
+ * @param {string} filename - Filename to search for
+ * @param {number} maxDepth - Maximum depth to search (default: 10)
+ * @returns {string|null} Full path to the file if found, null otherwise
+ */
+function findFileRecursively(dir, filename, maxDepth = 10) {
+    try {
+        // Try using native OS commands for better performance
+        const isWindows = process.platform === 'win32'
+
+        let result
+        if (isWindows) {
+            // Windows: Use Get-ChildItem (PowerShell) or dir with recursion
+            try {
+                // PowerShell command for recursive search
+                const psCommand = `Get-ChildItem -Path "${dir}" -Filter "${filename}" -Recurse -Depth ${maxDepth} -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName`
+                result = execSync(`powershell -Command "${psCommand}"`, {
+                    encoding: 'utf8',
+                    stdio: ['pipe', 'pipe', 'pipe'],
+                    timeout: 5000
+                }).trim()
+            } catch (psError) {
+                logMCPMessage(`PowerShell search failed: ${psError.message}`)
+                return findFileRecursivelyFallback(dir, filename, maxDepth, 0)
+            }
+        } else {
+            // Unix/Linux/Mac: Use find command
+            const excludeDirs = [
+                'node_modules',
+                '.git',
+                '.next',
+                'dist',
+                'build',
+                'coverage',
+                '.cache',
+                'tmp',
+                'temp'
+            ]
+            const pruneConditions = excludeDirs.map((d) => `-path "*/${d}/*" -prune`).join(' -o ')
+            const findCommand = `find "${dir}" -maxdepth ${maxDepth} \\( ${pruneConditions} \\) -o -type f -name "${filename}" -print -quit`
+
+            result = execSync(findCommand, {
+                encoding: 'utf8',
+                stdio: ['pipe', 'pipe', 'pipe'],
+                timeout: 5000
+            }).trim()
+        }
+
+        return result || null
+    } catch (error) {
+        logMCPMessage(`Native OS search failed, using fallback: ${error.message}`)
+        return findFileRecursivelyFallback(dir, filename, maxDepth, 0)
+    }
+}
+
+/**
+ * Fallback JavaScript implementation for file search
+ * @param {string} dir - Directory to search in
+ * @param {string} filename - Filename to search for
+ * @param {number} maxDepth - Maximum depth to search
+ * @param {number} currentDepth - Current recursion depth
+ * @returns {string|null} Full path to the file if found, null otherwise
+ */
+function findFileRecursivelyFallback(dir, filename, maxDepth, currentDepth) {
+    if (currentDepth > maxDepth) {
+        return null
+    }
+
+    try {
+        const entries = fs.readdirSync(dir, {withFileTypes: true})
+
+        // Check if file exists in current directory first
+        for (const entry of entries) {
+            if (entry.isFile() && entry.name === filename) {
+                return path.join(dir, entry.name)
+            }
+        }
+
+        // Skip common directories that are unlikely to contain custom API files
+        const skipDirs = new Set([
+            'node_modules',
+            '.git',
+            '.next',
+            'dist',
+            'build',
+            'coverage',
+            '.cache',
+            'tmp',
+            'temp'
+        ])
+
+        // Recursively search subdirectories
+        for (const entry of entries) {
+            if (entry.isDirectory() && !skipDirs.has(entry.name)) {
+                const found = findFileRecursivelyFallback(
+                    path.join(dir, entry.name),
+                    filename,
+                    maxDepth,
+                    currentDepth + 1
+                )
+                if (found) {
+                    return found
+                }
+            }
+        }
+    } catch (error) {
+        // Silently skip directories we don't have permission to read
+        if (error.code !== 'EACCES' && error.code !== 'EPERM') {
+            logMCPMessage(`Error searching directory ${dir}: ${error.message}`)
+        }
+    }
+
+    return null
+}
+
+/**
+ * Searches for api.json and schema.yaml in a given directory path
+ * @param {string} searchPath - Directory path to search in
+ * @param {string} source - Source identifier for logging (e.g., 'SFCC_CUSTOM_API_CARTRIDGE_PATH')
+ * @returns {Object|null} Object containing apiJson and schemaYaml content, or null if not found
+ */
+function searchForCustomApiFiles(searchPath, source) {
+    if (!searchPath || !fs.existsSync(searchPath)) {
+        logMCPMessage(`Search path does not exist: ${searchPath}`)
+        return null
+    }
+
+    try {
+        // Search for api.json recursively
+        const apiJsonPath = findFileRecursively(searchPath, 'api.json')
+
+        if (!apiJsonPath) {
+            logMCPMessage(`api.json not found in: ${searchPath}`)
+            return null
+        }
+
+        logMCPMessage(`Found api.json at: ${apiJsonPath} (source: ${source})`)
+        const apiJson = JSON.parse(fs.readFileSync(apiJsonPath, 'utf-8'))
+
+        // Search for schema.yaml in the same directory as api.json first, then recursively
+        const apiJsonDir = path.dirname(apiJsonPath)
+        let schemaYamlPath = path.join(apiJsonDir, 'schema.yaml')
+
+        if (!fs.existsSync(schemaYamlPath)) {
+            // If not found in same directory, search recursively from api.json directory
+            schemaYamlPath = findFileRecursively(apiJsonDir, 'schema.yaml')
+        }
+
+        let schemaYaml = null
+        if (schemaYamlPath && fs.existsSync(schemaYamlPath)) {
+            logMCPMessage(`Found schema.yaml at: ${schemaYamlPath}`)
+            schemaYaml = fs.readFileSync(schemaYamlPath, 'utf-8')
+        } else {
+            logMCPMessage(`schema.yaml not found, continuing without schema`)
+        }
+
+        return {apiJson, schemaYaml, apiJsonPath, schemaYamlPath, source}
+    } catch (error) {
+        logMCPMessage(`Error reading custom API from ${searchPath}: ${error.message}`)
+        return null
+    }
+}
+
+/**
+ * Loads custom API configuration from local filesystem fallback paths
+ * Search priority:
+ * 1. SFCC_CARTRIDGE_PATH env var
+ * 2. PWA_STOREFRONT_APP_PATH (search up parent directories and down subdirectories)
+ * @returns {Object|null} Object containing apiJson and schemaYaml content, or null if not found
+ */
+export function loadCustomApiFromFallbackPath() {
+    // Priority 1: Check SFCC_CARTRIDGE_PATH
+    const customApiPath = process.env.SFCC_CARTRIDGE_PATH
+    if (customApiPath) {
+        const result = searchForCustomApiFiles(customApiPath, 'SFCC_CARTRIDGE_PATH')
+        if (result) {
+            return result
+        }
+    }
+
+    // Priority 2: Check PWA_STOREFRONT_APP_PATH and traverse up/down
+    const storefrontAppPath = process.env.PWA_STOREFRONT_APP_PATH
+    if (storefrontAppPath && fs.existsSync(storefrontAppPath)) {
+        logMCPMessage(
+            `Searching for custom API files from PWA_STOREFRONT_APP_PATH: ${storefrontAppPath}`
+        )
+
+        // First search in the app path itself and its subdirectories
+        let result = searchForCustomApiFiles(storefrontAppPath, 'PWA_STOREFRONT_APP_PATH')
+        if (result) {
+            return result
+        }
+
+        // Traverse up parent directories until we hit root or home directory
+        let currentPath = path.resolve(storefrontAppPath)
+        const homeDir = os.homedir()
+        const rootDir = path.parse(currentPath).root
+        let level = 0
+
+        while (currentPath !== rootDir && currentPath !== homeDir) {
+            const parentPath = path.dirname(currentPath)
+
+            // Stop if we've reached the root or same path (safety check)
+            if (parentPath === currentPath) {
+                break
+            }
+
+            level++
+            logMCPMessage(`Searching parent directory (level ${level}): ${parentPath}`)
+            result = searchForCustomApiFiles(
+                parentPath,
+                `PWA_STOREFRONT_APP_PATH (parent ${level})`
+            )
+            if (result) {
+                return result
+            }
+
+            currentPath = parentPath
+
+            // Safety limit: stop at 10 levels to prevent excessive traversal
+            if (level >= 10) {
+                logMCPMessage('Reached maximum parent directory traversal depth (10 levels)')
+                break
+            }
+        }
+
+        if (currentPath === homeDir) {
+            logMCPMessage('Stopped search at home directory')
+        } else if (currentPath === rootDir) {
+            logMCPMessage('Stopped search at filesystem root')
+        }
+    }
+
+    logMCPMessage('No custom API files found in any fallback location')
     return null
 }
