@@ -204,15 +204,35 @@ describe('ShippingOptions Component', () => {
         const methods1 = {
             defaultShippingMethodId: 'std',
             applicableShippingMethods: [
-                {id: 'std', name: 'Standard Shipping (4-5 days)', description: 'Arrives: Sept 13-14', price: 0},
-                {id: 'exp', name: 'Express Shipping (Overnight)', description: 'Arrives: Tomorrow, Sept 12', price: 10}
+                {
+                    id: 'std',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'exp',
+                    name: 'Express Shipping (Overnight)',
+                    description: 'Arrives: Tomorrow, Sept 12',
+                    price: 10
+                }
             ]
         }
         const methods2 = {
             defaultShippingMethodId: 'std2',
             applicableShippingMethods: [
-                {id: 'std2', name: 'Standard Shipping (4-5 days)', description: 'Arrives: Sept 13-14', price: 0},
-                {id: 'prio', name: 'Priority Shipping', description: 'Arrives: Today at 5-9 PM', price: 25}
+                {
+                    id: 'std2',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'prio',
+                    name: 'Priority Shipping',
+                    description: 'Arrives: Today at 5-9 PM',
+                    price: 25
+                }
             ]
         }
 
@@ -221,26 +241,51 @@ describe('ShippingOptions Component', () => {
                 data: {
                     basketId: 'test-basket-id',
                     shipments: [
-                        {shipmentId: 'ship1', shippingAddress: {firstName: 'Oscar', lastName: 'Robertson', address1: '333 South Street Station', city: 'West Lafayette', stateCode: 'IN', postalCode: '98103'}, shippingMethod: null},
-                        {shipmentId: 'ship2', shippingAddress: {firstName: 'Lee', lastName: 'Robertson', address1: '158 South Street Station', city: 'West Lafayette', stateCode: 'IN', postalCode: '98103'}, shippingMethod: null}
+                        {
+                            shipmentId: 'ship1',
+                            shippingAddress: {
+                                firstName: 'Oscar',
+                                lastName: 'Robertson',
+                                address1: '333 South Street Station',
+                                city: 'West Lafayette',
+                                stateCode: 'IN',
+                                postalCode: '98103'
+                            },
+                            shippingMethod: null
+                        },
+                        {
+                            shipmentId: 'ship2',
+                            shippingAddress: {
+                                firstName: 'Lee',
+                                lastName: 'Robertson',
+                                address1: '158 South Street Station',
+                                city: 'West Lafayette',
+                                stateCode: 'IN',
+                                postalCode: '98103'
+                            },
+                            shippingMethod: null
+                        }
                     ]
                 },
                 derivedData: {hasBasket: true, totalItems: 2}
             })
         }))
 
-        const sdk = require('@salesforce/commerce-sdk-react')
+        const sdk = await import('@salesforce/commerce-sdk-react')
         sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
             if (parameters.shipmentId === 'ship1') return {data: methods1}
             if (parameters.shipmentId === 'ship2') return {data: methods2}
             return {data: methods1}
         })
 
-        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options')
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+        )
+        const Component = module.default
 
         const {user} = renderWithProviders(<Component />)
 
-        expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+        expect(screen.getByText('Shipping Method')).toBeInTheDocument()
         expect(screen.getByText('Shipment 1:')).toBeInTheDocument()
         expect(screen.getByText('Shipment 2:')).toBeInTheDocument()
 

@@ -23,7 +23,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {Box, Button, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -198,7 +198,15 @@ export default function ShippingAddress() {
         }
 
         autoSelectPreferredAddress()
-    }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading, multishipEnabled, hasMultipleProductItems])
+    }, [
+        step,
+        customer,
+        selectedShippingAddress,
+        hasAutoSelected,
+        isLoading,
+        multishipEnabled,
+        hasMultipleProductItems
+    ])
 
     return (
         <ToggleCard

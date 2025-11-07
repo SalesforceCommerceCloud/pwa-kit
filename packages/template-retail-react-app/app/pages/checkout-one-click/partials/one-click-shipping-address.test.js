@@ -252,7 +252,10 @@ describe('ShippingAddress Component', () => {
                 derivedData: {hasBasket: true, totalItems: 2}
             })
         }))
-        const {default: Component} = require('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address')
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
 
         const {user} = renderWithProviders(<Component />)
 
@@ -263,8 +266,6 @@ describe('ShippingAddress Component', () => {
 
         await user.click(multishipLink)
 
-        expect(
-            screen.getByRole('button', {name: 'Ship items to one address'})
-        ).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: 'Ship items to one address'})).toBeInTheDocument()
     })
 })

@@ -32,6 +32,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import PropTypes from 'prop-types'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
@@ -266,7 +267,10 @@ export default function ShippingOptions() {
                                                             <Flex justify="space-between" w="full">
                                                                 <Box>
                                                                     <Text>{opt.name}</Text>
-                                                                    <Text fontSize="sm" color="gray.600">
+                                                                    <Text
+                                                                        fontSize="sm"
+                                                                        color="gray.600"
+                                                                    >
                                                                         {opt.description}
                                                                     </Text>
                                                                 </Box>
@@ -278,15 +282,17 @@ export default function ShippingOptions() {
                                                                     />
                                                                 </Text>
                                                             </Flex>
-                                                            {opt.shippingPromotions?.map((promo) => (
-                                                                <Text
-                                                                    key={promo.promotionId}
-                                                                    fontSize="sm"
-                                                                    color="green.600"
-                                                                >
-                                                                    {promo.calloutMsg}
-                                                                </Text>
-                                                            ))}
+                                                            {opt.shippingPromotions?.map(
+                                                                (promo) => (
+                                                                    <Text
+                                                                        key={promo.promotionId}
+                                                                        fontSize="sm"
+                                                                        color="green.600"
+                                                                    >
+                                                                        {promo.calloutMsg}
+                                                                    </Text>
+                                                                )
+                                                            )}
                                                         </Radio>
                                                     )
                                                 )}
@@ -322,55 +328,55 @@ export default function ShippingOptions() {
                 !effectiveIsLoading &&
                 selectedShippingMethod &&
                 selectedShippingAddress && (
-                <ToggleCardSummary>
-                    <Flex justify="space-between" w="full">
-                        <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                            <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                                {selectedMethodDisplayPrice === 0 ? (
-                                    freeLabel
-                                ) : (
-                                    <FormattedNumber
-                                        value={selectedMethodDisplayPrice}
-                                        style="currency"
-                                        currency={currency}
-                                    />
-                                )}
-                            </Text>
-                            {selectedMethodDisplayPrice !== shippingItem.price && (
-                                <Text
-                                    fontWeight="normal"
-                                    textDecoration="line-through"
-                                    color="gray.600"
-                                    marginLeft={1}
-                                    aria-hidden="true"
-                                    role="presentation"
-                                >
-                                    <FormattedNumber
-                                        style="currency"
-                                        currency={currency}
-                                        value={shippingItem.price}
-                                    />
+                    <ToggleCardSummary>
+                        <Flex justify="space-between" w="full">
+                            <Text>{selectedShippingMethod.name}</Text>
+                            <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
+                                <Text fontWeight="bold" aria-hidden="true" role="presentation">
+                                    {selectedMethodDisplayPrice === 0 ? (
+                                        freeLabel
+                                    ) : (
+                                        <FormattedNumber
+                                            value={selectedMethodDisplayPrice}
+                                            style="currency"
+                                            currency={currency}
+                                        />
+                                    )}
                                 </Text>
-                            )}
+                                {selectedMethodDisplayPrice !== shippingItem.price && (
+                                    <Text
+                                        fontWeight="normal"
+                                        textDecoration="line-through"
+                                        color="gray.600"
+                                        marginLeft={1}
+                                        aria-hidden="true"
+                                        role="presentation"
+                                    >
+                                        <FormattedNumber
+                                            style="currency"
+                                            currency={currency}
+                                            value={shippingItem.price}
+                                        />
+                                    </Text>
+                                )}
+                            </Flex>
                         </Flex>
-                    </Flex>
-                    <Text fontSize="sm" color="gray.700">
-                        {selectedShippingMethod.description}
-                    </Text>
-                    {shippingItem?.priceAdjustments?.map((adjustment) => {
-                        return (
-                            <Text
-                                key={adjustment.priceAdjustmentId}
-                                fontSize="sm"
-                                color="green.600"
-                            >
-                                {adjustment.itemText}
-                            </Text>
-                        )
-                    })}
-                </ToggleCardSummary>
-            )}
+                        <Text fontSize="sm" color="gray.700">
+                            {selectedShippingMethod.description}
+                        </Text>
+                        {shippingItem?.priceAdjustments?.map((adjustment) => {
+                            return (
+                                <Text
+                                    key={adjustment.priceAdjustmentId}
+                                    fontSize="sm"
+                                    color="green.600"
+                                >
+                                    {adjustment.itemText}
+                                </Text>
+                            )
+                        })}
+                    </ToggleCardSummary>
+                )}
         </ToggleCard>
     )
 }
@@ -432,7 +438,10 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                     onChange={async (val) => {
                         setSelected(val)
                         await updateShippingMethod.mutateAsync({
-                            parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
+                            parameters: {
+                                basketId: basket.basketId,
+                                shipmentId: shipment.shipmentId
+                            },
                             body: {id: val}
                         })
                     }}
@@ -482,4 +491,10 @@ const ShipmentMethods = ({shipment, index, currency}) => {
             </Box>
         </Box>
     )
+}
+
+ShipmentMethods.propTypes = {
+    shipment: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired,
+    currency: PropTypes.string.isRequired
 }

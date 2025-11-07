@@ -7,7 +7,13 @@
 import React from 'react'
 import {defineMessages, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Stack, Text, Flex, Divider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Stack,
+    Text,
+    Flex,
+    Divider
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'

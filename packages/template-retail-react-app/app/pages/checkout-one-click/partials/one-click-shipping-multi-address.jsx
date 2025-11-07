@@ -32,8 +32,7 @@ import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/c
 const OneClickShippingMultiAddress = ({
     basket,
     submitButtonLabel,
-    onUnsavedGuestAddressesToggleWarning,
-    onBackToSingle
+    onUnsavedGuestAddressesToggleWarning
 }) => {
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
@@ -44,10 +43,7 @@ const OneClickShippingMultiAddress = ({
         .map((item) => item.productId)
         .join(',')
 
-    const {
-        data: productsMap,
-        isLoading: productsLoading
-    } = useProducts(
+    const {data: productsMap, isLoading: productsLoading} = useProducts(
         {parameters: {ids: productIds, allImages: true}},
         {
             enabled: Boolean(productIds),
@@ -100,7 +96,7 @@ const OneClickShippingMultiAddress = ({
             <Center py={8} px={4}>
                 <Text>
                     {formatMessage({
-                        defaultMessage: "There are no items to deliver. All items are pickup.",
+                        defaultMessage: 'There are no items to deliver. All items are pickup.',
                         id: 'shipping_multi_address.message.no_delivery_items'
                     })}
                 </Text>
@@ -153,7 +149,14 @@ const OneClickShippingMultiAddress = ({
             )}
 
             <VStack spacing={0}>
-                <Box border="1px solid" borderColor="gray.200" borderRadius="md" bg="white" p={2} w="100%">
+                <Box
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    bg="white"
+                    p={2}
+                    w="100%"
+                >
                     <VStack spacing={2} w="100%" h="100%">
                         {productAddressAssignment.deliveryItems.map((item) => {
                             const productDetail = productsMap?.[item.productId] || {}
@@ -172,7 +175,9 @@ const OneClickShippingMultiAddress = ({
                                     variant={variant}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
-                                    selectedAddressId={productAddressAssignment.selectedAddresses[addressKey]}
+                                    selectedAddressId={
+                                        productAddressAssignment.selectedAddresses[addressKey]
+                                    }
                                     availableAddresses={addresses}
                                     isGuestUser={customer?.isGuest}
                                     customerLoading={customerLoading}
@@ -191,9 +196,7 @@ const OneClickShippingMultiAddress = ({
                 {hasUnpersistedGuestAddresses && onUnsavedGuestAddressesToggleWarning && (
                     <Alert status="warning" mt={4}>
                         <AlertIcon />
-                        <AlertDescription>
-                            {onUnsavedGuestAddressesToggleWarning}
-                        </AlertDescription>
+                        <AlertDescription>{onUnsavedGuestAddressesToggleWarning}</AlertDescription>
                     </Alert>
                 )}
 
@@ -204,10 +207,11 @@ const OneClickShippingMultiAddress = ({
                         isLoading={isSubmitting || isFormSubmitting || isLoading}
                         isDisabled={!allShipmentsHaveAddress || isLoading}
                     >
-                        {submitButtonLabel || formatMessage({
-                            defaultMessage: 'Continue to Shipping Method',
-                            id: 'shipping_address.button.continue_to_shipping'
-                        })}
+                        {submitButtonLabel ||
+                            formatMessage({
+                                defaultMessage: 'Continue to Shipping Method',
+                                id: 'shipping_address.button.continue_to_shipping'
+                            })}
                     </Button>
                 </Box>
             </VStack>
@@ -218,10 +222,7 @@ const OneClickShippingMultiAddress = ({
 OneClickShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     submitButtonLabel: PropTypes.object,
-    onUnsavedGuestAddressesToggleWarning: PropTypes.node,
-    onBackToSingle: PropTypes.func
+    onUnsavedGuestAddressesToggleWarning: PropTypes.node
 }
 
 export default OneClickShippingMultiAddress
-
-
