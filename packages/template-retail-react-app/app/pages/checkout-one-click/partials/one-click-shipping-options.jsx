@@ -200,7 +200,6 @@ export default function ShippingOptions() {
     const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
-    // Note: For multiship, we render per-shipment method selectors and do not auto-advance.
     return (
         <ToggleCard
             id="step-2"
