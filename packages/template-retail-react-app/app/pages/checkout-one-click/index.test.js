@@ -320,9 +320,7 @@ describe('Checkout One Click', () => {
         })
 
         await waitFor(() => {
-            expect(
-                screen.getByText(/pickup address & information/i)
-            ).toBeInTheDocument()
+            expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
         })
         await waitFor(() => {
             expect(screen.getByText(/shipping address/i)).toBeInTheDocument()

@@ -44,8 +44,7 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
@@ -81,8 +80,7 @@ const CheckoutOneClick = () => {
 
     // Compute shipment types
     const pickupShipments = basket?.shipments?.filter((s) => isPickupShipment(s)) || []
-    const deliveryShipments =
-        basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
     const hasPickupShipments = pickupShipments.length > 0
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
@@ -169,7 +167,7 @@ const CheckoutOneClick = () => {
         }
 
         // For one-click checkout, billing same as shipping by default
-        const billingSameAsShipping = !isPickupOrder
+        const billingSameAsShipping = !isPickupOnly
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -283,10 +281,6 @@ const CheckoutOneClick = () => {
                         if (customerId && shipping) {
                             // Whitelist fields and strip non-customer fields (e.g., id, _type)
                             const {
-                                addressId: _ignoreAddressId,
-                                creationDate: _ignoreCreation,
-                                lastModified: _ignoreModified,
-                                preferred: _ignorePreferred,
                                 address1,
                                 address2,
                                 city,
