@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect, useRef} from 'react'
+import React, {useState, useMemo, useEffect, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -71,6 +71,8 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
+
+    const activeBasketIdRef = useRef(null)
 
     // Use props for parent-managed state with fallback defaults
     const currentSelectedPaymentMethod =
@@ -150,6 +152,16 @@ const Payment = ({
         }
     }, [shouldSavePaymentMethod, onSavePreferenceChange])
 
+    // Handles user registration checkbox toggle (OTP handled by UserRegistration)
+    const onUserRegistrationToggle = async (checked) => {
+        setEnableUserRegistration(checked)
+        if (checked && isGuest) {
+            // Default preferences for newly registering guest
+            setBillingSameAsShipping(true)
+            setShouldSavePaymentMethod(true)
+        }
+    }
+
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
 
@@ -177,7 +189,7 @@ const Payment = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
-    const onPaymentSubmit = async (formValue) => {
+    const onPaymentSubmit = async (formValue, forcedBasketId) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
         // month and year to submit them as individual fields.
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
@@ -199,10 +211,41 @@ const Payment = ({
         }
 
         return addPaymentInstrumentToBasket({
-            parameters: {basketId: basket?.basketId},
+            parameters: {basketId: forcedBasketId || activeBasketIdRef.current || basket?.basketId},
             body: paymentInstrument
         })
     }
+
+    const handleRegistrationSuccess = useCallback(
+        async (newBasketId) => {
+            if (newBasketId) {
+                activeBasketIdRef.current = newBasketId
+            }
+            setShouldSavePaymentMethod(true)
+            try {
+                const values = paymentMethodForm?.getValues?.()
+                const hasEnteredCard = values?.number && values?.holder && values?.expiry
+                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
+                if (hasEnteredCard && !hasApplied && newBasketId) {
+                    await onPaymentSubmit(values, newBasketId)
+                    await currentBasketQuery.refetch()
+                }
+            } catch (_e) {
+                // non-blocking
+            }
+            showToast({
+                variant: 'subtle',
+                title: formatMessage({
+                    defaultMessage: 'You are now signed in.',
+                    id: 'auth_modal.description.now_signed_in_simple'
+                }),
+                status: 'success',
+                position: 'top-right',
+                isClosable: true
+            })
+        },
+        [paymentMethodForm, currentBasketQuery, onPaymentSubmit, showToast, formatMessage]
+    )
 
     // Auto-select a saved payment instrument for registered customers (run at most once)
     const autoAppliedRef = useRef(false)
@@ -215,7 +258,10 @@ const Payment = ({
             const isRegistered = customer?.isRegistered
             const hasSaved = customer?.paymentInstruments?.length > 0
             const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
-            if (!isRegistered || !hasSaved || alreadyApplied) return
+            // If the shopper is currently typing a new card, skip auto-apply of saved
+            const entered = paymentMethodForm?.getValues?.()
+            const hasEnteredCard = entered?.number && entered?.holder && entered?.expiry
+            if (!isRegistered || !hasSaved || alreadyApplied || hasEnteredCard) return
             autoAppliedRef.current = true
             const preferred =
                 customer.paymentInstruments.find((pi) => pi.default === true) ||
@@ -223,7 +269,7 @@ const Payment = ({
             try {
                 setIsApplyingSavedPayment(true)
                 await addPaymentInstrumentToBasket({
-                    parameters: {basketId: basket?.basketId},
+                    parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                     body: {
                         paymentMethodId: 'CREDIT_CARD',
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
@@ -271,7 +317,7 @@ const Payment = ({
         } else {
             setIsApplyingSavedPayment(true)
             await addPaymentInstrumentToBasket({
-                parameters: {basketId: basket?.basketId},
+                parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                 body: {
                     paymentMethodId: 'CREDIT_CARD',
                     customerPaymentInstrumentId: paymentInstrumentId
@@ -300,7 +346,7 @@ const Payment = ({
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId}
+            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
         })
     }
 
@@ -308,7 +354,7 @@ const Payment = ({
         try {
             await removePaymentInstrumentFromBasket({
                 parameters: {
-                    basketId: basket.basketId,
+                    basketId: activeBasketIdRef.current || basket.basketId,
                     paymentInstrumentId: appliedPayment.paymentInstrumentId
                 }
             })
@@ -322,7 +368,7 @@ const Payment = ({
     const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
         try {
             if (!appliedPayment) {
-                await onPaymentSubmit(paymentFormValues)
+                await onPaymentSubmit(paymentFormValues, activeBasketIdRef.current)
             }
 
             // Update billing address
@@ -406,6 +452,7 @@ const Payment = ({
                                             <SavePaymentMethod
                                                 paymentInstrument={currentFormPayment}
                                                 onSaved={handleSavePreferenceChange}
+                                                checked={shouldSavePaymentMethod}
                                             />
                                         )}
                                     </PaymentForm>
@@ -457,8 +504,14 @@ const Payment = ({
                                 {isGuest && (
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
-                                        setEnableUserRegistration={setEnableUserRegistration}
+                                        setEnableUserRegistration={onUserRegistrationToggle}
                                         isGuestCheckout={registeredUserChoseGuest}
+                                        isDisabled={
+                                            // Disable until there is either an applied payment or a valid form
+                                            !appliedPayment && !paymentMethodForm.formState.isValid
+                                        }
+                                        onSavePreferenceChange={onSavePreferenceChange}
+                                        onRegistered={handleRegistrationSuccess}
                                     />
                                 )}
                             </Stack>
@@ -489,14 +542,6 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        {/* Guest only: offer save for future use */}
-                        {isGuest && newPaymentInstruments.length > 0 && (
-                            <SavePaymentMethod
-                                paymentInstrument={newPaymentInstruments[0]}
-                                onSaved={onPaymentMethodSaved}
-                            />
-                        )}
-
                         <Divider borderColor="gray.100" />
 
                         {selectedBillingAddress && (
@@ -516,6 +561,9 @@ const Payment = ({
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
                                 isGuestCheckout={registeredUserChoseGuest}
+                                isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
+                                onSavePreferenceChange={onSavePreferenceChange}
+                                onRegistered={handleRegistrationSuccess}
                             />
                         )}
                     </Stack>

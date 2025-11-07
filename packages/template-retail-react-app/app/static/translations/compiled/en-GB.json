@@ -497,6 +497,12 @@
       "value": "You're now signed in."
     }
   ],
+  "auth_modal.description.now_signed_in_simple": [
+    {
+      "type": 0,
+      "value": "You are now signed in."
+    }
+  ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
@@ -779,6 +785,12 @@
     {
       "type": 0,
       "value": "Place Order"
+    }
+  ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "Could not save shipping address."
     }
   ],
   "checkout.label.user_registration": [

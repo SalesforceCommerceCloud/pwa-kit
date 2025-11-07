@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
@@ -21,6 +21,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -33,6 +34,7 @@ const shippingAddressAriaLabel = defineMessage({
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
+    const toast = useToast()
     const [isLoading, setIsLoading] = useState()
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const {data: customer} = useCurrentCustomer()
@@ -45,6 +47,8 @@ export default function ShippingAddress() {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
+    const updateCustomer = useShopperCustomersMutation('updateCustomer')
+    const hasSavedPhoneRef = useRef(false)
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -104,6 +108,26 @@ export default function ShippingAddress() {
                         addressName: addressId
                     }
                 })
+            }
+
+            // Persist phone number onto the customer profile as phoneHome
+            if (customer.isRegistered && phone && !hasSavedPhoneRef.current) {
+                try {
+                    await updateCustomer.mutateAsync({
+                        parameters: {customerId: customer.customerId},
+                        body: {phoneHome: phone}
+                    })
+                    hasSavedPhoneRef.current = true
+                } catch (_e) {
+                    toast({
+                        title: formatMessage({
+                            id: 'shipping_address.error.phone_not_saved',
+                            defaultMessage:
+                                'We could not save your phone number. You can continue checking out.'
+                        }),
+                        status: 'error'
+                    })
+                }
             }
 
             goToNextStep()
