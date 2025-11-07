@@ -72,6 +72,8 @@ const Payment = ({
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
 
+    const activeBasketIdRef = useRef(null)
+
     // Use props for parent-managed state with fallback defaults
     const currentSelectedPaymentMethod =
         selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
