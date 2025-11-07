@@ -17,6 +17,9 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-c
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 import {IntlProvider} from 'react-intl'
+jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
+    useAppOrigin: () => 'https://example.test'
+}))
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
@@ -52,8 +55,18 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-currency')
-jest.mock('@salesforce/commerce-sdk-react')
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context')
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const original = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...original,
+        useShopperBasketsMutation: jest.fn(),
+        useAuthHelper: jest.fn(() => ({mutateAsync: jest.fn()})),
+        useUsid: () => ({getUsidWhenReady: jest.fn().mockResolvedValue('usid-123')}),
+        useCustomerType: jest.fn(() => ({isGuest: true, isRegistered: false})),
+        useDNT: jest.fn(() => ({effectiveDnt: false}))
+    }
+})
 
 // Mock sub-components
 jest.mock('@salesforce/retail-react-app/app/components/promo-code', () => ({
