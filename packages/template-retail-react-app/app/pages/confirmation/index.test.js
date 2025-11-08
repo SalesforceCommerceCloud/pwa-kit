@@ -13,11 +13,12 @@ import {
     renderWithProviders,
     createPathWithDefaults
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import Confirmation from '@salesforce/retail-react-app/app/pages/checkout/confirmation'
+import Confirmation from '@salesforce/retail-react-app/app/pages/confirmation/index'
 import {
     mockOrder,
     mockProducts
-} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+} from '@salesforce/retail-react-app/app/pages/confirmation/index.mock'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const MockedComponent = () => {
     return (
@@ -75,6 +76,25 @@ test('Renders the Create Account form for guest customer', async () => {
 
     const password = screen.getByLabelText('Password')
     expect(password).toBeInTheDocument()
+})
+
+test('No Create Account form if oneClickCheckout is enabled', async () => {
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {
+            appConfig: {
+                ...mockConfig.app,
+                oneClickCheckout: {
+                    enabled: true
+                }
+            }
+        }
+    })
+
+    const createAccountButton = screen.queryByRole('button', {name: /create account/i})
+    expect(createAccountButton).not.toBeInTheDocument()
+
+    const passwordField = screen.queryByLabelText('Password')
+    expect(passwordField).not.toBeInTheDocument()
 })
 
 test('Create Account form - renders error message', async () => {
