@@ -726,7 +726,7 @@
                 "name": "Valid Site ID",
                 "description": "Ensures the Site ID is valid.",
                 "message": "Valid characters are alphanumeric, hyphen, or underscore",
-                "regex": "^[a-z0-9_-]+$"
+                "regex": "^[A-Za-z0-9_-]+$"
             },
             {
                 "id": "validShortCode",

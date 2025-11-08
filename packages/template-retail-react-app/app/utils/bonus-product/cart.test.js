@@ -12,7 +12,8 @@ describe('Bonus Product Cart Utilities', () => {
         bonusDiscountLineItems: [
             {
                 id: 'bonus-123',
-                promotionId: 'BonusProductOnOrderOfAmountAbove250'
+                promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                bonusProducts: [{productId: 'bonus-product-1'}] // List-based promotion
             }
         ],
         productItems: [
@@ -64,7 +65,8 @@ describe('Bonus Product Cart Utilities', () => {
                 {
                     id: 'bonus-123',
                     promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                    maxBonusItems: 4 // 4 total ties available
+                    maxBonusItems: 4, // 4 total ties available
+                    bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based promotion
                 }
             ],
             productItems: [
@@ -253,13 +255,79 @@ describe('Bonus Product Cart Utilities', () => {
             expect(result).toEqual([])
         })
 
+        describe('Different Product Variants Sharing Same Promotion', () => {
+            test('distributes bonus products without duplication when different variants qualify for same promotion', () => {
+                const basketWithDifferentVariants = {
+                    bonusDiscountLineItems: [
+                        {
+                            id: 'bonus-123',
+                            promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                            maxBonusItems: 4,
+                            bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}]
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'shirt-small-item',
+                            productId: 'shirt-small',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'shirt-large-item',
+                            productId: 'shirt-large',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'tie-item-1',
+                            productId: 'red-tie',
+                            bonusProductLineItem: true,
+                            bonusDiscountLineItemId: 'bonus-123',
+                            quantity: 4
+                        }
+                    ]
+                }
+
+                const productsWithPromotions = {
+                    'shirt-small': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    },
+                    'shirt-large': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    }
+                }
+
+                const firstVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[0],
+                    productsWithPromotions
+                )
+                const secondVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[1],
+                    productsWithPromotions
+                )
+
+                // Each variant should get 2 ties (no duplication)
+                expect(firstVariantResult[0].quantity).toBe(2)
+                expect(secondVariantResult[0].quantity).toBe(2)
+
+                // Total should equal actual bonus products in cart
+                const totalAllocated =
+                    firstVariantResult[0].quantity + secondVariantResult[0].quantity
+                expect(totalAllocated).toBe(4)
+            })
+        })
+
         describe('Composite Sorting: Store Pickup Priority', () => {
             const basketWithShipments = {
                 bonusDiscountLineItems: [
                     {
                         id: 'bonus-123',
                         promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 4
+                        maxBonusItems: 4,
+                        bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                     }
                 ],
                 shipments: [
@@ -528,7 +596,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         // No shipments array
@@ -583,7 +652,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -647,7 +717,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -709,7 +780,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -802,7 +874,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -849,7 +922,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [],
@@ -888,7 +962,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -928,7 +1003,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 0 // Zero max items
+                                maxBonusItems: 0, // Zero max items
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -980,7 +1056,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1054,7 +1131,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1128,7 +1206,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1234,7 +1313,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 10
+                                maxBonusItems: 10,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1373,7 +1453,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1512,7 +1593,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: numItems * 2
+                                maxBonusItems: numItems * 2,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: largeShipments,

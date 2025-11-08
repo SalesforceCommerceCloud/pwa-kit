@@ -219,4 +219,4 @@ jobs:
                   # This is used by the e2e tests to run the tests against the MRT target.
                   export RETAIL_APP_HOME="https://${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_target_external_hostname || steps.mrt_target_details.outputs.ssrExternalHostname }}"
                   echo "RETAIL_APP_HOME environment variable value: $RETAIL_APP_HOME"
-                  npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile-slas-private-client --project=a11y-desktop-slas-private-client --workers=4
+                  npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile --project=a11y-desktop --workers=4

@@ -15,7 +15,8 @@ import {
     removeQueryParamsFromPath,
     absoluteUrl,
     createUrlTemplate,
-    removeSiteLocaleFromPath
+    removeSiteLocaleFromPath,
+    serverSafeEncode
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -417,5 +418,61 @@ describe('removeSiteLocaleFromPath', function () {
     test('return empty string when no path name is passed', () => {
         const pathName = removeSiteLocaleFromPath()
         expect(pathName).toBe('')
+    })
+})
+
+describe('serverSafeEncode', () => {
+    test('encodes simple string', () => {
+        const input = 'My Address'
+        const result = serverSafeEncode(input)
+        expect(result).toBe('My%20Address')
+    })
+
+    test('encodes string with special characters', () => {
+        const input = 'My Address & Co.'
+        const result = serverSafeEncode(input)
+        expect(result).toBe('My%20Address%20%26%20Co.')
+    })
+
+    test('encodes string with spaces and symbols', () => {
+        const input = 'Home Address #123'
+        const result = serverSafeEncode(input)
+        expect(result).toBe('Home%20Address%20%23123')
+    })
+
+    test('encodes string with unicode characters', () => {
+        const input = 'Café & Résumé'
+        const result = serverSafeEncode(input)
+        expect(result).toBe('Caf%C3%A9%20%26%20R%C3%A9sum%C3%A9')
+    })
+
+    test('encodes empty string', () => {
+        const input = ''
+        const result = serverSafeEncode(input)
+        expect(result).toBe('')
+    })
+
+    test('encodes string with URL-unsafe characters', () => {
+        const input = 'test@example.com'
+        const result = serverSafeEncode(input)
+        expect(result).toBe('test%40example.com')
+    })
+
+    test('verifies encoding behavior', () => {
+        const input = 'My Address & Co.'
+        const encoded = serverSafeEncode(input)
+
+        // Decode should give us original string
+        const decoded = decodeURIComponent(encoded)
+        expect(decoded).toBe(input)
+    })
+
+    test('correctly double encodes', () => {
+        const input = 'My%20Address%20%26%20Co.'
+        const encoded = serverSafeEncode(input)
+
+        // Decode should give us original string
+        const decoded = decodeURIComponent(encoded)
+        expect(decoded).toBe(input)
     })
 })

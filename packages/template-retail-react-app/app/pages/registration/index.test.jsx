@@ -115,14 +115,14 @@ test('Allows customer to create an account', async () => {
         })
     )
 
-    await user.click(withinForm.getByText(/create account/i))
+    await user.click(withinForm.getByRole('button', {name: /create account/i}))
 
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)
 
     await waitFor(
         () => {
-            expect(myAccount).toHaveLength(2)
+            expect(myAccount).toHaveLength(3) // h1 (sr-only), h2 (accordion), h2 (sidebar)
         },
         {
             timeout: 5000

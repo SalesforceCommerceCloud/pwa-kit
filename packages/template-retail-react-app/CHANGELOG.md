@@ -1,4 +1,17 @@
-## v8.2.0-dev (Sep 26, 2025)
+## v8.3.0-dev (Nov 05, 2025)
+
+## v8.2.0 (Nov 04, 2025)
+- Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
+- Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
+- Added Einstein suggestions support for popular and recent searches in search functionality. Users can now see personalized search suggestions based on Einstein AI recommendations. [#3422](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3422)
+- [Bugfix] Fix footer heading semantic consistency and alignment. Fix accessibility compliance by adding proper h1 headings to checkout pages to resolve the page-has-heading-one accessibility rule violation. [#3398](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3398)
+- [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
+- Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
+- My Account Order Details page correctly shows orders with BOPIS and with Multiple shipments [#3414](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3414)
+- Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
+- When registering a guest user on the confirmation page only save the delivery addresses to the new account
+[#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
+- Improve mobile layout for StoreDisplay component [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
 
 ## v8.1.0 (Sep 25, 2025)
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)

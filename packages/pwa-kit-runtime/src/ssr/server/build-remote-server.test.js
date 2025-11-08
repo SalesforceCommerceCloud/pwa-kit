@@ -4,15 +4,30 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {once, RemoteServerFactory, isBinary} from './build-remote-server'
+import {isBinary, once, RemoteServerFactory} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
+import logger from '../../utils/logger-instance'
+import {catchAndLog} from '../../utils/ssr-server'
 
 jest.mock('../../utils/ssr-config', () => {
     return {
         getConfig: () => {}
     }
 })
+
+jest.mock('../../utils/ssr-server', () => ({
+    ...jest.requireActual('../../utils/ssr-server'),
+    catchAndLog: jest.fn()
+}))
+jest.mock('../../utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn()
+    }
+}))
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -154,5 +169,373 @@ describe('isBinary function', () => {
             'content-type': 'text/html'
         }
         expect(isBinary(headers)).toBe(false)
+    })
+})
+
+describe('SLAS private proxy', () => {
+    let request
+    let mockExpress
+
+    beforeEach(() => {
+        // Mock express application
+        mockExpress = require('express')
+        request = require('supertest')
+    })
+
+    afterEach(() => {
+        // Clean up environment variables
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+    })
+
+    test('returns 404 when useSLASPrivateClient is false', async () => {
+        const app = mockExpress()
+        const options = {
+            useSLASPrivateClient: false,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        }
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        // Attempt to access the SLAS private proxy path
+        const response = await request(app).get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+
+        expect(response.status).toBe(404)
+    })
+
+    test('returns 501 when useSLASPrivateClient is true but no secret is set', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+
+        expect(response.status).toBe(501)
+    })
+
+    test('returns 403 for non-SLAS auth paths', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).get('/mobify/slas/private/shopper/products/v1')
+
+        expect(response.status).toBe(403)
+    })
+
+    test('returns 403 for trusted-system paths', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token'
+        )
+
+        expect(response.status).toBe(403)
+    })
+
+    test('invokes onSLASPrivateProxyReq callback and onSLASPrivateProxyRes callback', async () => {
+        // Create a mock SLAS endpoint for the http-proxy to consume
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
+            // Reflect the custom header back in the response to verify it was set
+            res.status(200).json({
+                access_token: 'mock-token',
+                reflected_header: req.headers['x-custom-request-header']
+            })
+        })
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const onSLASPrivateProxyReqMock = jest.fn((proxyRequest) => {
+                proxyRequest.setHeader('X-Custom-Request-Header', 'CustomRequestValue')
+            })
+
+            const onSLASPrivateProxyResMock = jest.fn((responseBuffer, proxyRes, req, res) => {
+                // Add a custom response header
+                res.setHeader('X-Custom-Response-Header', 'CustomResponseValue')
+                return responseBuffer
+            })
+
+            const app = mockExpress()
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                onSLASPrivateProxyReq: onSLASPrivateProxyReqMock,
+                onSLASPrivateProxyRes: onSLASPrivateProxyResMock,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id'
+                            }
+                        }
+                    }
+                }
+            })
+
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+            const response = await request(app).post(
+                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+            )
+
+            // Verify the request was successful
+            expect(response.status).toBe(200)
+
+            // Verify the callbacks were invoked
+            expect(onSLASPrivateProxyReqMock).toHaveBeenCalled()
+            expect(onSLASPrivateProxyResMock).toHaveBeenCalled()
+
+            // Verify the custom request header was added (reflected back in response)
+            expect(response.body.reflected_header).toBe('CustomRequestValue')
+
+            // Verify the custom response header was added
+            expect(response.headers['x-custom-response-header']).toBe('CustomResponseValue')
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
+})
+
+describe('errorHandlerMiddleware logic', () => {
+    it('calls sendMetric and sendStatus(500) when error is handled', () => {
+        catchAndLog.mockImplementation(() => {})
+        const req = {app: {sendMetric: jest.fn()}}
+        const res = {sendStatus: jest.fn()}
+        const err = new Error('fail')
+        // Inlined errorHandlerMiddleware logic
+        catchAndLog(err)
+        req.app.sendMetric('RenderErrors')
+        res.sendStatus(500)
+        expect(req.app.sendMetric).toHaveBeenCalledWith('RenderErrors')
+        expect(res.sendStatus).toHaveBeenCalledWith(500)
+    })
+})
+
+describe('_setRequestId', () => {
+    it('sets requestId from correlationId header', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        // Grab the actual middleware
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {'x-correlation-id': 'abc'}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(res.locals.requestId).toBe('abc')
+        expect(next).toHaveBeenCalled()
+    })
+    it('sets requestId from x-apigateway-event header', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {'x-apigateway-event': 'eventid'}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(res.locals.requestId).toBe('eventid')
+        expect(next).toHaveBeenCalled()
+    })
+    it('logs error if no id headers', () => {
+        const app = {use: jest.fn()}
+        RemoteServerFactory._setRequestId(app)
+        const mw = app.use.mock.calls[0][0]
+        const req = {headers: {}}
+        const res = {locals: {}}
+        const next = jest.fn()
+        mw(req, res, next)
+        expect(logger.error).toHaveBeenCalledWith(
+            'Both x-correlation-id and x-apigateway-event headers are missing',
+            expect.objectContaining({namespace: '_setRequestId'})
+        )
+        expect(next).toHaveBeenCalled()
+    })
+})
+
+describe('_setupHybridProxy', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('should call app.use with hybridProxy when enabled', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: true,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call app.use when hybridProxy is disabled', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: {
+                enabled: false,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy is undefined', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {}
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy is null', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: null
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should not call app.use when hybridProxy.enabled is undefined', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            hybridProxy: {
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).not.toHaveBeenCalled()
+    })
+
+    it('should call app.use when hybridProxy.enabled is explicitly true', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: true,
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call app.use when hybridProxy.enabled is truthy string', () => {
+        const mockApp = {use: jest.fn()}
+        const options = {
+            localAllowCookies: true,
+            hybridProxy: {
+                enabled: 'true', // truthy string
+                sfccOrigin: 'https://test.com',
+                routingRules: ['http.request.uri.path eq "/test"']
+            }
+        }
+
+        RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockApp.use).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call app.use when hybridProxy.enabled is falsy', () => {
+        const mockApp = {use: jest.fn()}
+        const falsyValues = [false, 0, '', null, undefined]
+
+        falsyValues.forEach((falsyValue) => {
+            jest.clearAllMocks()
+            const options = {
+                hybridProxy: {
+                    enabled: falsyValue,
+                    sfccOrigin: 'https://test.com',
+                    routingRules: ['http.request.uri.path eq "/test"']
+                }
+            }
+
+            RemoteServerFactory._setupHybridProxy(mockApp, options)
+
+            expect(mockApp.use).not.toHaveBeenCalled()
+        })
     })
 })

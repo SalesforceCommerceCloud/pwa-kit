@@ -88,24 +88,35 @@ export const isVariantValueOrderable = (product, variationParams) => {
  * an updated orderable flag.
  *
  * @param {Object} product
+ * @param {boolean} isProductPartOfSet
+ * @param {boolean} isProductPartOfBundle
+ * @param {Object} controlledVariationValues - Optional controlled variation values (skips URL reading)
+ * @param {Function} onVariationChange - Optional callback for controlled mode (attributeId, value) => void
  * @returns {Array} a decorated variation attributes list.
  *
  */
 export const useVariationAttributes = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    controlledVariationValues = null,
+    onVariationChange = null
 ) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        controlledVariationValues
+    )
     const existingParams = usePDPSearchParams(product.id)
     const isBundleChildVariant = isProductPartOfBundle && product?.type?.variant
 
     // In the product bundle edit modal on the cart page, the variant ID of each bundle child is used as a key
     // for query parameters, so when a new variant is selected, a new query parameter is added since variants
     // have different IDs. The old one is not overwritten with existing logic so we remove it here
-    if (isBundleChildVariant) {
+    if (isBundleChildVariant && !controlledVariationValues) {
         const [allParams] = existingParams
         product?.variants?.forEach(({productId: variantId}) => {
             if (variantId !== product.id && allParams.get(variantId)) {
@@ -113,6 +124,11 @@ export const useVariationAttributes = (
             }
         })
     }
+
+    // In controlled mode, we don't depend on location.search
+    const isControlled = controlledVariationValues !== null
+    const memoKey = isControlled ? product : [location.search, product]
+
     return useMemo(
         () =>
             variationAttributes.map((variationAttribute) => ({
@@ -132,18 +148,21 @@ export const useVariationAttributes = (
                     return {
                         ...value,
                         image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref({
-                            pathname: location.pathname,
-                            existingParams,
-                            newParams: params,
-                            productId: product.id,
-                            isProductPartOfSet,
-                            isProductPartOfBundle
-                        }),
+                        // In controlled mode, don't provide href (use callback instead)
+                        href: isControlled
+                            ? null
+                            : buildVariantValueHref({
+                                  pathname: location.pathname,
+                                  existingParams,
+                                  newParams: params,
+                                  productId: product.id,
+                                  isProductPartOfSet,
+                                  isProductPartOfBundle
+                              }),
                         orderable: isVariantValueOrderable(product, params)
                     }
                 })
             })),
-        [location.search, product]
+        Array.isArray(memoKey) ? memoKey : [memoKey]
     )
 }

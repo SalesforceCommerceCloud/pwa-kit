@@ -10,12 +10,16 @@ import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 import {z} from 'zod'
 import {
     CreateAppGuidelinesTool,
-    CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
-    CreateNewPageTool
+    CreateNewPageTool,
+    InstallAgentRulesTool,
+    ExploreCommerceAPITool,
+    HooksRecommendationTool,
+    CustomApiTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
+import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -63,9 +67,10 @@ class PwaStorefrontMCPServerHighLevel {
             return _origTool(name, description, inputSchema, wrappedHandler)
         }
 
-        this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
+        this.exploreCommerceAPITool = new ExploreCommerceAPITool()
+        this.hooksRecommendationTool = new HooksRecommendationTool()
         this.setupTools()
     }
 
@@ -84,25 +89,43 @@ class PwaStorefrontMCPServerHighLevel {
             DeveloperGuidelinesTool.fn
         )
         this.server.tool(
-            'run_site_test',
-            'Run site performance or accessibility test for a given site URL (e.g. https://pwa-kit.mobify-storefront.com)',
+            'pwakit_run_site_test',
+            `Run the ${PWA_KIT_DESCRIPTIVE_NAME} site or app performance or accessibility test for a given site URL`,
             {
                 testType: z.enum(['performance', 'accessibility']).describe('Type of test to run'),
-                siteUrl: z.string().optional().describe('Site URL to test (optional)')
+                siteUrl: z.string().describe('Site URL to test')
             },
             ({testType, siteUrl}) => this.testWithPlaywrightTool.run(testType, siteUrl)
         )
         this.server.tool(
-            this.createNewComponentTool.name,
-            this.createNewComponentTool.description,
-            this.createNewComponentTool.inputSchema,
-            this.createNewComponentTool.handler
+            InstallAgentRulesTool.name,
+            InstallAgentRulesTool.description,
+            InstallAgentRulesTool.inputSchema,
+            InstallAgentRulesTool.fn
         )
         this.server.tool(
             CreateNewPageTool.name,
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            this.exploreCommerceAPITool.name,
+            this.exploreCommerceAPITool.description,
+            this.exploreCommerceAPITool.inputSchema,
+            this.exploreCommerceAPITool.handler
+        )
+        this.server.tool(
+            this.hooksRecommendationTool.name,
+            this.hooksRecommendationTool.description,
+            this.hooksRecommendationTool.inputSchema,
+            this.hooksRecommendationTool.handler
+        )
+        this.server.tool(
+            CustomApiTool.name,
+            CustomApiTool.description,
+            CustomApiTool.inputSchema,
+            CustomApiTool.fn
         )
     }
 
@@ -118,6 +141,13 @@ class PwaStorefrontMCPServerHighLevel {
         }
 
         const noTelemetry = !!readFlag('no-telemetry', false)
+
+        // Store dw.json path globally so tools can access it
+        const dwJsonPath = readFlag('dw-json', null)
+        if (dwJsonPath) {
+            global.DW_JSON_PATH = dwJsonPath
+        }
+
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
         // when telemetry is enabled, then send telemetry events

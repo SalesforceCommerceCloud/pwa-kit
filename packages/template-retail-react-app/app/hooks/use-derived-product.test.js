@@ -34,7 +34,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     })
 }))
 
-const MockComponent = ({product}) => {
+const MockComponent = ({product, pickupInStore = false}) => {
     const {
         inventoryMessage,
         showInventoryMessage,
@@ -43,7 +43,7 @@ const MockComponent = ({product}) => {
         variant,
         isSelectedStoreOutOfStock,
         selectedStore
-    } = useDerivedProduct(product)
+    } = useDerivedProduct(product, false, false, pickupInStore)
 
     return (
         <div>
@@ -60,7 +60,8 @@ const MockComponent = ({product}) => {
 }
 
 MockComponent.propTypes = {
-    product: PropTypes.object
+    product: PropTypes.object,
+    pickupInStore: PropTypes.bool
 }
 
 describe('useDerivedProduct hook', () => {
@@ -352,6 +353,101 @@ describe('useDerivedProduct hook', () => {
             expect(
                 screen.getByText(/{"inventoryId":"inventory_m_store_store1"}/)
             ).toBeInTheDocument()
+        })
+
+        test('when pickupInStore is true and store has no stock, should show out of stock message', () => {
+            // Mock useSelectedStore to return a store with inventoryId
+            useSelectedStore.mockReturnValue({
+                selectedStore: {inventoryId},
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            })
+
+            // Mock useVariant to return a valid variant
+            useVariant.mockReturnValue({
+                orderable: true,
+                price: 299.99,
+                productId: '750518699578M',
+                variationValues: {color: 'BLACKFB', size: '038', width: 'V'}
+            })
+
+            const mockData = {
+                ...mockProductDetail,
+                quantity: 10,
+                // Default inventory has plenty of stock
+                inventory: {
+                    ats: 50,
+                    backorderable: false,
+                    id: 'inventory_m',
+                    orderable: true,
+                    preorderable: false,
+                    stockLevel: 50
+                },
+                // Store inventory has no stock
+                inventories: [
+                    {
+                        ats: 5,
+                        backorderable: false,
+                        id: 'inventory_m_store_store1',
+                        orderable: true,
+                        preorderable: false,
+                        stockLevel: 0
+                    }
+                ]
+            }
+
+            renderWithProviders(<MockComponent product={mockData} pickupInStore={true} />)
+
+            // Should show out of stock message based on store inventory stock level being 0
+            expect(screen.getByText(/Out of stock/)).toBeInTheDocument()
+            expect(screen.getByText(/isStoreOutOfStock: true/)).toBeInTheDocument()
+        })
+
+        test('when pickupInStore is true and store has limited stock, should show unfulfillable message', () => {
+            // Mock useSelectedStore to return a store with inventoryId
+            useSelectedStore.mockReturnValue({
+                selectedStore: {inventoryId},
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            })
+
+            useVariant.mockReturnValue(null)
+
+            const mockData = {
+                ...mockProductDetail,
+                type: {
+                    bundle: true
+                },
+                quantity: 10,
+                // Default inventory has plenty of stock
+                inventory: {
+                    ats: 50,
+                    backorderable: false,
+                    id: 'inventory_m',
+                    orderable: true,
+                    preorderable: false,
+                    stockLevel: 50
+                },
+                // Store inventory has limited stock but is orderable
+                inventories: [
+                    {
+                        ats: 5,
+                        backorderable: false,
+                        id: 'inventory_m_store_store1',
+                        orderable: true,
+                        preorderable: false,
+                        stockLevel: 5
+                    }
+                ]
+            }
+
+            renderWithProviders(<MockComponent product={mockData} pickupInStore={true} />)
+
+            // Limited stock shows unfulfillable message
+            expect(screen.getByText(/Only 5 left!/)).toBeInTheDocument()
+            expect(screen.getByText(/isStoreOutOfStock: true/)).toBeInTheDocument()
         })
     })
 })
