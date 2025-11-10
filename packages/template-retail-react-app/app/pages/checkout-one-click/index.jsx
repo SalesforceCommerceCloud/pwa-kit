@@ -21,7 +21,11 @@ import {
     useAuthHelper,
     AuthHelpers,
     useShopperBasketsMutation,
-    useShopperOrdersMutation
+    useShopperOrdersMutation,
+    useShopperCustomersMutation,
+    ShopperCustomersMutations,
+    ShopperBasketsMutations,
+    ShopperOrdersMutations
 } from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -43,23 +47,26 @@ import {
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {generatePassword} from '@salesforce/retail-react-app/app/utils/password-utils'
+import {nanoid} from 'nanoid'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
-    const [error] = useState()
     const showToast = useToast()
-
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-
     const {data: basket} = useCurrentBasket()
-
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const [error] = useState()
+    const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
-    const isPasswordlessEnabled = !!passwordless?.enabled
+    const createCustomerPaymentInstruments = useShopperCustomersMutation(
+        'createCustomerPaymentInstrument'
+    )
+    // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
+    // as the payment instrument on order only contains the masked number.
+    let shopperPaymentInstrument
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -71,13 +78,16 @@ const CheckoutOneClick = () => {
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
-        'addPaymentInstrumentToBasket'
+        ShopperBasketsMutations.AddPaymentInstrumentToBasket
     )
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
-        'updateBillingAddressForBasket'
+        ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
-    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
     const {mutateAsync: register} = useAuthHelper(AuthHelpers.Register)
+    const {mutateAsync: createCustomerAddress} = useShopperCustomersMutation(
+        ShopperCustomersMutations.CreateCustomerAddress
+    )
 
     const showError = (message) => {
         showToast({
@@ -112,6 +122,14 @@ const CheckoutOneClick = () => {
             }
         }
 
+        shopperPaymentInstrument = {
+            holder: formValue.holder,
+            number: formValue.number,
+            cardType: getPaymentInstrumentCardType(formValue.cardType),
+            expirationMonth: parseInt(expirationMonth),
+            expirationYear: parseInt(`20${expirationYear}`)
+        }
+
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
@@ -141,6 +159,39 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async () => {
+        const saveShippingAddress = async (customerId, address) => {
+            try {
+                await createCustomerAddress({
+                    body: address,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
+        const savePaymentInstrument = async (customerId, paymentMethodId) => {
+            try {
+                const paymentInstrument = {
+                    paymentMethodId: paymentMethodId,
+                    paymentCard: {
+                        holder: shopperPaymentInstrument.holder,
+                        number: shopperPaymentInstrument.number,
+                        cardType: shopperPaymentInstrument.cardType,
+                        expirationMonth: shopperPaymentInstrument.expirationMonth,
+                        expirationYear: shopperPaymentInstrument.expirationYear
+                    }
+                }
+
+                await createCustomerPaymentInstruments.mutateAsync({
+                    body: paymentInstrument,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         const registerUser = async (data) => {
             try {
                 const body = {
@@ -148,11 +199,18 @@ const CheckoutOneClick = () => {
                         firstName: data.firstName,
                         lastName: data.lastName,
                         email: data.email,
-                        login: data.email
+                        login: data.email,
+                        phoneHome: data.phoneHome
                     },
                     password: generatePassword()
                 }
-                await register(body)
+                const customer = await register(body)
+
+                // Save the shipping address from this order, should not block account creation
+                await saveShippingAddress(customer.customerId, data.address)
+
+                // Save the payment instrument
+                await savePaymentInstrument(customer.customerId, data.paymentMethodId)
 
                 showToast({
                     variant: 'subtle',
@@ -196,10 +254,17 @@ const CheckoutOneClick = () => {
             })
 
             if (enableUserRegistration) {
+                // Remove the id property from the address
+                const {id, ...address} = order.shipments[0].shippingAddress
+                address.addressId = nanoid()
+
                 await registerUser({
                     firstName: order.billingAddress.firstName,
                     lastName: order.billingAddress.lastName,
-                    email: order.customerInfo.email
+                    email: order.customerInfo.email,
+                    phoneHome: order.billingAddress.phone,
+                    address: address,
+                    paymentMethodId: order.paymentInstruments[0].paymentMethodId
                 })
             }
 
@@ -257,11 +322,7 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo
-                                isSocialEnabled={isSocialEnabled}
-                                isPasswordlessEnabled={isPasswordlessEnabled}
-                                idps={idps}
-                            />
+                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
@@ -271,25 +332,30 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                             />
 
-                            {/* Place Order Button */}
-                            <Box display="flex" bottom="0" px={4} pt={6} pb={11}>
-                                <Container variant="form">
-                                    <Button
-                                        w="full"
-                                        onClick={onPlaceOrder}
-                                        isLoading={isLoading}
-                                        data-testid="place-order-button"
-                                        size="lg"
-                                        px={8}
-                                        minW="200px"
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Place Order"
-                                            id="checkout_payment.button.place_order"
-                                        />
-                                    </Button>
-                                </Container>
-                            </Box>
+                            {step === 4 && (
+                                <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
+                                    <Container variant="form">
+                                        <Button
+                                            w="full"
+                                            onClick={onPlaceOrder}
+                                            isLoading={isLoading}
+                                            isDisabled={
+                                                !paymentMethodForm.formState.isValid &&
+                                                !appliedPayment
+                                            }
+                                            data-testid="place-order-button"
+                                            size="lg"
+                                            px={8}
+                                            minW="200px"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Place Order"
+                                                id="checkout_payment.button.place_order"
+                                            />
+                                        </Button>
+                                    </Container>
+                                </Box>
+                            )}
                         </Stack>
                     </GridItem>
 

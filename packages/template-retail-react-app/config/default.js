@@ -82,7 +82,8 @@ module.exports = {
         multishipEnabled: true,
         oneClickCheckout: {
             enabled: false
-        }
+        },
+        partialHydrationEnabled: false
     },
     envBasePath: '/',
     externals: [],
