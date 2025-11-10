@@ -13,11 +13,11 @@ import {
     renderWithProviders,
     createPathWithDefaults
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import Confirmation from '@salesforce/retail-react-app/app/pages/checkout/confirmation'
+import Confirmation from '@salesforce/retail-react-app/app/pages/confirmation/index'
 import {
     mockOrder,
     mockProducts
-} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+} from '@salesforce/retail-react-app/app/pages/confirmation/index.mock'
 
 const MockedComponent = () => {
     return (

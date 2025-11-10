@@ -31,7 +31,7 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
-import LoginState from '@salesforce/retail-react-app/app/pages/checkout/partials/login-state'
+import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/login-state'
 import {
     AuthModal,
     EMAIL_VIEW,
@@ -45,11 +45,12 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
+    PASSWORDLESS_ERROR_MESSAGES,
+    USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
@@ -79,10 +80,11 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
+    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+        : `${appOrigin}${passwordlessConfigCallback}`
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -94,7 +96,9 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+            const message = USER_NOT_FOUND_ERROR.test(error.message)
+                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             setError(message)
@@ -103,6 +107,11 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const submitForm = async (data) => {
         setError(null)
+        if (isPasswordlessLoginClicked) {
+            handlePasswordlessLogin(data.email)
+            setIsPasswordlessLoginClicked(false)
+            return
+        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -157,15 +166,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async (e) => {
-        const isValid = await form.trigger('email')
-        const domForm = e.target.closest('form')
-        if (isValid && domForm.checkValidity()) {
-            const email = form.getValues().email
-            await handlePasswordlessLogin(email)
-        } else {
-            domForm.reportValidity()
-        }
+    const onPasswordlessLoginClick = async () => {
+        setIsPasswordlessLoginClicked(true)
     }
 
     return (

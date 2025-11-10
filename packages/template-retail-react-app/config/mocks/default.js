@@ -114,7 +114,10 @@ module.exports = {
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
         storeLocatorEnabled: true,
-        multishipEnabled: true
+        multishipEnabled: true,
+        oneClickCheckout: {
+            enabled: false
+        }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
