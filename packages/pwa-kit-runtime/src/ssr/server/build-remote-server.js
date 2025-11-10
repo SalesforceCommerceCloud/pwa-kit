@@ -925,8 +925,8 @@ export const RemoteServerFactory = {
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                selfHandleResponse: true,
-                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                selfHandleResponse: false,
+                onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -964,62 +964,7 @@ export const RemoteServerFactory = {
                             })
                         }
                     }
-                },
-                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
-                    let workingBuffer = responseBuffer
-                    try {
-                        // If the passwordless login endpoint returns a 404, which corresponds to a user
-                        // email not being found, we mask it with a 200 OK response so that it is not
-                        // obvious that the user does not exist.
-                        // We do this to prevent user enumeration.
-                        if (
-                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
-                            proxyRes.statusCode === 404
-                        ) {
-                            res.statusCode = 200
-                            res.statusMessage = 'OK'
-
-                            // When a /passwordless/login endpoint response returns 200, it has no body
-                            // so we return an empty body here to match an actual 200 response.
-                            workingBuffer = Buffer.from('', 'utf8')
-                        }
-
-                        // Allow users to apply additional custom modifications to the proxy response
-                        if (typeof options.onSLASPrivateProxyRes === 'function') {
-                            try {
-                                const customBuffer = options.onSLASPrivateProxyRes(
-                                    workingBuffer,
-                                    proxyRes,
-                                    req,
-                                    res
-                                )
-                                // Only use the custom buffer if it was returned
-                                if (customBuffer !== undefined) {
-                                    workingBuffer = customBuffer
-                                }
-                            } catch (error) {
-                                logger.error(
-                                    'Error in custom onSLASPrivateProxyRes callback',
-                                    /* istanbul ignore next */
-                                    {
-                                        namespace: '_setupSlasPrivateClientProxy',
-                                        additionalProperties: {
-                                            error: error
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        return workingBuffer
-                    } catch (error) {
-                        console.error(
-                            'There is an error processing the response from SLAS. Returning original response.',
-                            error
-                        )
-                        return workingBuffer
-                    }
-                })
+                }
             })
         )
     },

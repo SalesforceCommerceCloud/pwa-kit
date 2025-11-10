@@ -1,4 +1,5 @@
 ## v3.15.0-dev (Nov 05, 2025)
+- Remove masking 404 responses for passwordless login calls [#3456](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3456)
 
 ## v3.14.0 (Nov 04, 2025)
 - Replace aws-serverless-express with @h4ad/serverless-adapter [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
