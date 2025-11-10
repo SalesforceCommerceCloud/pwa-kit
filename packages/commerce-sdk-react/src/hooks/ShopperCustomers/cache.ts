@@ -83,12 +83,12 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                                 paymentInstrumentId === parameters.paymentInstrumentId
                         )
                         if (idx >= 0) {
-                            customer.paymentInstruments[idx] = response as any
+                            customer.paymentInstruments[idx] = response
                             // If this instrument is now default, unset others
-                            if ((response as any)?.default) {
+                            if (response?.default) {
                                 customer.paymentInstruments = customer.paymentInstruments.map(
                                     (pi, i) => (i === idx ? pi : {...pi, default: false})
-                                ) as any
+                                )
                             }
                         }
                         return customer

@@ -925,8 +925,9 @@ export const RemoteServerFactory = {
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                selfHandleResponse: false,
-                onProxyReq: (proxyRequest, incomingRequest) => {
+                // Required when using `responseInterceptor` to mutate proxy responses
+                selfHandleResponse: true,
+                onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -950,7 +951,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
- 
+
                     // Allow users to apply additional custom modifications to the proxy request
                     if (typeof options.onSLASPrivateProxyReq === 'function') {
                         try {
