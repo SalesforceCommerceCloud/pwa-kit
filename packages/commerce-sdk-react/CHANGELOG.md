@@ -1,4 +1,5 @@
 ## v4.3.0-dev (Nov 05, 2025)
+- Add support for the new Shopper Configurations SCAPI and the new PATCH payment-instruments endpoint in Shopper Customers SCAPI [#3456](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3456)
 
 ## v4.2.0 (Nov 04, 2025)
 
