@@ -1,5 +1,6 @@
 ## 0.5.0-dev (Oct 24, 2025)
 - Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
+- Added the fallback path for the custom Api tool [#3458] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3458)
 
 ## 0.4.0 (Oct 24, 2025)
 - Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359), [#3379] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3379)
