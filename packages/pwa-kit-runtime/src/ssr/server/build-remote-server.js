@@ -51,8 +51,12 @@ import {
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
+<<<<<<< HEAD
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
+=======
+import {createProxyMiddleware} from 'http-proxy-middleware'
+>>>>>>> origin/feature/1cc_payments
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
@@ -925,8 +929,8 @@ export const RemoteServerFactory = {
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                selfHandleResponse: true,
-                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                selfHandleResponse: false,
+                onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -950,6 +954,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
+<<<<<<< HEAD
 
                     // Allow users to apply additional custom modifications to the proxy request
                     if (typeof options.onSLASPrivateProxyReq === 'function') {
@@ -1020,6 +1025,9 @@ export const RemoteServerFactory = {
                         return workingBuffer
                     }
                 })
+=======
+                }
+>>>>>>> origin/feature/1cc_payments
             })
         )
     },

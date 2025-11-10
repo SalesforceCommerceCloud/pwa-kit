@@ -21,7 +21,6 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
-    isAbsoluteUrl,
     stringToBase64,
     extractCustomParameters
 } from '../utils'
@@ -96,10 +95,19 @@ type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: string
+    /** When true, SLAS will register the customer as part of the passwordless flow */
+    register_customer?: boolean | string
+    /** Optional registration details forwarded to SLAS when register_customer=true */
+    first_name?: string
+    last_name?: string
+    email?: string
+    phone_number?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
+    /** When true, SLAS will register the customer if not already registered */
+    register_customer?: boolean | string
 }
 
 /**
@@ -1260,26 +1268,54 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const slasClient = this.client
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+        const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
-        const res = await helpers.authorizePasswordless({
-            slasClient: this.client,
-            credentials: {
-                clientSecret: this.clientSecret
+        const options = {
+            headers: {
+                Authorization: ''
             },
             parameters: {
-                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(parameters.register_customer !== undefined && {
+                    register_customer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? String(parameters.register_customer)
+                            : parameters.register_customer
+                })
+            },
+            body: {
+                user_id: parameters.userid,
+                mode: finalMode,
+                // Include usid and site as required by SLAS
                 ...(usid && {usid}),
-                userid: parameters.userid,
-                mode: finalMode
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                ...(callbackURI && {callback_uri: callbackURI}),
+                ...(parameters.last_name && {last_name: parameters.last_name}),
+                ...(parameters.email && {email: parameters.email}),
+                ...(parameters.first_name && {first_name: parameters.first_name}),
+                ...(parameters.phone_number && {phone_number: parameters.phone_number})
             }
-        })
-        if (res && res.status !== 200) {
-            const errorData = await res.json()
-            throw new Error(`${res.status} ${String(errorData.message)}`)
+        } as {
+            headers?: {[key: string]: string}
+            parameters?: Record<string, string>
+            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType &
+                helpers.CustomRequestBody
         }
+
+        // Use Basic auth header when using private client
+        if (this.clientSecret) {
+            options.headers = options.headers || {}
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        } else {
+            // If not using private client, avoid sending Authorization header
+            delete options.headers
+        }
+
+        const res = await slasClient.authorizePasswordlessCustomer(options)
         return res
     }
 
@@ -1289,6 +1325,7 @@ class Auth {
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
+        const usid = this.get('usid')
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
             credentials: {
@@ -1296,7 +1333,14 @@ class Auth {
             },
             parameters: {
                 pwdlessLoginToken,
-                dnt: dntPref !== undefined ? String(dntPref) : undefined
+                dnt: dntPref !== undefined ? String(dntPref) : undefined,
+                ...(usid && {usid}),
+                ...(parameters.register_customer !== undefined && {
+                    register_customer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? String(parameters.register_customer)
+                            : parameters.register_customer
+                })
             }
         })
         const isGuest = false
