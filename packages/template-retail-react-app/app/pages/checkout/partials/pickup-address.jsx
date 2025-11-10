@@ -30,7 +30,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useStores, useProducts} from '@salesforce/commerce-sdk-react'

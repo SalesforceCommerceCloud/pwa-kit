@@ -117,9 +117,13 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () =>
     }))
 )
 
-jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context', () => ({
-    useCheckout: () => mockCheckoutState
-}))
+<<<<<<< HEAD
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context',
+    () => ({
+        useCheckout: () => mockCheckoutState
+    })
+)
 
 const server = setupServer()
 

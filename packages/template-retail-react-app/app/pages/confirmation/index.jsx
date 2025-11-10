@@ -83,6 +83,7 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
+    const {oneClickCheckout = {}} = getConfig().app || {}
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -247,7 +248,7 @@ const CheckoutConfirmation = () => {
                         </Stack>
                     </Box>
 
-                    {customer.isGuest && (
+                    {!oneClickCheckout.enabled && customer.isGuest && (
                         <Box
                             layerStyle="card"
                             rounded={[0, 0, 'base']}

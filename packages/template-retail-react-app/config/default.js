@@ -79,7 +79,11 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
-        multishipEnabled: true
+        multishipEnabled: true,
+        oneClickCheckout: {
+            enabled: true
+        },
+        partialHydrationEnabled: false
     },
     envBasePath: '/',
     externals: [],

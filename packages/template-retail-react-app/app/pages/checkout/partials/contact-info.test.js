@@ -15,7 +15,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {
     mockGoToStep,
     mockGoToNextStep
-} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 
 const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
@@ -35,7 +35,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('../util/checkout-context', () => {
+jest.mock('@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context', () => {
     const mockGoToStep = jest.fn()
     const mockGoToNextStep = jest.fn()
     const MOCK_STEPS = {CONTACT_INFO: 0, PAYMENT: 2}

@@ -1280,3 +1280,87 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
     })
 })
+
+describe('hybridAuthEnabled property toggles clearECOMSession', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('clears DWSID cookie when hybridAuthEnabled is false', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: false})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was cleared
+        expect(auth.get('dwsid')).toBeFalsy()
+    })
+
+    test('does NOT clear DWSID cookie when hybridAuthEnabled is true', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: true})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was NOT cleared
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+})
+
+describe('hybridAuthEnabled property toggles clearECOMSession', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('clears DWSID cookie when hybridAuthEnabled is false', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: false})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was cleared
+        expect(auth.get('dwsid')).toBeFalsy()
+    })
+
+    test('does NOT clear DWSID cookie when hybridAuthEnabled is true', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: true})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was NOT cleared
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+})

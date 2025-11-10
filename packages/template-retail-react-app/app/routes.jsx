@@ -38,10 +38,10 @@ const Registration = loadable(() => import('./pages/registration'), {
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
 const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {
+const Checkout = loadable(() => import('./pages/checkout-container'), {
     fallback
 })
-const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const CheckoutConfirmation = loadable(() => import('./pages/confirmation'), {fallback})
 const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})

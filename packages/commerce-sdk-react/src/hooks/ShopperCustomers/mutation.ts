@@ -74,6 +74,11 @@ export const ShopperCustomersMutations = {
      */
     CreateCustomerPaymentInstrument: 'createCustomerPaymentInstrument',
     /**
+     * Updates a customer's payment instrument.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `updateCustomerPaymentInstrument` endpoint.
+     */
+    UpdateCustomerPaymentInstrument: 'updateCustomerPaymentInstrument',
+    /**
      * Deletes a customer's payment instrument.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `deleteCustomerPaymentInstrument` endpoint.
      */
