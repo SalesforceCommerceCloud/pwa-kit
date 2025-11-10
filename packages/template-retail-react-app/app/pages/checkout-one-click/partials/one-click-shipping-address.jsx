@@ -13,7 +13,7 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-address-selection'
+import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {
     useShopperCustomersMutation,

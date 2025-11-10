@@ -17,9 +17,8 @@ import {
     Text,
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {
@@ -32,21 +31,29 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/payment-form'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-address-selection'
+import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
+import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
+import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const Payment = () => {
+const Payment = ({
+    paymentMethodForm,
+    billingAddressForm,
+    enableUserRegistration,
+    setEnableUserRegistration
+}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
+    const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -56,27 +63,20 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
+
     const showToast = useToast()
-    const showError = () => {
+    const showError = (message) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: message || formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
 
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-
-    const billingAddressForm = useForm({
-        mode: 'onChange',
-        shouldUnregister: false,
-        defaultValues: {...selectedBillingAddress}
-    })
+    const {step, STEPS, goToStep} = useCheckout()
 
     // Using destructuring to remove properties from the object...
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
-
-    const paymentMethodForm = useForm()
 
     const onPaymentSubmit = async (formValue) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
@@ -99,6 +99,7 @@ const Payment = () => {
             body: paymentInstrument
         })
     }
+
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
 
@@ -116,6 +117,7 @@ const Payment = () => {
             parameters: {basketId: basket.basketId}
         })
     }
+
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
@@ -130,16 +132,15 @@ const Payment = () => {
     }
 
     const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
-        if (!appliedPayment) {
-            await onPaymentSubmit(paymentFormValues)
-        }
+        try {
+            if (!appliedPayment) {
+                await onPaymentSubmit(paymentFormValues)
+            }
 
-        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
-        // submit, `undefined` is returned.
-        const updatedBasket = await onBillingSubmit()
-
-        if (updatedBasket) {
-            goToNextStep()
+            // Update billing address
+            await onBillingSubmit()
+        } catch (error) {
+            showError()
         }
     })
 
@@ -151,6 +152,7 @@ const Payment = () => {
     return (
         <ToggleCard
             id="step-3"
+            data-testid="payment-component"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
             editing={step === STEPS.PAYMENT}
             isLoading={
@@ -171,7 +173,7 @@ const Payment = () => {
 
                 <Stack spacing={6}>
                     {!appliedPayment?.paymentCard ? (
-                        <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
+                        <PaymentForm form={paymentMethodForm} onSubmit={onSubmit} />
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
@@ -207,7 +209,7 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {!isPickupOrder && (
+                        {!isPickupOrder && selectedShippingAddress && (
                             <Checkbox
                                 name="billingSameAsShipping"
                                 isChecked={billingSameAsShipping}
@@ -238,17 +240,12 @@ const Payment = () => {
                             isBillingAddress
                         />
                     )}
-
-                    <Box pt={3}>
-                        <Container variant="form">
-                            <Button w="full" onClick={onSubmit}>
-                                <FormattedMessage
-                                    defaultMessage="Review Order"
-                                    id="checkout_payment.button.review_order"
-                                />
-                            </Button>
-                        </Container>
-                    </Box>
+                    {isGuest && (
+                        <UserRegistration
+                            enableUserRegistration={enableUserRegistration}
+                            setEnableUserRegistration={setEnableUserRegistration}
+                        />
+                    )}
                 </Stack>
             </ToggleCardEdit>
 
@@ -279,10 +276,22 @@ const Payment = () => {
                             <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
                     )}
+
+                    <UserRegistration
+                        enableUserRegistration={enableUserRegistration}
+                        setEnableUserRegistration={setEnableUserRegistration}
+                    />
                 </Stack>
             </ToggleCardSummary>
         </ToggleCard>
     )
+}
+
+Payment.propTypes = {
+    /** Whether user registration is enabled */
+    enableUserRegistration: PropTypes.bool,
+    /** Callback to set user registration state */
+    setEnableUserRegistration: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {
@@ -303,5 +312,10 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
+
+Payment.propTypes = {
+    paymentMethodForm: PropTypes.object.isRequired,
+    billingAddressForm: PropTypes.object.isRequired
+}
 
 export default Payment

@@ -8,9 +8,6 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
-  "account.title.my_account": {
-    "defaultMessage": "My Account"
-  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },
@@ -50,23 +47,11 @@
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
   },
-  "account_order_detail.heading.pickup_address": {
-    "defaultMessage": "Pickup Address"
-  },
-  "account_order_detail.heading.pickup_address_number": {
-    "defaultMessage": "Pickup Address {number}"
-  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
-  "account_order_detail.heading.shipping_address_number": {
-    "defaultMessage": "Shipping Address {number}"
-  },
   "account_order_detail.heading.shipping_method": {
     "defaultMessage": "Shipping Method"
-  },
-  "account_order_detail.heading.shipping_method_number": {
-    "defaultMessage": "Shipping Method {number}"
   },
   "account_order_detail.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -74,8 +59,8 @@
   "account_order_detail.label.ordered_date": {
     "defaultMessage": "Ordered: {date}"
   },
-  "account_order_detail.label.pickup_from_store": {
-    "defaultMessage": "Pick up from Store {storeId}"
+  "account_order_detail.label.pending_tracking_number": {
+    "defaultMessage": "Pending"
   },
   "account_order_detail.label.tracking_number": {
     "defaultMessage": "Tracking Number"
@@ -141,9 +126,6 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
-  "add_to_cart_modal.button.select_bonus_products": {
-    "defaultMessage": "Select Bonus Products"
-  },
   "add_to_cart_modal.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -198,33 +180,6 @@
   "bonus_product_item.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
   },
-  "bonus_product_modal.button_select": {
-    "defaultMessage": "Select"
-  },
-  "bonus_product_modal.no_bonus_products": {
-    "defaultMessage": "No bonus products available"
-  },
-  "bonus_product_modal.no_image": {
-    "defaultMessage": "No Image"
-  },
-  "bonus_product_modal.title": {
-    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
-  },
-  "bonus_product_view_modal.button.back_to_selection": {
-    "defaultMessage": "← Back to Selection"
-  },
-  "bonus_product_view_modal.button.view_cart": {
-    "defaultMessage": "View Cart"
-  },
-  "bonus_product_view_modal.modal_label": {
-    "defaultMessage": "Bonus product selection modal for {productName}"
-  },
-  "bonus_product_view_modal.title": {
-    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
-  },
-  "bonus_product_view_modal.toast.item_added": {
-    "defaultMessage": "Bonus item added to cart"
-  },
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
@@ -238,10 +193,10 @@
     "defaultMessage": "Item removed from cart"
   },
   "cart.order_type.delivery": {
-    "defaultMessage": "Delivery - {itemsInShipment} out of {totalItemsInCart} items"
+    "defaultMessage": "Delivery"
   },
   "cart.order_type.pickup_in_store": {
-    "defaultMessage": "Pick Up in Store - {itemsInShipment} out of {totalItemsInCart} items"
+    "defaultMessage": "Pick Up in Store ({storeName})"
   },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"
@@ -251,9 +206,6 @@
   },
   "cart.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
-  },
-  "cart.title.shopping_cart": {
-    "defaultMessage": "Shopping Cart"
   },
   "cart_cta.link.checkout": {
     "defaultMessage": "Proceed to Checkout"
@@ -291,11 +243,17 @@
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.label.user_registration": {
+    "defaultMessage": "Create an account for a faster checkout"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
   },
-  "checkout.title.checkout": {
-    "defaultMessage": "Checkout"
+  "checkout.message.user_registration": {
+    "defaultMessage": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "Save for Future Use"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
@@ -312,9 +270,6 @@
   "checkout_confirmation.heading.delivery_details": {
     "defaultMessage": "Delivery Details"
   },
-  "checkout_confirmation.heading.delivery_number": {
-    "defaultMessage": "Delivery {number}"
-  },
   "checkout_confirmation.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
@@ -326,9 +281,6 @@
   },
   "checkout_confirmation.heading.pickup_details": {
     "defaultMessage": "Pickup Details"
-  },
-  "checkout_confirmation.heading.pickup_location_number": {
-    "defaultMessage": "Pickup Location {number}"
   },
   "checkout_confirmation.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -353,6 +305,9 @@
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
@@ -405,6 +360,9 @@
   },
   "checkout_payment.action.remove": {
     "defaultMessage": "Remove"
+  },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "Place Order"
   },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Review Order"
@@ -498,6 +456,9 @@
   },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout as Guest"
+  },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "Continue to Shipping Address"
   },
   "contact_info.button.login": {
     "defaultMessage": "Log In"
@@ -732,6 +693,9 @@
   "global.account.link.wishlist": {
     "defaultMessage": "Wishlist"
   },
+  "global.error.create_account": {
+    "defaultMessage": "This feature is not currently available. You must create an account to access this feature."
+  },
   "global.error.feature_unavailable": {
     "defaultMessage": "This feature is not currently available."
   },
@@ -749,9 +713,6 @@
   },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removed from wishlist"
-  },
-  "global.info.store_insufficient_inventory": {
-    "defaultMessage": "Some items aren't available for pickup at this store."
   },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
@@ -865,9 +826,6 @@
   "home.link.read_docs": {
     "defaultMessage": "Read docs"
   },
-  "home.title.home": {
-    "defaultMessage": "Home"
-  },
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
   },
@@ -882,9 +840,6 @@
   },
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
-  },
-  "item_attributes.label.quantity_abbreviated": {
-    "defaultMessage": "Qty: {quantity}"
   },
   "item_attributes.label.selected_options": {
     "defaultMessage": "Selected Options"
@@ -1068,9 +1023,6 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
-  "login.title.sign_in": {
-    "defaultMessage": "Sign In"
-  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
@@ -1107,18 +1059,6 @@
   "login_page.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
-  "multi_ship_warning_modal.action.cancel": {
-    "defaultMessage": "Cancel"
-  },
-  "multi_ship_warning_modal.action.switch_to_one_address": {
-    "defaultMessage": "Switch"
-  },
-  "multi_ship_warning_modal.message.addresses_will_be_removed": {
-    "defaultMessage": "If you switch to one address, the shipping addresses you added for the items will be removed."
-  },
-  "multi_ship_warning_modal.title.switch_to_one_address": {
-    "defaultMessage": "Switch to one address?"
-  },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
@@ -1135,9 +1075,6 @@
   "order_summary.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
-  "order_summary.label.delivery_items": {
-    "defaultMessage": "Delivery Items"
-  },
   "order_summary.label.estimated_total": {
     "defaultMessage": "Estimated Total"
   },
@@ -1146,9 +1083,6 @@
   },
   "order_summary.label.order_total": {
     "defaultMessage": "Order Total"
-  },
-  "order_summary.label.pickup_items": {
-    "defaultMessage": "Pickup Items"
   },
   "order_summary.label.promo_applied": {
     "defaultMessage": "Promotion applied"
@@ -1191,9 +1125,6 @@
   },
   "page_not_found.title.page_cant_be_found": {
     "defaultMessage": "The page you're looking for can't be found."
-  },
-  "page_not_found.title.page_not_found": {
-    "defaultMessage": "Page Not Found"
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
@@ -1254,32 +1185,14 @@
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
   },
-  "pickup_address.bonus_products.title": {
-    "defaultMessage": "Bonus Items"
-  },
   "pickup_address.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
-  },
-  "pickup_address.button.continue_to_shipping_address": {
-    "defaultMessage": "Continue to Shipping Address"
-  },
-  "pickup_address.button.show_products": {
-    "defaultMessage": "Show Products"
   },
   "pickup_address.title.pickup_address": {
     "defaultMessage": "Pickup Address & Information"
   },
   "pickup_address.title.store_information": {
     "defaultMessage": "Store Information"
-  },
-  "pickup_or_delivery.label.choose_delivery_option": {
-    "defaultMessage": "Choose delivery option"
-  },
-  "pickup_or_delivery.label.pickup_in_store": {
-    "defaultMessage": "Pick Up in Store"
-  },
-  "pickup_or_delivery.label.ship_to_address": {
-    "defaultMessage": "Ship to Address"
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",
@@ -1308,9 +1221,6 @@
   },
   "product_detail.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
-  },
-  "product_detail.title.product_details": {
-    "defaultMessage": "Product Details"
   },
   "product_item.label.quantity": {
     "defaultMessage": "Quantity:"
@@ -1498,12 +1408,6 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
-  "registration.title.create_account": {
-    "defaultMessage": "Create Account"
-  },
-  "reset_password.title.reset_password": {
-    "defaultMessage": "Reset Password"
-  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Sign in"
   },
@@ -1523,24 +1427,6 @@
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
-  "search.suggestions.categories": {
-    "defaultMessage": "Categories"
-  },
-  "search.suggestions.didYouMean": {
-    "defaultMessage": "Did you mean"
-  },
-  "search.suggestions.popular": {
-    "defaultMessage": "Popular Searches"
-  },
-  "search.suggestions.products": {
-    "defaultMessage": "Products"
-  },
-  "search.suggestions.recent": {
-    "defaultMessage": "Recent Searches"
-  },
-  "search.suggestions.viewAll": {
-    "defaultMessage": "View All"
-  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Clear all filters"
   },
@@ -1550,20 +1436,8 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
-  "shipping_address.action.ship_to_multiple_addresses": {
-    "defaultMessage": "Ship to Multiple Addresses"
-  },
-  "shipping_address.action.ship_to_single_address": {
-    "defaultMessage": "Ship to Single Address"
-  },
-  "shipping_address.button.add_new_address": {
-    "defaultMessage": "+ Add New Address"
-  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
-  },
-  "shipping_address.error.update_failed": {
-    "defaultMessage": "Something went wrong while updating the shipping address. Try again."
   },
   "shipping_address.label.edit_button": {
     "defaultMessage": "Edit {address}"
@@ -1571,26 +1445,14 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "Remove {address}"
   },
-  "shipping_address.label.shipping_address": {
-    "defaultMessage": "Delivery Address"
-  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
-  },
-  "shipping_address.message.no_items_in_basket": {
-    "defaultMessage": "No items in basket."
-  },
-  "shipping_address.summary.multiple_addresses": {
-    "defaultMessage": "Your items will be shipped to multiple addresses."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
   "shipping_address_edit_form.button.save_and_continue": {
     "defaultMessage": "Save & Continue to Shipping Method"
-  },
-  "shipping_address_form.button.save": {
-    "defaultMessage": "Save"
   },
   "shipping_address_form.heading.edit_address": {
     "defaultMessage": "Edit Address"
@@ -1610,68 +1472,11 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
-  "shipping_multi_address.add_new_address.aria_label": {
-    "defaultMessage": "Add new delivery address for {productName}"
-  },
-  "shipping_multi_address.error.duplicate_address": {
-    "defaultMessage": "The address you entered already exists."
-  },
-  "shipping_multi_address.error.label": {
-    "defaultMessage": "Something went wrong while loading products."
-  },
-  "shipping_multi_address.error.message": {
-    "defaultMessage": "Something went wrong while loading products. Try again."
-  },
-  "shipping_multi_address.error.save_failed": {
-    "defaultMessage": "Couldn't save the address."
-  },
-  "shipping_multi_address.error.submit_failed": {
-    "defaultMessage": "Something went wrong while setting up shipments. Try again."
-  },
-  "shipping_multi_address.format.address_line_2": {
-    "defaultMessage": "{city}, {stateCode} {postalCode}"
-  },
-  "shipping_multi_address.image.alt": {
-    "defaultMessage": "Product image for {productName}"
-  },
-  "shipping_multi_address.loading.message": {
-    "defaultMessage": "Loading..."
-  },
-  "shipping_multi_address.loading_addresses": {
-    "defaultMessage": "Loading addresses..."
-  },
-  "shipping_multi_address.no_addresses_available": {
-    "defaultMessage": "No address available"
-  },
-  "shipping_multi_address.product_attributes.label": {
-    "defaultMessage": "Product attributes"
-  },
-  "shipping_multi_address.quantity.label": {
-    "defaultMessage": "Quantity"
-  },
-  "shipping_multi_address.submit.description": {
-    "defaultMessage": "Continue to next step with selected delivery addresses"
-  },
-  "shipping_multi_address.submit.loading": {
-    "defaultMessage": "Setting up shipments..."
-  },
-  "shipping_multi_address.success.address_saved": {
-    "defaultMessage": "Address saved successfully"
+  "shipping_options.action.send_as_a_gift": {
+    "defaultMessage": "Do you want to send this as a gift?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
-  },
-  "shipping_options.free": {
-    "defaultMessage": "Free"
-  },
-  "shipping_options.label.no_method_selected": {
-    "defaultMessage": "No shipping method selected"
-  },
-  "shipping_options.label.shipping_to": {
-    "defaultMessage": "Shipping to {name}"
-  },
-  "shipping_options.label.total_shipping": {
-    "defaultMessage": "Total Shipping"
   },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"
@@ -1694,14 +1499,8 @@
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
-  "store_display.button.use_recent_store": {
-    "defaultMessage": "Use Recent Store"
-  },
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
-  },
-  "store_display.label.store_contact_info": {
-    "defaultMessage": "Store Contact Info"
   },
   "store_display.label.store_hours": {
     "defaultMessage": "Store Hours"
@@ -1795,9 +1594,6 @@
   },
   "toggle_card.action.editShippingAddress": {
     "defaultMessage": "Edit Shipping Address"
-  },
-  "toggle_card.action.editShippingAddresses": {
-    "defaultMessage": "Edit Shipping Addresses"
   },
   "toggle_card.action.editShippingOptions": {
     "defaultMessage": "Edit Shipping Options"
