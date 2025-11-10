@@ -100,11 +100,7 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-<<<<<<< HEAD
       "maxSize": "84 kB"
-=======
-      "maxSize": "83 kB"
->>>>>>> origin/feature/1cc_payments
     },
     {
       "path": "build/vendor.js",

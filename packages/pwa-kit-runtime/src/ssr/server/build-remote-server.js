@@ -51,7 +51,6 @@ import {
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-<<<<<<< HEAD
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
@@ -951,8 +950,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
-<<<<<<< HEAD
-
+ 
                     // Allow users to apply additional custom modifications to the proxy request
                     if (typeof options.onSLASPrivateProxyReq === 'function') {
                         try {
@@ -1022,9 +1020,6 @@ export const RemoteServerFactory = {
                         return workingBuffer
                     }
                 })
-=======
-                }
->>>>>>> origin/feature/1cc_payments
             })
         )
     },
