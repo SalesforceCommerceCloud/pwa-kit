@@ -54,9 +54,6 @@ import logger from '../../utils/logger-instance'
 <<<<<<< HEAD
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
-=======
-import {createProxyMiddleware} from 'http-proxy-middleware'
->>>>>>> origin/feature/1cc_payments
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'

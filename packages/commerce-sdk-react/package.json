@@ -40,11 +40,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "commerce-sdk-isomorphic": "^4.0.1",
-=======
     "commerce-sdk-isomorphic": "4.0.0-nightly-20251027080801",
->>>>>>> origin/feature/1cc_payments
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },
