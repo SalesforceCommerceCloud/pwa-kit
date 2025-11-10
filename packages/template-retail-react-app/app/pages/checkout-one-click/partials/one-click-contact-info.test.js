@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor, fireEvent, cleanup} from '@testing-library/react'
+import {screen, waitFor, fireEvent} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
@@ -13,7 +13,6 @@ import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 jest.setTimeout(60000)
 const validEmail = 'test@salesforce.com'
-const invalidEmail = 'invalidEmail'
 const mockAuthHelperFunctions = {
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
     [AuthHelpers.Logout]: {mutateAsync: jest.fn()},

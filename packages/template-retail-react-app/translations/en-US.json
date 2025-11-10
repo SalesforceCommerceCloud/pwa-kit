@@ -8,10 +8,9 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
-<<<<<<< HEAD
   "account.title.my_account": {
     "defaultMessage": "My Account"
-=======
+  },
   "account.payments.action.refresh": {
     "defaultMessage": "Refresh"
   },
@@ -56,7 +55,6 @@
   },
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method for faster checkout."
->>>>>>> origin/feature/1cc_payments
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
@@ -353,10 +351,9 @@
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
   },
-<<<<<<< HEAD
   "checkout.title.checkout": {
     "defaultMessage": "Checkout"
-=======
+  },
   "checkout.message.user_registration": {
     "defaultMessage": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
   },
@@ -365,7 +362,6 @@
   },
   "checkout.title.user_registration": {
     "defaultMessage": "Save for Future Use"
->>>>>>> origin/feature/1cc_payments
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"

@@ -21,7 +21,6 @@ import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import useBasketRecovery from '@salesforce/retail-react-app/app/hooks/use-basket-recovery'
 
 export default function UserRegistration({
@@ -36,7 +35,6 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const auth = useAuthContext()
     const {recoverBasketAfterAuth} = useBasketRecovery()
     const appOrigin = useAppOrigin()
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI

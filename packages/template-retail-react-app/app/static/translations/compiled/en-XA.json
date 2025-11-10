@@ -41,20 +41,13 @@
       "value": "]"
     }
   ],
-<<<<<<< HEAD
-  "account.title.my_account": [
-=======
   "account.payments.action.refresh": [
->>>>>>> origin/feature/1cc_payments
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-<<<<<<< HEAD
-      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
-=======
       "value": "Řḗḗƒřḗḗşħ"
     },
     {
@@ -252,7 +245,20 @@
     {
       "type": 0,
       "value": "Ȧḓḓ ȧȧ ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ƒǿǿř ƒȧȧşŧḗḗř ƈħḗḗƈķǿǿŭŭŧ."
->>>>>>> origin/feature/1cc_payments
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
     },
     {
       "type": 0,
@@ -1907,20 +1913,13 @@
       "value": "]"
     }
   ],
-<<<<<<< HEAD
-  "checkout.title.checkout": [
-=======
   "checkout.message.user_registration": [
->>>>>>> origin/feature/1cc_payments
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-<<<<<<< HEAD
-      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
-=======
       "value": "Ẇħḗḗƞ ẏǿǿŭŭ ƥŀȧȧƈḗḗ ẏǿǿŭŭř ǿǿřḓḗḗř, ẇḗḗ ƈřḗḗȧȧŧḗḗ ȧȧƞ ȧȧƈƈǿǿŭŭƞŧ ƒǿǿř ẏǿǿŭŭ ȧȧƞḓ şȧȧṽḗḗ ẏǿǿŭŭř ƥȧȧẏḿḗḗƞŧ īƞƒǿǿřḿȧȧŧīǿǿƞ ȧȧƞḓ ǿǿŧħḗḗř ḓḗḗŧȧȧīŀş ƒǿǿř ƒŭŭŧŭŭřḗḗ ƥŭŭřƈħȧȧşḗḗş. Ḓŭŭřīƞɠ ẏǿǿŭŭř ƞḗḗẋŧ ƈħḗḗƈķǿǿŭŭŧ, ƈǿǿƞƒīřḿ ẏǿǿŭŭř ȧȧƈƈǿǿŭŭƞŧ ŭŭşīƞɠ ŧħḗḗ ƈǿǿḓḗḗ ẇḗḗ'ŀŀ şḗḗƞḓ ŧǿǿ ẏǿǿŭŭ."
     },
     {
@@ -1942,6 +1941,20 @@
       "value": "]"
     }
   ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout.title.user_registration": [
     {
       "type": 0,
@@ -1950,7 +1963,6 @@
     {
       "type": 0,
       "value": "Şȧȧṽḗḗ ƒǿǿř Ƒŭŭŧŭŭřḗḗ Ŭşḗḗ"
->>>>>>> origin/feature/1cc_payments
     },
     {
       "type": 0,

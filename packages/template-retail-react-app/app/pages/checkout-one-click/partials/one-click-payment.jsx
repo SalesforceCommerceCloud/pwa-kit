@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect, useRef, useCallback} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -46,7 +46,7 @@ const Payment = ({
     enableUserRegistration,
     setEnableUserRegistration,
     registeredUserChoseGuest = false,
-    onPaymentMethodSaved,
+    onPaymentMethodSaved: _onPaymentMethodSaved,
     onSavePreferenceChange,
     onPaymentSubmitted,
     selectedPaymentMethod,
@@ -78,6 +78,7 @@ const Payment = ({
     const currentSelectedPaymentMethod =
         selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
     const currentIsEditing = isEditing ?? false
+    useEffect(() => {}, [_onPaymentMethodSaved])
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -103,37 +104,6 @@ const Payment = ({
             setCurrentFormPayment(null)
         }
     }
-
-    // Detect new payment instruments that aren't in the customer's saved list
-    const newPaymentInstruments = useMemo(() => {
-        // Use currentFormPayment if available, otherwise fall back to appliedPayment
-        const paymentToCheck = currentFormPayment || appliedPayment
-
-        if (!isGuest && paymentToCheck) {
-            // If customer has no saved payment instruments, any new payment is considered new
-            if (!customer?.paymentInstruments || customer.paymentInstruments.length === 0) {
-                return [paymentToCheck]
-            }
-
-            // Check if current payment instrument is not in saved list
-            const isNewPayment = !customer.paymentInstruments.some((saved) => {
-                // Compare the entire payment instrument structure
-                return (
-                    saved.paymentCard?.cardType === paymentToCheck.paymentCard?.cardType &&
-                    saved.paymentCard?.numberLastDigits ===
-                        paymentToCheck.paymentCard?.numberLastDigits &&
-                    saved.paymentCard?.holder === paymentToCheck.paymentCard?.holder &&
-                    saved.paymentCard?.expirationMonth ===
-                        paymentToCheck.paymentCard?.expirationMonth &&
-                    saved.paymentCard?.expirationYear === paymentToCheck.paymentCard?.expirationYear
-                )
-            })
-
-            return isNewPayment ? [paymentToCheck] : []
-        }
-        return []
-    }, [isGuest, customer, appliedPayment, currentFormPayment])
-
     // Watch form values in real-time to detect new payment instruments
     useEffect(() => {
         if (paymentMethodForm && !isGuest) {

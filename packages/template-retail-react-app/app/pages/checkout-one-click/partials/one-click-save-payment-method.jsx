@@ -10,7 +10,7 @@ import {Checkbox, Text} from '@salesforce/retail-react-app/app/components/shared
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {FormattedMessage} from 'react-intl'
 
-export default function SavePaymentMethod({paymentInstrument, onSaved, checked}) {
+export default function SavePaymentMethod({onSaved, checked}) {
     const [shouldSave, setShouldSave] = useState(false)
     const {data: customer} = useCurrentCustomer()
 

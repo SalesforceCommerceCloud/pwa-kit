@@ -279,10 +279,6 @@ const CheckoutOneClick = () => {
                         if (customerId && shipping) {
                             // Whitelist fields and strip non-customer fields (e.g., id, _type)
                             const {
-                                addressId: _ignoreAddressId,
-                                creationDate: _ignoreCreation,
-                                lastModified: _ignoreModified,
-                                preferred: _ignorePreferred,
                                 address1,
                                 address2,
                                 city,

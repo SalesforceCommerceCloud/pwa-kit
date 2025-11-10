@@ -31,7 +31,6 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
 

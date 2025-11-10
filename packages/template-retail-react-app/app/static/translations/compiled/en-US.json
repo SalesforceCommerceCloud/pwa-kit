@@ -17,12 +17,6 @@
       "value": "Log Out"
     }
   ],
-<<<<<<< HEAD
-  "account.title.my_account": [
-    {
-      "type": 0,
-      "value": "My Account"
-=======
   "account.payments.action.refresh": [
     {
       "type": 0,
@@ -111,7 +105,12 @@
     {
       "type": 0,
       "value": "Add a new payment method for faster checkout."
->>>>>>> origin/feature/1cc_payments
+    }
+  ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
     }
   ],
   "account_addresses.badge.default": [
@@ -978,12 +977,6 @@
       "value": "An unexpected error occurred during checkout."
     }
   ],
-<<<<<<< HEAD
-  "checkout.title.checkout": [
-    {
-      "type": 0,
-      "value": "Checkout"
-=======
   "checkout.message.user_registration": [
     {
       "type": 0,
@@ -996,11 +989,16 @@
       "value": "Save this payment method for future use"
     }
   ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "Checkout"
+    }
+  ],
   "checkout.title.user_registration": [
     {
       "type": 0,
       "value": "Save for Future Use"
->>>>>>> origin/feature/1cc_payments
     }
   ],
   "checkout_confirmation.button.create_account": [
