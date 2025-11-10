@@ -44,6 +44,24 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {decode as base64Decode, encode as base64Encode} from 'base64-arraybuffer'
+
+// WebAuthn configuration
+const CLIENT_ID = 'd6ae9df8-e13f-48f4-a413-b9820d9a39bc'
+const CLIENT_SECRET = '9MBWoGTfPmUsm9ityrAN'
+const CHANNEL_ID = 'SiteGenesis'
+const TENANT_ID = 'bldm_stg'
+
+// Helper functions for base64url encoding/decoding
+const base64urlToUint8Array = (base64url) => {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/')
+    return new Uint8Array(base64Decode(base64))
+}
+
+const uint8arrayToBase64url = (uint8array) => {
+    const base64 = base64Encode(uint8array.buffer)
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -65,6 +83,7 @@ export const AuthModal = ({
     onClose,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
+    isWebAuthnEnabled = false,
     idps = [],
     ...props
 }) => {
@@ -115,6 +134,117 @@ export const AuthModal = ({
         }
     }
 
+    const handleWebAuthnLogin = async (email) => {
+        try {
+            console.log('WebAuthn /start', email)
+
+            // Step 1: Call /authenticate/start
+            const startResponse = await fetch(
+                `http://localhost:9020/api/v1/organizations/${TENANT_ID}/oauth2/webauthn/authenticate/start`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`
+                    },
+                    body: new URLSearchParams({
+                        client_id: CLIENT_ID,
+                        channel_id: CHANNEL_ID,
+                        user_id: email
+                    })
+                }
+            )
+
+            if (!startResponse.ok) {
+                throw new Error('WebAuthn /start failed')
+            }
+
+            const startData = await startResponse.json()
+            console.log('WebAuthn /start', startData)
+            
+            // Step 2: Transform response for WebAuthn API
+            const credentialRequestOptions = {
+                publicKey: {
+                    ...startData.publicKey,
+                    challenge: base64urlToUint8Array(startData.publicKey.challenge),
+                    allowCredentials: startData.publicKey.allowCredentials?.map(credential => ({
+                        ...credential,
+                        id: base64urlToUint8Array(credential.id)
+                    })) || []
+                }
+            }
+
+            // Step 3: Get the passkey credential
+            console.log('WebAuthn calling navigator.credentials.get')
+            const credential = await navigator.credentials.get(credentialRequestOptions)
+            
+            if (!credential) {
+                throw new Error('No credential returned')
+            }
+
+            // Step 4: Encode credential for /finish endpoint
+            const encodedCredential = {
+                id: credential.id,
+                rawId: uint8arrayToBase64url(new Uint8Array(credential.rawId)),
+                type: credential.type,
+                clientExtensionResults: credential.getClientExtensionResults(),
+                response: {
+                    authenticatorData: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.authenticatorData)
+                    ),
+                    clientDataJSON: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.clientDataJSON)
+                    ),
+                    signature: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.signature)
+                    ),
+                    userHandle: credential.response.userHandle
+                        ? uint8arrayToBase64url(new Uint8Array(credential.response.userHandle))
+                        : null
+                }
+            }
+
+            // Step 5: Call /authenticate/finish
+            const finishRequest = {
+                user_id: email,
+                email: email,
+                client_id: CLIENT_ID,
+                credential: encodedCredential
+            }
+            console.log('WebAuthn calling /authenticate/finish', finishRequest)
+            const finishResponse = await fetch(
+                `http://localhost:9020/api/v1/organizations/${TENANT_ID}/oauth2/webauthn/authenticate/finish`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(finishRequest)
+                }
+            )
+
+            if (!finishResponse.ok) {
+                throw new Error('WebAuthn authentication failed')
+            }
+
+            const finishData = await finishResponse.json()
+            console.log('WebAuthn /authenticate/finish', finishData)
+            
+            // Close modal and navigate to account page
+            onClose()
+            // Should navigate to account page after login
+            // navigate('/account')
+            
+            return true
+
+        } catch (err) {
+            // WebAuthn failed - will fall back to passwordless
+            console.log('WebAuthn failed, falling back to passwordless:', err.message)
+            return false
+        }
+    }
+
+
     const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
@@ -126,6 +256,14 @@ export const AuthModal = ({
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
+                    // Try WebAuthn first if enabled
+                    if (isWebAuthnEnabled) {
+                        const webAuthnSuccess = await handleWebAuthnLogin(email)
+                        if (webAuthnSuccess) {
+                            return // WebAuthn succeeded, we're done
+                        }
+                        // WebAuthn failed, fall through to passwordless
+                    }
                     await handlePasswordlessLogin(email)
                     return
                 }
@@ -336,6 +474,7 @@ AuthModal.propTypes = {
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
     isSocialEnabled: PropTypes.bool,
+    isWebAuthnEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
@@ -346,7 +485,7 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const {passwordless = {}, social = {}, webauthn = {}} = getConfig().app.login || {}
 
     return {
         initialView,
@@ -355,6 +494,7 @@ export const useAuthModal = (initialView = LOGIN_VIEW) => {
         onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,
         isSocialEnabled: !!social?.enabled,
+        isWebAuthnEnabled: !!webauthn?.enabled,
         idps: social?.idps
     }
 }

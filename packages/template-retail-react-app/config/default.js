@@ -31,19 +31,23 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: false,
+                enabled: true,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
-                enabled: false,
+                enabled: true,
                 idps: ['google', 'apple'],
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
                 callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
                 landingPath: '/reset-password-landing'
+            },
+            webauthn: {
+                enabled: true,
+                callbackURI: process.env.WEBAUTHN_CALLBACK_URI || '/web-authn-callback'
             }
         },
         defaultSite: 'RefArchGlobal',
