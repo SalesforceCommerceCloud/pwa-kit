@@ -73,6 +73,12 @@ const Payment = ({
 
     const activeBasketIdRef = useRef(null)
 
+    useEffect(() => {
+        if (isGuest) {
+            activeBasketIdRef.current = null
+        }
+    }, [isGuest])
+
     // Use props for parent-managed state with fallback defaults
     const currentSelectedPaymentMethod =
         selectedPaymentMethod ?? (appliedPayment?.customerPaymentInstrumentId || 'cc')
