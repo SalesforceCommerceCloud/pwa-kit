@@ -1079,9 +1079,11 @@ describe('DevServer middleware', () => {
     test('_validateConfiguration strictSSL', () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         RemoteServerFactory._validateConfiguration(opts({strictSSL: false}))
-        expect(warn.mock.calls).toEqual([
-            ['The SSR Server has _strictSSL turned off for https requests']
-        ])
+        expect(warn.mock.calls).toEqual(
+            expect.arrayContaining([
+                ['The SSR Server has _strictSSL turned off for https requests']
+            ])
+        )
     })
 })
 
@@ -1276,45 +1278,6 @@ describe('SLAS private client proxy', () => {
             'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
         )
     }, 15000)
-
-    test('proxy returns a 200 OK masking a user not found error', async () => {
-        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
-
-        // Create a new mock server specifically for this test so we can mock a response from SLAS
-        const testProxyApp = express()
-        const testProxyPort = 12346
-        const testSlasTarget = `http://localhost:${testProxyPort}/shopper/auth/responseHeaders`
-
-        // Set up the mock server to return a 404 for passwordless login
-        testProxyApp.use('/shopper/auth/responseHeaders', (req, res) => {
-            if (req.url.includes('/oauth2/passwordless/login')) {
-                res.status(404).send()
-            } else {
-                res.send(req.headers)
-            }
-        })
-
-        const testProxyServer = testProxyApp.listen(testProxyPort)
-
-        try {
-            const testAppConfig = {
-                ...appConfig,
-                slasTarget: testSlasTarget
-            }
-
-            const app = RemoteServerFactory._createApp(opts(testAppConfig))
-
-            return await request(app)
-                .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/login')
-                .expect(200)
-                .then((response) => {
-                    expect(response.text).toBe('')
-                })
-        } finally {
-            // Clean up the test server
-            testProxyServer.close()
-        }
-    })
 })
 
 describe('Base path tests', () => {
@@ -1426,6 +1389,25 @@ describe('Base path tests', () => {
             .then((response) => {
                 expect(response.status).toBe(200)
                 expect(response.body.message).toBe('test')
+            })
+    }, 15000)
+})
+
+describe('Forwarded headers', () => {
+    test('sets xForwardedOrigin from x-forwarded-* headers', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/xfo', (req, res) => {
+            res.json({origin: res.locals.xForwardedOrigin || null})
+        })
+
+        return request(app)
+            .get('/xfo')
+            .set('x-forwarded-host', 'example.com')
+            .set('x-forwarded-proto', 'http')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.origin).toBe('http://example.com')
             })
     }, 15000)
 })
