@@ -294,10 +294,10 @@ describe('ContactInfo Component', () => {
 
         // Verify modal content
         expect(
-            screen.getByText('To use your account information enter the code sent to your email.')
+            screen.getByText('To log in to your account, enter the code sent to your email.')
         ).toBeInTheDocument()
-        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
-        expect(screen.getByText('Resend code')).toBeInTheDocument()
+        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
+        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
     })
 
     test('opens OTP modal when form is submitted by clicking submit button', async () => {
@@ -324,10 +324,10 @@ describe('ContactInfo Component', () => {
 
         // Verify modal content is present
         expect(
-            screen.getByText('To use your account information enter the code sent to your email.')
+            screen.getByText('To log in to your account, enter the code sent to your email.')
         ).toBeInTheDocument()
-        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
-        expect(screen.getByText('Resend code')).toBeInTheDocument()
+        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
+        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
     })
 
     test('shows error message when updateCustomerForBasket fails', async () => {
@@ -383,11 +383,11 @@ describe('ContactInfo Component', () => {
         // Verify that the OTP modal is still open and we haven't proceeded to next step
         expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         expect(
-            screen.getByText('To use your account information enter the code sent to your email.')
+            screen.getByText('To log in to your account, enter the code sent to your email.')
         ).toBeInTheDocument()
 
         // The modal should still be visible, indicating we didn't proceed to the next step
-        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
-        expect(screen.getByText('Resend code')).toBeInTheDocument()
+        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
+        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
     })
 })

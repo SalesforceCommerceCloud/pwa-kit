@@ -282,7 +282,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             const message =
                 error.response?.status === 401
                     ? formatMessage({
-                          defaultMessage: 'Invalid or expired code. Please try again.',
+                          defaultMessage:
+                              'The code is invalid or expired. Click Resend Code and try again.',
                           id: 'otp.error.invalid_code'
                       })
                     : formatMessage(API_ERROR_MESSAGE)
