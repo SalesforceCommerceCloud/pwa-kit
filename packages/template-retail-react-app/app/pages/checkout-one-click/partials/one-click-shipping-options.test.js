@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -199,11 +199,124 @@ describe('ShippingOptions Component', () => {
         expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
     })
 
+    /* eslint-disable @typescript-eslint/no-var-requires */
+    test('renders per-shipment methods for multiship and updates by shipment', async () => {
+        jest.resetModules()
+        const methods1 = {
+            defaultShippingMethodId: 'std',
+            applicableShippingMethods: [
+                {
+                    id: 'std',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'exp',
+                    name: 'Express Shipping (Overnight)',
+                    description: 'Arrives: Tomorrow, Sept 12',
+                    price: 10
+                }
+            ]
+        }
+        const methods2 = {
+            defaultShippingMethodId: 'std2',
+            applicableShippingMethods: [
+                {
+                    id: 'std2',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'prio',
+                    name: 'Priority Shipping',
+                    description: 'Arrives: Today at 5-9 PM',
+                    price: 25
+                }
+            ]
+        }
+
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'ship1',
+                            shippingAddress: {
+                                firstName: 'Oscar',
+                                lastName: 'Robertson',
+                                address1: '333 South Street Station',
+                                city: 'West Lafayette',
+                                stateCode: 'IN',
+                                postalCode: '98103'
+                            },
+                            shippingMethod: null
+                        },
+                        {
+                            shipmentId: 'ship2',
+                            shippingAddress: {
+                                firstName: 'Lee',
+                                lastName: 'Robertson',
+                                address1: '158 South Street Station',
+                                city: 'West Lafayette',
+                                stateCode: 'IN',
+                                postalCode: '98103'
+                            },
+                            shippingMethod: null
+                        }
+                    ],
+                    shippingItems: [
+                        {shipmentId: 'ship1', price: 0},
+                        {shipmentId: 'ship2', price: 0}
+                    ]
+                },
+                derivedData: {hasBasket: true, totalItems: 2}
+            })
+        }))
+
+        const sdk = require('@salesforce/commerce-sdk-react')
+        sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
+            if (parameters.shipmentId === 'ship1') return {data: methods1}
+            if (parameters.shipmentId === 'ship2') return {data: methods2}
+            return {data: methods1}
+        })
+
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+        )
+        const Component = module.default
+
+        const {user} = localRenderWithProviders(<Component />)
+
+        expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
+        expect(screen.getByText('Shipment 1:')).toBeInTheDocument()
+        expect(screen.getByText('Shipment 2:')).toBeInTheDocument()
+
+        await user.click(screen.getByText('Express Shipping (Overnight)'))
+        expect(mockUpdateShippingMethod.mutateAsync).toHaveBeenCalledWith({
+            parameters: {basketId: 'test-basket-id', shipmentId: 'ship1'},
+            body: {id: 'exp'}
+        })
+
+        await user.click(screen.getByText('Priority Shipping'))
+        expect(mockUpdateShippingMethod.mutateAsync).toHaveBeenCalledWith({
+            parameters: {basketId: 'test-basket-id', shipmentId: 'ship2'},
+            body: {id: 'prio'}
+        })
+
+        expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+    })
+
     test('renders component structure correctly', () => {
         renderWithProviders(<ShippingOptions />)
 
         // Basic component rendering test
-        expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+        expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
         expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
     })
 })

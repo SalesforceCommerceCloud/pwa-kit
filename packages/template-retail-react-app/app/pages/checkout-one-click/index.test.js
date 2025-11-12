@@ -256,6 +256,80 @@ describe('Checkout One Click', () => {
         getConfig.mockImplementation(() => mockConfig)
     })
 
+    test('renders pickup and shipping sections for mixed baskets', async () => {
+        const mixedBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        if (!mixedBasket.productItems || mixedBasket.productItems.length === 0) {
+            mixedBasket.productItems = [
+                {
+                    itemId: 'item-delivery-1',
+                    productId: '701643070725M',
+                    quantity: 1,
+                    price: 19.18,
+                    shipmentId: 'me'
+                }
+            ]
+        }
+        mixedBasket.productItems.push({
+            itemId: 'item-pickup-1',
+            productId: '701643070725M',
+            quantity: 1,
+            price: 19.18,
+            shipmentId: 'pickup1',
+            inventoryId: 'inventory_m_store_store1'
+        })
+        mixedBasket.shipments = [
+            {
+                shipmentId: 'me',
+                shippingAddress: null,
+                shippingMethod: null
+            },
+            {
+                shipmentId: 'pickup1',
+                c_fromStoreId: 'store1',
+                shippingMethod: {id: 'PICKUP', c_storePickupEnabled: true},
+                shippingAddress: {
+                    firstName: 'Store 1',
+                    lastName: 'Pickup',
+                    address1: '1 Market St',
+                    city: 'San Francisco',
+                    postalCode: '94105',
+                    stateCode: 'CA',
+                    countryCode: 'US'
+                }
+            }
+        ]
+
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        baskets: [mixedBasket],
+                        total: 1
+                    })
+                )
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+        })
+        await waitFor(() => {
+            expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
+        })
+        await waitFor(() => {
+            expect(screen.getByText(/shipping & gift options/i)).toBeInTheDocument()
+        })
+    })
+
     afterEach(() => {
         jest.resetModules()
         jest.clearAllMocks()

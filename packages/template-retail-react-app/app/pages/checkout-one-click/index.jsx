@@ -39,12 +39,12 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
@@ -78,10 +78,12 @@ const CheckoutOneClick = () => {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
     const [isEditingPayment, setIsEditingPayment] = useState(false)
 
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    // Compute shipment types
+    const pickupShipments = basket?.shipments?.filter((s) => isPickupShipment(s)) || []
+    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    const hasPickupShipments = pickupShipments.length > 0
+    const hasDeliveryShipments = deliveryShipments.length > 0
+    const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
@@ -165,7 +167,7 @@ const CheckoutOneClick = () => {
         }
 
         // For one-click checkout, billing same as shipping by default
-        const billingSameAsShipping = !isPickupOrder
+        const billingSameAsShipping = !isPickupOnly
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -279,10 +281,6 @@ const CheckoutOneClick = () => {
                         if (customerId && shipping) {
                             // Whitelist fields and strip non-customer fields (e.g., id, _type)
                             const {
-                                addressId: _ignoreAddressId,
-                                creationDate: _ignoreCreation,
-                                lastModified: _ignoreModified,
-                                preferred: _ignorePreferred,
                                 address1,
                                 address2,
                                 city,
@@ -412,8 +410,9 @@ const CheckoutOneClick = () => {
                                 idps={idps}
                                 onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
-                            {!isPickupOrder && <ShippingOptions />}
+                            {hasPickupShipments && <PickupAddress />}
+                            {hasDeliveryShipments && <ShippingAddress />}
+                            {hasDeliveryShipments && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect, useRef, useCallback} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -46,7 +46,6 @@ const Payment = ({
     enableUserRegistration,
     setEnableUserRegistration,
     registeredUserChoseGuest = false,
-    onPaymentMethodSaved,
     onSavePreferenceChange,
     onPaymentSubmitted,
     selectedPaymentMethod,
@@ -103,36 +102,6 @@ const Payment = ({
             setCurrentFormPayment(null)
         }
     }
-
-    // Detect new payment instruments that aren't in the customer's saved list
-    const newPaymentInstruments = useMemo(() => {
-        // Use currentFormPayment if available, otherwise fall back to appliedPayment
-        const paymentToCheck = currentFormPayment || appliedPayment
-
-        if (!isGuest && paymentToCheck) {
-            // If customer has no saved payment instruments, any new payment is considered new
-            if (!customer?.paymentInstruments || customer.paymentInstruments.length === 0) {
-                return [paymentToCheck]
-            }
-
-            // Check if current payment instrument is not in saved list
-            const isNewPayment = !customer.paymentInstruments.some((saved) => {
-                // Compare the entire payment instrument structure
-                return (
-                    saved.paymentCard?.cardType === paymentToCheck.paymentCard?.cardType &&
-                    saved.paymentCard?.numberLastDigits ===
-                        paymentToCheck.paymentCard?.numberLastDigits &&
-                    saved.paymentCard?.holder === paymentToCheck.paymentCard?.holder &&
-                    saved.paymentCard?.expirationMonth ===
-                        paymentToCheck.paymentCard?.expirationMonth &&
-                    saved.paymentCard?.expirationYear === paymentToCheck.paymentCard?.expirationYear
-                )
-            })
-
-            return isNewPayment ? [paymentToCheck] : []
-        }
-        return []
-    }, [isGuest, customer, appliedPayment, currentFormPayment])
 
     // Watch form values in real-time to detect new payment instruments
     useEffect(() => {
@@ -275,8 +244,27 @@ const Payment = ({
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
                     }
                 })
-                // After auto-apply, if we already have a shipping address, submit billing so we can advance
-                if (selectedShippingAddress) {
+                if (isPickupOrder) {
+                    try {
+                        const saved = customer?.paymentInstruments?.find(
+                            (pi) => pi.paymentInstrumentId === preferred.paymentInstrumentId
+                        )
+                        const addr = saved?.billingAddress
+                        if (addr) {
+                            const cleaned = {...addr}
+                            delete cleaned.addressId
+                            delete cleaned.creationDate
+                            delete cleaned.lastModified
+                            delete cleaned.preferred
+                            await updateBillingAddressForBasket({
+                                body: cleaned,
+                                parameters: {basketId: activeBasketIdRef.current || basket.basketId}
+                            })
+                        }
+                    } catch {
+                        // ignore; user can enter billing manually
+                    }
+                } else if (selectedShippingAddress) {
                     await onBillingSubmit()
                     // Ensure basket is refreshed with payment & billing
                     await currentBasketQuery.refetch()
@@ -324,6 +312,27 @@ const Payment = ({
                 }
             })
             await currentBasketQuery.refetch()
+            if (isPickupOrder) {
+                try {
+                    const saved = customer?.paymentInstruments?.find(
+                        (pi) => pi.paymentInstrumentId === paymentInstrumentId
+                    )
+                    const addr = saved?.billingAddress
+                    if (addr) {
+                        const cleaned = {...addr}
+                        delete cleaned.addressId
+                        delete cleaned.creationDate
+                        delete cleaned.lastModified
+                        delete cleaned.preferred
+                        await updateBillingAddressForBasket({
+                            body: cleaned,
+                            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
+                        })
+                        await currentBasketQuery.refetch()
+                    }
+                } catch {
+                }
+            }
             setIsApplyingSavedPayment(false)
             onSelectedPaymentMethodChange?.(paymentInstrumentId)
         }
@@ -583,8 +592,6 @@ Payment.propTypes = {
     setEnableUserRegistration: PropTypes.func,
     /** Whether a registered user has chosen guest checkout */
     registeredUserChoseGuest: PropTypes.bool,
-    /** Callback when payment method is successfully saved */
-    onPaymentMethodSaved: PropTypes.func,
     /** Callback when save preference changes */
     onSavePreferenceChange: PropTypes.func,
     /** Callback when payment is submitted with full card details */

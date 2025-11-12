@@ -1620,7 +1620,7 @@
     "defaultMessage": "In Stock"
   },
   "shipping_address.action.ship_to_multiple_addresses": {
-    "defaultMessage": "Ship to Multiple Addresses"
+    "defaultMessage": "Ship to multiple addresses"
   },
   "shipping_address.action.ship_to_single_address": {
     "defaultMessage": "Ship to Single Address"
@@ -1655,6 +1655,9 @@
   "shipping_address.summary.multiple_addresses": {
     "defaultMessage": "Your items will be shipped to multiple addresses."
   },
+  "shipping_address.summary.multiple_locations": {
+    "defaultMessage": "You are shipping to multiple locations."
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -1682,6 +1685,9 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
+  "shipping_multi_address.action.ship_to_single_address": {
+    "defaultMessage": "Ship items to one address"
+  },
   "shipping_multi_address.add_new_address.aria_label": {
     "defaultMessage": "Add new delivery address for {productName}"
   },
@@ -1706,11 +1712,20 @@
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
+  "shipping_multi_address.label.note": {
+    "defaultMessage": "Note"
+  },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."
   },
   "shipping_multi_address.loading_addresses": {
     "defaultMessage": "Loading addresses..."
+  },
+  "shipping_multi_address.message.no_delivery_items": {
+    "defaultMessage": "There are no items to deliver. All items are pickup."
+  },
+  "shipping_multi_address.message.pickup_items": {
+    "defaultMessage": "Some items are set for pickup and are not shown here. Only delivery items can be assigned to addresses."
   },
   "shipping_multi_address.no_addresses_available": {
     "defaultMessage": "No address available"
@@ -1733,14 +1748,23 @@
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"
   },
+  "shipping_options.action.send_as_gift_wrapping": {
+    "defaultMessage": "Send as a gift (gift wrapping)"
+  },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
   },
   "shipping_options.free": {
     "defaultMessage": "Free"
   },
+  "shipping_options.help.notifications": {
+    "defaultMessage": "You can enable or disable notifications at any time."
+  },
   "shipping_options.label.no_method_selected": {
     "defaultMessage": "No shipping method selected"
+  },
+  "shipping_options.label.shipment_number": {
+    "defaultMessage": "Shipment {index}:"
   },
   "shipping_options.label.shipping_to": {
     "defaultMessage": "Shipping to {name}"
@@ -1749,6 +1773,9 @@
     "defaultMessage": "Total Shipping"
   },
   "shipping_options.title.shipping_gift_options": {
+    "defaultMessage": "Shipping & Gift Options"
+  },
+  "shipping_options.title.shipping_method": {
     "defaultMessage": "Shipping & Gift Options"
   },
   "signout_confirmation_dialog.button.cancel": {
@@ -1858,6 +1885,9 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
+  },
+  "toggle_card.action.change": {
+    "defaultMessage": "Change"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
