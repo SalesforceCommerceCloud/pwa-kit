@@ -53,6 +53,9 @@
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method to check out faster."
   },
+  "account.title.my_account": {
+    "defaultMessage": "My Account"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },
@@ -338,6 +341,9 @@
   },
   "checkout.payment.save_payment_method": {
     "defaultMessage": "Save this payment method for future use"
+  },
+  "checkout.title.checkout": {
+    "defaultMessage": "Checkout"
   },
   "checkout.title.user_registration": {
     "defaultMessage": "Save Checkout Info for Future Use"

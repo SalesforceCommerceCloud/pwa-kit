@@ -107,6 +107,12 @@
       "value": "Add a new payment method to check out faster."
     }
   ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -935,6 +941,12 @@
     {
       "type": 0,
       "value": "Save this payment method for future use"
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "Checkout"
     }
   ],
   "checkout.title.user_registration": [
