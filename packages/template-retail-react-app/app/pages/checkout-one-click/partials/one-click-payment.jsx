@@ -330,8 +330,8 @@ const Payment = ({
                         })
                         await currentBasketQuery.refetch()
                     }
-                } catch (e) {
-                    showError(e.message)
+                } catch (_e) {
+                    // Fail silently
                 }
             }
             setIsApplyingSavedPayment(false)

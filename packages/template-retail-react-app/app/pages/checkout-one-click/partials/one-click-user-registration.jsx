@@ -21,7 +21,6 @@ import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import useBasketRecovery from '@salesforce/retail-react-app/app/hooks/use-basket-recovery'
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -35,7 +34,6 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {recoverBasketAfterAuth} = useBasketRecovery()
     const appOrigin = useAppOrigin()
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -43,6 +41,7 @@ export default function UserRegistration({
         : `${appOrigin}${passwordlessConfigCallback}`
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
+
     const handleUserRegistrationChange = async (e) => {
         const checked = e.target.checked
         setEnableUserRegistration(checked)
@@ -64,6 +63,23 @@ export default function UserRegistration({
                 // Silent failure; user can continue as guest
             }
         }
+    }
+
+    const handleOtpVerification = async (otpCode) => {
+        try {
+            await loginPasswordless.mutateAsync({
+                pwdlessLoginToken: otpCode,
+                register_customer: true
+            })
+
+            if (onRegistered) {
+                await onRegistered(basket?.basketId)
+            }
+            onOtpClose()
+        } catch (_e) {
+            // Let OtpAuth surface errors via its own UI/toast
+        }
+        return {success: true}
     }
 
     // Hide the form if the "Checkout as Guest" button was clicked
@@ -133,26 +149,7 @@ export default function UserRegistration({
                         email
                     })
                 }}
-                handleOtpVerification={async (otpCode) => {
-                    try {
-                        await loginPasswordless.mutateAsync({
-                            pwdlessLoginToken: otpCode,
-                            register_customer: true
-                        })
-                        const newBasketId = await recoverBasketAfterAuth({
-                            preLoginItems: basket?.productItems || [],
-                            shipment: basket?.shipments?.[0] || null,
-                            doMerge: true
-                        })
-                        if (onRegistered) {
-                            await onRegistered(newBasketId)
-                        }
-                        onOtpClose()
-                    } catch (_e) {
-                        // Let OtpAuth surface errors via its own UI/toast
-                    }
-                    return {success: true}
-                }}
+                handleOtpVerification={handleOtpVerification}
             />
         </>
     )
