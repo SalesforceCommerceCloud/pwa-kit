@@ -34,8 +34,7 @@ const OtpAuth = ({
     form,
     handleSendEmailOtp,
     handleOtpVerification,
-    onCheckoutAsGuest,
-    isGuestRegistration = false
+    onCheckoutAsGuest
 }) => {
     const OTP_LENGTH = 8
     const [isVerifying, setIsVerifying] = useState(false)
@@ -179,6 +178,7 @@ const OtpAuth = ({
         }
     }
 
+    const isComplete = otpInputs.values.join('').length === OTP_LENGTH
     const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
@@ -186,33 +186,19 @@ const OtpAuth = ({
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    {isGuestRegistration ? (
-                        <FormattedMessage
-                            defaultMessage="Create an account"
-                            id="otp.title.create_account"
-                        />
-                    ) : (
-                        <FormattedMessage
-                            defaultMessage="Confirm it's you"
-                            id="otp.title.confirm_its_you"
-                        />
-                    )}
+                    <FormattedMessage
+                        defaultMessage="Confirm it's you"
+                        id="otp.title.confirm_its_you"
+                    />
                 </ModalHeader>
                 <ModalCloseButton disabled={isVerifying} />
                 <ModalBody pb={6}>
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
                         <Text fontSize="md" maxWidth="300px" textAlign="center">
-                            {isGuestRegistration ? (
-                                <FormattedMessage
-                                    defaultMessage="We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the 6-digit code below."
-                                    id="otp.message.enter_code_for_account_guest"
-                                />
-                            ) : (
-                                <FormattedMessage
-                                    defaultMessage="To log in to your account, enter the code sent to your email."
-                                    id="otp.message.enter_code_for_account_returning"
-                                />
-                            )}
+                            <FormattedMessage
+                                defaultMessage="To use your account information enter the code sent to your email."
+                                id="otp.message.enter_code_for_account"
+                            />
                         </Text>
 
                         {/* OTP Input */}
@@ -285,17 +271,10 @@ const OtpAuth = ({
                                     bg: 'gray.200'
                                 }}
                             >
-                                {isGuestRegistration ? (
-                                    <FormattedMessage
-                                        defaultMessage="Cancel"
-                                        id="otp.button.cancel_guest_registration"
-                                    />
-                                ) : (
-                                    <FormattedMessage
-                                        defaultMessage="Checkout as a Guest"
-                                        id="otp.button.checkout_as_guest"
-                                    />
-                                )}
+                                <FormattedMessage
+                                    defaultMessage="Checkout as a guest"
+                                    id="otp.button.checkout_as_guest"
+                                />
                             </Button>
 
                             <Button
@@ -311,13 +290,13 @@ const OtpAuth = ({
                             >
                                 {resendTimer > 0 ? (
                                     <FormattedMessage
-                                        defaultMessage="Resend code in {timer} seconds..."
+                                        defaultMessage="Resend code in {timer}s"
                                         id="otp.button.resend_timer"
                                         values={{timer: resendTimer}}
                                     />
                                 ) : (
                                     <FormattedMessage
-                                        defaultMessage="Resend Code"
+                                        defaultMessage="Resend code"
                                         id="otp.button.resend_code"
                                     />
                                 )}
@@ -336,8 +315,7 @@ OtpAuth.propTypes = {
     form: PropTypes.object.isRequired,
     handleSendEmailOtp: PropTypes.func.isRequired,
     handleOtpVerification: PropTypes.func.isRequired,
-    onCheckoutAsGuest: PropTypes.func,
-    isGuestRegistration: PropTypes.bool
+    onCheckoutAsGuest: PropTypes.func
 }
 
 export default OtpAuth

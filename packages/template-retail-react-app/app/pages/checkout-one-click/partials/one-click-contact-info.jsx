@@ -250,27 +250,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         'Content-Type': 'application/json'
                     },
                     parameters: {
-                        basketId: basket.basketId,
                         createDestinationBasket: true
                     }
                 })
-                const refetched = await currentBasketQuery.refetch()
-                const latestBasketId =
-                    refetched?.data?.basketId || refetched?.data?.basket_id || refetched?.data?.id
-                if (latestBasketId) {
-                    const email = form.getValues('email')
-                    await updateCustomerForBasket.mutateAsync({
-                        parameters: {basketId: latestBasketId},
-                        body: {email: email}
-                    })
-                }
-            } else {
-                const email = form.getValues('email')
-                await updateCustomerForBasket.mutateAsync({
-                    parameters: {basketId: basket.basketId},
-                    body: {email: email}
-                })
+                // Make sure UI reflects merged state before proceeding
+                await currentBasketQuery.refetch()
             }
+
+            // Update basket with email after successful OTP verification
+            const email = form.getValues('email')
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
@@ -290,8 +282,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             const message =
                 error.response?.status === 401
                     ? formatMessage({
-                          defaultMessage:
-                              'The code is invalid or expired. Click Resend Code and try again.',
+                          defaultMessage: 'Invalid or expired code. Please try again.',
                           id: 'otp.error.invalid_code'
                       })
                     : formatMessage(API_ERROR_MESSAGE)

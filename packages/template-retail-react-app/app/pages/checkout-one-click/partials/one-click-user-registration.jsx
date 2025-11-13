@@ -21,7 +21,8 @@ import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
+import useBasketRecovery from '@salesforce/retail-react-app/app/hooks/use-basket-recovery'
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -35,7 +36,8 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const auth = useAuthContext()
+    const {recoverBasketAfterAuth} = useBasketRecovery()
     const appOrigin = useAppOrigin()
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -83,7 +85,7 @@ export default function UserRegistration({
                 <Stack spacing={2}>
                     <Heading fontSize="lg" lineHeight="30px" tabIndex="0">
                         <FormattedMessage
-                            defaultMessage="Save Checkout Info for Future Use"
+                            defaultMessage="Save for Future Use"
                             id="checkout.title.user_registration"
                         />
                     </Heading>
@@ -97,14 +99,14 @@ export default function UserRegistration({
                         <Stack spacing={1}>
                             <Text>
                                 <FormattedMessage
-                                    defaultMessage="Create an account to check out faster"
+                                    defaultMessage="Create an account for a faster checkout"
                                     id="checkout.label.user_registration"
                                 />
                             </Text>
                             {enableUserRegistration && (
                                 <Text fontSize="sm" color="gray.500">
                                     <FormattedMessage
-                                        defaultMessage="Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
+                                        defaultMessage="When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
                                         id="checkout.message.user_registration"
                                     />
                                 </Text>
@@ -118,7 +120,6 @@ export default function UserRegistration({
             <OtpAuth
                 isOpen={isOtpOpen}
                 onClose={onOtpClose}
-                isGuestRegistration
                 form={{
                     getValues: (name) =>
                         name === 'email' ? basket?.customerInfo?.email : undefined,
@@ -139,19 +140,11 @@ export default function UserRegistration({
                             pwdlessLoginToken: otpCode,
                             register_customer: true
                         })
-                        let newBasketId = basket?.basketId
-                        const hasBasketItem = basket?.productItems?.length > 0
-                        if (hasBasketItem) {
-                            await mergeBasket.mutateAsync({
-                                parameters: {basketId: basket?.basketId, createDestinationBasket: true}
-                            })
-                            const refetched = await currentBasketQuery.refetch()
-                            newBasketId =
-                                refetched?.data?.basketId ||
-                                refetched?.data?.basket_id ||
-                                refetched?.data?.id ||
-                                newBasketId
-                        }
+                        const newBasketId = await recoverBasketAfterAuth({
+                            preLoginItems: basket?.productItems || [],
+                            shipment: basket?.shipments?.[0] || null,
+                            doMerge: true
+                        })
                         if (onRegistered) {
                             await onRegistered(newBasketId)
                         }

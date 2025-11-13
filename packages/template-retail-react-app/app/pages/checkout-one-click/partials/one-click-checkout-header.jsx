@@ -20,7 +20,9 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 
 const CheckoutHeader = () => {
     const intl = useIntl()
-    const {derivedData: {totalItems}} = useCurrentBasket()
+    const {
+        derivedData: {totalItems}
+    } = useCurrentBasket()
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
