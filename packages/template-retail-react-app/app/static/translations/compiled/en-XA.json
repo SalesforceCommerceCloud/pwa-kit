@@ -251,6 +251,20 @@
       "value": "]"
     }
   ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -1835,6 +1849,20 @@
     {
       "type": 0,
       "value": "Şȧȧṽḗḗ ŧħīş ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ƒǿǿř ƒŭŭŧŭŭřḗḗ ŭŭşḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
     },
     {
       "type": 0,
