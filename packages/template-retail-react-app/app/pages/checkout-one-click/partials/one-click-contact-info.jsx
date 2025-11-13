@@ -236,6 +236,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
+        let basketId
         try {
             // Prevent post-auth recovery effect from also attempting merge in this flow
             hasAttemptedRecoveryRef.current = true
@@ -245,7 +246,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             const hasBasketItem = basket.productItems?.length > 0
             if (hasBasketItem) {
                 // Mirror legacy checkout flow header and await completion
-                await mergeBasket.mutateAsync({
+                const merged = await mergeBasket.mutateAsync({
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -253,16 +254,21 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         createDestinationBasket: true
                     }
                 })
-                // Make sure UI reflects merged state before proceeding
-                await currentBasketQuery.refetch()
+                const mergedBasketId = merged?.basketId
+                const refreshedBasketId = await currentBasketQuery.refetch()
+                basketId = refreshedBasketId?.data?.basketId || mergedBasketId || basket.basketId
             }
 
             // Update basket with email after successful OTP verification
             const email = form.getValues('email')
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: email}
-            })
+            try {
+                await updateCustomerForBasket.mutateAsync({
+                    parameters: {basketId: basketId},
+                    body: {email}
+                })
+            } catch (error) {
+                setError(error.message)
+            }
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)

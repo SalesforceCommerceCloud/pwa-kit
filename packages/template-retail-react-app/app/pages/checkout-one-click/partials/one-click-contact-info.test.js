@@ -38,20 +38,21 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+const mockUseCurrentBasket = jest.fn(() => ({
+    data: {
+        basketId: 'test-basket-id',
+        customerInfo: {
+            email: null
+        }
+    },
+    derivedData: {
+        hasBasket: true,
+        totalItems: 1
+    },
+    refetch: jest.fn()
+}))
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
-    useCurrentBasket: () => ({
-        data: {
-            basketId: 'test-basket-id',
-            customerInfo: {
-                email: null
-            }
-        },
-        derivedData: {
-            hasBasket: true,
-            totalItems: 1
-        },
-        refetch: jest.fn()
-    })
+    useCurrentBasket: (...args) => mockUseCurrentBasket(...args)
 }))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
@@ -76,6 +77,29 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
             goToStep: null,
             goToNextStep: jest.fn()
         })
+    }
+})
+
+const mockAuth = {refreshAccessToken: jest.fn()}
+jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () => jest.fn(() => mockAuth))
+
+// Mock OtpAuth to expose a verify trigger
+jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
+    // eslint-disable-next-line react/prop-types
+    return function MockOtpAuth({isOpen, handleOtpVerification}) {
+        return isOpen ? (
+            <div>
+                <div>Confirm it&apos;s you</div>
+                <p>To log in to your account, enter the code sent to your email.</p>
+                <div>
+                    <button type="button">Checkout as a guest</button>
+                    <button type="button">Resend Code</button>
+                </div>
+                <button data-testid="otp-verify" onClick={() => handleOtpVerification('12345678')}>
+                    Verify
+                </button>
+            </div>
+        ) : null
     }
 })
 
@@ -389,5 +413,43 @@ describe('ContactInfo Component', () => {
         // The modal should still be visible, indicating we didn't proceed to the next step
         expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
         expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
+    })
+
+    test('OTP verification merges and updates basket email using merged id', async () => {
+        // Arrange mocks
+        mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync.mockResolvedValue({})
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
+
+        const mergedId = 'merged-123'
+        mockMergeBasket.mutateAsync.mockResolvedValue({basketId: mergedId})
+        // Make refetch return merged id to simulate hydration
+        const refetchSpy = jest.fn().mockResolvedValue({data: {basketId: mergedId}})
+        mockUseCurrentBasket.mockReturnValue({
+            data: {basketId: 'guest-1', productItems: [{}], shipments: [{}]},
+            derivedData: {hasBasket: true, totalItems: 1},
+            refetch: refetchSpy
+        })
+        // Ensure update succeeds
+        mockUpdateCustomerForBasket.mutateAsync.mockResolvedValue({})
+
+        // Act: render and open modal then verify
+        const {user} = renderWithProviders(<ContactInfo />)
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, 'test@salesforce.com')
+        // Open OTP modal (blur path)
+        fireEvent.blur(emailInput)
+        // Click our mocked verify button to invoke handleOtpVerification
+        await screen.findByTestId('otp-verify')
+        await user.click(screen.getByTestId('otp-verify'))
+
+        // Assert: merge called, refetch performed, email updated with merged id
+        await waitFor(() => {
+            expect(mockMergeBasket.mutateAsync).toHaveBeenCalled()
+            expect(refetchSpy).toHaveBeenCalled()
+            expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalledWith({
+                parameters: {basketId: mergedId},
+                body: {email: 'test@salesforce.com'}
+            })
+        })
     })
 })
