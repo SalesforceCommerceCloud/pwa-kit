@@ -185,7 +185,6 @@ export const AuthModal = ({
                         id: base64urlToUint8Array(credential.id),
                         transports: credential.transports
                     })),
-                    signal: controller.signal,
                     // Request conditional mediation
                     mediation: 'conditional'
                 }
