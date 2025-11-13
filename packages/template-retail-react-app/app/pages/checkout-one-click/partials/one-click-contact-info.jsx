@@ -254,7 +254,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         createDestinationBasket: true
                     }
                 })
-                const mergedBasketId = merged?.basketId || merged?.basket_id || merged?.id
+                const mergedBasketId = merged?.basketId
                 const refreshedBasketId = await currentBasketQuery.refetch()
                 basketId = refreshedBasketId?.data?.basketId || mergedBasketId || basket.basketId
             }
