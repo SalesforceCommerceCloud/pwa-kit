@@ -134,10 +134,22 @@ export const AuthModal = ({
         }
     }
 
-    const handleWebAuthnLogin = async (email) => {
-        try {
-            console.log('WebAuthn /start', email)
+    const handleWebAuthnLogin = async (email = '') => {
+        // Early return if conditional mediation is not available
+        if (!window.PublicKeyCredential || !PublicKeyCredential.isConditionalMediationAvailable) {
+            console.log('WebAuthN is not supported')
+            return
+        }
 
+        // Check if conditional mediation is available
+        const isCMA = await PublicKeyCredential.isConditionalMediationAvailable()
+        if (!isCMA) {
+            console.log('WebAuthN is not supported: Conditional mediation is not available')
+            return
+        }
+
+        console.log('WebAuthN supported')
+        try {
             // Step 1: Call /authenticate/start
             const startResponse = await fetch(
                 `http://localhost:9020/api/v1/organizations/${TENANT_ID}/oauth2/webauthn/authenticate/start`,
@@ -150,7 +162,7 @@ export const AuthModal = ({
                     body: new URLSearchParams({
                         client_id: CLIENT_ID,
                         channel_id: CHANNEL_ID,
-                        user_id: email
+                        ...(email && { user_id: email })
                     })
                 }
             )
@@ -165,17 +177,22 @@ export const AuthModal = ({
             // Step 2: Transform response for WebAuthn API
             const credentialRequestOptions = {
                 publicKey: {
-                    ...startData.publicKey,
                     challenge: base64urlToUint8Array(startData.publicKey.challenge),
-                    allowCredentials: startData.publicKey.allowCredentials?.map(credential => ({
-                        ...credential,
-                        id: base64urlToUint8Array(credential.id)
-                    })) || []
+                    timeout: startData.publicKey.timeout || 60000,
+                    rpId: startData.publicKey.rpId,
+                    allowCredentials: (startData.publicKey.allowCredentials || []).map(credential => ({
+                        type: credential.type || 'public-key',
+                        id: base64urlToUint8Array(credential.id),
+                        transports: credential.transports
+                    })),
+                    signal: controller.signal,
+                    // Request conditional mediation
+                    mediation: 'conditional'
                 }
             }
 
             // Step 3: Get the passkey credential
-            console.log('WebAuthn calling navigator.credentials.get')
+            console.log('WebAuthn calling navigator.credentials.get:', credentialRequestOptions)
             const credential = await navigator.credentials.get(credentialRequestOptions)
             
             if (!credential) {
@@ -206,10 +223,11 @@ export const AuthModal = ({
 
             // Step 5: Call /authenticate/finish
             const finishRequest = {
-                user_id: email,
-                email: email,
+                // email: email,
                 client_id: CLIENT_ID,
-                credential: encodedCredential
+                channel_id: CHANNEL_ID,
+                credential: encodedCredential,
+                ...(email && { user_id: email })
             }
             console.log('WebAuthn calling /authenticate/finish', finishRequest)
             const finishResponse = await fetch(
@@ -244,7 +262,6 @@ export const AuthModal = ({
         }
     }
 
-
     const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
@@ -258,6 +275,7 @@ export const AuthModal = ({
                     const email = data.email
                     // Try WebAuthn first if enabled
                     if (isWebAuthnEnabled) {
+                        // Prompt user to login with username (non-discoverable credentials)
                         const webAuthnSuccess = await handleWebAuthnLogin(email)
                         if (webAuthnSuccess) {
                             return // WebAuthn succeeded, we're done
@@ -342,6 +360,8 @@ export const AuthModal = ({
         if (isOpen) {
             setCurrentView(initialView)
             form.reset()
+            // Prompt user to login with without username (discoverable credentials)
+            handleWebAuthnLogin()
         }
     }, [isOpen])
 
