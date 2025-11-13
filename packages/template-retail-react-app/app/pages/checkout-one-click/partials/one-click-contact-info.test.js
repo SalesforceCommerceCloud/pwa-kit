@@ -34,6 +34,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             if (mutationType === 'updateCustomerForBasket') return mockUpdateCustomerForBasket
             if (mutationType === 'mergeBasket') return mockMergeBasket
             return {mutate: jest.fn()}
+        }),
+        useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
+            if (mutationType === 'updateCustomer') return {mutateAsync: jest.fn()}
+            return {mutateAsync: jest.fn()}
         })
     }
 })
@@ -63,6 +67,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
     })
 }))
 
+const mockSetContactPhone = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context', () => {
     return {
         useCheckout: jest.fn().mockReturnValue({
@@ -74,7 +79,8 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
             login: null,
             STEPS: {CONTACT_INFO: 0},
             goToStep: null,
-            goToNextStep: jest.fn()
+            goToNextStep: jest.fn(),
+            setContactPhone: mockSetContactPhone
         })
     }
 })
@@ -106,6 +112,8 @@ describe('ContactInfo Component', () => {
 
         expect(screen.getByLabelText('Email')).toBeInTheDocument()
         expect(screen.getByText('Contact Info')).toBeInTheDocument()
+        expect(screen.getByLabelText('Phone')).toBeInTheDocument()
+        expect(screen.getByLabelText('Phone')).not.toHaveAttribute('disabled')
     })
 
     test('renders email input field', () => {
@@ -114,6 +122,38 @@ describe('ContactInfo Component', () => {
         const emailInput = screen.getByLabelText('Email')
         expect(emailInput).toBeInTheDocument()
         expect(emailInput).toHaveAttribute('type', 'email')
+    })
+
+    test('updates checkout contact phone when user types phone (guest)', async () => {
+        const {user} = renderWithProviders(<ContactInfo />)
+        const phoneInput = screen.getByLabelText('Phone')
+        await user.type(phoneInput, '7275551234')
+        expect(mockSetContactPhone).toHaveBeenCalled()
+    })
+
+    test('shows phone disabled and prefilled for registered shopper', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+            useCurrentCustomer: () => ({
+                data: {
+                    email: 'reg@salesforce.com',
+                    isRegistered: true,
+                    phoneHome: '(111) 222-3333'
+                }
+            })
+        }))
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
+        )
+        const Component = module.default
+
+        localRenderWithProviders(<Component />)
+        const phoneInput = screen.getByLabelText('Phone')
+        expect(phoneInput).toBeInTheDocument()
+        expect(phoneInput).toHaveAttribute('disabled')
     })
 
     test('shows social login when enabled', () => {
@@ -294,10 +334,10 @@ describe('ContactInfo Component', () => {
 
         // Verify modal content
         expect(
-            screen.getByText('To log in to your account, enter the code sent to your email.')
+            screen.getByText('To use your account information enter the code sent to your email.')
         ).toBeInTheDocument()
-        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
-        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
+        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+        expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
 
     test('opens OTP modal when form is submitted by clicking submit button', async () => {
@@ -324,10 +364,10 @@ describe('ContactInfo Component', () => {
 
         // Verify modal content is present
         expect(
-            screen.getByText('To log in to your account, enter the code sent to your email.')
+            screen.getByText('To use your account information enter the code sent to your email.')
         ).toBeInTheDocument()
-        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
-        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
+        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+        expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
 
     test('shows error message when updateCustomerForBasket fails', async () => {
@@ -383,11 +423,11 @@ describe('ContactInfo Component', () => {
         // Verify that the OTP modal is still open and we haven't proceeded to next step
         expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         expect(
-            screen.getByText('To log in to your account, enter the code sent to your email.')
+            screen.getByText('To use your account information enter the code sent to your email.')
         ).toBeInTheDocument()
 
         // The modal should still be visible, indicating we didn't proceed to the next step
-        expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
-        expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
+        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+        expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
 })

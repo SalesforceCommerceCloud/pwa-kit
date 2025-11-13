@@ -27,7 +27,8 @@ const AddressFields = ({
     form,
     prefix = '',
     formTitleAriaLabel = defaultFormTitleAriaLabel,
-    isBillingAddress = false
+    isBillingAddress = false,
+    hidePhone = false
 }) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
@@ -49,7 +50,7 @@ const AddressFields = ({
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />
             </SimpleGrid>
-            <Field {...fields.phone} />
+            {!hidePhone && <Field {...fields.phone} />}
             <Field {...fields.countryCode} />
             <Field {...fields.address1} />
             <Field {...fields.city} />
@@ -77,7 +78,10 @@ AddressFields.propTypes = {
     formTitleAriaLabel: MESSAGE_PROPTYPE,
 
     /** Optional flag to indication if an address is a billing address */
-    isBillingAddress: PropTypes.bool
+    isBillingAddress: PropTypes.bool,
+
+    /** Optional flag to hide the phone field */
+    hidePhone: PropTypes.bool
 }
 
 export default AddressFields

@@ -99,7 +99,7 @@ const AccountPayments = () => {
                     onSuccess: () => {
                         showToast({
                             title: formatMessage({
-                                defaultMessage: 'New payment method was saved.',
+                                defaultMessage: 'New payment method saved',
                                 id: 'account.payments.info.payment_method_saved'
                             }),
                             status: 'success',
@@ -113,7 +113,7 @@ const AccountPayments = () => {
         } catch (e) {
             showToast({
                 title: formatMessage({
-                    defaultMessage: "We couldn't save the payment method. Try again.",
+                    defaultMessage: 'Unable to save payment method',
                     id: 'account.payments.error.payment_method_save_failed'
                 }),
                 status: 'error',
@@ -158,7 +158,7 @@ const AccountPayments = () => {
             })
             showToast({
                 title: formatMessage({
-                    defaultMessage: 'Payment method was made as default.',
+                    defaultMessage: 'Default payment method updated',
                     id: 'account.payments.info.default_payment_updated'
                 }),
                 status: 'success',
@@ -168,7 +168,7 @@ const AccountPayments = () => {
         } catch (e) {
             showToast({
                 title: formatMessage({
-                    defaultMessage: 'We couldnt make the payment method as default. Try again.',
+                    defaultMessage: 'Unable to set default payment method',
                     id: 'account.payments.error.set_default_failed'
                 }),
                 status: 'error',
@@ -189,7 +189,7 @@ const AccountPayments = () => {
                     onSuccess: () => {
                         showToast({
                             title: formatMessage({
-                                defaultMessage: 'Payment method was removed.',
+                                defaultMessage: 'Payment method removed',
                                 id: 'account.payments.info.payment_method_removed'
                             }),
                             status: 'success',
@@ -202,7 +202,7 @@ const AccountPayments = () => {
         } catch (e) {
             showToast({
                 title: formatMessage({
-                    defaultMessage: "We couldn't remove the payment method. Try again.",
+                    defaultMessage: 'Unable to remove payment method',
                     id: 'account.payments.error.payment_method_remove_failed'
                 }),
                 status: 'error',
@@ -250,7 +250,7 @@ const AccountPayments = () => {
                         <Stack spacing={4}>
                             <Text color="red.600">
                                 <FormattedMessage
-                                    defaultMessage="We couldn't load the payment methods. Try again."
+                                    defaultMessage="Error loading payment methods. Please try again."
                                     id="account.payments.message.error"
                                 />
                             </Text>
@@ -281,7 +281,7 @@ const AccountPayments = () => {
                         <CreditCardIcon boxSize={6} color="gray.700" />
                         <Text mt={4} fontWeight="semibold">
                             <FormattedMessage
-                                defaultMessage="No Saved Payment Methods"
+                                defaultMessage="No Saved Payments"
                                 id="account.payments.placeholder.heading"
                             />
                         </Text>
@@ -289,7 +289,7 @@ const AccountPayments = () => {
                             <div>
                                 <Text color="gray.600" mt={1}>
                                     <FormattedMessage
-                                        defaultMessage="Add a new payment method to check out faster."
+                                        defaultMessage="Add a new payment method for faster checkout."
                                         id="account.payments.placeholder.text"
                                     />
                                 </Text>
@@ -299,7 +299,7 @@ const AccountPayments = () => {
                                     leftIcon={<PlusIcon boxSize={3} />}
                                 >
                                     <FormattedMessage
-                                        defaultMessage="Add Payment Method"
+                                        defaultMessage="Add Payment"
                                         id="account_payments.button.add_payment"
                                     />
                                 </Button>
@@ -372,7 +372,7 @@ const AccountPayments = () => {
                             onClick={openAdd}
                         >
                             <FormattedMessage
-                                defaultMessage="Add Payment Method"
+                                defaultMessage="Add Payment"
                                 id="account_payments.button.add_payment"
                             />
                             {isAdding && <BoxArrow />}

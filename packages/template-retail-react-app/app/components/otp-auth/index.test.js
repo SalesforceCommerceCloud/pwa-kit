@@ -99,10 +99,12 @@ describe('OtpAuth', () => {
 
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
             expect(
-                screen.getByText('To log in to your account, enter the code sent to your email.')
+                screen.getByText(
+                    'To use your account information enter the code sent to your email.'
+                )
             ).toBeInTheDocument()
-            expect(screen.getByText(/Checkout as a guest/i)).toBeInTheDocument()
-            expect(screen.getByText(/Resend code/i)).toBeInTheDocument()
+            expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+            expect(screen.getByText('Resend code')).toBeInTheDocument()
         })
 
         test('renders 8 OTP input fields', () => {
@@ -122,7 +124,7 @@ describe('OtpAuth', () => {
         test('renders buttons with correct styling', () => {
             renderWithProviders(<WrapperComponent />)
 
-            const guestButton = screen.getByText(/Checkout as a guest/i)
+            const guestButton = screen.getByText('Checkout as a guest')
             const resendButton = screen.getByText('Resend code')
 
             expect(guestButton).toBeInTheDocument()
@@ -369,7 +371,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const guestButton = screen.getByText(/Checkout as a guest/i)
+            const guestButton = screen.getByText('Checkout as a guest')
             await user.click(guestButton)
 
             expect(mockOnClose).toHaveBeenCalled()
@@ -408,7 +410,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const resendButton = screen.getByText(/Resend code/i)
+            const resendButton = screen.getByText('Resend code')
             await user.click(resendButton)
 
             expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
@@ -447,7 +449,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const resendButton = screen.getByText(/Resend code/i)
+            const resendButton = screen.getByText('Resend code')
             await user.click(resendButton)
 
             // Wait for countdown to complete (mocked timers would be ideal here)

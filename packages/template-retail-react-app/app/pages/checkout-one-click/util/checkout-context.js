@@ -19,6 +19,7 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
+    const [contactPhone, setContactPhone] = useState('')
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -108,7 +109,9 @@ export const CheckoutProvider = ({children}) => {
         step,
         STEPS,
         goToNextStep,
-        goToStep
+        goToStep,
+        contactPhone,
+        setContactPhone
     }
 
     return <CheckoutContext.Provider value={value}>{children}</CheckoutContext.Provider>
