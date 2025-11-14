@@ -263,9 +263,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0
+            let basketId
             if (hasBasketItem) {
                 // Mirror legacy checkout flow header and await completion
-                await mergeBasket.mutateAsync({
+                const merged = await mergeBasket.mutateAsync({
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -273,16 +274,21 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         createDestinationBasket: true
                     }
                 })
-                // Make sure UI reflects merged state before proceeding
-                await currentBasketQuery.refetch()
+                basketId = merged?.basketId || basket.basketId
             }
 
             // Update basket with email after successful OTP verification
             const email = form.getValues('email')
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: email}
-            })
+            if (basketId && email) {
+                try {
+                    await updateCustomerForBasket.mutateAsync({
+                        parameters: {basketId: basketId},
+                        body: {email}
+                    })
+                } catch (error) {
+                    setError(error.message)
+                }
+            }
 
             // Persist phone number to the newly registered customer's profile
             const phone = form.getValues('phone')
@@ -315,7 +321,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             const message =
                 error.response?.status === 401
                     ? formatMessage({
-                          defaultMessage: 'Invalid or expired code. Please try again.',
+                          defaultMessage:
+                              'The code is invalid or expired. Click Resend Code and try again.',
                           id: 'otp.error.invalid_code'
                       })
                     : formatMessage(API_ERROR_MESSAGE)

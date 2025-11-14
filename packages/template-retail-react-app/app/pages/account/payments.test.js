@@ -246,7 +246,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
     })
 
     test('shows no payment methods message when paymentInstruments is undefined', () => {
