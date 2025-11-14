@@ -22,11 +22,13 @@ import {useEffect} from 'react'
  * @param {string} options.expand - Optional expand parameter (e.g., 'consentStatus' for logged-in user status on profile page)
  * @returns {Object} Object containing:
  *   - data: The consent subscription data
- *   - isLoading: Whether the query is loading
+ *   - isLoading: Whether the initial query is loading (only true when enabled=true on mount)
+ *   - isFetching: Whether the query is fetching (true during refetch() calls)
  *   - error: Any error from the query
+ *   - refetch: Function to manually fetch subscriptions (for use with enabled=false)
  *   - updateSubscription: Function to update a single subscription
  *   - updateSubscriptions: Function to update multiple subscriptions
- *   - isUpdating: Whether any update mutation is in progress
+ *   - isUpdating: Whether any operation is in progress (fetching OR updating)
  *   - updateError: Any error from update mutations
  *   - getSubscriptionStatus: Helper to get status for a specific subscription and channel
  *   - hasChannel: Helper to check if a subscription has a specific channel
@@ -231,8 +233,12 @@ export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) =>
         updateSubscription,
         updateSubscriptions,
 
-        // Mutation status
-        isUpdating: updateSubscriptionMutation.isLoading || updateSubscriptionsMutation.isLoading,
+        // Combined loading state - tracks ANY async operation (fetch or mutation)
+        // Use this for showing spinners/disabled states during form submission
+        isUpdating:
+            subscriptionsQuery.isFetching ||
+            updateSubscriptionMutation.isLoading ||
+            updateSubscriptionsMutation.isLoading,
         isUpdateSuccess:
             updateSubscriptionMutation.isSuccess || updateSubscriptionsMutation.isSuccess,
         updateError: updateSubscriptionMutation.error || updateSubscriptionsMutation.error,
