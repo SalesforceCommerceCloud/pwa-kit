@@ -182,7 +182,7 @@ describe('ContactInfo Component', () => {
         await user.click(emailInput)
         await user.tab()
 
-        expect(screen.getAllByText('Please enter your email address.')).toHaveLength(2)
+        expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
     })
 
     test('validates email format on form submission', async () => {
@@ -442,10 +442,9 @@ describe('ContactInfo Component', () => {
         await screen.findByTestId('otp-verify')
         await user.click(screen.getByTestId('otp-verify'))
 
-        // Assert: merge called, refetch performed, email updated with merged id
+        // Assert: merge called, email updated with merged id
         await waitFor(() => {
             expect(mockMergeBasket.mutateAsync).toHaveBeenCalled()
-            expect(refetchSpy).toHaveBeenCalled()
             expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalledWith({
                 parameters: {basketId: mergedId},
                 body: {email: 'test@salesforce.com'}

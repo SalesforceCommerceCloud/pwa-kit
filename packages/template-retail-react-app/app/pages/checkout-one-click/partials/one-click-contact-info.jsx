@@ -236,7 +236,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
-        let basketId
         try {
             // Prevent post-auth recovery effect from also attempting merge in this flow
             hasAttemptedRecoveryRef.current = true
@@ -244,6 +243,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0
+            let basketId
             if (hasBasketItem) {
                 // Mirror legacy checkout flow header and await completion
                 const merged = await mergeBasket.mutateAsync({
@@ -254,20 +254,20 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         createDestinationBasket: true
                     }
                 })
-                const mergedBasketId = merged?.basketId
-                const refreshedBasketId = await currentBasketQuery.refetch()
-                basketId = refreshedBasketId?.data?.basketId || mergedBasketId || basket.basketId
+                basketId = merged?.basketId
             }
 
             // Update basket with email after successful OTP verification
             const email = form.getValues('email')
-            try {
-                await updateCustomerForBasket.mutateAsync({
-                    parameters: {basketId: basketId},
-                    body: {email}
-                })
-            } catch (error) {
-                setError(error.message)
+            if (basketId && email) {
+                try {
+                    await updateCustomerForBasket.mutateAsync({
+                        parameters: {basketId: basketId},
+                        body: {email}
+                    })
+                } catch (error) {
+                    setError(error.message)
+                }
             }
 
             // Reset guest checkout flag since user is now logged in
