@@ -1827,7 +1827,13 @@
       "value": "By submitting this, I agree to the "
     },
     {
-      "type": 1,
+      "children": [
+        {
+          "type": 0,
+          "value": "Terms & Conditions"
+        }
+      ],
+      "type": 8,
       "value": "terms"
     },
     {
@@ -1835,7 +1841,13 @@
       "value": " and "
     },
     {
-      "type": 1,
+      "children": [
+        {
+          "type": 0,
+          "value": "Privacy Policy"
+        }
+      ],
+      "type": 8,
       "value": "privacy"
     },
     {

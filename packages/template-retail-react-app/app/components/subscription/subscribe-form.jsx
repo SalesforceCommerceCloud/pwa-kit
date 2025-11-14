@@ -18,7 +18,6 @@ import {
     AlertIcon,
     AlertDescription,
     Link,
-    Spinner,
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -35,8 +34,17 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
         subscribeMessage: subscribeFormStyles.message,
         subscribeField: subscribeFormStyles.field,
         subscribeButtonContainer: subscribeFormStyles.buttonContainer,
-        socialIcons: subscribeFormStyles.socialIcons
+        socialIcons: subscribeFormStyles.socialIcons,
+        subscribeDisclaimer: subscribeFormStyles.disclaimer
     }
+
+    // Helper to create themed links for FormattedMessage
+    const createLink = (chunks) => (
+        <Link href="/" {...subscribeFormStyles.link}>
+            {chunks}
+        </Link>
+    )
+
     const intl = useIntl()
     const {state, actions} = subscription
 
@@ -62,15 +70,6 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
             defaultMessage: 'Enter your email address...'
         })
     }
-
-    const termsConditions = intl.formatMessage({
-        id: 'footer.link.terms_conditions',
-        defaultMessage: 'Terms & Conditions'
-    })
-    const privacyPolicy = intl.formatMessage({
-        id: 'footer.link.privacy_policy',
-        defaultMessage: 'Privacy Policy'
-    })
 
     return (
         <Box {...styles.subscribe} {...otherProps}>
@@ -119,21 +118,13 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                     />
                 </InputGroup>
 
-                <Text fontSize="xs" color="gray.600" mt={2}>
+                <Text {...styles.subscribeDisclaimer}>
                     <FormattedMessage
                         id="footer.subscribe.disclaimer"
-                        defaultMessage="By submitting this, I agree to the {terms} and {privacy}."
+                        defaultMessage="By submitting this, I agree to the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>."
                         values={{
-                            terms: (
-                                <Link href="/" color="blue.600">
-                                    {termsConditions}
-                                </Link>
-                            ),
-                            privacy: (
-                                <Link href="/" color="blue.600">
-                                    {privacyPolicy}
-                                </Link>
-                            )
+                            terms: createLink,
+                            privacy: createLink
                         }}
                     />
                 </Text>

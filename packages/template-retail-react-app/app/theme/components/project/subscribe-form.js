@@ -5,7 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export default {
-    parts: ['container', 'heading', 'message', 'field', 'buttonContainer', 'socialIcons'],
+    parts: [
+        'container',
+        'heading',
+        'message',
+        'field',
+        'buttonContainer',
+        'socialIcons',
+        'link',
+        'disclaimer'
+    ],
     baseStyle: {
         container: {
             maxWidth: {base: '21.5rem', lg: 'none'}
@@ -28,6 +37,14 @@ export default {
         },
         socialIcons: {
             marginTop: 4
+        },
+        link: {
+            color: 'blue.600'
+        },
+        disclaimer: {
+            fontSize: 'xs',
+            color: 'gray.600',
+            marginTop: 2
         }
     }
 }

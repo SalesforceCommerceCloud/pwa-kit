@@ -715,7 +715,7 @@
     "defaultMessage": "Be the first to know about latest offers, news, tips, and more."
   },
   "footer.subscribe.disclaimer": {
-    "defaultMessage": "By submitting this, I agree to the {terms} and {privacy}."
+    "defaultMessage": "By submitting this, I agree to the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>."
   },
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "Email address for newsletter"
