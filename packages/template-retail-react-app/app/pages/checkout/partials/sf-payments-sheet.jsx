@@ -115,6 +115,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const containerElementRef = useRef(null)
     const config = useRef(null)
     const checkoutComponent = useRef(null)
+    const checkoutInitialized = useRef(false)
     const paymentMethodType = useRef(null)
     const currentBasket = useRef(null)
 
@@ -339,7 +340,13 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }))
 
     useEffect(() => {
-        if (sfp && metadata && containerElementRef.current && paymentConfig) {
+        if (
+            !checkoutInitialized.current &&
+            sfp &&
+            metadata &&
+            containerElementRef.current &&
+            paymentConfig
+        ) {
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
@@ -380,14 +387,32 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentRequest,
                 paymentElement
             )
+            checkoutInitialized.current = true
+
+            if (basket?.orderTotal !== undefined && basket?.orderTotal !== null && typeof basket?.orderTotal === 'number') {
+                void checkoutComponent.current.updateAmount(basket.orderTotal)
+            }
         }
 
-        // Cleanup on unmount
         return () => {
-            checkoutComponent.current?.destroy()
-            checkoutComponent.current = null
+            if (checkoutComponent.current && !containerElementRef.current) {
+                checkoutComponent.current.destroy()
+                checkoutComponent.current = null
+                checkoutInitialized.current = false
+            }
         }
-    }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
+    }, [sfp, metadata, paymentConfig])
+
+    useEffect(() => {
+        const hasComponent = !!checkoutComponent.current
+        const orderTotal = basket?.orderTotal
+        const hasOrderTotal = orderTotal !== undefined && orderTotal !== null && typeof orderTotal === 'number'
+        const isInitialized = checkoutInitialized.current
+        
+        if (hasComponent && hasOrderTotal && isInitialized) {
+            void checkoutComponent.current.updateAmount(orderTotal)
+        }
+    }, [basket?.orderTotal, basket])
 
     return (
         <ToggleCard
