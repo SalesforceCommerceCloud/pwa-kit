@@ -43,13 +43,15 @@ import {
     AuthHelpers,
     useAuthHelper,
     useShopperBasketsMutation,
-    useCustomerType
+    useCustomerType,
+    useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
+import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -64,14 +66,16 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const updateCustomer = useShopperCustomersMutation('updateCustomer')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
 
     const form = useForm({
         defaultValues: {
             email: customer?.email || basket?.customerInfo?.email || '',
+            phone: customer?.phoneHome || '',
             password: '',
             otp: ''
         }
@@ -102,6 +106,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         return () => clearTimeout(timer)
     }, [])
+
+    // Use phone number from contact info in shipping step
+    useEffect(() => {
+        const subscription = form.watch((values, info) => {
+            if (!info?.name || info.name === 'phone') {
+                setContactPhone(values?.phone || '')
+            }
+        })
+        // Initialize immediately
+        try {
+            setContactPhone(form.getValues('phone') || '')
+        } catch {}
+        return () => {
+            if (subscription?.unsubscribe) subscription.unsubscribe()
+        }
+    }, [form, setContactPhone])
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -267,6 +287,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     })
                 } catch (error) {
                     setError(error.message)
+                }
+            }
+
+            // Persist phone number to the newly registered customer's profile
+            const phone = form.getValues('phone')
+            if (phone && customer?.customerId) {
+                try {
+                    await updateCustomer.mutateAsync({
+                        parameters: {customerId: customer.customerId},
+                        body: {phoneHome: phone}
+                    })
+                } catch (_e) {
+                    // ignore phone save failures
                 }
             }
 
@@ -495,6 +528,26 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             {emailError}
                                         </Text>
                                     )}
+                                <Field
+                                    name="phone"
+                                    label={formatMessage({
+                                        defaultMessage: 'Phone',
+                                        id: 'use_address_fields.label.phone'
+                                    })}
+                                    type="tel"
+                                    control={form.control}
+                                    rules={{
+                                        required: formatMessage({
+                                            defaultMessage: 'Please enter your phone number.',
+                                            id: 'use_address_fields.error.please_enter_phone_number'
+                                        })
+                                    }}
+                                    inputProps={({onChange}) => ({
+                                        inputMode: 'numeric',
+                                        onChange: (evt) => onChange(formatPhoneNumber(evt.target.value)),
+                                        disabled: isRegistered
+                                    })}
+                                />
                                 </Stack>
 
                                 <Stack spacing={3}>

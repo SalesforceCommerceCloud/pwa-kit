@@ -40,7 +40,8 @@ const ShippingAddressEditForm = ({
     form,
     submitButtonLabel,
     formTitleAriaLabel,
-    isBillingAddress = false
+    isBillingAddress = false,
+    hidePhone = false
 }) => {
     const {formatMessage} = useIntl()
 
@@ -69,6 +70,7 @@ const ShippingAddressEditForm = ({
                         form={form}
                         formTitleAriaLabel={formTitleAriaLabel}
                         isBillingAddress={isBillingAddress}
+                        hidePhone={hidePhone}
                     />
 
                     {hasSavedAddresses && !hideSubmitButton ? (
@@ -105,7 +107,8 @@ ShippingAddressEditForm.propTypes = {
     form: PropTypes.object,
     submitButtonLabel: MESSAGE_PROPTYPE,
     formTitleAriaLabel: MESSAGE_PROPTYPE,
-    isBillingAddress: PropTypes.bool
+    isBillingAddress: PropTypes.bool,
+    hidePhone: PropTypes.bool
 }
 
 const submitButtonMessage = defineMessage({
@@ -354,7 +357,7 @@ const ShippingAddressSelection = ({
                                                 </RadioCard>
                                                 {isEditingAddress &&
                                                     address.addressId === selectedAddressId && (
-                                                        <ShippingAddressEditForm
+                                                            <ShippingAddressEditForm
                                                             title={formatMessage({
                                                                 defaultMessage:
                                                                     'Edit Shipping Address',
@@ -364,6 +367,7 @@ const ShippingAddressSelection = ({
                                                             toggleAddressEdit={toggleAddressEdit}
                                                             hideSubmitButton={hideSubmitButton}
                                                             form={form}
+                                                                hidePhone={!isBillingAddress}
                                                             submitButtonLabel={submitButtonLabel}
                                                             formTitleAriaLabel={formTitleAriaLabel}
                                                         />
@@ -422,6 +426,7 @@ const ShippingAddressSelection = ({
                         hideSubmitButton={hideSubmitButton}
                         form={form}
                         isBillingAddress={isBillingAddress}
+                        hidePhone={!isBillingAddress}
                         submitButtonLabel={submitButtonLabel}
                         formTitleAriaLabel={formTitleAriaLabel}
                     />

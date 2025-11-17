@@ -16,10 +16,7 @@ import {
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
-import {
-    useShopperCustomersMutation,
-    useShopperBasketsMutation
-} from '@salesforce/commerce-sdk-react'
+import {useShopperCustomersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -51,14 +48,12 @@ export default function ShippingAddress() {
     const {data: basket} = currentBasketQuery
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep, contactPhone} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
-    const updateCustomer = useShopperCustomersMutation('updateCustomer')
-    const hasSavedPhoneRef = useRef(false)
     const productItemsCount = basket?.productItems?.length || 0
     const hasMultipleProductItems = productItemsCount > 1
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
@@ -105,10 +100,12 @@ export default function ShippingAddress() {
                 countryCode,
                 firstName,
                 lastName,
-                phone,
                 postalCode,
                 stateCode
             } = address
+            const phoneValue = customer?.isRegistered
+                ? customer?.phoneHome || address?.phone || selectedShippingAddress?.phone
+                : contactPhone || address?.phone || selectedShippingAddress?.phone
             // Ensure we target the latest basket id in case it changed
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed?.data?.basketId || basket.basketId
@@ -125,7 +122,7 @@ export default function ShippingAddress() {
                     countryCode,
                     firstName,
                     lastName,
-                    phone,
+                    phone: phoneValue,
                     postalCode,
                     stateCode
                 }
@@ -138,7 +135,7 @@ export default function ShippingAddress() {
                     countryCode,
                     firstName,
                     lastName,
-                    phone,
+                    phone: phoneValue,
                     postalCode,
                     stateCode,
                     addressId: nanoid()
@@ -151,32 +148,12 @@ export default function ShippingAddress() {
 
             if (customer.isRegistered && addressId) {
                 await updateCustomerAddress.mutateAsync({
-                    body: address,
+                    body: {...address, phone: phoneValue},
                     parameters: {
                         customerId: customer.customerId,
                         addressName: addressId
                     }
                 })
-            }
-
-            // Persist phone number onto the customer profile as phoneHome
-            if (customer.isRegistered && phone && !hasSavedPhoneRef.current) {
-                try {
-                    await updateCustomer.mutateAsync({
-                        parameters: {customerId: customer.customerId},
-                        body: {phoneHome: phone}
-                    })
-                    hasSavedPhoneRef.current = true
-                } catch (_e) {
-                    toast({
-                        title: formatMessage({
-                            id: 'shipping_address.error.phone_not_saved',
-                            defaultMessage:
-                                'We could not save your phone number. You can continue checking out.'
-                        }),
-                        status: 'error'
-                    })
-                }
             }
 
             goToNextStep()

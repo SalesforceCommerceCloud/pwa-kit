@@ -14,6 +14,7 @@ const mockGoToStep = jest.fn()
 const mockUpdateShippingAddress = {mutateAsync: jest.fn()}
 const mockCreateCustomerAddress = {mutateAsync: jest.fn()}
 const mockUpdateCustomerAddress = {mutateAsync: jest.fn()}
+const mockRefetch = jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -69,7 +70,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
             hasBasket: true,
             totalItems: 1
         },
-        refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+        refetch: mockRefetch
     })
 }))
 
@@ -85,7 +86,8 @@ jest.mock(
                 SHIPPING_OPTIONS: 3
             },
             goToStep: mockGoToStep,
-            goToNextStep: mockGoToNextStep
+            goToNextStep: mockGoToNextStep,
+            contactPhone: '(727) 555-0000'
         })
     })
 )
@@ -219,6 +221,53 @@ describe('ShippingAddress Component', () => {
         // The ToggleCard should show loading state
         // This would require checking for loading indicators in the UI
         expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+    })
+
+    test('submits shipping address with phone for registered user (from address/customer)', async () => {
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        const {user} = renderWithProviders(<ShippingAddress />)
+        await user.click(screen.getByText('Continue to Shipping Method'))
+        expect(mockRefetch).toHaveBeenCalled()
+        const lastCall = mockUpdateShippingAddress.mutateAsync.mock.calls.pop()
+        const body = lastCall?.[0]?.body
+        expect(body).toHaveProperty('phone')
+        expect(body.phone).toBeDefined()
+    })
+
+    test('submits shipping address with phone for guest (from contact info context)', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+            useCurrentCustomer: () => ({
+                data: {
+                    customerId: null,
+                    isRegistered: false
+                }
+            })
+        }))
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+            () => ({
+                useCheckout: jest.fn().mockReturnValue({
+                    step: 2,
+                    STEPS: {CONTACT_INFO: 0, PICKUP_ADDRESS: 1, SHIPPING_ADDRESS: 2, SHIPPING_OPTIONS: 3},
+                    goToStep: mockGoToStep,
+                    goToNextStep: mockGoToNextStep,
+                    contactPhone: '(727) 555-9999'
+                })
+            })
+        )
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+        const {user} = localRenderWithProviders(<Component />)
+        await user.click(screen.getByText('Continue to Shipping Method'))
+        const lastCall = mockUpdateShippingAddress.mutateAsync.mock.calls.pop()
+        const body = lastCall?.[0]?.body
+        expect(body).toHaveProperty('phone', '(727) 555-9999')
     })
 
     test('component handles different user states correctly', () => {
