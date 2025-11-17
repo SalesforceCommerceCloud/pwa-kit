@@ -15,7 +15,7 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
  * This component dynamically fetches all subscriptions matching a given consent tag
  * and email channel, then opts the user into ALL matching subscriptions.
  *
- * This allows marketers to configure subscriptions in Business Manager without code changes.
+ * This allows marketers to configure subscriptions without code changes to the storefront UI.
  *
  * Subscriptions are fetched only when the user submits the form, keeping the initial page load lightweight.
  *

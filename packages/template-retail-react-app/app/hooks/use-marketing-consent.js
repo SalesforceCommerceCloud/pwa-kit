@@ -107,8 +107,7 @@ export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) =>
             if (hasError || subscriptions.length === 0) {
                 const tagFilter = tags.length > 0 ? ` (filtered by tags: ${tags.join(', ')})` : ''
                 console.warn(
-                    `[useMarketingConsent] Marketing Consent feature was enabled, but no subscriptions were found${tagFilter}. ` +
-                        'Check that the prerequisite setup was completed in Business Manager.'
+                    `[useMarketingConsent] Marketing Consent feature was enabled, but no subscriptions were found${tagFilter}.`
                 )
                 if (hasError) {
                     console.error('[useMarketingConsent] API Error:', subscriptionsQuery.error)

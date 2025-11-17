@@ -21,7 +21,7 @@ import {useIntl} from 'react-intl'
  *
  * Subscriptions are fetched on-demand when the user clicks submit, not on component mount.
  *
- * This allows marketers to configure subscriptions in Business Manager without code changes.
+ * This allows marketers to configure subscriptions without code changes to the storefront UI.
  *
  * @param {Object} options
  * @param {string|Array<string>} options.tag - The consent tag(s) to filter subscriptions by (e.g., CONSENT_TAGS.EMAIL_CAPTURE or [CONSENT_TAGS.EMAIL_CAPTURE, CONSENT_TAGS.ACCOUNT])
@@ -112,8 +112,7 @@ export const useEmailSubscription = ({tag} = {}) => {
             if (matchingSubs.length === 0) {
                 const tagList = tags.join(', ')
                 console.error(
-                    `[useEmailSubscription] No subscriptions found for tag(s) "${tagList}" and channel "email". ` +
-                        `Please configure subscriptions in Business Manager with one of these tags: ${tagList}.`
+                    `[useEmailSubscription] No subscriptions found for tag(s) "${tagList}" and channel "${CONSENT_CHANNELS.EMAIL}".`
                 )
                 setMessage(messages.error.generic_error)
                 setMessageType('error')
