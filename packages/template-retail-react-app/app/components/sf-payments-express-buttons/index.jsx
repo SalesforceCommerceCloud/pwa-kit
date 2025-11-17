@@ -88,10 +88,7 @@ const SFPaymentsExpressButtons = ({
     const expressComponent = useRef(null)
     const prepareBasketRef = useRef(prepareBasket)
 
-    // Update the ref whenever prepareBasket changes (this doesn't trigger the main effect)
-    // triggering the main effect can cause the component to unmount and remount
-    // This ensures handlers always have access to the latest prepareBasket function,
-    // including when the variant changes on PDP
+    // Update the ref whenever prepareBasket changes, including when the variant changes on PDP
     useEffect(() => {
         prepareBasketRef.current = prepareBasket
     }, [prepareBasket])
@@ -153,6 +150,8 @@ const SFPaymentsExpressButtons = ({
 
     /**
      * Create order from basket and update payment instrument
+     * TODO: Once Fail Order SCAPI is available, call it to clean up orders when
+     * payment instrument update fails
      */
     const createOrderAndUpdatePayment = async (basketId, paymentType, zoneIdValue) => {
         // Create order from the basket
@@ -181,7 +180,6 @@ const SFPaymentsExpressButtons = ({
                 body: paymentInstrumentBody
             })
         } catch (error) {
-            // Even if update fails, the order was created and basket was consumed
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             throw error
@@ -213,7 +211,7 @@ const SFPaymentsExpressButtons = ({
         // Create line items
         const orderTotal = currentBasket?.orderTotal
         const productSubTotal = currentBasket?.productSubTotal
-        const total = orderTotal || productSubTotal || initialAmount || 0
+        const total = orderTotal || productSubTotal
 
         // Validate that total is a valid number
         if (isNaN(total) || total <= 0) {
@@ -230,7 +228,7 @@ const SFPaymentsExpressButtons = ({
                     defaultMessage: 'Subtotal',
                     id: 'order_summary.label.subtotal'
                 }),
-                amount: (productSubTotal || 0).toString()
+                amount: total.toString()
             }
         ]
         // TODO: add discounts from currentBasket.orderPriceAdjustments
@@ -288,20 +286,20 @@ const SFPaymentsExpressButtons = ({
                 if (!isPayPalPaymentMethodType(paymentMethodType)) {
                     prepareBasketPromise.current = prepareBasketRef.current()
 
-                    // Don't await - call asynchronously to avoid potential 1 second Stripe timeout
+                    // Don't await - call asynchronously to avoid a potential gateway timeout
                     prepareBasketPromise.current
                         .then((basket) => {
                             expressBasket.current = basket
                         })
                         .catch((e) => {
                             prepareBasketPromise.current = null // Clear the promise so handlers don't try to await it
-                            // Only show toast for non-validation errors (validation errors are shown inline)
+                            // Don't show toast for validation errors
                             if (!e.isValidationError) {
                                 showErrorMessage(
                                     e.message ||
                                         intl.formatMessage({
                                             defaultMessage:
-                                                'Unable to prepare basket for Express Payments. Please select all product options.',
+                                                'Unable to prepare basket for express payments. Please select all required product attributes.',
                                             id: 'sfp_payments_express.error.prepare_basket'
                                         })
                                 )
@@ -327,42 +325,18 @@ const SFPaymentsExpressButtons = ({
                 // Only clean up if no order was created (basket still exists)
                 const sfPaymentsInstrument = getSFPaymentsInstrument(expressBasket.current)
                 if (sfPaymentsInstrument) {
-                    try {
-                        expressBasket.current = await removePaymentInstrumentFromBasket({
-                            parameters: {
-                                basketId: expressBasket.current.basketId,
-                                paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
-                            }
-                        })
-                    } catch (error) {
-                        // Only log if it's not a "Basket Not Found" error (basket might have been consumed after order creation)
-                        if (error?.response?.status !== 404 && error?.response?.status !== 400) {
-                            logger.error('Error removing payment instrument on cancel', {
-                                namespace: 'SFPaymentsExpressButtons.onCancel',
-                                additionalProperties: {error}
-                            })
+                    expressBasket.current = await removePaymentInstrumentFromBasket({
+                        parameters: {
+                            basketId: expressBasket.current.basketId,
+                            paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
                         }
-                        // If basket doesn't exist, clear the ref
-                        if (error?.response?.status === 404 || error?.response?.status === 400) {
-                            expressBasket.current = null
-                        }
-                    }
+                    })
                 }
                 // Delete the temporary basket if it exists
                 if (expressBasket.current?.basketId && expressBasket.current?.temporaryBasket) {
-                    try {
-                        await deleteBasket({
-                            parameters: {basketId: expressBasket.current.basketId}
-                        })
-                    } catch (error) {
-                        // Only log if it's not a "Basket Not Found" error (might have been deleted already)
-                        if (error?.response?.status !== 404 && error?.response?.status !== 400) {
-                            logger.error('Error deleting temporary basket on cancel', {
-                                namespace: 'SFPaymentsExpressButtons.onCancel',
-                                additionalProperties: {error}
-                            })
-                        }
-                    }
+                    await deleteBasket({
+                        parameters: {basketId: expressBasket.current.basketId}
+                    })
                 }
                 // Clear the ref after cleanup
                 expressBasket.current = null
@@ -418,14 +392,9 @@ const SFPaymentsExpressButtons = ({
                         updatedBasket,
                         updatedShippingMethods
                     )
-                    // Use the original basket's totals if updatedBasket doesn't have them
-                    const basketForTotals =
-                        updatedBasket?.orderTotal || updatedBasket?.productSubTotal
-                            ? updatedBasket
-                            : expressBasket.current
 
                     const expressCallback = createExpressCallback(
-                        basketForTotals,
+                        updatedBasket,
                         updatedShippingMethods
                     )
                     callback.updateShippingAddress(expressCallback)
@@ -451,18 +420,6 @@ const SFPaymentsExpressButtons = ({
                         }
                     }
 
-                    // Validate that expressBasket.current has valid data
-                    if (
-                        !expressBasket.current?.basketId ||
-                        (!expressBasket.current?.orderTotal &&
-                            !expressBasket.current?.productSubTotal)
-                    ) {
-                        callback.updateShippingMethod({
-                            errors: ['fail']
-                        })
-                        return
-                    }
-
                     // Update the shipping method in the default shipment
                     const updatedBasket = await updateShippingMethod.mutateAsync({
                         parameters: {
@@ -478,14 +435,9 @@ const SFPaymentsExpressButtons = ({
 
                     // Fetch applicable shipping methods after shipping method update
                     const {data: updatedShippingMethods} = await refetchShippingMethods()
-                    // Use the original basket's totals if updatedBasket doesn't have them
-                    const basketForTotals =
-                        updatedBasket?.orderTotal || updatedBasket?.productSubTotal
-                            ? updatedBasket
-                            : expressBasket.current
 
                     const expressCallback = createExpressCallback(
-                        basketForTotals, // Change from updatedBasket to basketForTotals
+                        updatedBasket,
                         updatedShippingMethods
                     )
                     callback.updateShippingMethod(expressCallback)
@@ -533,19 +485,6 @@ const SFPaymentsExpressButtons = ({
                         body: billingAddress
                     })
 
-                    // For PayPal, verify payment instrument still exists after address updates
-                    if (isPayPalPaymentMethodType(paymentMethodType)) {
-                        const paymentInstrument = getSFPaymentsInstrument(expressBasket.current)
-                        if (!paymentInstrument || !paymentInstrument.paymentReference) {
-                            logger.error(
-                                'Payment instrument missing or invalid after address updates',
-                                {
-                                    namespace: 'SFPaymentsExpressButtons.onPayerApprove',
-                                    additionalProperties: {paymentMethodType}
-                                }
-                            )
-                        }
-                    }
                     // For Stripe, create SF Payments basket payment instrument before creating order
                     if (!isPayPalPaymentMethodType(paymentMethodType)) {
                         expressBasket.current = await addPaymentInstrumentToBasket({

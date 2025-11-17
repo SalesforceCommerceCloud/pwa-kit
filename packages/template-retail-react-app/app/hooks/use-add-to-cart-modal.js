@@ -85,7 +85,6 @@ export const AddToCartModal = () => {
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
 
-    //This ensures currency is always defined
     const currency = basket?.currency || activeCurrency
     const productSubTotal = basket?.productSubTotal || 0
 

@@ -78,9 +78,6 @@ const TestComponent = ({onHookData}) => {
     )
 }
 
-//TestComponent.propTypes = {
-//    onHookData: () => null
-//}
 TestComponent.propTypes = {
     onHookData: PropTypes.func
 }

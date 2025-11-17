@@ -30,7 +30,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer,
-            keepPreviousData: true // Keep previous data during refetches to prevent unmounting
+            keepPreviousData: true // Prevent data from being cleared during refetches
         }
     )
     // Select the current basket, prioritizing confirmingBasket, then matching id, then first non-temporary basket

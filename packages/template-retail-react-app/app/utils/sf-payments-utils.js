@@ -78,7 +78,6 @@ export const transformShippingMethods = (
         id: method.id,
         name: method.name,
         classOfService: method.description,
-        // amount is the price of the shipping method (or shipping fee)
         amount: typeof method.price === 'number' ? method.price.toString() : method.price
     }))
 

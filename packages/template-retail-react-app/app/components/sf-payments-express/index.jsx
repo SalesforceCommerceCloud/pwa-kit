@@ -19,8 +19,6 @@ const SFPaymentsExpress = ({
     onExpressPaymentCompleted
 }) => {
     const {data: basket} = useCurrentBasket()
-
-    //const prepareBasket = useCallback(() => basket, [basket?.basketId])
     const prepareBasket = useCallback(async () => {
         return basket
     }, [basket?.basketId])
