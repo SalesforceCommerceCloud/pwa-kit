@@ -393,7 +393,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 void checkoutComponent.current.updateAmount(basket.orderTotal)
             }
         }
-
+        // Cleanup on unmount
         return () => {
             if (checkoutComponent.current && !containerElementRef.current) {
                 checkoutComponent.current.destroy()
@@ -401,7 +401,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 checkoutInitialized.current = false
             }
         }
-    }, [sfp, metadata, paymentConfig])
+    }, [sfp, metadata, paymentConfig, cardCaptureAutomatic])
 
     useEffect(() => {
         const hasComponent = !!checkoutComponent.current
