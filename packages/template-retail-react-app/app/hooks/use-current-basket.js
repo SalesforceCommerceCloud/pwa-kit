@@ -29,14 +29,17 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     } = useCustomerBaskets(
         {parameters: {customerId}},
         {
-            enabled: !!customerId && !isServer
+            enabled: !!customerId && !isServer,
+            keepPreviousData: true // Keep previous data during refetches to prevent unmounting
         }
     )
-
+    // Select the current basket, prioritizing confirmingBasket, then matching id, then first non-temporary basket
+    // Filters out temporary baskets to prevent them from showing in the cart
     const currentBasket =
-        confirmingBasket ||
-        basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
-        basketsData?.baskets?.[0]
+        confirmingBasket && !confirmingBasket.temporaryBasket
+            ? confirmingBasket
+            : basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
+              basketsData?.baskets?.find((basket) => !basket.temporaryBasket)
 
     const memoizedDerived = useMemo(() => {
         // count the number of items in each shipment and rollup total
@@ -101,7 +104,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         dataUpdatedAt: basketsDataUpdatedAt,
         isLoading: basketsIsLoading,
         derivedData: {
-            hasBasket: currentBasket || basketsData?.total > 0,
+            // Only true if a non-temporary basket exists (temporary baskets are filtered out above)
+            hasBasket: !!currentBasket,
             ...memoizedDerived
         }
     }

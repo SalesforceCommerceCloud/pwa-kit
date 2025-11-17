@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -36,6 +36,11 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {
+    useShopperBasketsMutation,
+    useCustomerBaskets,
+    useCustomerId
+} from '@salesforce/commerce-sdk-react'
+import {
     useSFPaymentsEnabled,
     useSFPayments
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
@@ -58,6 +63,7 @@ import PromoCallout from '@salesforce/retail-react-app/app/components/product-ti
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const ProductViewHeader = ({
     name,
@@ -174,6 +180,19 @@ const ProductView = forwardRef(
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
         const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+
+        // customerId and useCustomerBaskets is only for registered users
+        const customerId = useCustomerId()
+        const {data: basketsData, refetch: refetchBaskets} = useCustomerBaskets(
+            {parameters: {customerId}},
+            {
+                enabled: !!customerId
+            }
+        )
+        const {mutateAsync: createBasket} = useShopperBasketsMutation('createBasket')
+        const {mutateAsync: addItemToBasket} = useShopperBasketsMutation('addItemToBasket')
+        const {mutateAsync: deleteBasket} = useShopperBasketsMutation('deleteBasket')
+
         const theme = useTheme()
         const {confirmingBasket} = useSFPayments()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
@@ -269,6 +288,61 @@ const ProductView = forwardRef(
             return hasValidSelection
         }
 
+        // prepareBasket is used to prepare the basket for Express Payments
+        // useCallback ensures the function reference is stable across renders,
+        // preventing unnecessary re-runs of the useEffect in SFPaymentsExpressButtons
+        // that updates prepareBasketRef when prepareBasket changes
+        const prepareBasket = useCallback(async () => {
+            // Validate that all attributes are selected before proceeding
+            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
+
+            if (!hasValidSelection && !isProductASet && !isProductABundle) {
+                toggleShowOptionsMessage(true)
+                if (errorContainerRef.current) {
+                    errorContainerRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    })
+                }
+                const error = new Error(
+                    'Please select all product options before proceeding with Express Payments'
+                )
+                error.isValidationError = true // Mark as validation error
+                throw error
+            }
+
+            // Create a new temporary basket
+            const newBasket = await createBasket({
+                parameters: {
+                    temporary: true
+                },
+                body: {}
+            })
+
+            if (!newBasket || !newBasket.basketId) {
+                throw new Error('Failed to create temporary basket')
+            }
+
+            const prod = variant || product
+            const productIdToUse = prod?.productId || prod?.id
+
+            if (!productIdToUse) {
+                throw new Error('Unable to determine product ID for basket')
+            }
+            // Add the product to the temporary basket
+            const basketWithItem = await addItemToBasket({
+                parameters: {basketId: newBasket.basketId},
+                body: [
+                    {
+                        productId: productIdToUse,
+                        quantity: quantity
+                    }
+                ]
+            })
+
+            return basketWithItem
+        }, [variant, product, quantity, stockLevel, isProductASet, isProductABundle])
+
         const renderActionButtons = () => {
             const buttons = []
             const buttonText = {
@@ -345,15 +419,6 @@ const ProductView = forwardRef(
                     return
                 }
                 addToWishlist(product, variant, quantity)
-            }
-
-            const prepareBasket = async () => {
-                return addItemToNewOrExistingBasket([
-                    {
-                        productId: variant?.productId || product.id,
-                        quantity: quantity
-                    }
-                ])
             }
 
             // child product of bundles do not have add to cart button
@@ -505,6 +570,48 @@ const ProductView = forwardRef(
                 setPickupInStore(false)
             }
         }, [selectedStore])
+
+        // Add a useEffect to clean up temporary baskets on component mount
+        useEffect(() => {
+            const cleanupTemporaryBaskets = async () => {
+                // Works for both registered and guest users (guest users have anonymous customerId)
+                if (customerId && basketsData?.baskets && basketsData.baskets.length > 0) {
+                    const temporaryBaskets = basketsData.baskets.filter(
+                        (basket) => basket.temporaryBasket === true
+                    )
+                    if (temporaryBaskets.length > 0) {
+                        // Clean up in parallel (don't await, let it run in background)
+                        Promise.all(
+                            temporaryBaskets.map((basket) =>
+                                deleteBasket({
+                                    parameters: {basketId: basket.basketId}
+                                }).catch((error) => {
+                                    // Only log if it's not a "Basket Not Found" error
+                                    if (
+                                        error?.response?.status !== 404 &&
+                                        error?.response?.status !== 400
+                                    ) {
+                                        logger.error(
+                                            '`Error deleting temporary basket ${basket.basketId}:`',
+                                            {
+                                                namespace:
+                                                    'product-view.cleanupTemporaryBaskets._handleApiError'
+                                            }
+                                        )
+                                    }
+                                })
+                            )
+                        ).then(() => {
+                            // Refetch after cleanup completes
+                            refetchBaskets()
+                        })
+                    }
+                }
+            }
+
+            cleanupTemporaryBaskets()
+            // Only run once when customerId are first available
+        }, [customerId])
 
         const handleDeliveryOptionChange = (value) => {
             setPickupInStore(value === DELIVERY_OPTIONS.PICKUP)

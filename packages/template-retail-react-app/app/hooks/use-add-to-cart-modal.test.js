@@ -797,7 +797,7 @@ test('Renders AddToCartModal with multiple products', () => {
             },
             {
                 product: MOCK_PRODUCT,
-                variant: MOCK_PRODUCT.variants[0],
+                variant: MOCK_PRODUCT.variants[1],
                 quantity: 1
             }
         ]

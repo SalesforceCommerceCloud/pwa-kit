@@ -20,7 +20,10 @@ const SFPaymentsExpress = ({
 }) => {
     const {data: basket} = useCurrentBasket()
 
-    const prepareBasket = useCallback(() => basket, [basket?.basketId])
+    //const prepareBasket = useCallback(() => basket, [basket?.basketId])
+    const prepareBasket = useCallback(async () => {
+        return basket
+    }, [basket?.basketId])
     const [paymentCurrency, paymentCountryCode, initialAmount] = useMemo(
         () => [
             basket?.currency,
