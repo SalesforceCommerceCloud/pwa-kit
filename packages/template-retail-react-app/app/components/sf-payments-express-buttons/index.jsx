@@ -89,6 +89,7 @@ const SFPaymentsExpressButtons = ({
     const prepareBasketRef = useRef(prepareBasket)
 
     // Update the ref whenever prepareBasket changes, including when the variant changes on PDP
+    // Using prepareBasketRef.current also ensures the function handlers always call the latest prepareBasket function
     useEffect(() => {
         prepareBasketRef.current = prepareBasket
     }, [prepareBasket])
@@ -402,6 +403,7 @@ const SFPaymentsExpressButtons = ({
                     callback.updateShippingAddress({
                         errors: ['fail']
                     })
+                    showErrorMessage()
                 }
             }
 
@@ -445,6 +447,7 @@ const SFPaymentsExpressButtons = ({
                     callback.updateShippingMethod({
                         errors: ['fail']
                     })
+                    showErrorMessage()
                 }
             }
             //Async function to handle before payer approve event.  This is called before payment is confirmed
@@ -511,7 +514,12 @@ const SFPaymentsExpressButtons = ({
                 }
 
                 if (!expressBasket.current) {
-                    throw new Error('Basket not ready')
+                    throw new Error(
+                        intl.formatMessage({
+                            defaultMessage: 'Basket not ready',
+                            id: 'sfp_payments_express.error.basket_not_ready'
+                        })
+                    )
                 }
 
                 let updatedPaymentInstrument

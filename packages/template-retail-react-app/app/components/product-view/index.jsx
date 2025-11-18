@@ -275,7 +275,7 @@ const ProductView = forwardRef(
         const cleanupTemporaryBaskets = useCleanupTemporaryBaskets()
 
         // prepareBasket is used to prepare the basket for express payments
-        // useCallback ensures the function reference is stable across renders
+        // useCallback recreates prepareBasket primarily when product or quantity change, along with variant, stockLevel, and product type flags (isProductASet, isProductABundle)
         const prepareBasket = useCallback(async () => {
             // Validate that all attributes are selected before proceeding
             const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
@@ -310,14 +310,6 @@ const ProductView = forwardRef(
                 },
                 body: {}
             })
-
-            if (!newBasket || !newBasket.basketId) {
-                errorMessage = intl.formatMessage({
-                    defaultMessage: 'Failed to create temporary basket',
-                    id: 'product_view.prepareBasket'
-                })
-                throw new Error(errorMessage)
-            }
 
             const selectedProduct = variant || product
             // Use variant's productId if variant is selected, otherwise use product's id

@@ -18,7 +18,7 @@ import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payme
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
  * @param shouldFetchProductDetail - boolean to indicate if the baskets should fetch product details based on basket items
  */
-export const useCurrentBasket = ({id = ''} = {}) => {
+export const useCurrentBasket = ({id = '', keepPreviousData = false} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
     const {confirmingBasket} = useSFPayments()
@@ -30,7 +30,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer,
-            keepPreviousData: true // Prevent data from being cleared during refetches
+            keepPreviousData: keepPreviousData // Prevent data from being cleared during refetches
         }
     )
     // Select the current basket, prioritizing confirmingBasket, then matching id, then first non-temporary basket

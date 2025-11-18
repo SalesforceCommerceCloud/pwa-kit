@@ -78,7 +78,7 @@ export const transformShippingMethods = (
         id: method.id,
         name: method.name,
         classOfService: method.description,
-        amount: typeof method.price === 'number' ? method.price.toString() : method.price
+        amount: method.price?.toString()
     }))
 
     if (sortSelected && selectedId) {

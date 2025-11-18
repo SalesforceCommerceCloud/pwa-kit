@@ -99,8 +99,6 @@ describe('useSFPayments hook', () => {
     beforeEach(() => {
         jest.clearAllMocks()
 
-        // Reset global state
-        // global.window = Object.create(window)
         // Reset global state - don't try to redefine window, just delete the property
         if (global.window && global.window.SFPayments) {
             delete global.window.SFPayments
