@@ -636,9 +636,6 @@
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "電子報的電子郵件地址"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "搶先獲得消息"
-  },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "取消"
   },
