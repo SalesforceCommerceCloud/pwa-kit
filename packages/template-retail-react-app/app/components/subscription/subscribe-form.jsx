@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -27,6 +27,9 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
     // Use SubscribeForm's own theme config instead of Footer's context
     const subscribeFormStyles = useMultiStyleConfig('SubscribeForm')
 
+    // Ref to manage focus on the email input
+    const emailInputRef = useRef(null)
+
     // Map SubscribeForm theme parts to Footer's expected structure
     const styles = {
         subscribe: subscribeFormStyles.container,
@@ -47,6 +50,19 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
 
     const intl = useIntl()
     const {state, actions} = subscription
+
+    // Restore focus to the email input after submission completes (success or error)
+    // Track previous loading state to detect when submission completes
+    const prevLoadingRef = useRef(false)
+
+    useEffect(() => {
+        // Only restore focus when transitioning from loading to not loading
+        // This ensures we only focus after a submission completes, not on mount
+        if (prevLoadingRef.current && !state?.isLoading && emailInputRef.current) {
+            emailInputRef.current.focus()
+        }
+        prevLoadingRef.current = state?.isLoading
+    }, [state?.isLoading])
 
     const messages = {
         heading: intl.formatMessage({
@@ -87,21 +103,8 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
 
             <Box>
                 <InputGroup>
-                    {/* Had to swap the following InputRightElement and Input
-                        to avoid the hydration error due to mismatched html between server and client side.
-                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
-                    */}
-                    <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button
-                            variant="footer"
-                            onClick={actions?.submit}
-                            isLoading={state?.isLoading}
-                            loadingText={messages.buttonSignUp}
-                        >
-                            {messages.buttonSignUp}
-                        </Button>
-                    </InputRightElement>
                     <Input
+                        ref={emailInputRef}
                         type="email"
                         placeholder={messages.emailPlaceholder}
                         aria-label={messages.emailAriaLabel}
@@ -116,6 +119,16 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                         id="subscribe-email"
                         {...styles.subscribeField}
                     />
+                    <InputRightElement {...styles.subscribeButtonContainer}>
+                        <Button
+                            variant="footer"
+                            onClick={actions?.submit}
+                            isLoading={state?.isLoading}
+                            loadingText={messages.buttonSignUp}
+                        >
+                            {messages.buttonSignUp}
+                        </Button>
+                    </InputRightElement>
                 </InputGroup>
 
                 <Text {...styles.subscribeDisclaimer}>
