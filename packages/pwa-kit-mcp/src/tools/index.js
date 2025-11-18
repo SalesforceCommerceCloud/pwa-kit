@@ -15,6 +15,7 @@ export {default as ExploreCommerceAPITool} from './explore-scapi-shop-api-tool.j
 export {default as HooksRecommendationTool} from './hooks-recommendation.js'
 export {default as ComponentsRecommendationTool} from './components-recommendations.js'
 export {default as CustomApiTool} from './custom-api-discovery.js'
+export {default as PromptGuidanceTool} from './prompt-guidance.js'
 
 // Re-export individual test functions
 export {runAccessibilityTest} from './site-test-accessibility.js'

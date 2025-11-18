@@ -4,19 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import fs from 'fs/promises'
 import {z} from 'zod'
 import {loadHooksCatalog} from '../utils/data'
-import {
-    systemPromptForFileGeneration,
-    systemPromptForOrderedFileChanges,
-    SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS
-} from '../utils/constants'
 
-const systemPromptForHooksRecommendation = `please enter a page path and list of hooks to include in the page.
-If you would like to recommend hooks for a use case, please enter the use case.`
-
-const systemPromptForHooksIntegration = `please enter the path to the page to update`
+const systemPromptForHooksRecommendation = `please enter a list of hooks to include or a use case description.
+If you would like to recommend hooks for a use case, please enter the use case.
+If you want to get implementation details for specific hooks, please provide the hook names.`
 
 /**
  * Recommend hooks from the catalog based on a user-provided use case.
@@ -52,12 +45,11 @@ ${JSON.stringify(catalog, null, 2)}
 }
 
 /**
- * Update a page file with selected hooks from the catalog.
- * @param {string} selectedHooks - Array of string hook names selected by user.
- * @param {string} pagePath - Absolute path to the page file to update.
+ * Get selected hooks from the catalog with implementation instructions.
+ * @param {string[]} selectedHooks - Array of string hook names selected by user.
  * @returns {Promise<string>}
  */
-export async function updatePageWithHooks(selectedHooks, pagePath) {
+export async function getSelectedHooks(selectedHooks) {
     try {
         const catalog = await loadHooksCatalog()
 
@@ -80,148 +72,67 @@ export async function updatePageWithHooks(selectedHooks, pagePath) {
             )
         }
 
-        // Read the current page file
-        const pageContent = await fs.readFile(pagePath, 'utf8')
+        // Build response with instructions and hook details
+        let response = `## ⚠️ CRITICAL: Hooks Integration Instructions\n\n`
+        response += `You are about to integrate the following hooks into your page or component. Follow these rules strictly:\n\n`
+        response += `### MANDATORY RULES:\n`
+        response += `1. **Follow the code snippets/examples EXACTLY as provided** - Do not modify the structure or logic\n`
+        response += `2. **DO NOT modify import paths** - Use the import statements exactly as shown in the snippets\n`
+        response += `3. **Preserve hook usage patterns** - Copy the hook calls from the snippets\n`
+        response += `4. **Keep the same hook structure** - Do not rename or restructure the hook implementations\n`
+        response += `5. **Maintain the coding style** - Follow the patterns shown in the examples\n\n`
+        response += `### Selected Hooks:\n\n`
 
-        // Extract imports and hook code from selected hooks
-        const newImports = new Set()
-        const hookImplementations = []
+        // Add each hook with full details
+        response += `\`\`\`json\n${JSON.stringify(selectedHookData, null, 2)}\n\`\`\`\n\n`
 
-        for (const hookData of selectedHookData) {
-            // Extract import statements from snippet
-            const snippet = hookData.snippet
-            const importMatches = snippet.match(/\/\/ Imports:.*?\n/g)
+        response += `---\n\n`
+        response += `**REMINDER**: When integrating these hooks:\n`
+        response += `- Copy import statements EXACTLY as shown\n`
+        response += `- Follow the usage examples in the snippets closely\n`
+        response += `- Do not modify hook names or parameters\n`
+        response += `- Maintain the same import paths without changes\n`
 
-            if (importMatches) {
-                importMatches.forEach((importMatch) => {
-                    // Parse the import comment format: // Imports: {hook} from 'module'; {hook2} from 'react'
-                    const importStr = importMatch.replace('// Imports: ', '').replace('\n', '')
-                    const imports = importStr
-                        .split(';')
-                        .map((imp) => imp.trim())
-                        .filter((imp) => imp)
-                    imports.forEach((imp) => {
-                        if (imp) {
-                            newImports.add(`import ${imp}`)
-                        }
-                    })
-                })
-            } else {
-                // Look for standard import statements in the snippet
-                const standardImports = snippet.match(/^import\s+.*?$/gm)
-                if (standardImports) {
-                    standardImports.forEach((imp) => newImports.add(imp))
-                }
-            }
-
-            // Extract hook implementation (everything after imports and comments)
-            let implementation = snippet
-                .replace(/\/\/ Imports:.*?\n/g, '')
-                .replace(/^import\s+.*?$/gm, '')
-                .trim()
-
-            // Exclude everything after the first "Example:" comment
-            const returnIndex = implementation.indexOf('// Example:')
-            if (returnIndex !== -1) {
-                implementation = implementation.substring(0, returnIndex).trim()
-            }
-
-            if (implementation) {
-                hookImplementations.push(`  // ${hookData.name}: ${hookData.summary}`)
-                hookImplementations.push(`  ${implementation.split('\n').join('\n  ')}`)
-            }
-        }
-
-        // Update the page content
-        let updatedContent = pageContent
-
-        // Add new imports after existing imports
-        const importSection = Array.from(newImports).join('\n')
-        if (importSection) {
-            // Find the last import statement
-            const lastImportMatch = [...updatedContent.matchAll(/^import\s+.*?$/gm)]
-            if (lastImportMatch.length > 0) {
-                const lastImport = lastImportMatch[lastImportMatch.length - 1]
-                const insertPosition = lastImport.index + lastImport[0].length
-                updatedContent =
-                    updatedContent.slice(0, insertPosition) +
-                    '\n' +
-                    importSection +
-                    updatedContent.slice(insertPosition)
-            } else {
-                // No existing imports, add at the top after the first import
-                const firstImportIndex = updatedContent.indexOf('import')
-                if (firstImportIndex !== -1) {
-                    const lineEnd = updatedContent.indexOf('\n', firstImportIndex)
-                    updatedContent =
-                        updatedContent.slice(0, lineEnd) +
-                        '\n' +
-                        importSection +
-                        updatedContent.slice(lineEnd)
-                }
-            }
-        }
-
-        // Add hook implementations inside the component function
-        if (hookImplementations.length > 0) {
-            const hookCode = hookImplementations.join('\n\n')
-
-            // Find the component function and add hooks after the opening brace
-            const componentMatch = updatedContent.match(/const\s+\w+\s*=\s*\(\)\s*=>\s*{/)
-            if (componentMatch) {
-                const insertPosition = componentMatch.index + componentMatch[0].length
-                updatedContent =
-                    updatedContent.slice(0, insertPosition) +
-                    '\n' +
-                    hookCode +
-                    '\n' +
-                    updatedContent.slice(insertPosition)
-            }
-        }
-
-        const messages = []
-        messages.push(systemPromptForFileGeneration(pagePath, updatedContent))
-        messages.push(SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS)
-        return systemPromptForOrderedFileChanges(messages)
+        return response
     } catch (error) {
-        throw new Error(`Failed to update page with hooks: ${error.message}`)
+        throw new Error(`Failed to get selected hooks: ${error.message}`)
     }
 }
 class HooksRecommendationTool {
     constructor() {
         this.name = 'pwakit_recommend_hooks'
-        this.description = `Recommend and use React hooks from the out of the box hooks based on a specific use case.`
+        this.description = `Recommend React hooks from the available hooks catalog, or get detailed implementation information for specific hooks.
+
+When called WITHOUT selectedHooks: Recommends hooks based on a use case description.
+When called WITH selectedHooks: Returns full JSON details (including code snippets) for those specific hooks with strict integration instructions.`
         this.inputSchema = {
             useCase: z
                 .string()
                 .optional()
                 .describe(
-                    'The use case description for which to recommend hooks (e.g., "fetch product data", "manage shopping cart", "handle user authentication").'
+                    'The use case description for which to recommend hooks (e.g., "fetch product data", "manage shopping cart", "handle user authentication"). Use this when you need recommendations.'
                 ),
             selectedHooks: z
                 .array(z.string())
                 .optional()
                 .describe(
-                    'Comma-separated list of hook names to include in the page (e.g., "useProduct, useBasket"), or "none" for no hooks.'
-                ),
-            pagePath: z.string().optional().describe('Absolute path to the page file to update.')
+                    'Array of hook names to get implementation details for (e.g., ["useProduct", "useBasket"]). Use this when you know which hooks you need and want their full implementation details including code snippets.'
+                )
         }
     }
 
-    async handler({useCase, selectedHooks, pagePath}) {
+    async handler({useCase, selectedHooks}) {
+        // If neither parameter is provided, return prompt
         if (!selectedHooks?.length && !useCase) {
             return {
                 content: [{type: 'text', text: systemPromptForHooksRecommendation}]
             }
-        } else if (selectedHooks?.length && !pagePath) {
-            return {
-                content: [{type: 'text', text: systemPromptForHooksIntegration}]
-            }
         }
 
         try {
+            // If selectedHooks provided, return those hooks with instructions
             const result = selectedHooks?.length
-                ? await updatePageWithHooks(selectedHooks, pagePath)
+                ? await getSelectedHooks(selectedHooks)
                 : await recommendHooksForUseCase(useCase)
             return {
                 content: [
@@ -236,7 +147,7 @@ class HooksRecommendationTool {
                 content: [
                     {
                         type: 'text',
-                        text: `Failed to recommend hooks: ${error.message}`
+                        text: `Failed to process hooks request: ${error.message}`
                     }
                 ]
             }

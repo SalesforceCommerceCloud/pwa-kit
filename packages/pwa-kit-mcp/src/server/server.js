@@ -17,7 +17,8 @@ import {
     ExploreCommerceAPITool,
     HooksRecommendationTool,
     ComponentsRecommendationTool,
-    CustomApiTool
+    CustomApiTool,
+    PromptGuidanceTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 import {PWA_KIT_DESCRIPTIVE_NAME} from '../utils/constants'
@@ -134,6 +135,12 @@ class PwaStorefrontMCPServerHighLevel {
             CustomApiTool.description,
             CustomApiTool.inputSchema,
             CustomApiTool.fn
+        )
+        this.server.tool(
+            PromptGuidanceTool.name,
+            PromptGuidanceTool.description,
+            PromptGuidanceTool.inputSchema,
+            PromptGuidanceTool.fn
         )
     }
 

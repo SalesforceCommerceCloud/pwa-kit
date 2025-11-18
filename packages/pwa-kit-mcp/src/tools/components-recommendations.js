@@ -4,19 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import fs from 'fs/promises'
 import {z} from 'zod'
 import {loadComponentsCatalog} from '../utils/data'
-import {
-    systemPromptForFileGeneration,
-    systemPromptForOrderedFileChanges,
-    SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS
-} from '../utils/constants'
 
-const systemPromptForComponentsRecommendation = `please enter a page path and list of components to include in the page.
-If you would like to recommend components for a use case, please enter the use case.`
-
-const systemPromptForComponentsIntegration = `please enter the path to the page to update`
+const systemPromptForComponentsRecommendation = `please enter a list of components to include or a use case description.
+If you would like to recommend components for a use case, please enter the use case.
+If you want to get implementation details for specific components, please provide the component names.`
 
 /**
  * Recommend components from the catalog based on a user-provided use case.
@@ -52,12 +45,11 @@ ${JSON.stringify(catalog, null, 2)}
 }
 
 /**
- * Update a page file with selected components from the catalog.
- * @param {string} selectedComponents - Array of string component names selected by user.
- * @param {string} pagePath - Absolute path to the page file to update.
+ * Get selected components from the catalog with implementation instructions.
+ * @param {string[]} selectedComponents - Array of string component names selected by user.
  * @returns {Promise<string>}
  */
-export async function updatePageWithComponents(selectedComponents, pagePath) {
+export async function getSelectedComponents(selectedComponents) {
     try {
         const catalog = await loadComponentsCatalog()
 
@@ -82,143 +74,68 @@ export async function updatePageWithComponents(selectedComponents, pagePath) {
             )
         }
 
-        // Read the current page file
-        const pageContent = await fs.readFile(pagePath, 'utf8')
+        // Build response with instructions and component details
+        let response = `## ⚠️ CRITICAL: Component Integration Instructions\n\n`
+        response += `You are about to integrate the following components into your page or component. Follow these rules strictly:\n\n`
+        response += `### MANDATORY RULES:\n`
+        response += `1. **Follow the code snippets/examples EXACTLY as provided** - Do not modify the structure or logic\n`
+        response += `2. **DO NOT modify import paths** - Use the import statements exactly as shown in the snippets\n`
+        response += `3. **Preserve component props and usage patterns** - Copy the component usage from the snippets\n`
+        response += `4. **Keep the same component structure** - Do not rename or restructure the component hierarchy\n`
+        response += `5. **Maintain the coding style** - Follow the patterns shown in the examples\n\n`
+        response += `### Selected Components:\n\n`
 
-        // Extract imports and component usage from selected components
-        const newImports = new Set()
-        const componentUsages = []
+        // Add each component with full details
+        response += `\`\`\`json\n${JSON.stringify(selectedComponentData, null, 2)}\n\`\`\`\n\n`
 
-        for (const componentData of selectedComponentData) {
-            // Extract import statements from snippet
-            const snippet = componentData.snippet
-            const importMatches = snippet.match(/^import\s+.*?$/gm)
+        response += `---\n\n`
+        response += `**REMINDER**: When integrating these components:\n`
+        response += `- Copy import statements EXACTLY as shown\n`
+        response += `- Follow the usage examples in the snippets closely\n`
+        response += `- Do not modify component prop names or structures\n`
+        response += `- Maintain the same import paths without changes\n`
 
-            if (importMatches) {
-                importMatches.forEach((imp) => newImports.add(imp))
-            }
-
-            // Extract component usage example
-            let usage = snippet.replace(/^import\s+.*?$/gm, '').trim()
-
-            // Look for the JSX usage in the snippet
-            const functionMatch = usage.match(/function\s+MyComponent\s*\(\)\s*{([\s\S]*?)}\s*$/m)
-            if (functionMatch) {
-                const functionBody = functionMatch[1].trim()
-                // Try to find the return statement and extract everything after it
-                const returnMatch = functionBody.match(/return\s*\(([\s\S]*)\)\s*$/m)
-                if (returnMatch) {
-                    usage = returnMatch[1].trim()
-                } else {
-                    // Try to find JSX without parentheses
-                    const jsxMatch = functionBody.match(/return\s+([\s\S]*?)$/m)
-                    if (jsxMatch) {
-                        usage = jsxMatch[1].trim()
-                    }
-                }
-            }
-
-            if (usage) {
-                componentUsages.push(`  {/* ${componentData.name}: ${componentData.summary} */}`)
-                componentUsages.push(`  ${usage.split('\n').join('\n  ')}`)
-            }
-        }
-
-        // Update the page content
-        let updatedContent = pageContent
-
-        // Add new imports after existing imports
-        const importSection = Array.from(newImports).join('\n')
-        if (importSection) {
-            // Find the last import statement
-            const lastImportMatch = [...updatedContent.matchAll(/^import\s+.*?$/gm)]
-            if (lastImportMatch.length > 0) {
-                const lastImport = lastImportMatch[lastImportMatch.length - 1]
-                const insertPosition = lastImport.index + lastImport[0].length
-                updatedContent =
-                    updatedContent.slice(0, insertPosition) +
-                    '\n' +
-                    importSection +
-                    updatedContent.slice(insertPosition)
-            } else {
-                // No existing imports, add at the top
-                updatedContent = importSection + '\n\n' + updatedContent
-            }
-        }
-
-        // Add component usages inside the component's return statement
-        if (componentUsages.length > 0) {
-            const componentCode = componentUsages.join('\n\n')
-
-            // Find the return statement and add components after it
-            let returnMatch = updatedContent.match(/return\s*\(/m)
-            if (returnMatch) {
-                const insertPosition = returnMatch.index + returnMatch[0].length
-                updatedContent =
-                    updatedContent.slice(0, insertPosition) +
-                    '\n' +
-                    componentCode +
-                    '\n' +
-                    updatedContent.slice(insertPosition)
-            } else {
-                // Try to find return without parentheses
-                returnMatch = updatedContent.match(/return\s+</m)
-                if (returnMatch) {
-                    const insertPosition = returnMatch.index + returnMatch[0].length - 1 // -1 to keep the <
-                    updatedContent =
-                        updatedContent.slice(0, insertPosition) +
-                        '\n' +
-                        componentCode +
-                        '\n  ' +
-                        updatedContent.slice(insertPosition)
-                }
-            }
-        }
-
-        const messages = []
-        messages.push(systemPromptForFileGeneration(pagePath, updatedContent))
-        messages.push(SYSTEM_PROMPT_FOR_LINT_INSTRUCTIONS)
-        return systemPromptForOrderedFileChanges(messages)
+        return response
     } catch (error) {
-        throw new Error(`Failed to update page with components: ${error.message}`)
+        throw new Error(`Failed to get selected components: ${error.message}`)
     }
 }
 
 class ComponentsRecommendationTool {
     constructor() {
         this.name = 'pwakit_recommend_components'
-        this.description = `Recommend and use React components from the out of the box components based on a specific use case.`
+        this.description = `Recommend React components from the available component catalog, or get detailed implementation information for specific components.
+
+When called WITHOUT selectedComponents: Recommends components based on a use case description.
+When called WITH selectedComponents: Returns full JSON details (including code snippets) for those specific components with strict integration instructions.`
         this.inputSchema = {
             useCase: z
                 .string()
                 .optional()
                 .describe(
-                    'The use case description for which to recommend components (e.g., "display product information", "show breadcrumb navigation", "create checkout form").'
+                    'The use case description for which to recommend components (e.g., "display product information", "show breadcrumb navigation", "create checkout form"). Use this when you need recommendations.'
                 ),
             selectedComponents: z
                 .array(z.string())
                 .optional()
                 .describe(
-                    'Comma-separated list of component names to include in the page (e.g., "ProductTile, Breadcrumb"), or "none" for no components.'
-                ),
-            pagePath: z.string().optional().describe('Absolute path to the page file to update.')
+                    'Array of component names to get implementation details for (e.g., ["ProductTile", "Breadcrumb"]). Use this when you know which components you need and want their full implementation details including code snippets.'
+                )
         }
     }
 
-    async handler({useCase, selectedComponents, pagePath}) {
+    async handler({useCase, selectedComponents}) {
+        // If neither parameter is provided, return prompt
         if (!selectedComponents?.length && !useCase) {
             return {
                 content: [{type: 'text', text: systemPromptForComponentsRecommendation}]
             }
-        } else if (selectedComponents?.length && !pagePath) {
-            return {
-                content: [{type: 'text', text: systemPromptForComponentsIntegration}]
-            }
         }
 
         try {
+            // If selectedComponents provided, return those components with instructions
             const result = selectedComponents?.length
-                ? await updatePageWithComponents(selectedComponents, pagePath)
+                ? await getSelectedComponents(selectedComponents)
                 : await recommendComponentsForUseCase(useCase)
             return {
                 content: [
@@ -233,7 +150,7 @@ class ComponentsRecommendationTool {
                 content: [
                     {
                         type: 'text',
-                        text: `Failed to recommend components: ${error.message}`
+                        text: `Failed to process components request: ${error.message}`
                     }
                 ]
             }
