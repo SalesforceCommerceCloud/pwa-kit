@@ -7,8 +7,7 @@
 
 import {useState, useRef, useCallback, useEffect} from 'react'
 import {useMapsLibrary} from '@vis.gl/react-google-maps'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {convertGoogleMapsSuggestions} from '../utils/address-suggestions'
+import {convertGoogleMapsSuggestions} from '@salesforce/retail-react-app/app/utils/address-suggestions'
 
 const DEBOUNCE_DELAY = 300
 
@@ -25,8 +24,6 @@ export const useAutocompleteSuggestions = (
     requestOptions = {}
 ) => {
     const places = useMapsLibrary('places')
-    const {googleCloudAPI = {}} = getConfig().app || {}
-    const apiKey = googleCloudAPI.apiKey
 
     const sessionTokenRef = useRef(null)
     const debounceTimeoutRef = useRef(null)
@@ -36,7 +33,7 @@ export const useAutocompleteSuggestions = (
 
     const fetchSuggestions = useCallback(
         async (input) => {
-            if (!places || !apiKey || !input || input.length < 3) {
+            if (!places || !input || input.length < 3) {
                 setSuggestions([])
                 return
             }
@@ -72,7 +69,7 @@ export const useAutocompleteSuggestions = (
                 setIsLoading(false)
             }
         },
-        [places, apiKey, countryCode]
+        [places, countryCode]
     )
 
     const resetSession = useCallback(() => {

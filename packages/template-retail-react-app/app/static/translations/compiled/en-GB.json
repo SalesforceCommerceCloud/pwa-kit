@@ -869,12 +869,6 @@
       "value": "An unexpected error occurred during checkout."
     }
   ],
-  "checkout.title.checkout": [
-    {
-      "type": 0,
-      "value": "Checkout"
-    }
-  ],
   "checkout_confirmation.button.create_account": [
     {
       "type": 0,

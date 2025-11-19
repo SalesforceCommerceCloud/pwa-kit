@@ -8,7 +8,9 @@
 import {renderHook, act} from '@testing-library/react'
 import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 import {useMapsLibrary} from '@vis.gl/react-google-maps'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+// Import the mocked useCheckout function
+import {useCheckout} from '../pages/checkout/util/checkout-context'
 
 jest.mock('@vis.gl/react-google-maps', () => ({
     useMapsLibrary: jest.fn()
@@ -20,6 +22,19 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
             googleCloudAPI: {
                 apiKey: 'test-api-key'
             }
+        }
+    }))
+}))
+
+jest.mock('../pages/checkout/util/checkout-context', () => ({
+    useCheckout: jest.fn(() => ({
+        configurations: {
+            configurations: [
+                {
+                    id: 'gcp',
+                    value: 'test-api-key'
+                }
+            ]
         }
     }))
 }))
@@ -52,6 +67,18 @@ describe('useAutocompleteSuggestions', () => {
         }
 
         useMapsLibrary.mockReturnValue(mockPlaces)
+
+        // Reset useCheckout mock to default
+        useCheckout.mockReturnValue({
+            configurations: {
+                configurations: [
+                    {
+                        id: 'gcp',
+                        value: 'test-api-key'
+                    }
+                ]
+            }
+        })
     })
 
     afterEach(() => {
@@ -208,12 +235,8 @@ describe('useAutocompleteSuggestions', () => {
         expect(result.current.suggestions).toEqual([])
     })
 
-    it('should not fetch suggestions when API key is not available', async () => {
-        getConfig.mockReturnValue({
-            app: {
-                googleCloudAPI: {}
-            }
-        })
+    it('should not fetch suggestions when the places API is undefined', async () => {
+        useMapsLibrary.mockReturnValue(undefined)
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
@@ -232,7 +255,6 @@ describe('useAutocompleteSuggestions', () => {
             }
         }
         useMapsLibrary.mockReturnValue(mockPlaces)
-        getConfig.mockReturnValue({app: {googleCloudAPI: {apiKey: 'test-key'}}})
 
         const mockResponse = {
             suggestions: [

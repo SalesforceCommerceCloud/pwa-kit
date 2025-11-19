@@ -297,9 +297,6 @@
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
   },
-  "checkout.title.checkout": {
-    "defaultMessage": "Checkout"
-  },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
   },

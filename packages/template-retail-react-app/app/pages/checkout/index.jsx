@@ -6,6 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
+import PropTypes from 'prop-types'
 import {
     Alert,
     AlertIcon,
@@ -14,7 +15,6 @@ import {
     Container,
     Grid,
     GridItem,
-    Heading,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -41,12 +41,12 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {APIProvider} from '@vis.gl/react-google-maps'
+import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step} = useCheckout()
+    const {step, configurations} = useCheckout()
     const [error, setError] = useState()
     const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
@@ -67,6 +67,9 @@ const Checkout = () => {
     // Check if there are pickup shipments
     const hasPickupShipments = derivedData?.totalPickupShipments > 0
 
+    const googleCloudAPIKey =
+        getConfig()?.app?.googleCloudAPI?.apiKey ||
+        configurations?.configurations?.find((config) => config.id === 'gcp')?.value
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
@@ -104,9 +107,6 @@ const Checkout = () => {
 
     return (
         <Box background="gray.50" flex="1">
-            <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
-                <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
-            </Heading>
             <Container
                 data-testid="sf-checkout-container"
                 maxWidth="container.xl"
@@ -211,10 +211,10 @@ const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
+    // const {configurations} = useCheckout()
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
-    const {googleCloudAPI = {}} = getConfig().app || {}
 
     const handleRemoveItem = async (product) => {
         await removeItemFromBasketMutation.mutateAsync(
@@ -253,17 +253,16 @@ const CheckoutContainer = () => {
     }
 
     return (
-        <APIProvider apiKey={googleCloudAPI.apiKey}>
-            <CheckoutProvider>
-                {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-
+        <CheckoutProvider>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+            <GoogleAPIProvider>
                 <Checkout />
-                <UnavailableProductConfirmationModal
-                    productItems={basket?.productItems}
-                    handleUnavailableProducts={handleUnavailableProducts}
-                />
-            </CheckoutProvider>
-        </APIProvider>
+            </GoogleAPIProvider>
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
+        </CheckoutProvider>
     )
 }
 
