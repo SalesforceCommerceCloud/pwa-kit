@@ -36,12 +36,12 @@ const PickupAddress = () => {
     const shipmentsWithItems = shipments.filter((s) =>
         items.some((i) => i.shipmentId === s.shipmentId)
     )
-    const pickupShipment = shipmentsWithItems.find((s) => isPickupShipment(s)) || null
+    const pickupShipment = shipmentsWithItems.find((s) => isPickupShipment(s))
 
     const selectedShippingAddress = pickupShipment?.shippingAddress
 
     // Check if basket is a pickup order
-    const isPickupOrder = Boolean(pickupShipment)
+    const isPickupOrder = !!pickupShipment
     const storeId = pickupShipment?.c_fromStoreId
     const {data: storeData, isLoading: isStoreLoading} = useStores(
         {
