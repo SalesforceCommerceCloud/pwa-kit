@@ -17,6 +17,13 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 
 const {AuthHelpers} = jest.requireActual('@salesforce/commerce-sdk-react')
 
+const TEST_MESSAGES = {
+    'checkout.title.user_registration': 'Save Checkout Info for Future Use',
+    'checkout.label.user_registration': 'Create an account to check out faster',
+    'checkout.message.user_registration':
+        'Your payment, address, and contact information will be saved in a new account.'
+}
+
 const mockAuthHelperFunctions = {
     [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
     [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
@@ -36,12 +43,15 @@ jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () =>
 
 jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     // eslint-disable-next-line react/prop-types
-    const MockOtpAuth = function ({isOpen, handleOtpVerification, isGuestRegistration}) {
+    const MockOtpAuth = function ({isOpen, handleOtpVerification, onClose, isGuestRegistration}) {
         return isOpen ? (
             <>
                 <div data-testid={isGuestRegistration ? 'otp-guest' : 'otp-returning'} />
                 <button onClick={() => handleOtpVerification('otp-123')} data-testid="otp-verify">
                     Verify OTP
+                </button>
+                <button onClick={onClose} data-testid="otp-close">
+                    Close
                 </button>
             </>
         ) : null
@@ -93,7 +103,7 @@ const setup = (overrides = {}) => {
     }
 
     const utils = render(
-        <IntlProvider locale="en-GB" messages={{}}>
+        <IntlProvider locale="en-GB" messages={TEST_MESSAGES}>
             <UserRegistration {...props} />
         </IntlProvider>
     )
@@ -203,7 +213,7 @@ describe('UserRegistration', () => {
         expect(screen.getByRole('checkbox', {name: /Create an account/i})).toBeInTheDocument()
     })
 
-    test('prevents duplicate OTP sends', async () => {
+    test('blocks duplicate OTP sends until reset', async () => {
         const user = userEvent.setup()
         const {authorizePasswordlessLogin} = setup()
         const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
@@ -212,14 +222,105 @@ describe('UserRegistration', () => {
         await waitFor(() => {
             expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(1)
         })
-        // Click to disable
+        // Click to enable again without unchecking/closing — should not send again
         await user.click(checkbox)
-        // Click to enable again
-        await user.click(checkbox)
-        // Should still only have been called once due to otpSentRef
         expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(1)
     })
 
+    test('re-sends OTP after modal close and retry', async () => {
+        const user = userEvent.setup()
+        // Arrange mocks without rendering via setup()
+        const defaultBasket = {
+            basketId: 'basket-123',
+            customerInfo: {email: 'test@example.com'},
+            productItems: [{productId: 'sku-1', quantity: 1}],
+            shipments: [{shippingAddress: {address1: '123 Main'}, shippingMethod: {id: 'Ground'}}]
+        }
+        useCurrentBasket.mockReturnValue({data: defaultBasket})
+        useCustomerType.mockReturnValue({isGuest: true})
+        const authorizePasswordlessLogin =
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless]
+        authorizePasswordlessLogin.mutateAsync.mockResolvedValue({})
+        // Wrapper to control the enableUserRegistration prop to simulate real toggling
+        const Stateful = () => {
+            const [enabled, setEnabled] = React.useState(false)
+            return (
+                <IntlProvider locale="en-GB" messages={TEST_MESSAGES}>
+                    <UserRegistration
+                        enableUserRegistration={enabled}
+                        setEnableUserRegistration={(val) => setEnabled(val)}
+                        isGuestCheckout={false}
+                        isDisabled={false}
+                        onSavePreferenceChange={jest.fn()}
+                        onRegistered={jest.fn()}
+                    />
+                </IntlProvider>
+            )
+        }
+        render(<Stateful />)
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+        // First enable triggers OTP send and opens modal
+        await user.click(checkbox) // enable -> true
+        await waitFor(() => {
+            expect(screen.getByTestId('otp-guest')).toBeInTheDocument()
+        })
+        expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(1)
+        // Close the modal (this should reset the guard)
+        await user.click(screen.getByTestId('otp-close'))
+        // Toggle off then on to re-enable
+        await user.click(checkbox) // disable -> false
+        await user.click(checkbox) // enable -> true
+        // Should send OTP again after close + re-enable
+        await waitFor(() => {
+            expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(2)
+        })
+    })
+
+    test('re-sends OTP after uncheck and re-check', async () => {
+        const user = userEvent.setup()
+        // Arrange mocks without rendering via setup()
+        const defaultBasket = {
+            basketId: 'basket-123',
+            customerInfo: {email: 'test@example.com'},
+            productItems: [{productId: 'sku-1', quantity: 1}],
+            shipments: [{shippingAddress: {address1: '123 Main'}, shippingMethod: {id: 'Ground'}}]
+        }
+        useCurrentBasket.mockReturnValue({data: defaultBasket})
+        useCustomerType.mockReturnValue({isGuest: true})
+        const authorizePasswordlessLogin =
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless]
+        authorizePasswordlessLogin.mutateAsync.mockResolvedValue({})
+        // Wrapper to control the enableUserRegistration prop to simulate real toggling
+        const Stateful = () => {
+            const [enabled, setEnabled] = React.useState(false)
+            return (
+                <IntlProvider locale="en-GB" messages={TEST_MESSAGES}>
+                    <UserRegistration
+                        enableUserRegistration={enabled}
+                        setEnableUserRegistration={(val) => setEnabled(val)}
+                        isGuestCheckout={false}
+                        isDisabled={false}
+                        onSavePreferenceChange={jest.fn()}
+                        onRegistered={jest.fn()}
+                    />
+                </IntlProvider>
+            )
+        }
+        render(<Stateful />)
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+        // Enable -> first send
+        await user.click(checkbox) // enable -> true
+        await waitFor(() => {
+            expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(1)
+        })
+        // Uncheck
+        await user.click(checkbox) // disable -> false
+        // Re-check -> should send again due to guard reset on uncheck
+        await user.click(checkbox) // enable -> true
+        await waitFor(() => {
+            expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(2)
+        })
+    })
     test('OTP resend functionality works', async () => {
         const user = userEvent.setup()
         const {authorizePasswordlessLogin} = setup()
