@@ -462,9 +462,7 @@ describe('Payment Component', () => {
             render(<TestWrapper basketData={pickupBasket} />)
             // When pickup-only, billingSameAsShipping is forced false and the form should be shown
             await waitFor(() => {
-                expect(
-                    screen.getByTestId('shipping-address-selection')
-                ).toBeInTheDocument()
+                expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
             })
         })
     })

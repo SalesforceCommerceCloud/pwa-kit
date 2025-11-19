@@ -550,7 +550,8 @@ const Payment = ({
                                             !(
                                                 appliedPayment ||
                                                 paymentMethodForm.formState.isValid ||
-                                                (isPickupOnly && billingAddressForm.formState.isValid)
+                                                (isPickupOnly &&
+                                                    billingAddressForm.formState.isValid)
                                             )
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}

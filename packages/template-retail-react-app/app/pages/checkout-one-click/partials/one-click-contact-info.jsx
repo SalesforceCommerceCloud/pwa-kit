@@ -530,27 +530,27 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             {emailError}
                                         </Text>
                                     )}
-                                <Field
-                                    name="phone"
-                                    label={formatMessage({
-                                        defaultMessage: 'Phone',
-                                        id: 'use_address_fields.label.phone'
-                                    })}
-                                    type="tel"
-                                    control={form.control}
-                                    rules={{
-                                        required: formatMessage({
-                                            defaultMessage: 'Please enter your phone number.',
-                                            id: 'use_address_fields.error.please_enter_phone_number'
-                                        })
-                                    }}
-                                    inputProps={({onChange}) => ({
-                                        inputMode: 'numeric',
-                                        onChange: (evt) =>
-                                            onChange(formatPhoneNumber(evt.target.value)),
-                                        disabled: isRegistered
-                                    })}
-                                />
+                                    <Field
+                                        name="phone"
+                                        label={formatMessage({
+                                            defaultMessage: 'Phone',
+                                            id: 'use_address_fields.label.phone'
+                                        })}
+                                        type="tel"
+                                        control={form.control}
+                                        rules={{
+                                            required: formatMessage({
+                                                defaultMessage: 'Please enter your phone number.',
+                                                id: 'use_address_fields.error.please_enter_phone_number'
+                                            })
+                                        }}
+                                        inputProps={({onChange}) => ({
+                                            inputMode: 'numeric',
+                                            onChange: (evt) =>
+                                                onChange(formatPhoneNumber(evt.target.value)),
+                                            disabled: isRegistered
+                                        })}
+                                    />
                                 </Stack>
 
                                 <Stack spacing={3}>

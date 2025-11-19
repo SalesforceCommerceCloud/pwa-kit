@@ -16,7 +16,10 @@ import {
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
-import {useShopperCustomersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperCustomersMutation,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
