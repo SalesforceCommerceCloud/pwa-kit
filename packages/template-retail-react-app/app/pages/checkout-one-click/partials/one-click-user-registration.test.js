@@ -10,7 +10,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useCustomerType, useAuthHelper} from '@salesforce/commerce-sdk-react'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')

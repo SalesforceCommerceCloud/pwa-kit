@@ -19,6 +19,7 @@ import AddressDisplay from '@salesforce/retail-react-app/app/components/address-
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
@@ -29,13 +30,20 @@ const PickupAddress = () => {
     const {step, STEPS, goToStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
+    // Find the pickup shipment that actually has items assigned
+    const shipments = basket?.shipments || []
+    const items = basket?.productItems || []
+    const shipmentsWithItems = shipments.filter((s) =>
+        items.some((i) => i.shipmentId === s.shipmentId)
+    )
+    const pickupShipment = shipmentsWithItems.find((s) => isPickupShipment(s)) || null
+
+    const selectedShippingAddress = pickupShipment?.shippingAddress
 
     // Check if basket is a pickup order
-    const isPickupOrder = basket?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
-    const storeId = basket?.shipments?.[0]?.c_fromStoreId
-    const {data: storeData} = useStores(
+    const isPickupOrder = Boolean(pickupShipment)
+    const storeId = pickupShipment?.c_fromStoreId
+    const {data: storeData, isLoading: isStoreLoading} = useStores(
         {
             parameters: {
                 ids: storeId
@@ -56,6 +64,8 @@ const PickupAddress = () => {
         lastName: 'Pickup',
         phone: store?.phone
     }
+    // Prefer store-derived address; only fall back to shipment shippingAddress if store unavailable
+    const displayAddress = pickupAddress || selectedShippingAddress
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -64,7 +74,7 @@ const PickupAddress = () => {
         await updateShippingAddressForShipment.mutateAsync({
             parameters: {
                 basketId: basket.basketId,
-                shipmentId: 'me',
+                shipmentId: pickupShipment?.shipmentId || 'me',
                 useAsBilling: false
             },
             body: {
@@ -101,7 +111,16 @@ const PickupAddress = () => {
                             id="pickup_address.title.store_information"
                         />
                     </Text>
-                    <AddressDisplay address={pickupAddress} />
+                    {displayAddress ? (
+                        <AddressDisplay address={displayAddress} />
+                    ) : isStoreLoading ? (
+                        <Text>
+                            <FormattedMessage
+                                defaultMessage="Loading store information…"
+                                id="pickup_address.message.loading_store_info"
+                            />
+                        </Text>
+                    ) : null}
                     <Box pt={3}>
                         <Container variant="form">
                             <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
@@ -114,7 +133,7 @@ const PickupAddress = () => {
                     </Box>
                 </>
             )}
-            {isAddressFilled && (
+            {isPickupOrder && (displayAddress || isStoreLoading) && (
                 <ToggleCardSummary>
                     <Text fontWeight="bold" fontSize="md" mb={2}>
                         <FormattedMessage
@@ -122,7 +141,16 @@ const PickupAddress = () => {
                             id="pickup_address.title.store_information"
                         />
                     </Text>
-                    <AddressDisplay address={selectedShippingAddress} />
+                    {displayAddress ? (
+                        <AddressDisplay address={displayAddress} />
+                    ) : (
+                        <Text>
+                            <FormattedMessage
+                                defaultMessage="Loading store information…"
+                                id="pickup_address.message.loading_store_info"
+                            />
+                        </Text>
+                    )}
                 </ToggleCardSummary>
             )}
         </ToggleCard>

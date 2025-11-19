@@ -78,14 +78,21 @@ const CheckoutOneClick = () => {
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
     const [isEditingPayment, setIsEditingPayment] = useState(false)
 
-    // Compute shipment types
-    const pickupShipments = basket?.shipments?.filter((s) => isPickupShipment(s)) || []
-    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    // Compute shipment types (consider only shipments that have items assigned)
+    const allShipments = basket?.shipments || []
+    const productItems = basket?.productItems || []
+    const shipmentsWithItems = allShipments.filter((s) =>
+        productItems.some((i) => i.shipmentId === s.shipmentId)
+    )
+    const pickupShipments = shipmentsWithItems.filter((s) => isPickupShipment(s))
+    const deliveryShipments = shipmentsWithItems.filter((s) => !isPickupShipment(s))
     const hasPickupShipments = pickupShipments.length > 0
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
 
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    // For billing=shipping, align with legacy: use the first delivery shipment's address
+    const selectedShippingAddress =
+        deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
     const selectedBillingAddress = basket?.billingAddress
 
     // appliedPayment includes both manually entered payment instruments and saved payment instruments
@@ -435,9 +442,12 @@ const CheckoutOneClick = () => {
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
                                             isDisabled={
-                                                !appliedPayment &&
-                                                !isEditingPayment &&
-                                                !paymentMethodForm.formState.isValid
+                                                // Require payment instrument or valid new card
+                                                (!appliedPayment &&
+                                                    !paymentMethodForm.formState.isValid) ||
+                                                // And ensure billing exists for pickup-only
+                                                (isPickupOnly &&
+                                                    !billingAddressForm.formState.isValid)
                                             }
                                             data-testid="place-order-button"
                                             size="lg"

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -16,7 +16,10 @@ import {
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
-import {useShopperCustomersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperCustomersMutation,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -46,7 +49,9 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const deliveryShipments =
+        basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
+    const selectedShippingAddress = deliveryShipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
     const {step, STEPS, goToStep, goToNextStep, contactPhone} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -58,8 +63,6 @@ export default function ShippingAddress() {
     const hasMultipleProductItems = productItemsCount > 1
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
 
-    const deliveryShipments =
-        basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
@@ -110,10 +113,12 @@ export default function ShippingAddress() {
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed?.data?.basketId || basket.basketId
 
+            const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
+
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
                     basketId: latestBasketId,
-                    shipmentId: 'me',
+                    shipmentId: targetDeliveryShipmentId,
                     useAsBilling: false
                 },
                 body: {

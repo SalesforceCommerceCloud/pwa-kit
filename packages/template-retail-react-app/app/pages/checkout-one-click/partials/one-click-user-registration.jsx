@@ -72,9 +72,7 @@ export default function UserRegistration({
                 register_customer: true
             })
 
-            if (onRegistered) {
-                await onRegistered(basket?.basketId)
-            }
+            if (onRegistered) await onRegistered(basket?.basketId)
             onOtpClose()
         } catch (_e) {
             // Let OtpAuth surface errors via its own UI/toast

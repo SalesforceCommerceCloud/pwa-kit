@@ -43,20 +43,28 @@ export default function ShippingOptions() {
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    // Identify delivery shipments (exclude pickup)
+    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+    const targetDeliveryShipment = hasMultipleDeliveryShipments ? null : deliveryShipments[0]
+
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
                 basketId: basket?.basketId,
-                shipmentId: 'me'
+                shipmentId: targetDeliveryShipment?.shipmentId || 'me'
             }
         },
         {
-            enabled: Boolean(basket?.basketId) && step === STEPS.SHIPPING_OPTIONS
+            enabled:
+                Boolean(basket?.basketId) &&
+                step === STEPS.SHIPPING_OPTIONS &&
+                !hasMultipleDeliveryShipments
         }
     )
 
-    const selectedShippingMethod = basket?.shipments?.[0]?.shippingMethod
-    const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
+    const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
+    const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
     // Calculate if we should show loading state immediately for auto-selection
     const shouldShowInitialLoading = useMemo(() => {
@@ -136,7 +144,7 @@ export default function ShippingOptions() {
                     await updateShippingMethod.mutateAsync({
                         parameters: {
                             basketId: basket.basketId,
-                            shipmentId: 'me'
+                            shipmentId: targetDeliveryShipment?.shipmentId || 'me'
                         },
                         body: {
                             id: defaultMethodId
@@ -160,7 +168,7 @@ export default function ShippingOptions() {
         await updateShippingMethod.mutateAsync({
             parameters: {
                 basketId: basket.basketId,
-                shipmentId: 'me'
+                shipmentId: targetDeliveryShipment?.shipmentId || 'me'
             },
             body: {
                 id: shippingMethodId
@@ -197,9 +205,6 @@ export default function ShippingOptions() {
             }
         )
     }
-
-    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
-    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     return (
         <ToggleCard
