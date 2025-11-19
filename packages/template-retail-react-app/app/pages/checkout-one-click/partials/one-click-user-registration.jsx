@@ -42,11 +42,20 @@ export default function UserRegistration({
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
 
+    const handleOtpClose = () => {
+        otpSentRef.current = false
+        onOtpClose()
+    }
+
     const handleUserRegistrationChange = async (e) => {
         const checked = e.target.checked
         setEnableUserRegistration(checked)
         // Treat opting into registration as opting to save for future
         if (onSavePreferenceChange) onSavePreferenceChange(checked)
+        // If user unchecks, allow OTP to be re-triggered upon re-check
+        if (!checked) {
+            otpSentRef.current = false
+        }
         // Kick off OTP for guests when they opt in
         if (checked && isGuest && basket?.customerInfo?.email && !otpSentRef.current) {
             try {
@@ -75,7 +84,7 @@ export default function UserRegistration({
             if (onRegistered) {
                 await onRegistered(basket?.basketId)
             }
-            onOtpClose()
+            handleOtpClose()
         } catch (_e) {
             // Let OtpAuth surface errors via its own UI/toast
         }
@@ -133,7 +142,7 @@ export default function UserRegistration({
             {/* OTP modal lives with registration now */}
             <OtpAuth
                 isOpen={isOtpOpen}
-                onClose={onOtpClose}
+                onClose={handleOtpClose}
                 isGuestRegistration
                 form={{
                     getValues: (name) =>
