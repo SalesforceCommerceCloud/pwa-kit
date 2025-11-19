@@ -514,12 +514,10 @@ const SFPaymentsExpressButtons = ({
                 }
 
                 if (!expressBasket.current) {
-                    throw new Error(
-                        intl.formatMessage({
-                            defaultMessage: 'Basket not ready',
-                            id: 'sfp_payments_express.error.basket_not_ready'
-                        })
-                    )
+                    logger.error('Basket not ready', {
+                        namespace: 'SFPaymentsExpressButtons.createIntentFunction'
+                    })
+                    throw new Error()
                 }
 
                 let updatedPaymentInstrument
