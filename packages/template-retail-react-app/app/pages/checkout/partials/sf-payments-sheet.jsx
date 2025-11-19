@@ -115,7 +115,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const containerElementRef = useRef(null)
     const config = useRef(null)
     const checkoutComponent = useRef(null)
-    const checkoutInitialized = useRef(false)
     const paymentMethodType = useRef(null)
     const currentBasket = useRef(null)
 
@@ -341,7 +340,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (
-            !checkoutInitialized.current &&
+            !checkoutComponent.current &&
             sfp &&
             metadata &&
             containerElementRef.current &&
@@ -387,32 +386,21 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentRequest,
                 paymentElement
             )
-            checkoutInitialized.current = true
-
-            if (basket?.orderTotal !== undefined && basket?.orderTotal !== null && typeof basket?.orderTotal === 'number') {
-                void checkoutComponent.current.updateAmount(basket.orderTotal)
-            }
         }
         // Cleanup on unmount
         return () => {
             if (checkoutComponent.current && !containerElementRef.current) {
                 checkoutComponent.current.destroy()
                 checkoutComponent.current = null
-                checkoutInitialized.current = false
             }
         }
     }, [sfp, metadata, paymentConfig, cardCaptureAutomatic])
 
     useEffect(() => {
-        const hasComponent = !!checkoutComponent.current
-        const orderTotal = basket?.orderTotal
-        const hasOrderTotal = orderTotal !== undefined && orderTotal !== null && typeof orderTotal === 'number'
-        const isInitialized = checkoutInitialized.current
-        
-        if (hasComponent && hasOrderTotal && isInitialized) {
-            void checkoutComponent.current.updateAmount(orderTotal)
+        if (checkoutComponent.current && basket?.orderTotal != null) {
+            checkoutComponent.current.updateAmount(basket.orderTotal)
         }
-    }, [basket?.orderTotal, basket])
+    }, [basket?.orderTotal])
 
     return (
         <ToggleCard
