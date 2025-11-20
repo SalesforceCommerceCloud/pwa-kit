@@ -370,7 +370,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentElement = document.createElement('div')
             containerElementRef.current.appendChild(paymentElement)
 
-            //paymentElement.addEventListener('load', handlePaymentMethodSelected)
             paymentElement.addEventListener(
                 'sfp:paymentmethodselected',
                 handlePaymentMethodSelected
