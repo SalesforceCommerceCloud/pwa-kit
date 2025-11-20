@@ -1,4 +1,5 @@
 ## v8.3.0-dev (Nov 05, 2025)
+- Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
 
 ## v8.2.0 (Nov 04, 2025)
 - Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
