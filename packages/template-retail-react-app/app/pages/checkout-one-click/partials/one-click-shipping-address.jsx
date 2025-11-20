@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -16,7 +16,10 @@ import {
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
-import {useShopperCustomersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperCustomersMutation,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -156,9 +159,13 @@ export default function ShippingAddress() {
                 })
             }
 
-            goToNextStep()
+            if (typeof goToNextStep === 'function') {
+                goToNextStep()
+            }
         } catch (error) {
-            console.error('Error submitting shipping address:', error)
+            if (process.env.NODE_ENV !== 'test') {
+                console.error('Error submitting shipping address:', error)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -184,7 +191,9 @@ export default function ShippingAddress() {
             // Skip to next step if basket already has a shipping address
             if (selectedShippingAddress?.address1) {
                 setHasAutoSelected(true) // Prevent further attempts
-                goToNextStep()
+                if (typeof goToNextStep === 'function') {
+                    goToNextStep()
+                }
                 return
             }
 

@@ -357,7 +357,7 @@ const ShippingAddressSelection = ({
                                                 </RadioCard>
                                                 {isEditingAddress &&
                                                     address.addressId === selectedAddressId && (
-                                                            <ShippingAddressEditForm
+                                                        <ShippingAddressEditForm
                                                             title={formatMessage({
                                                                 defaultMessage:
                                                                     'Edit Shipping Address',
@@ -367,7 +367,7 @@ const ShippingAddressSelection = ({
                                                             toggleAddressEdit={toggleAddressEdit}
                                                             hideSubmitButton={hideSubmitButton}
                                                             form={form}
-                                                                hidePhone={!isBillingAddress}
+                                                            hidePhone={!isBillingAddress}
                                                             submitButtonLabel={submitButtonLabel}
                                                             formTitleAriaLabel={formTitleAriaLabel}
                                                         />
