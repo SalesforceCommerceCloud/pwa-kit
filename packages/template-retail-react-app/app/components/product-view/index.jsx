@@ -476,7 +476,7 @@ const ProductView = forwardRef(
                         initialAmount={priceData.currentPrice}
                         prepareBasket={prepareBasket}
                         expressButtonLayout="vertical"
-                        maximumButtonCount={3}
+                        maximumButtonCount={1}
                     />
                 )
             }
