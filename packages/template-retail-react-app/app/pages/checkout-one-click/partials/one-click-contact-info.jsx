@@ -115,9 +115,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
         })
         // Initialize immediately
-        try {
-            setContactPhone(form.getValues('phone') || '')
-        } catch {}
+        setContactPhone(form.getValues('phone') || '')
         return () => {
             if (subscription?.unsubscribe) subscription.unsubscribe()
         }
@@ -272,9 +270,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     },
                     parameters: {
                         createDestinationBasket: true
-                    }
+                    },
+                    body: {sourceBasketId: basket.basketId}
                 })
                 basketId = merged?.basketId || basket.basketId
+                // Ensure we hydrate the latest basket after merge
+                const refreshed = await currentBasketQuery.refetch()
+                basketId = refreshed?.data?.basketId || basketId
             }
 
             // Update basket with email after successful OTP verification
@@ -528,26 +530,27 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             {emailError}
                                         </Text>
                                     )}
-                                <Field
-                                    name="phone"
-                                    label={formatMessage({
-                                        defaultMessage: 'Phone',
-                                        id: 'use_address_fields.label.phone'
-                                    })}
-                                    type="tel"
-                                    control={form.control}
-                                    rules={{
-                                        required: formatMessage({
-                                            defaultMessage: 'Please enter your phone number.',
-                                            id: 'use_address_fields.error.please_enter_phone_number'
-                                        })
-                                    }}
-                                    inputProps={({onChange}) => ({
-                                        inputMode: 'numeric',
-                                        onChange: (evt) => onChange(formatPhoneNumber(evt.target.value)),
-                                        disabled: isRegistered
-                                    })}
-                                />
+                                    <Field
+                                        name="phone"
+                                        label={formatMessage({
+                                            defaultMessage: 'Phone',
+                                            id: 'use_address_fields.label.phone'
+                                        })}
+                                        type="tel"
+                                        control={form.control}
+                                        rules={{
+                                            required: formatMessage({
+                                                defaultMessage: 'Please enter your phone number.',
+                                                id: 'use_address_fields.error.please_enter_phone_number'
+                                            })
+                                        }}
+                                        inputProps={({onChange}) => ({
+                                            inputMode: 'numeric',
+                                            onChange: (evt) =>
+                                                onChange(formatPhoneNumber(evt.target.value)),
+                                            disabled: isRegistered
+                                        })}
+                                    />
                                 </Stack>
 
                                 <Stack spacing={3}>

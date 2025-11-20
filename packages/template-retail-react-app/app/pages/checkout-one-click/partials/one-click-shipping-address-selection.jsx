@@ -358,7 +358,6 @@ const ShippingAddressSelection = ({
                                                             hideSubmitButton={hideSubmitButton}
                                                             form={form}
                                                             hidePhone={!isBillingAddress}
-                                                            hidePreferred={true}
                                                             submitButtonLabel={submitButtonLabel}
                                                             formTitleAriaLabel={formTitleAriaLabel}
                                                         />

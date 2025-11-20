@@ -485,6 +485,10 @@ describe('ContactInfo Component', () => {
         // Assert: merge called, email updated with merged id
         await waitFor(() => {
             expect(mockMergeBasket.mutateAsync).toHaveBeenCalled()
+            // Validate merge called with sourceBasketId in body and createDestinationBasket param
+            const mergeArgs = mockMergeBasket.mutateAsync.mock.calls[0]?.[0]
+            expect(mergeArgs?.parameters).toMatchObject({createDestinationBasket: true})
+            expect(mergeArgs?.body).toMatchObject({sourceBasketId: 'guest-1'})
             expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalledWith({
                 parameters: {basketId: mergedId},
                 body: {email: 'test@salesforce.com'}
