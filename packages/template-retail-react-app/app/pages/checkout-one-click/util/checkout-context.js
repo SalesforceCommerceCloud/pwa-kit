@@ -10,7 +10,6 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutContext = React.createContext()
 
@@ -66,21 +65,6 @@ export const CheckoutProvider = ({children}) => {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
-        }
-
-        // Ensure multiship entry point is visible when applicable
-        const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-        const hasMultipleProductItems = (basket?.productItems?.length || 0) > 1
-        if (multishipEnabled && hasMultipleProductItems) {
-            // In multiship, only force shipping address step when delivery shipments still need an address.
-            // If delivery address is set but method missing, allow SHIPPING_OPTIONS.
-            if (anyDeliveryMissingAddress) {
-                step = STEPS.SHIPPING_ADDRESS
-            } else if (!hasDeliveryShipments && !shipmentsWithItems[0]?.shippingAddress?.address1) {
-                // Pickup-only with no pickup address yet
-                step = STEPS.PICKUP_ADDRESS
-            }
-            // Otherwise keep previously computed step (e.g., SHIPPING_OPTIONS or PAYMENT)
         }
 
         setStep(step)

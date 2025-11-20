@@ -443,7 +443,7 @@ const Payment = ({
                 editing={
                     currentIsEditing ||
                     step === STEPS.PAYMENT ||
-                    (isPickupOnly && !selectedBillingAddress?.address1)
+                    (isPickupOnly && !selectedBillingAddress?.address1 && step > STEPS.CONTACT_INFO)
                 }
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
@@ -543,10 +543,6 @@ const Payment = ({
                                         setEnableUserRegistration={onUserRegistrationToggle}
                                         isGuestCheckout={registeredUserChoseGuest}
                                         isDisabled={
-                                            // Enable when any one of these is true:
-                                            // - a payment instrument is applied
-                                            // - credit card form is valid
-                                            // - in pickup-only flow and billing form is valid
                                             !(
                                                 appliedPayment ||
                                                 paymentMethodForm.formState.isValid ||

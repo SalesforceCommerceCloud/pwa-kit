@@ -84,7 +84,9 @@ const CheckoutOneClick = () => {
     const shipmentsWithItems = allShipments.filter((s) =>
         productItems.some((i) => i.shipmentId === s.shipmentId)
     )
-    const pickupShipments = shipmentsWithItems.filter((s) => isPickupShipment(s))
+    const pickupShipments = shipmentsWithItems.filter(
+        (s) => isPickupShipment(s) || !!s.c_fromStoreId
+    )
     const deliveryShipments = shipmentsWithItems.filter((s) => !isPickupShipment(s))
     const hasPickupShipments = pickupShipments.length > 0
     const hasDeliveryShipments = deliveryShipments.length > 0
