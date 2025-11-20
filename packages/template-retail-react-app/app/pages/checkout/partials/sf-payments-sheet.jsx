@@ -350,7 +350,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 theme: buildTheme(),
                 actions: {
                     createIntent: createPaymentInstrument,
-                    onClick: () => undefined // No-op: return undefined for payment sheet since its not applicable and SDK proceeds immediately
+                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
