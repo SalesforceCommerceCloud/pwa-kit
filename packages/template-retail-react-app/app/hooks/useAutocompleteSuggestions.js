@@ -28,13 +28,30 @@ export const useAutocompleteSuggestions = (
     const sessionTokenRef = useRef(null)
     const debounceTimeoutRef = useRef(null)
 
+    const cacheRef = useRef(new Map())
+
     const [suggestions, setSuggestions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+
+    // Key format: `${inputString.toLowerCase().trim()}_${countryCode}`
+    const getCacheKey = useCallback((input, country) => {
+        return `${input.toLowerCase().trim()}_${country || ''}`
+    }, [])
 
     const fetchSuggestions = useCallback(
         async (input) => {
             if (!places || !input || input.length < 3) {
                 setSuggestions([])
+                return
+            }
+
+            const cacheKey = getCacheKey(input, countryCode)
+
+            // Check cache first
+            if (cacheRef.current.has(cacheKey)) {
+                const cachedSuggestions = cacheRef.current.get(cacheKey)
+                setSuggestions(cachedSuggestions)
+                setIsLoading(false)
                 return
             }
 
@@ -62,6 +79,9 @@ export const useAutocompleteSuggestions = (
 
                 const googleSuggestions = convertGoogleMapsSuggestions(response.suggestions)
 
+                // Store in cache for future use
+                cacheRef.current.set(cacheKey, googleSuggestions)
+
                 setSuggestions(googleSuggestions)
             } catch (error) {
                 setSuggestions([])
@@ -69,7 +89,7 @@ export const useAutocompleteSuggestions = (
                 setIsLoading(false)
             }
         },
-        [places, countryCode]
+        [places, countryCode, getCacheKey]
     )
 
     const resetSession = useCallback(() => {

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {useState, useCallback, useEffect, useRef} from 'react'
+import {useState, useCallback, useEffect} from 'react'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import {
     stateOptions,
@@ -49,7 +49,6 @@ export default function useAddressFields({
         watch,
         control,
         setValue,
-        reset,
         formState: {errors}
     },
     prefix = ''

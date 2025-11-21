@@ -6,7 +6,6 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import PropTypes from 'prop-types'
 import {
     Alert,
     AlertIcon,
@@ -15,6 +14,7 @@ import {
     Container,
     Grid,
     GridItem,
+    Heading,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -46,7 +46,7 @@ import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, configurations} = useCheckout()
+    const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
@@ -67,9 +67,6 @@ const Checkout = () => {
     // Check if there are pickup shipments
     const hasPickupShipments = derivedData?.totalPickupShipments > 0
 
-    const googleCloudAPIKey =
-        getConfig()?.app?.googleCloudAPI?.apiKey ||
-        configurations?.configurations?.find((config) => config.id === 'gcp')?.value
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
@@ -113,6 +110,9 @@ const Checkout = () => {
                 py={{base: 7, lg: 16}}
                 px={{base: 0, lg: 8}}
             >
+                <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
+                    <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
+                </Heading>
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
                         <Stack spacing={4}>
@@ -211,7 +211,6 @@ const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
-    // const {configurations} = useCheckout()
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)

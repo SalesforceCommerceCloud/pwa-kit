@@ -236,11 +236,13 @@ describe('AddressSuggestionDropdown', () => {
     })
 
     it('should handle mouse hover on suggestions', () => {
+        const mockOnSelect = jest.fn()
         renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
                 suggestions={mockSuggestions}
+                onSelectSuggestion={mockOnSelect}
             />
         )
 
@@ -248,8 +250,20 @@ describe('AddressSuggestionDropdown', () => {
             .getByText('123 Main Street, New York, NY 10001, USA')
             .closest('[role="button"]')
 
+        // Verify element exists before hover
+        expect(firstSuggestion).toBeInTheDocument()
+
+        // Simulate hover events
         fireEvent.mouseEnter(firstSuggestion)
         fireEvent.mouseLeave(firstSuggestion)
+
+        // Verify element is still present and functional after hover
+        expect(firstSuggestion).toBeInTheDocument()
+        expect(firstSuggestion).toHaveAttribute('role', 'button')
+
+        // Verify the suggestion is still clickable after hover
+        fireEvent.click(firstSuggestion)
+        expect(mockOnSelect).toHaveBeenCalledWith(mockSuggestions[0])
     })
 
     it('should display Google Maps placePrediction data correctly', () => {
