@@ -12,6 +12,7 @@ import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/par
 import {CheckoutProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import mockBasket from '@salesforce/retail-react-app/app/mocks/basket-with-suit'
 import {STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {rest} from 'msw'
 
 const mockAddPaymentInstrument = jest.fn()
 const mockUpdatePaymentInstrument = jest.fn()
@@ -21,6 +22,8 @@ const mockUpdateShippingAddress = jest.fn()
 const mockUpdateShippingMethod = jest.fn()
 const mockRefetchShippingMethods = jest.fn()
 const mockQueryClientInvalidate = jest.fn()
+const mockQueryClientSetQueryData = jest.fn()
+const mockQueryClientRemoveQueries = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -225,6 +228,18 @@ jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
     }
 })
 
+jest.mock('@tanstack/react-query', () => {
+    const actual = jest.requireActual('@tanstack/react-query')
+    return {
+        ...actual,
+        useQueryClient: () => ({
+            invalidateQueries: mockQueryClientInvalidate,
+            setQueryData: mockQueryClientSetQueryData,
+            removeQueries: mockQueryClientRemoveQueries
+        })
+    }
+})
+
 const renderWithCheckoutContext = (ui, options) => {
     return renderWithProviders(<CheckoutProvider>{ui}</CheckoutProvider>, options)
 }
@@ -238,6 +253,29 @@ describe('SFPaymentsSheet', () => {
     beforeEach(() => {
         jest.clearAllMocks()
 
+        // Mock product-lists endpoint to avoid console warnings
+        global.server.use(
+            rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        data: [],
+                        total: 0
+                    })
+                )
+            }),
+            rest.post('*/customers/:customerId/product-lists', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        id: 'test-list-id',
+                        type: 'wish_list'
+                    })
+                )
+            })
+        )
         // Reset mockBasket to default state
         mockBasket.shipments = [
             {

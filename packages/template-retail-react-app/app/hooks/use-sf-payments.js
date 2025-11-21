@@ -65,6 +65,15 @@ export const useSFPayments = () => {
         () => store,
         () => ({})
     )
+    // Separate subscription for confirmingBasket to ensure React detects changes
+    // The issue is that useSyncExternalStore compares snapshot values with Object.is().
+    // When the snapshot returns the entire store object, the reference stays the same,
+    // so React doesn't detect the change to store.confirmingBasket.
+    const confirmingBasket = useSyncExternalStore(
+        subscribe,
+        () => store.confirmingBasket, // Return just the value so React detects the change
+        () => null // Server snapshot
+    )
 
     const startConfirming = (basket) => {
         store.confirmingBasket = basket
@@ -79,7 +88,7 @@ export const useSFPayments = () => {
         sfp: globals.sfp,
         metadata: serverMetadata,
         isMetadataLoading: serverMetadataLoading,
-        confirmingBasket: globals.confirmingBasket,
+        confirmingBasket: confirmingBasket,
         startConfirming,
         endConfirming
     }

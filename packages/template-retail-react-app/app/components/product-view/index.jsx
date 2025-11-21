@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -34,7 +34,7 @@ import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/h
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {
     useSFPaymentsEnabled,
     useSFPayments
@@ -58,6 +58,7 @@ import PromoCallout from '@salesforce/retail-react-app/app/components/product-ti
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
 
 const ProductViewHeader = ({
     name,
@@ -173,7 +174,10 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
-        const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+
+        const {mutateAsync: createBasket} = useShopperBasketsMutation('createBasket')
+        const {mutateAsync: addItemToBasket} = useShopperBasketsMutation('addItemToBasket')
+
         const theme = useTheme()
         const {confirmingBasket} = useSFPayments()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
@@ -268,6 +272,69 @@ const ProductView = forwardRef(
 
             return hasValidSelection
         }
+        const cleanupTemporaryBaskets = useCleanupTemporaryBaskets()
+
+        // prepareBasket is used to prepare the basket for express payments
+        // useCallback recreates prepareBasket primarily when product or quantity change, along with variant, stockLevel, and product type flags (isProductASet, isProductABundle)
+        const prepareBasket = useCallback(async () => {
+            // Validate that all attributes are selected before proceeding
+            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
+            let errorMessage = ''
+
+            if (!hasValidSelection && !isProductASet && !isProductABundle) {
+                toggleShowOptionsMessage(true)
+                if (errorContainerRef.current) {
+                    errorContainerRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    })
+                }
+                errorMessage = intl.formatMessage({
+                    defaultMessage:
+                        'Please select all product options before proceeding with Express Payments',
+                    id: 'product_view.prepareBasket'
+                })
+
+                const error = new Error(errorMessage)
+                error.isValidationError = true
+                throw error
+            }
+
+            // Clean up temporary baskets before creating a new one
+            await cleanupTemporaryBaskets()
+
+            // Create a new temporary basket
+            const newBasket = await createBasket({
+                parameters: {
+                    temporary: true
+                },
+                body: {}
+            })
+
+            const selectedProduct = variant || product
+            // Use variant's productId if variant is selected, otherwise use product's id
+            const productIdToUse = selectedProduct?.productId || selectedProduct?.id
+
+            if (!productIdToUse) {
+                errorMessage = intl.formatMessage({
+                    defaultMessage: 'Unable to determine product ID for basket',
+                    id: 'product_view.prepareBasket'
+                })
+                throw new Error(errorMessage)
+            }
+            // Add the product to the temporary basket
+            const basketWithItem = await addItemToBasket({
+                parameters: {basketId: newBasket.basketId},
+                body: [
+                    {
+                        productId: productIdToUse,
+                        quantity: quantity
+                    }
+                ]
+            })
+
+            return basketWithItem
+        }, [variant, product, quantity, stockLevel, isProductASet, isProductABundle])
 
         const renderActionButtons = () => {
             const buttons = []
@@ -345,15 +412,6 @@ const ProductView = forwardRef(
                     return
                 }
                 addToWishlist(product, variant, quantity)
-            }
-
-            const prepareBasket = async () => {
-                return addItemToNewOrExistingBasket([
-                    {
-                        productId: variant?.productId || product.id,
-                        quantity: quantity
-                    }
-                ])
             }
 
             // child product of bundles do not have add to cart button

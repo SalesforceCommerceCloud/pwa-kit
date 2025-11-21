@@ -108,6 +108,23 @@ const createMockBasket = (basket) => {
     }
 }
 
+beforeEach(() => {
+    // Suppress unhandled request warnings for known endpoints
+    global.server.listen({
+        onUnhandledRequest: (req) => {
+            const url = req.url.href
+            if (
+                url.includes('/api/payment-metadata') ||
+                url.includes('/shopper-configurations') ||
+                url.includes('/product-lists')
+            ) {
+                return // Ignore these
+            }
+            console.error('Found an unhandled %s request to %s', req.method, url)
+        }
+    })
+})
+
 afterEach(() => {
     jest.clearAllMocks()
 })
