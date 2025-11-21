@@ -104,15 +104,15 @@ const Checkout = () => {
 
     return (
         <Box background="gray.50" flex="1">
+            <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
+                <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
+            </Heading>
             <Container
                 data-testid="sf-checkout-container"
                 maxWidth="container.xl"
                 py={{base: 7, lg: 16}}
                 px={{base: 0, lg: 8}}
             >
-                <Heading as="h1" fontSize="2xl" mb={6} textAlign="center">
-                    <FormattedMessage defaultMessage="Checkout" id="checkout.title.checkout" />
-                </Heading>
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
                         <Stack spacing={4}>
