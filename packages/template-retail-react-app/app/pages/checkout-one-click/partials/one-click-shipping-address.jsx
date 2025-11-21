@@ -64,7 +64,7 @@ export default function ShippingAddress() {
     )
     const productItemsCount = basket?.productItems?.length || 0
     const hasMultipleProductItems = productItemsCount > 1
-    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const multishipEnabled = false
 
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
@@ -129,23 +129,25 @@ export default function ShippingAddress() {
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed?.data?.basketId || basket.basketId
 
-            await updateShippingAddressForShipment.mutateAsync({
-                parameters: {
-                    basketId: latestBasketId,
-                    shipmentId: targetDeliveryShipmentId,
-                    useAsBilling: false
-                },
-                body: {
-                    address1,
-                    city,
-                    countryCode,
-                    firstName,
-                    lastName,
-                    phone: phoneValue,
-                    postalCode,
-                    stateCode
-                }
-            })
+            if (refreshed?.data?.shipments?.shippingAddress?.length > 0) {
+                await updateShippingAddressForShipment.mutateAsync({
+                    parameters: {
+                        basketId: latestBasketId,
+                        shipmentId: targetDeliveryShipmentId,
+                        useAsBilling: false
+                    },
+                    body: {
+                        address1,
+                        city,
+                        countryCode,
+                        firstName,
+                        lastName,
+                        phone: phoneValue,
+                        postalCode,
+                        stateCode
+                    }
+                })
+            }
 
             if (customer.isRegistered && !addressId) {
                 const body = {

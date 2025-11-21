@@ -155,10 +155,12 @@ const CheckoutOneClick = () => {
             }
         }
 
-        return addPaymentInstrumentToBasket({
-            parameters: {basketId: basket?.basketId},
-            body: paymentInstrument
-        })
+        if (basket?.paymentInstruments?.length > 0) {
+            return addPaymentInstrumentToBasket({
+                parameters: {basketId: basket?.basketId},
+                body: paymentInstrument
+            })
+        }
     }
 
     // Reset guest checkout flag when step changes (user goes back to edit)

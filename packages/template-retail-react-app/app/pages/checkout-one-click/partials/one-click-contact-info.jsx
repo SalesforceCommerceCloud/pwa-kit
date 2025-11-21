@@ -65,7 +65,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-    const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const transferBasket = useShopperBasketsMutation('transferBasket')
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
@@ -270,14 +270,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             let basketId
             if (hasBasketItem) {
                 // Mirror legacy checkout flow header and await completion
-                const merged = await mergeBasket.mutateAsync({
+                const merged = await transferBasket.mutateAsync({
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     parameters: {
-                        createDestinationBasket: true
-                    },
-                    body: {sourceBasketId: basket.basketId}
+                        merge: true
+                    }
                 })
                 basketId = merged?.basketId || basket.basketId
                 // Ensure we hydrate the latest basket after merge
@@ -364,15 +363,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 return
             }
             try {
-                await mergeBasket.mutateAsync({
+                await transferBasket.mutateAsync({
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     parameters: {
-                        createDestinationBasket: true
+                        merge: true
                     }
                 })
                 await currentBasketQuery.refetch()
+                // Jump straight to payment if basket is already complete after transfer
+                goToStep(STEPS.PAYMENT)
             } catch (_e) {
                 // no-op
             } finally {
