@@ -18,9 +18,14 @@ const SFPaymentsExpress = ({
     onPaymentMethodsRendered,
     onExpressPaymentCompleted
 }) => {
+    // keepPreviousData: true prevents components from unmounting during refetches triggered by
+    // SFPaymentsExpressButtons mutations. While mutations typically update the cache immediately,
+    // this flag ensures data remains available even if the refetch completes before the cache update.
     const {data: basket} = useCurrentBasket()
 
-    const prepareBasket = useCallback(() => basket, [basket?.basketId])
+    const prepareBasket = useCallback(async () => {
+        return basket
+    }, [basket?.basketId])
     const [paymentCurrency, paymentCountryCode, initialAmount] = useMemo(
         () => [
             basket?.currency,

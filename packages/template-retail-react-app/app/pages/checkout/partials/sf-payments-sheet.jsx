@@ -149,8 +149,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Clear the ref after cleanup
         currentBasket.current = null
         const message = formatMessage({
-            id: 'checkout.message.generic_error',
-            defaultMessage: 'An unexpected error occurred during checkout.'
+            id: 'checkout.message.payment_button_cancel',
+            defaultMessage:
+                'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed.'
         })
         onError(message)
     }
@@ -348,7 +349,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             config.current = {
                 theme: buildTheme(),
                 actions: {
-                    createIntentFunction: createPaymentInstrument
+                    createIntent: createPaymentInstrument,
+                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
@@ -368,10 +370,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentElement = document.createElement('div')
             containerElementRef.current.appendChild(paymentElement)
 
-            paymentElement.addEventListener('load', handlePaymentMethodSelected)
-            paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected)
-            paymentElement.addEventListener('sfppaymentbuttonapprove', handlePaymentButtonApprove)
-            paymentElement.addEventListener('sfppaymentcancelled', handlePaymentButtonCancel)
+            paymentElement.addEventListener(
+                'sfp:paymentmethodselected',
+                handlePaymentMethodSelected
+            )
+            paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
+            paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
 
             checkoutComponent.current = sfp.checkout(
                 metadata,

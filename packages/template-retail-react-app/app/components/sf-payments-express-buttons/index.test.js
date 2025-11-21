@@ -54,15 +54,14 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
+const defaultProps = {
+    usage: EXPRESS_PAY_NOW,
+    paymentCurrency: 'USD',
+    paymentCountryCode: 'US',
+    initialAmount: 100,
+    prepareBasket: jest.fn()
+}
 describe('SFPaymentsExpressButtons', () => {
-    const defaultProps = {
-        usage: EXPRESS_PAY_NOW,
-        paymentCurrency: 'USD',
-        paymentCountryCode: 'US',
-        initialAmount: 100,
-        prepareBasket: jest.fn()
-    }
-
     test('renders container element', () => {
         renderWithProviders(<SFPaymentsExpressButtons {...defaultProps} />)
 
@@ -141,6 +140,38 @@ describe('SFPaymentsExpressButtons', () => {
             <SFPaymentsExpressButtons {...defaultProps} prepareBasket={customPrepareBasket} />
         )
 
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+    })
+    test('renders with onExpressPaymentCompleted callback', () => {
+        const mockCallback = jest.fn()
+
+        renderWithProviders(
+            <SFPaymentsExpressButtons {...defaultProps} onExpressPaymentCompleted={mockCallback} />
+        )
+
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+    })
+    test('renders with initialAmount of 0', () => {
+        renderWithProviders(<SFPaymentsExpressButtons {...defaultProps} initialAmount={0} />)
+
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+    })
+})
+
+describe('prepareBasket prop updates', () => {
+    test('component handles prepareBasket prop changes without errors', () => {
+        const prepareBasket1 = jest.fn()
+        const {rerender} = renderWithProviders(
+            <SFPaymentsExpressButtons {...defaultProps} prepareBasket={prepareBasket1} />
+        )
+
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+
+        // Change prepareBasket prop (simulates variant change on PDP)
+        const prepareBasket2 = jest.fn()
+        rerender(<SFPaymentsExpressButtons {...defaultProps} prepareBasket={prepareBasket2} />)
+
+        // Component should still render without errors
         expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
     })
 })

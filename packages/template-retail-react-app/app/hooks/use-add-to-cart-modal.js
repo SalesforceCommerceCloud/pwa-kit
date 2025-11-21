@@ -50,7 +50,7 @@ import {
     getPromotionCalloutText,
     shouldShowBonusProductSelection
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
-
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 /**
  * This is the context for managing the AddToCartModal.
  * Used in top level App component.
@@ -78,12 +78,16 @@ export const AddToCartModal = () => {
     const isProductABundle = product?.type.bundle
 
     const intl = useIntl()
+    const {currency: activeCurrency} = useCurrency()
     const {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productSubTotal} = basket
+
+    const currency = basket?.currency || activeCurrency
+    const productSubTotal = basket?.productSubTotal || 0
+
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
         : Array.isArray(itemsAdded)

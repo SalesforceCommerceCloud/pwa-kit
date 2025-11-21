@@ -798,10 +798,9 @@ describe('sf-payments-utils', () => {
                 id: 'standard',
                 name: 'Standard Shipping',
                 classOfService: 'Delivery in 5-7 business days',
-                shippingFee: '5.99',
-                currencyIsoCode: 'USD'
+                amount: '5.99'
             })
-            expect(result[1].shippingFee).toBe('15.99')
+            expect(result[1].amount).toBe('15.99')
         })
 
         test('transforms shipping methods with string price', () => {
@@ -816,7 +815,7 @@ describe('sf-payments-utils', () => {
 
             const result = transformShippingMethods(shippingMethods, basket)
 
-            expect(result[0].shippingFee).toBe('0.00')
+            expect(result[0].amount).toBe('0.00')
         })
 
         test('sorts selected method to top when sortSelected is true', () => {
@@ -866,8 +865,9 @@ describe('sf-payments-utils', () => {
 
             const result = transformShippingMethods(shippingMethods, eurBasket)
 
-            expect(result[0].currencyIsoCode).toBe('EUR')
-            expect(result[1].currencyIsoCode).toBe('EUR')
+            expect(result).toHaveLength(2)
+            expect(result[0].amount).toBe('10')
+            expect(result[1].amount).toBe('20')
         })
     })
 

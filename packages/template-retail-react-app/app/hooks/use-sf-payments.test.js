@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {render, screen, waitFor, act, renderHook} from '@testing-library/react'
 import {
     useSFPayments,
@@ -17,7 +18,7 @@ import {
     store as sfPaymentsStore
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-
+import {rest} from 'msw'
 // Mock dependencies
 const mockUseScript = jest.fn()
 const mockGetConfig = jest.fn()
@@ -78,9 +79,8 @@ const TestComponent = ({onHookData}) => {
 }
 
 TestComponent.propTypes = {
-    onHookData: () => null
+    onHookData: PropTypes.func
 }
-
 // Helper to render with providers
 const renderWithQueryClient = (ui) => {
     const queryClient = new QueryClient({
@@ -99,9 +99,10 @@ describe('useSFPayments hook', () => {
     beforeEach(() => {
         jest.clearAllMocks()
 
-        // Reset global state
-        global.window = Object.create(window)
-        delete global.window.SFPayments
+        // Reset global state - don't try to redefine window, just delete the property
+        if (global.window && global.window.SFPayments) {
+            delete global.window.SFPayments
+        }
 
         // Reset the store state
         sfPaymentsStore.sfp = null
@@ -109,7 +110,17 @@ describe('useSFPayments hook', () => {
 
         // Reset fetch mock
         global.fetch = mockFetch
+        global.server.resetHandlers()
 
+        global.server.use(
+            rest.get('/api/payment-metadata', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({apiKey: 'test-key', publishableKey: 'pk_test'})
+                )
+            })
+        )
         // Default mock implementations
         mockUseScript.mockReturnValue({loaded: false, error: false})
         mockGetConfig.mockReturnValue({
@@ -127,9 +138,14 @@ describe('useSFPayments hook', () => {
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
+        jest.clearAllMocks()
+        if (global.window && global.window.SFPayments) {
+            delete global.window.SFPayments
+        }
         // Clean up any rendered components
         document.body.innerHTML = ''
+        sfPaymentsStore.sfp = null
+        sfPaymentsStore.confirmingBasket = null
     })
 
     describe('constants', () => {
@@ -221,10 +237,18 @@ describe('useSFPayments hook', () => {
         })
 
         test('handles metadata fetch error', async () => {
+            // Suppress expected error message
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
             mockFetch.mockResolvedValue({
                 ok: false
             })
 
+            global.server.use(
+                rest.get('*/api/payment-metadata', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(500))
+                })
+            )
             renderWithQueryClient(<TestComponent />)
 
             await waitFor(() => {
@@ -235,11 +259,34 @@ describe('useSFPayments hook', () => {
             await waitFor(() => {
                 expect(screen.getByTestId('metadata').textContent).toBe('')
             })
+
+            await waitFor(() => {
+                expect(consoleErrorSpy).toHaveBeenCalled()
+                // Check that it was called with an Error containing the message
+                const errorCall = consoleErrorSpy.mock.calls.find(
+                    (call) =>
+                        call[0]?.message === 'Failed to load payment metadata' ||
+                        call[0]?.toString().includes('Failed to load payment metadata')
+                )
+                expect(errorCall).toBeDefined()
+            })
+
+            // Restore console.error
+            consoleErrorSpy.mockRestore()
         })
 
         test('uses correct app origin for metadata request', async () => {
             mockUseAppOrigin.mockReturnValue('https://custom-origin.com')
 
+            global.server.use(
+                rest.get('*/api/payment-metadata', (req, res, ctx) => {
+                    return res(
+                        ctx.delay(0),
+                        ctx.status(200),
+                        ctx.json({apiKey: 'test-key', publishableKey: 'pk_test'})
+                    )
+                })
+            )
             renderWithQueryClient(<TestComponent />)
 
             await waitFor(() => {
@@ -465,7 +512,11 @@ describe('useSFPayments hook', () => {
     describe('edge cases', () => {
         test('handles script loading without window.SFPayments available', async () => {
             // Ensure window.SFPayments is not available
-            delete global.window.SFPayments
+            // Reset global state - don't try to redefine window, just delete the property
+            if (global.window && global.window.SFPayments) {
+                delete global.window.SFPayments
+            }
+            sfPaymentsStore.sfp = null
             mockUseScript.mockReturnValue({loaded: true, error: false})
 
             renderWithQueryClient(<TestComponent />)

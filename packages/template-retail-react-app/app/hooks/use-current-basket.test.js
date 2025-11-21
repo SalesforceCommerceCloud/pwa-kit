@@ -11,6 +11,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {rest} from 'msw'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -91,6 +92,44 @@ const MockComponent = () => {
 describe('useCurrentBasket', function () {
     beforeEach(() => {
         jest.resetModules()
+        // Mock necessary endpoints
+        global.server.use(
+            rest.get('*/api/payment-metadata', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({apiKey: 'test-key', publishableKey: 'pk_test'})
+                )
+            }),
+            rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        data: [],
+                        total: 0
+                    })
+                )
+            }),
+            rest.get('*/configuration/shopper-configurations/*', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        configurations: []
+                    })
+                )
+            }),
+            rest.get('*/product/shopper-products/*', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        data: []
+                    })
+                )
+            })
+        )
     })
 
     test('returns current basket and derivedData when both customerId and basket are defined', async () => {
