@@ -112,7 +112,17 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
      * Authorize WebAuthn passkey registration. Authorizes a user to register a WebAuthn credential (passkey). This endpoint validates the user's credentials and creates a password action token that can be used to start the registration process. The token is sent to the user via the specified channel (email or SMS).
      * @returns A TanStack Query mutation hook for interacting with the Shopper Login `authorizeWebauthnRegistration` endpoint.
      */
-    AuthorizeWebauthnRegistration: 'authorizeWebauthnRegistration'
+    AuthorizeWebauthnRegistration: 'authorizeWebauthnRegistration',
+    /**
+     * Start WebAuthn passkey authentication. Starts the WebAuthn authentication process by generating credential request options. Returns the challenge and allowed credentials for the user to authenticate with.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `startWebauthnAuthentication` endpoint.
+     */
+    StartWebauthnAuthentication: 'startWebauthnAuthentication',
+    /**
+     * Finish WebAuthn passkey authentication. Completes the WebAuthn authentication process by verifying the assertion from the authenticator. Returns OAuth tokens upon successful authentication.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `finishWebauthnAuthentication` endpoint.
+     */
+    FinishWebauthnAuthentication: 'finishWebauthnAuthentication'
 } as const
 
 /**

@@ -31,5 +31,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     introspectToken: noop,
     startWebauthnRegistration: noop,
     finishWebauthnRegistration: noop,
-    authorizeWebauthnRegistration: noop
+    authorizeWebauthnRegistration: noop,
+    startWebauthnAuthentication: noop,
+    finishWebauthnAuthentication: noop
 }
