@@ -26,7 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
-import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
+import standalonePaymentMethodsHandler from '@salesforce/retail-react-app/app/api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -318,14 +318,26 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                         'checkoutshopper-test.adyen.com',
                         // Allow Google Pay specific images
-                        'https://www.gstatic.com/'
+                        'https://www.gstatic.com/',
+                        '*.demandware.net',
+                        '*.sfcc-store-internal.net',
+                        'gstatic.com',
+                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
+                        'https://258agentcheckoutorg.test1.my.pc-rnd.site.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         '*.adyen.com',
                         'https://checkoutshopper-test.adyen.com',
-                        'https://pay.google.com/gp/p/js/pay.js'
+                        'https://pay.google.com/gp/p/js/pay.js',
+                        '*.test1.my.pc-rnd.site.com',
+                        '*.site.com',
+                        '*.commercecloud.com',
+                        'pay.google.com',
+                        'checkoutshopper-test.adyen.com',
+                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
+                        'https://258agentcheckoutorg.test1.my.pc-rnd.site.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -335,16 +347,33 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'https://api.lab.amplitude.com/sdk/vardata',
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com'
+                        '*.salesforce-scrt.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.pc-rnd.salesforce-scrt.com',
+                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
+                        'https://258agentcheckoutorg.test1.my.pc-rnd.site.com',
+                        'https://google.com/pay'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
                         'checkoutshopper-test.adyen.com',
                         // Allow Google Pay Specific frames
-                        'https://pay.google.com'
+                        'https://pay.google.com',
+                        '*.test1.my.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.pc-rnd.site.com',
+                        'pay.google.com',
+                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
+                        'https://258agentcheckoutorg.test1.my.pc-rnd.site.com'
                     ],
-                    'frame-ancestors': ['self']
+                    'frame-ancestors': [
+                        'self',
+                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
+                        'https://258agentcheckoutorg.test1.my.pc-rnd.site.com',
+                        'https://agent-checkout-payme-production.mobify-storefront.com',
+                        'https://cc-agent-checkout-ni-production.mrt-storefront-staging.com'
+                    ]
                 }
             }
         })

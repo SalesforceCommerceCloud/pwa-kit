@@ -451,7 +451,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
          * These fields provide context to the chat agent about the current user session,
          * site configuration, and locale settings.
          */
-        const handleEmbeddedMessagingReady = () => {
+        const handleEmbeddedMessagingReady = (event) => {
+            console.log('handleEmbeddedMessagingReady', event)
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 SiteId: siteId,
                 Locale: locale.id,
@@ -464,6 +465,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 DomainUrl: domainUrl
             })
         }
+
+        console.log('siteId', siteId)
 
         /**
          * Manages z-index for maximized chat windows to ensure proper layering
@@ -479,13 +482,20 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             }
         }
 
+        const handleEmbeddedMessagingUpdated = (event) => {
+            console.log('handleEmbeddedMessagingUpdated', event)
+        }
+
         // Set up event listeners for messaging lifecycle events
         window.addEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
         window.addEventListener(
             'onEmbeddedMessagingWindowMaximized',
             handleEmbeddedMessagingWindowMaximized
         )
-
+        window.addEventListener(
+            'onEmbeddedMessagingSessionStatusUpdate',
+            handleEmbeddedMessagingUpdated
+        )
         // Cleanup function to remove event listeners on unmount
         return () => {
             window.removeEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
@@ -588,6 +598,8 @@ ShopperAgentWindow.propTypes = {
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Extract enabled state from configuration
     const {enabled} = commerceAgentConfiguration
+
+    console.log('commerceAgentConfiguration', commerceAgentConfiguration)
 
     // Get current location and app origin for domain URL
     const appOrigin = useAppOrigin()
