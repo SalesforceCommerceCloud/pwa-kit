@@ -40,7 +40,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^4.0.0",
+    "commerce-sdk-isomorphic": "4.0.0-nightly-20251027080801",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },

@@ -47,6 +47,7 @@ import {
     getSFPaymentsInstrument,
     createPaymentInstrumentBody
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
     const {onRequiresPayButtonChange, onCreateOrder, onError} = props
@@ -54,6 +55,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const formatMessage = intl.formatMessage
     const queryClient = useQueryClient()
     const navigate = useNavigation()
+    const {data: customer} = useCurrentCustomer()
 
     const {data: basket} = useCurrentBasket()
     const isPickupOnly =
@@ -77,6 +79,23 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             countryCode: basket?.countryCode || countryCode || 'US' // TODO: remove US when parameter made optional
         }
     })
+
+    const stripeAccountId = paymentConfig
+        ? paymentConfig.paymentMethodSetAccounts?.find((account) => account.vendor === 'Stripe')
+              ?.accountId
+        : null
+    const savedPaymentMethods = stripeAccountId
+        ? customer?.paymentInstruments?.map((paymentInstrument) => {
+              return {
+                  accountId: stripeAccountId,
+                  id: paymentInstrument.paymentCard.creditCardToken,
+                  gatewayId: stripeAccountId,
+                  type: 'card',
+                  last4: paymentInstrument.paymentCard.numberLastDigits,
+                  gatewayTokenId: paymentInstrument.paymentCard.creditCardToken
+              }
+          })
+        : []
 
     const zoneId = useShopperConfiguration('zoneId')
     const cardCaptureAutomatic = useAutomaticCapture()
@@ -341,9 +360,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     useEffect(() => {
         if (sfp && metadata && containerElementRef.current && paymentConfig) {
+            const paymentMethodSetAccounts = paymentConfig.paymentMethodSetAccounts.map(
+                (account) => ({
+                    ...account,
+                    gatewayId: account.accountId
+                })
+            )
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+                paymentMethodSetAccounts
             }
 
             config.current = {
@@ -354,7 +379,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
-                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
+                    savedPaymentMethods
                 }
             }
 
