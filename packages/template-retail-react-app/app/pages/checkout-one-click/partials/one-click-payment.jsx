@@ -39,6 +39,7 @@ import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/componen
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {FormattedNumber} from 'react-intl'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const Payment = ({
     paymentMethodForm,
@@ -60,7 +61,6 @@ const Payment = ({
     const {data: basket} = currentBasketQuery
     const {data: customer, isLoading: isCustomerLoading} = useCurrentCustomer()
     const {isGuest} = useCustomerType()
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
@@ -131,8 +131,30 @@ const Payment = ({
         }
     }
 
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+    // Determine shipment composition (pickup-only vs mixed/delivery), considering only shipments with items
+    const shipments = basket?.shipments || []
+    const items = basket?.productItems || []
+    const shipmentsWithItems = shipments.filter((s) =>
+        items.some((i) => i.shipmentId === s.shipmentId)
+    )
+    const hasPickupShipments = shipmentsWithItems.some((s) => isPickupShipment(s))
+    const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
+    const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOnly)
+
+    // When the basket becomes pickup-only, force billing address entry
+    useEffect(() => {
+        if (isPickupOnly) {
+            setBillingSameAsShipping(false)
+        }
+    }, [isPickupOnly])
+
+    // For billing=shipping, align with legacy checkout. use the first delivery shipment's address
+    const selectedShippingAddress = React.useMemo(() => {
+        if (!shipmentsWithItems.length || isPickupOnly) return null
+        const deliveryShipment = shipmentsWithItems.find((s) => !isPickupShipment(s))
+        return deliveryShipment?.shippingAddress || null
+    }, [shipmentsWithItems, isPickupOnly])
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -244,7 +266,7 @@ const Payment = ({
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
                     }
                 })
-                if (isPickupOrder) {
+                if (isPickupOnly) {
                     try {
                         const saved = customer?.paymentInstruments?.find(
                             (pi) => pi.paymentInstrumentId === preferred.paymentInstrumentId
@@ -312,7 +334,7 @@ const Payment = ({
                 }
             })
             await currentBasketQuery.refetch()
-            if (isPickupOrder) {
+            if (isPickupOnly) {
                 try {
                     const saved = customer?.paymentInstruments?.find(
                         (pi) => pi.paymentInstrumentId === paymentInstrumentId
@@ -418,7 +440,11 @@ const Payment = ({
                     defaultMessage: 'Payment',
                     id: 'checkout_payment.title.payment'
                 })}
-                editing={currentIsEditing || step === STEPS.PAYMENT}
+                editing={
+                    currentIsEditing ||
+                    step === STEPS.PAYMENT ||
+                    (isPickupOnly && !selectedBillingAddress?.address1 && step > STEPS.CONTACT_INFO)
+                }
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
                     billingAddressForm.formState.isSubmitting ||
@@ -453,7 +479,7 @@ const Payment = ({
                                     <PaymentForm
                                         form={paymentMethodForm}
                                         onSubmit={onSubmit}
-                                        savedPaymentInstruments={customer.paymentInstruments}
+                                        savedPaymentInstruments={customer?.paymentInstruments || []}
                                         onPaymentMethodChange={onPaymentMethodChange}
                                         selectedPaymentMethod={currentSelectedPaymentMethod}
                                     >
@@ -478,7 +504,7 @@ const Payment = ({
                                         />
                                     </Heading>
 
-                                    {!isPickupOrder && selectedShippingAddress && (
+                                    {!isPickupOnly && selectedShippingAddress && (
                                         <Checkbox
                                             name="billingSameAsShipping"
                                             isChecked={billingSameAsShipping}
@@ -517,8 +543,12 @@ const Payment = ({
                                         setEnableUserRegistration={onUserRegistrationToggle}
                                         isGuestCheckout={registeredUserChoseGuest}
                                         isDisabled={
-                                            // Disable until there is either an applied payment or a valid form
-                                            !appliedPayment && !paymentMethodForm.formState.isValid
+                                            !(
+                                                appliedPayment ||
+                                                paymentMethodForm.formState.isValid ||
+                                                (isPickupOnly &&
+                                                    billingAddressForm.formState.isValid)
+                                            )
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}
                                         onRegistered={handleRegistrationSuccess}

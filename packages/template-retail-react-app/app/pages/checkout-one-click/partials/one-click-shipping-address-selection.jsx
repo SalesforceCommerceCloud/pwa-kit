@@ -71,6 +71,7 @@ const ShippingAddressEditForm = ({
                         formTitleAriaLabel={formTitleAriaLabel}
                         isBillingAddress={isBillingAddress}
                         hidePhone={hidePhone}
+                        hidePreferred={true}
                     />
 
                     {hasSavedAddresses && !hideSubmitButton ? (
@@ -175,17 +176,6 @@ const ShippingAddressSelection = ({
             }
         }
     }, [])
-
-    // After guest OTP success (customer becomes registered), default the address as preferred
-    useEffect(() => {
-        if (!isBillingAddress && customer?.isRegistered) {
-            try {
-                form.setValue('preferred', true, {shouldValidate: false, shouldDirty: true})
-            } catch (_e) {
-                // ignore
-            }
-        }
-    }, [customer?.isRegistered])
 
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
@@ -427,6 +417,7 @@ const ShippingAddressSelection = ({
                         form={form}
                         isBillingAddress={isBillingAddress}
                         hidePhone={!isBillingAddress}
+                        hidePreferred={true}
                         submitButtonLabel={submitButtonLabel}
                         formTitleAriaLabel={formTitleAriaLabel}
                     />

@@ -28,7 +28,8 @@ const AddressFields = ({
     prefix = '',
     formTitleAriaLabel = defaultFormTitleAriaLabel,
     isBillingAddress = false,
-    hidePhone = false
+    hidePhone = false,
+    hidePreferred = false
 }) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
@@ -62,7 +63,9 @@ const AddressFields = ({
                     <Field {...fields.postalCode} />
                 </GridItem>
             </Grid>
-            {customer.isRegistered && !isBillingAddress && <Field {...fields.preferred} />}
+            {customer.isRegistered && !isBillingAddress && !hidePreferred && (
+                <Field {...fields.preferred} />
+            )}
         </Stack>
     )
 }
@@ -81,7 +84,10 @@ AddressFields.propTypes = {
     isBillingAddress: PropTypes.bool,
 
     /** Optional flag to hide the phone field */
-    hidePhone: PropTypes.bool
+    hidePhone: PropTypes.bool,
+
+    /** Optional flag to hide the preferred/default checkbox */
+    hidePreferred: PropTypes.bool
 }
 
 export default AddressFields

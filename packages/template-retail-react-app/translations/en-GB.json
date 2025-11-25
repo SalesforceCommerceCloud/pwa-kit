@@ -53,9 +53,6 @@
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method to check out faster."
   },
-  "account.title.my_account": {
-    "defaultMessage": "My Account"
-  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },
@@ -341,9 +338,6 @@
   },
   "checkout.payment.save_payment_method": {
     "defaultMessage": "Save this payment method for future use"
-  },
-  "checkout.title.checkout": {
-    "defaultMessage": "Checkout"
   },
   "checkout.title.user_registration": {
     "defaultMessage": "Save Checkout Info for Future Use"
@@ -1356,6 +1350,9 @@
   "pickup_address.button.show_products": {
     "defaultMessage": "Show Products"
   },
+  "pickup_address.message.loading_store_info": {
+    "defaultMessage": "Loading store information…"
+  },
   "pickup_address.title.pickup_address": {
     "defaultMessage": "Pickup Address & Information"
   },
@@ -1625,6 +1622,9 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
+  "shipping_address.action.pickup_in_store": {
+    "defaultMessage": "Pick up in store"
+  },
   "shipping_address.action.ship_to_multiple_addresses": {
     "defaultMessage": "Ship to multiple addresses"
   },
@@ -1637,8 +1637,8 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
-  "shipping_address.error.phone_not_saved": {
-    "defaultMessage": "We could not save your phone number. You can continue checking out."
+  "shipping_address.error.switch_to_pickup_failed": {
+    "defaultMessage": "We could not switch to Store Pickup. Please try again or choose a different store."
   },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."
