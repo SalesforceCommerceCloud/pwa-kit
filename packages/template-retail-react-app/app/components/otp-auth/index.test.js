@@ -122,8 +122,8 @@ describe('OtpAuth', () => {
         test('renders buttons with correct styling', () => {
             renderWithProviders(<WrapperComponent />)
 
-            const guestButton = screen.getByText(/Checkout as a guest/i)
-            const resendButton = screen.getByText('Resend code')
+            const guestButton = screen.getByRole('button', {name: /Checkout as a Guest/i})
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
 
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
@@ -389,7 +389,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const guestButton = screen.getByText('Checkout as a guest')
+            const guestButton = screen.getByRole('button', {name: /Checkout as a Guest/i})
             await user.click(guestButton)
 
             expect(mockOnCheckoutAsGuest).toHaveBeenCalled()
@@ -427,7 +427,7 @@ describe('OtpAuth', () => {
             )
 
             // Click the resend button
-            await user.click(screen.getByText('Resend code'))
+            await user.click(screen.getByRole('button', {name: /Resend Code/i}))
 
             // Wait for the timer text to appear and assert the parent button is disabled
             const timerText = await screen.findByText(/Resend code in/i)
@@ -498,8 +498,8 @@ describe('OtpAuth', () => {
         test('buttons have accessible text', () => {
             renderWithProviders(<WrapperComponent />)
 
-            expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
-            expect(screen.getByText('Resend code')).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /Checkout as a Guest/i})).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /Resend Code/i})).toBeInTheDocument()
         })
     })
 
@@ -727,7 +727,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const resendButton = screen.getByText('Resend code')
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
             await user.click(resendButton)
 
             await waitFor(() => {
@@ -756,7 +756,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const resendButton = screen.getByText('Resend code')
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
             await user.click(resendButton)
 
             await waitFor(() => {
@@ -786,7 +786,7 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const guestButton = screen.getByText('Checkout as a guest')
+            const guestButton = screen.getByRole('button', {name: /Checkout as a Guest/i})
             await user.click(guestButton)
 
             await waitFor(() => {
@@ -865,7 +865,7 @@ describe('OtpAuth', () => {
             )
 
             // Click resend
-            const resendButton = screen.getByText('Resend code')
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
             await user.click(resendButton)
 
             // Fill OTP fields after resend
@@ -934,7 +934,7 @@ describe('OtpAuth', () => {
             )
 
             // Trigger multiple tracking events
-            const resendButton = screen.getByText('Resend code')
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
             await user.click(resendButton)
 
             const otpInputs = screen.getAllByRole('textbox')

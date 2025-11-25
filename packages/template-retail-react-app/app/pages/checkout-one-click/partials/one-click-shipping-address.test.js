@@ -199,7 +199,9 @@ describe('ShippingAddress Component', () => {
             const isActWarning =
                 typeof msg === 'string' &&
                 (msg.includes('not wrapped in act') ||
-                    msg.includes('The current testing environment is not configured to support act'))
+                    msg.includes(
+                        'The current testing environment is not configured to support act'
+                    ))
             if (isActWarning) {
                 return
             }

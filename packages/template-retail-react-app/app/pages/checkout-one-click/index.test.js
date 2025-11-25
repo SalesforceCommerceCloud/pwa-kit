@@ -45,6 +45,17 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useAuthHelper: () => ({
             mutateAsync: mockUseAuthHelper
         }),
+        useShopperBasketsMutation: (mutation) => {
+            if (mutation === 'removeItemFromBasket') {
+                return {
+                    mutateAsync: (_, {onSuccess} = {}) => {
+                        onSuccess && onSuccess()
+                        return Promise.resolve({})
+                    }
+                }
+            }
+            return originalModule.useShopperBasketsMutation(mutation)
+        },
         useShopperCustomersMutation: (mutation) => {
             if (mutation === 'createCustomerPaymentInstrument') {
                 return {

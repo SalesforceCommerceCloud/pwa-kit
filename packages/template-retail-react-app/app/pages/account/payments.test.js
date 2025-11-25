@@ -233,7 +233,9 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/error loading payment methods/i)).toBeInTheDocument()
+        expect(
+            screen.getByText(/couldn.?t load the payment methods\.? try again\.?/i)
+        ).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /retry/i})).toBeInTheDocument()
     })
 
@@ -258,7 +260,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
     })
 
     test('displays refresh button', () => {
@@ -404,7 +406,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
     })
 
@@ -428,7 +430,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
         expect(screen.queryByRole('button', {name: /add payment/i})).not.toBeInTheDocument()
     })
 
@@ -595,7 +597,9 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/error loading payment methods/i)).toBeInTheDocument()
+        expect(
+            screen.getByText(/couldn.?t load the payment methods\.? try again\.?/i)
+        ).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /retry/i})).toBeInTheDocument()
     })
 
@@ -619,7 +623,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
         // Should show add payment button when configuration is missing (falsy value)
         expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
     })

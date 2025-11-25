@@ -86,7 +86,7 @@ jest.mock('@salesforce/retail-react-app/app/components/promo-code', () => ({
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form',
     () => {
-        const MockPaymentForm = function ({onSubmit, children}) {
+        const MockPaymentForm = function ({onSubmit, onPaymentMethodChange, children}) {
             return (
                 <div data-testid="payment-form">
                     <div>Credit Card</div>
@@ -94,6 +94,12 @@ jest.mock(
                     <input aria-label="Expiry Date" data-testid="expiry-date" />
                     <input aria-label="CVV" data-testid="cvv" />
                     {children}
+                    <button type="button" onClick={() => onPaymentMethodChange?.('cc')}>
+                        Select CC
+                    </button>
+                    <button type="button" onClick={() => onPaymentMethodChange?.('pi-1')}>
+                        Select Saved
+                    </button>
                     <button
                         type="button"
                         onClick={() =>
@@ -263,8 +269,10 @@ const TestWrapper = ({
     setEnableUserRegistration = jest.fn(),
     onPaymentMethodSaved = jest.fn(),
     onSavePreferenceChange = jest.fn(),
+    onPaymentSubmitted = undefined,
     registeredUserChoseGuest = false,
     removePaymentShouldFail = false,
+    addPaymentShouldFail = false,
     initialStep = 4,
     selectedPaymentMethod = null,
     isEditing = false,
@@ -297,7 +305,9 @@ const TestWrapper = ({
     useCheckout.mockReturnValue(mockCheckout)
 
     // Mock mutations
-    const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+    const mockAddPaymentInstrument = addPaymentShouldFail
+        ? jest.fn().mockRejectedValue(new Error('add failed'))
+        : jest.fn().mockResolvedValue({})
     const mockUpdateBillingAddress = jest.fn().mockResolvedValue({})
     const mockRemovePaymentInstrument = removePaymentShouldFail
         ? jest.fn().mockRejectedValue(new Error('remove failed'))
@@ -369,6 +379,7 @@ const TestWrapper = ({
                     registeredUserChoseGuest={registeredUserChoseGuest}
                     onPaymentMethodSaved={onPaymentMethodSaved}
                     onSavePreferenceChange={onSavePreferenceChange}
+                    onPaymentSubmitted={onPaymentSubmitted}
                     selectedPaymentMethod={selectedPaymentMethod}
                     isEditing={isEditing}
                     onSelectedPaymentMethodChange={onSelectedPaymentMethodChange}
@@ -447,6 +458,27 @@ describe('Payment Component', () => {
         })
     })
 
+    describe('Callbacks', () => {
+        test('calls onPaymentSubmitted with full card details on submit', async () => {
+            const user = userEvent.setup()
+            const onPaymentSubmitted = jest.fn()
+            render(
+                <TestWrapper
+                    onPaymentMethodSaved={jest.fn()}
+                    onSavePreferenceChange={jest.fn()}
+                    onPaymentSubmitted={onPaymentSubmitted}
+                />
+            )
+            await user.click(screen.getByText('Submit Payment'))
+            expect(onPaymentSubmitted).toHaveBeenCalledWith({
+                number: '4111111111111111',
+                expiry: '12/25',
+                cvv: '123',
+                holder: 'John Doe',
+                cardType: 'Visa'
+            })
+        })
+    })
     describe('User Registration', () => {
         test('hides user registration when user chose guest checkout', () => {
             render(<TestWrapper enableUserRegistration={true} registeredUserChoseGuest={true} />)
@@ -566,6 +598,38 @@ describe('Payment Component', () => {
     })
 
     describe('Error Handling', () => {
+        test('shows error toast when add payment API fails on submit', async () => {
+            const user = userEvent.setup()
+            render(<TestWrapper addPaymentShouldFail={true} />)
+            await user.click(screen.getByText('Submit Payment'))
+            await waitFor(() => {
+                expect(mockToastFn).toHaveBeenCalled()
+            })
+        })
+
+        test('shows error toast and aborts when removing applied payment fails on change', async () => {
+            const user = userEvent.setup()
+            const basketWithApplied = {
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'applied-1',
+                        paymentCard: {
+                            cardType: 'Visa',
+                            numberLastDigits: '1111',
+                            expirationMonth: 1,
+                            expirationYear: 2030
+                        }
+                    }
+                ]
+            }
+            render(<TestWrapper basketData={basketWithApplied} removePaymentShouldFail={true} />)
+            await user.click(screen.getByText('Select CC'))
+            await waitFor(() => {
+                expect(mockToastFn).toHaveBeenCalled()
+            })
+        })
+
         test('enters edit mode successfully when handleEditPayment is called', async () => {
             const user = userEvent.setup()
 
@@ -619,6 +683,65 @@ describe('Payment Component', () => {
     })
 
     describe('Accessibility', () => {
+        test('changing to a saved payment instrument does not error', async () => {
+            const user = userEvent.setup()
+            // Provide saved instrument id 'pi-1' to match the PaymentForm mock
+            const customerWithSaved = {
+                isRegistered: true,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'pi-1',
+                        default: true,
+                        billingAddress: null
+                    }
+                ]
+            }
+            render(<TestWrapper isRegistered={true} customerData={customerWithSaved} />)
+            // Wait for form to appear (auto-apply may temporarily hide it)
+            await screen.findByTestId('payment-form')
+            await user.click(screen.getByText('Select Saved'))
+            // If no error thrown, the path executed successfully
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+        })
+
+        test('changing to a saved instrument on pickup updates without error', async () => {
+            const user = userEvent.setup()
+            const pickupBasket = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        ...mockBasket.shipments[0],
+                        shippingMethod: {c_storePickupEnabled: true}
+                    }
+                ]
+            }
+            const customerWithSaved = {
+                isRegistered: true,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'pi-1',
+                        default: true,
+                        billingAddress: {
+                            address1: '1 Admin Way',
+                            city: 'SF',
+                            stateCode: 'CA',
+                            postalCode: '94105',
+                            countryCode: 'US'
+                        }
+                    }
+                ]
+            }
+            render(
+                <TestWrapper
+                    basketData={pickupBasket}
+                    isRegistered={true}
+                    customerData={customerWithSaved}
+                />
+            )
+            await screen.findByTestId('payment-form')
+            await user.click(screen.getByText('Select Saved'))
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+        })
         test('payment section has proper heading structure', () => {
             render(<TestWrapper />)
 
@@ -639,6 +762,8 @@ describe('Payment Component', () => {
             render(<TestWrapper />)
 
             expect(screen.getByText('Submit Payment')).toBeInTheDocument()
+            expect(screen.getByText('Select CC')).toBeInTheDocument()
+            expect(screen.getByText('Select Saved')).toBeInTheDocument()
             expect(screen.getByText('Review Order')).toBeInTheDocument()
         })
 

@@ -62,7 +62,9 @@ const ConfirmationModal = ({
                         <Button
                             variant="ghost"
                             mr={3}
-                            aria-label={formatMessage(alternateActionLabel)}
+                            aria-label={formatMessage(
+                                props.alternateActionAriaLabel || alternateActionLabel
+                            )}
                             onClick={handleAlternateActionClick}
                         >
                             {formatMessage(alternateActionLabel)}
@@ -71,7 +73,9 @@ const ConfirmationModal = ({
                     <Button
                         variant="solid"
                         onClick={handleConfirmClick}
-                        aria-label={formatMessage(primaryActionLabel)}
+                        aria-label={formatMessage(
+                            props.primaryActionAriaLabel || primaryActionLabel
+                        )}
                     >
                         {formatMessage(primaryActionLabel)}
                     </Button>
