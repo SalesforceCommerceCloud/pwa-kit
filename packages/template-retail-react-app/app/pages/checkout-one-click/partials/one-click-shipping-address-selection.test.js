@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
@@ -132,7 +132,7 @@ describe('ShippingAddressSelection Component', () => {
     describe('Billing/Registered Effects', () => {
         // Skipped: creating a real RHF form instance in this test context causes hook errors
 
-        test('sets preferred=true when customer becomes registered', () => {
+        test('sets preferred=true when customer becomes registered', async () => {
             const setValue = jest.fn()
             const mockForm = {
                 handleSubmit: jest.fn(() => (e) => e?.preventDefault?.()),
@@ -146,9 +146,12 @@ describe('ShippingAddressSelection Component', () => {
                 isFetching: false
             })
             render(<ShippingAddressSelection form={mockForm} isBillingAddress={false} />)
-            expect(setValue).toHaveBeenCalledWith('preferred', true, {
-                shouldValidate: false,
-                shouldDirty: true
+            // useEffect runs after paint; wait for setValue to be invoked
+            await waitFor(() => {
+                expect(setValue).toHaveBeenCalledWith('preferred', true, {
+                    shouldValidate: false,
+                    shouldDirty: true
+                })
             })
         })
     })

@@ -331,13 +331,21 @@ describe('Checkout One Click', () => {
         })
 
         await waitFor(() => {
-            expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /pickup address & information/i})
+            ).toBeInTheDocument()
         })
         await waitFor(() => {
-            expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
+            const step1s = screen.getAllByTestId('sf-toggle-card-step-1')
+            const shippingStep = step1s.find((el) =>
+                within(el).queryByRole('heading', {name: /shipping address/i})
+            )
+            expect(shippingStep).toBeTruthy()
         })
         await waitFor(() => {
-            expect(screen.getByText(/shipping & gift options/i)).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /shipping & gift options/i})
+            ).toBeInTheDocument()
         })
     })
 

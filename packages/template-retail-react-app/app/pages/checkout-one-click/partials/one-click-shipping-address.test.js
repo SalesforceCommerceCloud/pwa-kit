@@ -243,8 +243,12 @@ describe('ShippingAddress Component', () => {
 
     test('handles user interactions correctly', async () => {
         const {user} = renderWithProviders(<ShippingAddress />)
-
-        const submitButton = screen.getByText('Continue to Shipping Method')
+        // Scope to the first step container to avoid duplicate matches
+        const stepContainers = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selection = within(stepContainers[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selection).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
 
         // Button should be clickable
         expect(submitButton).toBeInTheDocument()

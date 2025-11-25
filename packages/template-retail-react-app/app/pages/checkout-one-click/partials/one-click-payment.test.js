@@ -433,8 +433,11 @@ describe('Payment Component', () => {
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
             render(<TestWrapper />)
 
-            // The checkbox label shows as the message ID since we're mocking formatMessage
-            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            // Label can render as defaultMessage or id depending on mocks
+            const labelNode =
+                screen.queryByText(/same as shipping address/i) ||
+                screen.queryByText('checkout_payment.label.same_as_shipping')
+            expect(labelNode).toBeInTheDocument()
         })
 
         test('hides "Same as shipping address" checkbox for pickup orders', () => {
@@ -452,9 +455,16 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={pickupBasket} />)
 
-            expect(
+            const labelNode =
+                screen.queryByText(/same as shipping address/i) ||
                 screen.queryByText('checkout_payment.label.same_as_shipping')
-            ).not.toBeInTheDocument()
+            expect(labelNode).not.toBeInTheDocument()
+
+            // Billing form should be shown immediately for pickup-only
+            const formNode =
+                screen.queryByTestId('shipping-address-selection') ||
+                screen.queryByLabelText('First Name')
+            expect(formNode).toBeInTheDocument()
         })
     })
 
@@ -770,7 +780,10 @@ describe('Payment Component', () => {
         test('checkboxes have proper labels', () => {
             render(<TestWrapper />)
 
-            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const labelNode =
+                screen.queryByText(/same as shipping address/i) ||
+                screen.queryByText('checkout_payment.label.same_as_shipping')
+            expect(labelNode).toBeInTheDocument()
         })
     })
 })
