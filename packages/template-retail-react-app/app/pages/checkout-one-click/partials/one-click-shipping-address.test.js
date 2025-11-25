@@ -298,6 +298,45 @@ describe('ShippingAddress Component', () => {
         expect(mockGoToNextStep).not.toHaveBeenCalled()
     })
 
+    test('targets delivery shipment id when saving address in mixed cart', async () => {
+        jest.resetModules()
+        const deliveryId = 'delivery-1'
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        // Pickup shipment
+                        {
+                            shipmentId: 'pickup-1',
+                            shippingAddress: null,
+                            shippingMethod: {c_storePickupEnabled: true}
+                        },
+                        // Delivery shipment
+                        {
+                            shipmentId: deliveryId,
+                            shippingAddress: null,
+                            shippingMethod: {c_storePickupEnabled: false}
+                        }
+                    ]
+                },
+                derivedData: {hasBasket: true, totalItems: 1},
+                refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+            })
+        }))
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+        const {user} = localRenderWithProviders(<Component />)
+        await user.click(screen.getByText('Continue to Shipping Method'))
+        const last = mockUpdateShippingAddress.mutateAsync.mock.calls.pop()?.[0]
+        expect(last.parameters).toMatchObject({shipmentId: deliveryId})
+    })
+
     test('shows loading state during address submission', async () => {
         // Mock a delayed response
         mockUpdateShippingAddress.mutateAsync.mockImplementation(

@@ -9,8 +9,7 @@ import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const CheckoutContext = React.createContext()
 
@@ -40,36 +39,39 @@ export const CheckoutProvider = ({children}) => {
 
         let step = STEPS.REVIEW_ORDER
 
+        const shipments = basket?.shipments || []
+        const productItems = basket?.productItems || []
+        const shipmentsWithItems = shipments.filter((s) =>
+            productItems.some((i) => i.shipmentId === s.shipmentId)
+        )
+        const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
+        const anyDeliveryMissingAddress = shipmentsWithItems.some(
+            (s) => !isPickupShipment(s) && !s?.shippingAddress?.address1
+        )
+        const anyDeliveryMissingMethod = shipmentsWithItems.some(
+            (s) => !isPickupShipment(s) && !s?.shippingMethod
+        )
+
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!basket.shipments[0]?.shippingAddress?.address1) {
-            // Check if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
-        } else if (!basket.shipments[0]?.shippingMethod) {
+        } else if (anyDeliveryMissingAddress) {
+            // Mixed or delivery-only: prioritize collecting delivery address first
+            step = STEPS.SHIPPING_ADDRESS
+        } else if (!hasDeliveryShipments && !shipmentsWithItems[0]?.shippingAddress?.address1) {
+            // Pickup-only and we haven't set the pickup address details yet
+            step = STEPS.PICKUP_ADDRESS
+        } else if (anyDeliveryMissingMethod) {
+            // Delivery shipments exist and need a shipping method
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
-        }
-
-        // Ensure multiship entry point is visible when applicable
-        const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-        const hasMultipleProductItems = (basket?.productItems?.length || 0) > 1
-        if (multishipEnabled && hasMultipleProductItems) {
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         }
 
         setStep(step)
     }, [
         customer?.isGuest,
         basket?.customerInfo?.email,
-        basket?.shipments[0]?.shippingAddress,
-        basket?.shipments[0]?.shippingMethod,
+        basket?.shipments,
         basket?.paymentInstruments,
         basket?.billingAddress
     ])
@@ -93,11 +95,14 @@ export const CheckoutProvider = ({children}) => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
             // Determine if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            // Skip to appropriate next step
-            setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            const shipments = basket?.shipments || []
+            const productItems = basket?.productItems || []
+            const shipmentsWithItems = shipments.filter((s) =>
+                productItems.some((i) => i.shipmentId === s.shipmentId)
+            )
+            const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
+            // Skip to appropriate next step; when mixed, go to SHIPPING_ADDRESS
+            setStep(hasDeliveryShipments ? STEPS.SHIPPING_ADDRESS : STEPS.PICKUP_ADDRESS)
         } else {
             setStep(step + 1)
         }

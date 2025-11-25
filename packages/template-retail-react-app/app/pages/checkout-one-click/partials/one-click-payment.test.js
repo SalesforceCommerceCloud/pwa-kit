@@ -466,6 +466,26 @@ describe('Payment Component', () => {
                 screen.queryByLabelText('First Name')
             expect(formNode).toBeInTheDocument()
         })
+
+        test('pickup-only shows billing address form immediately', async () => {
+            const pickupBasket = {
+                ...mockBasket,
+                billingAddress: null,
+                shipments: [
+                    {
+                        shippingAddress: null,
+                        shippingMethod: {
+                            c_storePickupEnabled: true
+                        }
+                    }
+                ]
+            }
+            render(<TestWrapper basketData={pickupBasket} />)
+            // When pickup-only, billingSameAsShipping is forced false and the form should be shown
+            await waitFor(() => {
+                expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
+            })
+        })
     })
 
     describe('Callbacks', () => {

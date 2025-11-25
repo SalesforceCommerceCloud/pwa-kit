@@ -107,12 +107,6 @@
       "value": "Add a new payment method to check out faster."
     }
   ],
-  "account.title.my_account": [
-    {
-      "type": 0,
-      "value": "My Account"
-    }
-  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -941,12 +935,6 @@
     {
       "type": 0,
       "value": "Save this payment method for future use"
-    }
-  ],
-  "checkout.title.checkout": [
-    {
-      "type": 0,
-      "value": "Checkout"
     }
   ],
   "checkout.title.user_registration": [
@@ -3209,6 +3197,12 @@
       "value": "Show Products"
     }
   ],
+  "pickup_address.message.loading_store_info": [
+    {
+      "type": 0,
+      "value": "Loading store information…"
+    }
+  ],
   "pickup_address.title.pickup_address": [
     {
       "type": 0,
@@ -3855,6 +3849,12 @@
       "value": "In Stock"
     }
   ],
+  "shipping_address.action.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "Pick up in store"
+    }
+  ],
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
@@ -3879,10 +3879,10 @@
       "value": "Continue to Shipping Method"
     }
   ],
-  "shipping_address.error.phone_not_saved": [
+  "shipping_address.error.switch_to_pickup_failed": [
     {
       "type": 0,
-      "value": "We could not save your phone number. You can continue checking out."
+      "value": "We could not switch to Store Pickup. Please try again or choose a different store."
     }
   ],
   "shipping_address.error.update_failed": [

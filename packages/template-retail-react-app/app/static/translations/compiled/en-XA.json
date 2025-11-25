@@ -251,20 +251,6 @@
       "value": "]"
     }
   ],
-  "account.title.my_account": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -1849,20 +1835,6 @@
     {
       "type": 0,
       "value": "Şȧȧṽḗḗ ŧħīş ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ƒǿǿř ƒŭŭŧŭŭřḗḗ ŭŭşḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout.title.checkout": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
     },
     {
       "type": 0,
@@ -6793,6 +6765,20 @@
       "value": "]"
     }
   ],
+  "pickup_address.message.loading_store_info": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ şŧǿǿřḗḗ īƞƒǿǿřḿȧȧŧīǿǿƞ…"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "pickup_address.title.pickup_address": [
     {
       "type": 0,
@@ -8151,6 +8137,20 @@
       "value": "]"
     }
   ],
+  "shipping_address.action.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķ ŭŭƥ īƞ şŧǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
@@ -8207,14 +8207,14 @@
       "value": "]"
     }
   ],
-  "shipping_address.error.phone_not_saved": [
+  "shipping_address.error.switch_to_pickup_failed": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ şȧȧṽḗḗ ẏǿǿŭŭř ƥħǿǿƞḗḗ ƞŭŭḿƀḗḗř. Ẏǿǿŭŭ ƈȧȧƞ ƈǿǿƞŧīƞŭŭḗḗ ƈħḗḗƈķīƞɠ ǿǿŭŭŧ."
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ şẇīŧƈħ ŧǿǿ Şŧǿǿřḗḗ Ƥīƈķŭŭƥ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř ƈħǿǿǿǿşḗḗ ȧȧ ḓīƒƒḗḗřḗḗƞŧ şŧǿǿřḗḗ."
     },
     {
       "type": 0,

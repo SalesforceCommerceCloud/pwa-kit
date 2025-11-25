@@ -49,7 +49,9 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const deliveryShipments =
+        basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
+    const selectedShippingAddress = deliveryShipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
     const {step, STEPS, goToStep, goToNextStep, contactPhone} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -61,8 +63,6 @@ export default function ShippingAddress() {
     const hasMultipleProductItems = productItemsCount > 1
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
 
-    const deliveryShipments =
-        basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
@@ -113,10 +113,12 @@ export default function ShippingAddress() {
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed?.data?.basketId || basket.basketId
 
+            const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
+
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
                     basketId: latestBasketId,
-                    shipmentId: 'me',
+                    shipmentId: targetDeliveryShipmentId,
                     useAsBilling: false
                 },
                 body: {

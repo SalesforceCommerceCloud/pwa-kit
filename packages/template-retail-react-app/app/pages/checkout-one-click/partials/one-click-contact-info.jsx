@@ -274,9 +274,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     },
                     parameters: {
                         createDestinationBasket: true
-                    }
+                    },
+                    body: {sourceBasketId: basket.basketId}
                 })
                 basketId = merged?.basketId || basket.basketId
+                // Ensure we hydrate the latest basket after merge
+                const refreshed = await currentBasketQuery.refetch()
+                basketId = refreshed?.data?.basketId || basketId
             }
 
             // Update basket with email after successful OTP verification

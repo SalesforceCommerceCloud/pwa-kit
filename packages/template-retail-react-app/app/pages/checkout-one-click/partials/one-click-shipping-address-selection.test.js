@@ -206,4 +206,53 @@ describe('ShippingAddressSelection Component', () => {
             expect(mutateAsync).toHaveBeenCalled()
         })
     })
+
+    describe('Preferred Address Checkbox', () => {
+        test('does not show "Set as default" checkbox for registered customers in checkout', () => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: []
+                },
+                isLoading: false,
+                isFetching: false
+            })
+
+            render(<ShippingAddressSelection />)
+
+            // The "Set as default" checkbox should not be present in checkout
+            expect(screen.queryByText('Set as default')).not.toBeInTheDocument()
+            expect(screen.queryByLabelText('Set as default')).not.toBeInTheDocument()
+        })
+
+        test('does not show "Set as default" checkbox for registered customers with saved addresses', () => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: [
+                        {
+                            addressId: 'addr-1',
+                            address1: '123 Main St',
+                            city: 'Test City',
+                            countryCode: 'US',
+                            firstName: 'John',
+                            lastName: 'Doe',
+                            postalCode: '12345',
+                            stateCode: 'CA'
+                        }
+                    ]
+                },
+                isLoading: false,
+                isFetching: false
+            })
+
+            render(<ShippingAddressSelection />)
+
+            // The "Set as default" checkbox should not be present in checkout
+            expect(screen.queryByText('Set as default')).not.toBeInTheDocument()
+            expect(screen.queryByLabelText('Set as default')).not.toBeInTheDocument()
+        })
+    })
 })
