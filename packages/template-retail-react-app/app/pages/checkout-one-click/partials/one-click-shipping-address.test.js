@@ -230,7 +230,11 @@ describe('ShippingAddress Component', () => {
         // Component should render successfully for registered customers
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
         expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-        expect(screen.getByText('Continue to Shipping Method')).toBeInTheDocument()
+        const stepContainersA = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selectionA = within(stepContainersA[0]).getByTestId('shipping-address-selection')
+        expect(
+            within(selectionA).getByRole('button', {name: /Continue to Shipping Method/i})
+        ).toBeInTheDocument()
     })
 
     test('renders address selection component correctly', () => {
@@ -267,7 +271,11 @@ describe('ShippingAddress Component', () => {
         // Component should render form elements
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
         expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-        expect(screen.getByText('Continue to Shipping Method')).toBeInTheDocument()
+        const stepContainersB = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selectionB = within(stepContainersB[0]).getByTestId('shipping-address-selection')
+        expect(
+            within(selectionB).getByRole('button', {name: /Continue to Shipping Method/i})
+        ).toBeInTheDocument()
     })
 
     test('component integrates with address selection correctly', () => {
@@ -276,7 +284,11 @@ describe('ShippingAddress Component', () => {
         // Should render and integrate with the address selection component
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
         expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-        expect(screen.getByText('Continue to Shipping Method')).toBeInTheDocument()
+        const stepContainersC = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selectionC = within(stepContainersC[0]).getByTestId('shipping-address-selection')
+        expect(
+            within(selectionC).getByRole('button', {name: /Continue to Shipping Method/i})
+        ).toBeInTheDocument()
     })
 
     test('handles submission errors gracefully', async () => {
@@ -284,7 +296,11 @@ describe('ShippingAddress Component', () => {
 
         const {user} = renderWithProviders(<ShippingAddress />)
 
-        const submitButton = screen.getByText('Continue to Shipping Method')
+        const stepContainersD = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selectionD = within(stepContainersD[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selectionD).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
         await act(async () => {
             await user.click(submitButton)
         })
@@ -332,7 +348,13 @@ describe('ShippingAddress Component', () => {
         )
         const Component = module.default
         const {user} = localRenderWithProviders(<Component />)
-        await user.click(screen.getByText('Continue to Shipping Method'))
+        {
+            const steps = screen.getAllByTestId('sf-toggle-card-step-1')
+            const sel = within(steps[0]).getByTestId('shipping-address-selection')
+            await user.click(
+                within(sel).getByRole('button', {name: /Continue to Shipping Method/i})
+            )
+        }
         const last = mockUpdateShippingAddress.mutateAsync.mock.calls.pop()?.[0]
         expect(last.parameters).toMatchObject({shipmentId: deliveryId})
     })
@@ -345,7 +367,11 @@ describe('ShippingAddress Component', () => {
 
         const {user} = renderWithProviders(<ShippingAddress />)
 
-        const submitButton = screen.getByText('Continue to Shipping Method')
+        const stepContainersE = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selectionE = within(stepContainersE[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selectionE).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
         await act(async () => {
             await user.click(submitButton)
         })
@@ -360,7 +386,11 @@ describe('ShippingAddress Component', () => {
         mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
         const {user} = renderWithProviders(<ShippingAddress />)
         await act(async () => {
-            await user.click(screen.getByText('Continue to Shipping Method'))
+            const steps = screen.getAllByTestId('sf-toggle-card-step-1')
+            const sel = within(steps[0]).getByTestId('shipping-address-selection')
+            await user.click(
+                within(sel).getByRole('button', {name: /Continue to Shipping Method/i})
+            )
         })
         await waitFor(() => {
             expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()

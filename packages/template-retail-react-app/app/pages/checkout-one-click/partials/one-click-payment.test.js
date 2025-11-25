@@ -238,6 +238,7 @@ const mockBasket = {
     orderTotal: 100.0,
     shipments: [
         {
+            shipmentId: 's-1',
             shippingAddress: {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -250,6 +251,12 @@ const mockBasket = {
             shippingMethod: {
                 c_storePickupEnabled: false
             }
+        }
+    ],
+    productItems: [
+        {
+            itemId: 'item-1',
+            shipmentId: 's-1'
         }
     ],
     billingAddress: null
@@ -433,11 +440,11 @@ describe('Payment Component', () => {
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
             render(<TestWrapper />)
 
-            // Label can render as defaultMessage or id depending on mocks
-            const labelNode =
-                screen.queryByText(/same as shipping address/i) ||
-                screen.queryByText('checkout_payment.label.same_as_shipping')
-            expect(labelNode).toBeInTheDocument()
+            expect(
+                screen.getByRole('checkbox', {
+                    name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+                })
+            ).toBeInTheDocument()
         })
 
         test('hides "Same as shipping address" checkbox for pickup orders', () => {
@@ -455,16 +462,13 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={pickupBasket} />)
 
-            const labelNode =
-                screen.queryByText(/same as shipping address/i) ||
+            const sameAs =
+                screen.queryByRole('checkbox', {name: /same as shipping address/i}) ||
                 screen.queryByText('checkout_payment.label.same_as_shipping')
-            expect(labelNode).not.toBeInTheDocument()
+            expect(sameAs).not.toBeInTheDocument()
 
             // Billing form should be shown immediately for pickup-only
-            const formNode =
-                screen.queryByTestId('shipping-address-selection') ||
-                screen.queryByLabelText('First Name')
-            expect(formNode).toBeInTheDocument()
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
         })
 
         test('pickup-only shows billing address form immediately', async () => {
@@ -473,18 +477,18 @@ describe('Payment Component', () => {
                 billingAddress: null,
                 shipments: [
                     {
+                        shipmentId: 'p-1',
                         shippingAddress: null,
                         shippingMethod: {
                             c_storePickupEnabled: true
                         }
                     }
-                ]
+                ],
+                productItems: [{itemId: 'p-item', shipmentId: 'p-1'}]
             }
             render(<TestWrapper basketData={pickupBasket} />)
             // When pickup-only, billingSameAsShipping is forced false and the form should be shown
-            await waitFor(() => {
-                expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-            })
+            expect(await screen.findByTestId('shipping-address-selection')).toBeInTheDocument()
         })
     })
 
@@ -617,7 +621,9 @@ describe('Payment Component', () => {
             render(<TestWrapper billingAddressForm={mockBillingAddressForm} />)
 
             // Uncheck same as shipping
-            const checkbox = screen.getByText('checkout_payment.label.same_as_shipping')
+            const checkbox = screen.getByRole('checkbox', {
+                name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+            })
             await user.click(checkbox)
 
             // Should show the billing address form
