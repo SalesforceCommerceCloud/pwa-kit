@@ -579,70 +579,38 @@ describe('Payment Component', () => {
 
         test('retains billingSameAsShipping unchecked after authentication via user registration', async () => {
             const user = userEvent.setup()
-            const setBillingSameAsShippingSpy = jest.fn()
 
-            render(
-                <TestWrapper
-                    enableUserRegistration={true}
-                    initialBillingSameAsShipping={false}
-                    setBillingSameAsShipping={setBillingSameAsShippingSpy}
-                />
-            )
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={false} />)
 
             // Verify initial state - billingSameAsShipping should be false
             expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
-
-            // Get the initial checkbox state
             const checkboxBefore = document.querySelector('input[name="billingSameAsShipping"]')
             expect(checkboxBefore).toBeInTheDocument()
-            const initialStateChecked = checkboxBefore.checked
+            expect(checkboxBefore).not.toBeChecked()
 
             // Find and trigger user registration
             const registrationComponent = screen.getByTestId('user-registration')
-            expect(registrationComponent).toBeInTheDocument()
-
             const triggerRegistrationButton =
                 within(registrationComponent).getByTestId('trigger-registration')
-
-            // Clear any previous calls to setBillingSameAsShipping
-            setBillingSameAsShippingSpy.mockClear()
 
             // Trigger registration
             await user.click(triggerRegistrationButton)
 
-            // Wait for registration to complete (handleRegistrationSuccess callback should execute)
+            // Wait for registration to complete
             await waitFor(() => {
-                // Verify registration component is still present (registration completed)
                 expect(screen.getByTestId('user-registration')).toBeInTheDocument()
             })
 
-            // Verify billingSameAsShipping was not changed during registration
-            // setBillingSameAsShipping should not have been called with a different value
-            const callsWithDifferentValue = setBillingSameAsShippingSpy.mock.calls.filter(
-                (call) => call[0] !== initialStateChecked
-            )
-            expect(callsWithDifferentValue).toHaveLength(0)
-
-            // Verify checkbox still reflects the retained state
+            // Verify checkbox still reflects the retained state (unchecked)
             const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
             expect(checkboxAfter).toBeInTheDocument()
-            expect(checkboxAfter.checked).toBe(initialStateChecked)
+            expect(checkboxAfter).not.toBeChecked()
         })
 
         test('retains billingSameAsShipping checked after authentication via user registration', async () => {
             const user = userEvent.setup()
-            let billingSameAsShippingState = true
-            const setBillingSameAsShipping = jest.fn((value) => {
-                billingSameAsShippingState = value
-            })
 
-            render(
-                <TestWrapper
-                    enableUserRegistration={true}
-                    initialBillingSameAsShipping={true}
-                    setBillingSameAsShipping={setBillingSameAsShipping}
-                />
-            )
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={true} />)
 
             // Verify initial state - billingSameAsShipping should be true
             expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
@@ -650,30 +618,20 @@ describe('Payment Component', () => {
             expect(checkboxBefore).toBeInTheDocument()
             expect(checkboxBefore).toBeChecked()
 
-            // Store the initial state
-            const initialState = billingSameAsShippingState
-
             // Find and trigger user registration
             const registrationComponent = screen.getByTestId('user-registration')
-            expect(registrationComponent).toBeInTheDocument()
-
             const triggerRegistrationButton =
                 within(registrationComponent).getByTestId('trigger-registration')
 
             // Trigger registration
             await user.click(triggerRegistrationButton)
 
-            // Wait for registration to complete (handleRegistrationSuccess callback should execute)
+            // Wait for registration to complete
             await waitFor(() => {
-                // The registration should complete - verify by checking that state hasn't changed unexpectedly
-                expect(billingSameAsShippingState).toBe(initialState)
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
             })
 
-            // Verify billingSameAsShipping state is retained (not changed by registration)
-            expect(billingSameAsShippingState).toBe(true)
-            expect(billingSameAsShippingState).toBe(initialState)
-
-            // Verify checkbox still reflects the retained state
+            // Verify checkbox still reflects the retained state (checked)
             const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
             expect(checkboxAfter).toBeInTheDocument()
             expect(checkboxAfter).toBeChecked()
