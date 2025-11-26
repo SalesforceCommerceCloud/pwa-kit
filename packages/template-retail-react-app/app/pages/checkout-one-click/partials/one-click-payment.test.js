@@ -143,9 +143,21 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration',
     () => {
-        const MockUserRegistration = function ({enableUserRegistration}) {
+        const MockUserRegistration = function ({enableUserRegistration, onRegistered}) {
             return enableUserRegistration ? (
-                <div data-testid="user-registration">User Registration</div>
+                <div data-testid="user-registration">
+                    User Registration
+                    <button
+                        data-testid="trigger-registration"
+                        onClick={async () => {
+                            if (onRegistered) {
+                                await onRegistered('new-basket-id')
+                            }
+                        }}
+                    >
+                        Complete Registration
+                    </button>
+                </div>
             ) : null
         }
 
@@ -284,8 +296,32 @@ const TestWrapper = ({
     selectedPaymentMethod = null,
     isEditing = false,
     onSelectedPaymentMethodChange = jest.fn(),
-    onIsEditingChange = jest.fn()
+    onIsEditingChange = jest.fn(),
+    billingSameAsShipping: initialBillingSameAsShipping = true,
+    setBillingSameAsShipping: providedSetBillingSameAsShipping,
+    paymentMethodForm: providedPaymentMethodForm,
+    billingAddressForm: providedBillingAddressForm
 }) => {
+    // Manage billingSameAsShipping as state so the component can update it
+    const [billingSameAsShipping, setBillingSameAsShippingState] = React.useState(
+        initialBillingSameAsShipping
+    )
+
+    // Create a setter that updates both state and calls the provided setter if given
+    const setBillingSameAsShipping = React.useCallback(
+        (value) => {
+            setBillingSameAsShippingState(value)
+            if (providedSetBillingSameAsShipping) {
+                providedSetBillingSameAsShipping(value)
+            }
+        },
+        [providedSetBillingSameAsShipping]
+    )
+
+    // Sync state when initial prop changes
+    React.useEffect(() => {
+        setBillingSameAsShippingState(initialBillingSameAsShipping)
+    }, [initialBillingSameAsShipping])
     // Mock hooks
     useCurrentCustomer.mockReturnValue({data: customerData})
     useCurrentBasket.mockReturnValue({data: basketData, refetch: jest.fn().mockResolvedValue({})})
@@ -334,7 +370,7 @@ const TestWrapper = ({
     })
 
     // Mock form objects
-    const mockPaymentMethodForm = {
+    const mockPaymentMethodForm = providedPaymentMethodForm || {
         handleSubmit: jest.fn((callback) => (e) => {
             e?.preventDefault?.()
             callback({
@@ -349,7 +385,7 @@ const TestWrapper = ({
         formState: {isSubmitting: false}
     }
 
-    const mockBillingAddressForm = {
+    const mockBillingAddressForm = providedBillingAddressForm || {
         handleSubmit: jest.fn((callback) => (e) => {
             e?.preventDefault?.()
             callback({
@@ -391,6 +427,8 @@ const TestWrapper = ({
                     isEditing={isEditing}
                     onSelectedPaymentMethodChange={onSelectedPaymentMethodChange}
                     onIsEditingChange={onIsEditingChange}
+                    billingSameAsShipping={billingSameAsShipping}
+                    setBillingSameAsShipping={setBillingSameAsShipping}
                 />
             </CurrencyProvider>
         </IntlProvider>
@@ -453,9 +491,18 @@ describe('Payment Component', () => {
                 shipments: [
                     {
                         ...mockBasket.shipments[0],
+                        shipmentId: 'shipment-1',
                         shippingMethod: {
                             c_storePickupEnabled: true
                         }
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        shipmentId: 'shipment-1',
+                        productId: 'product-1',
+                        quantity: 1
                     }
                 ]
             }
@@ -528,6 +575,66 @@ describe('Payment Component', () => {
 
             // The component should set up the registration preference handler
             expect(mockSetEnableUserRegistration).toBeDefined()
+        })
+
+        test('retains billingSameAsShipping unchecked after authentication via user registration', async () => {
+            const user = userEvent.setup()
+
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={false} />)
+
+            // Verify initial state - billingSameAsShipping should be false
+            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const checkboxBefore = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxBefore).toBeInTheDocument()
+            expect(checkboxBefore).not.toBeChecked()
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify checkbox still reflects the retained state (unchecked)
+            const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxAfter).toBeInTheDocument()
+            expect(checkboxAfter).not.toBeChecked()
+        })
+
+        test('retains billingSameAsShipping checked after authentication via user registration', async () => {
+            const user = userEvent.setup()
+
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={true} />)
+
+            // Verify initial state - billingSameAsShipping should be true
+            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const checkboxBefore = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxBefore).toBeInTheDocument()
+            expect(checkboxBefore).toBeChecked()
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify checkbox still reflects the retained state (checked)
+            const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxAfter).toBeInTheDocument()
+            expect(checkboxAfter).toBeChecked()
         })
     })
 

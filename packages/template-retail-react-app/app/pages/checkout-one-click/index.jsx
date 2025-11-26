@@ -92,6 +92,8 @@ const CheckoutOneClick = () => {
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
 
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
+
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
         deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
@@ -168,20 +170,30 @@ const CheckoutOneClick = () => {
         }
     }, [step])
 
-    const onBillingSubmit = async () => {
-        const isFormValid = await billingAddressForm.trigger()
+    // Update billingSameAsShipping when pickup-only status changes
+    // For pickup-only: always require manual billing address entry (not same as store address)
+    // For normal shipping: default to same as shipping address (user can change via checkbox)
+    useEffect(() => {
+        if (isPickupOnly) {
+            setBillingSameAsShipping(false)
+        } else {
+            setBillingSameAsShipping(true)
+        }
+    }, [isPickupOnly])
 
-        if (!isFormValid) {
-            return
+    const onBillingSubmit = async () => {
+        let billingAddress
+        if (billingSameAsShipping && selectedShippingAddress) {
+            billingAddress = selectedShippingAddress
+        } else {
+            const isFormValid = await billingAddressForm.trigger()
+
+            if (!isFormValid) {
+                return
+            }
+            billingAddress = billingAddressForm.getValues()
         }
 
-        // For one-click checkout, billing same as shipping by default
-        const billingSameAsShipping = !isPickupOnly
-        const billingAddress = billingSameAsShipping
-            ? selectedShippingAddress
-            : billingAddressForm.getValues()
-
-        // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
@@ -434,6 +446,8 @@ const CheckoutOneClick = () => {
                                 isEditing={isEditingPayment}
                                 onSelectedPaymentMethodChange={setSelectedPaymentMethod}
                                 onIsEditingChange={setIsEditingPayment}
+                                billingSameAsShipping={billingSameAsShipping}
+                                setBillingSameAsShipping={setBillingSameAsShipping}
                             />
 
                             {step >= STEPS.PAYMENT && (

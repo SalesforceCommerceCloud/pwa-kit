@@ -52,7 +52,9 @@ const Payment = ({
     selectedPaymentMethod,
     isEditing,
     onSelectedPaymentMethodChange,
-    onIsEditingChange
+    onIsEditingChange,
+    billingSameAsShipping,
+    setBillingSameAsShipping
 }) => {
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
@@ -126,7 +128,6 @@ const Payment = ({
         setEnableUserRegistration(checked)
         if (checked && isGuest) {
             // Default preferences for newly registering guest
-            setBillingSameAsShipping(true)
             setShouldSavePaymentMethod(true)
         }
     }
@@ -140,14 +141,7 @@ const Payment = ({
     const hasPickupShipments = shipmentsWithItems.some((s) => isPickupShipment(s))
     const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOnly)
-
-    // When the basket becomes pickup-only, force billing address entry
-    useEffect(() => {
-        if (isPickupOnly) {
-            setBillingSameAsShipping(false)
-        }
-    }, [isPickupOnly])
+    const effectiveBillingSameAsShipping = isPickupOnly ? false : billingSameAsShipping
 
     // For billing=shipping, align with legacy checkout. use the first delivery shipment's address
     const selectedShippingAddress = React.useMemo(() => {
@@ -507,7 +501,7 @@ const Payment = ({
                                     {!isPickupOnly && selectedShippingAddress && (
                                         <Checkbox
                                             name="billingSameAsShipping"
-                                            isChecked={billingSameAsShipping}
+                                            isChecked={effectiveBillingSameAsShipping}
                                             onChange={(e) =>
                                                 setBillingSameAsShipping(e.target.checked)
                                             }
@@ -521,14 +515,14 @@ const Payment = ({
                                         </Checkbox>
                                     )}
 
-                                    {billingSameAsShipping && selectedShippingAddress && (
+                                    {effectiveBillingSameAsShipping && selectedShippingAddress && (
                                         <Box pl={7}>
                                             <AddressDisplay address={selectedShippingAddress} />
                                         </Box>
                                     )}
                                 </Stack>
 
-                                {!billingSameAsShipping && (
+                                {!effectiveBillingSameAsShipping && (
                                     <ShippingAddressSelection
                                         form={billingAddressForm}
                                         selectedAddress={selectedBillingAddress}
@@ -638,7 +632,11 @@ Payment.propTypes = {
     /** Payment method form */
     paymentMethodForm: PropTypes.object.isRequired,
     /** Billing address form */
-    billingAddressForm: PropTypes.object.isRequired
+    billingAddressForm: PropTypes.object.isRequired,
+    /** Whether billing address is same as shipping */
+    billingSameAsShipping: PropTypes.bool.isRequired,
+    /** Callback to set billing same as shipping state */
+    setBillingSameAsShipping: PropTypes.func.isRequired
 }
 
 const PaymentCardSummary = ({payment}) => {
