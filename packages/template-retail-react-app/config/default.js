@@ -24,8 +24,8 @@ module.exports = {
             conversationContext: []
         },
         url: {
-            site: 'path',
-            locale: 'path',
+            site: 'none',
+            locale: 'none',
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },

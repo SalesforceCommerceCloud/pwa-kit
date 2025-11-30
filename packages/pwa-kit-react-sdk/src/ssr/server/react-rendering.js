@@ -134,7 +134,8 @@ const performRender = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
+    const routes = await getRoutes(res.locals)
+    console.log('react-rendering.js routes:', routes)
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
@@ -145,6 +146,13 @@ const performRender = async (req, res, next) => {
             interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
         })
     }
+
+    // Serialize the routes and add them to the config. We'll use this on the client-side later.
+    config.app.routes = routes.map((route) => ({
+        path: route.path,
+        componentName: route.component.displayName.match(/\((\w+)\)/)[1],
+        componentProps: route.props
+    }))
 
     // Step 1 - Find the match.
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')

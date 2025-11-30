@@ -63,7 +63,7 @@ import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-s
 import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
@@ -101,6 +101,9 @@ const ProductDetail = () => {
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
+    if (props.productId) {
+        productId = props.productId
+    }
     const urlParams = new URLSearchParams(location.search)
     const {
         data: productResponse,

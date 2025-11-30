@@ -7,6 +7,10 @@
 
 import {getSites} from '@salesforce/retail-react-app/app/utils/site-utils'
 import {urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import React from 'react'
+import loadable from '@loadable/component'
+import {Redirect} from 'react-router-dom'
+import {fallback, ProductDetail, ProductList} from '@salesforce/retail-react-app/app/routes'
 
 /**
  * Construct literal routes based on url config
@@ -108,4 +112,40 @@ export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
         return res
     }, [])
     return outputRoutes
+}
+
+/**
+ * Transforms a URL mapping from the Shopper Search getUrlMapping API to a routes config.
+ * https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-seo?meta=getUrlMapping
+ * 
+ * @param {Object} urlMapping - The URL mapping object.
+ * @param {string} urlMapping.resourceType - The type of resource (e.g., 'product', 'category').
+ * @param {string} urlMapping.resourceId - The ID of the resource.
+ * @param {string} urlMapping.destinationUrl - The destination URL for redirects.
+ * @param {Object} resourceableComponentsMap - A map of resource types to React components.
+ */
+export const transformUrlMappingToRoute = (path, urlMapping, resourceableComponentsMap) => {
+    let Component, props
+
+    // Resource type is not defined for redirects with a URL destination
+    const isRedirect = !urlMapping.resourceType
+
+    if (isRedirect) {
+        Component = Redirect
+        props = {
+            to: urlMapping.destinationUrl
+        }
+    } else {
+        Component = resourceableComponentsMap[urlMapping.resourceType]
+        props = {
+            [`${urlMapping.resourceType}Id`]: urlMapping.resourceId
+        }
+    }
+
+    return {
+        path: path,
+        // DEVELOPER NOTE: Here we would want to use a Loadable component as to not bloat the home page chunk size.
+        component: Component,
+        props
+    }
 }
