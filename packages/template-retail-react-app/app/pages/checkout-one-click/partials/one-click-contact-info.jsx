@@ -154,13 +154,18 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         // Validate email format
         if (!email) {
             setEmailError('Please enter your email address.')
+            setError('Please enter your email address.')
             return
         }
 
         if (!isValidEmail(email)) {
             setEmailError('Please enter a valid email address.')
+            setError('Please enter a valid email address.')
             return
         }
+
+        // Clear any top-level email error once email is valid
+        setError('')
 
         // Email is valid, proceed with OTP check
         // Use separate blur checking state to avoid disabling the button
@@ -187,6 +192,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Clear email error when user focuses back on the field
         setEmailError('')
+        // Also clear any top-level email error on focus
+        setError('')
     }
 
     // Handle sending OTP email
@@ -424,6 +431,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
 
             if (!result.isRegistered) {
+                // Guest shoppers must provide phone number before proceeding
+                const phone = (formData.phone || '').trim()
+                if (!phone) {
+                    const phoneRequiredMsg = formatMessage({
+                        defaultMessage: 'Please enter your phone number.',
+                        id: 'use_address_fields.error.please_enter_phone_number'
+                    })
+                    try {
+                        form.setError('phone', {type: 'required', message: phoneRequiredMsg})
+                    } catch (_e) {
+                        // ignore setError failures
+                    }
+                    setError(phoneRequiredMsg)
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
+                    return
+                }
                 try {
                     // User is not registered (guest), update basket and proceed to next step
                     await updateCustomerForBasket.mutateAsync({
@@ -543,6 +567,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         })}
                                         type="tel"
                                         control={form.control}
+                                        error={form.formState?.errors?.phone}
                                         rules={{
                                             required: formatMessage({
                                                 defaultMessage: 'Please enter your phone number.',
