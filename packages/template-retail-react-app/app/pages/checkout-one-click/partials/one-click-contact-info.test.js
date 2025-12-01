@@ -260,7 +260,9 @@ describe('ContactInfo Component', () => {
         fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(screen.getAllByText('Please enter a valid email address.').length).toBeGreaterThan(0)
+            expect(
+                screen.getAllByText('Please enter a valid email address.').length
+            ).toBeGreaterThan(0)
         })
 
         // Should not show required email error

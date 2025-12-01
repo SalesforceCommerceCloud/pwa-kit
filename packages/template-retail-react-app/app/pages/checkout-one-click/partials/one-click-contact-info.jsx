@@ -154,18 +154,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         // Validate email format
         if (!email) {
             setEmailError('Please enter your email address.')
-            setError('Please enter your email address.')
             return
         }
 
         if (!isValidEmail(email)) {
             setEmailError('Please enter a valid email address.')
-            setError('Please enter a valid email address.')
             return
         }
-
-        // Clear any top-level email error once email is valid
-        setError('')
 
         // Email is valid, proceed with OTP check
         // Use separate blur checking state to avoid disabling the button
@@ -576,8 +571,21 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         }}
                                         inputProps={({onChange}) => ({
                                             inputMode: 'numeric',
-                                            onChange: (evt) =>
-                                                onChange(formatPhoneNumber(evt.target.value)),
+                                            onChange: (evt) => {
+                                                const formatted = formatPhoneNumber(
+                                                    evt.target.value
+                                                )
+                                                onChange(formatted)
+                                                // Clear phone field error and top-level error as soon as user provides a value
+                                                if (formatted && formatted.trim().length > 0) {
+                                                    try {
+                                                        form.clearErrors('phone')
+                                                    } catch (_e) {
+                                                        // ignore
+                                                    }
+                                                    setError('')
+                                                }
+                                            },
                                             disabled: isRegistered
                                         })}
                                     />
