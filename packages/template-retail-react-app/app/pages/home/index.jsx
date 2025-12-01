@@ -80,7 +80,7 @@ const Home = () => {
         }
     })
 
-    /**************** Einstein ****************/
+    /***************** Einstein *****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
         dataCloud.sendViewPage(pathname)
