@@ -174,6 +174,38 @@ const Payment = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
+    // Ensure saved payment radio is selected when an applied payment exists but lacks a customerPaymentInstrumentId.
+    // We match by last 4 and card type to find the corresponding saved instrument and select it.
+    useEffect(() => {
+        if (step !== STEPS.PAYMENT) return
+        if (currentIsEditing) return
+        if (!appliedPayment) return
+        // If already selected to a saved instrument, nothing to do
+        if (currentSelectedPaymentMethod && currentSelectedPaymentMethod !== 'cc') return
+        // If the applied payment references a saved instrument id, nothing to do
+        if (appliedPayment.customerPaymentInstrumentId) return
+        const last4 = appliedPayment?.paymentCard?.numberLastDigits
+        const type = appliedPayment?.paymentCard?.cardType
+        if (!last4 || !type) return
+        const match = customer?.paymentInstruments?.find(
+            (pi) =>
+                pi?.paymentCard?.numberLastDigits === last4 &&
+                String(pi?.paymentCard?.cardType || '').toLowerCase() ===
+                    String(type || '').toLowerCase()
+        )
+        if (match?.paymentInstrumentId) {
+            onSelectedPaymentMethodChange?.(match.paymentInstrumentId)
+        }
+    }, [
+        step,
+        STEPS.PAYMENT,
+        currentIsEditing,
+        appliedPayment,
+        currentSelectedPaymentMethod,
+        customer?.paymentInstruments,
+        onSelectedPaymentMethodChange
+    ])
+
     const onPaymentSubmit = async (formValue, forcedBasketId) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
         // month and year to submit them as individual fields.
@@ -436,8 +468,8 @@ const Payment = ({
                 })}
                 editing={
                     currentIsEditing ||
-                    step === STEPS.PAYMENT ||
-                    (isPickupOnly && !selectedBillingAddress?.address1 && step > STEPS.CONTACT_INFO)
+                    (step === STEPS.PAYMENT &&
+                        (!appliedPayment || (isPickupOnly && !selectedBillingAddress?.address1)))
                 }
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||

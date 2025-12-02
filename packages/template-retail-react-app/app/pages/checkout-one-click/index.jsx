@@ -91,9 +91,7 @@ const CheckoutOneClick = () => {
     const hasPickupShipments = pickupShipments.length > 0
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
-
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
-
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
         deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
@@ -170,14 +168,17 @@ const CheckoutOneClick = () => {
         }
     }, [step])
 
-    // Update billingSameAsShipping when pickup-only status changes
-    // For pickup-only: always require manual billing address entry (not same as store address)
-    // For normal shipping: default to same as shipping address (user can change via checkbox)
+    // Ensure saved payment radio is selected when entering Payment with an applied instrument
+    useEffect(() => {
+        if (step === STEPS.PAYMENT && appliedPayment?.customerPaymentInstrumentId) {
+            setSelectedPaymentMethod(appliedPayment.customerPaymentInstrumentId)
+        }
+    }, [step, appliedPayment?.customerPaymentInstrumentId, STEPS.PAYMENT])
+
+    // Clamp when cart becomes pickup-only; preserve shopper choice otherwise
     useEffect(() => {
         if (isPickupOnly) {
             setBillingSameAsShipping(false)
-        } else {
-            setBillingSameAsShipping(true)
         }
     }, [isPickupOnly])
 
@@ -461,9 +462,12 @@ const CheckoutOneClick = () => {
                                                 // Require payment instrument or valid new card
                                                 (!appliedPayment &&
                                                     !paymentMethodForm.formState.isValid) ||
-                                                // And ensure billing exists for pickup-only
+                                                // And ensure billing exists for pickup-only (form valid or existing billing on basket)
                                                 (isPickupOnly &&
-                                                    !billingAddressForm.formState.isValid)
+                                                    !(
+                                                        selectedBillingAddress?.address1 ||
+                                                        billingAddressForm.formState.isValid
+                                                    ))
                                             }
                                             data-testid="place-order-button"
                                             size="lg"

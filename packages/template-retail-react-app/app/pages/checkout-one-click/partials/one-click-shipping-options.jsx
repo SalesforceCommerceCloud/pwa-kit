@@ -103,23 +103,11 @@ export default function ShippingOptions() {
         }
     }, [selectedShippingMethod, shippingMethods])
 
-    // Auto-select default shipping method and proceed for authenticated users
+    // Validate existing shipping method for new address or auto-select default for authenticated users
     useEffect(() => {
-        const autoSelectDefaultShippingMethod = async () => {
+        const handleShippingMethodForReturningShopper = async () => {
             // Only auto-select when on this step and haven't already auto-selected
             if (step !== STEPS.SHIPPING_OPTIONS || hasAutoSelected || isLoading) {
-                return
-            }
-
-            // Only proceed for authenticated users
-            if (!customer?.isRegistered) {
-                return
-            }
-
-            // Skip if basket already has a shipping method
-            if (selectedShippingMethod?.id) {
-                setHasAutoSelected(true)
-                goToNextStep()
                 return
             }
 
@@ -128,11 +116,28 @@ export default function ShippingOptions() {
                 return
             }
 
+            const applicable = shippingMethods.applicableShippingMethods
+
+            // If we already have a shipping method on the basket, validate it against the new address' methods.
+            if (selectedShippingMethod?.id) {
+                const stillValid = applicable.some((m) => m.id === selectedShippingMethod.id)
+                setHasAutoSelected(true)
+                if (stillValid) {
+                    // Do not update the basket – keep existing method and proceed to payment
+                    goToNextStep()
+                    return
+                }
+                // If existing method is no longer valid, fall through to select/apply a default
+            }
+
+            // Only proceed with auto-apply for authenticated users when no valid method is present
+            if (!customer?.isRegistered) {
+                return
+            }
+
             const defaultMethodId = shippingMethods.defaultShippingMethodId
             const defaultMethod =
-                shippingMethods.applicableShippingMethods.find(
-                    (method) => method.id === defaultMethodId
-                ) || shippingMethods.applicableShippingMethods[0]
+                applicable.find((method) => method.id === defaultMethodId) || applicable[0]
 
             if (defaultMethod) {
                 //Auto-selecting default shipping method
@@ -161,8 +166,18 @@ export default function ShippingOptions() {
             }
         }
 
-        autoSelectDefaultShippingMethod()
-    }, [step, selectedShippingMethod, customer, shippingMethods, hasAutoSelected, basket?.basketId])
+        handleShippingMethodForReturningShopper()
+    }, [
+        step,
+        selectedShippingMethod,
+        customer,
+        shippingMethods,
+        hasAutoSelected,
+        basket?.basketId,
+        isLoading,
+        goToNextStep,
+        updateShippingMethod
+    ])
 
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({

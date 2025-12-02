@@ -18,7 +18,8 @@ import AddressDisplay from '@salesforce/retail-react-app/app/components/address-
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
 import {
     useShopperCustomersMutation,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -46,12 +47,14 @@ export default function ShippingAddress() {
     const [isLoading, setIsLoading] = useState()
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const [isMultiShipping, setIsMultiShipping] = useState(false)
+    const [openedByUser, setOpenedByUser] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const deliveryShipments =
         basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
     const selectedShippingAddress = deliveryShipments[0]?.shippingAddress
+    const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
     const {step, STEPS, goToStep, goToNextStep, contactPhone} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -69,6 +72,19 @@ export default function ShippingAddress() {
     const {selectedStore} = useSelectedStore()
     const {navigate} = useNavigation()
     const {updatePickupShipment} = usePickupShipment(basket)
+
+    // Prepare a shipping methods query we can manually refetch after address updates
+    const shippingMethodsQuery = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: targetDeliveryShipmentId
+            }
+        },
+        {
+            enabled: false
+        }
+    )
 
     const switchToPickup = async () => {
         try {
@@ -112,8 +128,6 @@ export default function ShippingAddress() {
             // Ensure we target the latest basket id in case it changed
             const refreshed = await currentBasketQuery.refetch()
             const latestBasketId = refreshed?.data?.basketId || basket.basketId
-
-            const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
 
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
@@ -161,8 +175,25 @@ export default function ShippingAddress() {
                 })
             }
 
-            if (typeof goToNextStep === 'function') {
-                goToNextStep()
+            // For registered shoppers: if an existing shipping method is still valid for the new address,
+            // skip the Shipping Options step and go straight to Payment.
+            try {
+                const selectedMethodId = deliveryShipments[0]?.shippingMethod?.id
+                if (customer?.isRegistered && selectedMethodId) {
+                    const methods = await shippingMethodsQuery.refetch()
+                    const applicable = methods?.data?.applicableShippingMethods || []
+                    const stillValid = applicable.some((m) => m.id === selectedMethodId)
+                    if (stillValid) {
+                        goToStep?.(STEPS.PAYMENT)
+                    } else {
+                        goToNextStep?.()
+                    }
+                } else {
+                    goToNextStep?.()
+                }
+            } catch {
+                // On any failure, fall back to normal progression
+                goToNextStep?.()
             }
         } catch (error) {
             if (process.env.NODE_ENV !== 'test') {
@@ -178,6 +209,11 @@ export default function ShippingAddress() {
         const autoSelectPreferredAddress = async () => {
             // Only auto-select when on this step and haven't already auto-selected
             if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) {
+                return
+            }
+
+            // If user explicitly opened this card, do not auto-advance
+            if (openedByUser) {
                 return
             }
 
@@ -225,8 +261,16 @@ export default function ShippingAddress() {
         hasAutoSelected,
         isLoading,
         multishipEnabled,
-        hasMultipleProductItems
+        hasMultipleProductItems,
+        openedByUser
     ])
+
+    // Reset manual-open flag when leaving this step
+    useEffect(() => {
+        if (step !== STEPS.SHIPPING_ADDRESS && openedByUser) {
+            setOpenedByUser(false)
+        }
+    }, [step, STEPS.SHIPPING_ADDRESS, openedByUser])
 
     return (
         <ToggleCard
@@ -238,7 +282,10 @@ export default function ShippingAddress() {
             editing={step === STEPS.SHIPPING_ADDRESS}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
-            onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
+            onEdit={() => {
+                setOpenedByUser(true)
+                goToStep(STEPS.SHIPPING_ADDRESS)
+            }}
             editLabel={formatMessage({
                 defaultMessage: 'Change',
                 id: 'toggle_card.action.change'

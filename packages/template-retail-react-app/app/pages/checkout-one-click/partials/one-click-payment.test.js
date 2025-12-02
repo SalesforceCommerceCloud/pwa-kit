@@ -518,7 +518,7 @@ describe('Payment Component', () => {
             expect(screen.getByTestId('payment-form')).toBeInTheDocument()
         })
 
-        test('pickup-only shows billing address form immediately', async () => {
+        test('pickup-only shows billing address form immediately (initial render)', async () => {
             const pickupBasket = {
                 ...mockBasket,
                 billingAddress: null,
@@ -536,6 +536,28 @@ describe('Payment Component', () => {
             render(<TestWrapper basketData={pickupBasket} />)
             // When pickup-only, billingSameAsShipping is forced false and the form should be shown
             expect(await screen.findByTestId('shipping-address-selection')).toBeInTheDocument()
+        })
+
+        test('pickup-only shows billing address form immediately', async () => {
+            const pickupBasket = {
+                ...mockBasket,
+                billingAddress: null,
+                shipments: [
+                    {
+                        shipmentId: 'p2-1',
+                        shippingAddress: null,
+                        shippingMethod: {
+                            c_storePickupEnabled: true
+                        }
+                    }
+                ],
+                productItems: [{itemId: 'p2-item', shipmentId: 'p2-1'}]
+            }
+            render(<TestWrapper basketData={pickupBasket} />)
+            // When pickup-only, billingSameAsShipping is forced false and the form should be shown
+            await waitFor(() => {
+                expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
+            })
         })
     })
 
@@ -766,7 +788,15 @@ describe('Payment Component', () => {
                     }
                 ]
             }
-            render(<TestWrapper basketData={basketWithApplied} removePaymentShouldFail={true} />)
+            render(
+                <TestWrapper
+                    basketData={basketWithApplied}
+                    removePaymentShouldFail={true}
+                    isEditing={true}
+                />
+            )
+            // Payment form should be visible in edit mode
+            expect(await screen.findByTestId('payment-form')).toBeInTheDocument()
             await user.click(screen.getByText('Select CC'))
             await waitFor(() => {
                 expect(mockToastFn).toHaveBeenCalled()
