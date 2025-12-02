@@ -362,10 +362,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 country: 'US', // TODO: see W-18812582
                 locale: intl.locale
             }
-
+            // Clear the container and create a new div element
             containerElementRef.current.innerHTML = ''
             const paymentElement = document.createElement('div')
             containerElementRef.current.appendChild(paymentElement)
+
             paymentElement.addEventListener('load', handlePaymentMethodSelected)
             paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected)
             paymentElement.addEventListener('sfppaymentbuttonapprove', handlePaymentButtonApprove)
@@ -379,6 +380,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentElement
             )
         }
+        
         // Cleanup on unmount
         return () => {
             checkoutComponent.current?.destroy()
