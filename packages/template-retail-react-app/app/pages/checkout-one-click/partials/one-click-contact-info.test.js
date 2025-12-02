@@ -70,6 +70,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 }))
 
 const mockSetContactPhone = jest.fn()
+const mockGoToNextStep = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context', () => {
     return {
         useCheckout: jest.fn().mockReturnValue({
@@ -81,7 +82,7 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
             login: null,
             STEPS: {CONTACT_INFO: 0},
             goToStep: null,
-            goToNextStep: jest.fn(),
+            goToNextStep: mockGoToNextStep,
             setContactPhone: mockSetContactPhone
         })
     }
@@ -259,7 +260,9 @@ describe('ContactInfo Component', () => {
         fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+            expect(
+                screen.getAllByText('Please enter a valid email address.').length
+            ).toBeGreaterThan(0)
         })
 
         // Should not show required email error
@@ -318,6 +321,30 @@ describe('ContactInfo Component', () => {
             })
             expect(continueBtn).toBeEnabled()
         })
+    })
+
+    test('requires phone for guest shoppers on submit', async () => {
+        // Ensure guest path (no OTP modal)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        // Enter valid email, leave phone empty
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.change(emailInput, {target: {value: validEmail}})
+        fireEvent.blur(emailInput)
+
+        // Click continue
+        const continueBtn = await screen.findByRole('button', {
+            name: /continue to shipping address/i
+        })
+        await user.click(continueBtn)
+
+        // Should not proceed or update basket without phone
+        expect(mockUpdateCustomerForBasket.mutateAsync).not.toHaveBeenCalled()
+        expect(mockGoToNextStep).not.toHaveBeenCalled()
     })
 
     test('handles OTP authorization failure gracefully', async () => {

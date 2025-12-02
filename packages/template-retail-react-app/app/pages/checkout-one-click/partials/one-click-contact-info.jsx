@@ -187,6 +187,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Clear email error when user focuses back on the field
         setEmailError('')
+        // Also clear any top-level email error on focus
+        setError('')
     }
 
     // Handle sending OTP email
@@ -424,6 +426,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
 
             if (!result.isRegistered) {
+                // Guest shoppers must provide phone number before proceeding
+                const phone = (formData.phone || '').trim()
+                if (!phone) {
+                    const phoneRequiredMsg = formatMessage({
+                        defaultMessage: 'Please enter your phone number.',
+                        id: 'use_address_fields.error.please_enter_phone_number'
+                    })
+                    try {
+                        form.setError('phone', {type: 'required', message: phoneRequiredMsg})
+                    } catch (_e) {
+                        // ignore setError failures
+                    }
+                    setError(phoneRequiredMsg)
+                    setIsSubmitting(false)
+                    setIsCheckingEmail(false)
+                    return
+                }
                 try {
                     // User is not registered (guest), update basket and proceed to next step
                     await updateCustomerForBasket.mutateAsync({
@@ -543,6 +562,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         })}
                                         type="tel"
                                         control={form.control}
+                                        error={form.formState?.errors?.phone}
                                         rules={{
                                             required: formatMessage({
                                                 defaultMessage: 'Please enter your phone number.',
@@ -551,8 +571,21 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         }}
                                         inputProps={({onChange}) => ({
                                             inputMode: 'numeric',
-                                            onChange: (evt) =>
-                                                onChange(formatPhoneNumber(evt.target.value)),
+                                            onChange: (evt) => {
+                                                const formatted = formatPhoneNumber(
+                                                    evt.target.value
+                                                )
+                                                onChange(formatted)
+                                                // Clear phone field error and top-level error as soon as user provides a value
+                                                if (formatted && formatted.trim().length > 0) {
+                                                    try {
+                                                        form.clearErrors('phone')
+                                                    } catch (_e) {
+                                                        // ignore
+                                                    }
+                                                    setError('')
+                                                }
+                                            },
                                             disabled: isRegistered
                                         })}
                                     />
