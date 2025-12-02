@@ -168,6 +168,13 @@ const CheckoutOneClick = () => {
         }
     }, [step])
 
+    // Ensure saved payment radio is selected when entering Payment with an applied instrument
+    useEffect(() => {
+        if (step === STEPS.PAYMENT && appliedPayment?.customerPaymentInstrumentId) {
+            setSelectedPaymentMethod(appliedPayment.customerPaymentInstrumentId)
+        }
+    }, [step, appliedPayment?.customerPaymentInstrumentId, STEPS.PAYMENT])
+
     // Clamp when cart becomes pickup-only; preserve shopper choice otherwise
     useEffect(() => {
         if (isPickupOnly) {
