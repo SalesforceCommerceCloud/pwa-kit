@@ -91,7 +91,7 @@ const CheckoutOneClick = () => {
     const hasPickupShipments = pickupShipments.length > 0
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
-
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
         deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
@@ -168,20 +168,26 @@ const CheckoutOneClick = () => {
         }
     }, [step])
 
-    const onBillingSubmit = async () => {
-        const isFormValid = await billingAddressForm.trigger()
+    // Clamp when cart becomes pickup-only; preserve shopper choice otherwise
+    useEffect(() => {
+        if (isPickupOnly) {
+            setBillingSameAsShipping(false)
+        }
+    }, [isPickupOnly])
 
-        if (!isFormValid) {
-            return
+    const onBillingSubmit = async () => {
+        let billingAddress
+        if (billingSameAsShipping && selectedShippingAddress) {
+            billingAddress = selectedShippingAddress
+        } else {
+            const isFormValid = await billingAddressForm.trigger()
+
+            if (!isFormValid) {
+                return
+            }
+            billingAddress = billingAddressForm.getValues()
         }
 
-        // For one-click checkout, billing same as shipping by default
-        const billingSameAsShipping = !isPickupOnly
-        const billingAddress = billingSameAsShipping
-            ? selectedShippingAddress
-            : billingAddressForm.getValues()
-
-        // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
@@ -434,6 +440,8 @@ const CheckoutOneClick = () => {
                                 isEditing={isEditingPayment}
                                 onSelectedPaymentMethodChange={setSelectedPaymentMethod}
                                 onIsEditingChange={setIsEditingPayment}
+                                billingSameAsShipping={billingSameAsShipping}
+                                setBillingSameAsShipping={setBillingSameAsShipping}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -447,9 +455,12 @@ const CheckoutOneClick = () => {
                                                 // Require payment instrument or valid new card
                                                 (!appliedPayment &&
                                                     !paymentMethodForm.formState.isValid) ||
-                                                // And ensure billing exists for pickup-only
+                                                // And ensure billing exists for pickup-only (form valid or existing billing on basket)
                                                 (isPickupOnly &&
-                                                    !billingAddressForm.formState.isValid)
+                                                    !(
+                                                        selectedBillingAddress?.address1 ||
+                                                        billingAddressForm.formState.isValid
+                                                    ))
                                             }
                                             data-testid="place-order-button"
                                             size="lg"

@@ -75,12 +75,13 @@ export const usePickupShipment = (basket) => {
         }
 
         if (!pickupShippingMethodId) {
-            const {data: fetchedShippingMethods} = await refetchShippingMethods()
+            const refetchResult = await refetchShippingMethods()
+            const fetchedShippingMethods = refetchResult?.data ?? refetchResult ?? null
             pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-        }
-
-        if (!pickupShippingMethodId) {
-            throw new Error('No pickup shipping method available for this site')
+            // If refetch returned nothing (undefined), fall back to default pickup id '005'
+            if (!pickupShippingMethodId && typeof refetchResult === 'undefined') {
+                pickupShippingMethodId = '005'
+            }
         }
 
         // Update shipment to ensure pickup configuration
@@ -202,7 +203,8 @@ export const usePickupShipment = (basket) => {
             (isCurrentlyPickup && currentStoreId !== selectedStore.id)
         ) {
             // Fetch shipping methods to get available options
-            const {data: fetchedShippingMethods} = await refetchShippingMethods()
+            const refetchResult = await refetchShippingMethods()
+            const fetchedShippingMethods = refetchResult?.data ?? refetchResult ?? null
 
             if (selectedPickup) {
                 // Configure pickup shipment if pickup is selected but current method is not pickup

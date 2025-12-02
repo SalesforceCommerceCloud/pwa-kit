@@ -86,7 +86,7 @@ jest.mock('@salesforce/retail-react-app/app/components/promo-code', () => ({
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form',
     () => {
-        const MockPaymentForm = function ({onSubmit, children}) {
+        const MockPaymentForm = function ({onSubmit, onPaymentMethodChange, children}) {
             return (
                 <div data-testid="payment-form">
                     <div>Credit Card</div>
@@ -94,6 +94,12 @@ jest.mock(
                     <input aria-label="Expiry Date" data-testid="expiry-date" />
                     <input aria-label="CVV" data-testid="cvv" />
                     {children}
+                    <button type="button" onClick={() => onPaymentMethodChange?.('cc')}>
+                        Select CC
+                    </button>
+                    <button type="button" onClick={() => onPaymentMethodChange?.('pi-1')}>
+                        Select Saved
+                    </button>
                     <button
                         type="button"
                         onClick={() =>
@@ -137,9 +143,21 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration',
     () => {
-        const MockUserRegistration = function ({enableUserRegistration}) {
+        const MockUserRegistration = function ({enableUserRegistration, onRegistered}) {
             return enableUserRegistration ? (
-                <div data-testid="user-registration">User Registration</div>
+                <div data-testid="user-registration">
+                    User Registration
+                    <button
+                        data-testid="trigger-registration"
+                        onClick={async () => {
+                            if (onRegistered) {
+                                await onRegistered('new-basket-id')
+                            }
+                        }}
+                    >
+                        Complete Registration
+                    </button>
+                </div>
             ) : null
         }
 
@@ -232,6 +250,7 @@ const mockBasket = {
     orderTotal: 100.0,
     shipments: [
         {
+            shipmentId: 's-1',
             shippingAddress: {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -244,6 +263,12 @@ const mockBasket = {
             shippingMethod: {
                 c_storePickupEnabled: false
             }
+        }
+    ],
+    productItems: [
+        {
+            itemId: 'item-1',
+            shipmentId: 's-1'
         }
     ],
     billingAddress: null
@@ -263,14 +288,40 @@ const TestWrapper = ({
     setEnableUserRegistration = jest.fn(),
     onPaymentMethodSaved = jest.fn(),
     onSavePreferenceChange = jest.fn(),
+    onPaymentSubmitted = undefined,
     registeredUserChoseGuest = false,
     removePaymentShouldFail = false,
+    addPaymentShouldFail = false,
     initialStep = 4,
     selectedPaymentMethod = null,
     isEditing = false,
     onSelectedPaymentMethodChange = jest.fn(),
-    onIsEditingChange = jest.fn()
+    onIsEditingChange = jest.fn(),
+    billingSameAsShipping: initialBillingSameAsShipping = true,
+    setBillingSameAsShipping: providedSetBillingSameAsShipping,
+    paymentMethodForm: providedPaymentMethodForm,
+    billingAddressForm: providedBillingAddressForm
 }) => {
+    // Manage billingSameAsShipping as state so the component can update it
+    const [billingSameAsShipping, setBillingSameAsShippingState] = React.useState(
+        initialBillingSameAsShipping
+    )
+
+    // Create a setter that updates both state and calls the provided setter if given
+    const setBillingSameAsShipping = React.useCallback(
+        (value) => {
+            setBillingSameAsShippingState(value)
+            if (providedSetBillingSameAsShipping) {
+                providedSetBillingSameAsShipping(value)
+            }
+        },
+        [providedSetBillingSameAsShipping]
+    )
+
+    // Sync state when initial prop changes
+    React.useEffect(() => {
+        setBillingSameAsShippingState(initialBillingSameAsShipping)
+    }, [initialBillingSameAsShipping])
     // Mock hooks
     useCurrentCustomer.mockReturnValue({data: customerData})
     useCurrentBasket.mockReturnValue({data: basketData, refetch: jest.fn().mockResolvedValue({})})
@@ -297,7 +348,9 @@ const TestWrapper = ({
     useCheckout.mockReturnValue(mockCheckout)
 
     // Mock mutations
-    const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+    const mockAddPaymentInstrument = addPaymentShouldFail
+        ? jest.fn().mockRejectedValue(new Error('add failed'))
+        : jest.fn().mockResolvedValue({})
     const mockUpdateBillingAddress = jest.fn().mockResolvedValue({})
     const mockRemovePaymentInstrument = removePaymentShouldFail
         ? jest.fn().mockRejectedValue(new Error('remove failed'))
@@ -317,7 +370,7 @@ const TestWrapper = ({
     })
 
     // Mock form objects
-    const mockPaymentMethodForm = {
+    const mockPaymentMethodForm = providedPaymentMethodForm || {
         handleSubmit: jest.fn((callback) => (e) => {
             e?.preventDefault?.()
             callback({
@@ -332,7 +385,7 @@ const TestWrapper = ({
         formState: {isSubmitting: false}
     }
 
-    const mockBillingAddressForm = {
+    const mockBillingAddressForm = providedBillingAddressForm || {
         handleSubmit: jest.fn((callback) => (e) => {
             e?.preventDefault?.()
             callback({
@@ -369,10 +422,13 @@ const TestWrapper = ({
                     registeredUserChoseGuest={registeredUserChoseGuest}
                     onPaymentMethodSaved={onPaymentMethodSaved}
                     onSavePreferenceChange={onSavePreferenceChange}
+                    onPaymentSubmitted={onPaymentSubmitted}
                     selectedPaymentMethod={selectedPaymentMethod}
                     isEditing={isEditing}
                     onSelectedPaymentMethodChange={onSelectedPaymentMethodChange}
                     onIsEditingChange={onIsEditingChange}
+                    billingSameAsShipping={billingSameAsShipping}
+                    setBillingSameAsShipping={setBillingSameAsShipping}
                 />
             </CurrencyProvider>
         </IntlProvider>
@@ -422,8 +478,11 @@ describe('Payment Component', () => {
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
             render(<TestWrapper />)
 
-            // The checkbox label shows as the message ID since we're mocking formatMessage
-            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            expect(
+                screen.getByRole('checkbox', {
+                    name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+                })
+            ).toBeInTheDocument()
         })
 
         test('hides "Same as shipping address" checkbox for pickup orders', () => {
@@ -432,18 +491,51 @@ describe('Payment Component', () => {
                 shipments: [
                     {
                         ...mockBasket.shipments[0],
+                        shipmentId: 'shipment-1',
                         shippingMethod: {
                             c_storePickupEnabled: true
                         }
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        shipmentId: 'shipment-1',
+                        productId: 'product-1',
+                        quantity: 1
                     }
                 ]
             }
 
             render(<TestWrapper basketData={pickupBasket} />)
 
-            expect(
+            const sameAs =
+                screen.queryByRole('checkbox', {name: /same as shipping address/i}) ||
                 screen.queryByText('checkout_payment.label.same_as_shipping')
-            ).not.toBeInTheDocument()
+            expect(sameAs).not.toBeInTheDocument()
+
+            // Billing form should be shown immediately for pickup-only
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+        })
+
+        test('pickup-only shows billing address form immediately', async () => {
+            const pickupBasket = {
+                ...mockBasket,
+                billingAddress: null,
+                shipments: [
+                    {
+                        shipmentId: 'p-1',
+                        shippingAddress: null,
+                        shippingMethod: {
+                            c_storePickupEnabled: true
+                        }
+                    }
+                ],
+                productItems: [{itemId: 'p-item', shipmentId: 'p-1'}]
+            }
+            render(<TestWrapper basketData={pickupBasket} />)
+            // When pickup-only, billingSameAsShipping is forced false and the form should be shown
+            expect(await screen.findByTestId('shipping-address-selection')).toBeInTheDocument()
         })
 
         test('pickup-only shows billing address form immediately', async () => {
@@ -467,6 +559,27 @@ describe('Payment Component', () => {
         })
     })
 
+    describe('Callbacks', () => {
+        test('calls onPaymentSubmitted with full card details on submit', async () => {
+            const user = userEvent.setup()
+            const onPaymentSubmitted = jest.fn()
+            render(
+                <TestWrapper
+                    onPaymentMethodSaved={jest.fn()}
+                    onSavePreferenceChange={jest.fn()}
+                    onPaymentSubmitted={onPaymentSubmitted}
+                />
+            )
+            await user.click(screen.getByText('Submit Payment'))
+            expect(onPaymentSubmitted).toHaveBeenCalledWith({
+                number: '4111111111111111',
+                expiry: '12/25',
+                cvv: '123',
+                holder: 'John Doe',
+                cardType: 'Visa'
+            })
+        })
+    })
     describe('User Registration', () => {
         test('hides user registration when user chose guest checkout', () => {
             render(<TestWrapper enableUserRegistration={true} registeredUserChoseGuest={true} />)
@@ -482,6 +595,66 @@ describe('Payment Component', () => {
 
             // The component should set up the registration preference handler
             expect(mockSetEnableUserRegistration).toBeDefined()
+        })
+
+        test('retains billingSameAsShipping unchecked after authentication via user registration', async () => {
+            const user = userEvent.setup()
+
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={false} />)
+
+            // Verify initial state - billingSameAsShipping should be false
+            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const checkboxBefore = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxBefore).toBeInTheDocument()
+            expect(checkboxBefore).not.toBeChecked()
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify checkbox still reflects the retained state (unchecked)
+            const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxAfter).toBeInTheDocument()
+            expect(checkboxAfter).not.toBeChecked()
+        })
+
+        test('retains billingSameAsShipping checked after authentication via user registration', async () => {
+            const user = userEvent.setup()
+
+            render(<TestWrapper enableUserRegistration={true} billingSameAsShipping={true} />)
+
+            // Verify initial state - billingSameAsShipping should be true
+            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const checkboxBefore = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxBefore).toBeInTheDocument()
+            expect(checkboxBefore).toBeChecked()
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify checkbox still reflects the retained state (checked)
+            const checkboxAfter = document.querySelector('input[name="billingSameAsShipping"]')
+            expect(checkboxAfter).toBeInTheDocument()
+            expect(checkboxAfter).toBeChecked()
         })
     })
 
@@ -575,7 +748,9 @@ describe('Payment Component', () => {
             render(<TestWrapper billingAddressForm={mockBillingAddressForm} />)
 
             // Uncheck same as shipping
-            const checkbox = screen.getByText('checkout_payment.label.same_as_shipping')
+            const checkbox = screen.getByRole('checkbox', {
+                name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+            })
             await user.click(checkbox)
 
             // Should show the billing address form
@@ -586,6 +761,38 @@ describe('Payment Component', () => {
     })
 
     describe('Error Handling', () => {
+        test('shows error toast when add payment API fails on submit', async () => {
+            const user = userEvent.setup()
+            render(<TestWrapper addPaymentShouldFail={true} />)
+            await user.click(screen.getByText('Submit Payment'))
+            await waitFor(() => {
+                expect(mockToastFn).toHaveBeenCalled()
+            })
+        })
+
+        test('shows error toast and aborts when removing applied payment fails on change', async () => {
+            const user = userEvent.setup()
+            const basketWithApplied = {
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'applied-1',
+                        paymentCard: {
+                            cardType: 'Visa',
+                            numberLastDigits: '1111',
+                            expirationMonth: 1,
+                            expirationYear: 2030
+                        }
+                    }
+                ]
+            }
+            render(<TestWrapper basketData={basketWithApplied} removePaymentShouldFail={true} />)
+            await user.click(screen.getByText('Select CC'))
+            await waitFor(() => {
+                expect(mockToastFn).toHaveBeenCalled()
+            })
+        })
+
         test('enters edit mode successfully when handleEditPayment is called', async () => {
             const user = userEvent.setup()
 
@@ -639,6 +846,65 @@ describe('Payment Component', () => {
     })
 
     describe('Accessibility', () => {
+        test('changing to a saved payment instrument does not error', async () => {
+            const user = userEvent.setup()
+            // Provide saved instrument id 'pi-1' to match the PaymentForm mock
+            const customerWithSaved = {
+                isRegistered: true,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'pi-1',
+                        default: true,
+                        billingAddress: null
+                    }
+                ]
+            }
+            render(<TestWrapper isRegistered={true} customerData={customerWithSaved} />)
+            // Wait for form to appear (auto-apply may temporarily hide it)
+            await screen.findByTestId('payment-form')
+            await user.click(screen.getByText('Select Saved'))
+            // If no error thrown, the path executed successfully
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+        })
+
+        test('changing to a saved instrument on pickup updates without error', async () => {
+            const user = userEvent.setup()
+            const pickupBasket = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        ...mockBasket.shipments[0],
+                        shippingMethod: {c_storePickupEnabled: true}
+                    }
+                ]
+            }
+            const customerWithSaved = {
+                isRegistered: true,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'pi-1',
+                        default: true,
+                        billingAddress: {
+                            address1: '1 Admin Way',
+                            city: 'SF',
+                            stateCode: 'CA',
+                            postalCode: '94105',
+                            countryCode: 'US'
+                        }
+                    }
+                ]
+            }
+            render(
+                <TestWrapper
+                    basketData={pickupBasket}
+                    isRegistered={true}
+                    customerData={customerWithSaved}
+                />
+            )
+            await screen.findByTestId('payment-form')
+            await user.click(screen.getByText('Select Saved'))
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+        })
         test('payment section has proper heading structure', () => {
             render(<TestWrapper />)
 
@@ -659,13 +925,18 @@ describe('Payment Component', () => {
             render(<TestWrapper />)
 
             expect(screen.getByText('Submit Payment')).toBeInTheDocument()
+            expect(screen.getByText('Select CC')).toBeInTheDocument()
+            expect(screen.getByText('Select Saved')).toBeInTheDocument()
             expect(screen.getByText('Review Order')).toBeInTheDocument()
         })
 
         test('checkboxes have proper labels', () => {
             render(<TestWrapper />)
 
-            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
+            const labelNode =
+                screen.queryByText(/same as shipping address/i) ||
+                screen.queryByText('checkout_payment.label.same_as_shipping')
+            expect(labelNode).toBeInTheDocument()
         })
     })
 })

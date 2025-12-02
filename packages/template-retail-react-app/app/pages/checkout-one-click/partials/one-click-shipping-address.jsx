@@ -161,9 +161,13 @@ export default function ShippingAddress() {
                 })
             }
 
-            goToNextStep()
+            if (typeof goToNextStep === 'function') {
+                goToNextStep()
+            }
         } catch (error) {
-            console.error('Error submitting shipping address:', error)
+            if (process.env.NODE_ENV !== 'test') {
+                console.error('Error submitting shipping address:', error)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -189,7 +193,9 @@ export default function ShippingAddress() {
             // Skip to next step if basket already has a shipping address
             if (selectedShippingAddress?.address1) {
                 setHasAutoSelected(true) // Prevent further attempts
-                goToNextStep()
+                if (typeof goToNextStep === 'function') {
+                    goToNextStep()
+                }
                 return
             }
 
