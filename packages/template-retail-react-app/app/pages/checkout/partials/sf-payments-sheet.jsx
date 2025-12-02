@@ -339,13 +339,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }))
 
     useEffect(() => {
-        if (
-            !checkoutComponent.current &&
-            sfp &&
-            metadata &&
-            containerElementRef.current &&
-            paymentConfig
-        ) {
+        if (sfp && metadata && containerElementRef.current && paymentConfig) {
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
@@ -369,11 +363,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 locale: intl.locale
             }
 
-            // Clear the container and create a new div element
             containerElementRef.current.innerHTML = ''
             const paymentElement = document.createElement('div')
             containerElementRef.current.appendChild(paymentElement)
-
             paymentElement.addEventListener('load', handlePaymentMethodSelected)
             paymentElement.addEventListener('paymentMethodSelected', handlePaymentMethodSelected)
             paymentElement.addEventListener('sfppaymentbuttonapprove', handlePaymentButtonApprove)
@@ -389,15 +381,13 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
         // Cleanup on unmount
         return () => {
-            if (checkoutComponent.current && !containerElementRef.current) {
-                checkoutComponent.current.destroy()
-                checkoutComponent.current = null
-            }
+            checkoutComponent.current?.destroy()
+            checkoutComponent.current = null
         }
-    }, [sfp, metadata, paymentConfig, cardCaptureAutomatic])
+    }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
 
     useEffect(() => {
-        if (checkoutComponent.current && basket?.orderTotal != null) {
+        if (checkoutComponent.current !== null && basket?.orderTotal !== null) {
             checkoutComponent.current.updateAmount(basket.orderTotal)
         }
     }, [basket?.orderTotal])
@@ -415,13 +405,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 id: 'toggle_card.action.editPaymentInfo'
             })}
         >
+            <Box display={step === STEPS.PAYMENT ? 'block' : 'none'}>
+                <Box ref={containerElementRef} />
+            </Box>
+            
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
                 <Stack spacing={6}>
-                    <Box ref={containerElementRef} />
 
                     <Divider borderColor="gray.100" />
 
