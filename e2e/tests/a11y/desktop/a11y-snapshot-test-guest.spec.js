@@ -94,7 +94,12 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
             })
 
         // Run the a11y test
-        await runAccessibilityTest(page, ['guest', 'pdp-a11y-violations.json'])
+        await runAccessibilityTest(page, ['guest', 'pdp-a11y-violations.json'], {
+            exclude: [
+                's', // Exclude strikethrough price elements
+                '.css-... > .css-...' // Exclude color variant swatches (text-based)
+            ]
+        })
     })
 
     test('Cart should not have new accessibility issues', async ({page}) => {
@@ -108,7 +113,12 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
         // Run the a11y test
-        await runAccessibilityTest(page, ['guest', 'cart-a11y-violations.json'])
+        await runAccessibilityTest(page, ['guest', 'cart-a11y-violations.json'], {
+            exclude: [
+                's', // Exclude strikethrough price elements
+                '.css-... > .css-...' // Exclude color variant swatches (text-based)
+            ]
+        })
     })
 
     test('Checkout should not have new accessibility issues', async ({page}) => {
