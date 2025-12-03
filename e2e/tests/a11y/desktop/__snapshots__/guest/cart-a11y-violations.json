@@ -16,6 +16,36 @@
     ]
   },
   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright",
+    "nodes": [
+      {
+        "html": "<s class=\"...\" aria-label=\"From original price $89.00\">$89.00</s>",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.21 (foreground color: #747474, background color: #f3f3f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "target": [
+          ".css-...:nth-child(3) > .css-... > .css-....chakra-link > s"
+        ]
+      },
+      {
+        "html": "<s class=\"...\" aria-label=\"From original price $119.00\">$119.00</s>",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.21 (foreground color: #747474, background color: #f3f3f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "target": [
+          "s"
+        ]
+      },
+      {
+        "html": "<div class=\"...\">Navy</div>",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.65 (foreground color: #c9c9c9, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "target": [
+          ".css-... > .css-..."
+        ]
+      }
+    ]
+  },
+  {
     "id": "landmark-unique",
     "impact": "moderate",
     "description": "Ensure landmarks are unique",
