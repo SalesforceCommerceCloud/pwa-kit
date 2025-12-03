@@ -230,7 +230,7 @@ const Account = () => {
 
                 <Switch>
                     <Route exact path={path}>
-                        <AccountDetail 
+                        <AccountDetail
                             handleForgotPasswordClick={() => navigate('/reset-password')}
                         />
                     </Route>

@@ -17,11 +17,7 @@ import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components
 import Field from '@salesforce/retail-react-app/app/components/field'
 import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
 
-const UpdatePasswordFields = ({
-    form, 
-    prefix = '', 
-    handleForgotPasswordClick
-}) => {
+const UpdatePasswordFields = ({form, prefix = '', handleForgotPasswordClick}) => {
     const fields = useUpdatePasswordFields({form, prefix})
     const password = form.watch('password')
 
@@ -30,14 +26,14 @@ const UpdatePasswordFields = ({
             <Stack>
                 <Field {...fields.currentPassword} />
                 {handleForgotPasswordClick && (
-                <Box>
-                    <Button variant="link" size="sm" onClick={handleForgotPasswordClick}>
-                        <FormattedMessage
-                            defaultMessage="Forgot Password?"
-                            id="update_password_fields.button.forgot_password"
-                        />
-                    </Button>
-                </Box>
+                    <Box>
+                        <Button variant="link" size="sm" onClick={handleForgotPasswordClick}>
+                            <FormattedMessage
+                                defaultMessage="Forgot Password?"
+                                id="update_password_fields.button.forgot_password"
+                            />
+                        </Button>
+                    </Box>
                 )}
             </Stack>
 
