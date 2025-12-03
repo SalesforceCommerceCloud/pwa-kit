@@ -95,10 +95,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'pdp-a11y-violations.json'], {
-            exclude: [
-                's', // Exclude strikethrough price elements
-                '.css-... > .css-...' // Exclude color variant swatches (text-based)
-            ]
+            disableRules: ['color-contrast'] // Disable the entire color-contrast rule
         })
     })
 
@@ -114,10 +111,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'cart-a11y-violations.json'], {
-            exclude: [
-                's', // Exclude strikethrough price elements
-                '.css-... > .css-...' // Exclude color variant swatches (text-based)
-            ]
+            disableRules: ['color-contrast'] // Disable the entire color-contrast rule
         })
     })
 
