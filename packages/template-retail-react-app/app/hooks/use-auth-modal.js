@@ -107,7 +107,7 @@ export const AuthModal = ({
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessMode,
-                ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
+                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {

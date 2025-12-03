@@ -79,7 +79,9 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const passwordlessConfigMode = passwordlessConfig?.mode
+    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
@@ -89,6 +91,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             const redirectPath = window.location.pathname + (window.location.search || '')
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
+                mode: passwordlessConfigMode,
                 callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
             })
             setAuthModalView(EMAIL_VIEW)
