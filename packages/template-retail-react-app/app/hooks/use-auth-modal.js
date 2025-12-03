@@ -88,7 +88,9 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
+    const passwordlessMode = passwordlessConfig?.mode
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
@@ -104,7 +106,8 @@ export const AuthModal = ({
             const redirectPath = window.location.pathname + (window.location.search || '')
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+                mode: passwordlessMode,
+                ...(passwordlessMode === 'callback' && callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {

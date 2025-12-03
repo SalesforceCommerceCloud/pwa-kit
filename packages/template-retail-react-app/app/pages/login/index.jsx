@@ -61,6 +61,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const passwordlessMode = !!passwordless?.mode
+    const passwordlessCallbackURI = passwordless?.callbackURI
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 
@@ -105,7 +107,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            await authorizePasswordlessLogin.mutateAsync({userid: email})
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                mode: passwordlessMode
+            })
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
