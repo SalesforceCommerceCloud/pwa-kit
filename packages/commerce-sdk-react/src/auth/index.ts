@@ -55,6 +55,7 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
+    locale: string
 }
 
 interface JWTHeaders {
@@ -95,7 +96,7 @@ type AuthorizeIDPParams = {
 type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
-    mode?: string
+    mode: string
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -265,6 +266,7 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
+    private locale: string
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -362,6 +364,8 @@ class Auth {
         this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
+        
+        this.locale = config.locale
     }
 
     get(name: AuthDataKeys) {
@@ -1262,7 +1266,8 @@ class Auth {
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+        const locale = this.locale
+        const mode = parameters.mode
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1270,10 +1275,11 @@ class Auth {
                 clientSecret: this.clientSecret
             },
             parameters: {
-                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(mode === 'callback' && callbackURI && {callbackURI}),
                 ...(usid && {usid}),
+                ...(locale && {locale}),
                 userid: parameters.userid,
-                mode: finalMode
+                mode: parameters.mode,
             }
         })
         if (res && res.status !== 200) {

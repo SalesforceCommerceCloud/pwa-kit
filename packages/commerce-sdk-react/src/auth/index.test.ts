@@ -100,7 +100,8 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI'
+    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI',
+    locale: 'en-US'
 }
 
 const configSLASPrivate = {
@@ -123,16 +124,6 @@ const JWTExpired = jwt.sign(
     },
     'secret'
 )
-
-const configPasswordlessSms = {
-    clientId: 'clientId',
-    organizationId: 'organizationId',
-    shortCode: 'shortCode',
-    siteId: 'siteId',
-    proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    logger: console
-}
 
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
 
@@ -940,8 +931,8 @@ describe('Auth', () => {
     })
 
     test('authorizePasswordless sets mode to sms as configured', async () => {
-        const auth = new Auth(configPasswordlessSms)
-        await auth.authorizePasswordless({userid: 'userid'})
+        const auth = new Auth(config)
+        await auth.authorizePasswordless({userid: 'userid', mode: 'sms'})
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
