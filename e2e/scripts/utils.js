@@ -104,9 +104,10 @@ function sanitizeHtml(html) {
  * @param {string|string[]} snapshotName - Name for the snapshot file
  * @param {Object} options - Optional configuration
  * @param {string[]} options.exclude - CSS selectors to exclude from scan
+ * @param {string[]} options.disableRules - Rule IDs to disable (e.g., ['color-contrast'])
  */
 async function runAccessibilityTest(page, snapshotName, options = {}) {
-    const {exclude = []} = options
+    const {exclude = [], disableRules = []} = options
 
     // Create AxeBuilder instance
     let axeBuilder = new AxeBuilder({page})
@@ -116,10 +117,13 @@ async function runAccessibilityTest(page, snapshotName, options = {}) {
         axeBuilder = axeBuilder.exclude(exclude)
     }
 
+    // Disabled specific rules if provided
+    if (disableRules.length > 0) {
+        axeBuilder = axeBuilder.disableRules(disableRules)
+    }
+
     // Run the accessibility audit
     const accessibilityScanResults = await axeBuilder.analyze()
-
-    // console.log(`Found ${accessibilityScanResults.violations.length} accessibility violations`)
 
     // Create simplified versions of violations for more stable snapshots
     const simplifiedViolations = simplifyViolations(accessibilityScanResults.violations)
