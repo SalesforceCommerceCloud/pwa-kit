@@ -62,7 +62,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
     const passwordlessMode = !!passwordless?.mode
-    const passwordlessCallbackURI = passwordless?.callbackURI
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 

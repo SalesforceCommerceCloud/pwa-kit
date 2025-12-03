@@ -246,7 +246,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
 
         // check that check email modal is open
@@ -265,7 +265,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
     })
 
@@ -296,7 +296,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
 
         // check that check email modal is open
