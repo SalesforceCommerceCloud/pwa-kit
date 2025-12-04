@@ -32,7 +32,7 @@ import {
     getEnvBasePath,
     slasPrivateProxyPath
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
+import {buildAbsoluteUrl, createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
@@ -89,9 +89,7 @@ const AppConfig = ({children, locals = {}}) => {
     const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
-    const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)
-        ? passwordlessCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
+    const passwordlessLoginCallbackURI = buildAbsoluteUrl(appOrigin, passwordlessCallback)
 
     return (
         <CommerceApiProvider

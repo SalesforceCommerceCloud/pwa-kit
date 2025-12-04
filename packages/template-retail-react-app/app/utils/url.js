@@ -316,21 +316,22 @@ export const serverSafeEncode = (input) => {
 }
 
 /**
- * Builds the full callback URL from a configured callback URI.
+ * Resolves a URL or path to an absolute application URL.
  *
- * If the callback URI is absolute, it is returned as-is. If it is relative,
- * it is prefixed with the application origin and the env base path.
+ * If the input is already an absolute URL, it is returned as-is. If it is
+ * a relative path, it is prefixed with the application origin and the env
+ * base path. If the input is falsy, undefined is returned.
  *
  * @param {string} appOrigin - The application origin, e.g. "https://example.com".
- * @param {string} callbackURI - The configured callback URI, absolute or relative.
- * @returns {string|undefined} - The fully-qualified callback URL, or undefined if no callbackURI is provided.
+ * @param {string} urlOrPath - An absolute URL or a relative path.
+ * @returns {string|undefined} - The fully-qualified URL, or undefined if no input is provided.
  */
-export const buildCallbackURL = (appOrigin, callbackURI) => {
-    if (!callbackURI) {
+export const buildAbsoluteUrl = (appOrigin, urlOrPath) => {
+    if (!urlOrPath) {
         return undefined
     }
 
-    return isAbsoluteURL(callbackURI)
-        ? callbackURI
-        : `${appOrigin}${getEnvBasePath()}${callbackURI}`
+    return isAbsoluteURL(urlOrPath)
+        ? urlOrPath
+        : `${appOrigin}${getEnvBasePath()}${urlOrPath}`
 }

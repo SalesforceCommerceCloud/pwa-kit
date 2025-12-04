@@ -258,7 +258,7 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private passwordlessLoginCallbackURI: string
+    private passwordlessLoginCallbackURI: string | undefined
     private refreshTokenRegisteredCookieTTL: number | undefined
     private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
@@ -360,8 +360,7 @@ class Auth {
 
         this.isPrivate = !!this.clientSecret
 
-        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
         
@@ -1267,7 +1266,6 @@ class Auth {
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
         const locale = this.locale
-        const mode = parameters.mode
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1275,7 +1273,7 @@ class Auth {
                 clientSecret: this.clientSecret
             },
             parameters: {
-                ...(mode === 'callback' && callbackURI && {callbackURI}),
+                ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
                 ...(locale && {locale}),
                 userid: parameters.userid,
