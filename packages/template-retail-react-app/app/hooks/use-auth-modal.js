@@ -41,8 +41,7 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {buildCallbackURL} from '@salesforce/retail-react-app/app/utils/url'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 
 export const LOGIN_VIEW = 'login'
@@ -91,9 +90,7 @@ export const AuthModal = ({
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const passwordlessMode = passwordlessConfig?.mode
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+    const callbackURL = buildCallbackURL(appOrigin, passwordlessConfigCallback)
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -107,7 +104,7 @@ export const AuthModal = ({
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessMode,
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+                ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {

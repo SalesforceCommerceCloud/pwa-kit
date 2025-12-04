@@ -13,6 +13,8 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
@@ -311,4 +313,24 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
 export const serverSafeEncode = (input) => {
     // WARNING: only use this because server double-decodes URL components
     return encodeURIComponent(input)
+}
+
+/**
+ * Builds the full callback URL from a configured callback URI.
+ *
+ * If the callback URI is absolute, it is returned as-is. If it is relative,
+ * it is prefixed with the application origin and the env base path.
+ *
+ * @param {string} appOrigin - The application origin, e.g. "https://example.com".
+ * @param {string} callbackURI - The configured callback URI, absolute or relative.
+ * @returns {string|undefined} - The fully-qualified callback URL, or undefined if no callbackURI is provided.
+ */
+export const buildCallbackURL = (appOrigin, callbackURI) => {
+    if (!callbackURI) {
+        return undefined
+    }
+
+    return isAbsoluteURL(callbackURI)
+        ? callbackURI
+        : `${appOrigin}${getEnvBasePath()}${callbackURI}`
 }

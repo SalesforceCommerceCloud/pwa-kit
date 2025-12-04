@@ -41,11 +41,10 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {buildCallbackURL} from '@salesforce/retail-react-app/app/utils/url'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
@@ -82,9 +81,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigMode = passwordlessConfig?.mode
     const passwordlessConfigCallback = passwordlessConfig?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+    const callbackURL = buildCallbackURL(appOrigin, passwordlessConfigCallback)
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -92,7 +89,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessConfigMode,
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+                ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()

@@ -16,7 +16,8 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath,
-    serverSafeEncode
+    serverSafeEncode,
+    buildCallbackURL
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -474,5 +475,33 @@ describe('serverSafeEncode', () => {
         // Decode should give us original string
         const decoded = decodeURIComponent(encoded)
         expect(decoded).toBe(input)
+    })
+})
+
+describe('buildCallbackURL', () => {
+    test.each([
+        [
+            'absolute callbackURI',
+            'https://callback.com/',
+            'https://callback.com/'
+        ],
+        [
+            'relative callbackURI',
+            '/callback',
+            'https://www.example.com/callback'
+        ],
+        [
+            'empty callbackURI',
+            '',
+            undefined
+        ],
+        [
+            'undefined callbackURI',
+            undefined,
+            undefined
+        ]
+    ])('returns correct URL for %s', (_, callbackURI, expected) => {
+        const result = buildCallbackURL('https://www.example.com', callbackURI)
+        expect(result).toBe(expected)
     })
 })
