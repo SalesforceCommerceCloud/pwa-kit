@@ -21,7 +21,6 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
-    isAbsoluteUrl,
     stringToBase64,
     extractCustomParameters
 } from '../utils'
@@ -363,7 +362,7 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
-        
+
         this.locale = config.locale
     }
 

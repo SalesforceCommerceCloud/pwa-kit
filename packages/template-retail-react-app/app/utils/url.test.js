@@ -480,26 +480,10 @@ describe('serverSafeEncode', () => {
 
 describe('buildAbsoluteUrl', () => {
     test.each([
-        [
-            'absolute callbackURI',
-            'https://callback.com/',
-            'https://callback.com/'
-        ],
-        [
-            'relative callbackURI',
-            '/callback',
-            'https://www.example.com/callback'
-        ],
-        [
-            'empty callbackURI',
-            '',
-            undefined
-        ],
-        [
-            'undefined callbackURI',
-            undefined,
-            undefined
-        ]
+        ['absolute callbackURI', 'https://callback.com/', 'https://callback.com/'],
+        ['relative callbackURI', '/callback', 'https://www.example.com/callback'],
+        ['empty callbackURI', '', undefined],
+        ['undefined callbackURI', undefined, undefined]
     ])('returns correct URL for %s', (_, callbackURI, expected) => {
         const result = buildAbsoluteUrl('https://www.example.com', callbackURI)
         expect(result).toBe(expected)

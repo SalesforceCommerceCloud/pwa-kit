@@ -7,12 +7,7 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {
-    helpers,
-    ShopperCustomersTypes,
-    ShopperCustomers,
-    ShopperLogin
-} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -20,7 +15,7 @@ import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
-import {ApiClientConfigParams, RequireKeys} from '../hooks/types'
+import {RequireKeys} from '../hooks/types'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -931,13 +926,13 @@ describe('Auth', () => {
         [
             'defaults callbackURI to passwordlessLoginCallbackURI when not specified',
             {userid: 'userid'},
-            {userid: 'userid', mode: 'callback', callbackURI: configSLASPrivate.passwordlessLoginCallbackURI}
+            {
+                userid: 'userid',
+                mode: 'callback',
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
         ],
-        [
-            'with mode email',
-            {userid: 'userid', mode: 'email'},
-            {userid: 'userid', mode: 'email'}
-        ]
+        ['with mode email', {userid: 'userid', mode: 'email'}, {userid: 'userid', mode: 'email'}]
     ])('authorizePasswordless %s', async (_, input: any, expectedParams: any) => {
         const auth = new Auth(configSLASPrivate)
         // @ts-expect-error private method
@@ -952,8 +947,8 @@ describe('Auth', () => {
             },
             parameters: {
                 ...expectedParams,
-                usid: 'test-usid-value',
-            },
+                usid: 'test-usid-value'
+            }
         })
     })
 
@@ -967,8 +962,8 @@ describe('Auth', () => {
             parameters: {
                 userid: 'userid',
                 mode: 'callback',
-                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI,
-            },
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
         })
         // Verify usid is not in parameters when not set
         expect(functionArg.parameters.usid).toBeUndefined()

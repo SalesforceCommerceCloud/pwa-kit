@@ -330,13 +330,13 @@ describe('Navigate away from login page tests', function () {
     })
 })
 
-describe("Passwordless login tests", () => {
+describe('Passwordless login tests', () => {
     beforeEach(() => {
         // Clear the mock before each test
         mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockClear()
     })
 
-    test("allows passwordless login", async () => {
+    test('allows passwordless login', async () => {
         getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
@@ -358,12 +358,12 @@ describe("Passwordless login tests", () => {
         })
 
         // enter credentials
-        const testEmail = 'customer@test.com';
-        await user.type(screen.getByLabelText('Email'), testEmail);
-        
+        const testEmail = 'customer@test.com'
+        await user.type(screen.getByLabelText('Email'), testEmail)
+
         // Click the submit button
-        await user.click(screen.getByRole('button', {name: /Continue Securely/i}));
-        
+        await user.click(screen.getByRole('button', {name: /Continue Securely/i}))
+
         // Verify that authorizePasswordless is called with correct parameters
         await waitFor(() => {
             expect(
@@ -392,4 +392,3 @@ describe("Passwordless login tests", () => {
         })
     })
 })
-    

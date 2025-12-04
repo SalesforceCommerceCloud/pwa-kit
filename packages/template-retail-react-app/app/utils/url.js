@@ -331,7 +331,5 @@ export const buildAbsoluteUrl = (appOrigin, urlOrPath) => {
         return undefined
     }
 
-    return isAbsoluteURL(urlOrPath)
-        ? urlOrPath
-        : `${appOrigin}${getEnvBasePath()}${urlOrPath}`
+    return isAbsoluteURL(urlOrPath) ? urlOrPath : `${appOrigin}${getEnvBasePath()}${urlOrPath}`
 }

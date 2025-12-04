@@ -241,9 +241,7 @@ describe('passwordless enabled', () => {
             origin: 'https://example.com'
         })
 
-        const {user} = renderWithProviders(
-            <ContactInfo isPasswordlessEnabled={true} />
-        )
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
 
         await user.type(screen.getByLabelText('Email'), validEmail)
 
