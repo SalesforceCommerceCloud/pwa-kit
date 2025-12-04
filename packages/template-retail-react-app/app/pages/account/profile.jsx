@@ -235,7 +235,7 @@ ProfileCard.propTypes = {
     allowPasswordChange: PropTypes.bool
 }
 
-const PasswordCard = () => {
+const PasswordCard = ({handleForgotPasswordClick}) => {
     const {formatMessage} = useIntl()
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
@@ -300,7 +300,10 @@ const PasswordCard = () => {
                                     </Text>
                                 </Alert>
                             )}
-                            <UpdatePasswordFields form={form} />
+                            <UpdatePasswordFields
+                                form={form}
+                                handleForgotPasswordClick={handleForgotPasswordClick}
+                            />
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
@@ -336,7 +339,11 @@ const PasswordCard = () => {
     )
 }
 
-const AccountDetail = () => {
+PasswordCard.propTypes = {
+    handleForgotPasswordClick: PropTypes.func
+}
+
+const AccountDetail = ({handleForgotPasswordClick}) => {
     const headingRef = useRef()
     useEffect(() => {
         // Focus the 'Account Details' header when the component mounts for accessibility
@@ -356,10 +363,16 @@ const AccountDetail = () => {
 
             <Stack spacing={4}>
                 <ProfileCard allowPasswordChange={!isExternal} />
-                {!isExternal && <PasswordCard />}
+                {!isExternal && (
+                    <PasswordCard handleForgotPasswordClick={handleForgotPasswordClick} />
+                )}
             </Stack>
         </Stack>
     )
+}
+
+AccountDetail.propTypes = {
+    handleForgotPasswordClick: PropTypes.func
 }
 
 AccountDetail.getTemplateName = () => 'account-detail'
