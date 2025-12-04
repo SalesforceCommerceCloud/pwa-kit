@@ -258,7 +258,7 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private passwordlessLoginCallbackURI: string | undefined
+    private passwordlessLoginCallbackURI: string
     private refreshTokenRegisteredCookieTTL: number | undefined
     private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
@@ -360,7 +360,7 @@ class Auth {
 
         this.isPrivate = !!this.clientSecret
 
-        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
+        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
         
