@@ -61,7 +61,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
-    const passwordlessMode = !!passwordless?.mode
+    const passwordlessMode = passwordless?.mode
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 

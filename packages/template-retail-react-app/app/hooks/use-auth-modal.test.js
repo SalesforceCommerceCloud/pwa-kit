@@ -21,6 +21,7 @@ import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/m
 import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -54,8 +55,6 @@ const mockAuthHelperFunctions = {
     [AuthHelpers.Register]: {mutateAsync: jest.fn()},
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
 }
-
-const defaultConfig = require('@salesforce/retail-react-app/config/mocks/default')
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -96,7 +95,7 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
-    getConfig.mockImplementation(() => defaultConfig)
+    getConfig.mockImplementation(() => mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -320,9 +319,9 @@ describe('Passwordless enabled', () => {
 
     test('sends callbackURI when passwordless callback is configured', async () => {
         getConfig.mockReturnValue({
-            ...defaultConfig,
+            ...mockConfig,
             app: {
-                ...defaultConfig.app,
+                ...mockConfig.app,
                 login: {
                     passwordless: {
                         mode: 'callback',
