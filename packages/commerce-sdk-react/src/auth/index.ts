@@ -96,7 +96,7 @@ type AuthorizeIDPParams = {
 type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
-    mode: string
+    mode?: 'email' | 'callback'
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -1264,6 +1264,9 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
+        // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
+        // expect this mode. Newer versions should explicitly set mode.
+        const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
         const locale = this.locale
 
@@ -1277,7 +1280,7 @@ class Auth {
                 ...(usid && {usid}),
                 ...(locale && {locale}),
                 userid: parameters.userid,
-                mode: parameters.mode,
+                mode
             }
         })
         if (res && res.status !== 200) {
