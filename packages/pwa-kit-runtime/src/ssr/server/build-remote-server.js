@@ -56,7 +56,7 @@ import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
-import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
+import {PromiseResolver} from '@h4ad/serverless-adapter/lib/resolvers/promise'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
@@ -1275,7 +1275,7 @@ export const RemoteServerFactory = {
             })
             .setFramework(new ExpressFramework())
             .setHandler(new DefaultHandler())
-            .setResolver(new CallbackResolver())
+            .setResolver(new PromiseResolver())
             .addAdapter(
                 new ApiGatewayV1Adapter({
                     // Preserve the original aws-serverless-express behavior
@@ -1285,7 +1285,7 @@ export const RemoteServerFactory = {
             )
             .build()
 
-        const handler = (event, context, callback) => {
+        const handler = async (event, context) => {
             // encode non ASCII request headers
             if (options?.encodeNonAsciiHttpHeaders) {
                 Object.keys(event.headers).forEach((key) => {
@@ -1303,24 +1303,6 @@ export const RemoteServerFactory = {
                     }
                 })
             }
-
-            // We don't want to wait for an empty event loop once the response
-            // has been sent. Setting this to false will "send the response
-            // right away when the callback executes", but any pending events
-            // may be executed if the Lambda container is then reused for
-            // another invocation (which we expect will happen under all
-            // but very low load). This means two things:
-            // 1. Any code that we have *after* the callback MAY be executed
-            // if the Lambda container is reused, but there's no guarantee
-            // it will be.
-            // 2. There is no way to have code do cleanup work (such as sending
-            // metrics) after the response is sent to the browser. We have
-            // to accept that doing such work delays the response.
-            // It would be good if we could set this to true and do work like sending
-            // metrics after calling the callback, but that doesn't work - API Gateway
-            // will wait for the Lambda invocation to complete before sending
-            // the response to the browser.
-            context.callbackWaitsForEmptyEventLoop = false
 
             if (lambdaContainerReused) {
                 const forceGarbageCollection = process.env.FORCE_GC
@@ -1340,21 +1322,14 @@ export const RemoteServerFactory = {
                 app.sendMetric('LambdaCreated')
             }
 
-            const managedCallback = (err, response) => {
-                return (
-                    app._requestMonitor
-                        ._waitForResponses()
-                        .then(() => app.metrics.flush())
-                        // Now call the Lambda callback to complete the response
-                        .then(() => callback(err, processLambdaResponse(response, event)))
-                    // DON'T add any then() handlers here, after the callback.
-                    // They won't be called after the response is sent, but they
-                    // *might* be called if the Lambda container running this code
-                    // is reused, which can lead to odd and unpredictable
-                    // behaviour.
-                )
-            }
-            return serverlessAdapterHandler(event, context, managedCallback)
+            const response = await serverlessAdapterHandler(event, context)
+
+            // Lambda returns the response when the Promise resolves, so
+            // we await critical async work before returning.
+            await app._requestMonitor._waitForResponses()
+            await app.metrics.flush()
+
+            return processLambdaResponse(response, event)
         }
         // Upgrading to serverless-adapter removes the server property
         // return a null server to maintain backwards compatibility
