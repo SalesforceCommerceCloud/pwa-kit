@@ -257,4 +257,26 @@ describe('updating password', function () {
 
         expect(await screen.findByTestId('password-update-error')).toBeInTheDocument()
     })
+
+    test('navigates to reset-password page when "Forgot Password?" is clicked', async () => {
+        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+
+        const el = within(screen.getByTestId('sf-toggle-card-password'))
+        await user.click(el.getByText(/edit/i))
+
+        const forgotPasswordButton = el.getByText(/forgot password/i)
+        expect(forgotPasswordButton).toBeInTheDocument()
+
+        await user.click(forgotPasswordButton)
+
+        await waitFor(() => {
+            expect(window.location.pathname).toBe(`${expectedBasePath}/reset-password`)
+        })
+    })
 })

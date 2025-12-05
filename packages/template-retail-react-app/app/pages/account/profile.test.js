@@ -115,3 +115,47 @@ test('Non ECOM user cannot see the password card', async () => {
 
     expect(screen.queryByText(/Password/i)).not.toBeInTheDocument()
 })
+
+describe('AccountDetail component', () => {
+    test('passes handleForgotPasswordClick prop to PasswordCard when provided', async () => {
+        sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        const handleForgotPasswordClick = jest.fn()
+
+        const {user} = renderWithProviders(
+            <AccountDetail handleForgotPasswordClick={handleForgotPasswordClick} />,
+            {
+                wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+            }
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText(/Account Details/i)).toBeInTheDocument()
+        })
+
+        const passwordCard = screen.getByTestId('sf-toggle-card-password')
+        await user.click(within(passwordCard).getByText(/edit/i))
+
+        const forgotPasswordButton = screen.getByText(/forgot password/i)
+        expect(forgotPasswordButton).toBeInTheDocument()
+
+        await user.click(forgotPasswordButton)
+        expect(handleForgotPasswordClick).toHaveBeenCalledTimes(1)
+    })
+
+    test('does not show "Forgot Password?" button when handleForgotPasswordClick is not provided', async () => {
+        sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+
+        const {user} = renderWithProviders(<AccountDetail />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText(/Account Details/i)).toBeInTheDocument()
+        })
+
+        const passwordCard = screen.getByTestId('sf-toggle-card-password')
+        await user.click(within(passwordCard).getByText(/edit/i))
+
+        expect(screen.queryByText(/forgot password/i)).not.toBeInTheDocument()
+    })
+})
