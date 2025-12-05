@@ -28,6 +28,8 @@ import {
 
 const fallback = <Skeleton height="75vh" width="100%" />
 const socialRedirectURI = getConfig()?.app?.login?.social?.redirectURI
+const passwordlessLoginLandingPath = getConfig()?.app?.login?.passwordless?.landingPath
+const resetPasswordLandingPath = getConfig()?.app?.login?.resetPassword?.landingPath
 
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
@@ -78,11 +80,13 @@ export const routes = [
         exact: true
     },
     {
+        // path: resetPasswordLandingPath || '/reset-password-landing',
         path: RESET_PASSWORD_LANDING_PATH,
         component: ResetPassword,
         exact: true
     },
     {
+        // path: passwordlessLoginLandingPath || '/passwordless-login-landing',
         path: PASSWORDLESS_LOGIN_LANDING_PATH,
         component: Login,
         exact: true
