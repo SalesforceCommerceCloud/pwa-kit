@@ -7,12 +7,7 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {
-    helpers,
-    ShopperCustomersTypes,
-    ShopperCustomers,
-    ShopperLogin
-} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -20,7 +15,7 @@ import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
-import {ApiClientConfigParams, RequireKeys} from '../hooks/types'
+import {RequireKeys} from '../hooks/types'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -100,7 +95,8 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI'
+    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI',
+    locale: 'en-US'
 }
 
 const configSLASPrivate = {
@@ -123,16 +119,6 @@ const JWTExpired = jwt.sign(
     },
     'secret'
 )
-
-const configPasswordlessSms = {
-    clientId: 'clientId',
-    organizationId: 'organizationId',
-    shortCode: 'shortCode',
-    siteId: 'siteId',
-    proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    logger: console
-}
 
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
 
@@ -921,32 +907,94 @@ describe('Auth', () => {
         expect(result).toHaveProperty('codeVerifier')
     })
 
-    test('authorizePasswordless calls isomorphic authorizePasswordless', async () => {
-        const auth = new Auth(config)
-        await auth.authorizePasswordless({
-            callbackURI: 'callbackURI',
-            userid: 'userid',
-            mode: 'callback'
-        })
+    test.each([
+        [
+            'with all parameters specified',
+            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'},
+            {
+                callbackURI: 'callbackURI',
+                userid: 'userid',
+                mode: 'callback',
+                locale: configSLASPrivate.locale
+            }
+        ],
+        [
+            'defaults mode to callback when not specified',
+            {userid: 'userid'},
+            {userid: 'userid', mode: 'callback'}
+        ],
+        [
+            'defaults callbackURI to passwordlessLoginCallbackURI when not specified',
+            {userid: 'userid'},
+            {
+                userid: 'userid',
+                mode: 'callback',
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
+        ],
+        ['with mode email', {userid: 'userid', mode: 'email'}, {userid: 'userid', mode: 'email'}]
+    ])('authorizePasswordless %s', async (_, input: any, expectedParams: any) => {
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private method
+        auth.set('usid', 'test-usid-value')
+
+        await auth.authorizePasswordless(input)
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
+            credentials: {
+                clientSecret: SLAS_SECRET_PLACEHOLDER
+            },
             parameters: {
-                callbackURI: 'callbackURI',
-                userid: 'userid',
-                mode: 'callback'
+                ...expectedParams,
+                usid: 'test-usid-value'
             }
         })
     })
 
-    test('authorizePasswordless sets mode to sms as configured', async () => {
-        const auth = new Auth(configPasswordlessSms)
+    test('authorizePasswordless without usid', async () => {
+        const auth = new Auth(configSLASPrivate)
+
         await auth.authorizePasswordless({userid: 'userid'})
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {userid: 'userid', mode: 'sms'}
+            parameters: {
+                userid: 'userid',
+                mode: 'callback',
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
         })
+        // Verify usid is not in parameters when not set
+        expect(functionArg.parameters.usid).toBeUndefined()
+    })
+
+    test('authorizePasswordless without passwordlessLoginCallbackURI in config', async () => {
+        const configWithoutCallback = {
+            ...configSLASPrivate,
+            passwordlessLoginCallbackURI: undefined
+        }
+        const auth = new Auth(configWithoutCallback)
+
+        await auth.authorizePasswordless({userid: 'userid'})
+        expect(helpers.authorizePasswordless).toHaveBeenCalled()
+        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
+        // callbackURI should not be in parameters when not configured
+        expect(functionArg.parameters.callbackURI).toBeUndefined()
+    })
+
+    test('authorizePasswordless throws error on non-200 response', async () => {
+        const auth = new Auth(configSLASPrivate)
+
+        const mockErrorResponse = {
+            status: 400,
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+        }
+        ;(helpers.authorizePasswordless as jest.Mock).mockResolvedValueOnce(mockErrorResponse)
+
+        await expect(auth.authorizePasswordless({userid: 'userid'})).rejects.toThrow(
+            '400 Invalid request'
+        )
     })
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
