@@ -180,17 +180,15 @@ export default function ShippingOptions() {
     ])
 
     const submitForm = async ({shippingMethodId}) => {
-        if (basket?.shipments?.shippingMethod?.length > 0) {
-            await updateShippingMethod.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    shipmentId: targetDeliveryShipment?.shipmentId || 'me'
-                },
-                body: {
-                    id: shippingMethodId
-                }
-            })
-        }
+        await updateShippingMethod.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: targetDeliveryShipment?.shipmentId || 'me'
+            },
+            body: {
+                id: shippingMethodId
+            }
+        })
         goToNextStep()
     }
 

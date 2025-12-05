@@ -372,8 +372,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     }
                 })
                 await currentBasketQuery.refetch()
-                // Jump straight to payment if basket is already complete after transfer
-                goToStep(STEPS.PAYMENT)
             } catch (_e) {
                 // no-op
             } finally {
