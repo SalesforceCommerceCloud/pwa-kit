@@ -21,7 +21,7 @@ const mockAuthHelperFunctions = {
 }
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
-const mockMergeBasket = {mutate: jest.fn(), mutateAsync: jest.fn()}
+const mockTransferBasket = {mutate: jest.fn(), mutateAsync: jest.fn()}
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -33,7 +33,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType]),
         useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateCustomerForBasket') return mockUpdateCustomerForBasket
-            if (mutationType === 'mergeBasket') return mockMergeBasket
+            if (mutationType === 'transferBasket') return mockTransferBasket
             return {mutate: jest.fn()}
         }),
         useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
@@ -155,8 +155,9 @@ describe('ContactInfo Component', () => {
     test('updates checkout contact phone when user types phone (guest)', async () => {
         const {user} = renderWithProviders(<ContactInfo />)
         const phoneInput = screen.getByLabelText('Phone')
-        await user.type(phoneInput, '7275551234')
-        // Formatting can be applied incrementally; assert value is being updated
+        await act(async () => {
+            await user.type(phoneInput, '7275551234')
+        })
         expect(phoneInput.value.length).toBeGreaterThan(0)
     })
 
@@ -521,13 +522,13 @@ describe('ContactInfo Component', () => {
         expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
     })
 
-    test('OTP verification merges and updates basket email using merged id', async () => {
+    test('OTP verification transfers and updates basket email using transferred id', async () => {
         // Arrange mocks
         mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync.mockResolvedValue({})
         mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
 
         const mergedId = 'merged-123'
-        mockMergeBasket.mutateAsync.mockResolvedValue({basketId: mergedId})
+        mockTransferBasket.mutateAsync.mockResolvedValue({basketId: mergedId})
         // Make refetch return merged id to simulate hydration
         const refetchSpy = jest.fn().mockResolvedValue({data: {basketId: mergedId}})
         mockUseCurrentBasket.mockReturnValue({
@@ -560,11 +561,10 @@ describe('ContactInfo Component', () => {
         useCustomerType.mockReturnValue({isRegistered: true})
 
         await waitFor(() => {
-            expect(mockMergeBasket.mutateAsync).toHaveBeenCalled()
-            // Validate merge called with sourceBasketId in body and createDestinationBasket param
-            const mergeArgs = mockMergeBasket.mutateAsync.mock.calls[0]?.[0]
-            expect(mergeArgs?.parameters).toMatchObject({createDestinationBasket: true})
-            expect(mergeArgs?.body).toMatchObject({sourceBasketId: 'guest-1'})
+            expect(mockTransferBasket.mutateAsync).toHaveBeenCalled()
+            // Validate transferBasket called with merge=true parameter
+            const transferArgs = mockTransferBasket.mutateAsync.mock.calls[0]?.[0]
+            expect(transferArgs?.parameters).toMatchObject({merge: true})
         })
         // Updating basket email may occur asynchronously or be skipped if unchanged; don't hard-require it here
     })
