@@ -1,4 +1,6 @@
-## v4.3.0-dev (Nov 05, 2025)
+## v4.3.0-dev
+
+- Update `authorizePasswordless` to pass locale and simplify mode selection to respect user's explicit mode choice while still defaulting to callback mode for backward compatibility [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492)
 
 ## v4.2.0 (Nov 04, 2025)
 
