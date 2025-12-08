@@ -93,6 +93,15 @@ module.exports = {
                 callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
                 // The landing path for reset password
                 landingPath: '/reset-password-landing'
+            },
+            passkey: {
+                // Enables or disables passkey login for the site. Defaults to: false
+                {{#if answers.project.demo.enableDemoSettings}}
+                enabled: true,
+                {{else}}
+                enabled: false,
+                {{/if}}
+                callbackURI: process.env.PASSKEY_CALLBACK_URI,
             }
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
