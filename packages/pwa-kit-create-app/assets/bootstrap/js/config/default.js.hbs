@@ -101,6 +101,7 @@ module.exports = {
                 {{else}}
                 enabled: false,
                 {{/if}}
+                // The callback URI must be an absolute URL (i.e. third-party URI) set up by the developer.
                 callbackURI: process.env.PASSKEY_CALLBACK_URI,
             }
         },

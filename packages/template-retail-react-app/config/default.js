@@ -47,7 +47,7 @@ module.exports = {
             },
             passkey: {
                 enabled: false,
-                callbackURI: process.env.PASSKEY_CALLBACK_URI,
+                callbackURI: process.env.PASSKEY_CALLBACK_URI
             }
         },
         defaultSite: 'RefArchGlobal',
