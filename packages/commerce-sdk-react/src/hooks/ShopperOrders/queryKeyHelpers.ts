@@ -53,12 +53,15 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/orders/',
-        params.orderNo
+        params?.orderNo
     ],
     queryKey: (params: Params<'getOrder'>) => {
-        return [...getOrder.path(params), pickValidParams(params, ShopperOrders.paramKeys.getOrder)]
+        return [
+            ...getOrder.path(params),
+            pickValidParams(params || {}, ShopperOrders.paramKeys.getOrder)
+        ]
     }
 }
 
@@ -66,15 +69,15 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/orders/',
-        params.orderNo,
+        params?.orderNo,
         '/payment-methods'
     ],
     queryKey: (params: Params<'getPaymentMethodsForOrder'>) => {
         return [
             ...getPaymentMethodsForOrder.path(params),
-            pickValidParams(params, ShopperOrders.paramKeys.getPaymentMethodsForOrder)
+            pickValidParams(params || {}, ShopperOrders.paramKeys.getPaymentMethodsForOrder)
         ]
     }
 }
@@ -83,15 +86,15 @@ export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/orders/',
-        params.orderNo,
+        params?.orderNo,
         '/taxes'
     ],
     queryKey: (params: Params<'getTaxesFromOrder'>) => {
         return [
             ...getTaxesFromOrder.path(params),
-            pickValidParams(params, ShopperOrders.paramKeys.getTaxesFromOrder)
+            pickValidParams(params || {}, ShopperOrders.paramKeys.getTaxesFromOrder)
         ]
     }
 }

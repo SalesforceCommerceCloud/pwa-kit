@@ -12,13 +12,17 @@ const {defineConfig, devices} = require('@playwright/test')
  */
 module.exports = defineConfig({
     testDir: './e2e',
+    /* E2E tests are defined in *.spec.js files while unit tests are defined in *.test.js files.
+     * Playwright should only run the *.spec.js files.
+     */
+    testMatch: '**/*.spec.js',
     timeout: 60000,
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
     forbidOnly: !!process.env.CI,
     /* Retry on CI only */
-    retries: 3,
+    retries: 2,
     /* Opt out of parallel tests on CI. */
     workers: 1,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -47,14 +51,28 @@ module.exports = defineConfig({
             testIgnore: ['**/a11y/**', '**/desktop/**', '**/extra-features.spec.js']
         },
         {
-            name: 'a11y-mobile',
+            name: 'a11y-mobile-slas-public-client',
             use: {...devices['Pixel 5']},
-            testDir: './e2e/tests/a11y/mobile'
+            testDir: './e2e/tests/a11y/mobile',
+            snapshotPathTemplate: './e2e/tests/a11y/mobile/slas-public-client/__snapshots__/{arg}{ext}'
         },
         {
-            name: 'a11y-desktop',
+            name: 'a11y-desktop-slas-public-client',
             use: {...devices['Desktop Chrome']},
-            testDir: './e2e/tests/a11y/desktop'
+            testDir: './e2e/tests/a11y/desktop',
+            snapshotPathTemplate: './e2e/tests/a11y/desktop/slas-public-client/__snapshots__/{arg}{ext}'
+        },
+        {
+            name: 'a11y-mobile-slas-private-client',
+            use: {...devices['Pixel 5']},
+            testDir: './e2e/tests/a11y/mobile',
+            snapshotPathTemplate: './e2e/tests/a11y/mobile/slas-private-client/__snapshots__/{arg}{ext}'
+        },
+        {
+            name: 'a11y-desktop-slas-private-client',
+            use: {...devices['Desktop Chrome']},
+            testDir: './e2e/tests/a11y/desktop',
+            snapshotPathTemplate: './e2e/tests/a11y/desktop/slas-private-client/__snapshots__/{arg}{ext}'
         },
         {
             name: 'extra-features-desktop',

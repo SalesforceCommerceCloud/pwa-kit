@@ -40,13 +40,13 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/product-search'
     ],
     queryKey: (params: Params<'productSearch'>) => {
         return [
             ...productSearch.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.productSearch)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.productSearch)
         ]
     }
 }
@@ -55,13 +55,13 @@ export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/search-suggestions'
     ],
     queryKey: (params: Params<'getSearchSuggestions'>) => {
         return [
             ...getSearchSuggestions.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.getSearchSuggestions)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.getSearchSuggestions)
         ]
     }
 }

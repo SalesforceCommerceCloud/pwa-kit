@@ -1,9 +1,12 @@
-## v3.12.0-preview.0 (Aug 01, 2025)
+## v3.13.0 (Sep 25, 2025)
+- This features introduces enhancements to the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
 
-- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
-- Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
+## v3.12.0 (Sep 04, 2025)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-
+- Add BOPIS and MULTISHIP configuration defaults [#3142](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3142)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- Update _app-config generator template to include `hybridAuthEnabled` prop [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Update templates files to include sfdc_user_agent header for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
 
 ## v3.11.0 (Jul 22, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)

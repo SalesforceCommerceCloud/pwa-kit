@@ -23,7 +23,6 @@ import SearchSuggestions from '@salesforce/retail-react-app/app/components/searc
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
-    boldString,
     getSessionJSONItem,
     setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
@@ -42,6 +41,13 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useLocation} from 'react-router-dom'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 
 const onClient = typeof window !== 'undefined'
 
@@ -49,7 +55,7 @@ function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
     return enabled === 'true' && askAgentOnSearch === 'true' && onClient
 }
 
-const formatSuggestions = (searchSuggestions, input) => {
+const formatSuggestions = (searchSuggestions) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
@@ -57,7 +63,9 @@ const formatSuggestions = (searchSuggestions, input) => {
                     type: 'category',
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
-                    name: boldString(suggestion.name, capitalize(input))
+                    name: capitalize(suggestion.name),
+                    image: suggestion.image?.disBaseLink,
+                    parentCategoryName: suggestion.parentCategoryName
                 }
             }
         ),
@@ -67,19 +75,30 @@ const formatSuggestions = (searchSuggestions, input) => {
                 currency: product.currency,
                 price: product.price,
                 productId: product.productId,
-                name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId})
+                name: capitalize(product.productName),
+                link: productUrlBuilder({id: product.productId}),
+                image: product.image?.disBaseLink
             }
         }),
-        phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
+        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
+            // Init cap the brand name
+            return {
+                type: 'brand',
+                name: capitalize(brand.phrase),
+                link: searchUrlBuilder(brand.phrase)
+            }
+        }),
+        phraseSuggestions: searchSuggestions?.productSuggestions?.suggestedPhrases?.map(
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: boldString(phrase.phrase, capitalize(input)),
-                    link: searchUrlBuilder(phrase.phrase)
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
                 }
             }
-        )
+        ),
+        searchPhrase: searchSuggestions?.searchPhrase
     }
 }
 
@@ -93,15 +112,29 @@ const formatSuggestions = (searchSuggestions, input) => {
  */
 const Search = (props) => {
     const config = getConfig()
-    const {enabled, askAgentOnSearch} = config.app.commerceAgent
-    const askAgentOnSearchEnabled = isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
+
+    // Add new hooks for chat functionality
+    const {locale, siteId, commerceOrgId, buildUrl} = useMultiSite()
+    const {usid} = useUsid()
+    const refreshToken = useRefreshToken()
+    const location = useLocation()
+    const appOrigin = useAppOrigin()
+    const sfLanguage = normalizeLocaleToSalesforce(locale.id)
+
+    const askAgentOnSearchEnabled = useMemo(() => {
+        const {enabled, askAgentOnSearch} = getCommerceAgentConfig()
+        return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
+    }, [config.app.commerceAgent])
+
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
-                q: searchQuery
+                q: searchQuery,
+                expand: 'images,prices'
             }
         },
         {
@@ -115,7 +148,7 @@ const Search = (props) => {
     })
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
-        () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
+        () => formatSuggestions(searchSuggestion.data),
         [searchSuggestion]
     )
 
@@ -165,12 +198,33 @@ const Search = (props) => {
         setIsOpen(false)
     }
 
+    // Function to set pre-chat fields only when launching a new chat session
+    const setPrechatFieldsForNewSession = () => {
+        // Only set pre-chat fields if this is a new chat launch (not already launched)
+        if (!miawChatRef.current.newChatLaunched) {
+            if (window.embeddedservice_bootstrap?.prechatAPI) {
+                window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+                    SiteId: siteId,
+                    Locale: locale.id,
+                    OrganizationId: commerceOrgId,
+                    UsId: usid,
+                    IsCartMgmtSupported: 'true',
+                    RefreshToken: refreshToken,
+                    Currency: locale.preferredCurrency,
+                    Language: sfLanguage,
+                    DomainUrl: `${appOrigin}${buildUrl(location.pathname)}`
+                })
+            }
+        }
+    }
+
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
             if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
                 if (
                     e.detail.conversationEntry?.sender?.role === 'Chatbot' &&
-                    searchInputRef?.current?.value
+                    searchInputRef?.current?.value &&
+                    window.embeddedservice_bootstrap?.utilAPI
                 ) {
                     miawChatRef.current.hasFired = true
                     setTimeout(() => {
@@ -190,9 +244,16 @@ const Search = (props) => {
         }
     }, [])
     const launchChat = () => {
-        window.embeddedservice_bootstrap.utilAPI
-            .launchChat()
-            .then((successMessage) => {
+        // Set pre-chat fields only for new sessions
+        setPrechatFieldsForNewSession()
+
+        if (window.embeddedservice_bootstrap?.settings) {
+            window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
+            window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false
+        }
+        window.embeddedservice_bootstrap?.utilAPI
+            ?.launchChat()
+            ?.then((successMessage) => {
                 /* TODO: With the Salesforce Winter '26 release, we will be able to use the
                  * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
                 if (successMessage.includes('Successfully initialized the messaging client')) {
@@ -200,7 +261,7 @@ const Search = (props) => {
                     miawChatRef.current.newChatLaunched = true
                 }
             })
-            .catch((err) => {
+            ?.catch((err) => {
                 console.error('launchChat error', err)
             })
     }
@@ -214,7 +275,7 @@ const Search = (props) => {
             return
         }
 
-        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap) {
+        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap?.utilAPI) {
             // Add a 500ms delay before sending the message to ensure the experience isn't jarring to the user
             setTimeout(() => {
                 window.embeddedservice_bootstrap.utilAPI
@@ -253,7 +314,7 @@ const Search = (props) => {
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
         if (
             (document.activeElement.id === 'search-input' && recentSearches?.length > 0) ||
-            (searchSuggestionsAvailable && searchInputRef.current.value.length > 0)
+            (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0)
         ) {
             setIsOpen(true)
         } else {
@@ -306,7 +367,15 @@ const Search = (props) => {
                 </PopoverTrigger>
 
                 <HideOnMobile>
-                    <PopoverContent data-testid="sf-suggestion-popover">
+                    <PopoverContent
+                        data-testid="sf-suggestion-popover"
+                        width="100vw"
+                        maxWidth="100vw"
+                        left={0}
+                        right={0}
+                        marginLeft={0}
+                        marginRight={0}
+                    >
                         <SearchSuggestions
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}

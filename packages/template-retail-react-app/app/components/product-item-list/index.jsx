@@ -20,6 +20,7 @@ import ProductItem from '@salesforce/retail-react-app/app/components/product-ite
 const ProductItemList = ({
     productItems = [],
     renderSecondaryActions,
+    renderDeliveryActions,
     onItemQuantityChange,
     onRemoveItemClick,
     // Optional props with defaults
@@ -28,17 +29,30 @@ const ProductItemList = ({
     localQuantity = {},
     localIsGiftItems = {},
     isCartItemLoading = false,
-    selectedItem = null
+    selectedItem = null,
+    removingItemIds = [],
+    // Styling options
+    hideBorder = false,
+    hideBottomBorder = false
 }) => {
     return (
         <Stack spacing={4}>
             {productItems.map((productItem) => {
                 const isBonusProductItem = productItem.bonusProductLineItem
+                // Check if this product item (regular or bonus) is being removed
+                const isBeingRemoved = removingItemIds.includes(productItem.itemId)
 
                 return (
                     <ProductItem
                         key={productItem.itemId}
                         isBonusProduct={isBonusProductItem}
+                        isRemoving={isBeingRemoved}
+                        containerStyles={{
+                            borderX: 'none',
+                            borderTop: 'none',
+                            boxShadow: 'none',
+                            ...(hideBottomBorder && {borderBottom: 'none'})
+                        }}
                         secondaryActions={
                             renderSecondaryActions
                                 ? renderSecondaryActions({
@@ -48,6 +62,9 @@ const ProductItemList = ({
                                           : productItem.gift
                                   })
                                 : null
+                        }
+                        deliveryActions={
+                            renderDeliveryActions ? renderDeliveryActions(productItem) : null
                         }
                         product={{
                             ...productItem,
@@ -62,9 +79,11 @@ const ProductItemList = ({
                         }}
                         onItemQuantityChange={onItemQuantityChange?.bind(this, productItem)}
                         showLoading={
-                            isCartItemLoading && selectedItem?.itemId === productItem.itemId
+                            (isCartItemLoading && selectedItem?.itemId === productItem.itemId) ||
+                            isBeingRemoved
                         }
                         handleRemoveItem={onRemoveItemClick}
+                        hideBorder={hideBorder}
                     />
                 )
             })}
@@ -75,6 +94,7 @@ const ProductItemList = ({
 ProductItemList.propTypes = {
     productItems: PropTypes.arrayOf(PropTypes.object),
     renderSecondaryActions: PropTypes.func,
+    renderDeliveryActions: PropTypes.func,
     onItemQuantityChange: PropTypes.func.isRequired,
     onRemoveItemClick: PropTypes.func,
     productsByItemId: PropTypes.object,
@@ -82,7 +102,10 @@ ProductItemList.propTypes = {
     localQuantity: PropTypes.object,
     localIsGiftItems: PropTypes.object,
     isCartItemLoading: PropTypes.bool,
-    selectedItem: PropTypes.object
+    selectedItem: PropTypes.object,
+    removingItemIds: PropTypes.arrayOf(PropTypes.string),
+    hideBorder: PropTypes.bool,
+    hideBottomBorder: PropTypes.bool
 }
 
 export default ProductItemList

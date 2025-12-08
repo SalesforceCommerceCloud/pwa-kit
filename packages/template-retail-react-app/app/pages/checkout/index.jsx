@@ -24,7 +24,7 @@ import {
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -34,36 +34,53 @@ import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/c
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const {removeEmptyShipments} = useMultiship(basket)
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+
+    // cart has both pickup and delivery orders
+    const isDeliveryAndPickupOrder =
+        multishipEnabled &&
+        derivedData?.totalPickupShipments > 0 &&
+        derivedData?.totalDeliveryShipments > 0
+
+    // Check if there are pickup shipments
+    const hasPickupShipments = derivedData?.totalPickupShipments > 0
 
     // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
         }
     }, [error, step])
+
+    // Remove any empty shipments whenever navigating to the checkout page
+    // Using basketId ensures that the basket is in a valid state before removing empty shipments
+    useEffect(() => {
+        if (basket?.shipments?.length > 1) {
+            removeEmptyShipments(basket)
+        }
+    }, [basket?.basketId])
 
     const submitOrder = async () => {
         setIsLoading(true)
@@ -106,8 +123,16 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
-                            {!isPickupOrder && <ShippingOptions />}
+
+                            {isPickupOrderOnly ? (
+                                <PickupAddress />
+                            ) : (
+                                <>
+                                    {hasPickupShipments && <PickupAddress />}
+                                    <ShippingAddress />
+                                    <ShippingMethods />
+                                </>
+                            )}
                             <Payment />
 
                             {step === 5 && (

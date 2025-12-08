@@ -437,7 +437,7 @@ const useEinstein = () => {
     const {effectiveDnt} = useDNT()
     const {getTokenWhenReady} = useAccessToken()
     const {
-        app: {einsteinAPI: config}
+        app: {einsteinAPI: config = {}}
     } = getConfig()
     const {host, einsteinId, siteId, isProduction} = config
 

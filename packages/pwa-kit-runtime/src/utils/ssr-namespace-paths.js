@@ -26,17 +26,44 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 /*
  * Returns the base path. This is prepended to a /mobify path.
+ * Returns an empty string if the base path is not set or is '/'.
  */
 export const getEnvBasePath = () => {
     const config = getConfig()
     let basePath = config?.envBasePath || ''
 
     if (typeof basePath !== 'string') {
-        logger.warn('Invalid envBasePath configuration. No base path is applied.')
+        logger.warn('Invalid envBasePath configuration. No base path is applied.', {
+            namespace: 'ssr-namespace-paths.getEnvBasePath'
+        })
         return ''
     }
 
-    return basePath.replace(/\/$/, '')
+    // Normalize the base path
+    basePath = basePath
+        .trim()
+        .replace(/^\/?/, '/') // Ensure leading slash
+        .replace(/\/+/g, '/') // Normalize multiple slashes
+        .replace(/\/$/, '') // Remove trailing slash
+
+    // Return empty string for root path or empty result
+    if (basePath === '/' || !basePath) {
+        return ''
+    }
+
+    // only allow simple, safe characters
+    // eslint-disable-next-line no-useless-escape
+    if (!/^\/[a-zA-Z0-9\-_\/]*$/.test(basePath)) {
+        logger.warn(
+            'Invalid envBasePath configuration. Only letters, numbers, hyphens, underscores, and slashes allowed. No base path is applied.',
+            {
+                namespace: 'ssr-namespace-paths.getEnvBasePath'
+            }
+        )
+        return ''
+    }
+
+    return basePath
 }
 
 export const proxyBasePath = PROXY_PATH_BASE

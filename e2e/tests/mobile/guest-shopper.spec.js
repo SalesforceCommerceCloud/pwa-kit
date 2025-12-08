@@ -6,7 +6,6 @@
  */
 
 const {test, expect} = require('@playwright/test')
-const config = require('../../config')
 const {addProductToCart, searchProduct, checkoutProduct} = require('../../scripts/pageHelpers')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 
@@ -58,11 +57,10 @@ test('Guest shopper can checkout items as guest', async ({page}) => {
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
     await page.waitForLoadState()
 
-    const continueToPayment = page.getByRole('button', {
-        name: /Continue to Payment/i
-    })
+    const continueToPayment = page.getByRole('button', {name: /Continue to Payment/i})
 
-    if (continueToPayment.isEnabled()) {
+    // If the Continue to Payment button is not visible, the payment details form is already being shown, so we can skip this step.
+    if ((await continueToPayment.count()) > 0 && (await continueToPayment.isEnabled())) {
         await continueToPayment.click()
     }
 
@@ -80,7 +78,7 @@ test('Guest shopper can checkout items as guest', async ({page}) => {
     // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
     const step3Card = page.locator("div[data-testid='sf-toggle-card-step-3']")
 
-    await expect(step3Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    await expect(step3Card.getByRole('button', {name: /Edit Payment Info/i})).toBeVisible()
     page.getByRole('button', {name: /Place Order/i})
         .first()
         .click()

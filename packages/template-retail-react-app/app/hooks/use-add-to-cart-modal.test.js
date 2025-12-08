@@ -27,6 +27,88 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
+    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-wish-list', () => ({
+    useWishList: jest.fn(() => ({
+        data: {
+            id: 'test-wishlist-id',
+            customerProductListItems: []
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn(() => jest.fn())
+}))
+
+// Mock SelectBonusProductsCard to verify props being passed
+
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card',
+    () =>
+        // eslint-disable-next-line react/prop-types
+        function MockSelectBonusProductsCard({hideSelectionCounter}) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const React = require('react')
+            return React.createElement(
+                'div',
+                {
+                    'data-testid': 'select-bonus-products-card',
+                    'data-hide-selection-counter': hideSelectionCounter
+                },
+                'Mock Bonus Products Card'
+            )
+        }
+)
+
+// Mock bonus product utilities
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
+    getRemainingAvailableBonusProductsForProduct: jest.fn(() => ({
+        bonusItems: [
+            {
+                bonusDiscountLineItemId: 'bonus-line-item-1',
+                promotionId: 'promo-123'
+            }
+        ],
+        aggregatedMaxBonusItems: 2,
+        aggregatedSelectedItems: 0
+    })),
+    useBasketProductsWithPromotions: jest.fn(() => ({
+        data: {
+            'test-product-123': {
+                productPromotions: [
+                    {
+                        promotionId: 'promo-123',
+                        calloutMsg: "Buy one men's suit, get 2 free ties"
+                    }
+                ]
+            }
+        }
+    })),
+    getPromotionCalloutText: jest.fn((product, promotionId) => {
+        return (
+            product.productPromotions?.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
+        )
+    }),
+    shouldShowBonusProductSelection: jest.fn(() => true)
+}))
+
 const MOCK_PRODUCT = {
     currency: 'USD',
     id: '701642811398M',
@@ -869,4 +951,67 @@ test('displays standard products in bundle without variation attributes', async 
 
     expect(screen.queryByText(/Color:/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Size:/)).not.toBeInTheDocument()
+})
+
+test('renders SelectBonusProductsCard with hideSelectionCounter=true in add-to-cart modal', () => {
+    // Mock product with bonus products eligibility
+    const MOCK_PRODUCT_WITH_BONUS = {
+        ...MOCK_PRODUCT,
+        id: 'test-product-123',
+        productPromotions: [
+            {
+                promotionId: 'promo-123',
+                calloutMsg: "Buy one men's suit, get 2 free ties"
+            }
+        ]
+    }
+
+    const MOCK_DATA_WITH_BONUS = {
+        product: MOCK_PRODUCT_WITH_BONUS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_WITH_BONUS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    // Mock basket with bonus discount line items
+    const mockBasketWithBonusItems = {
+        data: {
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-line-item-1',
+                    promotionId: 'promo-123',
+                    maxBonusItems: 2
+                }
+            ],
+            productSubTotal: 191.99,
+            currency: 'USD'
+        },
+        derivedData: {
+            totalItems: 1
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasketWithBonusItems)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_WITH_BONUS,
+                onClose: jest.fn()
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    // Verify that the SelectBonusProductsCard is rendered with hideSelectionCounter=true
+    const bonusProductsCard = screen.getByTestId('select-bonus-products-card')
+    expect(bonusProductsCard).toBeInTheDocument()
+    expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })

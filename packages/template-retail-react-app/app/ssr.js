@@ -26,6 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
+import standalonePaymentMethodsHandler from '@salesforce/retail-react-app/app/api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -231,8 +232,16 @@ const throwSlasTokenValidationError = (message, code) => {
 export const createRemoteJWKSet = (tenantId) => {
     const appOrigin = getAppOrigin()
     const {app: appConfig} = getConfig()
-    const shortCode = appConfig.commerceAPI.parameters.shortCode
-    const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
+    const shortCode = appConfig.commerceAPI?.parameters?.shortCode
+    const configTenantId = appConfig.commerceAPI?.parameters?.organizationId?.replace(
+        /^f_ecom_/,
+        ''
+    )
+    if (!shortCode || !configTenantId) {
+        throw new Error(
+            'Cannot find `commerceAPI.parameters.(shortCode|organizationId)` in your config file. Please check the config file.'
+        )
+    }
     if (tenantId !== configTenantId) {
         throw new Error(
             `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`
@@ -309,11 +318,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        'checkoutshopper-test.adyen.com'
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay specific images
+                        'https://www.gstatic.com/'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        '*.adyen.com',
+                        'https://checkoutshopper-test.adyen.com',
+                        'https://pay.google.com/gp/p/js/pay.js'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -328,16 +342,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
-                        'checkoutshopper-test.adyen.com'
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay Specific frames
+                        'https://pay.google.com'
                     ],
-                    'frame-ancestors': ["'self'"]
+                    'frame-ancestors': ['self']
                 }
             }
         })
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback?*', (req, res) => {
+    app.get('/callback', (req, res) => {
         // This endpoint does nothing and is not expected to change
         // Thus we cache it for a year to maximize performance
         res.set('Cache-Control', `max-age=31536000`)
@@ -412,6 +428,20 @@ const {handler} = runtime.createHandler(options, (app) => {
      * }
      */
     registerAdyenEndpoints(app, runtime)
+
+    // Register standalone payment methods endpoint for Apple Pay "Buy Now" flows
+    app.get('/api/adyen/paymentMethods/standalone', async (req, res) => {
+        try {
+            await standalonePaymentMethodsHandler(req, res)
+        } catch (error) {
+            console.error('Error in standalone payment methods endpoint:', error)
+            res.status(500).json({
+                error: 'Internal server error',
+                message: error.message
+            })
+        }
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
