@@ -98,6 +98,25 @@ const formatSuggestions = (searchSuggestions) => {
                 }
             }
         ),
+        // Einstein suggestions for popular and recent searches
+        popularSearchSuggestions:
+            searchSuggestions?.einsteinSuggestedPhrases?.popularSearchPhrases?.map((phrase) => {
+                return {
+                    type: 'popular',
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
+                }
+            }),
+        recentSearchSuggestions:
+            searchSuggestions?.einsteinSuggestedPhrases?.recentSearchPhrases?.map((phrase) => {
+                return {
+                    type: 'recent',
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
+                }
+            }),
         searchPhrase: searchSuggestions?.searchPhrase
     }
 }
@@ -134,7 +153,8 @@ const Search = (props) => {
         {
             parameters: {
                 q: searchQuery,
-                expand: 'images,prices'
+                expand: 'images,prices',
+                includeEinsteinSuggestedPhrases: true
             }
         },
         {
@@ -160,7 +180,9 @@ const Search = (props) => {
     const searchSuggestionsAvailable =
         searchSuggestions &&
         (searchSuggestions?.categorySuggestions?.length ||
-            searchSuggestions?.phraseSuggestions?.length)
+            searchSuggestions?.phraseSuggestions?.length ||
+            searchSuggestions?.popularSearchSuggestions?.length ||
+            searchSuggestions?.recentSearchSuggestions?.length)
 
     const saveRecentSearch = (searchText) => {
         // Get recent searches or an empty array if undefined.

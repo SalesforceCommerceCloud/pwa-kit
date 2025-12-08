@@ -1,4 +1,6 @@
-## v3.14.0-dev (Sep 26, 2025)
+## v3.15.0-dev (Nov 05, 2025)
+
+## v3.14.0 (Nov 04, 2025)
 
 ## v3.13.0 (Sep 25, 2025)
 - Exclude opentelemetry packages from client side bundling [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)

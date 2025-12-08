@@ -13,6 +13,7 @@ import {
     isLocalComponent,
     isLocalSharedUIComponent,
     generateComponentImportStatement,
+    findDwJsonPath,
     loadConfig,
     getOAuthToken,
     callCustomApiDxEndpoint
@@ -280,6 +281,104 @@ describe('Utils', () => {
                 true // hasOverridesDir
             )
             expect(result).toBe("import MyComponent from '../../components/my-component'")
+        })
+    })
+})
+
+describe('findDwJsonPath', () => {
+    const originalEnv = process.env.PWA_STOREFRONT_APP_PATH
+    const originalGlobal = global.DW_JSON_PATH
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        // Reset environment variables
+        delete process.env.PWA_STOREFRONT_APP_PATH
+        delete global.DW_JSON_PATH
+        // Mock process.cwd to return a predictable path
+        jest.spyOn(process, 'cwd').mockReturnValue('/mock/current/directory')
+    })
+
+    afterEach(() => {
+        // Restore environment variables
+        if (originalEnv) {
+            process.env.PWA_STOREFRONT_APP_PATH = originalEnv
+        } else {
+            delete process.env.PWA_STOREFRONT_APP_PATH
+        }
+        global.DW_JSON_PATH = originalGlobal
+        jest.restoreAllMocks()
+    })
+
+    describe('priority order', () => {
+        it('returns global DW_JSON_PATH when available', () => {
+            global.DW_JSON_PATH = '/mock/global/dw.json'
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === '/mock/global/dw.json'
+            })
+
+            const result = findDwJsonPath()
+
+            expect(result).toBe('/mock/global/dw.json')
+            expect(fs.existsSync).toHaveBeenCalledWith('/mock/global/dw.json')
+        })
+
+        it('returns PWA_STOREFRONT_APP_PATH/dw.json when global path is not available', () => {
+            process.env.PWA_STOREFRONT_APP_PATH = '/mock/storefront/path'
+            const expectedPath = path.join('/mock/storefront/path', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+
+            const result = findDwJsonPath()
+
+            expect(result).toBe(expectedPath)
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+        })
+
+        it('returns PWA_STOREFRONT_APP_PATH/../dw.json when storefront path is not available', () => {
+            process.env.PWA_STOREFRONT_APP_PATH = '/mock/storefront/path'
+            const expectedPath = path.join('/mock/storefront/path', '..', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+
+            const result = findDwJsonPath()
+
+            expect(result).toBe(expectedPath)
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+        })
+
+        it('returns PWA_STOREFRONT_APP_PATH/../../dw.json when parent path is not available', () => {
+            process.env.PWA_STOREFRONT_APP_PATH = '/mock/storefront/path'
+            const expectedPath = path.join('/mock/storefront/path', '..', '..', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+
+            const result = findDwJsonPath()
+
+            expect(result).toBe(expectedPath)
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+        })
+
+        it('returns current working directory dw.json when storefront paths are not available', () => {
+            const expectedPath = path.join('/mock/current/directory', 'dw.json')
+            jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+                return filePath === expectedPath
+            })
+
+            const result = findDwJsonPath()
+
+            expect(result).toBe(expectedPath)
+            expect(fs.existsSync).toHaveBeenCalledWith(expectedPath)
+        })
+
+        it('returns null when no dw.json file is found', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+            const result = findDwJsonPath()
+
+            expect(result).toBeNull()
         })
     })
 })
