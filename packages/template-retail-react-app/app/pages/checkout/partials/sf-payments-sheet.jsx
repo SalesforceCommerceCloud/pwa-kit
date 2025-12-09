@@ -390,7 +390,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
 
     useEffect(() => {
-        if (checkoutComponent.current != null && basket?.orderTotal !== undefined) {
+        if (checkoutComponent.current && basket?.orderTotal) {
             checkoutComponent.current.updateAmount(basket.orderTotal)
         }
     }, [basket?.orderTotal])
