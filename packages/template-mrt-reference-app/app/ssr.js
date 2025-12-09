@@ -43,6 +43,7 @@ const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
 const {isolationTests} = require('./isolation-actions')
+const fs = require('fs').promises
 
 /**
  * Custom error class
@@ -205,6 +206,27 @@ const responseHeadersTest = async (req, res) => {
         // If value is an array then a multi-value header will be created
         res.set(key, value)
     }
+    res.json(jsonFromRequest(req))
+}
+
+const ssrShared = async (req, res) => {
+    const fileName = `${__dirname}/static/example.json`
+    try {
+        const data = await fs.readFile(fileName, { encoding: 'utf8' })
+        const jsonData = JSON.parse(data)
+        res.json(jsonData)
+    } catch (error) {
+        res.json({
+            error: error
+        })
+    }
+    
+}
+
+const customLogLevel = async (req, res) => {
+    console.log('Startard Log level')
+    process.stdout.write('{"message":"Custom Log Level","level":"mrtcustom"}\n')
+
     res.json(jsonFromRequest(req))
 }
 
@@ -372,6 +394,8 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
+    app.get('/ssr-shared', ssrShared)
+    app.get('/custom-log-level', customLogLevel)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

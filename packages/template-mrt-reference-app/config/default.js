@@ -11,6 +11,7 @@ module.exports = {
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
         'static/example.txt',
+        'static/example.json',
         'static/favicon.ico',
         'static/robots.txt',
         'config/default.js'

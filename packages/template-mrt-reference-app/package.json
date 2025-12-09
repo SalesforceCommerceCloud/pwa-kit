@@ -47,6 +47,7 @@
     ],
     "ssrShared": [
       "static/example.txt",
+      "static/example.json",
       "static/favicon.ico",
       "static/robots.txt"
     ]
