@@ -153,7 +153,6 @@ describe('Passwordless landing tests', function () {
 
         await waitFor(() => {
             expect(window.location.pathname).toBe('/uk/en-GB/womens-tops')
-
         })
     })
 
@@ -161,13 +160,13 @@ describe('Passwordless landing tests', function () {
         const token = '12345678'
         const localizedPath = '/us/en-CA/passwordless-login-landing'
         mockRouteMatchPath = localizedPath
-        
+
         window.history.pushState(
             {},
             'Passwordless Login Landing',
             `${localizedPath}?token=${token}`
         )
-        
+
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'us',
