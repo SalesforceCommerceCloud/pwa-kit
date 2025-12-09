@@ -362,6 +362,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 country: 'US', // TODO: see W-18812582
                 locale: intl.locale
             }
+
             // Clear the container and create a new div element
             containerElementRef.current.innerHTML = ''
             const paymentElement = document.createElement('div')
@@ -380,7 +381,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentElement
             )
         }
-        
+
         // Cleanup on unmount
         return () => {
             checkoutComponent.current?.destroy()
@@ -389,7 +390,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
 
     useEffect(() => {
-        if (checkoutComponent.current !== null && basket?.orderTotal !== null) {
+        if (checkoutComponent.current != null && basket?.orderTotal !== undefined) {
             checkoutComponent.current.updateAmount(basket.orderTotal)
         }
     }, [basket?.orderTotal])
@@ -410,14 +411,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             <Box display={step === STEPS.PAYMENT ? 'block' : 'none'}>
                 <Box ref={containerElementRef} />
             </Box>
-            
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
                 <Stack spacing={6}>
-
                     <Divider borderColor="gray.100" />
 
                     <Stack spacing={2}>
