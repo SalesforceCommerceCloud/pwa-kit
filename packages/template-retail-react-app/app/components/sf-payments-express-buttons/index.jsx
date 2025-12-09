@@ -82,11 +82,14 @@ const SFPaymentsExpressButtons = ({
     )
     const {mutateAsync: deleteBasket} = useShopperBasketsMutation('deleteBasket')
 
+    const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
+
     const expressBasket = useRef(null)
     const prepareBasketPromise = useRef(null)
     const containerElementRef = useRef(null)
     const expressComponent = useRef(null)
     const prepareBasketRef = useRef(prepareBasket)
+    const failOrderCalledRef = useRef(false)
 
     // Update the ref whenever prepareBasket changes, including when the variant changes on PDP
     // Using prepareBasketRef.current also ensures the function handlers always call the latest prepareBasket function
@@ -168,6 +171,7 @@ const SFPaymentsExpressButtons = ({
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody(
                 order.orderTotal,
+               //-1,
                 paymentType,
                 zoneIdValue
             )
@@ -181,6 +185,47 @@ const SFPaymentsExpressButtons = ({
                 body: paymentInstrumentBody
             })
         } catch (error) {
+
+            const statusCode = error?.response?.status || error?.status
+            const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
+            const errorDetails = error?.response?.data || error?.body || {}
+            
+            // TODO: log details of body if needed or change toast message to refer the type of message error?
+            logger.error('Failed to patch payment instrument to order', {
+                namespace: 'SFPaymentsExpressButtons.createOrderAndUpdatePayment',
+                additionalProperties: {
+                    statusCode,
+                    errorMessage,
+                    errorDetails,
+                    basketId: expressBasket.current?.basketId,
+                    paymentMethodType: paymentType,
+                    orderTotal: expressBasket.current?.orderTotal,
+                    productSubTotal: expressBasket.current?.productSubTotal,
+                    error: error
+                }
+            })
+             
+            // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
+            await failOrder({
+                parameters: {
+                    orderNo: createdOrderNo,
+                    reopenBasket: true
+                },
+                body: {
+                    reasonCode: "payment_confirm_failure"
+                }
+            })
+            failOrderCalledRef.current = true
+
+            // Show error message to user - order was failed and basket reopened
+            showErrorMessage(
+                intl.formatMessage({
+                    defaultMessage:
+                        'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                    id: 'sfp_payments_express.error.fail_order'
+                })
+            )
+
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             throw error
@@ -313,41 +358,53 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
-            const onCancel = async () => {
-                endConfirming()
-
+            // Helper function to clean up express basket state
+            const cleanupExpressBasket = async () => {
                 // If an order was already created, the basket was consumed - don't try to clean it up
                 if (orderNo) {
                     expressBasket.current = null
-                    showErrorMessage()
                     return
                 }
-
                 // Only clean up if no order was created (basket still exists)
-                const sfPaymentsInstrument = getSFPaymentsInstrument(expressBasket.current)
-                if (sfPaymentsInstrument) {
-                    expressBasket.current = await removePaymentInstrumentFromBasket({
-                        parameters: {
-                            basketId: expressBasket.current.basketId,
-                            paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
+                if (expressBasket.current) {
+                    const sfPaymentsInstrument = getSFPaymentsInstrument(expressBasket.current)
+                    if (sfPaymentsInstrument) {
+                        try {
+                            expressBasket.current = await removePaymentInstrumentFromBasket({
+                                parameters: {
+                                    basketId: expressBasket.current.basketId,
+                                    paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
+                                }
+                            })
+                        } catch (cleanupError) {
+                            logger.warn('Failed to remove payment instrument during cleanup', {
+                                namespace: 'SFPaymentsExpressButtons.cleanupExpressBasket',
+                                additionalProperties: {cleanupError}
+                            })
                         }
-                    })
+                    }
+                    // Delete the temporary basket if it exists
+                    if (expressBasket.current?.basketId && expressBasket.current?.temporaryBasket) {
+                        try {
+                            await deleteBasket({
+                                parameters: {basketId: expressBasket.current.basketId}
+                            })
+                        } catch (cleanupError) {
+                            logger.warn('Failed to delete temporary basket during cleanup', {
+                                namespace: 'SFPaymentsExpressButtons.cleanupExpressBasket',
+                                additionalProperties: {cleanupError}
+                            })
+                        }
+                    }
+                    // Clear the ref after cleanup
+                    expressBasket.current = null
                 }
-                // Delete the temporary basket if it exists
-                if (expressBasket.current?.basketId && expressBasket.current?.temporaryBasket) {
-                    await deleteBasket({
-                        parameters: {basketId: expressBasket.current.basketId}
-                    })
-                }
-                // Clear the ref after cleanup
-                expressBasket.current = null
-                showErrorMessage(
-                    intl.formatMessage({
-                        defaultMessage:
-                            'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
-                        id: 'sfp_payments_express.error.cancel'
-                    })
-                )
+            }
+
+            const onCancel = async () => {
+                endConfirming()
+                await cleanupExpressBasket()
+                showErrorMessage()
             }
 
             const onShippingAddressChange = async (shippingAddress, callback) => {
@@ -490,14 +547,62 @@ const SFPaymentsExpressButtons = ({
 
                     // For Stripe, create SF Payments basket payment instrument before creating order
                     if (!isPayPalPaymentMethodType(paymentMethodType)) {
-                        expressBasket.current = await addPaymentInstrumentToBasket({
+                        /*expressBasket.current = await addPaymentInstrumentToBasket({
                             parameters: {basketId: updatedBasket.basketId},
                             body: createPaymentInstrumentBody(
                                 updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
                                 paymentMethodType,
                                 zoneId
                             )
-                        })
+                        })*/
+                            try {
+                                expressBasket.current = await addPaymentInstrumentToBasket({
+                                    parameters: {basketId: updatedBasket.basketId},
+                                    body: createPaymentInstrumentBody(
+                                        updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
+                                        paymentMethodType,
+                                        zoneId
+                                    )
+                                })
+                                /*expressBasket.current = await addPaymentInstrumentToBasket({
+                                    parameters: {basketId: expressBasket.current.basketId},
+                                    body: createPaymentInstrumentBody(
+                                        expressBasket.current.orderTotal ||
+                                            expressBasket.current.productSubTotal,
+                                        null,
+                                        "default1"
+                                    )
+                                })*/
+                            } catch (error) {
+                                const statusCode = error?.response?.status || error?.status
+                                const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
+                                const errorDetails = error?.response?.data || error?.body || {}
+                                
+                                // TODO: log details of body if needed or change toast message to refer the type of message error?
+                                logger.error('Failed to add payment instrument to basket', {
+                                    namespace: 'SFPaymentsExpressButtons.onPayerApprove',
+                                    additionalProperties: {
+                                        statusCode,
+                                        errorMessage,
+                                        errorDetails,
+                                        basketId: expressBasket.current?.basketId,
+                                        paymentMethodType,
+                                        orderTotal: expressBasket.current?.orderTotal,
+                                        productSubTotal: expressBasket.current?.productSubTotal,
+                                        error: error
+                                    }
+                                })
+                                 
+                                // Show error message to user immediately
+                                showErrorMessage(
+                                    intl.formatMessage({
+                                        defaultMessage:
+                                            'Unable to process payment. Please try again or select a different payment method.',
+                                        id: 'sfp_payments_express.error.onPayerApprove'
+                                    })
+                                )
+                                throw error
+                            }
                     }
                 } catch (error) {
                     endConfirming()
@@ -533,15 +638,47 @@ const SFPaymentsExpressButtons = ({
                         })
                     }
                     // Add Salesforce Payments payment instrument to basket
-                    expressBasket.current = await addPaymentInstrumentToBasket({
-                        parameters: {basketId: expressBasket.current.basketId},
-                        body: createPaymentInstrumentBody(
-                            expressBasket.current.orderTotal ||
-                                expressBasket.current.productSubTotal,
-                            paymentMethodType,
-                            zoneId
+                    try {
+                        expressBasket.current = await addPaymentInstrumentToBasket({
+                            parameters: {basketId: expressBasket.current.basketId},
+                            body: createPaymentInstrumentBody(
+                                expressBasket.current.orderTotal ||
+                                    expressBasket.current.productSubTotal,
+                                paymentMethodType,
+                                zoneId
+                            )
+                        })
+                    } catch (error) {
+                        const statusCode = error?.response?.status || error?.status
+                        const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
+                        const errorDetails = error?.response?.data || error?.body || {}
+                        
+                        // TODO: log details of body if needed or change toast message to refer the type of message error?
+                        logger.error('Failed to add payment instrument to basket', {
+                            namespace: 'SFPaymentsExpressButtons.createIntentFunction',
+                            additionalProperties: {
+                                statusCode,
+                                errorMessage,
+                                errorDetails,
+                                basketId: expressBasket.current?.basketId,
+                                paymentMethodType,
+                                orderTotal: expressBasket.current?.orderTotal,
+                                productSubTotal: expressBasket.current?.productSubTotal,
+                                error: error
+                            }
+                        })
+                         
+                        // Show error message to user immediately
+                        showErrorMessage(
+                            intl.formatMessage({
+                                defaultMessage:
+                                    'Unable to process payment. Please try again or select a different payment method.',
+                                id: 'sfp_payments_express.error.add_payment_instrument'
+                            })
                         )
-                    })
+                        // Re-throw so SF Payments SDK can handle the error if needed
+                        throw error
+                    }
                     updatedPaymentInstrument = getSFPaymentsInstrument(expressBasket.current)
                 } else {
                     // Create order and update payment instrument
@@ -553,6 +690,7 @@ const SFPaymentsExpressButtons = ({
                         )
                         orderNo = order.orderNo
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
+                        // TODO validate updatedPaymentInstrument paymentRererence values?
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
                         // orderNo will be attached to the error
@@ -595,12 +733,30 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
+            // Async function to handle payment error event.  This is called when error event is handled by SF Payments SDK.
             const paymentError = async () => {
                 endConfirming()
-                if (orderNo) {
+                /*if (orderNo) {
                     // TODO: fail the order
                     orderNo = null
+                }*/
+                // if orderNo is present and failOrder has not been called, call failOrder
+                if (orderNo && !failOrderCalledRef.current) {
+                    console.log('paymentError 1')
+                    // TODO:  once payment intent is created BUT confirm fails (Ex: generic declined card), failOrder is not working
+                    await failOrder({
+                        parameters: {
+                            orderNo: orderNo,
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: "payment_confirm_failure"
+                        }
+                    })
+                    failOrderCalledRef.current = true
                 }
+                orderNo = null
+                failOrderCalledRef.current = false // Reset for next attempt
             }
 
             const handlePaymentMethodsRendered = (details) => {

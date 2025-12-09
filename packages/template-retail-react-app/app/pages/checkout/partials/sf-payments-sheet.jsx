@@ -47,6 +47,7 @@ import {
     getSFPaymentsInstrument,
     createPaymentInstrumentBody
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
     const {onRequiresPayButtonChange, onCreateOrder, onError} = props
@@ -100,6 +101,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         'removePaymentInstrumentFromBasket'
     )
 
+    const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
+
     const {step, STEPS, goToStep} = useCheckout()
 
     const billingAddressForm = useForm({
@@ -136,7 +139,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 id: 'checkout.message.generic_error',
                 defaultMessage: 'An unexpected error occurred during checkout.'
             })
-            onError(message)
+            // Use error.message if available, otherwise use the formatted default message
+            onError(error.message || message)
         }
     }
 
@@ -223,16 +227,62 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        // Update order payment instrument to create payment
-        const updatedOrder = await updatePaymentInstrumentForOrder({
-            parameters: {
-                orderNo: order.orderNo,
-                paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
-            },
-            body: createPaymentInstrumentBody(order.orderTotal, paymentMethodType.current, zoneId)
-        })
+        try {
+            // Update order payment instrument to create payment
+            const updatedOrder = await updatePaymentInstrumentForOrder({
+                parameters: {
+                    orderNo: order.orderNo,
+                    paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
+                },
+                body: createPaymentInstrumentBody(order.orderTotal, paymentMethodType.current, zoneId)
+                //body: createPaymentInstrumentBody(-1, paymentMethodType.current, zoneId)
+            })
 
-        return updatedOrder
+            return updatedOrder
+        } catch (error) {
+            const statusCode = error?.response?.status || error?.status
+            const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
+            const errorDetails = error?.response?.data || error?.body || {}
+            
+            // TODO: log details of body if needed or change toast message to refer the type of message error?
+            logger.error('Failed to patch payment instrument to order', {
+                namespace: 'SFPaymentsSheet.createAndUpdateOrder',
+                additionalProperties: {
+                    statusCode,
+                    errorMessage,
+                    errorDetails,
+                    basketId: currentBasket.current?.basketId,
+                    paymentMethodType: paymentMethodType.current,
+                    orderTotal: order.orderTotal,
+                    productSubTotal: currentBasket.current?.productSubTotal,
+                    error: error
+                }
+            })
+            const createdOrderNo = order.orderNo
+            // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
+            await failOrder({
+                parameters: {
+                    orderNo: createdOrderNo,
+                    reopenBasket: true
+                },
+                body: {
+                    reasonCode: "payment_confirm_failure"
+                }
+            })
+            
+            // Show error message to user - order was failed and basket reopened
+            const message = formatMessage({
+                defaultMessage:
+                    'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                id: 'checkout.message.payment_confirm_failure'
+            })
+            onError(message)
+            
+            // Attach orderNo to the error so caller knows order was created
+            error.orderNo = createdOrderNo
+            error.message = message
+            throw error
+        }
     }
 
     const confirmPayment = async () => {
@@ -259,15 +309,17 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             )
         })
 
+        let updatedOrder = null
         try {
             // Update order payment instrument to create payment
-            const updatedOrder = await createAndUpdateOrder()
+            updatedOrder = await createAndUpdateOrder()
 
             // Find updated SF Payments payment instrument in updated order
             const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
 
             // Track created payment intent
             const paymentIntent = {
+                //client_secret: '123',
                 client_secret: orderPaymentInstrument.paymentReference.clientSecret,
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
             }
@@ -309,6 +361,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
+            // Store orderNo before confirm in case confirm fails
+            const orderNo = updatedOrder.orderNo
+
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
                 () => paymentIntent,
@@ -324,6 +379,44 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             queryClient.invalidateQueries()
             // Finally return the created order
             return updatedOrder
+        } catch (error) {
+            // Only fail order if createAndUpdateOrder succeeded but perhaps confirm fails
+            if (updatedOrder && !error.orderNo) {
+                // createAndUpdateOrder succeeded but confirm failed - need to fail the order
+                try {
+                    await failOrder({
+                        parameters: {
+                            orderNo: updatedOrder.orderNo,
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: 'payment_confirm_failure'
+                        }
+                    })
+                    logger.info('Order failed successfully after confirm failure', {
+                        namespace: 'SFPaymentsSheet.confirmPayment',
+                        additionalProperties: {orderNo: updatedOrder.orderNo}
+                    })
+                        
+                    // Show error message to user - order was failed and basket reopened
+                    const message = formatMessage({
+                        defaultMessage:
+                            'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                        id: 'checkout.message.payment_confirm_failure'
+                    })
+                    onError(message)
+                    error.message = message
+                } catch (failOrderError) {
+                    logger.error('Failed to fail order after confirm failure', {
+                        namespace: 'SFPaymentsSheet.confirmPayment',
+                        additionalProperties: {
+                            orderNo: updatedOrder.orderNo,
+                            failOrderError
+                        }
+                    })
+                }
+            }
+            throw error
         } finally {
             // Remove tracked basket being confirmed
             endConfirming()

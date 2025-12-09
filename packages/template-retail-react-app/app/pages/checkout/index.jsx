@@ -48,6 +48,8 @@ import {
     useSFPayments
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
+let persistedPaymentsError = null
+
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -95,6 +97,14 @@ const Checkout = () => {
         }
     }, [basket?.basketId])
 
+    // Restore error if component remounted after payments error causes a refresh
+    useEffect(() => {
+        if (persistedPaymentsError && !error) {
+            setError(persistedPaymentsError)
+            persistedPaymentsError = null // Clear it after restoring
+        }
+    }, [])
+
     // Callback to handle when payment method requires its own pay button
     const handleRequiresPayButtonChange = (requiresPayButton) => {
         setShouldHidePlaceOrderButton(requiresPayButton === false)
@@ -107,6 +117,7 @@ const Checkout = () => {
     }
 
     const handlePaymentError = (errorMessage) => {
+        persistedPaymentsError = errorMessage
         setError(errorMessage)
     }
 
@@ -121,11 +132,13 @@ const Checkout = () => {
             }
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
-            const message = formatMessage({
-                id: 'checkout.message.generic_error',
-                defaultMessage: 'An unexpected error occurred during checkout.'
-            })
-            setError(message)
+            if (!persistedPaymentsError) {
+                const message = formatMessage({
+                    id: 'checkout.message.generic_error',
+                    defaultMessage: 'An unexpected error occurred during checkout.'
+                })
+                setError(message)
+            } 
         } finally {
             setIsLoading(false)
         }
@@ -151,7 +164,6 @@ const Checkout = () => {
                                     {error}
                                 </Alert>
                             )}
-
                             {sfPaymentsEnabled && (
                                 <Box
                                     layerStyle="card"
