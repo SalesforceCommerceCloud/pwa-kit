@@ -16,6 +16,8 @@ import {
     mockGoToStep,
     mockGoToNextStep
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
@@ -65,6 +67,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
         __esModule: true,
         useCurrentBasket: jest.fn().mockReturnValue(defaultReturn)
     }
+})
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
+beforeEach(() => {
+    getConfig.mockImplementation(() => mockConfig)
 })
 
 afterEach(() => {
@@ -192,8 +202,7 @@ describe('passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI:
-                'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/checkout'
+            mode: 'email'
         })
 
         // check that check email modal is open
@@ -209,8 +218,42 @@ describe('passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI:
-                'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/checkout'
+            mode: 'email'
+        })
+    })
+
+    test('sends callbackURI when passwordless callback is configured', async () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                login: {
+                    passwordless: {
+                        mode: 'callback',
+                        callbackURI: 'https://callback.com/passwordless'
+                    }
+                }
+            }
+        })
+
+        jest.spyOn(window, 'location', 'get').mockReturnValue({
+            pathname: '/checkout',
+            origin: 'https://example.com'
+        })
+
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
+
+        await user.type(screen.getByLabelText('Email'), validEmail)
+
+        const passwordlessLoginButton = screen.getByText('Secure Link')
+        await user.click(passwordlessLoginButton)
+
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({
+            userid: validEmail,
+            mode: 'callback',
+            callbackURI: 'https://callback.com/passwordless?redirectUrl=/checkout'
         })
     })
 

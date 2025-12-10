@@ -45,11 +45,13 @@ const MockedComponent = () => {
     )
 }
 
+let mockRouteMatchPath = '/passwordless-login-landing'
+
 jest.mock('react-router', () => {
     return {
         ...jest.requireActual('react-router'),
         useRouteMatch: () => {
-            return {path: '/passwordless-login-landing'}
+            return {path: mockRouteMatchPath}
         }
     }
 })
@@ -72,6 +74,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 
 // Set up and clean up
 beforeEach(() => {
+    mockRouteMatchPath = '/passwordless-login-landing'
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -94,6 +97,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     jest.resetModules()
+    jest.clearAllMocks()
 })
 
 describe('Passwordless landing tests', function () {
@@ -149,6 +153,36 @@ describe('Passwordless landing tests', function () {
 
         await waitFor(() => {
             expect(window.location.pathname).toBe('/uk/en-GB/womens-tops')
+        })
+    })
+
+    test('redirects to account page with correct locale when path includes locale', async () => {
+        const token = '12345678'
+        const localizedPath = '/us/en-CA/passwordless-login-landing'
+        mockRouteMatchPath = localizedPath
+
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            `${localizedPath}?token=${token}`
+        )
+
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'us',
+                locale: {id: 'en-CA'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+        ).toHaveBeenCalledWith({
+            pwdlessLoginToken: token
+        })
+
+        await waitFor(() => {
+            expect(window.location.pathname).toBe('/us/en-CA/account')
         })
     })
 })

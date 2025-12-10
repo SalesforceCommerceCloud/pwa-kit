@@ -19,6 +19,8 @@ import Registration from '@salesforce/retail-react-app/app/pages/registration'
 import ResetPassword from '@salesforce/retail-react-app/app/pages/reset-password'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
@@ -28,6 +30,28 @@ const mockMergedBasket = {
         email: 'customer@test.com'
     }
 }
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
+const mockAuthHelperFunctions = {
+    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()}
+}
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useAuthHelper: jest.fn((helperType) => {
+            // Return mock for AuthorizePasswordless, real implementation for others
+            if (mockAuthHelperFunctions[helperType]) {
+                return mockAuthHelperFunctions[helperType]
+            }
+            return originalModule.useAuthHelper(helperType)
+        })
+    }
+})
 
 const MockedComponent = () => {
     const match = {
@@ -53,6 +77,7 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    getConfig.mockReturnValue(mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -302,5 +327,68 @@ describe('Navigate away from login page tests', function () {
                 /Enter your email to receive instructions on how to reset your password/i
             )
         ).toBeInTheDocument()
+    })
+})
+
+describe('Passwordless login tests', () => {
+    beforeEach(() => {
+        // Clear the mock before each test
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockClear()
+    })
+
+    test('allows passwordless login', async () => {
+        getConfig.mockReturnValue({
+            app: {
+                ...mockConfig.app,
+                login: {
+                    passwordless: {
+                        enabled: true,
+                        mode: 'email'
+                    }
+                }
+            }
+        })
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app,
+                bypassAuth: false
+            }
+        })
+
+        // enter credentials
+        const testEmail = 'customer@test.com'
+        await user.type(screen.getByLabelText('Email'), testEmail)
+
+        // Click the submit button
+        await user.click(screen.getByRole('button', {name: /Continue Securely/i}))
+
+        // Verify that authorizePasswordless is called with correct parameters
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+            ).toHaveBeenCalledWith({
+                userid: testEmail,
+                mode: 'email'
+            })
+        })
+
+        // check that check email page is open
+        await waitFor(
+            () => {
+                expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
+
+        // resend the email
+        await user.click(screen.getByText(/Resend Link/i))
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({
+            userid: testEmail,
+            mode: 'email'
+        })
     })
 })

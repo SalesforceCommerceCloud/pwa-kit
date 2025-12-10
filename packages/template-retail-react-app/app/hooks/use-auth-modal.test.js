@@ -20,6 +20,8 @@ import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -64,6 +66,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
 let authModal = undefined
 const MockedComponent = (props) => {
     const {initialView, isPasswordlessEnabled = false} = props
@@ -89,6 +95,7 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
+    getConfig.mockImplementation(() => mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -246,7 +253,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
 
         // check that check email modal is open
@@ -265,7 +272,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
     })
 
@@ -296,7 +303,7 @@ describe('Passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+            mode: 'email'
         })
 
         // check that check email modal is open
@@ -308,6 +315,47 @@ describe('Passwordless enabled', () => {
             },
             {timeout: 5000}
         )
+    })
+
+    test('sends callbackURI when passwordless callback is configured', async () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                login: {
+                    passwordless: {
+                        mode: 'callback',
+                        callbackURI: 'https://callback.com/passwordless'
+                    }
+                }
+            }
+        })
+
+        jest.spyOn(window, 'location', 'get').mockReturnValue({
+            pathname: '/',
+            origin: 'https://example.com'
+        })
+
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+        const validEmail = 'test@salesforce.com'
+
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        })
+
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/continue securely/i))
+
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({
+            userid: validEmail,
+            mode: 'callback',
+            callbackURI: 'https://callback.com/passwordless?redirectUrl=/'
+        })
     })
 })
 

@@ -13,6 +13,8 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
@@ -311,4 +313,23 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
 export const serverSafeEncode = (input) => {
     // WARNING: only use this because server double-decodes URL components
     return encodeURIComponent(input)
+}
+
+/**
+ * Resolves a URL or path to an absolute application URL.
+ *
+ * If the input is already an absolute URL, it is returned as-is. If it is
+ * a relative path, it is prefixed with the application origin and the env
+ * base path. If the input is falsy, undefined is returned.
+ *
+ * @param {string} appOrigin - The application origin, e.g. "https://example.com".
+ * @param {string} urlOrPath - An absolute URL or a relative path.
+ * @returns {string|undefined} - The fully-qualified URL, or undefined if no input is provided.
+ */
+export const buildAbsoluteUrl = (appOrigin, urlOrPath) => {
+    if (!urlOrPath) {
+        return undefined
+    }
+
+    return isAbsoluteURL(urlOrPath) ? urlOrPath : `${appOrigin}${getEnvBasePath()}${urlOrPath}`
 }

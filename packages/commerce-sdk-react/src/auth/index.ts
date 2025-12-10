@@ -21,7 +21,6 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
-    isAbsoluteUrl,
     stringToBase64,
     extractCustomParameters
 } from '../utils'
@@ -55,6 +54,7 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
+    locale: string
 }
 
 interface JWTHeaders {
@@ -95,7 +95,7 @@ type AuthorizeIDPParams = {
 type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
-    mode?: string
+    mode?: 'email' | 'callback'
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -265,6 +265,7 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
+    private locale: string
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -358,10 +359,11 @@ class Auth {
 
         this.isPrivate = !!this.clientSecret
 
-        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
+
+        this.locale = config.locale
     }
 
     get(name: AuthDataKeys) {
@@ -1261,8 +1263,11 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
+        // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
+        // expect this mode. Newer versions should explicitly set mode.
+        const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+        const locale = this.locale
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1270,10 +1275,11 @@ class Auth {
                 clientSecret: this.clientSecret
             },
             parameters: {
-                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
+                ...(locale && {locale}),
                 userid: parameters.userid,
-                mode: finalMode
+                mode
             }
         })
         if (res && res.status !== 200) {
