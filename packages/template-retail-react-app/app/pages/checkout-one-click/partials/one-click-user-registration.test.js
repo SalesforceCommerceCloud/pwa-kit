@@ -332,6 +332,42 @@ describe('UserRegistration', () => {
         expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledTimes(1)
     })
 
+    test('shows account creation notification after successful OTP verification', async () => {
+        const user = userEvent.setup()
+        setup()
+        // Enable registration to trigger OTP
+        await user.click(screen.getByRole('checkbox', {name: /Create an account/i}))
+        // Verify OTP (mocked)
+        const otpButton = await screen.findByTestId('otp-verify')
+        await user.click(otpButton)
+        // Notification should appear after registration succeeds
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-account-creation-notification')).toBeInTheDocument()
+        })
+        // Optional: assert key content
+        expect(screen.getByText(/Account Created/i)).toBeInTheDocument()
+        // Use aria-label to avoid ambiguity with body text containing 'verified'
+        expect(screen.getByLabelText(/Verified/i)).toBeInTheDocument()
+    })
+
+    test('renders account creation notification when showNotice prop is true', async () => {
+        render(
+            <IntlProvider locale="en-GB">
+                <UserRegistration
+                    enableUserRegistration={false}
+                    setEnableUserRegistration={jest.fn()}
+                    isGuestCheckout={false}
+                    isDisabled={false}
+                    onSavePreferenceChange={jest.fn()}
+                    onRegistered={jest.fn()}
+                    showNotice
+                />
+            </IntlProvider>
+        )
+        expect(screen.getByTestId('sf-account-creation-notification')).toBeInTheDocument()
+        expect(screen.getByText(/Account Created/i)).toBeInTheDocument()
+    })
+
     test('calls loginPasswordless with OTP code and register flag', async () => {
         const user = userEvent.setup()
         const {loginPasswordless} = setup()

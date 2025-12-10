@@ -80,6 +80,15 @@
   "account_addresses.title.addresses": {
     "defaultMessage": "Addresses"
   },
+  "account_creation_notification.body": {
+    "defaultMessage": "We’ve created and verified your account using the information from your order. Next time you check out, just enter the code we send to log in — no password needed."
+  },
+  "account_creation_notification.title": {
+    "defaultMessage": "Account Created"
+  },
+  "account_creation_notification.verified": {
+    "defaultMessage": "Verified"
+  },
   "account_detail.title.account_details": {
     "defaultMessage": "Account Details"
   },

@@ -24,13 +24,9 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {Text, Button, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -68,11 +64,6 @@ export default function ShippingAddress() {
 
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const {selectedStore} = useSelectedStore()
-    const {navigate} = useNavigation()
-    const {updatePickupShipment} = usePickupShipment(basket)
-
     // Prepare a shipping methods query we can manually refetch after address updates
     const shippingMethodsQuery = useShippingMethodsForShipment(
         {
@@ -85,29 +76,6 @@ export default function ShippingAddress() {
             enabled: false
         }
     )
-
-    const switchToPickup = async () => {
-        try {
-            if (!selectedStore?.inventoryId) {
-                navigate('/store-locator')
-                return
-            }
-            const refreshed = await currentBasketQuery.refetch()
-            const latestBasketId = refreshed?.data?.basketId || basket.basketId
-            await updatePickupShipment(latestBasketId, selectedStore)
-            await currentBasketQuery.refetch()
-            goToStep(STEPS.PICKUP_ADDRESS)
-        } catch (_e) {
-            toast({
-                title: formatMessage({
-                    defaultMessage:
-                        'We could not switch to Store Pickup. Please try again or choose a different store.',
-                    id: 'shipping_address.error.switch_to_pickup_failed'
-                }),
-                status: 'error'
-            })
-        }
-    }
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -314,24 +282,12 @@ export default function ShippingAddress() {
                         onBackToSingle={() => setIsMultiShipping(false)}
                     />
                 ) : (
-                    <>
-                        {storeLocatorEnabled && (
-                            <Box mb={3}>
-                                <Button variant="link" onClick={switchToPickup}>
-                                    {formatMessage({
-                                        defaultMessage: 'Pick up in store',
-                                        id: 'shipping_address.action.pickup_in_store'
-                                    })}
-                                </Button>
-                            </Box>
-                        )}
-                        <ShippingAddressSelection
-                            selectedAddress={selectedShippingAddress}
-                            submitButtonLabel={submitButtonMessage}
-                            onSubmit={submitAndContinue}
-                            formTitleAriaLabel={shippingAddressAriaLabel}
-                        />
-                    </>
+                    <ShippingAddressSelection
+                        selectedAddress={selectedShippingAddress}
+                        submitButtonLabel={submitButtonMessage}
+                        onSubmit={submitAndContinue}
+                        formTitleAriaLabel={shippingAddressAriaLabel}
+                    />
                 )}
             </ToggleCardEdit>
             {(hasMultipleDeliveryShipments || isAddressFilled) && (
