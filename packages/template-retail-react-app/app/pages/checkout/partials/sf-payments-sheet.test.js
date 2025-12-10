@@ -149,6 +149,7 @@ const mockStartConfirming = jest.fn()
 const mockEndConfirming = jest.fn()
 const mockCheckoutConfirm = jest.fn()
 const mockCheckoutDestroy = jest.fn()
+const mockUpdateAmount = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
@@ -158,7 +159,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
             sfp: {
                 checkout: jest.fn(() => ({
                     confirm: mockCheckoutConfirm,
-                    destroy: mockCheckoutDestroy
+                    destroy: mockCheckoutDestroy,
+                    updateAmount: mockUpdateAmount
                 }))
             },
             metadata: {key: 'value'},
@@ -195,15 +197,16 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
 })
 
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
-    const ToggleCard = ({children, title}) => (
-        <div data-testid="toggle-card">
+    const ToggleCard = ({children, title, editing}) => (
+        <div data-testid="toggle-card" data-editing={editing ? 'true' : 'false'}>
             <h2>{title}</h2>
             {children}
         </div>
     )
     ToggleCard.propTypes = {
         children: () => null,
-        title: () => null
+        title: () => null,
+        editing: () => null
     }
 
     const ToggleCardEdit = ({children}) => <div data-testid="toggle-card-edit">{children}</div>
@@ -706,6 +709,172 @@ describe('SFPaymentsSheet', () => {
             expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
             expect(mockOnRequiresPayButtonChange).toBeDefined()
             expect(mockOnRequiresPayButtonChange).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('container element persistence', () => {
+        test('payment container is rendered outside ToggleCardEdit to prevent unmounting', () => {
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            const toggleCard = screen.getByTestId('toggle-card')
+
+            expect(toggleCard).toBeInTheDocument()
+            expect(toggleCard).toBeInTheDocument()
+        })
+    })
+
+    describe('updateAmount', () => {
+        beforeEach(() => {
+            mockUpdateAmount.mockClear()
+        })
+
+        test('calls updateAmount when basket orderTotal changes', async () => {
+            const initialBasket = {
+                ...mockBasket,
+                orderTotal: 100.0
+            }
+
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: initialBasket,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 1,
+                    totalPickupShipments: 0
+                },
+                isLoading: false
+            }))
+
+            const {rerender} = renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
+            })
+
+            await waitFor(
+                () => {
+                    expect(mockUpdateAmount).toHaveBeenCalledWith(100.0)
+                },
+                {timeout: 2000}
+            )
+
+            mockUpdateAmount.mockClear()
+
+            const updatedBasket = {
+                ...initialBasket,
+                orderTotal: 150.0
+            }
+
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: updatedBasket,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 1,
+                    totalPickupShipments: 0
+                },
+                isLoading: false
+            }))
+
+            rerender(
+                <CheckoutProvider>
+                    <SFPaymentsSheet
+                        ref={mockRef}
+                        onCreateOrder={mockOnCreateOrder}
+                        onError={mockOnError}
+                    />
+                </CheckoutProvider>
+            )
+
+            await waitFor(
+                () => {
+                    expect(mockUpdateAmount).toHaveBeenCalledWith(150.0)
+                },
+                {timeout: 2000}
+            )
+        })
+
+        test('does not call updateAmount when orderTotal is undefined', async () => {
+            const basketWithoutOrderTotal = {
+                ...mockBasket,
+                orderTotal: undefined
+            }
+
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: basketWithoutOrderTotal,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 1,
+                    totalPickupShipments: 0
+                },
+                isLoading: false
+            }))
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
+            })
+
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockUpdateAmount).not.toHaveBeenCalled()
+        })
+
+        test('calls updateAmount with correct orderTotal value on initial render', async () => {
+            const basketWithOrderTotal = {
+                ...mockBasket,
+                orderTotal: 250.75
+            }
+
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: basketWithOrderTotal,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 1,
+                    totalPickupShipments: 0
+                },
+                isLoading: false
+            }))
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(
+                () => {
+                    expect(mockUpdateAmount).toHaveBeenCalledWith(250.75)
+                },
+                {timeout: 2000}
+            )
         })
     })
 })
