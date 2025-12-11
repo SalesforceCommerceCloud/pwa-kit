@@ -41,7 +41,7 @@ export default {
                 marginRight: 2,
                 marginLeft: 0,
                 marginBottom: 2,
-                color: `${props.selected ? 'black' : 'gray.200'}`,
+                color: `${props.selected ? 'black' : 'gray.600'}`,
                 border: `${props.selected ? '1px' : '0'}`,
                 _hover: {
                     borderColor: `${props.selected ? 'black' : 'gray.200'}`,
