@@ -62,7 +62,27 @@ export default function ShippingOptions() {
             enabled:
                 Boolean(basket?.basketId) &&
                 step === STEPS.SHIPPING_OPTIONS &&
-                !hasMultipleDeliveryShipments
+                !hasMultipleDeliveryShipments,
+            onSuccess: (data) => {
+                const noMethods =
+                    !data?.applicableShippingMethods || data.applicableShippingMethods.length === 0
+                if (
+                    step === STEPS.SHIPPING_OPTIONS &&
+                    !hasMultipleDeliveryShipments &&
+                    noMethods &&
+                    !noMethodsToastShown
+                ) {
+                    showToast({
+                        title: formatMessage({
+                            defaultMessage:
+                                'No shipping methods are available for this address. Please enter a different address.',
+                            id: 'shipping_options.error.no_shipping_methods'
+                        }),
+                        status: 'error'
+                    })
+                    setNoMethodsToastShown(true)
+                }
+            }
         }
     )
 
@@ -184,36 +204,6 @@ export default function ShippingOptions() {
         isLoading,
         goToNextStep,
         updateShippingMethod
-    ])
-
-    // Inform the shopper if no shipping methods are available for the selected address
-    useEffect(() => {
-        if (
-            step === STEPS.SHIPPING_OPTIONS &&
-            !hasMultipleDeliveryShipments &&
-            shippingMethods &&
-            (!shippingMethods.applicableShippingMethods ||
-                shippingMethods.applicableShippingMethods.length === 0) &&
-            !noMethodsToastShown
-        ) {
-            showToast({
-                title: formatMessage({
-                    defaultMessage:
-                        'No shipping methods are available for this address. Please update the address or try again later.',
-                    id: 'shipping_options.error.no_shipping_methods'
-                }),
-                status: 'error'
-            })
-            setNoMethodsToastShown(true)
-        }
-    }, [
-        step,
-        STEPS.SHIPPING_OPTIONS,
-        shippingMethods,
-        hasMultipleDeliveryShipments,
-        showToast,
-        formatMessage,
-        noMethodsToastShown
     ])
 
     const submitForm = async ({shippingMethodId}) => {

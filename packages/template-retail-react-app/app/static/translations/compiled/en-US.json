@@ -4166,7 +4166,7 @@
   "shipping_options.error.no_shipping_methods": [
     {
       "type": 0,
-      "value": "No shipping methods are available for this address. Please update the address or try again later."
+      "value": "No shipping methods are available for this address. Please enter a different address."
     }
   ],
   "shipping_options.free": [

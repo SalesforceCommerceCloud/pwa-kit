@@ -1764,7 +1764,7 @@
     "defaultMessage": "Continue to Payment"
   },
   "shipping_options.error.no_shipping_methods": {
-    "defaultMessage": "No shipping methods are available for this address. Please update the address or try again later."
+    "defaultMessage": "No shipping methods are available for this address. Please enter a different address."
   },
   "shipping_options.free": {
     "defaultMessage": "Free"
