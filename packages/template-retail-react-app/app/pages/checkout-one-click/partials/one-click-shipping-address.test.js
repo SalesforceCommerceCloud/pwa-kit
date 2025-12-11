@@ -533,10 +533,16 @@ describe('ShippingAddress Component', () => {
             useCurrentBasket: () => ({
                 data: {
                     basketId: 'test-basket-id',
-                    productItems: [{itemId: 'i1'}, {itemId: 'i2'}],
+                    productItems: [
+                        {itemId: 'i1', shipmentId: 'me'},
+                        {itemId: 'i2', shipmentId: 'me'}
+                    ],
                     shipments: [
                         {
                             shipmentId: 'me',
+                            shippingMethod: {
+                                c_storePickupEnabled: false
+                            },
                             shippingAddress: null
                         }
                     ]
