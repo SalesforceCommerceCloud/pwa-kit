@@ -681,7 +681,8 @@ describe('processLambdaResponse', () => {
         const event = {}
         const result = processLambdaResponse(response, event)
 
-        expect(result.multiValueHeaders).toBeUndefined()
+        // multiValueHeaders should be an empty object when no cookies are present
+        expect(result.multiValueHeaders).toEqual({})
         expect(result.headers['accept-language']).toBe('en-US')
     })
 
