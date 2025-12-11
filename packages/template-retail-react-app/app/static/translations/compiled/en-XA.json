@@ -377,6 +377,48 @@
       "value": "]"
     }
   ],
+  "account_creation_notification.body": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ’ṽḗḗ ƈřḗḗȧȧŧḗḗḓ ȧȧƞḓ ṽḗḗřīƒīḗḗḓ ẏǿǿŭŭř ȧȧƈƈǿǿŭŭƞŧ ŭŭşīƞɠ ŧħḗḗ īƞƒǿǿřḿȧȧŧīǿǿƞ ƒřǿǿḿ ẏǿǿŭŭř ǿǿřḓḗḗř. Ƞḗḗẋŧ ŧīḿḗḗ ẏǿǿŭŭ ƈħḗḗƈķ ǿǿŭŭŧ, ĵŭŭşŧ ḗḗƞŧḗḗř ŧħḗḗ ƈǿǿḓḗḗ ẇḗḗ şḗḗƞḓ ŧǿǿ ŀǿǿɠ īƞ — ƞǿǿ ƥȧȧşşẇǿǿřḓ ƞḗḗḗḗḓḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_creation_notification.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧƈƈǿǿŭŭƞŧ Ƈřḗḗȧȧŧḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_creation_notification.verified": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽḗḗřīƒīḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_detail.title.account_details": [
     {
       "type": 0,

@@ -233,11 +233,13 @@ const Payment = ({
         })
     }
 
+    const [showRegistrationNotice, setShowRegistrationNotice] = useState(false)
     const handleRegistrationSuccess = useCallback(
         async (newBasketId) => {
             if (newBasketId) {
                 activeBasketIdRef.current = newBasketId
             }
+            setShowRegistrationNotice(true)
             setShouldSavePaymentMethod(true)
             try {
                 const values = paymentMethodForm?.getValues?.()
@@ -563,7 +565,7 @@ const Payment = ({
                                         isBillingAddress
                                     />
                                 )}
-                                {isGuest && (
+                                {(isGuest || showRegistrationNotice) && (
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
                                         setEnableUserRegistration={onUserRegistrationToggle}
@@ -578,6 +580,7 @@ const Payment = ({
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}
                                         onRegistered={handleRegistrationSuccess}
+                                        showNotice={showRegistrationNotice}
                                     />
                                 )}
                             </Stack>
@@ -610,7 +613,8 @@ const Payment = ({
 
                         <Divider borderColor="gray.100" />
 
-                        {selectedBillingAddress && (
+                        {(selectedBillingAddress ||
+                            (effectiveBillingSameAsShipping && selectedShippingAddress)) && (
                             <Stack spacing={2}>
                                 <Heading as="h3" fontSize="md">
                                     <FormattedMessage
@@ -618,11 +622,13 @@ const Payment = ({
                                         id="checkout_payment.heading.billing_address"
                                     />
                                 </Heading>
-                                <AddressDisplay address={selectedBillingAddress} />
+                                <AddressDisplay
+                                    address={selectedBillingAddress || selectedShippingAddress}
+                                />
                             </Stack>
                         )}
 
-                        {isGuest && (
+                        {(isGuest || showRegistrationNotice) && (
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
@@ -630,6 +636,7 @@ const Payment = ({
                                 isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
                                 onSavePreferenceChange={onSavePreferenceChange}
                                 onRegistered={handleRegistrationSuccess}
+                                showNotice={showRegistrationNotice}
                             />
                         )}
                     </Stack>

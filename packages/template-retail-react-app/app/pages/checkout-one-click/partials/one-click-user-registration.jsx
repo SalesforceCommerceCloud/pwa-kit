@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import {FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -13,6 +13,8 @@ import {
     Stack,
     Text,
     Heading,
+    Badge,
+    HStack,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
@@ -28,7 +30,8 @@ export default function UserRegistration({
     isGuestCheckout = false,
     isDisabled = false,
     onSavePreferenceChange,
-    onRegistered
+    onRegistered,
+    showNotice = false
 }) {
     const {data: basket} = useCurrentBasket()
     const {isGuest} = useCustomerType()
@@ -41,6 +44,7 @@ export default function UserRegistration({
         : `${appOrigin}${passwordlessConfigCallback}`
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
+    const [registrationSucceeded, setRegistrationSucceeded] = useState(false)
 
     const handleOtpClose = () => {
         otpSentRef.current = false
@@ -85,6 +89,7 @@ export default function UserRegistration({
                 await onRegistered(basket?.basketId)
             }
             handleOtpClose()
+            setRegistrationSucceeded(true)
         } catch (_e) {
             // Let OtpAuth surface errors via its own UI/toast
         }
@@ -94,6 +99,49 @@ export default function UserRegistration({
     // Hide the form if the "Checkout as Guest" button was clicked
     if (isGuestCheckout) {
         return null
+    }
+
+    // After successful registration (local) or when parent instructs to show, render notice
+    if (registrationSucceeded || showNotice) {
+        return (
+            <Box
+                border="1px solid"
+                borderColor="gray.200"
+                rounded="md"
+                p={4}
+                data-testid="sf-account-creation-notification"
+            >
+                <HStack justify="space-between" align="start" mb={2}>
+                    <Heading fontSize="lg" lineHeight="30px">
+                        <FormattedMessage
+                            defaultMessage="Account Created"
+                            id="account_creation_notification.title"
+                        />
+                    </Heading>
+                    <Badge
+                        colorScheme="green"
+                        fontSize="0.9em"
+                        px={3}
+                        py={1}
+                        rounded="md"
+                        aria-label="Verified"
+                    >
+                        <FormattedMessage
+                            defaultMessage="Verified"
+                            id="account_creation_notification.verified"
+                        />
+                    </Badge>
+                </HStack>
+                <Stack spacing={2}>
+                    <Text color="gray.700">
+                        <FormattedMessage
+                            defaultMessage="We’ve created and verified your account using the information from your order. Next time you check out, just enter the code we send to log in — no password needed."
+                            id="account_creation_notification.body"
+                        />
+                    </Text>
+                </Stack>
+            </Box>
+        )
     }
 
     return (
@@ -175,5 +223,7 @@ UserRegistration.propTypes = {
     isDisabled: PropTypes.bool,
     /** Callback to set save-for-future preference */
     onSavePreferenceChange: PropTypes.func,
-    onRegistered: PropTypes.func
+    onRegistered: PropTypes.func,
+    /** When true, forces the success notice to show (e.g., after component would normally unmount) */
+    showNotice: PropTypes.bool
 }

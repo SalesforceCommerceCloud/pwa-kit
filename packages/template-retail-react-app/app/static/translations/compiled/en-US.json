@@ -161,6 +161,24 @@
       "value": "Addresses"
     }
   ],
+  "account_creation_notification.body": [
+    {
+      "type": 0,
+      "value": "We’ve created and verified your account using the information from your order. Next time you check out, just enter the code we send to log in — no password needed."
+    }
+  ],
+  "account_creation_notification.title": [
+    {
+      "type": 0,
+      "value": "Account Created"
+    }
+  ],
+  "account_creation_notification.verified": [
+    {
+      "type": 0,
+      "value": "Verified"
+    }
+  ],
   "account_detail.title.account_details": [
     {
       "type": 0,
