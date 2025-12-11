@@ -12,6 +12,7 @@ import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
     ShopperBaskets,
     ShopperContexts,
+    ShopperConfigurations,
     ShopperCustomers,
     ShopperExperience,
     ShopperGiftCertificates,
@@ -257,6 +258,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
+            shopperConfigurations: new ShopperConfigurations(config),
             shopperCustomers: new ShopperCustomers(config),
             shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
