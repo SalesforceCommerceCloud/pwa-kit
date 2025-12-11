@@ -96,7 +96,9 @@ describe('server', () => {
         expect(Array.isArray(setCookieHeaders)).toBe(true)
         expect(setCookieHeaders.length).toBeGreaterThanOrEqual(3)
         // Check that the first cookie is set using res.cookie (includes Path=/)
-        expect(setCookieHeaders.some((cookie) => cookie.includes('test-cookie=test-value'))).toBe(true)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-cookie=test-value'))).toBe(
+            true
+        )
         // Check that the appended cookies are present
         expect(setCookieHeaders.some((cookie) => cookie.includes('test-value2'))).toBe(true)
         expect(setCookieHeaders.some((cookie) => cookie.includes('test-value3'))).toBe(true)

@@ -201,7 +201,6 @@ const multiCookies = async (req, res) => {
     res.json(jsonFromRequest(req))
 }
 
-
 /**
  * Express handler that sets single and multi-value response headers
  * and returns a JSON response with diagnostic values.

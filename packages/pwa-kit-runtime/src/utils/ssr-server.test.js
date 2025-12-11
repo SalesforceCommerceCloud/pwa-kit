@@ -639,11 +639,7 @@ describe('processLambdaResponse', () => {
     test('preserves multiple cookies in multiValueHeaders', () => {
         const response = {
             multiValueHeaders: {
-                'set-cookie': [
-                    'test-cookie=test-value; Path=/',
-                    'test-value2',
-                    'test-value3'
-                ]
+                'set-cookie': ['test-cookie=test-value; Path=/', 'test-value2', 'test-value3']
             }
         }
         const event = {}
