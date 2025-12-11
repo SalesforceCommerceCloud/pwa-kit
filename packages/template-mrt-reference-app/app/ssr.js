@@ -214,15 +214,11 @@ const responseHeadersTest = async (req, res) => {
  */
 const ssrShared = async (req, res) => {
     const fileName = `${__dirname}/static/example.json`
-    console.log(`debug: fileName: ${fileName}`)
     try {
         const data = await fs.readFile(fileName, {encoding: 'utf8'})
-        console.log(`debug: data: ${data}`)
         const jsonData = JSON.parse(data)
-        console.log(`debug: jsonData: ${jsonData}`)
         res.json(jsonData)
     } catch (error) {
-        console.log(`debug: error: ${error}`)
         res.json({
             error: error
         })
