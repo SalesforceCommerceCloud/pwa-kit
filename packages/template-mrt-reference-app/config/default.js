@@ -10,6 +10,7 @@ module.exports = {
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
+        'static/example.json',
         'static/example.txt',
         'static/favicon.ico',
         'static/robots.txt',
