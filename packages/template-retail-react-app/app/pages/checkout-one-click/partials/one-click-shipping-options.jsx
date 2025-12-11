@@ -33,6 +33,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import PropTypes from 'prop-types'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
@@ -43,6 +44,8 @@ export default function ShippingOptions() {
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const showToast = useToast()
+    const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     // Identify delivery shipments (exclude pickup)
     const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
@@ -100,6 +103,10 @@ export default function ShippingOptions() {
 
         if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
             form.reset({shippingMethodId: selectedShippingMethod.id})
+        }
+        // If there are no applicable methods for the current address, clear the form selection
+        if (!shippingMethods?.applicableShippingMethods?.length && methodId) {
+            form.reset({shippingMethodId: ''})
         }
     }, [selectedShippingMethod, shippingMethods])
 
@@ -179,6 +186,36 @@ export default function ShippingOptions() {
         updateShippingMethod
     ])
 
+    // Inform the shopper if no shipping methods are available for the selected address
+    useEffect(() => {
+        if (
+            step === STEPS.SHIPPING_OPTIONS &&
+            !hasMultipleDeliveryShipments &&
+            shippingMethods &&
+            (!shippingMethods.applicableShippingMethods ||
+                shippingMethods.applicableShippingMethods.length === 0) &&
+            !noMethodsToastShown
+        ) {
+            showToast({
+                title: formatMessage({
+                    defaultMessage:
+                        'No shipping methods are available for this address. Please update the address or try again later.',
+                    id: 'shipping_options.error.no_shipping_methods'
+                }),
+                status: 'error'
+            })
+            setNoMethodsToastShown(true)
+        }
+    }, [
+        step,
+        STEPS.SHIPPING_OPTIONS,
+        shippingMethods,
+        hasMultipleDeliveryShipments,
+        showToast,
+        formatMessage,
+        noMethodsToastShown
+    ])
+
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({
             parameters: {
@@ -198,6 +235,19 @@ export default function ShippingOptions() {
         shippingItem?.price || 0,
         shippingItem?.priceAfterItemDiscount || 0
     )
+
+    const hasApplicableMethods = Boolean(
+        shippingMethods?.applicableShippingMethods &&
+            shippingMethods.applicableShippingMethods.length > 0
+    )
+    const isSelectedMethodValid =
+        hasApplicableMethods &&
+        Boolean(
+            selectedShippingMethod?.id &&
+                shippingMethods.applicableShippingMethods?.some(
+                    (m) => m.id === selectedShippingMethod.id
+                )
+        )
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
@@ -269,7 +319,7 @@ export default function ShippingOptions() {
                         data-testid="sf-checkout-shipping-options-form"
                     >
                         <Stack spacing={6}>
-                            {shippingMethods?.applicableShippingMethods && (
+                            {shippingMethods?.applicableShippingMethods?.length > 0 && (
                                 <Controller
                                     name="shippingMethodId"
                                     control={form.control}
@@ -329,16 +379,18 @@ export default function ShippingOptions() {
                                     />
                                 </Button>
                             </Box>
-                            <Box>
-                                <Container variant="form">
-                                    <Button w="full" type="submit">
-                                        <FormattedMessage
-                                            defaultMessage="Continue to Payment"
-                                            id="shipping_options.button.continue_to_payment"
-                                        />
-                                    </Button>
-                                </Container>
-                            </Box>
+                            {shippingMethods?.applicableShippingMethods?.length > 0 && (
+                                <Box>
+                                    <Container variant="form">
+                                        <Button w="full" type="submit">
+                                            <FormattedMessage
+                                                defaultMessage="Continue to Payment"
+                                                id="shipping_options.button.continue_to_payment"
+                                            />
+                                        </Button>
+                                    </Container>
+                                </Box>
+                            )}
                         </Stack>
                     </form>
                 )}
@@ -346,7 +398,7 @@ export default function ShippingOptions() {
 
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
-                selectedShippingMethod &&
+                isSelectedMethodValid &&
                 selectedShippingAddress && (
                     <ToggleCardSummary>
                         <Flex justify="space-between" w="full">
@@ -414,24 +466,38 @@ const ShipmentMethods = ({shipment, index, currency}) => {
         },
         {enabled: Boolean(basket?.basketId && shipment?.shipmentId)}
     )
-    const [selected, setSelected] = useState(
-        shipment?.shippingMethod?.id || methods?.defaultShippingMethodId
-    )
+    const [selected, setSelected] = useState(shipment?.shippingMethod?.id || undefined)
 
     useEffect(() => {
-        const defaultId = shipment?.shippingMethod?.id || methods?.defaultShippingMethodId
-        if (!selected && defaultId) {
-            setSelected(defaultId)
+        // Only attempt auto-select when there are applicable methods available
+        const applicableIds = methods?.applicableShippingMethods?.map((m) => m.id) || []
+        if (!applicableIds.length) {
+            return
+        }
+        const preferredId =
+            (shipment?.shippingMethod?.id && applicableIds.includes(shipment.shippingMethod.id)
+                ? shipment.shippingMethod.id
+                : undefined) ||
+            (methods?.defaultShippingMethodId &&
+            applicableIds.includes(methods.defaultShippingMethodId)
+                ? methods.defaultShippingMethodId
+                : undefined)
+        if (!selected && preferredId) {
+            setSelected(preferredId)
             try {
                 updateShippingMethod.mutateAsync({
                     parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
-                    body: {id: defaultId}
+                    body: {id: preferredId}
                 })
             } catch {
                 // Ignore; user can manually select another method
             }
         }
-    }, [methods, shipment?.shippingMethod?.id])
+    }, [
+        methods?.applicableShippingMethods,
+        methods?.defaultShippingMethodId,
+        shipment?.shippingMethod?.id
+    ])
 
     const address = shipment?.shippingAddress
     const addressLine = address
@@ -455,7 +521,7 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                 </Text>
             )}
 
-            {methods?.applicableShippingMethods && (
+            {methods?.applicableShippingMethods?.length > 0 && (
                 <RadioGroup
                     name={`shipping-options-${shipment.shipmentId}`}
                     value={selected}

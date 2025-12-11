@@ -3849,12 +3849,6 @@
       "value": "In Stock"
     }
   ],
-  "shipping_address.action.pickup_in_store": [
-    {
-      "type": 0,
-      "value": "Pick up in store"
-    }
-  ],
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
@@ -3877,12 +3871,6 @@
     {
       "type": 0,
       "value": "Continue to Shipping Method"
-    }
-  ],
-  "shipping_address.error.switch_to_pickup_failed": [
-    {
-      "type": 0,
-      "value": "We could not switch to Store Pickup. Please try again or choose a different store."
     }
   ],
   "shipping_address.error.update_failed": [
@@ -4155,6 +4143,12 @@
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.error.no_shipping_methods": [
+    {
+      "type": 0,
+      "value": "No shipping methods are available for this address. Please update the address or try again later."
     }
   ],
   "shipping_options.free": [

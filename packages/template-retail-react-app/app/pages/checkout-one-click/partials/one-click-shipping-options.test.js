@@ -107,6 +107,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks', () => ({
 
 beforeEach(() => {
     jest.clearAllMocks()
+    // Default mutation to resolve to avoid leakage from tests that override it
+    mockUpdateShippingMethod.mutateAsync.mockResolvedValue({})
 })
 
 describe('ShippingOptions Component', () => {
