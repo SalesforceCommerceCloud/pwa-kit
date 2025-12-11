@@ -13,6 +13,7 @@ export const processLambdaResponse = (response, event) => {
 
     // Retrieve the correlation ID from the event headers
     const correlationId = event.headers?.['x-correlation-id']
+    const cookies = response?.multiValueHeaders?.['set-cookie']
 
     let joinedHeaders = getFlattenedHeadersMap(response.multiValueHeaders || {}, ',', true)
     joinedHeaders['date'] = new Date().toUTCString()
@@ -34,6 +35,10 @@ export const processLambdaResponse = (response, event) => {
     const result = {
         ...response,
         headers: joinedHeaders
+    }
+    if (cookies) {
+        delete result.headers['set-cookie']
+        result['multiValueHeaders'] = {'set-cookie': cookies}
     }
     return result
 }
