@@ -58,6 +58,7 @@ describe('server', () => {
         ['/exception', 500, 'text/html; charset=utf-8'],
         ['/cache', 200, 'application/json; charset=utf-8'],
         ['/cookie', 200, 'application/json; charset=utf-8'],
+        ['/multi-cookies', 200, 'application/json; charset=utf-8'],
         ['/set-response-headers', 200, 'application/json; charset=utf-8'],
         ['/isolation', 200, 'application/json; charset=utf-8'],
         ['/memtest', 200, 'application/json; charset=utf-8']
@@ -86,6 +87,21 @@ describe('server', () => {
         return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
+    })
+
+    test('Path "/multi-cookies" sets multiple cookies', async () => {
+        const response = await request(app).get('/multi-cookies')
+        const setCookieHeaders = response.headers['set-cookie']
+        expect(setCookieHeaders).toBeDefined()
+        expect(Array.isArray(setCookieHeaders)).toBe(true)
+        expect(setCookieHeaders.length).toBeGreaterThanOrEqual(3)
+        // Check that the first cookie is set using res.cookie (includes Path=/)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-cookie=test-value'))).toBe(
+            true
+        )
+        // Check that the appended cookies are present
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value2'))).toBe(true)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value3'))).toBe(true)
     })
 
     test('Path "/set-response-headers" sets response header', () => {

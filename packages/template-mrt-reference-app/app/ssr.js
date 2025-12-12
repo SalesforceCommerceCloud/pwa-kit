@@ -194,6 +194,13 @@ const cookieTest = async (req, res) => {
     res.json(jsonFromRequest(req))
 }
 
+const multiCookies = async (req, res) => {
+    res.cookie('test-cookie', 'test-value')
+    res.append('Set-Cookie', 'test-value2')
+    res.append('Set-Cookie', 'test-value3')
+    res.json(jsonFromRequest(req))
+}
+
 /**
  * Express handler that sets single and multi-value response headers
  * and returns a JSON response with diagnostic values.
@@ -369,6 +376,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/cache/:duration(\\d+)', cacheTest)
     app.get('/memtest', memoryTest)
     app.get('/cookie', cookieTest)
+    app.get('/multi-cookies', multiCookies)
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
