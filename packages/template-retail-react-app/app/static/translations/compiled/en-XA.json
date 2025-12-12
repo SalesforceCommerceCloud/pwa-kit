@@ -8179,20 +8179,6 @@
       "value": "]"
     }
   ],
-  "shipping_address.action.pickup_in_store": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥīƈķ ŭŭƥ īƞ şŧǿǿřḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
@@ -8243,20 +8229,6 @@
     {
       "type": 0,
       "value": "Ƈǿǿƞŧīƞŭŭḗḗ ŧǿǿ Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_address.error.switch_to_pickup_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ şẇīŧƈħ ŧǿǿ Şŧǿǿřḗḗ Ƥīƈķŭŭƥ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř ƈħǿǿǿǿşḗḗ ȧȧ ḓīƒƒḗḗřḗḗƞŧ şŧǿǿřḗḗ."
     },
     {
       "type": 0,
@@ -8849,6 +8821,20 @@
     {
       "type": 0,
       "value": "Ƈǿǿƞŧīƞŭŭḗḗ ŧǿǿ Ƥȧȧẏḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_options.error.no_shipping_methods": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ şħīƥƥīƞɠ ḿḗḗŧħǿǿḓş ȧȧřḗḗ ȧȧṽȧȧīŀȧȧƀŀḗḗ ƒǿǿř ŧħīş ȧȧḓḓřḗḗşş. Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ȧȧ ḓīƒƒḗḗřḗḗƞŧ ȧȧḓḓřḗḗşş."
     },
     {
       "type": 0,

@@ -1631,9 +1631,6 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
-  "shipping_address.action.pickup_in_store": {
-    "defaultMessage": "Pick up in store"
-  },
   "shipping_address.action.ship_to_multiple_addresses": {
     "defaultMessage": "Ship to multiple addresses"
   },
@@ -1645,9 +1642,6 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
-  },
-  "shipping_address.error.switch_to_pickup_failed": {
-    "defaultMessage": "We could not switch to Store Pickup. Please try again or choose a different store."
   },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."
@@ -1768,6 +1762,9 @@
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
+  },
+  "shipping_options.error.no_shipping_methods": {
+    "defaultMessage": "No shipping methods are available for this address. Please enter a different address."
   },
   "shipping_options.free": {
     "defaultMessage": "Free"

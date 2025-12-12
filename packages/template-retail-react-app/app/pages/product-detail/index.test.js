@@ -912,7 +912,8 @@ test('fetches product with inventoryIds when store is selected', async () => {
     }))
 
     // Mock the product API to check for inventoryIds param
-    let inventoryIdsParam
+    let inventoryIdsParamDetail
+    let inventoryIdsParamVariants
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             inventoryIdsParam = req.url.searchParams.get('inventoryIds')

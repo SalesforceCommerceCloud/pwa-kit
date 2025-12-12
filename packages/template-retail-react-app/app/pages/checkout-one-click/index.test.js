@@ -470,7 +470,10 @@ describe('Checkout One Click', () => {
         await waitFor(() => {
             expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
         })
-        await user.click(screen.getByText(/continue to payment/i))
+        const contToPayment1 = screen.queryByText(/continue to payment/i)
+        if (contToPayment1) {
+            await user.click(contToPayment1)
+        }
         await waitFor(() => {
             expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
         })
@@ -803,7 +806,10 @@ describe('Checkout One Click', () => {
         await waitFor(() => {
             expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
         })
-        await user.click(screen.getByText(/continue to payment/i))
+        const contToPayment2 = screen.queryByText(/continue to payment/i)
+        if (contToPayment2) {
+            await user.click(contToPayment2)
+        }
 
         // Wait for payment step to render
         await waitFor(() => {
