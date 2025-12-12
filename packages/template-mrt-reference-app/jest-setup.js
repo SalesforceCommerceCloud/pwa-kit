@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-env jest */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 /**
  * Jest setup file to handle Node.js built-in modules with 'node:' prefix.
  *
@@ -28,4 +31,3 @@ jest.mock('node:url', () => require('url'))
 jest.mock('node:zlib', () => require('zlib'))
 jest.mock('node:events', () => require('events'))
 jest.mock('node:async_hooks', () => require('async_hooks'))
-
