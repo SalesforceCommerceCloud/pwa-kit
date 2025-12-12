@@ -18,5 +18,7 @@ module.exports = {
     collectCoverageFrom: ['src/**/*.js', '!src/**/*.test.js', '!src/**/*.spec.js'],
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'html'],
-    testTimeout: 10000
+    testTimeout: 10000,
+    // Transform zod and zod-to-json-schema which use ESM syntax
+    transformIgnorePatterns: ['/node_modules/(?!(zod|zod-to-json-schema)/)']
 }
