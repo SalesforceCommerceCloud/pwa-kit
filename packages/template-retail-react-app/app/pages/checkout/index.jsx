@@ -41,6 +41,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -253,8 +254,9 @@ const CheckoutContainer = () => {
     return (
         <CheckoutProvider>
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-
-            <Checkout />
+            <GoogleAPIProvider>
+                <Checkout />
+            </GoogleAPIProvider>
             <UnavailableProductConfirmationModal
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}
