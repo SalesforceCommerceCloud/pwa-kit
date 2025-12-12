@@ -56,6 +56,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "14.4.3",
+    "@vis.gl/react-google-maps": "^1.5.4",
     "babel-plugin-module-resolver": "5.0.2",
     "base64-arraybuffer": "^0.2.0",
     "bundlesize2": "^0.0.35",
@@ -104,7 +105,7 @@
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "335 kB"
+      "maxSize": "340 kB"
     }
   ]
 }

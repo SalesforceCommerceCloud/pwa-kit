@@ -56,5 +56,6 @@ export const CLIENT_KEYS = {
     SHOPPER_PROMOTIONS: 'shopperPromotions',
     SHOPPER_SEARCH: 'shopperSearch',
     SHOPPER_SEO: 'shopperSeo',
-    SHOPPER_STORES: 'shopperStores'
+    SHOPPER_STORES: 'shopperStores',
+    SHOPPER_CONFIGURATIONS: 'shopperConfigurations'
 } as const
