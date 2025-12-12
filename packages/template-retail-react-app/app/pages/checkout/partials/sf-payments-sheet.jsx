@@ -393,6 +393,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
     }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
 
+    useEffect(() => {
+        if (checkoutComponent.current && basket?.orderTotal) {
+            checkoutComponent.current.updateAmount(basket.orderTotal)
+        }
+    }, [basket?.orderTotal])
+
     return (
         <ToggleCard
             id="step-3"
@@ -406,14 +412,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 id: 'toggle_card.action.editPaymentInfo'
             })}
         >
+            <Box display={step === STEPS.PAYMENT ? 'block' : 'none'}>
+                <Box ref={containerElementRef} />
+            </Box>
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
                 <Stack spacing={6}>
-                    <Box ref={containerElementRef} />
-
                     <Divider borderColor="gray.100" />
 
                     <Stack spacing={2}>
