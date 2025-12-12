@@ -70,6 +70,24 @@ const CheckoutConfirmation = () => {
             enabled: !!orderNo && onClient
         }
     )
+
+    const isSavedPaymentMethod = React.useMemo(() => {
+        if (!order?.paymentInstruments?.[0]) {
+            return false
+        }
+
+        const orderPaymentInstrument = order.paymentInstruments[0]
+        if (orderPaymentInstrument.paymentMethodId === 'Salesforce Payments') {
+            return (
+                customer?.paymentInstruments?.some(
+                    (savedPI) =>
+                        savedPI.paymentInstrumentId === orderPaymentInstrument.paymentInstrumentId
+                ) || false
+            )
+        }
+        return true
+    }, [order?.paymentInstruments, customer?.paymentInstruments])
+
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
@@ -509,9 +527,11 @@ const CheckoutConfirmation = () => {
 
                                     {order.paymentInstruments[0].paymentMethodId ===
                                     'Salesforce Payments' ? (
-                                        <SFPaymentsOrderSummary
-                                            paymentInstrument={order.paymentInstruments[0]}
-                                        />
+                                        isSavedPaymentMethod ? (
+                                            <SFPaymentsOrderSummary
+                                                paymentInstrument={order.paymentInstruments[0]}
+                                            />
+                                        ) : null
                                     ) : (
                                         <Stack spacing={1}>
                                             <Heading as="h3" fontSize="sm">
