@@ -916,7 +916,7 @@ test('fetches product with inventoryIds when store is selected', async () => {
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             inventoryIdsParam = req.url.searchParams.get('inventoryIds')
-            return res(ctx.json(masterProduct))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(masterProduct))
         })
     )
 
@@ -924,7 +924,11 @@ test('fetches product with inventoryIds when store is selected', async () => {
 
     // Assert: Product page loads and inventoryIds param was sent
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    expect(inventoryIdsParam).toBe(inventoryId)
+
+    // Wait for the request to be made with the inventory ID
+    await waitFor(() => {
+        expect(inventoryIdsParam).toBe(inventoryId)
+    })
 })
 
 test('Add to Cart (Pick Up in Store) includes inventoryId for the selected variant', async () => {

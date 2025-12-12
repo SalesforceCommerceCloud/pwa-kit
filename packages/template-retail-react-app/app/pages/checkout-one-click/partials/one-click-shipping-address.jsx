@@ -58,11 +58,16 @@ export default function ShippingAddress() {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
-    const productItemsCount = basket?.productItems?.length || 0
-    const hasMultipleProductItems = productItemsCount > 1
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
+    // Check if there are multiple delivery items to show option to ship to multiple addresses
+    // Only count items that are in delivery shipments (not pickup shipments)
+    const deliveryItems =
+        basket?.productItems?.filter((item) =>
+            deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
+        ) || []
+    const hasMultipleDeliveryItems = deliveryItems.length > 1
 
     // Prepare a shipping methods query we can manually refetch after address updates
     const shippingMethodsQuery = useShippingMethodsForShipment(
@@ -185,7 +190,7 @@ export default function ShippingAddress() {
                 return
             }
 
-            if (multishipEnabled && hasMultipleProductItems) {
+            if (multishipEnabled && hasMultipleDeliveryItems) {
                 return
             }
 
@@ -229,7 +234,7 @@ export default function ShippingAddress() {
         hasAutoSelected,
         isLoading,
         multishipEnabled,
-        hasMultipleProductItems,
+        hasMultipleDeliveryItems,
         openedByUser
     ])
 
@@ -259,7 +264,7 @@ export default function ShippingAddress() {
                 id: 'toggle_card.action.change'
             })}
             editAction={
-                multishipEnabled && hasMultipleProductItems
+                multishipEnabled && hasMultipleDeliveryItems
                     ? isMultiShipping
                         ? formatMessage({
                               defaultMessage: 'Ship items to one address',
@@ -272,7 +277,7 @@ export default function ShippingAddress() {
                     : undefined
             }
             onEditActionClick={() =>
-                multishipEnabled && hasMultipleProductItems && setIsMultiShipping((v) => !v)
+                multishipEnabled && hasMultipleDeliveryItems && setIsMultiShipping((v) => !v)
             }
         >
             <ToggleCardEdit>
