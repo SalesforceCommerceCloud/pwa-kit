@@ -124,6 +124,8 @@ const CheckoutOneClick = () => {
 
     // Form for payment method
     const paymentMethodForm = useForm({
+        mode: 'onChange',
+        shouldUnregister: false,
         defaultValues: {
             holder: '',
             number: '',
@@ -365,6 +367,16 @@ const CheckoutOneClick = () => {
 
     const onPlaceOrder = async () => {
         try {
+            // If using a new card (no applied saved payment), validate fields to surface errors
+            const isUsingNewCard = !appliedPayment
+            if (isUsingNewCard) {
+                const isValid = await paymentMethodForm.trigger()
+                if (!isValid) {
+                    // Keep payment section open and show field errors
+                    setIsEditingPayment(true)
+                    return
+                }
+            }
             // Check if we have form values (new card entered)
             const paymentFormValues = paymentMethodForm.getValues()
             const hasFormValues = paymentFormValues && paymentFormValues.expiry

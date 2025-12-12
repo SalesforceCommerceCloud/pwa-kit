@@ -6,12 +6,14 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
-
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {useForm} from 'react-hook-form'
+const renderOC = (ui, options) => renderWithProviders(ui, {wrapper: Wrapper, ...(options || {})})
 // Mock react-intl
 jest.mock('react-intl', () => ({
     ...jest.requireActual('react-intl'),
@@ -42,42 +44,38 @@ jest.mock('react-intl', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 jest.mock('@salesforce/retail-react-app/app/hooks')
 
-// Mock CreditCardFields
-jest.mock('@salesforce/retail-react-app/app/components/forms/credit-card-fields', () => {
-    return function CreditCardFields() {
-        return (
-            <div data-testid="credit-card-fields">
-                <input aria-label="Card Number" data-testid="card-number" />
-                <input aria-label="Expiry Date" data-testid="expiry-date" />
-                <input aria-label="CVV" data-testid="cvv" />
-                <input aria-label="Cardholder Name" data-testid="cardholder-name" />
+// Note: Do not mock CreditCardFields here so that validation tests use real rules.
+
+// Mock cc-utils
+jest.mock('@salesforce/retail-react-app/app/utils/cc-utils', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/utils/cc-utils')
+    return {
+        ...actual,
+        getCreditCardIcon: jest.fn(() => {
+            return function MockCardIcon() {
+                return <div data-testid="card-icon">Card Icon</div>
+            }
+        })
+    }
+})
+
+// Mock icons
+jest.mock('@salesforce/retail-react-app/app/components/icons', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/components/icons')
+    return {
+        ...actual,
+        LockIcon: (props) => (
+            <div data-testid="lock-icon" {...props}>
+                🔒
+            </div>
+        ),
+        PaypalIcon: (props) => (
+            <div data-testid="paypal-icon" {...props}>
+                PayPal
             </div>
         )
     }
 })
-
-// Mock cc-utils
-jest.mock('@salesforce/retail-react-app/app/utils/cc-utils', () => ({
-    getCreditCardIcon: jest.fn(() => {
-        return function MockCardIcon() {
-            return <div data-testid="card-icon">Card Icon</div>
-        }
-    })
-}))
-
-// Mock icons
-jest.mock('@salesforce/retail-react-app/app/components/icons', () => ({
-    LockIcon: (props) => (
-        <div data-testid="lock-icon" {...props}>
-            🔒
-        </div>
-    ),
-    PaypalIcon: (props) => (
-        <div data-testid="paypal-icon" {...props}>
-            PayPal
-        </div>
-    )
-}))
 
 const mockBasket = {
     orderTotal: 99.99,
@@ -97,6 +95,28 @@ const mockForm = {
     formState: {errors: {}},
     control: {}
 }
+const Wrapper = ({children}) => {
+    // Provide a RHF form with onChange mode to surface inline validation
+    const form = useForm({
+        mode: 'onChange',
+        shouldUnregister: false,
+        defaultValues: {
+            holder: '',
+            number: '',
+            cardType: '',
+            expiry: '',
+            securityCode: ''
+        }
+    })
+    const onSubmit = jest.fn()
+    return React.cloneElement(children, {
+        ...children.props,
+        form,
+        onSubmit: children.props?.onSubmit ?? onSubmit,
+        selectedPaymentMethod: children.props?.selectedPaymentMethod ?? 'cc',
+        savedPaymentInstruments: children.props?.savedPaymentInstruments ?? []
+    })
+}
 
 describe('PaymentForm Component', () => {
     beforeEach(() => {
@@ -105,29 +125,125 @@ describe('PaymentForm Component', () => {
         useCurrency.mockReturnValue({currency: 'USD'})
     })
 
+    describe('One-Click PaymentForm credit card validation', () => {
+        test('shows required errors when fields are left empty after interaction', async () => {
+            const {user} = renderWithProviders(<PaymentForm>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
+
+            // Interact with each field to trigger validation
+            const number = await screen.findByLabelText(
+                /(Card Number|use_credit_card_fields\.label\.card_number)/i
+            )
+            const name = screen.getByLabelText(
+                /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+            )
+            const expiry = screen.getByLabelText(
+                /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+            )
+            const cvv = screen.getByLabelText(
+                /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+            )
+
+            await user.type(number, '1')
+            await user.clear(number)
+            await user.tab()
+            await user.type(name, 'a')
+            await user.clear(name)
+            await user.tab()
+            await user.type(expiry, '1')
+            await user.clear(expiry)
+            await user.tab()
+            await user.type(cvv, '1')
+            await user.clear(cvv)
+            await user.tab()
+
+            await waitFor(() => {
+                expect(
+                    screen.getAllByText(/use_credit_card_fields\.error\./i).length
+                ).toBeGreaterThanOrEqual(3)
+            })
+        })
+
+        test('shows invalid errors for bad values and clears when values are valid', async () => {
+            const {user} = renderWithProviders(<PaymentForm>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
+
+            const number = await screen.findByLabelText(
+                /(Card Number|use_credit_card_fields\.label\.card_number)/i
+            )
+            const name = screen.getByLabelText(
+                /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+            )
+            const expiry = screen.getByLabelText(
+                /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+            )
+            const cvv = screen.getByLabelText(
+                /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+            )
+
+            // Enter invalid values
+            await user.type(number, '1234 5678 9012 3456')
+            await user.tab()
+            await user.type(name, 'A')
+            await user.tab()
+            await user.type(expiry, '1329') // invalid month 13 -> formatted to 13/29
+            await user.tab()
+            await user.type(cvv, '1')
+            await user.tab()
+
+            // Expect some validation errors to appear (match intl ids or messages)
+            await waitFor(() => {
+                expect(
+                    screen.getAllByText(/use_credit_card_fields\.error\./i).length
+                ).toBeGreaterThan(0)
+            })
+
+            // Replace with valid Visa test card, proper name, valid expiry and cvv
+            await user.clear(number)
+            await user.type(number, '4111 1111 1111 1111')
+            await user.clear(name)
+            await user.type(name, 'John Smith')
+            await user.clear(expiry)
+            await user.type(expiry, '0129') // 01/29
+            await user.clear(cvv)
+            await user.type(cvv, '123')
+
+            // Errors should disappear
+            await waitFor(() => {
+                expect(screen.queryByText(/use_credit_card_fields\.error\./i)).toBeNull()
+            })
+        })
+    })
+
     describe('Rendering', () => {
         test('renders PayPal option', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
 
             expect(screen.getByTestId('paypal-icon')).toBeInTheDocument()
         })
 
         test('shows security lock icon with tooltip', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
 
             expect(screen.getByTestId('lock-icon')).toBeInTheDocument()
         })
 
         test('credit card radio is selected by default', () => {
-            render(<PaymentForm form={mockForm} selectedPaymentMethod="cc" onSubmit={jest.fn()} />)
+            renderOC(
+                <PaymentForm selectedPaymentMethod="cc" onSubmit={jest.fn()}>
+                    {null}
+                </PaymentForm>
+            )
 
             const creditCardRadio = screen.getByDisplayValue('cc')
             expect(creditCardRadio).toBeChecked()
         })
 
         test('renders additional children when provided', () => {
-            render(
-                <PaymentForm form={mockForm} onSubmit={jest.fn()}>
+            renderOC(
+                <PaymentForm onSubmit={jest.fn()}>
                     <div data-testid="additional-content">Save Payment Method</div>
                 </PaymentForm>
             )
@@ -137,7 +253,7 @@ describe('PaymentForm Component', () => {
         })
 
         test('does not render children section when no children provided', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
 
             expect(screen.queryByTestId('additional-content')).not.toBeInTheDocument()
         })
@@ -168,12 +284,13 @@ describe('PaymentForm Component', () => {
         ]
 
         test('renders saved payment methods when provided', () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
-                />
+                >
+                    {null}
+                </PaymentForm>
             )
 
             // Check that saved payment methods are rendered
@@ -183,12 +300,13 @@ describe('PaymentForm Component', () => {
         })
 
         test('displays saved payment method details correctly', () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
-                />
+                >
+                    {null}
+                </PaymentForm>
             )
 
             // Check first saved payment method details
@@ -198,12 +316,13 @@ describe('PaymentForm Component', () => {
         })
 
         test('renders credit card icon for saved payment methods', () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={[mockSavedPaymentInstruments[0]]}
-                />
+                >
+                    {null}
+                </PaymentForm>
             )
 
             // The mock getCreditCardIcon should be called and return a component
@@ -211,16 +330,14 @@ describe('PaymentForm Component', () => {
         })
 
         test('does not render saved payment methods when array is empty', () => {
-            render(
-                <PaymentForm form={mockForm} onSubmit={jest.fn()} savedPaymentInstruments={[]} />
-            )
+            renderOC(<PaymentForm onSubmit={jest.fn()} savedPaymentInstruments={[]} />)
 
             expect(screen.queryByDisplayValue('saved-payment-1')).not.toBeInTheDocument()
             expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
         })
 
         test('does not render saved payment methods when prop is undefined', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
 
             expect(screen.queryByDisplayValue('saved-payment-1')).not.toBeInTheDocument()
             expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
@@ -232,9 +349,8 @@ describe('PaymentForm Component', () => {
                 {...mockSavedPaymentInstruments[1], default: true}
             ]
 
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={savedWithDefault}
                     selectedPaymentMethod={savedWithDefault[1].paymentInstrumentId}
@@ -248,9 +364,8 @@ describe('PaymentForm Component', () => {
         test('handles saved payment method selection', () => {
             const mockOnPaymentMethodChange = jest.fn()
 
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
                     onPaymentMethodChange={mockOnPaymentMethodChange}
@@ -264,9 +379,8 @@ describe('PaymentForm Component', () => {
         })
 
         test('shows selected saved payment method', () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
                     selectedPaymentMethod="saved-payment-1"
@@ -289,9 +403,8 @@ describe('PaymentForm Component', () => {
             ]
 
             expect(() => {
-                render(
+                renderOC(
                     <PaymentForm
-                        form={mockForm}
                         onSubmit={jest.fn()}
                         savedPaymentInstruments={incompletePaymentInstrument}
                     />
@@ -300,9 +413,8 @@ describe('PaymentForm Component', () => {
         })
 
         test('renders saved payment methods between credit card and PayPal options', async () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
                 />
@@ -322,9 +434,8 @@ describe('PaymentForm Component', () => {
         })
 
         test('renders card icons for saved payment methods', () => {
-            render(
+            renderOC(
                 <PaymentForm
-                    form={mockForm}
                     onSubmit={jest.fn()}
                     savedPaymentInstruments={mockSavedPaymentInstruments}
                 />
@@ -343,9 +454,8 @@ describe('PaymentForm Component', () => {
 
         describe('Show All Payment Instruments', () => {
             test('renders show all button when there are more than 1 saved payment methods', () => {
-                render(
+                renderOC(
                     <PaymentForm
-                        form={mockForm}
                         onSubmit={jest.fn()}
                         savedPaymentInstruments={mockSavedPaymentInstruments}
                     />
@@ -354,9 +464,8 @@ describe('PaymentForm Component', () => {
             })
 
             test('does not render show all button when there is only one saved payment method', () => {
-                render(
+                renderOC(
                     <PaymentForm
-                        form={mockForm}
                         onSubmit={jest.fn()}
                         savedPaymentInstruments={mockSavedPaymentInstruments.slice(0, 1)}
                     />
@@ -368,9 +477,8 @@ describe('PaymentForm Component', () => {
 
             test('does not render show all button when there are no saved payment methods', () => {
                 ;[undefined, null, []].forEach((savedPaymentInstruments) => {
-                    render(
+                    renderOC(
                         <PaymentForm
-                            form={mockForm}
                             onSubmit={jest.fn()}
                             savedPaymentInstruments={savedPaymentInstruments}
                         />
@@ -382,9 +490,8 @@ describe('PaymentForm Component', () => {
             })
 
             test('renders multiple saved payment methods with unique keys', async () => {
-                render(
+                renderOC(
                     <PaymentForm
-                        form={mockForm}
                         onSubmit={jest.fn()}
                         savedPaymentInstruments={mockSavedPaymentInstruments}
                     />
@@ -408,9 +515,8 @@ describe('PaymentForm Component', () => {
             })
 
             test('renders card icons for saved payment methods', () => {
-                render(
+                renderOC(
                     <PaymentForm
-                        form={mockForm}
                         onSubmit={jest.fn()}
                         savedPaymentInstruments={mockSavedPaymentInstruments}
                     />
@@ -435,13 +541,7 @@ describe('PaymentForm Component', () => {
                     }
                 ]
 
-                render(
-                    <PaymentForm
-                        form={mockForm}
-                        onSubmit={jest.fn()}
-                        savedPaymentInstruments={threeSaved}
-                    />
-                )
+                renderOC(<PaymentForm onSubmit={jest.fn()} savedPaymentInstruments={threeSaved} />)
 
                 // Collapsed should show first 3 saved only, not CC/PayPal
                 expect(screen.queryByDisplayValue('cc')).not.toBeInTheDocument()
@@ -456,7 +556,7 @@ describe('PaymentForm Component', () => {
                 data: {...mockBasket, orderTotal: 0}
             })
 
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
             expect(
                 screen.getByLabelText('payment_selection.radio_group.assistive_msg')
             ).toBeInTheDocument()
@@ -467,7 +567,7 @@ describe('PaymentForm Component', () => {
                 data: {...mockBasket, orderTotal: null}
             })
 
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
             expect(
                 screen.getByLabelText('payment_selection.radio_group.assistive_msg')
             ).toBeInTheDocument()
@@ -476,7 +576,7 @@ describe('PaymentForm Component', () => {
         test('handles different currency', () => {
             useCurrency.mockReturnValue({currency: 'EUR'})
 
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
             expect(
                 screen.getByLabelText('payment_selection.radio_group.assistive_msg')
             ).toBeInTheDocument()
@@ -485,7 +585,7 @@ describe('PaymentForm Component', () => {
         test('handles missing basket data', () => {
             useCurrentBasket.mockReturnValue({data: null})
 
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
             expect(
                 screen.getByLabelText('payment_selection.radio_group.assistive_msg')
             ).toBeInTheDocument()
@@ -494,7 +594,7 @@ describe('PaymentForm Component', () => {
         test('handles undefined basket', () => {
             useCurrentBasket.mockReturnValue({data: undefined})
 
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderOC(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>)
             expect(
                 screen.getByLabelText('payment_selection.radio_group.assistive_msg')
             ).toBeInTheDocument()
@@ -509,22 +609,31 @@ describe('PaymentForm Component', () => {
                 control: {}
             }
 
-            render(<PaymentForm form={customForm} onSubmit={jest.fn()} />)
-
-            expect(screen.getByTestId('credit-card-fields')).toBeInTheDocument()
+            renderWithProviders(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
+            expect(
+                screen.getByLabelText(/(Card Number|use_credit_card_fields\.label\.card_number)/i)
+            ).toBeInTheDocument()
         })
 
         test('passes form to CreditCardFields component', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderWithProviders(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
 
             // CreditCardFields should be rendered, indicating form was passed
-            expect(screen.getByTestId('credit-card-fields')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText(/(Card Number|use_credit_card_fields\.label\.card_number)/i)
+            ).toBeInTheDocument()
         })
     })
 
     describe('Accessibility', () => {
         test('radio buttons have proper names', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderWithProviders(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
 
             const creditCardRadio = screen.getByDisplayValue('cc')
             const paypalRadio = screen.getByDisplayValue('paypal')
@@ -534,12 +643,28 @@ describe('PaymentForm Component', () => {
         })
 
         test('credit card fields are accessible', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            renderWithProviders(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>, {
+                wrapper: Wrapper
+            })
 
-            expect(screen.getByLabelText('Card Number')).toBeInTheDocument()
-            expect(screen.getByLabelText('Expiry Date')).toBeInTheDocument()
-            expect(screen.getByLabelText('CVV')).toBeInTheDocument()
-            expect(screen.getByLabelText('Cardholder Name')).toBeInTheDocument()
+            expect(
+                screen.getByLabelText(/(Card Number|use_credit_card_fields\.label\.card_number)/i)
+            ).toBeInTheDocument()
+            expect(
+                screen.getByLabelText(
+                    /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+                )
+            ).toBeInTheDocument()
+            expect(
+                screen.getByLabelText(
+                    /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+                )
+            ).toBeInTheDocument()
+            expect(
+                screen.getByLabelText(
+                    /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+                )
+            ).toBeInTheDocument()
         })
     })
 
@@ -548,7 +673,7 @@ describe('PaymentForm Component', () => {
     describe('Error Handling', () => {
         test('handles missing onSubmit callback gracefully', () => {
             expect(() => {
-                render(<PaymentForm form={mockForm} />)
+                renderOC(<PaymentForm>{null}</PaymentForm>)
             }).not.toThrow()
         })
     })
