@@ -126,4 +126,11 @@ describe('server', () => {
         const calls = console.error.mock.calls.map((call) => call[0])
         expect(errors.some((error) => calls.includes(error))).toBe(true)
     })
+
+    test('Path "/ssr-shared" serves the example.json file', async () => {
+        const response = await request(app).get('/ssr-shared')
+        expect(response.body.message).toBe(
+            'This file is used in the E2E tests to verify that correct header values are set.'
+        )
+    })
 })
