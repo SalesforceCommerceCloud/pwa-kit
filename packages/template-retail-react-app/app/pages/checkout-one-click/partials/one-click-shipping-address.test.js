@@ -533,10 +533,16 @@ describe('ShippingAddress Component', () => {
             useCurrentBasket: () => ({
                 data: {
                     basketId: 'test-basket-id',
-                    productItems: [{itemId: 'i1'}, {itemId: 'i2'}],
+                    productItems: [
+                        {itemId: 'i1', shipmentId: 'me'},
+                        {itemId: 'i2', shipmentId: 'me'}
+                    ],
                     shipments: [
                         {
                             shipmentId: 'me',
+                            shippingMethod: {
+                                c_storePickupEnabled: false
+                            },
                             shippingAddress: null
                         }
                     ]
@@ -565,5 +571,50 @@ describe('ShippingAddress Component', () => {
         })
 
         expect(screen.getByRole('button', {name: 'Ship items to one address'})).toBeInTheDocument()
+    })
+
+    test('does not show multiship option when only one delivery item exists with pickup items', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    productItems: [
+                        {itemId: 'i1', shipmentId: 'delivery-shipment'},
+                        {itemId: 'i2', shipmentId: 'pickup-shipment'}
+                    ],
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-shipment',
+                            shippingMethod: {
+                                c_storePickupEnabled: false
+                            },
+                            shippingAddress: null
+                        },
+                        {
+                            shipmentId: 'pickup-shipment',
+                            shippingMethod: {
+                                c_storePickupEnabled: true
+                            },
+                            c_fromStoreId: 'store-123'
+                        }
+                    ]
+                },
+                derivedData: {hasBasket: true, totalItems: 2},
+                refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+            })
+        }))
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+
+        localRenderWithProviders(<Component />)
+
+        // Should not show multiship link because only 1 delivery item
+        expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
     })
 })

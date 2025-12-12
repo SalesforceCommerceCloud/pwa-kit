@@ -916,13 +916,8 @@ test('fetches product with inventoryIds when store is selected', async () => {
     let inventoryIdsParamVariants
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
-            inventoryIdsParamDetail = req.url.searchParams.get('inventoryIds')
-            return res(ctx.json(masterProduct))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            // Capture inventoryIds from the child variants request as well
-            inventoryIdsParamVariants = req.url.searchParams.get('inventoryIds')
-            return res(ctx.json({data: []}))
+            inventoryIdsParam = req.url.searchParams.get('inventoryIds')
+            return res(ctx.delay(0), ctx.status(200), ctx.json(masterProduct))
         })
     )
 
@@ -930,10 +925,11 @@ test('fetches product with inventoryIds when store is selected', async () => {
 
     // Assert: Product page loads and inventoryIds param was sent
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    const capturedParams = [inventoryIdsParamDetail, inventoryIdsParamVariants].filter(Boolean)
-    // Some SDK versions may not forward inventoryIds on the detail call.
-    // If present on either call, it must match; otherwise accept as optional.
-    expect(capturedParams.length === 0 || capturedParams.includes(inventoryId)).toBe(true)
+
+    // Wait for the request to be made with the inventory ID
+    await waitFor(() => {
+        expect(inventoryIdsParam).toBe(inventoryId)
+    })
 })
 
 test('Add to Cart (Pick Up in Store) includes inventoryId for the selected variant', async () => {
