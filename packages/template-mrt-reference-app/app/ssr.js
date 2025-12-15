@@ -43,6 +43,7 @@ const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
 const {isolationTests} = require('./isolation-actions')
+const fs = require('fs').promises
 
 /**
  * Custom error class
@@ -209,6 +210,22 @@ const responseHeadersTest = async (req, res) => {
 }
 
 /**
+ * Serve the example.json file from the static directory to verify that the file is served correctly.
+ */
+const ssrShared = async (req, res) => {
+    const fileName = `${__dirname}/static/example.json`
+    try {
+        const data = await fs.readFile(fileName, {encoding: 'utf8'})
+        const jsonData = JSON.parse(data)
+        res.json(jsonData)
+    } catch (error) {
+        res.json({
+            error: error
+        })
+    }
+}
+
+/**
  * Express handler that allocates a lot of memory, and then removes
  * a reference to the objects, such that they may be garbage collected.
  */
@@ -372,6 +389,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
+    app.get('/ssr-shared', ssrShared)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
