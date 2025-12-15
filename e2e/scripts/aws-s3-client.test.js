@@ -4,30 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+const {S3Client, PutObjectCommand, GetObjectCommand} = require('@aws-sdk/client-s3')
+const {STSClient, AssumeRoleCommand} = require('@aws-sdk/client-sts')
 const SecureS3Client = require('./aws-s3-client')
 const {PWA_KIT_BOT_USER_SESSION, AWS_ACCESS_READ_WRITE, AWS_DEFAULT_REGION} = require('./constants')
 
-// Mock AWS SDK modules with explicit factory functions
-const mockS3ClientSend = jest.fn()
-const mockSTSClientSend = jest.fn()
-
-jest.mock('@aws-sdk/client-s3', () => ({
-    S3Client: jest.fn(() => ({
-        send: mockS3ClientSend
-    })),
-    PutObjectCommand: jest.fn(),
-    GetObjectCommand: jest.fn()
-}))
-
-jest.mock('@aws-sdk/client-sts', () => ({
-    STSClient: jest.fn(() => ({
-        send: mockSTSClientSend
-    })),
-    AssumeRoleCommand: jest.fn()
-}))
-
-const {S3Client, PutObjectCommand, GetObjectCommand} = require('@aws-sdk/client-s3')
-const {STSClient, AssumeRoleCommand} = require('@aws-sdk/client-sts')
+// Mock AWS SDK modules
+jest.mock('@aws-sdk/client-s3')
+jest.mock('@aws-sdk/client-sts')
 
 // Mock console methods to avoid cluttering test output
 const originalConsoleLog = console.log
@@ -35,6 +19,8 @@ const originalConsoleError = console.error
 
 describe('SecureS3Client', () => {
     let client
+    let mockS3Client
+    let mockSTSClient
 
     beforeEach(() => {
         // Reset mocks
@@ -43,6 +29,18 @@ describe('SecureS3Client', () => {
         // Mock console methods
         console.log = jest.fn()
         console.error = jest.fn()
+
+        // Setup mock S3 client
+        mockS3Client = {
+            send: jest.fn()
+        }
+        S3Client.mockImplementation(() => mockS3Client)
+
+        // Setup mock STS client
+        mockSTSClient = {
+            send: jest.fn()
+        }
+        STSClient.mockImplementation(() => mockSTSClient)
     })
 
     afterEach(() => {
@@ -129,7 +127,7 @@ describe('SecureS3Client', () => {
                 SessionToken: 'test-session-token'
             }
 
-            mockSTSClientSend.mockResolvedValue({
+            mockSTSClient.send.mockResolvedValue({
                 Credentials: mockCredentials
             })
 
@@ -141,7 +139,7 @@ describe('SecureS3Client', () => {
                 RoleSessionName: PWA_KIT_BOT_USER_SESSION,
                 DurationSeconds: 3600
             })
-            expect(mockSTSClientSend).toHaveBeenCalled()
+            expect(mockSTSClient.send).toHaveBeenCalled()
             expect(client.credentials).toEqual({
                 accessKeyId: mockCredentials.AccessKeyId,
                 secretAccessKey: mockCredentials.SecretAccessKey,
@@ -156,7 +154,7 @@ describe('SecureS3Client', () => {
             process.env.CI = 'true'
             client.externalId = 'test-external-id'
 
-            mockSTSClientSend.mockResolvedValue({
+            mockSTSClient.send.mockResolvedValue({
                 Credentials: {
                     AccessKeyId: 'test-access-key',
                     SecretAccessKey: 'test-secret-key',
@@ -177,7 +175,7 @@ describe('SecureS3Client', () => {
 
         test('should throw error when role assumption fails', async () => {
             const error = new Error('Role assumption failed')
-            mockSTSClientSend.mockRejectedValue(error)
+            mockSTSClient.send.mockRejectedValue(error)
 
             await expect(client._assumeRole()).rejects.toThrow('Role assumption failed')
             expect(console.error).toHaveBeenCalledWith('❌ Failed to assume role:', error)
@@ -192,7 +190,7 @@ describe('SecureS3Client', () => {
 
         test('should successfully upload file with ETag', async () => {
             const mockResult = {ETag: '"test-etag"'}
-            mockS3ClientSend.mockResolvedValue(mockResult)
+            mockS3Client.send.mockResolvedValue(mockResult)
 
             const result = await client.upload('test-bucket', 'test-key', 'test-body', 'test-etag')
 
@@ -210,7 +208,7 @@ describe('SecureS3Client', () => {
 
         test('should throw error when upload fails', async () => {
             const error = new Error('Upload failed')
-            mockS3ClientSend.mockRejectedValue(error)
+            mockS3Client.send.mockRejectedValue(error)
 
             await expect(client.upload('test-bucket', 'test-key', 'test-body')).rejects.toThrow(
                 'Upload failed'
@@ -221,7 +219,7 @@ describe('SecureS3Client', () => {
         test('should handle PreconditionFailedException specifically', async () => {
             const error = new Error('Precondition failed')
             error.name = 'PreconditionFailedException'
-            mockS3ClientSend.mockRejectedValue(error)
+            mockS3Client.send.mockRejectedValue(error)
 
             await expect(client.upload('test-bucket', 'test-key', 'test-body')).rejects.toThrow(
                 'Precondition failed'
@@ -247,7 +245,7 @@ describe('SecureS3Client', () => {
                 ContentType: 'application/json',
                 ContentLength: 100
             }
-            mockS3ClientSend.mockResolvedValue(mockResult)
+            mockS3Client.send.mockResolvedValue(mockResult)
 
             const result = await client.download('test-bucket', 'test-key')
 
@@ -255,7 +253,7 @@ describe('SecureS3Client', () => {
                 Bucket: 'test-bucket',
                 Key: 'test-key'
             })
-            expect(mockS3ClientSend).toHaveBeenCalled()
+            expect(mockS3Client.send).toHaveBeenCalled()
             expect(result).toEqual({
                 body: mockResult.Body,
                 etag: mockResult.ETag,
@@ -271,7 +269,7 @@ describe('SecureS3Client', () => {
 
         test('should throw error when download fails', async () => {
             const error = new Error('Download failed')
-            mockS3ClientSend.mockRejectedValue(error)
+            mockS3Client.send.mockRejectedValue(error)
 
             await expect(client.download('test-bucket', 'test-key')).rejects.toThrow(
                 'Download failed'
@@ -293,13 +291,13 @@ describe('SecureS3Client', () => {
                 SecretAccessKey: 'test-secret-key',
                 SessionToken: 'test-session-token'
             }
-            mockSTSClientSend.mockResolvedValue({
+            mockSTSClient.send.mockResolvedValue({
                 Credentials: mockCredentials
             })
 
             // Mock upload
             const mockUploadResult = {ETag: '"upload-etag"'}
-            mockS3ClientSend.mockResolvedValue(mockUploadResult)
+            mockS3Client.send.mockResolvedValue(mockUploadResult)
 
             await client.initialize()
             const result = await client.upload('test-bucket', 'test-key', 'test-body')
@@ -324,7 +322,7 @@ describe('SecureS3Client', () => {
                 ContentType: 'text/plain',
                 ContentLength: 50
             }
-            mockS3ClientSend.mockResolvedValue(mockDownloadResult)
+            mockS3Client.send.mockResolvedValue(mockDownloadResult)
 
             const downloadResult = await client.download('test-bucket', 'test-key')
             expect(downloadResult.body).toBe(mockDownloadResult.Body)
