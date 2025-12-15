@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
-    "@aws-sdk/client-s3": "3.862.0",
-    "@aws-sdk/client-sts": "3.862.0",
+    "@aws-sdk/client-s3": "3.450.0",
+    "@aws-sdk/client-sts": "3.450.0",
     "@salesforce/pwa-kit-dev": "3.15.0-dev",
     "jest": "^26.6.3"
   },
