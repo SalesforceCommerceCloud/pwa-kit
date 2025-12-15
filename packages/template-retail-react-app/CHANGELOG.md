@@ -1,7 +1,5 @@
-## v8.4.0-dev (Dec 09, 2025)
-- [Bugfix] - Remove debug console.log statement that could expose error details in production [#3498](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3498)
-
 ## v8.3.0-dev (Nov 05, 2025)
+- [Bugfix] Remove debug console.log statement that could expose error details in production [#3498](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3498)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
 - Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
 
