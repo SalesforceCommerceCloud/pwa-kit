@@ -43,7 +43,6 @@ export const handleAddToCart = async (
         // by the add to cart modal.
         return productSelectionValues
     } catch (error) {
-        console.log('error', error)
         showError(error)
     }
 }
