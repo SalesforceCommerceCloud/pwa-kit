@@ -52,8 +52,8 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-cloudwatch-logs": "^3.450.0",
-    "@aws-sdk/client-lambda": "^3.450.0",
-    "@aws-sdk/client-s3": "^3.450.0"
+    "@aws-sdk/client-cloudwatch-logs": "3.450.0",
+    "@aws-sdk/client-lambda": "3.450.0",
+    "@aws-sdk/client-s3": "3.450.0"
   }
 }
