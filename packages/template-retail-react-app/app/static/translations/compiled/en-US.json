@@ -3014,7 +3014,15 @@
   "otp.message.enter_code_for_account_guest": [
     {
       "type": 0,
-      "value": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the 6-digit code below."
+      "value": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below."
     }
   ],
   "otp.message.enter_code_for_account_returning": [

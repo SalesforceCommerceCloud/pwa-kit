@@ -204,8 +204,9 @@ const OtpAuth = ({
                         <Text fontSize="md" maxWidth="300px" textAlign="center">
                             {isGuestRegistration ? (
                                 <FormattedMessage
-                                    defaultMessage="We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the 6-digit code below."
+                                    defaultMessage="We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the {otpLength}-digit code below."
                                     id="otp.message.enter_code_for_account_guest"
+                                    values={{otpLength: OTP_LENGTH}}
                                 />
                             ) : (
                                 <FormattedMessage
