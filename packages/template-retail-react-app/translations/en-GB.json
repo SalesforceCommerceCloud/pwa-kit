@@ -1259,7 +1259,7 @@
     "defaultMessage": "The code is invalid or expired. Click Resend Code and try again."
   },
   "otp.message.enter_code_for_account_guest": {
-    "defaultMessage": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the 6-digit code below."
+    "defaultMessage": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the {otpLength}-digit code below."
   },
   "otp.message.enter_code_for_account_returning": {
     "defaultMessage": "To log in to your account, enter the code sent to your email."
