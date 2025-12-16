@@ -1,3 +1,6 @@
+## v4.3.0-nightly-20251216080223 (Dec 16, 2025)
+## v4.3.0-dev (Dec 16, 2025)
+## v3.15.0-nightly-20251216080223 (Dec 16, 2025)
 ## v4.3.0-dev (Nov 05, 2025)
 
 - Upgrade to commerce-sdk-isomorphic v4.2.0 and introduce Shopper Configurations SCAPI integration [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
