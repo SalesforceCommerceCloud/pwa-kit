@@ -1,5 +1,5 @@
 
-## v3.15.0-preview.0 (Dec 12, 2025)
+## v3.15.0-preview.1 (Dec 17, 2025)
 - Add new Google Cloud API configuration and Bonus Product configuration [#3523](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3523)
 
 ## v3.14.0 (Nov 04, 2025)
