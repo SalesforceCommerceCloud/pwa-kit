@@ -27,7 +27,7 @@ import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hook
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
-import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
+import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-product-shipping-address-card.jsx'
 
 const OneClickShippingMultiAddress = ({
     basket,
