@@ -135,6 +135,16 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: '{{answers.project.dataCloud.appSourceId}}',
             tenantId: '{{answers.project.dataCloud.tenantId}}'
+        },
+        // Bonus product config
+        pages: {
+            cart: {
+                groupBonusProductsWithQualifyingProduct: true
+            }
+        },
+        // Google Cloud api config
+        googleCloudAPI: {
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
     // Experimental: The base path for the app. This is the path that will be prepended to all /mobify routes,
