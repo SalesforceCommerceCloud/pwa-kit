@@ -61,7 +61,8 @@ describe('server', () => {
         ['/cookie', 200, 'application/json; charset=utf-8'],
         ['/set-response-headers', 200, 'application/json; charset=utf-8'],
         ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8']
+        ['/memtest', 200, 'application/json; charset=utf-8'],
+        ['/streaming-large', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
@@ -132,5 +133,11 @@ describe('server', () => {
         expect(response.body.message).toBe(
             'This file is used in the E2E tests to verify that correct header values are set.'
         )
+    })
+
+    test('Path "/streaming-large" returns streaming: false', async () => {
+        const response = await request(app).get('/streaming-large')
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({streaming: false})
     })
 })
