@@ -78,7 +78,10 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
-        multishipEnabled: true
+        multishipEnabled: true,
+        googleCloudAPI: {
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
+        }
     },
     envBasePath: '/',
     externals: [],

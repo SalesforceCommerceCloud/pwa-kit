@@ -2,6 +2,8 @@
 
 - Update `authorizePasswordless` to pass locale and simplify mode selection to respect user's explicit mode choice while still defaulting to callback mode for backward compatibility [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492)
 
+- Upgrade to commerce-sdk-isomorphic v4.2.0 and introduce Shopper Configurations SCAPI integration [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
+
 ## v4.2.0 (Nov 04, 2025)
 
 - Upgrade to commerce-sdk-isomorphic v4.0.1 [#3449](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3449)

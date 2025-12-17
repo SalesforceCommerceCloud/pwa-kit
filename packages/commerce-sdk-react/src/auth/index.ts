@@ -174,6 +174,14 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'local',
         key: 'idp_access_token'
     },
+    idp_refresh_token: {
+        storageType: 'local',
+        key: 'idp_refresh_token'
+    },
+    dnt: {
+        storageType: 'local',
+        key: 'dnt'
+    },
     token_type: {
         storageType: 'local',
         key: 'token_type'
