@@ -139,14 +139,23 @@ export const createPaymentInstrumentBody = (
     zoneId,
     shippingPreference
 ) => {
+    const paymentReferenceRequest = {
+        paymentMethodType: paymentMethodType,
+        zoneId: zoneId ?? 'default'
+    }
+
+    if (shippingPreference != null) {
+        paymentReferenceRequest.gatewayProperties = {
+            paypal: {
+                shippingPreference
+            }
+        }
+    }
+
     return {
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
-        paymentReferenceRequest: {
-            paymentMethodType: paymentMethodType,
-            zoneId: zoneId ?? 'default',
-            shippingPreference: shippingPreference
-        }
+        paymentReferenceRequest
     }
 }
 

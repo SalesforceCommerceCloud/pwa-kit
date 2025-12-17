@@ -563,7 +563,9 @@ const SFPaymentsExpressButtons = ({
                     }
                 }
                 return {
-                    client_secret: updatedPaymentInstrument.paymentReference.clientSecret,
+                    client_secret:
+                        updatedPaymentInstrument.paymentReference.gatewayProperties?.stripe
+                            ?.clientSecret,
                     id: updatedPaymentInstrument.paymentReference.paymentReferenceId
                 }
             }

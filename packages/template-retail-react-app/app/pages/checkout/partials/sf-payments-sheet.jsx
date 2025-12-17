@@ -268,7 +268,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             // Track created payment intent
             const paymentIntent = {
-                client_secret: orderPaymentInstrument.paymentReference.clientSecret,
+                client_secret:
+                    orderPaymentInstrument.paymentReference.gatewayProperties?.stripe?.clientSecret,
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
             }
 

@@ -140,7 +140,12 @@ describe('sf-payments-utils', () => {
                 paymentInstrumentId: 'test-id',
                 paymentReference: {
                     paymentReferenceId: 'ref-123',
-                    clientSecret: 'secret-abc'
+                    gateway: 'stripe',
+                    gatewayProperties: {
+                        stripe: {
+                            clientSecret: 'secret-abc'
+                        }
+                    }
                 },
                 customProperty: 'custom-value'
             }
@@ -1112,7 +1117,7 @@ describe('sf-payments-utils', () => {
                 'GET_FROM_FILE'
             )
 
-            expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
+            expect(result.paymentReferenceRequest.gatewayProperties.paypal.shippingPreference).toBe('GET_FROM_FILE')
         })
     })
 })

@@ -460,7 +460,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -478,7 +483,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -533,7 +543,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -602,7 +617,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -617,7 +637,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -664,7 +689,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
@@ -682,7 +712,12 @@ describe('SFPaymentsSheet', () => {
                         paymentInstrumentId: 'PI123',
                         paymentMethodId: 'Salesforce Payments',
                         paymentReference: {
-                            clientSecret: 'secret123',
+                            gateway: 'stripe',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            },
                             paymentReferenceId: 'ref123'
                         }
                     }
