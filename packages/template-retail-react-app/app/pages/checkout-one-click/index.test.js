@@ -344,7 +344,7 @@ describe('Checkout One Click', () => {
         })
         await waitFor(() => {
             expect(
-                screen.getByRole('heading', {name: /shipping & gift options/i})
+                screen.getByRole('heading', {name: /shipping options/i})
             ).toBeInTheDocument()
         })
     })

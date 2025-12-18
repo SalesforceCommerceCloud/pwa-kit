@@ -4153,12 +4153,6 @@
       "value": "Address saved successfully"
     }
   ],
-  "shipping_options.action.send_as_a_gift": [
-    {
-      "type": 0,
-      "value": "Do you want to send this as a gift?"
-    }
-  ],
   "shipping_options.action.send_as_gift_wrapping": [
     {
       "type": 0,
@@ -4234,7 +4228,7 @@
   "shipping_options.title.shipping_method": [
     {
       "type": 0,
-      "value": "Shipping & Gift Options"
+      "value": "Shipping Options"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [

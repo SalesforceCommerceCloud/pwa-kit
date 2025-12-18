@@ -136,72 +136,66 @@ describe('ShippingOptions Component', () => {
     describe('with default mocks (registered user, single shipment, editing step)', () => {
         test('renders shipping options component', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('renders component correctly for registered customer', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('component initializes without errors', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('shows loading state immediately when auto-selection conditions are met', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('component renders correctly for all user types', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('component handles step transitions correctly', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('component renders without errors when auto-selection fails', async () => {
             mockUpdateShippingMethod.mutateAsync.mockRejectedValue(new Error('API Error'))
 
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
 
             await new Promise((resolve) => setTimeout(resolve, 100))
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
         })
 
         test('renders shipping method name in component', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('component handles loading states correctly', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('renders gift options section', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('renders correctly with default mock setup', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getByText('Shipping Options')).toBeInTheDocument()
         })
 
         test('renders component structure correctly', () => {
             renderWithProviders(<ShippingOptions />)
-            expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
-            expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
+            expect(screen.getAllByText('Shipping Options').length).toBeGreaterThan(0)
         })
 
         test('shows error toast and hides controls when no shipping methods are available', async () => {
@@ -686,7 +680,7 @@ describe('ShippingOptions Component', () => {
 
             const {user} = localRenderWithProviders(<module.default />)
 
-            expect(screen.getAllByText('Shipping & Gift Options').length).toBeGreaterThan(0)
+            expect(screen.getAllByText('Shipping Options').length).toBeGreaterThan(0)
             expect(screen.getByText('Shipment 1:')).toBeInTheDocument()
             expect(screen.getByText('Shipment 2:')).toBeInTheDocument()
 
