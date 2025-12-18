@@ -350,7 +350,9 @@ const CheckoutConfirmation = () => {
 
                                                         return (
                                                             <ItemVariantProvider
-                                                                key={`${product.productId}-${product.itemId || idx}`}
+                                                                key={`${product.productId}-${
+                                                                    product.itemId || idx
+                                                                }`}
                                                                 index={idx}
                                                                 variant={variant}
                                                             >

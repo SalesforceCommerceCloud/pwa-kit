@@ -81,7 +81,9 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
                                         return (
                                             <ItemVariantProvider
-                                                key={`${product.productId}-${product.itemId || idx}`}
+                                                key={`${product.productId}-${
+                                                    product.itemId || idx
+                                                }`}
                                                 index={idx}
                                                 variant={variant}
                                             >
