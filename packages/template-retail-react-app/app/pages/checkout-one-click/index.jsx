@@ -42,6 +42,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {
     API_ERROR_MESSAGE,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
@@ -66,6 +67,7 @@ const CheckoutOneClick = () => {
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const {data: currentCustomer} = useCurrentCustomer()
+    const {removeEmptyShipments} = useMultiship(basket)
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
@@ -121,6 +123,14 @@ const CheckoutOneClick = () => {
             status: 'error'
         })
     }
+
+    // Remove any empty shipments whenever navigating to the checkout page
+    // Using basketId ensures that the basket is in a valid state before removing empty shipments
+    useEffect(() => {
+        if (basket?.shipments?.length > 1) {
+            removeEmptyShipments(basket)
+        }
+    }, [basket?.basketId])
 
     // Form for payment method
     const paymentMethodForm = useForm({
