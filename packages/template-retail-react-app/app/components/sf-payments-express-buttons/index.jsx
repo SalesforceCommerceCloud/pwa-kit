@@ -109,7 +109,12 @@ const SFPaymentsExpressButtons = ({
         }
     )
 
-    // Define error message constants at the top of the component
+    const ERROR_MESSAGE_KEYS = {
+        DEFAULT: 'DEFAULT',
+        FAIL_ORDER: 'FAIL_ORDER',
+        PREPARE_BASKET: 'PREPARE_BASKET',
+        PROCESS_PAYMENT: 'PROCESS_PAYMENT'
+    }
     const ERROR_MESSAGES = {
         DEFAULT: {
             defaultMessage:
@@ -134,21 +139,20 @@ const SFPaymentsExpressButtons = ({
     }
 
     const showErrorMessage = (messageKey = 'DEFAULT') => {
-        const messageConfig =
-            typeof messageKey === 'string' && ERROR_MESSAGES[messageKey]
-                ? ERROR_MESSAGES[messageKey]
-                : {
-                      defaultMessage: messageKey || ERROR_MESSAGES.DEFAULT.defaultMessage,
-                      id: ERROR_MESSAGES.DEFAULT.id
-                  }
-
-        toast({
-            title:
-                typeof messageKey === 'string' && ERROR_MESSAGES[messageKey]
-                    ? intl.formatMessage(messageConfig)
-                    : messageConfig.defaultMessage,
-            status: 'error'
-        })
+        // If messageKey is a valid key in ERROR_MESSAGES, use it
+        if (ERROR_MESSAGES[messageKey]) {
+            toast({
+                title: intl.formatMessage(ERROR_MESSAGES[messageKey]),
+                status: 'error'
+            })
+        } else {
+            // Otherwise, treat it as a custom error message string
+            // (e.g., from e.message) or fallback to DEFAULT if empty
+            toast({
+                title: messageKey || ERROR_MESSAGES.DEFAULT.defaultMessage,
+                status: 'error'
+            })
+        }
     }
 
     /**
@@ -240,7 +244,7 @@ const SFPaymentsExpressButtons = ({
                 }
             })
             failOrderCalledRef.current = true
-            showErrorMessage('FAIL_ORDER')
+            showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
 
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
@@ -357,7 +361,7 @@ const SFPaymentsExpressButtons = ({
                             prepareBasketPromise.current = null // Clear the promise so handlers don't try to await it
                             // Don't show toast for validation errors
                             if (!e.isValidationError) {
-                                showErrorMessage(e.message || 'PREPARE_BASKET')
+                                showErrorMessage(e.message || ERROR_MESSAGE_KEYS.PREPARE_BASKET)
                             }
                         })
                 }
@@ -413,7 +417,7 @@ const SFPaymentsExpressButtons = ({
             const onCancel = async () => {
                 endConfirming()
                 await cleanupExpressBasket()
-                showErrorMessage()
+                showErrorMessage(ERROR_MESSAGE_KEYS.DEFAULT)
             }
 
             const onShippingAddressChange = async (shippingAddress, callback) => {
@@ -584,7 +588,7 @@ const SFPaymentsExpressButtons = ({
                                     error: error
                                 }
                             })
-                            showErrorMessage('PROCESS_PAYMENT')
+                            showErrorMessage(ERROR_MESSAGE_KEYS.PROCESS_PAYMENT)
                             throw error
                         }
                     }
@@ -651,7 +655,7 @@ const SFPaymentsExpressButtons = ({
                                 error: error
                             }
                         })
-                        showErrorMessage('PROCESS_PAYMENT')
+                        showErrorMessage(ERROR_MESSAGE_KEYS.PROCESS_PAYMENT)
                         // Re-throw so SF Payments SDK can handle the error if needed
                         throw error
                     }
