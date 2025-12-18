@@ -223,8 +223,15 @@ const CheckoutOneClick = () => {
             fullCardDetails
         ) => {
             try {
+                // Set as default only for newly registered users (guests who just registered)
+                const isNewlyRegisteredUser =
+                    enableUserRegistration &&
+                    currentCustomer?.isRegistered &&
+                    !registeredUserChoseGuest
+
                 const paymentInstrument = {
                     paymentMethodId: paymentMethodId,
+                    default: isNewlyRegisteredUser,
                     paymentCard: {
                         holder: fullCardDetails.holder,
                         number: fullCardDetails.number,
