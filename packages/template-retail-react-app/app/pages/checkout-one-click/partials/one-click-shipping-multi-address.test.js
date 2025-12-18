@@ -25,16 +25,20 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
 })
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {screen, waitFor} from '@testing-library/react'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import OneClickShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-multi-address'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: jest.fn()
 }))
-jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useProducts: jest.fn(() => ({data: {}, isLoading: false}))
-}))
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        useProducts: jest.fn(() => ({data: {}, isLoading: false}))
+    }
+})
 jest.mock('@salesforce/retail-react-app/app/hooks/use-product-address-assignment', () => ({
     useProductAddressAssignment: jest.fn()
 }))
@@ -53,8 +57,14 @@ jest.mock(
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: jest.fn(() => jest.fn())
 }))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal', () => ({
+    AddToCartModalProvider: ({children}) => children
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal', () => ({
+    BonusProductSelectionModalProvider: ({children}) => children
+}))
 jest.mock(
-    '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx',
+    '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-product-shipping-address-card.jsx',
     () => {
         return function CardMock(props) {
             return (
@@ -118,7 +128,7 @@ describe('OneClickShippingMultiAddress', () => {
     })
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('shows info alert when there are pickup items', () => {
-        render(
+        renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: true})}
                 submitButtonLabel="Continue"
@@ -140,7 +150,7 @@ describe('OneClickShippingMultiAddress', () => {
                 ]
             })
         )
-        render(
+        renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: false})}
                 submitButtonLabel="Continue"
@@ -152,7 +162,7 @@ describe('OneClickShippingMultiAddress', () => {
 
     test('continue button disabled until all shipments have address', () => {
         useProductAddressAssignment.mockReturnValue(mockAddressAssignment({allHave: false}))
-        render(
+        renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: false})}
                 submitButtonLabel="Continue"
@@ -169,14 +179,14 @@ describe('OneClickShippingMultiAddress', () => {
         const goToStep = jest.fn()
         useCheckout.mockReturnValue({STEPS: {SHIPPING_OPTIONS: 3}, goToStep})
 
-        render(
+        const {user} = renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: false})}
                 submitButtonLabel="Continue"
             />
         )
         const btn = screen.getByRole('button', {name: /continue/i})
-        await userEvent.click(btn)
+        await user.click(btn)
         await waitFor(() => {
             expect(orchestrateShipmentOperations).toHaveBeenCalled()
             expect(goToStep).toHaveBeenCalledWith(3)
@@ -190,13 +200,13 @@ describe('OneClickShippingMultiAddress', () => {
         const showToast = jest.fn()
         useToast.mockReturnValue(showToast)
 
-        render(
+        const {user} = renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: false})}
                 submitButtonLabel="Continue"
             />
         )
-        await userEvent.click(screen.getByRole('button', {name: /continue/i}))
+        await user.click(screen.getByRole('button', {name: /continue/i}))
         await waitFor(() => {
             expect(showToast).toHaveBeenCalled()
         })
@@ -205,7 +215,7 @@ describe('OneClickShippingMultiAddress', () => {
     test('shows guest warning when guest with open address form', () => {
         useCurrentCustomer.mockReturnValue({data: {isGuest: true}, isLoading: false})
         useAddressForm.mockReturnValue(mockAddressForm({isOpen: true}))
-        render(
+        renderWithProviders(
             <OneClickShippingMultiAddress
                 basket={makeBasket({hasPickup: false})}
                 submitButtonLabel="Continue"
