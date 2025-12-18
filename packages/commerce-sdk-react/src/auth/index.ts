@@ -95,6 +95,7 @@ type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: string
+    locale?: string
     /** When true, SLAS will register the customer as part of the passwordless flow */
     register_customer?: boolean | string
     /** Optional registration details forwarded to SLAS when register_customer=true */
@@ -1288,6 +1289,7 @@ class Auth {
             body: {
                 user_id: parameters.userid,
                 mode: finalMode,
+                locale: parameters.locale,
                 // Include usid and site as required by SLAS
                 ...(usid && {usid}),
                 channel_id: slasClient.clientConfig.parameters.siteId,

@@ -46,17 +46,14 @@ import {
     useCustomerType,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const appOrigin = useAppOrigin()
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -69,6 +66,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
+    const {locale} = useMultiSite()
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
 
@@ -124,11 +122,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             if (subscription?.unsubscribe) subscription.unsubscribe()
         }
     }, [form, setContactPhone])
-
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
 
     // Modal controls for OtpAuth
     const {
@@ -205,7 +198,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
-                    callbackURI: `${callbackURL}?mode=otp_email`
+                    mode: 'email',
+                    locale: locale?.id
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()

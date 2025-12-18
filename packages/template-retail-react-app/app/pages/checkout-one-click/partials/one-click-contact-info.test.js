@@ -91,6 +91,15 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
 const mockAuth = {refreshAccessToken: jest.fn()}
 jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () => jest.fn(() => mockAuth))
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'RefArch'},
+        locale: {id: 'en-US'},
+        buildUrl: jest.fn((path) => path)
+    })
+}))
+
 // Mock OtpAuth to expose a verify trigger
 jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     // eslint-disable-next-line react/prop-types
@@ -301,6 +310,15 @@ describe('ContactInfo Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        })
+
+        // Verify authorize passwordless was called with correct parameters
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({
+            userid: validEmail,
+            mode: 'email',
+            locale: 'en-US'
         })
     })
 

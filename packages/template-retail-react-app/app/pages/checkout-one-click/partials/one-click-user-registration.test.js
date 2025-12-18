@@ -59,11 +59,13 @@ jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     return MockOtpAuth
 })
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
-    useAppOrigin: () => 'http://localhost:3000'
-}))
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
-    getConfig: () => ({app: {login: {passwordless: {callbackURI: '/callback'}}}})
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'RefArch'},
+        locale: {id: 'en-US'},
+        buildUrl: jest.fn((path) => path)
+    })
 }))
 
 const setup = (overrides = {}) => {
@@ -131,7 +133,8 @@ describe('UserRegistration', () => {
         await waitFor(() => {
             expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledWith({
                 userid: 'test@example.com',
-                callbackURI: 'http://localhost:3000/callback?mode=otp_email',
+                mode: 'email',
+                locale: 'en-US',
                 register_customer: true,
                 last_name: 'test@example.com',
                 email: 'test@example.com'
