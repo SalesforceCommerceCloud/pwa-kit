@@ -1,6 +1,6 @@
 {
   "name": "template-express-minimal",
-  "version": "3.15.0-dev",
+  "version": "3.16.0-dev",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@h4ad/serverless-adapter": "4.4.0",
-    "@salesforce/pwa-kit-dev": "3.15.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.15.0-dev",
+    "@salesforce/pwa-kit-dev": "3.16.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.16.0-dev",
     "supertest": "^4.0.2"
   },
   "mobify": {
