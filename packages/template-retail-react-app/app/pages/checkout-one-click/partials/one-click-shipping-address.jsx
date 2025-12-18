@@ -23,7 +23,6 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -39,7 +38,6 @@ const shippingAddressAriaLabel = defineMessage({
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
-    const toast = useToast()
     const [isLoading, setIsLoading] = useState()
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const [isMultiShipping, setIsMultiShipping] = useState(false)

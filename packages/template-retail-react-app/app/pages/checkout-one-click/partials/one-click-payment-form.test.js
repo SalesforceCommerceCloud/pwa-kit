@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
@@ -82,19 +82,6 @@ const mockBasket = {
     basketId: 'test-basket-id'
 }
 
-const mockForm = {
-    handleSubmit: jest.fn((callback) => (e) => {
-        e?.preventDefault?.()
-        callback({
-            number: '4111111111111111',
-            expiry: '12/25',
-            cvv: '123',
-            holder: 'John Doe'
-        })
-    }),
-    formState: {errors: {}},
-    control: {}
-}
 const Wrapper = ({children}) => {
     // Provide a RHF form with onChange mode to surface inline validation
     const form = useForm({
@@ -603,12 +590,6 @@ describe('PaymentForm Component', () => {
 
     describe('Form Integration', () => {
         test('integrates with react-hook-form properly', () => {
-            const customForm = {
-                handleSubmit: jest.fn(),
-                formState: {errors: {}},
-                control: {}
-            }
-
             renderWithProviders(<PaymentForm onSubmit={jest.fn()}>{null}</PaymentForm>, {
                 wrapper: Wrapper
             })

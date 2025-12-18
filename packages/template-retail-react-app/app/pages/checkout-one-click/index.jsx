@@ -470,17 +470,6 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
-                                            isDisabled={
-                                                // Require payment instrument or valid new card
-                                                (!appliedPayment &&
-                                                    !paymentMethodForm.formState.isValid) ||
-                                                // And ensure billing exists for pickup-only (form valid or existing billing on basket)
-                                                (isPickupOnly &&
-                                                    !(
-                                                        selectedBillingAddress?.address1 ||
-                                                        billingAddressForm.formState.isValid
-                                                    ))
-                                            }
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
