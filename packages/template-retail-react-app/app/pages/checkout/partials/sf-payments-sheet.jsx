@@ -234,7 +234,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     orderNo: order.orderNo,
                     paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
                 },
-                body: createPaymentInstrumentBody(order.orderTotal, paymentMethodType.current, zoneId)
+                body: createPaymentInstrumentBody(
+                    order.orderTotal,
+                    paymentMethodType.current,
+                    zoneId
+                )
                 //body: createPaymentInstrumentBody(-1, paymentMethodType.current, zoneId)
             })
 
@@ -243,7 +247,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const statusCode = error?.response?.status || error?.status
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
-            
+
             // TODO: log details of body if needed or change toast message to refer the type of message error?
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsSheet.createAndUpdateOrder',
@@ -266,18 +270,18 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     reopenBasket: true
                 },
                 body: {
-                    reasonCode: "payment_confirm_failure"
+                    reasonCode: 'payment_confirm_failure'
                 }
             })
-            
+
             // Show error message to user - order was failed and basket reopened
             const message = formatMessage({
                 defaultMessage:
                     'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
-                id: 'checkout.message.payment_confirm_failure'
+                id: 'checkout.message.payment_processing_failed'
             })
             onError(message)
-            
+
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             error.message = message
@@ -397,7 +401,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         namespace: 'SFPaymentsSheet.confirmPayment',
                         additionalProperties: {orderNo: updatedOrder.orderNo}
                     })
-                        
+
                     // Show error message to user - order was failed and basket reopened
                     const message = formatMessage({
                         defaultMessage:

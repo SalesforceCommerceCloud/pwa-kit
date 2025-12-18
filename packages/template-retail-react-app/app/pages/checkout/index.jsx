@@ -138,7 +138,7 @@ const Checkout = () => {
                     defaultMessage: 'An unexpected error occurred during checkout.'
                 })
                 setError(message)
-            } 
+            }
         } finally {
             setIsLoading(false)
         }

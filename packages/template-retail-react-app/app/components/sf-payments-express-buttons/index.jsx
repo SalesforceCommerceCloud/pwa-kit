@@ -109,15 +109,44 @@ const SFPaymentsExpressButtons = ({
         }
     )
 
-    const showErrorMessage = (message) => {
+    // Define error message constants at the top of the component
+    const ERROR_MESSAGES = {
+        DEFAULT: {
+            defaultMessage:
+                'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
+            id: 'sfp_payments_express.error.default'
+        },
+        FAIL_ORDER: {
+            defaultMessage:
+                'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+            id: 'sfp_payments_express.error.fail_order'
+        },
+        PREPARE_BASKET: {
+            defaultMessage:
+                'Unable to prepare basket for express payments. Please select all required product attributes.',
+            id: 'sfp_payments_express.error.prepare_basket'
+        },
+        PROCESS_PAYMENT: {
+            defaultMessage:
+                'Unable to process payment. Please try again or select a different payment method.',
+            id: 'sfp_payments_express.error.process_payment'
+        }
+    }
+
+    const showErrorMessage = (messageKey = 'DEFAULT') => {
+        const messageConfig =
+            typeof messageKey === 'string' && ERROR_MESSAGES[messageKey]
+                ? ERROR_MESSAGES[messageKey]
+                : {
+                      defaultMessage: messageKey || ERROR_MESSAGES.DEFAULT.defaultMessage,
+                      id: ERROR_MESSAGES.DEFAULT.id
+                  }
+
         toast({
             title:
-                message ||
-                intl.formatMessage({
-                    defaultMessage:
-                        'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
-                    id: 'sfp_payments_express.error.default'
-                }),
+                typeof messageKey === 'string' && ERROR_MESSAGES[messageKey]
+                    ? intl.formatMessage(messageConfig)
+                    : messageConfig.defaultMessage,
             status: 'error'
         })
     }
@@ -171,7 +200,6 @@ const SFPaymentsExpressButtons = ({
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody(
                 order.orderTotal,
-               //-1,
                 paymentType,
                 zoneIdValue
             )
@@ -185,11 +213,10 @@ const SFPaymentsExpressButtons = ({
                 body: paymentInstrumentBody
             })
         } catch (error) {
-
             const statusCode = error?.response?.status || error?.status
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
-            
+
             // TODO: log details of body if needed or change toast message to refer the type of message error?
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsExpressButtons.createOrderAndUpdatePayment',
@@ -204,7 +231,7 @@ const SFPaymentsExpressButtons = ({
                     error: error
                 }
             })
-             
+
             // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
             await failOrder({
                 parameters: {
@@ -212,19 +239,11 @@ const SFPaymentsExpressButtons = ({
                     reopenBasket: true
                 },
                 body: {
-                    reasonCode: "payment_confirm_failure"
+                    reasonCode: 'payment_confirm_failure'
                 }
             })
             failOrderCalledRef.current = true
-
-            // Show error message to user - order was failed and basket reopened
-            showErrorMessage(
-                intl.formatMessage({
-                    defaultMessage:
-                        'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
-                    id: 'sfp_payments_express.error.fail_order'
-                })
-            )
+            showErrorMessage('FAIL_ORDER')
 
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
@@ -341,14 +360,7 @@ const SFPaymentsExpressButtons = ({
                             prepareBasketPromise.current = null // Clear the promise so handlers don't try to await it
                             // Don't show toast for validation errors
                             if (!e.isValidationError) {
-                                showErrorMessage(
-                                    e.message ||
-                                        intl.formatMessage({
-                                            defaultMessage:
-                                                'Unable to prepare basket for express payments. Please select all required product attributes.',
-                                            id: 'sfp_payments_express.error.prepare_basket'
-                                        })
-                                )
+                                showErrorMessage(e.message || 'PREPARE_BASKET')
                             }
                         })
                 }
@@ -555,16 +567,16 @@ const SFPaymentsExpressButtons = ({
                                 zoneId
                             )
                         })*/
-                            try {
-                                expressBasket.current = await addPaymentInstrumentToBasket({
-                                    parameters: {basketId: updatedBasket.basketId},
-                                    body: createPaymentInstrumentBody(
-                                        updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
-                                        paymentMethodType,
-                                        zoneId
-                                    )
-                                })
-                                /*expressBasket.current = await addPaymentInstrumentToBasket({
+                        try {
+                            expressBasket.current = await addPaymentInstrumentToBasket({
+                                parameters: {basketId: updatedBasket.basketId},
+                                body: createPaymentInstrumentBody(
+                                    updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
+                                    paymentMethodType,
+                                    zoneId
+                                )
+                            })
+                            /*expressBasket.current = await addPaymentInstrumentToBasket({
                                     parameters: {basketId: expressBasket.current.basketId},
                                     body: createPaymentInstrumentBody(
                                         expressBasket.current.orderTotal ||
@@ -573,36 +585,29 @@ const SFPaymentsExpressButtons = ({
                                         "default1"
                                     )
                                 })*/
-                            } catch (error) {
-                                const statusCode = error?.response?.status || error?.status
-                                const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
-                                const errorDetails = error?.response?.data || error?.body || {}
-                                
-                                // TODO: log details of body if needed or change toast message to refer the type of message error?
-                                logger.error('Failed to add payment instrument to basket', {
-                                    namespace: 'SFPaymentsExpressButtons.onPayerApprove',
-                                    additionalProperties: {
-                                        statusCode,
-                                        errorMessage,
-                                        errorDetails,
-                                        basketId: expressBasket.current?.basketId,
-                                        paymentMethodType,
-                                        orderTotal: expressBasket.current?.orderTotal,
-                                        productSubTotal: expressBasket.current?.productSubTotal,
-                                        error: error
-                                    }
-                                })
-                                 
-                                // Show error message to user immediately
-                                showErrorMessage(
-                                    intl.formatMessage({
-                                        defaultMessage:
-                                            'Unable to process payment. Please try again or select a different payment method.',
-                                        id: 'sfp_payments_express.error.onPayerApprove'
-                                    })
-                                )
-                                throw error
-                            }
+                        } catch (error) {
+                            const statusCode = error?.response?.status || error?.status
+                            const errorMessage =
+                                error?.message || error?.response?.data?.message || 'Unknown error'
+                            const errorDetails = error?.response?.data || error?.body || {}
+
+                            // TODO: log details of body if needed or change toast message to refer the type of message error?
+                            logger.error('Failed to add payment instrument to basket', {
+                                namespace: 'SFPaymentsExpressButtons.onPayerApprove',
+                                additionalProperties: {
+                                    statusCode,
+                                    errorMessage,
+                                    errorDetails,
+                                    basketId: expressBasket.current?.basketId,
+                                    paymentMethodType,
+                                    orderTotal: expressBasket.current?.orderTotal,
+                                    productSubTotal: expressBasket.current?.productSubTotal,
+                                    error: error
+                                }
+                            })
+                            showErrorMessage('PROCESS_PAYMENT')
+                            throw error
+                        }
                     }
                 } catch (error) {
                     endConfirming()
@@ -650,9 +655,10 @@ const SFPaymentsExpressButtons = ({
                         })
                     } catch (error) {
                         const statusCode = error?.response?.status || error?.status
-                        const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
+                        const errorMessage =
+                            error?.message || error?.response?.data?.message || 'Unknown error'
                         const errorDetails = error?.response?.data || error?.body || {}
-                        
+
                         // TODO: log details of body if needed or change toast message to refer the type of message error?
                         logger.error('Failed to add payment instrument to basket', {
                             namespace: 'SFPaymentsExpressButtons.createIntentFunction',
@@ -667,15 +673,7 @@ const SFPaymentsExpressButtons = ({
                                 error: error
                             }
                         })
-                         
-                        // Show error message to user immediately
-                        showErrorMessage(
-                            intl.formatMessage({
-                                defaultMessage:
-                                    'Unable to process payment. Please try again or select a different payment method.',
-                                id: 'sfp_payments_express.error.add_payment_instrument'
-                            })
-                        )
+                        showErrorMessage('PROCESS_PAYMENT')
                         // Re-throw so SF Payments SDK can handle the error if needed
                         throw error
                     }
@@ -750,7 +748,7 @@ const SFPaymentsExpressButtons = ({
                             reopenBasket: true
                         },
                         body: {
-                            reasonCode: "payment_confirm_failure"
+                            reasonCode: 'payment_confirm_failure'
                         }
                     })
                     failOrderCalledRef.current = true
