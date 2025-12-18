@@ -239,7 +239,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     paymentMethodType.current,
                     zoneId
                 )
-                //body: createPaymentInstrumentBody(-1, paymentMethodType.current, zoneId)
             })
 
             return updatedOrder
@@ -248,7 +247,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
 
-            // TODO: log details of body if needed or change toast message to refer the type of message error?
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsSheet.createAndUpdateOrder',
                 additionalProperties: {
@@ -323,7 +321,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             // Track created payment intent
             const paymentIntent = {
-                //client_secret: '123',
                 client_secret: orderPaymentInstrument.paymentReference.clientSecret,
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
             }

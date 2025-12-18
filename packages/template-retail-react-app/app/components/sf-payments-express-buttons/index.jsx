@@ -183,8 +183,6 @@ const SFPaymentsExpressButtons = ({
 
     /**
      * Create order from basket and update payment instrument
-     * TODO: Once Fail Order SCAPI is available, call it to clean up orders when
-     * payment instrument update fails
      */
     const createOrderAndUpdatePayment = async (basketId, paymentType, zoneIdValue) => {
         // Create order from the basket
@@ -217,7 +215,6 @@ const SFPaymentsExpressButtons = ({
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
 
-            // TODO: log details of body if needed or change toast message to refer the type of message error?
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsExpressButtons.createOrderAndUpdatePayment',
                 additionalProperties: {
@@ -559,14 +556,6 @@ const SFPaymentsExpressButtons = ({
 
                     // For Stripe, create SF Payments basket payment instrument before creating order
                     if (!isPayPalPaymentMethodType(paymentMethodType)) {
-                        /*expressBasket.current = await addPaymentInstrumentToBasket({
-                            parameters: {basketId: updatedBasket.basketId},
-                            body: createPaymentInstrumentBody(
-                                updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
-                                paymentMethodType,
-                                zoneId
-                            )
-                        })*/
                         try {
                             expressBasket.current = await addPaymentInstrumentToBasket({
                                 parameters: {basketId: updatedBasket.basketId},
@@ -576,22 +565,12 @@ const SFPaymentsExpressButtons = ({
                                     zoneId
                                 )
                             })
-                            /*expressBasket.current = await addPaymentInstrumentToBasket({
-                                    parameters: {basketId: expressBasket.current.basketId},
-                                    body: createPaymentInstrumentBody(
-                                        expressBasket.current.orderTotal ||
-                                            expressBasket.current.productSubTotal,
-                                        null,
-                                        "default1"
-                                    )
-                                })*/
                         } catch (error) {
                             const statusCode = error?.response?.status || error?.status
                             const errorMessage =
                                 error?.message || error?.response?.data?.message || 'Unknown error'
                             const errorDetails = error?.response?.data || error?.body || {}
 
-                            // TODO: log details of body if needed or change toast message to refer the type of message error?
                             logger.error('Failed to add payment instrument to basket', {
                                 namespace: 'SFPaymentsExpressButtons.onPayerApprove',
                                 additionalProperties: {
@@ -659,7 +638,6 @@ const SFPaymentsExpressButtons = ({
                             error?.message || error?.response?.data?.message || 'Unknown error'
                         const errorDetails = error?.response?.data || error?.body || {}
 
-                        // TODO: log details of body if needed or change toast message to refer the type of message error?
                         logger.error('Failed to add payment instrument to basket', {
                             namespace: 'SFPaymentsExpressButtons.createIntentFunction',
                             additionalProperties: {
@@ -688,7 +666,6 @@ const SFPaymentsExpressButtons = ({
                         )
                         orderNo = order.orderNo
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
-                        // TODO validate updatedPaymentInstrument paymentRererence values?
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
                         // orderNo will be attached to the error
@@ -734,14 +711,8 @@ const SFPaymentsExpressButtons = ({
             // Async function to handle payment error event.  This is called when error event is handled by SF Payments SDK.
             const paymentError = async () => {
                 endConfirming()
-                /*if (orderNo) {
-                    // TODO: fail the order
-                    orderNo = null
-                }*/
                 // if orderNo is present and failOrder has not been called, call failOrder
                 if (orderNo && !failOrderCalledRef.current) {
-                    console.log('paymentError 1')
-                    // TODO:  once payment intent is created BUT confirm fails (Ex: generic declined card), failOrder is not working
                     await failOrder({
                         parameters: {
                             orderNo: orderNo,
