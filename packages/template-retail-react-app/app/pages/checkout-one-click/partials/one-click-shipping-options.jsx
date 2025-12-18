@@ -38,7 +38,10 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {totalShippingCost}
+    } = useCurrentBasket()
     const {data: customer} = useCurrentCustomer()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
@@ -46,8 +49,9 @@ export default function ShippingOptions() {
     const [isLoading, setIsLoading] = useState(false)
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
-    // Identify delivery shipments (exclude pickup)
-    const deliveryShipments = basket?.shipments?.filter((s) => !isPickupShipment(s)) || []
+    // Identify delivery shipments (exclude pickup and those without shipping addresses)
+    const deliveryShipments =
+        basket?.shipments?.filter((s) => s.shippingAddress && !isPickupShipment(s)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
     const targetDeliveryShipment = hasMultipleDeliveryShipments ? null : deliveryShipments[0]
 
@@ -386,61 +390,192 @@ export default function ShippingOptions() {
                 )}
             </ToggleCardEdit>
 
+            {!effectiveIsLoading && hasMultipleDeliveryShipments && (
+                <MultiShipmentSummary
+                    deliveryShipments={deliveryShipments}
+                    totalShippingCost={totalShippingCost}
+                    currency={currency}
+                    freeLabel={freeLabel}
+                />
+            )}
+
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
                 isSelectedMethodValid &&
                 selectedShippingAddress && (
-                    <ToggleCardSummary>
-                        <Flex justify="space-between" w="full">
-                            <Text>{selectedShippingMethod.name}</Text>
-                            <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                                <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                                    {selectedMethodDisplayPrice === 0 ? (
+                    <SingleShipmentSummary
+                        selectedShippingMethod={selectedShippingMethod}
+                        selectedMethodDisplayPrice={selectedMethodDisplayPrice}
+                        shippingItem={shippingItem}
+                        shippingPriceLabel={shippingPriceLabel}
+                        currency={currency}
+                        freeLabel={freeLabel}
+                    />
+                )}
+        </ToggleCard>
+    )
+}
+
+// Child component for multi-shipment summary
+const MultiShipmentSummary = ({deliveryShipments, totalShippingCost, currency, freeLabel}) => {
+    const {formatMessage} = useIntl()
+
+    return (
+        <ToggleCardSummary>
+            <Stack spacing={2}>
+                {deliveryShipments.map((shipment) => {
+                    // Use shipment.shippingTotal to include all costs (base + promotions + surcharges + other fees)
+                    const itemCost = shipment.shippingTotal || 0
+                    return (
+                        <Box key={shipment.shipmentId}>
+                            <Flex justify="space-between" w="full">
+                                <Box flex="1">
+                                    {shipment.shippingMethod ? (
+                                        <>
+                                            <Text mt={2}>{shipment.shippingMethod.name}</Text>
+                                            <Text fontSize="sm" color="gray.700">
+                                                {shipment.shippingMethod.description}
+                                            </Text>
+                                        </>
+                                    ) : (
+                                        <Text mt={2} fontSize="sm" color="gray.500">
+                                            {formatMessage({
+                                                defaultMessage: 'No shipping method selected',
+                                                id: 'shipping_options.label.no_method_selected'
+                                            })}
+                                        </Text>
+                                    )}
+                                </Box>
+                                <Text fontWeight="bold" fontSize="sm">
+                                    {itemCost === 0 ? (
                                         freeLabel
                                     ) : (
                                         <FormattedNumber
-                                            value={selectedMethodDisplayPrice}
+                                            value={itemCost}
                                             style="currency"
                                             currency={currency}
                                         />
                                     )}
                                 </Text>
-                                {selectedMethodDisplayPrice !== shippingItem.price && (
-                                    <Text
-                                        fontWeight="normal"
-                                        textDecoration="line-through"
-                                        color="gray.600"
-                                        marginLeft={1}
-                                        aria-hidden="true"
-                                        role="presentation"
-                                    >
-                                        <FormattedNumber
-                                            style="currency"
-                                            currency={currency}
-                                            value={shippingItem.price}
-                                        />
-                                    </Text>
-                                )}
                             </Flex>
+                        </Box>
+                    )
+                })}
+                {deliveryShipments.length > 1 && (
+                    <Box borderTopWidth="1px" pt={2} mt={2}>
+                        <Flex justify="space-between" w="full">
+                            <Text fontWeight="semibold">
+                                {formatMessage({
+                                    defaultMessage: 'Total Shipping',
+                                    id: 'shipping_options.label.total_shipping'
+                                })}
+                            </Text>
+                            <Text fontWeight="bold">
+                                <FormattedNumber
+                                    value={totalShippingCost}
+                                    style="currency"
+                                    currency={currency}
+                                />
+                            </Text>
                         </Flex>
-                        <Text fontSize="sm" color="gray.700">
-                            {selectedShippingMethod.description}
-                        </Text>
-                        {shippingItem?.priceAdjustments?.map((adjustment) => {
-                            return (
-                                <Text
-                                    key={adjustment.priceAdjustmentId}
-                                    fontSize="sm"
-                                    color="green.600"
-                                >
-                                    {adjustment.itemText}
-                                </Text>
-                            )
-                        })}
-                    </ToggleCardSummary>
+                    </Box>
                 )}
-        </ToggleCard>
+            </Stack>
+        </ToggleCardSummary>
     )
+}
+
+MultiShipmentSummary.propTypes = {
+    deliveryShipments: PropTypes.arrayOf(
+        PropTypes.shape({
+            shipmentId: PropTypes.string.isRequired,
+            shippingMethod: PropTypes.shape({
+                name: PropTypes.string,
+                description: PropTypes.string
+            }),
+            shippingTotal: PropTypes.number
+        })
+    ).isRequired,
+    totalShippingCost: PropTypes.number.isRequired,
+    currency: PropTypes.string.isRequired,
+    freeLabel: PropTypes.string.isRequired
+}
+
+// Child component for single-shipment summary
+const SingleShipmentSummary = ({
+    selectedShippingMethod,
+    selectedMethodDisplayPrice,
+    shippingItem,
+    shippingPriceLabel,
+    currency,
+    freeLabel
+}) => {
+    return (
+        <ToggleCardSummary>
+            <Flex justify="space-between" w="full">
+                <Text>{selectedShippingMethod.name}</Text>
+                <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
+                    <Text fontWeight="bold" aria-hidden="true" role="presentation">
+                        {selectedMethodDisplayPrice === 0 ? (
+                            freeLabel
+                        ) : (
+                            <FormattedNumber
+                                value={selectedMethodDisplayPrice}
+                                style="currency"
+                                currency={currency}
+                            />
+                        )}
+                    </Text>
+                    {selectedMethodDisplayPrice !== shippingItem.price && (
+                        <Text
+                            fontWeight="normal"
+                            textDecoration="line-through"
+                            color="gray.600"
+                            marginLeft={1}
+                            aria-hidden="true"
+                            role="presentation"
+                        >
+                            <FormattedNumber
+                                style="currency"
+                                currency={currency}
+                                value={shippingItem.price}
+                            />
+                        </Text>
+                    )}
+                </Flex>
+            </Flex>
+            <Text fontSize="sm" color="gray.700">
+                {selectedShippingMethod.description}
+            </Text>
+            {shippingItem?.priceAdjustments?.map((adjustment) => {
+                return (
+                    <Text key={adjustment.priceAdjustmentId} fontSize="sm" color="green.600">
+                        {adjustment.itemText}
+                    </Text>
+                )
+            })}
+        </ToggleCardSummary>
+    )
+}
+
+SingleShipmentSummary.propTypes = {
+    selectedShippingMethod: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        description: PropTypes.string
+    }).isRequired,
+    selectedMethodDisplayPrice: PropTypes.number.isRequired,
+    shippingItem: PropTypes.shape({
+        price: PropTypes.number,
+        priceAdjustments: PropTypes.arrayOf(
+            PropTypes.shape({
+                priceAdjustmentId: PropTypes.string,
+                itemText: PropTypes.string
+            })
+        )
+    }),
+    shippingPriceLabel: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
+    freeLabel: PropTypes.string.isRequired
 }
 
 const ShipmentMethods = ({shipment, index, currency}) => {
@@ -457,36 +592,56 @@ const ShipmentMethods = ({shipment, index, currency}) => {
         {enabled: Boolean(basket?.basketId && shipment?.shipmentId)}
     )
     const [selected, setSelected] = useState(shipment?.shippingMethod?.id || undefined)
+    const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
     useEffect(() => {
-        // Only attempt auto-select when there are applicable methods available
-        const applicableIds = methods?.applicableShippingMethods?.map((m) => m.id) || []
-        if (!applicableIds.length) {
+        // Only attempt auto-select when there are applicable methods available and we haven't already auto-selected
+        const applicableMethods = methods?.applicableShippingMethods || []
+        const applicableIds = applicableMethods.map((m) => m.id)
+        if (!applicableIds.length || hasAutoSelected) {
             return
         }
-        const preferredId =
-            (shipment?.shippingMethod?.id && applicableIds.includes(shipment.shippingMethod.id)
+
+        // Determine the method to select:
+        // 1. Use existing shipment method if still valid
+        // 2. Use default shipping method if available
+        // 3. Fall back to first available method
+        const existingMethodId =
+            shipment?.shippingMethod?.id && applicableIds.includes(shipment.shippingMethod.id)
                 ? shipment.shippingMethod.id
-                : undefined) ||
-            (methods?.defaultShippingMethodId &&
+                : undefined
+        const defaultMethodId =
+            methods?.defaultShippingMethodId &&
             applicableIds.includes(methods.defaultShippingMethodId)
                 ? methods.defaultShippingMethodId
-                : undefined)
-        if (!selected && preferredId) {
-            setSelected(preferredId)
-            try {
-                updateShippingMethod.mutateAsync({
+                : undefined
+        const firstMethodId = applicableMethods[0]?.id
+
+        const methodToSelect = existingMethodId || defaultMethodId || firstMethodId
+
+        if (methodToSelect && methodToSelect !== shipment?.shippingMethod?.id) {
+            setSelected(methodToSelect)
+            setHasAutoSelected(true)
+            updateShippingMethod
+                .mutateAsync({
                     parameters: {basketId: basket.basketId, shipmentId: shipment.shipmentId},
-                    body: {id: preferredId}
+                    body: {id: methodToSelect}
                 })
-            } catch {
-                // Ignore; user can manually select another method
-            }
+                .catch(() => {
+                    // Ignore; user can manually select another method
+                })
+        } else if (methodToSelect) {
+            // Method already set on shipment, just update local state
+            setSelected(methodToSelect)
+            setHasAutoSelected(true)
         }
     }, [
         methods?.applicableShippingMethods,
         methods?.defaultShippingMethodId,
-        shipment?.shippingMethod?.id
+        shipment?.shippingMethod?.id,
+        hasAutoSelected,
+        basket?.basketId,
+        shipment?.shipmentId
     ])
 
     const address = shipment?.shippingAddress
