@@ -381,6 +381,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // before we invoke the handlers)
     app.use((req, res, next) => {
         res.set('Cache-Control', 'no-cache')
+        res.set('Server', 'mrt ref app')
         return next()
     })
 

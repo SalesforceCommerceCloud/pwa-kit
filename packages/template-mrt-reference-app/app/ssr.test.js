@@ -78,6 +78,10 @@ describe('server', () => {
         return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
     })
 
+    test('All responses have Server header set to "mrt ref app"', () => {
+        return request(app).get('/').expect('Server', 'mrt ref app')
+    })
+
     test('Path "/headers" echoes request headers', async () => {
         const response = await request(app).get('/headers').set('Random-Header', 'random')
 
