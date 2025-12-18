@@ -269,7 +269,7 @@ export default function ShippingOptions() {
         <ToggleCard
             id="step-2"
             title={formatMessage({
-                defaultMessage: 'Shipping & Gift Options',
+                defaultMessage: 'Shipping Options',
                 id: 'shipping_options.title.shipping_method'
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
@@ -365,14 +365,6 @@ export default function ShippingOptions() {
                                     )}
                                 />
                             )}
-                            <Box>
-                                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                                    <FormattedMessage
-                                        defaultMessage="Do you want to send this as a gift?"
-                                        id="shipping_options.action.send_as_a_gift"
-                                    />
-                                </Button>
-                            </Box>
                             {shippingMethods?.applicableShippingMethods?.length > 0 && (
                                 <Box>
                                     <Container variant="form">

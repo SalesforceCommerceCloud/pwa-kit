@@ -1754,9 +1754,6 @@
   "shipping_multi_address.success.address_saved": {
     "defaultMessage": "Address saved successfully"
   },
-  "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "Do you want to send this as a gift?"
-  },
   "shipping_options.action.send_as_gift_wrapping": {
     "defaultMessage": "Send as a gift (gift wrapping)"
   },
@@ -1788,7 +1785,7 @@
     "defaultMessage": "Shipping & Gift Options"
   },
   "shipping_options.title.shipping_method": {
-    "defaultMessage": "Shipping & Gift Options"
+    "defaultMessage": "Shipping Options"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Cancel"
