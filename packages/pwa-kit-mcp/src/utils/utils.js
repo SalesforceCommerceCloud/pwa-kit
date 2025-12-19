@@ -9,7 +9,6 @@ import fsPromises from 'fs/promises'
 import path from 'path'
 import os from 'os'
 import {spawn} from 'cross-spawn'
-import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
 import {execSync} from 'child_process'
 
@@ -17,9 +16,7 @@ import {execSync} from 'child_process'
 const CREATE_APP_VERSION = 'latest'
 
 // Private schema used to generate the JSON schema
-const emptySchema = z.object({}).strict()
-
-export const EmptyJsonSchema = zodToJsonSchema(emptySchema)
+export const EmptyJsonSchema = z.object({}).strict().toJSONSchema()
 
 /**
  * Converts a string to PascalCase (e.g., product-card -> ProductCard)
