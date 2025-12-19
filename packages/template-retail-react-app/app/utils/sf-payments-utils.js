@@ -6,6 +6,15 @@
  */
 
 /**
+ * Helper function to read the client secret from the payment instrument
+ * @param {Object} paymentInstrument - Payment instrument object
+ * @returns {string|null} Client secret
+ */
+export const getClientSecret = (paymentInstrument) => {
+    return paymentInstrument?.paymentReference?.gatewayProperties?.stripe?.clientSecret
+}
+
+/**
  * Returns the first Salesforce Payments instrument found in a basket or order.
  * @param {Object} basketOrOrder - A basket or order object containing paymentInstruments
  * @returns {Object|undefined} First Salesforce Payments payment instrument found, or undefined if none exist
