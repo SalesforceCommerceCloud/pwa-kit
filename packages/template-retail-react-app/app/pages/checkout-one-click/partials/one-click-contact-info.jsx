@@ -83,6 +83,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const emailRef = useRef()
     // Single-flight guard for OTP authorization to avoid duplicate sends
     const otpSendPromiseRef = useRef(null)
+    // Track the last email that was sent for passwordless login to avoid duplicate calls
+    const lastEmailSentRef = useRef(null)
 
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
@@ -186,6 +188,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
+        // Normalize email for comparison (trim and lowercase)
+        const normalizedEmail = email?.trim().toLowerCase() || ''
+
+        // Skip if email hasn't changed from the last one we sent
+        if (lastEmailSentRef.current === normalizedEmail) {
+            // Return cached result if we have one
+            if (otpSendPromiseRef.current) {
+                return otpSendPromiseRef.current
+            }
+            // If no cached result, return a default response
+            return {isRegistered: false}
+        }
+
         // Reuse in-flight request (single-flight) across blur and submit
         if (otpSendPromiseRef.current) {
             return otpSendPromiseRef.current
@@ -204,12 +219,16 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
                 otpFromContactRef.current = true
+                // Update the last email sent ref after successful call
+                lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {
                     setShowContinueButton(true)
                 }
+                // Update the last email sent ref even on error to prevent retrying immediately
+                lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: false}
             } finally {
                 setIsCheckingEmail(false)
