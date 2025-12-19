@@ -24,6 +24,7 @@ class AccessDenied extends ServiceException {
 }
 
 describe('server', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let originalEnv, app, server
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
@@ -61,7 +62,8 @@ describe('server', () => {
         ['/multi-cookies', 200, 'application/json; charset=utf-8'],
         ['/set-response-headers', 200, 'application/json; charset=utf-8'],
         ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8']
+        ['/memtest', 200, 'application/json; charset=utf-8'],
+        ['/streaming-large', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
@@ -75,6 +77,10 @@ describe('server', () => {
 
     test('Path "/cache/:duration" has Cache-Control set correctly', () => {
         return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
+    })
+
+    test('All responses have Server header set to "mrt ref app"', () => {
+        return request(app).get('/').expect('Server', 'mrt ref app')
     })
 
     test('Path "/headers" echoes request headers', async () => {
@@ -170,5 +176,11 @@ describe('server', () => {
         expect(response.body.message).toBe(
             'This file is used in the E2E tests to verify that correct header values are set.'
         )
+    })
+
+    test('Path "/streaming-large" returns streaming: false', async () => {
+        const response = await request(app).get('/streaming-large')
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({streaming: false})
     })
 })
