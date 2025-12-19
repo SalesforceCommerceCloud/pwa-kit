@@ -13,7 +13,8 @@ import {
     getSelectedShippingMethodId,
     isShippingMethodValid,
     isPayPalPaymentMethodType,
-    createPaymentInstrumentBody
+    createPaymentInstrumentBody,
+    getClientSecret
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 describe('sf-payments-utils', () => {
@@ -1113,6 +1114,32 @@ describe('sf-payments-utils', () => {
             )
 
             expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
+        })
+    })
+
+    describe('getClientSecret', () => {
+        test('returns clientSecret from gatewayProperties.stripe structure', () => {
+            const paymentInstrument = {
+                paymentReference: {
+                    gatewayProperties: {
+                        stripe: {
+                            clientSecret: 'pi_3Sfub6RArCOz1e7h0XCpAXOJ_secret_MV5Mk96oULHJLY7OLU6r74Hao'
+                        }
+                    },
+                    paymentReferenceId: 'pi_3Sfub6RArCOz1e7h0XCpAXOJ'
+                }
+            }
+
+            const result = getClientSecret(paymentInstrument)
+
+            expect(result).toBe('pi_3Sfub6RArCOz1e7h0XCpAXOJ_secret_MV5Mk96oULHJLY7OLU6r74Hao')
+        })
+
+        test('returns undefined when structure is missing or invalid', () => {
+            expect(getClientSecret(null)).toBeUndefined()
+            expect(getClientSecret(undefined)).toBeUndefined()
+            expect(getClientSecret({})).toBeUndefined()
+            expect(getClientSecret({paymentReference: {}})).toBeUndefined()
         })
     })
 })
