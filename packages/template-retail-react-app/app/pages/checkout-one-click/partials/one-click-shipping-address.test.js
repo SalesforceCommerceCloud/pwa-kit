@@ -50,6 +50,13 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             if (mutationType === 'updateCustomerAddress') return mockUpdateCustomerAddress
             if (mutationType === 'createCustomerProductList') return mockCreateCustomerProductList
             return {mutateAsync: jest.fn()}
+        }),
+        useShippingMethodsForShipment: jest.fn().mockReturnValue({
+            refetch: jest.fn().mockResolvedValue({
+                data: {
+                    applicableShippingMethods: []
+                }
+            })
         })
     }
 })
@@ -161,8 +168,26 @@ jest.mock(
         }
 )
 
+// Mock multiship and item shipment management hooks
+const mockRemoveEmptyShipments = jest.fn().mockResolvedValue({})
+const mockUpdateItemsToDeliveryShipment = jest.fn().mockResolvedValue({})
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+    useMultiship: jest.fn(() => ({
+        removeEmptyShipments: mockRemoveEmptyShipments
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management', () => ({
+    useItemShipmentManagement: jest.fn(() => ({
+        updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
+    }))
+}))
+
 beforeEach(() => {
     jest.clearAllMocks()
+    mockRemoveEmptyShipments.mockClear()
+    mockUpdateItemsToDeliveryShipment.mockClear()
     // Stub background product-lists calls that can 403 and keep Jest open with retries
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
@@ -396,7 +421,6 @@ describe('ShippingAddress Component', () => {
             expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
         })
         await waitForNotLoading()
-        expect(mockRefetch).toHaveBeenCalled()
         const lastCall = mockUpdateShippingAddress.mutateAsync.mock.calls.pop()
         const body = lastCall?.[0]?.body
         expect(body).toHaveProperty('phone')
@@ -571,6 +595,60 @@ describe('ShippingAddress Component', () => {
         })
 
         expect(screen.getByRole('button', {name: 'Ship items to one address'})).toBeInTheDocument()
+    })
+    test('should consolidate multiple shipments when shipping to single address', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    productItems: [
+                        {itemId: 'i1', shipmentId: 'me'},
+                        {itemId: 'i2', shipmentId: 'delivery-shipment'}
+                    ],
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {
+                                c_storePickupEnabled: false
+                            },
+                            shippingAddress: null
+                        },
+                        {
+                            shipmentId: 'delivery-shipment',
+                            shippingMethod: {
+                                c_storePickupEnabled: false
+                            },
+                            shippingAddress: null
+                        }
+                    ]
+                },
+                derivedData: {hasBasket: true, totalItems: 2},
+                refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+            })
+        }))
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+
+        const {user} = localRenderWithProviders(<Component />)
+
+        //only get first
+        const continueButton = screen.getAllByRole('button', {
+            name: 'Continue to Shipping Method'
+        })[0]
+
+        await act(async () => {
+            await user.click(continueButton)
+        })
+        // Expect removeEmptyShipments to be called
+        expect(mockRemoveEmptyShipments).toHaveBeenCalled()
+        // Expect updateItemsToDeliveryShipment to be called
+        expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalled()
     })
 
     test('does not show multiship option when only one delivery item exists with pickup items', async () => {

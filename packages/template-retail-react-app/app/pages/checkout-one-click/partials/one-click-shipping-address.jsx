@@ -24,8 +24,14 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    isPickupShipment,
+    findExistingDeliveryShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -58,6 +64,8 @@ export default function ShippingAddress() {
     )
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+    const {removeEmptyShipments} = useMultiship(basket)
+    const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
 
     // Check if there are multiple delivery items to show option to ship to multiple addresses
     // Only count items that are in delivery shipments (not pickup shipments)
@@ -96,14 +104,15 @@ export default function ShippingAddress() {
             const phoneValue = customer?.isRegistered
                 ? customer?.phoneHome || address?.phone || selectedShippingAddress?.phone
                 : contactPhone || address?.phone || selectedShippingAddress?.phone
-            // Ensure we target the latest basket id in case it changed
-            const refreshed = await currentBasketQuery.refetch()
-            const latestBasketId = refreshed?.data?.basketId || basket.basketId
+
+            const targetShipment = findExistingDeliveryShipment(basket)
+            const targetShipmentId = targetShipment?.shipmentId || DEFAULT_SHIPMENT_ID
+            let basketAfterItemMoves = null
 
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
-                    basketId: latestBasketId,
-                    shipmentId: targetDeliveryShipmentId,
+                    basketId: basket.basketId,
+                    shipmentId: targetShipmentId,
                     useAsBilling: false
                 },
                 body: {
@@ -145,6 +154,17 @@ export default function ShippingAddress() {
                     }
                 })
             }
+            // Move all items to the single target delivery shipment.
+            const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
+            if (itemsToMove.length > 0) {
+                basketAfterItemMoves = await updateItemsToDeliveryShipment(
+                    itemsToMove,
+                    targetShipmentId
+                    // note: passing defaultInventoryId here is not needed
+                )
+            }
+            // Remove any empty shipments. Use updated basket if available
+            await removeEmptyShipments(basketAfterItemMoves || basket)
 
             // For registered shoppers: if an existing shipping method is still valid for the new address,
             // skip the Shipping Options step and go straight to Payment.
