@@ -20,9 +20,7 @@ import {
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -37,11 +35,7 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const appOrigin = useAppOrigin()
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
+    const {locale} = useMultiSite()
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
     const [registrationSucceeded, setRegistrationSucceeded] = useState(false)
@@ -65,7 +59,8 @@ export default function UserRegistration({
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: basket.customerInfo.email,
-                    callbackURI: `${callbackURL}?mode=otp_email`,
+                    mode: 'email',
+                    locale: locale?.id,
                     register_customer: true,
                     last_name: basket.customerInfo.email,
                     email: basket.customerInfo.email
@@ -200,7 +195,8 @@ export default function UserRegistration({
                 handleSendEmailOtp={async (email) => {
                     return authorizePasswordlessLogin.mutateAsync({
                         userid: email,
-                        callbackURI: `${callbackURL}?mode=otp_email`,
+                        mode: 'email',
+                        locale: locale?.id,
                         register_customer: true,
                         last_name: email,
                         email
