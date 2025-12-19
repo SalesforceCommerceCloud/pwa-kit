@@ -1293,7 +1293,7 @@ class Auth {
                 // Include usid and site as required by SLAS
                 ...(usid && {usid}),
                 channel_id: slasClient.clientConfig.parameters.siteId,
-                ...(callbackURI && {callback_uri: callbackURI}),
+                ...(finalMode === 'callback' && callbackURI && {callback_uri: callbackURI}),
                 ...(parameters.last_name && {last_name: parameters.last_name}),
                 ...(parameters.email && {email: parameters.email}),
                 ...(parameters.first_name && {first_name: parameters.first_name}),
