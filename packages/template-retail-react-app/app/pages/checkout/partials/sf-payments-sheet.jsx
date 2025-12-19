@@ -45,7 +45,8 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 import {
     buildTheme,
     getSFPaymentsInstrument,
-    createPaymentInstrumentBody
+    createPaymentInstrumentBody,
+    getClientSecret
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
@@ -321,7 +322,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             // Track created payment intent
             const paymentIntent = {
-                client_secret: orderPaymentInstrument.paymentReference.clientSecret,
+                client_secret: getClientSecret(orderPaymentInstrument),
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
             }
 

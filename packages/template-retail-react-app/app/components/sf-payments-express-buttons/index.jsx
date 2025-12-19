@@ -33,7 +33,8 @@ import {
     transformShippingMethods,
     getSelectedShippingMethodId,
     createPaymentInstrumentBody,
-    isPayPalPaymentMethodType
+    isPayPalPaymentMethodType,
+    getClientSecret
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 const SFPaymentsExpressButtons = ({
@@ -680,7 +681,7 @@ const SFPaymentsExpressButtons = ({
                     }
                 }
                 return {
-                    client_secret: updatedPaymentInstrument.paymentReference.clientSecret,
+                    client_secret: getClientSecret(updatedPaymentInstrument),
                     id: updatedPaymentInstrument.paymentReference.paymentReferenceId
                 }
             }
