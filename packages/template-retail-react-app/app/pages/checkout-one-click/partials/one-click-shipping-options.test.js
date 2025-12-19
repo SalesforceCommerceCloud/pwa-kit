@@ -588,15 +588,35 @@ describe('ShippingOptions Component', () => {
         const multiShipMethods1 = {
             defaultShippingMethodId: 'std',
             applicableShippingMethods: [
-                {id: 'std', name: 'Standard Shipping (4-5 days)', description: 'Arrives: Sept 13-14', price: 0},
-                {id: 'exp', name: 'Express Shipping (Overnight)', description: 'Arrives: Tomorrow, Sept 12', price: 10}
+                {
+                    id: 'std',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'exp',
+                    name: 'Express Shipping (Overnight)',
+                    description: 'Arrives: Tomorrow, Sept 12',
+                    price: 10
+                }
             ]
         }
         const multiShipMethods2 = {
             defaultShippingMethodId: 'std2',
             applicableShippingMethods: [
-                {id: 'std2', name: 'Standard Shipping (4-5 days)', description: 'Arrives: Sept 13-14', price: 0},
-                {id: 'prio', name: 'Priority Shipping', description: 'Arrives: Today at 5-9 PM', price: 25}
+                {
+                    id: 'std2',
+                    name: 'Standard Shipping (4-5 days)',
+                    description: 'Arrives: Sept 13-14',
+                    price: 0
+                },
+                {
+                    id: 'prio',
+                    name: 'Priority Shipping',
+                    description: 'Arrives: Today at 5-9 PM',
+                    price: 25
+                }
             ]
         }
 
