@@ -226,6 +226,14 @@ const ssrShared = async (req, res) => {
 }
 
 /**
+ * Express handler that returns a non-streaming response.
+ */
+const streamingLarge = (req, res) => {
+    res.status(200)
+    res.json({streaming: false})
+}
+
+/**
  * Express handler that allocates a lot of memory, and then removes
  * a reference to the objects, such that they may be garbage collected.
  */
@@ -373,6 +381,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // before we invoke the handlers)
     app.use((req, res, next) => {
         res.set('Cache-Control', 'no-cache')
+        res.set('Server', 'mrt ref app')
         return next()
     })
 
@@ -390,6 +399,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
     app.get('/ssr-shared', ssrShared)
+    app.get('/streaming-large', streamingLarge)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
