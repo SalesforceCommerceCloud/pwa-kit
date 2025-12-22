@@ -32,6 +32,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import PropTypes from 'prop-types'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -42,7 +43,8 @@ const shippingAddressAriaLabel = defineMessage({
     id: 'shipping_address.label.shipping_address_form'
 })
 
-export default function ShippingAddress() {
+export default function ShippingAddress(props) {
+    const {enableUserRegistration = false} = props
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
@@ -127,7 +129,9 @@ export default function ShippingAddress() {
                 }
             })
 
-            if (customer.isRegistered && !addressId) {
+            // Skip saving address for newly registered users during checkout
+            // The address will be saved after order placement instead
+            if (customer.isRegistered && !addressId && !enableUserRegistration) {
                 const body = {
                     address1,
                     city,
@@ -329,4 +333,8 @@ export default function ShippingAddress() {
             )}
         </ToggleCard>
     )
+}
+
+ShippingAddress.propTypes = {
+    enableUserRegistration: PropTypes.bool
 }

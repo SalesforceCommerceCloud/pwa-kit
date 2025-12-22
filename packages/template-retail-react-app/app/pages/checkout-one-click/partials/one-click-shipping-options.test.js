@@ -199,7 +199,7 @@ describe('ShippingOptions Component', () => {
         })
 
         test('shows error toast and hides controls when no shipping methods are available', async () => {
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockImplementation((_params, opts) => {
                 const payload = {applicableShippingMethods: [], defaultShippingMethodId: 'std'}
                 if (opts && typeof opts.onSuccess === 'function') {
@@ -331,7 +331,7 @@ describe('ShippingOptions Component', () => {
                 ]
             }
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: methodsWithPromos})
 
             localRenderWithProviders(<Component />)
@@ -568,7 +568,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: freeShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -684,7 +684,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
                 if (parameters.shipmentId === 'ship1') return {data: multiShipMethods1}
                 if (parameters.shipmentId === 'ship2') return {data: multiShipMethods2}
@@ -802,7 +802,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
                 if (parameters.shipmentId === 'ship1') return {data: methods1}
                 if (parameters.shipmentId === 'ship2') return {data: methods2}
@@ -906,7 +906,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -995,7 +995,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -1091,7 +1091,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -1178,7 +1178,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = require('@salesforce/commerce-sdk-react')
+            const sdk = await import('@salesforce/commerce-sdk-react')
             sdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(

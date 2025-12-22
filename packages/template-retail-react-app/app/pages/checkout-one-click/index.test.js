@@ -678,9 +678,11 @@ describe('Checkout One Click', () => {
         // The core functionality (authorizePasswordlessLogin call) is tested below
 
         // Verify that the authorizePasswordlessLogin was called with the correct parameters
+        // The contact-info component calls authorizePasswordlessLogin.mutateAsync when email is blurred
         expect(mockUseAuthHelper).toHaveBeenCalledWith({
             userid: 'test@test.com',
-            callbackURI: expect.stringContaining('mode=otp_email')
+            mode: 'email',
+            locale: 'en-GB'
         })
     })
 

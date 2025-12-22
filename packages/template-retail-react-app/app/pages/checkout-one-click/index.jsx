@@ -462,7 +462,9 @@ const CheckoutOneClick = () => {
                                 onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
                             />
                             {hasPickupShipments && <PickupAddress />}
-                            {hasDeliveryShipments && <ShippingAddress />}
+                            {hasDeliveryShipments && (
+                                <ShippingAddress enableUserRegistration={enableUserRegistration} />
+                            )}
                             {hasDeliveryShipments && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}
