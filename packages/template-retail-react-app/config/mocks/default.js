@@ -40,6 +40,9 @@ module.exports = {
             social: {
                 enabled: false,
                 idps: ['google', 'apple']
+            },
+            resetPassword: {
+                mode: 'email'
             }
         },
         siteAliases: {
