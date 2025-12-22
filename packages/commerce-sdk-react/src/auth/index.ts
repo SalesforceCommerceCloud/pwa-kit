@@ -1272,7 +1272,7 @@ class Auth {
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
         // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
-        // expect this mode. Newer versions should explicitly set mode.
+        // do not pass the mode parameter. Newer versions should explicitly pass the mode.
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
         const locale = this.locale
