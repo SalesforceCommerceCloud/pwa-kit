@@ -31,7 +31,7 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: true,
+                enabled: false,
                 mode: 'email',
                 landingPath: '/passwordless-login-landing'
             },
@@ -54,10 +54,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'bb1e8c16-7767-4ed8-bc5d-83efc59a208a',
-                // secret: FctBOLiYAMFFJVu4NiuxYYON6pTIcXjsf_4Wtj7zd80
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: 'staging-001',
+                shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
             }
         },
