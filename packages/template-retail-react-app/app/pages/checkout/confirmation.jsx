@@ -44,6 +44,7 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import MultiShipOrderSummary from '@salesforce/retail-react-app/app/components/multiship/multiship-order-summary'
 import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/partials/shipment-details'
+import SFPaymentsOrderSummary from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-order-summary'
 
 // Hooks
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -508,7 +509,13 @@ const CheckoutConfirmation = () => {
                                     </Stack>
 
                                     {order.paymentInstruments[0].paymentMethodId ===
-                                    'Salesforce Payments' ? null : (
+                                    'Salesforce Payments' ? (
+                                        order.paymentInstruments[0].c_paymentReference_type ? (
+                                            <SFPaymentsOrderSummary
+                                                paymentInstrument={order.paymentInstruments[0]}
+                                            />
+                                        ) : null
+                                    ) : (
                                         <Stack spacing={1}>
                                             <Heading as="h3" fontSize="sm">
                                                 <FormattedMessage

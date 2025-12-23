@@ -323,15 +323,27 @@ describe('Salesforce Payments Integration', () => {
         ]
     }
 
-    beforeEach(() => {
+    const mockSFPaymentsOrderWithType = {
+        ...mockOrder,
+        paymentInstruments: [
+            {
+                amount: 82.56,
+                paymentInstrumentId: 'sfp123',
+                paymentMethodId: 'Salesforce Payments',
+                c_paymentReference_type: 'card',
+                c_paymentReference_brand: 'visa',
+                c_paymentReference_last4: '4242'
+            }
+        ]
+    }
+
+    test('does not render payment details for Salesforce Payments orders when c_paymentReference_type is missing', async () => {
         global.server.use(
             rest.get('*/orders/:orderId', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.json(mockSFPaymentsOrder))
             })
         )
-    })
 
-    test('does not render payment details for Salesforce Payments orders', async () => {
         renderWithProviders(<MockedComponent />)
 
         await screen.findByText(mockSFPaymentsOrder.orderNo)
@@ -339,11 +351,37 @@ describe('Salesforce Payments Integration', () => {
         // Payment Details section should exist
         expect(screen.getByText('Payment Details')).toBeInTheDocument()
 
-        // No payment method details should be shown for SFP orders
+        // No payment method details should be shown for SFP orders when c_paymentReference_type is missing
         expect(screen.queryByRole('heading', {name: /credit card/i})).not.toBeInTheDocument()
     })
 
+    test('renders SFPaymentsOrderSummary for Salesforce Payments orders when c_paymentReference_type exists', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrderWithType))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrderWithType.orderNo)
+
+        // Payment Details section should exist
+        expect(screen.getByText('Payment Details')).toBeInTheDocument()
+
+        // SFPaymentsOrderSummary should render when c_paymentReference_type is available
+        expect(await screen.findByRole('heading', {name: /credit card/i})).toBeInTheDocument()
+        expect(screen.getByText('Visa')).toBeInTheDocument()
+        expect(screen.getByText(/4242/)).toBeInTheDocument()
+    })
+
     test('renders billing address for Salesforce Payments orders', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrder))
+            })
+        )
+
         renderWithProviders(<MockedComponent />)
 
         await screen.findByText(mockSFPaymentsOrder.orderNo)
