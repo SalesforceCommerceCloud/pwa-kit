@@ -9,6 +9,7 @@ import {screen, waitFor, within, act} from '@testing-library/react'
 import {rest} from 'msw'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // Global filter for noisy act warnings in this spec only
 let globalConsoleErrorSpy
@@ -694,5 +695,351 @@ describe('ShippingAddress Component', () => {
 
         // Should not show multiship link because only 1 delivery item
         expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
+    })
+
+    test('does not save address for newly registered users when enableUserRegistration is true', async () => {
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        const {user} = renderWithProviders(<ShippingAddress enableUserRegistration={true} />)
+
+        const stepContainers = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selection = within(stepContainers[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selection).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
+
+        await act(async () => {
+            await user.click(submitButton)
+        })
+
+        await waitFor(() => {
+            expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        })
+        await waitForNotLoading()
+
+        // Address should be updated on basket but NOT saved to customer addresses
+        expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        expect(mockCreateCustomerAddress.mutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('saves address for existing registered users when enableUserRegistration is false', async () => {
+        jest.resetModules()
+        // Re-mock commerce-sdk-react to provide mutations
+        jest.doMock('@salesforce/commerce-sdk-react', () => {
+            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+            return {
+                ...originalModule,
+                useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+                    if (mutationType === 'updateShippingAddressForShipment')
+                        return mockUpdateShippingAddress
+                    return {mutateAsync: jest.fn()}
+                }),
+                useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
+                    if (mutationType === 'createCustomerAddress') return mockCreateCustomerAddress
+                    if (mutationType === 'updateCustomerAddress') return mockUpdateCustomerAddress
+                    if (mutationType === 'createCustomerProductList')
+                        return mockCreateCustomerProductList
+                    return {mutateAsync: jest.fn()}
+                }),
+                useShippingMethodsForShipment: jest.fn().mockReturnValue({
+                    refetch: jest.fn().mockResolvedValue({
+                        data: {
+                            applicableShippingMethods: []
+                        }
+                    })
+                })
+            }
+        })
+        // Re-mock customer as registered user
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+            useCurrentCustomer: () => ({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: []
+                }
+            })
+        }))
+        // Re-mock current basket
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shippingAddress: null
+                        }
+                    ]
+                },
+                derivedData: {
+                    hasBasket: true,
+                    totalItems: 1
+                },
+                refetch: mockRefetch
+            })
+        }))
+        // Mock ShippingAddressSelection to submit address without addressId (new address)
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection',
+            () => {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                const PropTypes = require('prop-types')
+                function MockShippingAddressSelection({onSubmit}) {
+                    return (
+                        <div data-testid="shipping-address-selection">
+                            <button
+                                onClick={() =>
+                                    onSubmit({
+                                        // No addressId - this is a new address
+                                        address1: '123 Test St',
+                                        city: 'Test City',
+                                        countryCode: 'US',
+                                        firstName: 'Test',
+                                        lastName: 'User',
+                                        phone: '555-0123',
+                                        postalCode: '12345',
+                                        stateCode: 'CA'
+                                    })
+                                }
+                            >
+                                Continue to Shipping Method
+                            </button>
+                        </div>
+                    )
+                }
+                MockShippingAddressSelection.propTypes = {onSubmit: PropTypes.func}
+                return MockShippingAddressSelection
+            }
+        )
+        // Re-mock checkout context
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+            () => ({
+                useCheckout: jest.fn().mockReturnValue({
+                    step: 2,
+                    STEPS: {
+                        CONTACT_INFO: 0,
+                        PICKUP_ADDRESS: 1,
+                        SHIPPING_ADDRESS: 2,
+                        SHIPPING_OPTIONS: 3
+                    },
+                    goToStep: mockGoToStep,
+                    goToNextStep: mockGoToNextStep,
+                    contactPhone: '(727) 555-0000'
+                })
+            })
+        )
+        // Re-mock multiship and item shipment management hooks
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+            useMultiship: jest.fn(() => ({
+                removeEmptyShipments: mockRemoveEmptyShipments
+            }))
+        }))
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management', () => ({
+            useItemShipmentManagement: jest.fn(() => ({
+                updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
+            }))
+        }))
+        // Re-mock getConfig
+        jest.doMock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+            getConfig: jest.fn(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    multishipEnabled: true
+                }
+            }))
+        }))
+
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        mockCreateCustomerAddress.mutateAsync.mockResolvedValue({})
+
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+        const {user} = localRenderWithProviders(<Component enableUserRegistration={false} />)
+
+        const stepContainers = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selection = within(stepContainers[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selection).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
+
+        await act(async () => {
+            await user.click(submitButton)
+        })
+
+        await waitFor(() => {
+            expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        })
+        await waitForNotLoading()
+
+        // Address should be updated on basket AND saved to customer addresses
+        expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        expect(mockCreateCustomerAddress.mutateAsync).toHaveBeenCalled()
+    })
+
+    test('saves address for existing registered users when enableUserRegistration prop is not provided', async () => {
+        jest.resetModules()
+        // Re-mock commerce-sdk-react to provide mutations
+        jest.doMock('@salesforce/commerce-sdk-react', () => {
+            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+            return {
+                ...originalModule,
+                useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+                    if (mutationType === 'updateShippingAddressForShipment')
+                        return mockUpdateShippingAddress
+                    return {mutateAsync: jest.fn()}
+                }),
+                useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
+                    if (mutationType === 'createCustomerAddress') return mockCreateCustomerAddress
+                    if (mutationType === 'updateCustomerAddress') return mockUpdateCustomerAddress
+                    if (mutationType === 'createCustomerProductList')
+                        return mockCreateCustomerProductList
+                    return {mutateAsync: jest.fn()}
+                }),
+                useShippingMethodsForShipment: jest.fn().mockReturnValue({
+                    refetch: jest.fn().mockResolvedValue({
+                        data: {
+                            applicableShippingMethods: []
+                        }
+                    })
+                })
+            }
+        })
+        // Re-mock customer as registered user
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+            useCurrentCustomer: () => ({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: []
+                }
+            })
+        }))
+        // Re-mock current basket
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+            useCurrentBasket: () => ({
+                data: {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shippingAddress: null
+                        }
+                    ]
+                },
+                derivedData: {
+                    hasBasket: true,
+                    totalItems: 1
+                },
+                refetch: mockRefetch
+            })
+        }))
+        // Mock ShippingAddressSelection to submit address without addressId (new address)
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection',
+            () => {
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                const PropTypes = require('prop-types')
+                function MockShippingAddressSelection({onSubmit}) {
+                    return (
+                        <div data-testid="shipping-address-selection">
+                            <button
+                                onClick={() =>
+                                    onSubmit({
+                                        // No addressId - this is a new address
+                                        address1: '123 Test St',
+                                        city: 'Test City',
+                                        countryCode: 'US',
+                                        firstName: 'Test',
+                                        lastName: 'User',
+                                        phone: '555-0123',
+                                        postalCode: '12345',
+                                        stateCode: 'CA'
+                                    })
+                                }
+                            >
+                                Continue to Shipping Method
+                            </button>
+                        </div>
+                    )
+                }
+                MockShippingAddressSelection.propTypes = {onSubmit: PropTypes.func}
+                return MockShippingAddressSelection
+            }
+        )
+        // Re-mock checkout context
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+            () => ({
+                useCheckout: jest.fn().mockReturnValue({
+                    step: 2,
+                    STEPS: {
+                        CONTACT_INFO: 0,
+                        PICKUP_ADDRESS: 1,
+                        SHIPPING_ADDRESS: 2,
+                        SHIPPING_OPTIONS: 3
+                    },
+                    goToStep: mockGoToStep,
+                    goToNextStep: mockGoToNextStep,
+                    contactPhone: '(727) 555-0000'
+                })
+            })
+        )
+        // Re-mock multiship and item shipment management hooks
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+            useMultiship: jest.fn(() => ({
+                removeEmptyShipments: mockRemoveEmptyShipments
+            }))
+        }))
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management', () => ({
+            useItemShipmentManagement: jest.fn(() => ({
+                updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
+            }))
+        }))
+        // Re-mock getConfig
+        jest.doMock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+            getConfig: jest.fn(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    multishipEnabled: true
+                }
+            }))
+        }))
+
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        mockCreateCustomerAddress.mutateAsync.mockResolvedValue({})
+
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
+        )
+        const Component = module.default
+        const {user} = localRenderWithProviders(<Component />)
+
+        const stepContainers = screen.getAllByTestId('sf-toggle-card-step-1')
+        const selection = within(stepContainers[0]).getByTestId('shipping-address-selection')
+        const submitButton = within(selection).getByRole('button', {
+            name: /Continue to Shipping Method/i
+        })
+
+        await act(async () => {
+            await user.click(submitButton)
+        })
+
+        await waitFor(() => {
+            expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        })
+        await waitForNotLoading()
+
+        // Address should be updated on basket AND saved to customer addresses (default behavior)
+        expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        expect(mockCreateCustomerAddress.mutateAsync).toHaveBeenCalled()
     })
 })
