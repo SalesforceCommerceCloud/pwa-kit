@@ -508,9 +508,9 @@ const CheckoutConfirmation = () => {
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
-                                    {order.paymentInstruments[0].paymentMethodId ===
+                                    {order.paymentInstruments?.[0]?.paymentMethodId ===
                                     'Salesforce Payments' ? (
-                                        order.paymentInstruments[0].c_paymentReference_type ? (
+                                        order.paymentInstruments?.[0]?.c_paymentReference_type ? (
                                             <SFPaymentsOrderSummary
                                                 paymentInstrument={order.paymentInstruments[0]}
                                             />
