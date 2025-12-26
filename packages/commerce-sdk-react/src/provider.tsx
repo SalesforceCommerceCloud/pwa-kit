@@ -210,7 +210,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 ...serverAffinityHeader
             },
             throwOnBadResponse: true,
+            // Ensure credentials are set so cookies are sent with requests
+            // This is required for CDN simulator httpOnly cookie auth
             fetchOptions: {
+                credentials: 'same-origin' as RequestCredentials,
                 ...options.fetchOptions,
                 ...fetchOptions
             }
@@ -252,7 +255,12 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency
             },
             throwOnBadResponse: true,
-            fetchOptions
+            // Ensure credentials are set so cookies are sent with requests
+            // This is required for CDN simulator httpOnly cookie auth
+            fetchOptions: {
+                credentials: 'same-origin' as RequestCredentials,
+                ...fetchOptions
+            }
         }
 
         return {

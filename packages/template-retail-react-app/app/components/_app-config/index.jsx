@@ -112,6 +112,8 @@ const AppConfig = ({children, locals = {}}) => {
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
+            // CDN Simulator mode - detected automatically via cc_cdn_sim cookie
+            // Enable with: ENABLE_CDN_SIMULATOR=true npm start
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>

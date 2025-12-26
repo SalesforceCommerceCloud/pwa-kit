@@ -25,6 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {requestContextStorage} from '@salesforce/commerce-sdk-react'
+import {createCdnSimulator} from './cdn-simulator'
 
 const config = getConfig()
 
@@ -79,7 +81,11 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: false,
+    //
+    // CDN SIMULATOR REQUIREMENT:
+    // - CDN Simulator requires this to be 'true' to set httpOnly cookies for testing
+    // - Automatically enabled when ENABLE_CDN_SIMULATOR=true
+    localAllowCookies: process.env.ENABLE_CDN_SIMULATOR === 'true' ? true : false,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -345,6 +351,24 @@ export async function jwksCaching(req, res, options) {
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
+
+    // ⭐ CDN Simulator - MUST be first to intercept SLAS responses
+    // This simulates CDN edge transformer behavior for local development
+    // Enable with: ENABLE_CDN_SIMULATOR=true npm start
+    app.use(createCdnSimulator())
+
+    // ⭐ AsyncLocalStorage - Set request context for Auth module
+    // This makes request cookies available to Auth constructor during SSR
+    app.use((req, res, next) => {
+        requestContextStorage.run(
+            {
+                cookies: req.headers.cookie || '',
+                headers: req.headers
+            },
+            () => next()
+        )
+    })
+
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers

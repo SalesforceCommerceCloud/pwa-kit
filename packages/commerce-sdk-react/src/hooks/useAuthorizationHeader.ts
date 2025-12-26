@@ -26,22 +26,31 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
     const logger = config.logger || console
     return async (options) => {
         const {access_token} = await auth.ready()
+
+        // Build headers - only include Authorization if we have a token
+        // In CDN simulator mode on client, tokens are in httpOnly cookies
+        // and the proxy will inject the Authorization header
+        const headers: Record<string, string> = {...options.headers}
+        if (access_token) {
+            headers.Authorization = `Bearer ${access_token}`
+        }
+
         return await method({
             ...options,
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-                ...options.headers
-            }
+            headers
         }).catch(async (error) => {
             const {access_token} = await handleInvalidToken(error, auth, logger)
+
+            // Build retry headers
+            const retryHeaders: Record<string, string> = {...options.headers}
+            if (access_token) {
+                retryHeaders.Authorization = `Bearer ${access_token}`
+            }
 
             // Retry again after resetting auth state
             return await method({
                 ...options,
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    ...options.headers
-                }
+                headers: retryHeaders
             })
         })
     }

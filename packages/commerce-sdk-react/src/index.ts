@@ -9,3 +9,6 @@ export * from './hooks/types'
 export * from './hooks'
 
 export {CommerceApiProvider}
+
+// Export request context utilities for SSR setup
+export {requestContextStorage, getRequestCookies, parseCookieHeader} from './utils/request-context'

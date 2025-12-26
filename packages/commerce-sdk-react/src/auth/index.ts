@@ -25,6 +25,7 @@ import {
     stringToBase64,
     extractCustomParameters
 } from '../utils'
+import {getRequestCookies, parseCookieHeader} from '../utils/request-context'
 import {
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
@@ -274,6 +275,11 @@ class Auth {
 
     private hybridAuthEnabled: boolean
 
+    /**
+     * Site ID used for cookie suffixes in CDN simulator mode.
+     */
+    private siteId: string
+
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
@@ -309,6 +315,8 @@ class Auth {
             throwOnBadResponse: true,
             fetchOptions: config.fetchOptions
         })
+
+        this.siteId = config.siteId
 
         const options = {
             keySuffix: config.siteId,
@@ -370,12 +378,46 @@ class Auth {
         this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
+
+        /**
+         * On server-side, automatically populate tokens from request cookies
+         * This enables SSR to work with httpOnly cookies set by CDN
+         */
+        if (!onClient()) {
+            const requestCookies = getRequestCookies()
+            if (requestCookies) {
+                this.initializeFromRequestCookies(requestCookies)
+            }
+        }
     }
 
-    get(name: AuthDataKeys) {
+    /**
+     * Detect if CDN simulator mode is active.
+     * - Server-side: Check ENABLE_CDN_SIMULATOR environment variable
+     * - Client-side: Check for cc_cdn_sim marker cookie (set by proxy after browser gets tokens)
+     */
+    private isCdnSimulatorMode(): boolean {
+        if (onClient()) {
+            // Client-side: check for marker cookie (set by proxy when browser gets tokens)
+            const cookieNameWithSiteId = `cc_cdn_sim_${this.siteId}`
+            const genericCookieName = 'cc_cdn_sim'
+            const cookies = document.cookie.split(';')
+            return cookies.some(c => {
+                const trimmed = c.trim()
+                return trimmed.startsWith(`${cookieNameWithSiteId}=`) || 
+                       trimmed.startsWith(`${genericCookieName}=`)
+            })
+        } else {
+            // Server-side: check environment variable
+            // SSR tokens should NOT be persisted when CDN simulator is enabled
+            return process.env.ENABLE_CDN_SIMULATOR === 'true'
+        }
+    }
+
+    get(name: AuthDataKeys): string {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
-        return storage.get(key)
+        return storage.get(key) || ''
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
@@ -407,12 +449,18 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        const accessToken = this.getAccessToken()
         let isInSync = true
-        if (accessToken) {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            isInSync = dnt === dntCookieVal
+        
+        // In CDN simulator mode on client, tokens are in httpOnly cookies
+        // We can't decode them, so skip the sync check
+        if (!this.isCdnSimulatorMode() || !onClient()) {
+            const accessToken = this.getAccessToken()
+            if (accessToken) {
+                const {dnt} = this.parseSlasJWT(accessToken)
+                isInSync = dnt === dntCookieVal
+            }
         }
+        
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)
         } else {
@@ -555,7 +603,12 @@ class Auth {
                 isGuest
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            this.set('access_token', sfraAuthToken)
+
+            // In CDN simulator mode, don't store access_token in localStorage
+            // Tokens are managed via httpOnly cookies
+            if (!this.isCdnSimulatorMode()) {
+                this.set('access_token', sfraAuthToken)
+            }
             this.set('customer_id', customerId)
 
             /**
@@ -670,33 +723,91 @@ class Auth {
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
-        this.set('access_token', res.access_token)
-        this.set('customer_id', res.customer_id)
-        this.set('enc_user_id', res.enc_user_id)
-        this.set('expires_in', `${res.expires_in}`)
-        this.set('id_token', res.id_token)
-        this.set('idp_access_token', res.idp_access_token)
-        this.set('token_type', res.token_type)
+
+        // When CDN simulator is enabled, tokens are stored in httpOnly cookies
+        // and should NOT be stored in JavaScript-accessible storage
+        const useServerOnlyStorage = this.isCdnSimulatorMode()
+
+        if (!useServerOnlyStorage) {
+            // Normal flow: tokens are in response body, CDN simulator is NOT active
+            this.set('access_token', res.access_token)
+            this.set('id_token', res.id_token)
+            this.set('idp_access_token', res.idp_access_token)
+            this.set('token_type', res.token_type)
+
+            if (res.access_token) {
+                const {uido} = this.parseSlasJWT(res.access_token)
+                this.set('uido', uido)
+            }
+
+            const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                res.refresh_token_expires_in,
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+            this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+            this.set(refreshTokenKey, res.refresh_token, {
+                expires: expiresDate
+            })
+        } else {
+            // CDN simulator mode on server: Store tokens in MemoryStorage
+            // SSR token responses pass through unmodified (NOT intercepted by proxy)
+            // MemoryStorage is used on server and is NOT serialized to client
+            if (!onClient()) {
+                if (res.access_token) {
+                    this.set('access_token', res.access_token)
+                    const {uido} = this.parseSlasJWT(res.access_token)
+                    this.set('uido', uido)
+                    console.log('[Auth] Stored access_token in MemoryStorage (server-only)')
+                }
+
+                if (res.refresh_token) {
+                    const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+                    this.set(refreshTokenKey, res.refresh_token)
+                    console.log('[Auth] Stored refresh_token in MemoryStorage (server-only)')
+                }
+
+                if (res.id_token) {
+                    this.set('id_token', res.id_token)
+                }
+
+                if (res.idp_access_token) {
+                    this.set('idp_access_token', res.idp_access_token)
+                }
+
+                if (res.token_type) {
+                    this.set('token_type', res.token_type)
+                }
+            }
+            // On client-side in CDN simulator mode, tokens are in httpOnly cookies
+            // and automatically sent with requests - the proxy handles Authorization header
+            // No need to store them in JavaScript-accessible storage
+        }
+
+        // These fields are always set (not stripped from response)
+        if (res.customer_id) {
+            this.set('customer_id', res.customer_id)
+        }
+        if (res.enc_user_id) {
+            this.set('enc_user_id', res.enc_user_id)
+        }
+        if (res.expires_in) {
+            this.set('expires_in', `${res.expires_in}`)
+        }
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
-        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-            res.refresh_token_expires_in,
-            isGuest
-        )
-        if (res.access_token) {
-            const {uido} = this.parseSlasJWT(res.access_token)
-            this.set('uido', uido)
+        if (res.usid) {
+            // Use same expiration as refresh token
+            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                res.refresh_token_expires_in,
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+            this.set('usid', res.usid, {
+                expires: expiresDate
+            })
         }
-        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        this.set(refreshTokenKey, res.refresh_token, {
-            expires: expiresDate
-        })
-
-        this.set('usid', res.usid, {
-            expires: expiresDate
-        })
     }
 
     async refreshAccessToken() {
@@ -857,7 +968,12 @@ class Auth {
                 isGuest
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            this.set('access_token', this.fetchedToken)
+
+            // In CDN simulator mode, don't store access_token in localStorage
+            // Tokens are managed via httpOnly cookies
+            if (!this.isCdnSimulatorMode()) {
+                this.set('access_token', this.fetchedToken)
+            }
             this.set('customer_id', customerId)
 
             /**
@@ -883,8 +999,18 @@ class Auth {
             return this.data
         }
 
+        // CDN Simulator Mode: tokens are in httpOnly cookies
+        // In this mode, we don't trigger re-authentication - the proxy handles Authorization headers
+        if (onClient() && this.isCdnSimulatorMode()) {
+            console.log('[Auth] CDN simulator mode - tokens are in httpOnly cookies, skipping re-auth')
+            // Return current data without triggering re-auth
+            // The proxy will inject Authorization header from httpOnly cookies
+            return this.data
+        }
+
         return await this.refreshAccessToken()
     }
+
 
     /**
      * Creates a function that only executes after a session is initialized.
@@ -1421,6 +1547,72 @@ class Auth {
             isAgent,
             agentId,
             uido
+        }
+    }
+
+    /**
+     * Initialize auth storage from request cookies (server-side only)
+     * This is called during SSR when httpOnly cookies are present
+     * @private
+     */
+    private initializeFromRequestCookies(cookieHeader: string) {
+        const cookies = parseCookieHeader(cookieHeader)
+
+        // Helper to find cookie by name or name_siteId pattern
+        const getCookieValue = (baseName: string): string | undefined => {
+            // Try exact match first
+            if (cookies[baseName]) return cookies[baseName]
+            // Try with siteId suffix (e.g., access_token_RefArchGlobal)
+            const suffixedKey = `${baseName}_${this.siteId}`
+            if (cookies[suffixedKey]) return cookies[suffixedKey]
+            return undefined
+        }
+
+        const accessToken = getCookieValue('access_token')
+        const refreshToken = getCookieValue('refresh_token')
+        const idToken = getCookieValue('id_token')
+        const idpAccessToken = getCookieValue('idp_access_token')
+
+        // Store tokens - on server this uses MemoryStorage which is NOT serialized to client
+        if (accessToken) {
+            this.set('access_token', accessToken)
+        }
+
+        // Store refresh_token (need to determine if guest or registered)
+        if (refreshToken) {
+            // Check if we can determine type from the token itself
+            let isGuest = false
+            try {
+                if (accessToken) {
+                    const parsed = this.parseSlasJWT(accessToken)
+                    isGuest = parsed.isGuest
+                }
+            } catch (e) {
+                // If we can't parse, assume registered (safer default)
+                isGuest = false
+            }
+
+            const refreshKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+            this.set(refreshKey, refreshToken)
+        }
+
+        // Store id_token
+        if (idToken) {
+            this.set('id_token', idToken)
+        }
+
+        // Store idp_access_token
+        if (idpAccessToken) {
+            this.set('idp_access_token', idpAccessToken)
+        }
+
+        // Store other cookie data if present (these are not sensitive tokens, can use regular storage)
+        if (cookies.customer_id) {
+            this.set('customer_id', cookies.customer_id)
+        }
+
+        if (cookies.usid) {
+            this.set('usid', cookies.usid)
         }
     }
 }
