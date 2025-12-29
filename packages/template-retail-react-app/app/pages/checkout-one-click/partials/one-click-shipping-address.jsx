@@ -212,10 +212,6 @@ export default function ShippingAddress(props) {
                 return
             }
 
-            if (multishipEnabled && hasMultipleDeliveryItems) {
-                return
-            }
-
             // Only proceed if customer is registered and has addresses
             if (!customer?.isRegistered || !customer?.addresses?.length) {
                 return
@@ -235,6 +231,9 @@ export default function ShippingAddress(props) {
                 customer.addresses.find((addr) => addr.preferred === true) || customer.addresses[0]
 
             //Auto-selecting preferred shipping address
+            // This works for both single and multi-shipment orders:
+            // - For single shipment: applies address directly
+            // - For multi-shipment: consolidates all items to one shipment with the preferred address
             if (preferredAddress) {
                 setHasAutoSelected(true)
 
@@ -249,16 +248,7 @@ export default function ShippingAddress(props) {
         }
 
         autoSelectPreferredAddress()
-    }, [
-        step,
-        customer,
-        selectedShippingAddress,
-        hasAutoSelected,
-        isLoading,
-        multishipEnabled,
-        hasMultipleDeliveryItems,
-        openedByUser
-    ])
+    }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading, openedByUser])
 
     // Reset manual-open flag when leaving this step
     useEffect(() => {
