@@ -323,6 +323,8 @@ const CheckoutOneClick = () => {
                         if (!customerId) return
 
                         // Get all delivery shipments (not pickup) from the order
+                        // This handles both single delivery and multi-shipment orders
+                        // For BOPIS orders, pickup shipments are filtered out
                         const deliveryShipments =
                             order?.shipments?.filter(
                                 (shipment) =>

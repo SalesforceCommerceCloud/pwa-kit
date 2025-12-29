@@ -37,6 +37,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
 const mockUseAuthHelper = jest.fn()
 mockUseAuthHelper.mockResolvedValue({customerId: 'test-customer-id'})
 const mockUseShopperCustomersMutation = jest.fn()
+const mockCreateCustomerAddress = jest.fn()
 const mockCreateCustomerPaymentInstruments = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -60,6 +61,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             if (mutation === 'createCustomerPaymentInstrument') {
                 return {
                     mutateAsync: mockCreateCustomerPaymentInstruments
+                }
+            }
+            if (mutation === 'createCustomerAddress') {
+                return {
+                    mutateAsync: mockCreateCustomerAddress
                 }
             }
             return {
