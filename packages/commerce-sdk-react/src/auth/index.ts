@@ -402,10 +402,12 @@ class Auth {
             const cookieNameWithSiteId = `cc_cdn_sim_${this.siteId}`
             const genericCookieName = 'cc_cdn_sim'
             const cookies = document.cookie.split(';')
-            return cookies.some(c => {
+            return cookies.some((c) => {
                 const trimmed = c.trim()
-                return trimmed.startsWith(`${cookieNameWithSiteId}=`) || 
-                       trimmed.startsWith(`${genericCookieName}=`)
+                return (
+                    trimmed.startsWith(`${cookieNameWithSiteId}=`) ||
+                    trimmed.startsWith(`${genericCookieName}=`)
+                )
             })
         } else {
             // Server-side: check environment variable
@@ -450,7 +452,7 @@ class Auth {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
         let isInSync = true
-        
+
         // In CDN simulator mode on client, tokens are in httpOnly cookies
         // We can't decode them, so skip the sync check
         if (!this.isCdnSimulatorMode() || !onClient()) {
@@ -460,7 +462,7 @@ class Auth {
                 isInSync = dnt === dntCookieVal
             }
         }
-        
+
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)
         } else {
@@ -763,7 +765,9 @@ class Auth {
                 }
 
                 if (res.refresh_token) {
-                    const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+                    const refreshTokenKey = isGuest
+                        ? 'refresh_token_guest'
+                        : 'refresh_token_registered'
                     this.set(refreshTokenKey, res.refresh_token)
                     console.log('[Auth] Stored refresh_token in MemoryStorage (server-only)')
                 }
@@ -787,7 +791,13 @@ class Auth {
 
         // These fields are always set (not stripped from response)
         if (res.customer_id) {
+            const oldCustomerId = this.get('customer_id')
+            console.log(
+                `[Auth] Updating customer_id: ${oldCustomerId || '(none)'} → ${res.customer_id}`
+            )
             this.set('customer_id', res.customer_id)
+        } else {
+            console.log('[Auth] ⚠️ Token response missing customer_id!')
         }
         if (res.enc_user_id) {
             this.set('enc_user_id', res.enc_user_id)
@@ -1002,7 +1012,9 @@ class Auth {
         // CDN Simulator Mode: tokens are in httpOnly cookies
         // In this mode, we don't trigger re-authentication - the proxy handles Authorization headers
         if (onClient() && this.isCdnSimulatorMode()) {
-            console.log('[Auth] CDN simulator mode - tokens are in httpOnly cookies, skipping re-auth')
+            console.log(
+                '[Auth] CDN simulator mode - tokens are in httpOnly cookies, skipping re-auth'
+            )
             // Return current data without triggering re-auth
             // The proxy will inject Authorization header from httpOnly cookies
             return this.data
@@ -1010,7 +1022,6 @@ class Auth {
 
         return await this.refreshAccessToken()
     }
-
 
     /**
      * Creates a function that only executes after a session is initialized.

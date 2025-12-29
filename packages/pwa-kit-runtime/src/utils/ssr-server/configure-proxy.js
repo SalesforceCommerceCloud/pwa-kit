@@ -12,7 +12,6 @@ import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
 
-
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
 /**
@@ -218,26 +217,32 @@ export const configureProxy = ({
                 // First, try to get access_token from cookies (browser requests)
                 // Cookie names may have siteId suffix (e.g., access_token_RefArchGlobal)
                 const cookieHeader = incomingRequest.headers.cookie
-                
+
                 // Debug: log all cookies received
                 if (cookieHeader) {
-                    console.log(`[CDN Sim] 🍪 Cookies received: ${cookieHeader.substring(0, 200)}${cookieHeader.length > 200 ? '...' : ''}`)
+                    console.log(
+                        `[CDN Sim] 🍪 Cookies received: ${cookieHeader.substring(0, 200)}${
+                            cookieHeader.length > 200 ? '...' : ''
+                        }`
+                    )
                 } else {
                     console.log(`[CDN Sim] 🍪 No cookies in request for ${incomingRequest.url}`)
                 }
-                
+
                 if (cookieHeader) {
                     // Parse cookies to find access_token or access_token_<siteId>
                     const cookies = {}
-                    cookieHeader.split(';').forEach(cookie => {
+                    cookieHeader.split(';').forEach((cookie) => {
                         const [key, ...valueParts] = cookie.trim().split('=')
                         if (key && valueParts.length > 0) {
                             cookies[key] = decodeURIComponent(valueParts.join('='))
                         }
                     })
-                    
+
                     // Debug: log parsed cookie keys
-                    console.log(`[CDN Sim] 🍪 Parsed cookie keys: ${Object.keys(cookies).join(', ')}`)
+                    console.log(
+                        `[CDN Sim] 🍪 Parsed cookie keys: ${Object.keys(cookies).join(', ')}`
+                    )
 
                     // Try exact match first, then look for access_token_* pattern
                     if (cookies.access_token) {
@@ -245,7 +250,9 @@ export const configureProxy = ({
                         tokenSource = 'cookie'
                     } else {
                         // Find cookie matching access_token_<siteId> pattern
-                        const accessTokenKey = Object.keys(cookies).find(key => key.startsWith('access_token_'))
+                        const accessTokenKey = Object.keys(cookies).find((key) =>
+                            key.startsWith('access_token_')
+                        )
                         if (accessTokenKey) {
                             accessToken = cookies[accessTokenKey]
                             tokenSource = `cookie (${accessTokenKey})`
@@ -256,7 +263,9 @@ export const configureProxy = ({
                 // Inject Authorization header if access_token found in cookies
                 if (accessToken) {
                     proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
-                    console.log(`[CDN Sim] 🔑 Injected Authorization header from ${tokenSource} for ${incomingRequest.url}`)
+                    console.log(
+                        `[CDN Sim] 🔑 Injected Authorization header from ${tokenSource} for ${incomingRequest.url}`
+                    )
                 } else {
                     console.log(`[CDN Sim] ⚠️ No access_token found for ${incomingRequest.url}`)
                 }
@@ -289,18 +298,51 @@ export const configureProxy = ({
 
             // CDN Simulator: When enabled, transform SLAS token responses
             // ONLY for browser-initiated requests (not SSR requests)
-            // SSR tokens are used server-side only and discarded (important for caching)
+            // NOTE: This is only added as hybrid-auth is enabled on zzrf
             if (!caching && cdnSimulatorEnabled) {
-                const isSlasTokenEndpoint = req.url && req.url.match(/\/oauth2\/(token|authorize|login)/)
-                
+                const isSlasTokenEndpoint =
+                    req.url && req.url.match(/\/oauth2\/(token|authorize|login)/)
+
+                // Helper function to filter old-format token cookies from ANY response
+                // This prevents duplicate token storage that causes session conflicts
+                const filterOldTokenCookies = (cookies) => {
+                    if (!cookies) return []
+                    const cookieArray = Array.isArray(cookies) ? cookies : [cookies]
+                    const oldTokenCookiePatterns = [
+                        /^cc-nx-g/i, // Old guest refresh token
+                        /^cc-nx[^-]/i, // Old registered refresh token (but not cc-nx-g)
+                        /^cc-nx=/i, // Old registered refresh token (exact)
+                        /^cc-at/i // Old access token (SFRA hybrid)
+                    ]
+                    return cookieArray.filter((cookie) => {
+                        const cookieName = cookie.split('=')[0].trim()
+                        const isOldTokenCookie = oldTokenCookiePatterns.some((pattern) =>
+                            pattern.test(cookieName)
+                        )
+                        if (isOldTokenCookie) {
+                            console.log(
+                                `[CDN Sim] ⛔ Filtered out old-format cookie: ${cookieName}`
+                            )
+                        }
+                        return !isOldTokenCookie
+                    })
+                }
+
+                // ALWAYS filter old-format cookies from all responses in CDN sim mode
+                if (proxyResponse.headers['set-cookie']) {
+                    proxyResponse.headers['set-cookie'] = filterOldTokenCookies(
+                        proxyResponse.headers['set-cookie']
+                    )
+                }
                 // Detect if request is from browser vs SSR (Node.js fetch)
                 // Browser indicators:
                 // 1. sec-fetch-* headers (modern browsers, standard since 2020)
                 // 2. origin header (CORS requests from browser)
                 // 3. referer header starting with our app URL (browser navigation)
-                const hasSecFetchHeaders = req.headers['sec-fetch-mode'] || 
-                                          req.headers['sec-fetch-site'] || 
-                                          req.headers['sec-fetch-dest']
+                const hasSecFetchHeaders =
+                    req.headers['sec-fetch-mode'] ||
+                    req.headers['sec-fetch-site'] ||
+                    req.headers['sec-fetch-dest']
                 const hasOriginHeader = req.headers['origin']
                 const isBrowserRequest = hasSecFetchHeaders || hasOriginHeader
 
@@ -321,11 +363,17 @@ export const configureProxy = ({
 
                 if (isSlasTokenEndpoint) {
                     console.log(`[CDN Sim] 🎯 SLAS token endpoint detected: ${req.url}`)
-                    console.log(`[CDN Sim]    isBrowserRequest: ${!!isBrowserRequest} (sec-fetch-mode: ${req.headers['sec-fetch-mode']})`)
+                    console.log(
+                        `[CDN Sim]    isBrowserRequest: ${!!isBrowserRequest} (sec-fetch-mode: ${
+                            req.headers['sec-fetch-mode']
+                        })`
+                    )
                 }
-                
+
                 if (isSlasTokenEndpoint && isBrowserRequest) {
-                    console.log(`[CDN Sim] 🎯 Intercepting SLAS token response (browser request): ${req.url}`)
+                    console.log(
+                        `[CDN Sim] 🎯 Intercepting SLAS token response (browser request): ${req.url}`
+                    )
 
                     // Check if response is compressed
                     const contentEncoding = proxyResponse.headers['content-encoding']
@@ -340,7 +388,10 @@ export const configureProxy = ({
                     proxyResponse.on('end', async () => {
                         try {
                             let responseBody = Buffer.concat(body)
-                            console.log('[CDN Sim] 📦 Response body length (raw):', responseBody.length)
+                            console.log(
+                                '[CDN Sim] 📦 Response body length (raw):',
+                                responseBody.length
+                            )
 
                             // Decompress if needed
                             if (contentEncoding === 'gzip') {
@@ -351,36 +402,51 @@ export const configureProxy = ({
                                         else resolve(decompressed)
                                     })
                                 })
-                                console.log('[CDN Sim] Decompressed body length:', responseBody.length)
+                                console.log(
+                                    '[CDN Sim] Decompressed body length:',
+                                    responseBody.length
+                                )
                             }
 
                             const responseBodyString = responseBody.toString('utf8')
                             const data = JSON.parse(responseBodyString)
-                            console.log('[CDN Sim] 🔍 Response has access_token:', !!data.access_token)
+                            console.log(
+                                '[CDN Sim] 🔍 Response has access_token:',
+                                !!data.access_token
+                            )
 
                             if (data && data.access_token) {
                                 console.log('[CDN Sim] 🔐 Transforming SLAS token response')
 
                                 // Extract siteId from URL params OR from JWT payload
                                 const urlParams = new URLSearchParams(req.url.split('?')[1] || '')
-                                let siteId = urlParams.get('siteId') || urlParams.get('channel_id') || ''
-                                
+                                let siteId =
+                                    urlParams.get('siteId') || urlParams.get('channel_id') || ''
+
                                 // If not in URL, extract from JWT (the aux.channel_id field)
                                 if (!siteId && data.access_token) {
                                     try {
                                         const [, payloadB64] = data.access_token.split('.')
                                         if (payloadB64) {
                                             // JWT uses URL-safe Base64: replace - with + and _ with /
-                                            const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/')
+                                            const base64 = payloadB64
+                                                .replace(/-/g, '+')
+                                                .replace(/_/g, '/')
                                             // Add padding if needed
-                                            const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
-                                            const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'))
+                                            const padded =
+                                                base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+                                            const payload = JSON.parse(
+                                                Buffer.from(padded, 'base64').toString('utf8')
+                                            )
                                             // Extract siteId from isb claim (format: ...::chid:RefArchGlobal)
                                             if (payload?.isb) {
                                                 const chidMatch = payload.isb.match(/chid:([^:]+)/)
                                                 if (chidMatch) {
                                                     siteId = chidMatch[1]
-                                                    console.log('[CDN Sim] Extracted siteId from JWT:', siteId)
+                                                    console.log(
+                                                        '[CDN Sim] Extracted siteId from JWT:',
+                                                        siteId
+                                                    )
                                                 }
                                             }
                                             // Fallback: try aux.channel_id
@@ -389,19 +455,31 @@ export const configureProxy = ({
                                             }
                                         }
                                     } catch (e) {
-                                        console.log('[CDN Sim] ⚠️ Failed to extract channel_id from JWT:', e.message)
+                                        console.log(
+                                            '[CDN Sim] ⚠️ Failed to extract channel_id from JWT:',
+                                            e.message
+                                        )
                                     }
                                 }
                                 const cookieSuffix = siteId ? `_${siteId}` : ''
                                 console.log(`[CDN Sim]   → Using siteId: ${siteId || '(none)'}`)
 
                                 // Extract tokens from response
-                                const {access_token, refresh_token, id_token, idp_access_token, ...safeBody} = data
+                                const {
+                                    access_token,
+                                    refresh_token,
+                                    id_token,
+                                    idp_access_token,
+                                    ...safeBody
+                                } = data
 
                                 const isProduction = process.env.NODE_ENV === 'production'
 
                                 // Set httpOnly cookies with siteId suffix (e.g., access_token_RefArchGlobal)
-                                const setCookies = Array.isArray(proxyResponse.headers['set-cookie'])
+                                // Old-format cookies were already filtered at the top of CDN sim block
+                                const setCookies = Array.isArray(
+                                    proxyResponse.headers['set-cookie']
+                                )
                                     ? [...proxyResponse.headers['set-cookie']]
                                     : []
 
@@ -413,9 +491,13 @@ export const configureProxy = ({
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=1800'
-                                    ].filter(Boolean).join('; ')
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
                                     setCookies.push(cookie)
-                                    console.log(`[CDN Sim]   ✓ Set access_token${cookieSuffix} cookie (httpOnly)`)
+                                    console.log(
+                                        `[CDN Sim]   ✓ Set access_token${cookieSuffix} cookie (httpOnly)`
+                                    )
                                 }
 
                                 if (refresh_token) {
@@ -426,9 +508,13 @@ export const configureProxy = ({
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=7776000'
-                                    ].filter(Boolean).join('; ')
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
                                     setCookies.push(cookie)
-                                    console.log(`[CDN Sim]   ✓ Set refresh_token${cookieSuffix} cookie (httpOnly)`)
+                                    console.log(
+                                        `[CDN Sim]   ✓ Set refresh_token${cookieSuffix} cookie (httpOnly)`
+                                    )
                                 }
 
                                 if (id_token) {
@@ -439,9 +525,13 @@ export const configureProxy = ({
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=1800'
-                                    ].filter(Boolean).join('; ')
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
                                     setCookies.push(cookie)
-                                    console.log(`[CDN Sim]   ✓ Set id_token${cookieSuffix} cookie (httpOnly)`)
+                                    console.log(
+                                        `[CDN Sim]   ✓ Set id_token${cookieSuffix} cookie (httpOnly)`
+                                    )
                                 }
 
                                 if (idp_access_token) {
@@ -452,9 +542,13 @@ export const configureProxy = ({
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=3600000'
-                                    ].filter(Boolean).join('; ')
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
                                     setCookies.push(cookie)
-                                    console.log(`[CDN Sim]   ✓ Set idp_access_token${cookieSuffix} cookie (httpOnly)`)
+                                    console.log(
+                                        `[CDN Sim]   ✓ Set idp_access_token${cookieSuffix} cookie (httpOnly)`
+                                    )
                                 }
 
                                 // Set marker cookie so client-side Auth knows CDN sim is active
@@ -465,13 +559,25 @@ export const configureProxy = ({
                                     'SameSite=Lax',
                                     'Path=/',
                                     'Max-Age=1800'
-                                ].filter(Boolean).join('; ')
+                                ]
+                                    .filter(Boolean)
+                                    .join('; ')
                                 setCookies.push(markerCookie)
-                                console.log(`[CDN Sim]   ✓ Set cc_cdn_sim${cookieSuffix} marker cookie`)
+                                console.log(
+                                    `[CDN Sim]   ✓ Set cc_cdn_sim${cookieSuffix} marker cookie`
+                                )
 
                                 // STRIP TOKENS FROM RESPONSE BODY
                                 // This simulates CDN edge transformer behavior in production
                                 // Tokens are now ONLY available in httpOnly cookies
+                                console.log(
+                                    '[CDN Sim]   📋 safeBody keys:',
+                                    Object.keys(safeBody).join(', ')
+                                )
+                                console.log(
+                                    '[CDN Sim]   📋 safeBody.customer_id:',
+                                    safeBody.customer_id || '(missing!)'
+                                )
                                 const strippedResponse = JSON.stringify(safeBody)
 
                                 // Remove transfer-encoding and content-encoding headers
@@ -486,7 +592,8 @@ export const configureProxy = ({
                                     // Only show first 100 chars of cookie value for security
                                     const [name, ...rest] = cookie.split('=')
                                     const value = rest.join('=')
-                                    const preview = value.length > 100 ? value.substring(0, 100) + '...' : value
+                                    const preview =
+                                        value.length > 100 ? value.substring(0, 100) + '...' : value
                                     console.log(`[CDN Sim]      ${i + 1}. ${name}=${preview}`)
                                 })
 
@@ -497,7 +604,9 @@ export const configureProxy = ({
                                 })
                                 res.end(strippedResponse)
                                 console.log('[CDN Sim]   ✓ Stripped tokens from response body')
-                                console.log('[CDN Sim]   → Tokens are now ONLY in httpOnly cookies (not accessible to JavaScript)')
+                                console.log(
+                                    '[CDN Sim]   → Tokens are now ONLY in httpOnly cookies (not accessible to JavaScript)'
+                                )
                                 return
                             }
                         } catch (e) {
