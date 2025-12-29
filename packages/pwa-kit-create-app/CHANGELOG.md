@@ -1,6 +1,8 @@
-
-## v3.15.0-dev (Nov 05, 2025)
+## v3.16.0-dev (Dec 17, 2025)
 - Update `default.js` and `/_app-config/index.jsx` template to use email mode by default for passwordless login. [#3526] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3526)
+
+## v3.15.0 (Dec 17, 2025)
+- Add new Google Cloud API configuration and Bonus Product configuration [#3523](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3523)
 
 ## v3.14.0 (Nov 04, 2025)
 - Prompt text for Site ID should match actual validation: Site ID may contain uppercase or lowercase letters, numbers, hyphens, or underscores. - Updated Site ID validator regex to allow both uppercase and lowercase letters for improved compatibility, clarity. [#3410] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3410)

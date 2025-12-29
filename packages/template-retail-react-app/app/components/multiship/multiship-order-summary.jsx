@@ -22,6 +22,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 
 const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
@@ -59,6 +60,7 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                 <Stack spacing={4}>
                     {shipments.map((shipment) => {
                         const items = getItemsForShipment(shipment.shipmentId)
+                        const consolidatedItems = consolidateDuplicateBonusProducts(items)
 
                         return (
                             <Box key={shipment.shipmentId}>
@@ -68,7 +70,7 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                                     width="full"
                                     divider={<Divider />}
                                 >
-                                    {items.map((product, idx) => {
+                                    {consolidatedItems.map((product, idx) => {
                                         const productDetail =
                                             productItemsMap?.[product.productId] || {}
                                         const variant = {
@@ -79,7 +81,9 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
                                         return (
                                             <ItemVariantProvider
-                                                key={product.productId}
+                                                key={`${product.productId}-${
+                                                    product.itemId || idx
+                                                }`}
                                                 index={idx}
                                                 variant={variant}
                                             >
