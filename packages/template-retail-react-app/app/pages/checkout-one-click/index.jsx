@@ -311,6 +311,8 @@ const CheckoutOneClick = () => {
                 }
 
                 // For newly registered guests only, persist shipping address when billing same as shipping
+                // Skip saving pickup/store addresses - only save delivery addresses
+                // For multi-shipment orders, save all delivery addresses with the first one as default
                 if (
                     enableUserRegistration &&
                     currentCustomer?.isRegistered &&
@@ -318,26 +320,24 @@ const CheckoutOneClick = () => {
                 ) {
                     try {
                         const customerId = order.customerInfo?.customerId
-                        const shipping = order?.shipments?.[0]?.shippingAddress
-                        if (customerId && shipping) {
-                            // Whitelist fields and strip non-customer fields (e.g., id, _type)
-                            const {
-                                address1,
-                                address2,
-                                city,
-                                countryCode,
-                                firstName,
-                                lastName,
-                                phone,
-                                postalCode,
-                                stateCode
-                            } = shipping || {}
+                        if (!customerId) return
 
-                            await createCustomerAddress.mutateAsync({
-                                parameters: {customerId},
-                                body: {
-                                    addressId: nanoid(),
-                                    preferred: true,
+                        // Get all delivery shipments (not pickup) from the order
+                        const deliveryShipments =
+                            order?.shipments?.filter(
+                                (shipment) =>
+                                    !isPickupShipment(shipment) && shipment.shippingAddress
+                            ) || []
+
+                        if (deliveryShipments.length > 0) {
+                            // Save all delivery addresses, with the first one as preferred
+                            for (let i = 0; i < deliveryShipments.length; i++) {
+                                const shipment = deliveryShipments[i]
+                                const shipping = shipment.shippingAddress
+                                if (!shipping) continue
+
+                                // Whitelist fields and strip non-customer fields (e.g., id, _type)
+                                const {
                                     address1,
                                     address2,
                                     city,
@@ -347,8 +347,26 @@ const CheckoutOneClick = () => {
                                     phone,
                                     postalCode,
                                     stateCode
-                                }
-                            })
+                                } = shipping || {}
+
+                                await createCustomerAddress.mutateAsync({
+                                    parameters: {customerId},
+                                    body: {
+                                        addressId: nanoid(),
+                                        preferred: i === 0, // First address is preferred
+                                        address1,
+                                        address2,
+                                        city,
+                                        countryCode,
+                                        firstName,
+                                        lastName,
+                                        phone,
+                                        postalCode,
+                                        stateCode
+                                    }
+                                })
+                            }
+
                             // Also persist billing phone as phoneHome
                             const phoneHome = order?.billingAddress?.phone
                             if (phoneHome) {
