@@ -35,7 +35,8 @@ const OtpAuth = ({
     handleSendEmailOtp,
     handleOtpVerification,
     onCheckoutAsGuest,
-    isGuestRegistration = false
+    isGuestRegistration = false,
+    hideCheckoutAsGuestButton = false
 }) => {
     const OTP_LENGTH = 8
     const [isVerifying, setIsVerifying] = useState(false)
@@ -269,35 +270,37 @@ const OtpAuth = ({
 
                         {/* Buttons */}
                         <HStack spacing={4} width="100%" justifyContent="center">
-                            <Button
-                                onClick={handleCheckoutAsGuest}
-                                variant="solid"
-                                size="lg"
-                                minWidth="160px"
-                                isDisabled={isVerifying}
-                                bg="gray.50"
-                                color="gray.800"
-                                fontWeight="bold"
-                                border="none"
-                                _hover={{
-                                    bg: 'gray.100'
-                                }}
-                                _active={{
-                                    bg: 'gray.200'
-                                }}
-                            >
-                                {isGuestRegistration ? (
-                                    <FormattedMessage
-                                        defaultMessage="Cancel"
-                                        id="otp.button.cancel_guest_registration"
-                                    />
-                                ) : (
-                                    <FormattedMessage
-                                        defaultMessage="Checkout as a Guest"
-                                        id="otp.button.checkout_as_guest"
-                                    />
-                                )}
-                            </Button>
+                            {!hideCheckoutAsGuestButton && (
+                                <Button
+                                    onClick={handleCheckoutAsGuest}
+                                    variant="solid"
+                                    size="lg"
+                                    minWidth="160px"
+                                    isDisabled={isVerifying}
+                                    bg="gray.50"
+                                    color="gray.800"
+                                    fontWeight="bold"
+                                    border="none"
+                                    _hover={{
+                                        bg: 'gray.100'
+                                    }}
+                                    _active={{
+                                        bg: 'gray.200'
+                                    }}
+                                >
+                                    {isGuestRegistration ? (
+                                        <FormattedMessage
+                                            defaultMessage="Cancel"
+                                            id="otp.button.cancel_guest_registration"
+                                        />
+                                    ) : (
+                                        <FormattedMessage
+                                            defaultMessage="Checkout as a Guest"
+                                            id="otp.button.checkout_as_guest"
+                                        />
+                                    )}
+                                </Button>
+                            )}
 
                             <Button
                                 onClick={handleResend}
@@ -338,7 +341,8 @@ OtpAuth.propTypes = {
     handleSendEmailOtp: PropTypes.func.isRequired,
     handleOtpVerification: PropTypes.func.isRequired,
     onCheckoutAsGuest: PropTypes.func,
-    isGuestRegistration: PropTypes.bool
+    isGuestRegistration: PropTypes.bool,
+    hideCheckoutAsGuestButton: PropTypes.bool
 }
 
 export default OtpAuth

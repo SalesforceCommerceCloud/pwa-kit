@@ -365,6 +365,7 @@ export const AuthModal = ({
                 form={form}
                 handleSendEmailOtp={handlePasswordlessLogin}
                 handleOtpVerification={handleOtpVerification}
+                hideCheckoutAsGuestButton={true}
             />
         </>
     )
