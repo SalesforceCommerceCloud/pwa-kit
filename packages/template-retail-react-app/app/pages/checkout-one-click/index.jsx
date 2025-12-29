@@ -39,7 +39,10 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    isPickupShipment,
+    findExistingDeliveryShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
@@ -311,6 +314,7 @@ const CheckoutOneClick = () => {
                 }
 
                 // For newly registered guests only, persist shipping address when billing same as shipping
+                // Skip saving pickup/store addresses - only save delivery addresses
                 if (
                     enableUserRegistration &&
                     currentCustomer?.isRegistered &&
@@ -318,7 +322,9 @@ const CheckoutOneClick = () => {
                 ) {
                     try {
                         const customerId = order.customerInfo?.customerId
-                        const shipping = order?.shipments?.[0]?.shippingAddress
+                        // Find the delivery shipment (not pickup) to get the shipping address
+                        const deliveryShipment = findExistingDeliveryShipment(order)
+                        const shipping = deliveryShipment?.shippingAddress
                         if (customerId && shipping) {
                             // Whitelist fields and strip non-customer fields (e.g., id, _type)
                             const {
