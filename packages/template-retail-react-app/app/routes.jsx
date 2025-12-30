@@ -41,7 +41,10 @@ const Cart = loadable(() => import('./pages/cart'), {fallback})
 const Checkout = loadable(() => import('./pages/checkout'), {
     fallback
 })
-const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const CheckoutOneClick = loadable(() => import('./pages/checkout-one-click'), {
+    fallback
+})
+const CheckoutConfirmation = loadable(() => import('./pages/confirmation'), {fallback})
 const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
@@ -93,7 +96,10 @@ export const routes = [
     },
     {
         path: '/checkout',
-        component: Checkout,
+        component: (props) => {
+            const enabled = getConfig()?.app?.oneClickCheckout?.enabled
+            return enabled ? <CheckoutOneClick {...props} /> : <Checkout {...props} />
+        },
         exact: true
     },
     {

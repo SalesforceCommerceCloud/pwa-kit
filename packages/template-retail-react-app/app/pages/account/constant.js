@@ -10,14 +10,16 @@ import {
     AccountIcon,
     LocationIcon,
     ReceiptIcon,
-    HeartIcon
+    HeartIcon,
+    CreditCardIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
 export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},
     addresses: {defaultMessage: 'Addresses', id: 'global.account.link.addresses'},
     orders: {defaultMessage: 'Order History', id: 'global.account.link.order_history'},
-    wishlist: {defaultMessage: 'Wishlist', id: 'global.account.link.wishlist'}
+    wishlist: {defaultMessage: 'Wishlist', id: 'global.account.link.wishlist'},
+    payments: {defaultMessage: 'Payment Methods', id: 'global.account.link.payment_methods'}
 })
 
 export const navLinks = [
@@ -40,6 +42,11 @@ export const navLinks = [
         name: 'addresses',
         path: '/addresses',
         icon: LocationIcon
+    },
+    {
+        name: 'payments',
+        path: '/payments',
+        icon: CreditCardIcon
     }
 ]
 
