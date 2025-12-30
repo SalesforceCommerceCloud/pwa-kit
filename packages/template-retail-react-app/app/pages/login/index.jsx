@@ -26,6 +26,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
@@ -74,6 +75,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const [currentView, setCurrentView] = useState(initialView)
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
     const [redirectPath, setRedirectPath] = useState('')
+    const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -105,12 +107,30 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            await authorizePasswordlessLogin.mutateAsync({userid: email})
+            // TODO: use proper parameters from the config
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                mode: 'email',
+                locale: 'en-GB'
+            })
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)
+            setIsOtpAuthOpen(true)
         } catch (error) {
             const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
+    }
+
+    const handleOtpVerification = async (pwdlessLoginToken) => {
+        try {
+            await loginPasswordless.mutateAsync({pwdlessLoginToken})
+        } catch (e) {
+            const errorData = await e.response?.json()
+            const message = INVALID_TOKEN_ERROR.test(errorData.message)
+                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
@@ -173,6 +193,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // If customer is registered push to account page and merge the basket
     useEffect(() => {
         if (isRegistered) {
+            setIsOtpAuthOpen(false)
             handleMergeBasket()
             const redirectTo = redirectPath ? redirectPath : '/account'
             navigate(redirectTo)
@@ -213,11 +234,21 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     />
                 )}
                 {currentView === EMAIL_VIEW && (
-                    <PasswordlessEmailConfirmation
-                        form={form}
-                        submitForm={submitForm}
-                        email={passwordlessLoginEmail}
-                    />
+                    <>
+                        <PasswordlessEmailConfirmation
+                            form={form}
+                            submitForm={submitForm}
+                            email={passwordlessLoginEmail}
+                        />
+                        <OtpAuth
+                            isOpen={isOtpAuthOpen}
+                            onClose={() => setIsOtpAuthOpen(false)}
+                            form={form}
+                            handleSendEmailOtp={handlePasswordlessLogin}
+                            handleOtpVerification={handleOtpVerification}
+                            hideCheckoutAsGuestButton={true}
+                        />
+                    </>
                 )}
             </Container>
         </Box>
