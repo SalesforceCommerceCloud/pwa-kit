@@ -21,6 +21,14 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
         throw error
     }
 
+    // In CDN simulator mode, try to refresh the token first
+    // This handles cases where the access_token cookie was deleted or invalidated
+    const refreshed = await auth.handleUnauthorizedError()
+    if (refreshed) {
+        logger.info('Token refreshed after 401 in CDN simulator mode.')
+        return auth.ready()
+    }
+
     const response = await error?.response?.json()
     if (response?.detail !== 'Customer credentials changed after token was issued.') {
         throw error

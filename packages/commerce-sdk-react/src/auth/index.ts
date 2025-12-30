@@ -280,6 +280,12 @@ class Auth {
      */
     private siteId: string
 
+    /**
+     * Pending CDN mode refresh promise for deduplication.
+     * Prevents multiple simultaneous refresh requests when access_token_expiry is missing.
+     */
+    private pendingCdnRefresh: Promise<AuthData> | undefined
+
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
@@ -413,6 +419,90 @@ class Auth {
             // Server-side: check environment variable
             // SSR tokens should NOT be persisted when CDN simulator is enabled
             return process.env.ENABLE_CDN_SIMULATOR === 'true'
+        }
+    }
+
+    /**
+     * Check if the access token is expired by reading the access_token_expiry cookie.
+     * This cookie is NOT HttpOnly, so JavaScript can read it.
+     * Returns true if expired or if the expiry cookie doesn't exist.
+     */
+    private isAccessTokenExpiredViaCookie(): boolean {
+        if (!onClient()) {
+            return false
+        }
+
+        const cookieNameWithSiteId = `access_token_expiry_${this.siteId}`
+        const genericCookieName = 'access_token_expiry'
+
+        const cookies = document.cookie.split(';')
+        let expiryTimestamp: number | null = null
+
+        for (const cookie of cookies) {
+            const trimmed = cookie.trim()
+            if (trimmed.startsWith(`${cookieNameWithSiteId}=`)) {
+                expiryTimestamp = parseInt(trimmed.split('=')[1], 10)
+                break
+            }
+            if (trimmed.startsWith(`${genericCookieName}=`)) {
+                expiryTimestamp = parseInt(trimmed.split('=')[1], 10)
+                break
+            }
+        }
+
+        if (!expiryTimestamp) {
+            // No expiry cookie found - token might not exist or is invalid
+            return true
+        }
+
+        // Add 60 second buffer to refresh before actual expiry
+        const bufferMs = 60 * 1000
+        const isExpired = Date.now() + bufferMs >= expiryTimestamp
+
+        if (isExpired) {
+            console.log('[Auth] Access token expired (via expiry cookie), needs refresh')
+        }
+
+        return isExpired
+    }
+
+    /**
+     * Force clear the expiry cookie to trigger a refresh on next API call.
+     * This is useful when a 401 error is received, indicating the access token
+     * is invalid even though the expiry cookie shows it should be valid.
+     * @private
+     */
+    private clearExpiryCookie(): void {
+        if (!onClient()) return
+
+        const cookieNameWithSiteId = `access_token_expiry_${this.siteId}`
+        // Clear by setting expired date
+        document.cookie = `${cookieNameWithSiteId}=; Path=/; Max-Age=0`
+        console.log('[Auth] Cleared access_token_expiry cookie')
+    }
+
+    /**
+     * Handle a 401 Unauthorized error by triggering a token refresh.
+     * Call this when an API request fails with 401 in CDN simulator mode.
+     * Returns true if refresh was triggered, false otherwise.
+     */
+    async handleUnauthorizedError(): Promise<boolean> {
+        if (!onClient() || !this.isCdnSimulatorMode()) {
+            return false
+        }
+
+        console.log('[Auth] Handling 401 error - clearing expiry and triggering refresh')
+
+        // Clear the expiry cookie to force refresh
+        this.clearExpiryCookie()
+
+        // Trigger refresh
+        try {
+            await this.refreshAccessTokenInCdnMode()
+            return true
+        } catch (error) {
+            console.log('[Auth] Failed to refresh after 401:', error)
+            return false
         }
     }
 
@@ -820,6 +910,114 @@ class Auth {
         }
     }
 
+    /**
+     * Refresh access token in CDN simulator mode.
+     * In this mode, the refresh_token is in an HttpOnly cookie and the proxy will inject it.
+     * We make a request without the refresh_token in the body.
+     * Uses deduplication to prevent multiple simultaneous refresh requests.
+     */
+    private async refreshAccessTokenInCdnMode(): Promise<AuthData> {
+        // Deduplication: if a refresh is already in progress, wait for it
+        if (this.pendingCdnRefresh) {
+            console.log('[Auth] CDN mode refresh already in progress, waiting...')
+            return this.pendingCdnRefresh
+        }
+
+        const refreshPromise = this.doRefreshAccessTokenInCdnMode()
+        this.pendingCdnRefresh = refreshPromise
+
+        try {
+            return await refreshPromise
+        } finally {
+            this.pendingCdnRefresh = undefined
+        }
+    }
+
+    /**
+     * Internal implementation of CDN mode refresh (without deduplication logic).
+     */
+    private async doRefreshAccessTokenInCdnMode(): Promise<AuthData> {
+        const dntPref = this.getDnt({includeDefaults: true})
+
+        console.log('[Auth] CDN mode refresh - proxy will inject refresh_token')
+
+        try {
+            // Make refresh request - proxy will inject refresh_token from HttpOnly cookie
+            const {proxy = '', parameters} = this.client.clientConfig
+            const orgId = parameters.organizationId || ''
+            const clientId = parameters.clientId || ''
+
+            const response = await fetch(
+                `${proxy}/shopper/auth/v1/organizations/${orgId}/oauth2/token`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    credentials: 'same-origin', // Include cookies
+                    body: new URLSearchParams({
+                        grant_type: 'refresh_token',
+                        client_id: clientId,
+                        channel_id: this.siteId,
+                        ...(dntPref !== undefined && {dnt: String(dntPref)})
+                        // Note: refresh_token is NOT included - proxy injects it from cookie
+                    }).toString()
+                }
+            )
+
+            if (!response.ok) {
+                const errorText = await response.text()
+                console.log('[Auth] CDN mode refresh failed:', response.status, errorText)
+                throw new Error(`Refresh failed: ${response.status}`)
+            }
+
+            // Type for stripped token response (tokens removed by proxy)
+            type StrippedTokenResponse = {
+                customer_id?: string
+                usid?: string
+                expires_in?: number
+                enc_user_id?: string
+                refresh_token_expires_in?: number
+            }
+            const token: StrippedTokenResponse = await response.json()
+            console.log('[Auth] CDN mode refresh successful')
+
+            // In CDN mode, the proxy transforms the response and strips tokens
+            // We only get non-sensitive data (customer_id, usid, expires_in, etc.)
+            // The tokens are set as HttpOnly cookies by the proxy
+            if (token.customer_id) {
+                this.set('customer_id', token.customer_id)
+            }
+            if (token.usid) {
+                // Determine if guest based on existing customer_type or default to guest
+                const currentCustomerType = this.get('customer_type')
+                const isGuest = currentCustomerType === 'guest' || !currentCustomerType
+                const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                    token.refresh_token_expires_in,
+                    isGuest
+                )
+                const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+                this.set('usid', token.usid, {
+                    expires: expiresDate
+                })
+            }
+            if (token.expires_in) {
+                this.set('expires_in', String(token.expires_in))
+            }
+            if (token.enc_user_id) {
+                this.set('enc_user_id', token.enc_user_id)
+            }
+
+            return this.data
+        } catch (error) {
+            console.log('[Auth] CDN mode refresh error, falling back to guest login:', error)
+            // If refresh fails, clear storage and start fresh with guest login
+            this.clearStorage()
+            await this.loginGuestUser()
+            return this.data
+        }
+    }
+
     async refreshAccessToken() {
         const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
@@ -1010,13 +1208,22 @@ class Auth {
         }
 
         // CDN Simulator Mode: tokens are in httpOnly cookies
-        // In this mode, we don't trigger re-authentication - the proxy handles Authorization headers
+        // Check expiry via the non-HttpOnly access_token_expiry cookie
         if (onClient() && this.isCdnSimulatorMode()) {
-            console.log(
-                '[Auth] CDN simulator mode - tokens are in httpOnly cookies, skipping re-auth'
-            )
+            // Check if we need to refresh (expired or missing expiry cookie)
+            if (this.isAccessTokenExpiredViaCookie()) {
+                console.log(
+                    '[Auth] CDN simulator mode - access token expired/missing, triggering refresh'
+                )
+                // Trigger refresh - the proxy will inject refresh_token from HttpOnly cookie
+                return await this.refreshAccessTokenInCdnMode()
+            }
+
+            console.log('[Auth] CDN simulator mode - tokens appear valid')
             // Return current data without triggering re-auth
             // The proxy will inject Authorization header from httpOnly cookies
+            // Note: If access_token cookie was manually deleted but expiry cookie wasn't,
+            // API calls will return 401. Call handleUnauthorizedError() in that case.
             return this.data
         }
 

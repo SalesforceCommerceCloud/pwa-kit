@@ -11,6 +11,9 @@ import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
+import zlib from 'zlib'
+import https from 'https'
+import http from 'http'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -102,6 +105,428 @@ export const applyProxyRequestHeaders = ({
             proxyRequest.removeHeader(key)
         }
     })
+}
+
+/**
+ * Handle refresh token request directly (CDN simulator mode).
+ * This function makes the SLAS call with the refresh_token from HttpOnly cookie
+ * and returns the transformed response.
+ * @private
+ */
+const handleRefreshTokenRequest = async ({
+    req,
+    res,
+    targetProtocol,
+    targetHost,
+    appProtocol
+    // appHostname - not needed for refresh token handling
+}) => {
+    // Parse cookies to get refresh_token
+    const cookieHeader = req.headers.cookie || ''
+    console.log(
+        `[CDN Sim] 🔄 Refresh request - cookie header: ${cookieHeader.substring(0, 200)}...`
+    )
+
+    const cookies = {}
+    cookieHeader.split(';').forEach((cookie) => {
+        const [key, ...valueParts] = cookie.trim().split('=')
+        if (key && valueParts.length > 0) {
+            cookies[key] = decodeURIComponent(valueParts.join('='))
+        }
+    })
+
+    console.log(
+        `[CDN Sim] 🔄 Refresh request - parsed cookie keys: ${Object.keys(cookies).join(', ')}`
+    )
+
+    // Find refresh_token (with or without siteId suffix)
+    let refreshToken = cookies.refresh_token
+    if (!refreshToken) {
+        const refreshTokenKey = Object.keys(cookies).find((key) => key.startsWith('refresh_token_'))
+        if (refreshTokenKey) {
+            refreshToken = cookies[refreshTokenKey]
+            console.log(`[CDN Sim] 🔄 Found refresh_token from cookie: ${refreshTokenKey}`)
+        }
+    }
+
+    if (!refreshToken) {
+        console.log('[CDN Sim] ❌ No refresh_token cookie found for refresh request')
+        console.log('[CDN Sim] ❌ Available cookies:', Object.keys(cookies))
+        res.status(400).json({error: 'No refresh token available'})
+        return
+    }
+
+    console.log(
+        `[CDN Sim] 🔄 Handling refresh token request directly (token length: ${refreshToken.length})`
+    )
+
+    // Parse the original request body to get other parameters
+    let bodyParams = {}
+    if (req.body && typeof req.body === 'object') {
+        bodyParams = req.body
+    } else if (req.body && typeof req.body === 'string') {
+        bodyParams = Object.fromEntries(new URLSearchParams(req.body))
+    }
+
+    // Build the request body with refresh_token injected
+    const requestBody = new URLSearchParams({
+        ...bodyParams,
+        refresh_token: refreshToken
+    }).toString()
+
+    // Extract the path from the original URL (remove /mobify/proxy/api prefix)
+    const targetPath = req.url.replace(/^\/mobify\/proxy\/[^/]+/, '')
+
+    console.log(`[CDN Sim] 🔄 Making refresh request to ${targetHost}${targetPath}`)
+
+    // Make the request to SLAS
+    const httpModule = targetProtocol === 'https' ? https : http
+    const options = {
+        hostname: targetHost,
+        port: targetProtocol === 'https' ? 443 : 80,
+        path: targetPath,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(requestBody)
+        }
+    }
+
+    const proxyReq = httpModule.request(options, async (proxyRes) => {
+        let body = []
+        proxyRes.on('data', (chunk) => body.push(chunk))
+        proxyRes.on('end', async () => {
+            try {
+                let responseBody = Buffer.concat(body)
+
+                // Decompress if needed
+                const contentEncoding = proxyRes.headers['content-encoding']
+                if (contentEncoding === 'gzip') {
+                    responseBody = await new Promise((resolve, reject) => {
+                        zlib.gunzip(responseBody, (err, decompressed) => {
+                            if (err) reject(err)
+                            else resolve(decompressed)
+                        })
+                    })
+                }
+
+                const data = JSON.parse(responseBody.toString('utf8'))
+                console.log(
+                    '[CDN Sim] 🔄 Refresh response received, has access_token:',
+                    !!data.access_token
+                )
+
+                if (data.access_token) {
+                    // Transform response - same logic as regular token endpoint
+                    // Strip all token fields from response (they go in HttpOnly cookies)
+                    const {
+                        access_token,
+                        refresh_token,
+                        id_token: _id_token,
+                        idp_access_token: _idp_access_token,
+                        ...safeBody
+                    } = data
+                    // Suppress unused variable warnings (we extract to exclude from safeBody)
+                    void _id_token
+                    void _idp_access_token
+
+                    // Extract siteId from JWT
+                    let siteId = ''
+                    try {
+                        const [, payloadB64] = access_token.split('.')
+                        if (payloadB64) {
+                            const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/')
+                            const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+                            const payloadStr = Buffer.from(padded, 'base64').toString('utf8')
+                            const payload = JSON.parse(payloadStr)
+                            if (payload?.isb) {
+                                const chidMatch = payload.isb.match(/chid:([^:]+)/)
+                                if (chidMatch) {
+                                    siteId = chidMatch[1]
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.log('[CDN Sim] ⚠️ Failed to extract siteId from JWT:', e.message)
+                    }
+
+                    const cookieSuffix = siteId ? `_${siteId}` : ''
+                    const expiresInSeconds = data.expires_in || 1800
+                    const expiryTimestamp = Date.now() + expiresInSeconds * 1000
+                    const useSecure = isRemote() || appProtocol === 'https'
+                    const secureFlag = useSecure ? '; Secure' : ''
+
+                    const setCookies = []
+
+                    // Set HttpOnly cookies for tokens
+                    setCookies.push(
+                        [
+                            `access_token${cookieSuffix}=${access_token}`,
+                            'HttpOnly',
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    setCookies.push(
+                        [
+                            `access_token_expiry${cookieSuffix}=${expiryTimestamp}`,
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    if (refresh_token) {
+                        setCookies.push(
+                            [
+                                `refresh_token${cookieSuffix}=${refresh_token}`,
+                                'HttpOnly',
+                                useSecure && 'Secure',
+                                'SameSite=Lax',
+                                'Path=/',
+                                'Max-Age=7776000'
+                            ]
+                                .filter(Boolean)
+                                .join('; ')
+                        )
+                    }
+
+                    setCookies.push(
+                        [
+                            `cc_cdn_sim${cookieSuffix}=1`,
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    console.log(
+                        `[CDN Sim] 🔄 Refresh successful, set cookies (HttpOnly${secureFlag})`
+                    )
+
+                    const strippedResponse = JSON.stringify(safeBody)
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json',
+                        'Set-Cookie': setCookies,
+                        'Content-Length': Buffer.byteLength(strippedResponse)
+                    })
+                    res.end(strippedResponse)
+                } else {
+                    // Pass through error response
+                    console.log('[CDN Sim] 🔄 Refresh failed, passing through error')
+                    res.writeHead(proxyRes.statusCode, {'Content-Type': 'application/json'})
+                    res.end(responseBody)
+                }
+            } catch (e) {
+                console.log('[CDN Sim] ❌ Error processing refresh response:', e.message)
+                res.status(500).json({error: 'Failed to process refresh response'})
+            }
+        })
+    })
+
+    proxyReq.on('error', (e) => {
+        console.log('[CDN Sim] ❌ Refresh request error:', e.message)
+        res.status(500).json({error: 'Refresh request failed'})
+    })
+
+    proxyReq.write(requestBody)
+    proxyReq.end()
+}
+
+/**
+ * Handle direct token request (non-refresh) from browser in CDN simulator mode.
+ * This passes the request body as-is to SLAS and transforms the response.
+ * @private
+ */
+const handleDirectTokenRequest = async ({
+    req,
+    res,
+    rawBody,
+    targetProtocol,
+    targetHost,
+    appProtocol
+}) => {
+    console.log('[CDN Sim] 📤 Making direct token request to SLAS')
+
+    // Extract the path from the original URL (remove /mobify/proxy/api prefix)
+    const targetPath = req.url.replace(/^\/mobify\/proxy\/[^/]+/, '')
+
+    console.log(`[CDN Sim] 📤 Direct token request to ${targetHost}${targetPath}`)
+
+    // Make the request to SLAS
+    const httpModule = targetProtocol === 'https' ? https : http
+    const options = {
+        hostname: targetHost,
+        port: targetProtocol === 'https' ? 443 : 80,
+        path: targetPath,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(rawBody)
+        }
+    }
+
+    const proxyReq = httpModule.request(options, async (proxyRes) => {
+        let body = []
+        proxyRes.on('data', (chunk) => body.push(chunk))
+        proxyRes.on('end', async () => {
+            try {
+                let responseBody = Buffer.concat(body)
+
+                // Decompress if needed
+                const contentEncoding = proxyRes.headers['content-encoding']
+                if (contentEncoding === 'gzip') {
+                    responseBody = await new Promise((resolve, reject) => {
+                        zlib.gunzip(responseBody, (err, decompressed) => {
+                            if (err) reject(err)
+                            else resolve(decompressed)
+                        })
+                    })
+                }
+
+                const data = JSON.parse(responseBody.toString('utf8'))
+                console.log(
+                    '[CDN Sim] 📤 Direct token response, has access_token:',
+                    !!data.access_token
+                )
+
+                if (data.access_token) {
+                    // Transform response - same logic as in onProxyRes
+                    // Strip all token fields from response (they go in HttpOnly cookies)
+                    const {
+                        access_token,
+                        refresh_token,
+                        id_token: _id_token,
+                        idp_access_token: _idp_access_token,
+                        ...safeBody
+                    } = data
+                    // Suppress unused variable warnings (we extract to exclude from safeBody)
+                    void _id_token
+                    void _idp_access_token
+
+                    // Extract siteId from JWT
+                    let siteId = ''
+                    try {
+                        const [, payloadB64] = access_token.split('.')
+                        if (payloadB64) {
+                            const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/')
+                            const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+                            const payloadStr = Buffer.from(padded, 'base64').toString('utf8')
+                            const payload = JSON.parse(payloadStr)
+                            if (payload?.isb) {
+                                const chidMatch = payload.isb.match(/chid:([^:]+)/)
+                                if (chidMatch) {
+                                    siteId = chidMatch[1]
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.log('[CDN Sim] ⚠️ Failed to extract siteId from JWT:', e.message)
+                    }
+
+                    const cookieSuffix = siteId ? `_${siteId}` : ''
+                    const expiresInSeconds = data.expires_in || 1800
+                    const expiryTimestamp = Date.now() + expiresInSeconds * 1000
+                    const useSecure = isRemote() || appProtocol === 'https'
+                    const secureFlag = useSecure ? '; Secure' : ''
+
+                    const setCookies = []
+
+                    // Set HttpOnly cookies for tokens
+                    setCookies.push(
+                        [
+                            `access_token${cookieSuffix}=${access_token}`,
+                            'HttpOnly',
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    setCookies.push(
+                        [
+                            `access_token_expiry${cookieSuffix}=${expiryTimestamp}`,
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    if (refresh_token) {
+                        setCookies.push(
+                            [
+                                `refresh_token${cookieSuffix}=${refresh_token}`,
+                                'HttpOnly',
+                                useSecure && 'Secure',
+                                'SameSite=Lax',
+                                'Path=/',
+                                'Max-Age=7776000'
+                            ]
+                                .filter(Boolean)
+                                .join('; ')
+                        )
+                    }
+
+                    setCookies.push(
+                        [
+                            `cc_cdn_sim${cookieSuffix}=1`,
+                            useSecure && 'Secure',
+                            'SameSite=Lax',
+                            'Path=/',
+                            `Max-Age=${expiresInSeconds}`
+                        ]
+                            .filter(Boolean)
+                            .join('; ')
+                    )
+
+                    console.log(
+                        `[CDN Sim] 📤 Direct token successful, set cookies (HttpOnly${secureFlag})`
+                    )
+
+                    const strippedResponse = JSON.stringify(safeBody)
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json',
+                        'Set-Cookie': setCookies,
+                        'Content-Length': Buffer.byteLength(strippedResponse)
+                    })
+                    res.end(strippedResponse)
+                } else {
+                    // Pass through error response
+                    console.log('[CDN Sim] 📤 Direct token failed, passing through')
+                    res.writeHead(proxyRes.statusCode, {'Content-Type': 'application/json'})
+                    res.end(responseBody)
+                }
+            } catch (e) {
+                console.log('[CDN Sim] ❌ Error processing direct token response:', e.message)
+                res.status(500).json({error: 'Failed to process token response'})
+            }
+        })
+    })
+
+    proxyReq.on('error', (e) => {
+        console.log('[CDN Sim] ❌ Direct token request error:', e.message)
+        res.status(500).json({error: 'Token request failed'})
+    })
+
+    proxyReq.write(rawBody)
+    proxyReq.end()
 }
 
 /**
@@ -209,7 +634,7 @@ export const configureProxy = ({
                 targetProtocol
             })
 
-            // CDN Simulator: Inject Authorization header from httpOnly cookie or AsyncLocalStorage
+            // CDN Simulator: Inject Authorization header from httpOnly cookie
             if (!caching && cdnSimulatorEnabled) {
                 let accessToken = null
                 let tokenSource = null
@@ -269,6 +694,9 @@ export const configureProxy = ({
                 } else {
                     console.log(`[CDN Sim] ⚠️ No access_token found for ${incomingRequest.url}`)
                 }
+
+                // Note: Refresh token requests are handled in the middleware wrapper
+                // (before reaching this proxy) via handleRefreshTokenRequest()
             }
         },
 
@@ -395,7 +823,6 @@ export const configureProxy = ({
 
                             // Decompress if needed
                             if (contentEncoding === 'gzip') {
-                                const zlib = require('zlib')
                                 responseBody = await new Promise((resolve, reject) => {
                                     zlib.gunzip(responseBody, (err, decompressed) => {
                                         if (err) reject(err)
@@ -473,8 +900,6 @@ export const configureProxy = ({
                                     ...safeBody
                                 } = data
 
-                                const isProduction = process.env.NODE_ENV === 'production'
-
                                 // Set httpOnly cookies with siteId suffix (e.g., access_token_RefArchGlobal)
                                 // Old-format cookies were already filtered at the top of CDN sim block
                                 const setCookies = Array.isArray(
@@ -483,28 +908,55 @@ export const configureProxy = ({
                                     ? [...proxyResponse.headers['set-cookie']]
                                     : []
 
+                                // Calculate expiry timestamp for browser to know when to refresh
+                                // expires_in is in seconds, we convert to absolute timestamp
+                                const expiresInSeconds = data.expires_in || 1800
+                                const expiryTimestamp = Date.now() + expiresInSeconds * 1000
+
+                                // Only add Secure attribute in production (HTTPS)
+                                // In local dev (HTTP), Secure cookies work on localhost but not other domains
+                                const useSecure = isRemote() || appProtocol === 'https'
+                                const secureFlag = useSecure ? '; Secure' : ''
+
                                 if (access_token) {
+                                    // HttpOnly cookie for access token (+ Secure in production)
                                     const cookie = [
                                         `access_token${cookieSuffix}=${access_token}`,
                                         'HttpOnly',
-                                        isProduction && 'Secure',
+                                        useSecure && 'Secure',
                                         'SameSite=Lax',
                                         'Path=/',
-                                        'Max-Age=1800'
+                                        `Max-Age=${expiresInSeconds}`
                                     ]
                                         .filter(Boolean)
                                         .join('; ')
                                     setCookies.push(cookie)
                                     console.log(
-                                        `[CDN Sim]   ✓ Set access_token${cookieSuffix} cookie (httpOnly)`
+                                        `[CDN Sim]   ✓ Set access_token${cookieSuffix} (HttpOnly${secureFlag})`
+                                    )
+
+                                    // Non-HttpOnly expiry cookie so browser JS can proactively refresh
+                                    const expiryCookie = [
+                                        `access_token_expiry${cookieSuffix}=${expiryTimestamp}`,
+                                        useSecure && 'Secure',
+                                        'SameSite=Lax',
+                                        'Path=/',
+                                        `Max-Age=${expiresInSeconds}`
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
+                                    setCookies.push(expiryCookie)
+                                    console.log(
+                                        `[CDN Sim]   ✓ Set access_token_expiry${cookieSuffix} cookie (readable by JS)`
                                     )
                                 }
 
                                 if (refresh_token) {
+                                    // HttpOnly cookie for refresh token (+ Secure in production)
                                     const cookie = [
                                         `refresh_token${cookieSuffix}=${refresh_token}`,
                                         'HttpOnly',
-                                        isProduction && 'Secure',
+                                        useSecure && 'Secure',
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=7776000'
@@ -513,7 +965,7 @@ export const configureProxy = ({
                                         .join('; ')
                                     setCookies.push(cookie)
                                     console.log(
-                                        `[CDN Sim]   ✓ Set refresh_token${cookieSuffix} cookie (httpOnly)`
+                                        `[CDN Sim]   ✓ Set refresh_token${cookieSuffix} (HttpOnly${secureFlag})`
                                     )
                                 }
 
@@ -521,16 +973,16 @@ export const configureProxy = ({
                                     const cookie = [
                                         `id_token${cookieSuffix}=${id_token}`,
                                         'HttpOnly',
-                                        isProduction && 'Secure',
+                                        useSecure && 'Secure',
                                         'SameSite=Lax',
                                         'Path=/',
-                                        'Max-Age=1800'
+                                        `Max-Age=${expiresInSeconds}`
                                     ]
                                         .filter(Boolean)
                                         .join('; ')
                                     setCookies.push(cookie)
                                     console.log(
-                                        `[CDN Sim]   ✓ Set id_token${cookieSuffix} cookie (httpOnly)`
+                                        `[CDN Sim]   ✓ Set id_token${cookieSuffix} (HttpOnly${secureFlag})`
                                     )
                                 }
 
@@ -538,7 +990,7 @@ export const configureProxy = ({
                                     const cookie = [
                                         `idp_access_token${cookieSuffix}=${idp_access_token}`,
                                         'HttpOnly',
-                                        isProduction && 'Secure',
+                                        useSecure && 'Secure',
                                         'SameSite=Lax',
                                         'Path=/',
                                         'Max-Age=3600000'
@@ -547,7 +999,7 @@ export const configureProxy = ({
                                         .join('; ')
                                     setCookies.push(cookie)
                                     console.log(
-                                        `[CDN Sim]   ✓ Set idp_access_token${cookieSuffix} cookie (httpOnly)`
+                                        `[CDN Sim]   ✓ Set idp_access_token${cookieSuffix} (HttpOnly${secureFlag})`
                                     )
                                 }
 
@@ -555,10 +1007,10 @@ export const configureProxy = ({
                                 // This cookie is NOT httpOnly so JavaScript can read it
                                 const markerCookie = [
                                     `cc_cdn_sim${cookieSuffix}=1`,
-                                    isProduction && 'Secure',
+                                    useSecure && 'Secure',
                                     'SameSite=Lax',
                                     'Path=/',
-                                    'Max-Age=1800'
+                                    `Max-Age=${expiresInSeconds}`
                                 ]
                                     .filter(Boolean)
                                     .join('; ')
@@ -663,8 +1115,69 @@ export const configureProxy = ({
 
     const proxyFunc = createProxyMiddleware(config)
 
-    // For a standard proxy, we're done
+    // For a standard proxy, wrap with refresh token handler if CDN simulator is enabled
     if (!caching) {
+        if (cdnSimulatorEnabled) {
+            // Wrap proxy to intercept refresh token requests from browser
+            return (req, res, next) => {
+                // Check if this is a token endpoint POST from browser
+                const isTokenEndpoint = req.url && req.url.includes('/oauth2/token')
+                const isPostRequest = req.method === 'POST'
+                const hasSecFetchHeaders =
+                    req.headers['sec-fetch-mode'] ||
+                    req.headers['sec-fetch-site'] ||
+                    req.headers['sec-fetch-dest']
+                const hasOriginHeader = req.headers['origin']
+                const isBrowserRequest = hasSecFetchHeaders || hasOriginHeader
+
+                if (isTokenEndpoint && isPostRequest && isBrowserRequest) {
+                    console.log('[CDN Sim] 🔍 Detected browser POST to token endpoint')
+                    // Read the raw body to check for refresh_token grant type
+                    // Body-parser may not have run for proxy routes
+                    const chunks = []
+                    req.on('data', (chunk) => chunks.push(chunk))
+                    req.on('end', () => {
+                        const rawBody = Buffer.concat(chunks).toString('utf8')
+                        console.log(`[CDN Sim] 🔍 Token endpoint body: ${rawBody}`)
+
+                        const isRefreshGrant = rawBody.includes('grant_type=refresh_token')
+                        console.log(`[CDN Sim] 🔍 Is refresh grant: ${isRefreshGrant}`)
+
+                        if (isRefreshGrant) {
+                            console.log('[CDN Sim] 🔄 Intercepting REFRESH token request')
+                            // Store parsed body for handleRefreshTokenRequest
+                            req.body = Object.fromEntries(new URLSearchParams(rawBody))
+                            console.log('[CDN Sim] 🔄 Parsed body:', req.body)
+                            return handleRefreshTokenRequest({
+                                req,
+                                res,
+                                targetProtocol,
+                                targetHost,
+                                appProtocol
+                            })
+                        } else {
+                            // For authorization_code grants, let proxy handle it
+                            // But we need to re-create the request since we consumed the body
+                            console.log('[CDN Sim] 📤 Passing through non-refresh token request')
+
+                            // Make direct request to SLAS (same as refresh but different handling)
+                            handleDirectTokenRequest({
+                                req,
+                                res,
+                                rawBody,
+                                targetProtocol,
+                                targetHost,
+                                appProtocol
+                            })
+                        }
+                    })
+                    return
+                }
+
+                // Not a token endpoint POST, proceed with normal proxy
+                return proxyFunc(req, res, next)
+            }
+        }
         return proxyFunc
     }
 
