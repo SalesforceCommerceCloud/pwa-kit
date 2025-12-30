@@ -37,8 +37,7 @@ const PasswordlessLogin = ({
 
     return (
         <>
-            {((!form.formState.isSubmitSuccessful && !showPasswordView) ||
-                form.formState.errors.email) && (
+            {(!showPasswordView || form.formState.errors.email) && (
                 <Stack spacing={6} paddingLeft={4} paddingRight={4}>
                     <LoginFields
                         form={form}
@@ -81,16 +80,14 @@ const PasswordlessLogin = ({
                     </Stack>
                 </Stack>
             )}
-            {!form.formState.isSubmitSuccessful &&
-                showPasswordView &&
-                !form.formState.errors.email && (
-                    <StandardLogin
-                        form={form}
-                        handleForgotPasswordClick={handleForgotPasswordClick}
-                        setShowPasswordView={setShowPasswordView}
-                        hideEmail={true}
-                    />
-                )}
+            {showPasswordView && !form.formState.errors.email && (
+                <StandardLogin
+                    form={form}
+                    handleForgotPasswordClick={handleForgotPasswordClick}
+                    setShowPasswordView={setShowPasswordView}
+                    hideEmail={true}
+                />
+            )}
         </>
     )
 }
