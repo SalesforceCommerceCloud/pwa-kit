@@ -8,9 +8,6 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
-  "account.title.my_account": {
-    "defaultMessage": "My Account"
-  },
   "account.payments.action.refresh": {
     "defaultMessage": "Refresh"
   },
@@ -55,6 +52,9 @@
   },
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method to check out faster."
+  },
+  "account.title.my_account": {
+    "defaultMessage": "My Account"
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
@@ -363,14 +363,14 @@
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
   },
-  "checkout.title.checkout": {
-    "defaultMessage": "Checkout"
-  },
   "checkout.message.user_registration": {
     "defaultMessage": "Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
   },
   "checkout.payment.save_payment_method": {
     "defaultMessage": "Save this payment method for future use"
+  },
+  "checkout.title.checkout": {
+    "defaultMessage": "Checkout"
   },
   "checkout.title.user_registration": {
     "defaultMessage": "Save Checkout Info for Future Use"
