@@ -98,6 +98,9 @@
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method to check out faster."
   },
+  "account.title.my_account": {
+    "defaultMessage": "My Account"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },

@@ -271,8 +271,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSEO(config),
-            shopperStores: new ShopperStores(config),
-            shopperConfigurations: new ShopperConfigurations(config)
+            shopperStores: new ShopperStores(config)
         }
     }, [
         clientId,
