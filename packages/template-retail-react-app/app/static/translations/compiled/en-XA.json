@@ -251,6 +251,216 @@
       "value": "]"
     }
   ],
+  "account.payments.action.refresh": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƒřḗḗşħ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.action.retry": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧřẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.badge.default": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƒȧȧŭŭŀŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.checkbox.make_default": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿȧȧķḗḗ ḓḗḗƒȧȧŭŭŀŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.error.payment_method_remove_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ řḗḗḿǿǿṽḗḗ ŧħḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.error.payment_method_save_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ şȧȧṽḗḗ ŧħḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.error.set_default_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞŧ ḿȧȧķḗḗ ŧħḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ȧȧş ḓḗḗƒȧȧŭŭŀŧ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.heading.payment_methods": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧẏḿḗḗƞŧ Ḿḗḗŧħǿǿḓş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.info.default_payment_updated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ẇȧȧş ḿȧȧḓḗḗ ȧȧş ḓḗḗƒȧȧŭŭŀŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ẇȧȧş řḗḗḿǿǿṽḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.info.payment_method_saved": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ẇȧȧş şȧȧṽḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.message.error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ ŀǿǿȧȧḓ ŧħḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓş. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.message.loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.placeholder.heading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ Şȧȧṽḗḗḓ Ƥȧȧẏḿḗḗƞŧ Ḿḗḗŧħǿǿḓş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.placeholder.text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ ȧȧ ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ŧǿǿ ƈħḗḗƈķ ǿǿŭŭŧ ƒȧȧşŧḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -9077,6 +9287,20 @@
       "value": "]"
     }
   ],
+  "shipping_options.action.send_as_gift_wrapping": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƞḓ ȧȧş ȧȧ ɠīƒŧ (ɠīƒŧ ẇřȧȧƥƥīƞɠ)"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -9113,6 +9337,20 @@
     {
       "type": 0,
       "value": "Ƒřḗḗḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_options.help.notifications": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ƈȧȧƞ ḗḗƞȧȧƀŀḗḗ ǿǿř ḓīşȧȧƀŀḗḗ ƞǿǿŧīƒīƈȧȧŧīǿǿƞş ȧȧŧ ȧȧƞẏ ŧīḿḗḗ."
     },
     {
       "type": 0,
