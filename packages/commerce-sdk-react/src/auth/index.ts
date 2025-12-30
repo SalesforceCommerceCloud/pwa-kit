@@ -25,7 +25,6 @@ import {
     stringToBase64,
     extractCustomParameters
 } from '../utils'
-import {getRequestCookies, parseCookieHeader} from '../utils/request-context'
 import {
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
@@ -384,17 +383,6 @@ class Auth {
         this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
-
-        /**
-         * On server-side, automatically populate tokens from request cookies
-         * This enables SSR to work with httpOnly cookies set by CDN
-         */
-        if (!onClient()) {
-            const requestCookies = getRequestCookies()
-            if (requestCookies) {
-                this.initializeFromRequestCookies(requestCookies)
-            }
-        }
     }
 
     /**
@@ -1765,72 +1753,6 @@ class Auth {
             isAgent,
             agentId,
             uido
-        }
-    }
-
-    /**
-     * Initialize auth storage from request cookies (server-side only)
-     * This is called during SSR when httpOnly cookies are present
-     * @private
-     */
-    private initializeFromRequestCookies(cookieHeader: string) {
-        const cookies = parseCookieHeader(cookieHeader)
-
-        // Helper to find cookie by name or name_siteId pattern
-        const getCookieValue = (baseName: string): string | undefined => {
-            // Try exact match first
-            if (cookies[baseName]) return cookies[baseName]
-            // Try with siteId suffix (e.g., access_token_RefArchGlobal)
-            const suffixedKey = `${baseName}_${this.siteId}`
-            if (cookies[suffixedKey]) return cookies[suffixedKey]
-            return undefined
-        }
-
-        const accessToken = getCookieValue('access_token')
-        const refreshToken = getCookieValue('refresh_token')
-        const idToken = getCookieValue('id_token')
-        const idpAccessToken = getCookieValue('idp_access_token')
-
-        // Store tokens - on server this uses MemoryStorage which is NOT serialized to client
-        if (accessToken) {
-            this.set('access_token', accessToken)
-        }
-
-        // Store refresh_token (need to determine if guest or registered)
-        if (refreshToken) {
-            // Check if we can determine type from the token itself
-            let isGuest = false
-            try {
-                if (accessToken) {
-                    const parsed = this.parseSlasJWT(accessToken)
-                    isGuest = parsed.isGuest
-                }
-            } catch (e) {
-                // If we can't parse, assume registered (safer default)
-                isGuest = false
-            }
-
-            const refreshKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-            this.set(refreshKey, refreshToken)
-        }
-
-        // Store id_token
-        if (idToken) {
-            this.set('id_token', idToken)
-        }
-
-        // Store idp_access_token
-        if (idpAccessToken) {
-            this.set('idp_access_token', idpAccessToken)
-        }
-
-        // Store other cookie data if present (these are not sensitive tokens, can use regular storage)
-        if (cookies.customer_id) {
-            this.set('customer_id', cookies.customer_id)
-        }
-
-        if (cookies.usid) {
-            this.set('usid', cookies.usid)
         }
     }
 }

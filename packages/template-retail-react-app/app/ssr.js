@@ -25,7 +25,6 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {requestContextStorage} from '@salesforce/commerce-sdk-react'
 import {createCdnSimulator} from './cdn-simulator'
 
 const config = getConfig()
@@ -356,18 +355,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     // This simulates CDN edge transformer behavior for local development
     // Enable with: ENABLE_CDN_SIMULATOR=true npm start
     app.use(createCdnSimulator())
-
-    // ⭐ AsyncLocalStorage - Set request context for Auth module
-    // This makes request cookies available to Auth constructor during SSR
-    app.use((req, res, next) => {
-        requestContextStorage.run(
-            {
-                cookies: req.headers.cookie || '',
-                headers: req.headers
-            },
-            () => next()
-        )
-    })
 
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)

@@ -256,7 +256,29 @@ const handleRefreshTokenRequest = async ({
                     const useSecure = isRemote() || appProtocol === 'https'
                     const secureFlag = useSecure ? '; Secure' : ''
 
-                    const setCookies = []
+                    // Get upstream cookies from SLAS response and transform dwsid to HttpOnly
+                    let upstreamCookies = []
+                    if (Array.isArray(proxyRes.headers['set-cookie'])) {
+                        upstreamCookies = proxyRes.headers['set-cookie']
+                    } else if (proxyRes.headers['set-cookie']) {
+                        upstreamCookies = [proxyRes.headers['set-cookie']]
+                    }
+
+                    const setCookies = upstreamCookies.map((cookie) => {
+                        const cookieName = cookie.split('=')[0].trim().toLowerCase()
+                        if (cookieName === 'dwsid') {
+                            let transformed = cookie
+                            if (!/httponly/i.test(cookie)) {
+                                transformed += '; HttpOnly'
+                            }
+                            if (useSecure && !/;\s*secure/i.test(cookie)) {
+                                transformed += '; Secure'
+                            }
+                            console.log(`[CDN Sim]   ✓ Made dwsid HttpOnly${secureFlag}`)
+                            return transformed
+                        }
+                        return cookie
+                    })
 
                     // Set HttpOnly cookies for tokens
                     setCookies.push(
@@ -441,7 +463,29 @@ const handleDirectTokenRequest = async ({
                     const useSecure = isRemote() || appProtocol === 'https'
                     const secureFlag = useSecure ? '; Secure' : ''
 
-                    const setCookies = []
+                    // Get upstream cookies from SLAS response and transform dwsid to HttpOnly
+                    let upstreamCookies = []
+                    if (Array.isArray(proxyRes.headers['set-cookie'])) {
+                        upstreamCookies = proxyRes.headers['set-cookie']
+                    } else if (proxyRes.headers['set-cookie']) {
+                        upstreamCookies = [proxyRes.headers['set-cookie']]
+                    }
+
+                    const setCookies = upstreamCookies.map((cookie) => {
+                        const cookieName = cookie.split('=')[0].trim().toLowerCase()
+                        if (cookieName === 'dwsid') {
+                            let transformed = cookie
+                            if (!/httponly/i.test(cookie)) {
+                                transformed += '; HttpOnly'
+                            }
+                            if (useSecure && !/;\s*secure/i.test(cookie)) {
+                                transformed += '; Secure'
+                            }
+                            console.log(`[CDN Sim]   ✓ Made dwsid HttpOnly${secureFlag}`)
+                            return transformed
+                        }
+                        return cookie
+                    })
 
                     // Set HttpOnly cookies for tokens
                     setCookies.push(
@@ -654,9 +698,9 @@ export const configureProxy = ({
                     console.log(`[CDN Sim] 🍪 No cookies in request for ${incomingRequest.url}`)
                 }
 
+                // Parse cookies once and extract tokens
+                let cookies = {}
                 if (cookieHeader) {
-                    // Parse cookies to find access_token or access_token_<siteId>
-                    const cookies = {}
                     cookieHeader.split(';').forEach((cookie) => {
                         const [key, ...valueParts] = cookie.trim().split('=')
                         if (key && valueParts.length > 0) {
@@ -693,6 +737,13 @@ export const configureProxy = ({
                     )
                 } else {
                     console.log(`[CDN Sim] ⚠️ No access_token found for ${incomingRequest.url}`)
+                }
+
+                // Inject sfdc_dwsid header if found in cookies (for session tracking)
+                const dwsid = cookies.dwsid
+                if (dwsid) {
+                    proxyRequest.setHeader('sfdc_dwsid', dwsid)
+                    console.log(`[CDN Sim] 🔑 Injected sfdc_dwsid header for ${incomingRequest.url}`)
                 }
 
                 // Note: Refresh token requests are handled in the middleware wrapper
@@ -902,21 +953,41 @@ export const configureProxy = ({
 
                                 // Set httpOnly cookies with siteId suffix (e.g., access_token_RefArchGlobal)
                                 // Old-format cookies were already filtered at the top of CDN sim block
-                                const setCookies = Array.isArray(
+                                const upstreamCookies = Array.isArray(
                                     proxyResponse.headers['set-cookie']
                                 )
                                     ? [...proxyResponse.headers['set-cookie']]
                                     : []
 
-                                // Calculate expiry timestamp for browser to know when to refresh
-                                // expires_in is in seconds, we convert to absolute timestamp
-                                const expiresInSeconds = data.expires_in || 1800
-                                const expiryTimestamp = Date.now() + expiresInSeconds * 1000
-
                                 // Only add Secure attribute in production (HTTPS)
                                 // In local dev (HTTP), Secure cookies work on localhost but not other domains
                                 const useSecure = isRemote() || appProtocol === 'https'
                                 const secureFlag = useSecure ? '; Secure' : ''
+
+                                // Transform upstream cookies to add HttpOnly/Secure to dwsid
+                                const setCookies = upstreamCookies.map((cookie) => {
+                                    const cookieName = cookie.split('=')[0].trim().toLowerCase()
+                                    if (cookieName === 'dwsid') {
+                                        // Add HttpOnly and Secure to dwsid if not present
+                                        let transformed = cookie
+                                        if (!/httponly/i.test(cookie)) {
+                                            transformed += '; HttpOnly'
+                                        }
+                                        if (useSecure && !/;\s*secure/i.test(cookie)) {
+                                            transformed += '; Secure'
+                                        }
+                                        console.log(
+                                            `[CDN Sim]   ✓ Made dwsid HttpOnly${secureFlag}`
+                                        )
+                                        return transformed
+                                    }
+                                    return cookie
+                                })
+
+                                // Calculate expiry timestamp for browser to know when to refresh
+                                // expires_in is in seconds, we convert to absolute timestamp
+                                const expiresInSeconds = data.expires_in || 1800
+                                const expiryTimestamp = Date.now() + expiresInSeconds * 1000
 
                                 if (access_token) {
                                     // HttpOnly cookie for access token (+ Secure in production)
