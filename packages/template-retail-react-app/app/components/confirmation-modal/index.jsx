@@ -24,10 +24,9 @@ import {useIntl} from 'react-intl'
 const ConfirmationModal = ({
     dialogTitle = CONFIRMATION_DIALOG_DEFAULT_CONFIG.dialogTitle,
     confirmationMessage = CONFIRMATION_DIALOG_DEFAULT_CONFIG.confirmationMessage,
+    confirmationMessageValues,
     primaryActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionLabel,
-    primaryActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionAriaLabel,
     alternateActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionLabel,
-    alternateActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionAriaLabel,
     hideAlternateAction = false,
     onPrimaryAction = noop,
     onAlternateAction = noop,
@@ -55,7 +54,7 @@ const ConfirmationModal = ({
             <AlertDialogContent>
                 <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
                 <AlertDialogBody>
-                    <Text>{formatMessage(confirmationMessage)}</Text>
+                    <Text>{formatMessage(confirmationMessage, confirmationMessageValues)}</Text>
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
@@ -63,7 +62,9 @@ const ConfirmationModal = ({
                         <Button
                             variant="ghost"
                             mr={3}
-                            aria-label={formatMessage(alternateActionAriaLabel)}
+                            aria-label={formatMessage(
+                                props.alternateActionAriaLabel || alternateActionLabel
+                            )}
                             onClick={handleAlternateActionClick}
                         >
                             {formatMessage(alternateActionLabel)}
@@ -72,7 +73,9 @@ const ConfirmationModal = ({
                     <Button
                         variant="solid"
                         onClick={handleConfirmClick}
-                        aria-label={formatMessage(primaryActionAriaLabel)}
+                        aria-label={formatMessage(
+                            props.primaryActionAriaLabel || primaryActionLabel
+                        )}
                     >
                         {formatMessage(primaryActionLabel)}
                     </Button>
@@ -103,6 +106,10 @@ ConfirmationModal.propTypes = {
      * Text to display in confirmation modal prompting user to pick an action
      */
     confirmationMessage: PropTypes.object,
+    /**
+     * Optional values for placeholders in confirmationMessage
+     */
+    confirmationMessageValues: PropTypes.object,
     /**
      * Button Label for primary action in confirmation modal
      */

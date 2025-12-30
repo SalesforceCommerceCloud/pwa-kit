@@ -45,6 +45,8 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -98,6 +100,14 @@ const Account = () => {
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
+    const {oneClickCheckout = {}} = getConfig().app || {}
+    const isOneClickCheckoutEnabled = oneClickCheckout.enabled
+
+    // Filter navigation links based on 1CC configuration
+    const filteredNavLinks = isOneClickCheckoutEnabled
+        ? navLinks
+        : navLinks.filter((link) => link.name !== 'payments')
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -162,7 +172,7 @@ const Account = () => {
                                 <AccordionPanel px={4} paddingBottom={4}>
                                     <Flex as="nav" spacing={0} direction="column">
                                         <Stack spacing={0} as="ul" data-testid="account-nav">
-                                            {navLinks.map((link) => (
+                                            {filteredNavLinks.map((link) => (
                                                 <Box
                                                     align="center"
                                                     key={link.name}
@@ -209,7 +219,7 @@ const Account = () => {
                     </Heading>
 
                     <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">
-                        {navLinks.map((link) => {
+                        {filteredNavLinks.map((link) => {
                             const LinkIcon = link.icon
                             return (
                                 <Button
@@ -243,6 +253,11 @@ const Account = () => {
                     <Route path={`${path}/orders`}>
                         <AccountOrders />
                     </Route>
+                    {isOneClickCheckoutEnabled && (
+                        <Route exact path={`${path}/payments`}>
+                            <AccountPayments />
+                        </Route>
+                    )}
                 </Switch>
             </Grid>
         </Box>
