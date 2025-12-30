@@ -41,20 +41,6 @@
       "value": "]"
     }
   ],
-  "account.title.my_account": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account.payments.action.refresh": [
     {
       "type": 0,
@@ -259,6 +245,20 @@
     {
       "type": 0,
       "value": "Ȧḓḓ ȧȧ ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ŧǿǿ ƈħḗḗƈķ ǿǿŭŭŧ ƒȧȧşŧḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
     },
     {
       "type": 0,
@@ -1969,20 +1969,6 @@
       "value": "]"
     }
   ],
-  "checkout.title.checkout": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "checkout.message.user_registration": [
     {
       "type": 0,
@@ -2005,6 +1991,20 @@
     {
       "type": 0,
       "value": "Şȧȧṽḗḗ ŧħīş ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ƒǿǿř ƒŭŭŧŭŭřḗḗ ŭŭşḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħḗḗƈķǿǿŭŭŧ"
     },
     {
       "type": 0,
