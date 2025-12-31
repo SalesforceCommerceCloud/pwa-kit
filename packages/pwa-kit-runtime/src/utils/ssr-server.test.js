@@ -468,17 +468,20 @@ describe('MetricsSender', () => {
             })
         }
 
-        // Set up a fake CloudWatch client
+        // Set up a fake CloudWatch client (AWS SDK v3)
         const calledParams = []
         let callCount = 0
         sender._CW = {
-            putMetricData: (params, callback) => {
+            send: (command) => {
                 callCount += 1
                 // This returns a fake error on the first call, and then
                 // accepts all subsequent calls.
                 const err = calledParams.length ? null : new Error('imaginary error')
-                params.MetricData.forEach((metric) => calledParams.push(metric))
-                callback(err, null)
+                command.input.MetricData.forEach((metric) => calledParams.push(metric))
+                if (err) {
+                    return Promise.reject(err)
+                }
+                return Promise.resolve()
             }
         }
 
@@ -537,24 +540,22 @@ describe('MetricsSender', () => {
         ]
 
         // Set up a fake CloudWatch client that will return a Throttling
-        // error every time it's called.
+        // error every time it's called (AWS SDK v3).
+        const sendSpy = sandbox.spy(() => {
+            const err = new Error('Throttled')
+            err.code = 'Throttling'
+            return Promise.reject(err)
+        })
         sender._CW = {
-            putMetricData: (params, callback) => {
-                const err = new Error('Throttled')
-                err.code = 'Throttling'
-                callback(err)
-            }
+            send: sendSpy
         }
-
-        // Allow spying on the putMetricData calls
-        sender._CW.putMetricData = sandbox.spy(sender._CW, 'putMetricData')
 
         // Send the params.
         sender.send(metrics1)
         expect(sender.queueLength).toEqual(metrics1.length)
         return sender.flush().then(() => {
             // Expect that we retried the correct number of times
-            expect(sender._CW.putMetricData.callCount).toBe(1)
+            expect(sendSpy.callCount).toBe(1)
             expect(sender.queueLength).toBe(0)
         })
     })
