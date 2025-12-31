@@ -61,6 +61,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const passwordlessMode = passwordless?.mode
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 
@@ -104,11 +105,9 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            // TODO: use proper parameters from the config
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
-                mode: 'email',
-                locale: 'en-GB'
+                mode: passwordlessMode
             })
             setIsOtpAuthOpen(true)
         } catch (error) {
@@ -155,7 +154,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
+        if (path.endsWith(PASSWORDLESS_LOGIN_LANDING_PATH) && isSuccessCustomerBaskets) {
             const token = decodeURIComponent(queryParams.get('token'))
             if (queryParams.get('redirect_url')) {
                 setRedirectPath(decodeURIComponent(queryParams.get('redirect_url')))

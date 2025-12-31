@@ -43,8 +43,7 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 
 export const LOGIN_VIEW = 'login'
@@ -91,11 +90,10 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
+    const passwordlessMode = passwordlessConfig?.mode
+    const callbackURL = buildAbsoluteUrl(appOrigin, passwordlessConfigCallback)
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -105,13 +103,11 @@ export const AuthModal = ({
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            // TODO: use proper parameters from the config
             const redirectPath = window.location.pathname + (window.location.search || '')
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
-                mode: 'email',
-                locale: 'en-GB',
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+                mode: passwordlessMode,
+                ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             // Close AuthModal first, then open OtpAuth modal after a brief delay
             onClose()
