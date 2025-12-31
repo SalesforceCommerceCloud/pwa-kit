@@ -133,6 +133,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const submitForm = async (data) => {
         form.clearErrors()
 
+        // If passwordless is enabled and the password is not provided, handle passwordless login
         if (isPasswordlessEnabled && !data.password) {
             const email = data.email
             await handlePasswordlessLogin(email)
@@ -147,7 +148,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
-        handleMergeBasket()
     }
 
     // Handles passwordless login by retrieving the 'token' from the query parameters and

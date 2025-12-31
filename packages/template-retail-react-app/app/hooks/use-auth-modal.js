@@ -90,6 +90,7 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const passwordlessMode = passwordlessConfig?.mode
@@ -176,7 +177,6 @@ export const AuthModal = ({
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
                 }
-                handleMergeBasket()
             },
             register: async (data) => {
                 try {
@@ -223,7 +223,6 @@ export const AuthModal = ({
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
-        handleMergeBasket()
     }
 
     // Reset form and local state when opening the modal
@@ -288,6 +287,7 @@ export const AuthModal = ({
 
             // Execute action to be performed on successful login
             onLoginSuccess()
+            handleMergeBasket()
         }
 
         if (registering) {
