@@ -14,7 +14,8 @@ import {
     useAuthHelper,
     useCustomerBaskets,
     useCustomerId,
-    useCustomerType
+    useCustomerType,
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -33,8 +34,8 @@ import {
     PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
+import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {useMergeBasket} from '@salesforce/retail-react-app/app/hooks/use-merge-basket'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
@@ -54,7 +55,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -65,13 +66,42 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const idps = social?.idps
 
     const customerId = useCustomerId()
-    const {isSuccess: isSuccessCustomerBaskets} = useCustomerBaskets(
+    const prevAuthType = usePrevious(customerType)
+    const {data: baskets, isSuccess: isSuccessCustomerBaskets} = useCustomerBaskets(
         {parameters: {customerId}},
         {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
-    const handleMergeBasket = useMergeBasket()
+    const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
+
+    const handleMergeBasket = () => {
+        const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+        // we only want to merge basket when the user is logged in as a recurring user
+        // only recurring users trigger the login mutation, new user triggers register mutation
+        // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+        // if you change logic here, also change it in login page
+        const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+        if (shouldMergeBasket) {
+            try {
+                mergeBasket.mutate({
+                    headers: {
+                        // This is not required since the request has no body
+                        // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
+                    }
+                })
+            } catch (e) {
+                form.setError('global', {
+                    type: 'manual',
+                    message: formatMessage(API_ERROR_MESSAGE)
+                })
+            }
+        }
+    }
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -140,12 +170,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     useEffect(() => {
         if (isRegistered) {
             setIsOtpAuthOpen(false)
-            handleMergeBasket().catch(() => {
-                form.setError('global', {
-                    type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
-                })
-            })
+            handleMergeBasket()
             const redirectTo = redirectPath ? redirectPath : '/account'
             navigate(redirectTo)
         }

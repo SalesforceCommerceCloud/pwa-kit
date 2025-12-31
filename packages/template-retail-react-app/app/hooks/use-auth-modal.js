@@ -22,7 +22,9 @@ import {
     useAuthHelper,
     useCustomer,
     useCustomerId,
-    useCustomerType
+    useCustomerType,
+    useCustomerBaskets,
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
@@ -37,8 +39,9 @@ import {
     INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {useMergeBasket} from '@salesforce/retail-react-app/app/hooks/use-merge-basket'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
@@ -68,7 +71,8 @@ export const AuthModal = ({
 }) => {
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
+    const prevAuthType = usePrevious(customerType)
 
     const customer = useCustomer(
         {parameters: {customerId}},
@@ -92,7 +96,11 @@ export const AuthModal = ({
     const passwordlessMode = passwordlessConfig?.mode
     const callbackURL = buildAbsoluteUrl(appOrigin, passwordlessConfigCallback)
 
-    const handleMergeBasket = useMergeBasket()
+    const {data: baskets} = useCustomerBaskets(
+        {parameters: {customerId}},
+        {enabled: !!customerId && !isServer, keepPreviousData: true}
+    )
+    const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -112,6 +120,34 @@ export const AuthModal = ({
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
+        }
+    }
+
+    const handleMergeBasket = () => {
+        const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+        // we only want to merge basket when the user is logged in as a recurring user
+        // only recurring users trigger the login mutation, new user triggers register mutation
+        // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+        // if you change logic here, also change it in login page
+        const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+        if (shouldMergeBasket) {
+            try {
+                mergeBasket.mutate({
+                    headers: {
+                        // This is not required since the request has no body
+                        // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
+                    }
+                })
+            } catch (error) {
+                form.setError('global', {
+                    type: 'manual',
+                    message: formatMessage(API_ERROR_MESSAGE)
+                })
+            }
         }
     }
 
@@ -251,12 +287,7 @@ export const AuthModal = ({
 
             // Execute action to be performed on successful login
             onLoginSuccess()
-            handleMergeBasket().catch(() => {
-                form.setError('global', {
-                    type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
-                })
-            })
+            handleMergeBasket()
         }
 
         if (registering) {
