@@ -428,7 +428,13 @@ describe('SSRServer Lambda integration', () => {
     })
 
     test('Lambda reuse -- Default Behavior', () => {
-        const {route, handler, collectGarbage, sendMetric, server: new_server} = createServerWithGCSpy()
+        const {
+            route,
+            handler,
+            collectGarbage,
+            sendMetric,
+            server: new_server
+        } = createServerWithGCSpy()
         const {event, context} = createApiGatewayEvent()
         server = new_server
 
@@ -459,7 +465,13 @@ describe('SSRServer Lambda integration', () => {
     test('Lambda reuse -- with Forced Garbage Collection Enabled', () => {
         process.env.FORCE_GC = 'true'
         const {event, context} = createApiGatewayEvent()
-        const {route, handler, collectGarbage, sendMetric, server: new_server} = createServerWithGCSpy()
+        const {
+            route,
+            handler,
+            collectGarbage,
+            sendMetric,
+            server: new_server
+        } = createServerWithGCSpy()
         server = new_server
 
         const call = (event) =>
