@@ -1337,10 +1337,10 @@ class Auth {
                 mode: parameters.mode || 'callback',
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                callback_uri: parameters.callback_uri,
+                ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
                 hint: parameters.hint || 'cross_device',
-                locale: parameters.locale,
-                idp_name: parameters.idp_name,
+                locale: parameters.locale || this.locale,
+                ...(parameters.idp_name && {idp_name: parameters.idp_name}),
                 ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }
         }
@@ -1371,8 +1371,8 @@ class Auth {
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                hint: parameters.hint,
-                code_verifier: parameters.code_verifier
+                hint: parameters.hint || 'cross_device',
+                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
 

@@ -1,6 +1,8 @@
 ## v4.4.0-dev (Dec 17, 2025)
 
 - Update `authorizePasswordless` to pass locale and simplify mode selection to respect user's explicit mode choice while still defaulting to callback mode for backward compatibility [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492)
+- Update `getPasswordResetToken` to default locale to the one in CommerceApiProvider and pass callback_uri and idp_name only when they are defined [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
+- Update `resetPassword` to default hint to `cross_device` and pass code_verifier only when it is defined [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
 
 ## v4.3.0 (Dec 17, 2025)
 
