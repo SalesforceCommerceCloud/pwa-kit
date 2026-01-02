@@ -40,17 +40,49 @@ test('Verify passwordless login request on mobile', async ({page}) => {
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login'
     )
 
+    // Verify the passwordless login request
     expect(interceptedRequest).toBeTruthy()
     expect(interceptedRequest.method()).toBe('POST')
 
-    const postData = interceptedRequest.postData()
+    let postData = interceptedRequest.postData()
     expect(postData).toBeTruthy()
 
-    const params = new URLSearchParams(postData)
+    let params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
     expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
+
+    await page.route(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/token',
+        (route) => {
+            interceptedRequest = route.request()
+            route.continue()
+        }
+    )
+
+    // Wait for OTP input fields to appear and fill the 8-digit code
+    const otpCode = '12345678' // Replace with actual OTP code
+    const otpInputs = page.locator('input[inputmode="numeric"][maxlength="1"]')
+    await otpInputs.first().waitFor()
+
+    // Fill each input field with one digit
+    for (let i = 0; i < 8; i++) {
+        await otpInputs.nth(i).fill(otpCode[i])
+    }
+
+    await page.waitForResponse(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/token'
+    )
+
+    // Verify the passwordless login token request
+    expect(interceptedRequest).toBeTruthy()
+    expect(interceptedRequest.method()).toBe('POST')
+    postData = interceptedRequest.postData()
+    expect(postData).toBeTruthy()
+    params = new URLSearchParams(postData)
+    expect(params.get('pwdless_login_token')).toBe(otpCode)
+    expect(params.get('hint')).toBe('pwdless_login')
 })
 
 test('Verify password reset request on mobile (extra features enabled)', async ({page}) => {
