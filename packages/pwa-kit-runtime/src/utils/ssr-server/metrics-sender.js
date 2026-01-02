@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {CloudWatchClient, PutMetricDataCommand} from '@aws-sdk/client-cloudwatch'
 import {isRemote} from './utils'
 import logger from '../logger-instance'
 
@@ -41,22 +42,19 @@ export class MetricsSender {
      * if this MetricsSender is not actually sending metrics.
      *
      * @private
-     * @returns {CloudWatch|null}
+     * @returns {CloudWatchClient|null}
      */
     _setup() {
         /* istanbul ignore next */
         if (!this._CW && (isRemote() || MetricsSender._override)) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const Cloudwatch = require('aws-sdk/clients/cloudwatch')
-            this._CW = new Cloudwatch({
-                apiVersion: '2010-08-01',
+            this._CW = new CloudWatchClient({
                 // The AWS_REGION variable is defined by the Lambda
                 // environment.
                 region: process.env.AWS_REGION || 'us-east-1',
-                // Setting maxRetries to 0 will prevent the SDK from retrying.
+                // Setting maxAttempts to 1 will prevent the SDK from retrying.
                 // This is necessary because under high load, there will be backpressure
                 // on the Lambda function, and causing severe performance issues (400-500ms latency)
-                maxRetries: 0
+                maxAttempts: 1
             })
         }
         return this._CW
@@ -66,7 +64,7 @@ export class MetricsSender {
      * Call putMetricData as needed, including retrying.
      *
      * @private
-     * @param {CloudWatch} cw - Cloudwatch client
+     * @param {CloudWatchClient} cw - Cloudwatch client
      * @param {Array} metrics - Array of metrics to send
      * @returns {Promise.<*>} resolved when the metrics are sent
      * (or when they can't be sent).
@@ -77,25 +75,19 @@ export class MetricsSender {
             return Promise.resolve()
         }
 
-        return new Promise((resolve) => {
-            cw.putMetricData(
-                {
-                    MetricData: metrics,
-                    Namespace: 'ssr'
-                },
-                (err) => {
-                    if (err) {
-                        logger.warn(`Metrics: error sending data: ${err}`, {
-                            namespace: 'metrics-sender._putMetricData',
-                            additionalProperties: {
-                                metrics,
-                                error: err
-                            }
-                        })
-                    }
-                    resolve()
+        const command = new PutMetricDataCommand({
+            MetricData: metrics,
+            Namespace: 'ssr'
+        })
+
+        return cw.send(command).catch((err) => {
+            logger.warn(`Metrics: error sending data: ${err}`, {
+                namespace: 'metrics-sender._putMetricData',
+                additionalProperties: {
+                    metrics,
+                    error: err
                 }
-            )
+            })
         })
     }
 

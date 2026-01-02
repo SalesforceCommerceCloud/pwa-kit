@@ -308,9 +308,10 @@ describe('SSRServer Lambda integration', () => {
             // track them.
             const metrics = []
             app.metrics._CW = {
-                putMetricData: (params, callback) => {
-                    metrics.push(params)
-                    callback(null)
+                send: (command) => {
+                    // AWS SDK v3 uses commands, extract the MetricData
+                    metrics.push(command.input)
+                    return Promise.resolve()
                 }
             }
             const metricSent = (name) =>
@@ -427,7 +428,13 @@ describe('SSRServer Lambda integration', () => {
     })
 
     test('Lambda reuse -- Default Behavior', () => {
-        const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
+        const {
+            route,
+            handler,
+            collectGarbage,
+            sendMetric,
+            server: new_server
+        } = createServerWithGCSpy()
         const {event, context} = createApiGatewayEvent()
         server = new_server
 
@@ -458,7 +465,13 @@ describe('SSRServer Lambda integration', () => {
     test('Lambda reuse -- with Forced Garbage Collection Enabled', () => {
         process.env.FORCE_GC = 'true'
         const {event, context} = createApiGatewayEvent()
-        const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
+        const {
+            route,
+            handler,
+            collectGarbage,
+            sendMetric,
+            server: new_server
+        } = createServerWithGCSpy()
         server = new_server
 
         const call = (event) =>

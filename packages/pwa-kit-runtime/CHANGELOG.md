@@ -1,4 +1,6 @@
 ## v3.16.0-dev (Dec 17, 2025)
+- Upgrade aws-sdk from V2 to V3 for metrics sender
+
 ## v3.15.0 (Dec 17, 2025)
 - Fix multiple set-cookie headers [#3508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3508)
 
