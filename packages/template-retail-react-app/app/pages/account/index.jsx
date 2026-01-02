@@ -103,13 +103,9 @@ const Account = () => {
 
     const {buildUrl} = useMultiSite()
     
-    // Show passkey toast if user just registered (from any source)
+    // Show passkey toast when user is on the account page
     useEffect(() => {
-        if (getSessionJSONItem('newAccountCreated')) {
-            showToast()
-            // Clear flag immediately
-            clearSessionJSONItem('newAccountCreated')
-        }
+        showToast()
     }, [])
     
     /**************** Einstein ****************/
