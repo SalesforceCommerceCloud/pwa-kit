@@ -51,7 +51,7 @@ test('Verify passwordless login request', async ({page}) => {
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
 })
 
-test('Verify password reset callback request', async ({page}) => {
+test('Verify password reset request', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -93,9 +93,7 @@ test('Verify password reset callback request', async ({page}) => {
 })
 
 // Verify on the login UI that looks different when extra login features are not enabled
-test('Verify password reset callback request when extra login features are not enabled', async ({
-    page
-}) => {
+test('Verify password reset request when extra login features are not enabled', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -135,7 +133,7 @@ test('Verify password reset callback request when extra login features are not e
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request', async ({page}) => {
+test('Verify password reset action request', async ({page}) => {
     let interceptedRequest = null
     await page.route(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action',

@@ -53,9 +53,7 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
 })
 
-test('Verify password reset callback request on mobile (extra features enabled)', async ({
-    page
-}) => {
+test('Verify password reset request on mobile (extra features enabled)', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -96,7 +94,7 @@ test('Verify password reset callback request on mobile (extra features enabled)'
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset callback request on mobile when extra login features are not enabled', async ({
+test('Verify password reset request on mobile when extra login features are not enabled', async ({
     page
 }) => {
     let interceptedRequest = null
@@ -139,7 +137,7 @@ test('Verify password reset callback request on mobile when extra login features
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request on mobile', async ({page}) => {
+test('Verify password reset action request on mobile', async ({page}) => {
     let interceptedRequest = null
     await page.route(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action',
