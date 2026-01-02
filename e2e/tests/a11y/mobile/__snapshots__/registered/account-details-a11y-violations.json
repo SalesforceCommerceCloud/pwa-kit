@@ -4,7 +4,7 @@
     "impact": "critical",
     "description": "Ensure an element's role supports its ARIA attributes",
     "help": "Elements must only use supported ARIA attributes",
-    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-allowed-attr?application=playwright",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/aria-allowed-attr?application=playwright",
     "nodes": [
       {
         "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-...\">",
@@ -20,7 +20,7 @@
     "impact": "moderate",
     "description": "Ensure landmarks are unique",
     "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
-    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-unique?application=playwright",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/landmark-unique?application=playwright",
     "nodes": [
       {
         "html": "<div role=\"region\" aria-live=\"polite\" id=\"...\" >",
@@ -36,7 +36,7 @@
     "impact": "serious",
     "description": "Ensure that lists are structured correctly",
     "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
-    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/list?application=playwright",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/list?application=playwright",
     "nodes": [
       {
         "html": "<ul class=\"...\" >",

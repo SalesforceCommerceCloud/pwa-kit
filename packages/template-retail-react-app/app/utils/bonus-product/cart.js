@@ -553,3 +553,35 @@ export const processProductsForBonusCart = (
 
     return productItems
 }
+
+/**
+ * Consolidates duplicate bonus products in a product items array for display purposes.
+ * Groups bonus products by productId and sums their quantities, while keeping non-bonus products as-is.
+ *
+ * @param {Array<Object>} productItems - Array of product items from basket or order
+ * @returns {Array<Object>} Array of product items with consolidated bonus products
+ */
+export const consolidateDuplicateBonusProducts = (productItems) => {
+    if (!productItems || productItems.length === 0) {
+        return []
+    }
+
+    // Separate bonus products from regular products
+    const bonusProducts = []
+    const regularProducts = []
+
+    productItems.forEach((item) => {
+        if (item.bonusProductLineItem) {
+            bonusProducts.push(item)
+        } else {
+            regularProducts.push(item)
+        }
+    })
+
+    // Consolidate duplicate bonus products by productId
+    const consolidatedBonusProducts = aggregateBonusProductQuantities(bonusProducts)
+
+    // Combine regular products with consolidated bonus products
+    // Keep regular products first, then bonus products
+    return [...regularProducts, ...consolidatedBonusProducts]
+}

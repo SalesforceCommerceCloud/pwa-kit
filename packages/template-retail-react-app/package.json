@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "8.3.0-dev",
+  "version": "8.4.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -46,10 +46,10 @@
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "1.1.2",
-    "@salesforce/commerce-sdk-react": "4.3.0-dev",
-    "@salesforce/pwa-kit-dev": "3.15.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.15.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.15.0-dev",
+    "@salesforce/commerce-sdk-react": "4.4.0-dev",
+    "@salesforce/pwa-kit-dev": "3.16.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.16.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.16.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -101,11 +101,11 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "84 kB"
+      "maxSize": "86 kB"
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "340 kB"
+      "maxSize": "363 kB"
     }
   ]
 }

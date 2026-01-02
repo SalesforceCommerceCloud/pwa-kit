@@ -1,4 +1,5 @@
-## v3.15.0-dev (Dec 11, 2025)
+## v3.16.0-dev (Dec 17, 2025)
+## v3.15.0 (Dec 17, 2025)
 - Fix multiple set-cookie headers [#3508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3508)
 
 ## v3.14.0 (Nov 04, 2025)

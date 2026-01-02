@@ -35,6 +35,7 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -57,7 +58,8 @@ const OrderProducts = ({productItems, currency}) => {
             }
         }
     )
-    const variants = productItems?.map((item) => {
+    const consolidatedItems = consolidateDuplicateBonusProducts(productItems || [])
+    const variants = consolidatedItems?.map((item) => {
         const product = products?.[item.productId]
         return {
             ...(product ? product : {}),
