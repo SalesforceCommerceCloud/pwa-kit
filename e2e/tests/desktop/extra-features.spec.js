@@ -47,9 +47,8 @@ test('Verify passwordless login request', async ({page}) => {
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
 test('Verify password reset callback request', async ({page}) => {
@@ -88,9 +87,8 @@ test('Verify password reset callback request', async ({page}) => {
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
@@ -132,9 +130,8 @@ test('Verify password reset callback request when extra login features are not e
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
