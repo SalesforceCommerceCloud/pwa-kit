@@ -251,12 +251,6 @@ export const LOGIN_TYPES = {
     SOCIAL: 'social'
 }
 
-// Constants for Password Reset
-export const RESET_PASSWORD_LANDING_PATH = '/reset-password-landing'
-
-// Constants for Passwordless Login
-export const PASSWORDLESS_LOGIN_LANDING_PATH = '/passwordless-login-landing'
-
 export const PASSWORDLESS_ERROR_MESSAGES = [
     /callback_uri doesn't match/i,
     /passwordless permissions error/i,
