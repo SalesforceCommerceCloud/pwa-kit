@@ -125,6 +125,8 @@ type AuthDataKeys =
     | typeof DWSID_COOKIE_NAME
     | 'code_verifier'
     | 'uido'
+    | 'idp_refresh_token'
+    | 'dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
