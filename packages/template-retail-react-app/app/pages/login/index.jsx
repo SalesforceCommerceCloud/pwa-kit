@@ -31,7 +31,7 @@ import {
     INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES,
+    PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
