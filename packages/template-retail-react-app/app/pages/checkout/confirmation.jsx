@@ -70,6 +70,7 @@ const CheckoutConfirmation = () => {
             enabled: !!orderNo && onClient
         }
     )
+
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
@@ -507,11 +508,13 @@ const CheckoutConfirmation = () => {
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
-                                    {order.paymentInstruments[0].paymentMethodId ===
+                                    {order.paymentInstruments?.[0]?.paymentMethodId ===
                                     'Salesforce Payments' ? (
-                                        <SFPaymentsOrderSummary
-                                            paymentInstrument={order.paymentInstruments[0]}
-                                        />
+                                        order.paymentInstruments?.[0]?.c_paymentReference_type ? (
+                                            <SFPaymentsOrderSummary
+                                                paymentInstrument={order.paymentInstruments[0]}
+                                            />
+                                        ) : null
                                     ) : (
                                         <Stack spacing={1}>
                                             <Heading as="h3" fontSize="sm">
