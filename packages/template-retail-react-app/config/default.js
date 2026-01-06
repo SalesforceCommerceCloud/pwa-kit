@@ -34,7 +34,7 @@ module.exports = {
                 enabled: false,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
-                landingPath: '/passwordless-login-landing'
+                landingPath: '/custom-passwordless-login-landing'
             },
             social: {
                 enabled: false,
@@ -43,7 +43,7 @@ module.exports = {
             },
             resetPassword: {
                 callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
-                landingPath: '/reset-password-landing'
+                landingPath: '/custom-reset-password-landing'
             }
         },
         defaultSite: 'RefArchGlobal',
@@ -55,7 +55,7 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: '475ad705-e2c1-4808-af78-81661f754511',
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
