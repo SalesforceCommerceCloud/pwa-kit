@@ -17,7 +17,6 @@ const mockNewPassword = 'new-password'
 
 const MockComponent = () => {
     const {getPasswordResetToken, resetPassword, resetPasswordLandingPath} = usePasswordReset()
-    console.log('resetPasswordLandingPath', resetPasswordLandingPath)
     return (
         <div>
             <button
