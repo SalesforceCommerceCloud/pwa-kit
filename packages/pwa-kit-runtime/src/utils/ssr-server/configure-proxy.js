@@ -333,6 +333,36 @@ const handleRefreshTokenRequest = async ({
                             .join('; ')
                     )
 
+                    // Extract and set dnt value from JWT for client-side sync checking
+                    // This is NOT HttpOnly so browser JS can compare with dw_dnt preference cookie
+                    try {
+                        const [, payloadB64] = access_token.split('.')
+                        if (payloadB64) {
+                            const base64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/')
+                            const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+                            const payloadStr = Buffer.from(padded, 'base64').toString('utf8')
+                            const payload = JSON.parse(payloadStr)
+                            if (payload?.dnt !== undefined) {
+                                setCookies.push(
+                                    [
+                                        `access_token_dnt${cookieSuffix}=${payload.dnt}`,
+                                        useSecure && 'Secure',
+                                        'SameSite=Lax',
+                                        'Path=/',
+                                        `Max-Age=${expiresInSeconds}`
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
+                                )
+                                console.log(
+                                    `[CDN Sim]   ✓ Set access_token_dnt${cookieSuffix}=${payload.dnt}`
+                                )
+                            }
+                        }
+                    } catch (e) {
+                        console.log('[CDN Sim] ⚠️ Failed to extract dnt from JWT:', e.message)
+                    }
+
                     console.log(
                         `[CDN Sim] 🔄 Refresh successful, set cookies (HttpOnly${secureFlag})`
                     )
@@ -540,6 +570,37 @@ const handleDirectTokenRequest = async ({
                             .join('; ')
                     )
 
+                    // Extract and set dnt value from JWT for client-side sync checking
+                    // This is NOT HttpOnly so browser JS can compare with dw_dnt preference cookie
+                    try {
+                        const [, dntPayloadB64] = access_token.split('.')
+                        if (dntPayloadB64) {
+                            const dntBase64 = dntPayloadB64.replace(/-/g, '+').replace(/_/g, '/')
+                            const dntPadded =
+                                dntBase64 + '='.repeat((4 - (dntBase64.length % 4)) % 4)
+                            const dntPayloadStr = Buffer.from(dntPadded, 'base64').toString('utf8')
+                            const dntPayload = JSON.parse(dntPayloadStr)
+                            if (dntPayload?.dnt !== undefined) {
+                                setCookies.push(
+                                    [
+                                        `access_token_dnt${cookieSuffix}=${dntPayload.dnt}`,
+                                        useSecure && 'Secure',
+                                        'SameSite=Lax',
+                                        'Path=/',
+                                        `Max-Age=${expiresInSeconds}`
+                                    ]
+                                        .filter(Boolean)
+                                        .join('; ')
+                                )
+                                console.log(
+                                    `[CDN Sim]   ✓ Set access_token_dnt${cookieSuffix}=${dntPayload.dnt}`
+                                )
+                            }
+                        }
+                    } catch (e) {
+                        console.log('[CDN Sim] ⚠️ Failed to extract dnt from JWT:', e.message)
+                    }
+
                     console.log(
                         `[CDN Sim] 📤 Direct token successful, set cookies (HttpOnly${secureFlag})`
                     )
@@ -719,8 +780,12 @@ export const configureProxy = ({
                         tokenSource = 'cookie'
                     } else {
                         // Find cookie matching access_token_<siteId> pattern
-                        const accessTokenKey = Object.keys(cookies).find((key) =>
-                            key.startsWith('access_token_')
+                        // Exclude access_token_dnt_ and access_token_expiry_ which are not actual tokens
+                        const accessTokenKey = Object.keys(cookies).find(
+                            (key) =>
+                                key.startsWith('access_token_') &&
+                                !key.startsWith('access_token_dnt_') &&
+                                !key.startsWith('access_token_expiry_')
                         )
                         if (accessTokenKey) {
                             accessToken = cookies[accessTokenKey]
@@ -743,7 +808,9 @@ export const configureProxy = ({
                 const dwsid = cookies.dwsid
                 if (dwsid) {
                     proxyRequest.setHeader('sfdc_dwsid', dwsid)
-                    console.log(`[CDN Sim] 🔑 Injected sfdc_dwsid header for ${incomingRequest.url}`)
+                    console.log(
+                        `[CDN Sim] 🔑 Injected sfdc_dwsid header for ${incomingRequest.url}`
+                    )
                 }
 
                 // Note: Refresh token requests are handled in the middleware wrapper
@@ -1020,6 +1087,45 @@ export const configureProxy = ({
                                     console.log(
                                         `[CDN Sim]   ✓ Set access_token_expiry${cookieSuffix} cookie (readable by JS)`
                                     )
+
+                                    // Extract and set dnt value from JWT for client-side sync checking
+                                    // This is NOT HttpOnly so browser JS can compare with dw_dnt preference cookie
+                                    try {
+                                        const [, dntPayloadB64] = access_token.split('.')
+                                        if (dntPayloadB64) {
+                                            const dntBase64 = dntPayloadB64
+                                                .replace(/-/g, '+')
+                                                .replace(/_/g, '/')
+                                            const dntPadded =
+                                                dntBase64 +
+                                                '='.repeat((4 - (dntBase64.length % 4)) % 4)
+                                            const dntPayloadStr = Buffer.from(
+                                                dntPadded,
+                                                'base64'
+                                            ).toString('utf8')
+                                            const dntPayload = JSON.parse(dntPayloadStr)
+                                            if (dntPayload?.dnt !== undefined) {
+                                                const dntCookie = [
+                                                    `access_token_dnt${cookieSuffix}=${dntPayload.dnt}`,
+                                                    useSecure && 'Secure',
+                                                    'SameSite=Lax',
+                                                    'Path=/',
+                                                    `Max-Age=${expiresInSeconds}`
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join('; ')
+                                                setCookies.push(dntCookie)
+                                                console.log(
+                                                    `[CDN Sim]   ✓ Set access_token_dnt${cookieSuffix}=${dntPayload.dnt} (readable by JS)`
+                                                )
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log(
+                                            '[CDN Sim] ⚠️ Failed to extract dnt from JWT:',
+                                            e.message
+                                        )
+                                    }
                                 }
 
                                 if (refresh_token) {

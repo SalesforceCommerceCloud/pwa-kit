@@ -125,6 +125,7 @@ type AuthDataKeys =
     | typeof DWSID_COOKIE_NAME
     | 'code_verifier'
     | 'uido'
+    | 'access_token_dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -239,6 +240,10 @@ const DATA_MAP: AuthDataMap = {
     uido: {
         storageType: 'local',
         key: 'uido'
+    },
+    access_token_dnt: {
+        storageType: 'cookie',
+        key: 'access_token_dnt'
     }
 }
 
@@ -532,8 +537,14 @@ class Auth {
         let isInSync = true
 
         // In CDN simulator mode on client, tokens are in httpOnly cookies
-        // We can't decode them, so skip the sync check
-        if (!this.isCdnSimulatorMode() || !onClient()) {
+        // We can't decode them directly, so use access_token_dnt cookie (set by transformer)
+        if (this.isCdnSimulatorMode() && onClient()) {
+            const accessTokenDnt = this.get('access_token_dnt')
+            if (accessTokenDnt) {
+                isInSync = accessTokenDnt === dntCookieVal
+            }
+        } else {
+            // Normal mode: decode JWT directly
             const accessToken = this.getAccessToken()
             if (accessToken) {
                 const {dnt} = this.parseSlasJWT(accessToken)
@@ -572,27 +583,65 @@ class Auth {
         if (preference === null) {
             dntCookieVal = this.defaultDnt ? String(Number(this.defaultDnt)) : '0'
         }
+        console.log('[Auth] setDnt called with preference:', preference, '→ dntCookieVal:', dntCookieVal)
+        console.log('[Auth] Cookie attributes:', getDefaultCookieAttributes())
+        
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
         this.set(DNT_COOKIE_NAME, dntCookieVal, {
-            ...getDefaultCookieAttributes(),
-            secure: true
+            ...getDefaultCookieAttributes()
+            // Note: secure flag is handled by getDefaultCookieAttributes() based on protocol
         })
-        const accessToken = this.getAccessToken()
-        if (accessToken !== '') {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            if (dnt !== dntCookieVal) {
-                await this.refreshAccessToken()
+        
+        // Verify the cookie was set
+        const verifySet = this.get(DNT_COOKIE_NAME)
+        console.log('[Auth] After first set, dw_dnt cookie value:', verifySet)
+
+        // Check if we need to refresh to get a new token with the updated DNT value
+        let needsRefresh = false
+
+        if (this.isCdnSimulatorMode() && onClient()) {
+            // In CDN mode, use access_token_dnt cookie (set by transformer) for comparison
+            const accessTokenDnt = this.get('access_token_dnt')
+            if (accessTokenDnt) {
+                needsRefresh = accessTokenDnt !== dntCookieVal
+            } else {
+                // No token yet, need to refresh
+                needsRefresh = true
             }
         } else {
-            await this.refreshAccessToken()
+            // Normal mode: decode JWT directly
+            const accessToken = this.getAccessToken()
+            if (accessToken !== '') {
+                const {dnt} = this.parseSlasJWT(accessToken)
+                needsRefresh = dnt !== dntCookieVal
+            } else {
+                needsRefresh = true
+            }
         }
+
+        if (needsRefresh) {
+            console.log('[Auth] Refresh needed, calling refreshAccessToken()')
+            await this.refreshAccessToken()
+            console.log('[Auth] Refresh completed')
+        }
+
+        // Check cookie after refresh
+        const afterRefresh = this.get(DNT_COOKIE_NAME)
+        console.log('[Auth] After refresh, dw_dnt cookie value:', afterRefresh)
+
         if (preference !== null) {
             const SECONDS_IN_DAY = 86400
+            const expiresInDays = Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
+            console.log('[Auth] Setting dw_dnt with expires:', expiresInDays, 'days')
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
-                secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
+                // Note: secure flag is handled by getDefaultCookieAttributes() based on protocol
+                expires: expiresInDays
             })
+            
+            // Final verification
+            const finalValue = this.get(DNT_COOKIE_NAME)
+            console.log('[Auth] Final dw_dnt cookie value:', finalValue)
         }
     }
 
@@ -925,6 +974,8 @@ class Auth {
      * Internal implementation of CDN mode refresh (without deduplication logic).
      */
     private async doRefreshAccessTokenInCdnMode(): Promise<AuthData> {
+        // Skip sync check to avoid deleting the dw_dnt cookie during refresh
+        // The sync check would compare with the OLD token's dnt value
         const dntPref = this.getDnt({includeDefaults: true})
 
         console.log('[Auth] CDN mode refresh - proxy will inject refresh_token')
@@ -992,6 +1043,9 @@ class Auth {
             if (token.expires_in) {
                 this.set('expires_in', String(token.expires_in))
             }
+            if (token.refresh_token_expires_in) {
+                this.set('refresh_token_expires_in', String(token.refresh_token_expires_in))
+            }
             if (token.enc_user_id) {
                 this.set('enc_user_id', token.enc_user_id)
             }
@@ -1007,6 +1061,13 @@ class Auth {
     }
 
     async refreshAccessToken() {
+        // In CDN mode on client, refresh tokens are in HttpOnly cookies
+        // Use the CDN-specific refresh flow instead
+        if (this.isCdnSimulatorMode() && onClient()) {
+            return this.refreshAccessTokenInCdnMode()
+        }
+
+        // Skip sync check to avoid deleting the dw_dnt cookie during refresh
         const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -1241,6 +1302,7 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
+        // Skip sync check during login to avoid deleting the dw_dnt cookie
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = true
         const guestPrivateArgs = {
@@ -1325,6 +1387,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
+        // Skip sync check during login to avoid deleting the dw_dnt cookie
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
 
@@ -1531,6 +1594,7 @@ class Auth {
     async authorizeIDP(parameters: AuthorizeIDPParams) {
         const slasClient = this.client
         const usid = this.get('usid')
+        // Skip sync check during IDP auth to avoid deleting the dw_dnt cookie
         const dntPref = this.getDnt({includeDefaults: true})
 
         // Extract known parameters and get custom ones
@@ -1571,6 +1635,7 @@ class Auth {
         const codeVerifier = this.get('code_verifier')
         const redirectURI = parameters.redirectURI || this.redirectURI
         const usid = parameters.usid || this.get('usid')
+        // Skip sync check during IDP login to avoid deleting the dw_dnt cookie
         const dntPref = this.getDnt({includeDefaults: true})
 
         const token = await helpers.loginIDPUser({
@@ -1628,6 +1693,7 @@ class Auth {
      */
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
+        // Skip sync check during passwordless login to avoid deleting the dw_dnt cookie
         const dntPref = this.getDnt({includeDefaults: true})
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
