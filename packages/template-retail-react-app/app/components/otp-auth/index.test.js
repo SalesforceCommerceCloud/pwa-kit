@@ -10,6 +10,8 @@ import userEvent from '@testing-library/user-event'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // Mock the Einstein hook
 const mockSendViewPage = jest.fn()
@@ -42,6 +44,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
 }))
 
 const WrapperComponent = ({...props}) => {
@@ -91,6 +97,7 @@ describe('OtpAuth', () => {
         mockHandleOtpVerification.mockResolvedValue({
             success: true
         })
+        getConfig.mockImplementation(() => mockConfig)
     })
 
     describe('Component Rendering', () => {
@@ -105,11 +112,31 @@ describe('OtpAuth', () => {
             expect(screen.getByText(/Resend code/i)).toBeInTheDocument()
         })
 
-        test('renders 8 OTP input fields', () => {
+        test('renders 8 OTP input fields by default', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
             expect(otpInputs).toHaveLength(8)
+        })
+
+        test('renders OTP input fields based on token length configuration', () => {
+            const tokenLength = 6
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {
+                        ...mockConfig.app.login,
+                        passwordless: {
+                            ...mockConfig.app.login.passwordless,
+                            tokenLength: tokenLength
+                        }
+                    }
+                }
+            }))
+            renderWithProviders(<WrapperComponent />)
+            const otpInputs = screen.getAllByRole('textbox')
+            expect(otpInputs).toHaveLength(tokenLength)
         })
 
         test('renders phone icon', () => {

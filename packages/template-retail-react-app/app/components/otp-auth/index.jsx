@@ -27,6 +27,7 @@ import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useOtpInputs} from '@salesforce/retail-react-app/app/hooks/use-otp-inputs'
 import {useCountdown} from '@salesforce/retail-react-app/app/hooks/use-countdown'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const OtpAuth = ({
     isOpen,
@@ -38,7 +39,7 @@ const OtpAuth = ({
     isGuestRegistration = false,
     hideCheckoutAsGuestButton = false
 }) => {
-    const OTP_LENGTH = 8
+    const OTP_LENGTH = getConfig().app.login.passwordless.tokenLength || 8
     const [isVerifying, setIsVerifying] = useState(false)
     const [error, setError] = useState('')
     const [resendTimer, setResendTimer] = useCountdown(0)
