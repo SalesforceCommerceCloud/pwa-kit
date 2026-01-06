@@ -506,7 +506,7 @@ describe('MetricsSender', () => {
                 expect(actual).toBeDefined()
                 expect(actual.MetricName).toEqual(metric.name)
                 expect(actual.Value).toEqual(metric.value || 0)
-                expect(actual.Timestamp).toEqual(nowISO)
+                expect(actual.Timestamp.toISOString()).toEqual(nowISO)
 
                 if (metric.dimensions) {
                     expect(actual.Dimensions).toBeDefined()
