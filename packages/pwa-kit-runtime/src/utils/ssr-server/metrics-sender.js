@@ -46,17 +46,20 @@ export class MetricsSender {
     _setup() {
         /* istanbul ignore next */
         if (!this._CW && (isRemote() || MetricsSender._override)) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const Cloudwatch = require('aws-sdk/clients/cloudwatch')
+            const {
+                CloudWatch: Cloudwatch
+            } = require('@aws-sdk/client-cloudwatch');
             this._CW = new Cloudwatch({
-                apiVersion: '2010-08-01',
                 // The AWS_REGION variable is defined by the Lambda
                 // environment.
                 region: process.env.AWS_REGION || 'us-east-1',
+
                 // Setting maxRetries to 0 will prevent the SDK from retrying.
                 // This is necessary because under high load, there will be backpressure
                 // on the Lambda function, and causing severe performance issues (400-500ms latency)
-                maxRetries: 0
+                // The key maxRetries is renamed to maxAttempts.
+                // The value of maxAttempts needs to be maxRetries + 1.
+                maxAttempts: 1
             })
         }
         return this._CW
@@ -77,25 +80,18 @@ export class MetricsSender {
             return Promise.resolve()
         }
 
-        return new Promise((resolve) => {
-            cw.putMetricData(
-                {
-                    MetricData: metrics,
-                    Namespace: 'ssr'
-                },
-                (err) => {
-                    if (err) {
-                        logger.warn(`Metrics: error sending data: ${err}`, {
-                            namespace: 'metrics-sender._putMetricData',
-                            additionalProperties: {
-                                metrics,
-                                error: err
-                            }
-                        })
-                    }
-                    resolve()
+        // v3 supports promises, so we can use that instead of a callback.
+        return cw.putMetricData({ 
+            MetricData: metrics, 
+            Namespace: 'ssr' 
+        }).catch((err) => {
+            logger.warn(`Metrics: error sending data: ${err}`, {
+                namespace: 'metrics-sender._putMetricData',
+                additionalProperties: {
+                    metrics,
+                    error: err
                 }
-            )
+            })
         })
     }
 
@@ -170,8 +166,10 @@ export class MetricsSender {
                 // This value must be a string
                 Timestamp: (metric.timestamp instanceof Date
                     ? metric.timestamp
-                    : now
-                ).toISOString(),
+                    : (typeof metric.timestamp === 'number'
+                        ? new Date(metric.timestamp)
+                        : now)
+                ),
                 Unit: metric.unit || 'Count'
             }
 
