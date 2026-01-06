@@ -91,7 +91,12 @@ const testMap: TestMap = {
     introspectToken: [OPTIONS, {token: 'token'}],
     resetPassword: [OPTIONS, undefined],
     revokeToken: [OPTIONS, {token: 'token'}],
-    logoutCustomer: [OPTIONS, TOKEN_RESPONSE]
+    logoutCustomer: [OPTIONS, TOKEN_RESPONSE],
+    startWebauthnRegistration: [OPTIONS, undefined],
+    finishWebauthnRegistration: [OPTIONS, undefined],
+    authorizeWebauthnRegistration: [OPTIONS, undefined],
+    startWebauthnAuthentication: [OPTIONS, undefined],
+    finishWebauthnAuthentication: [OPTIONS, TOKEN_RESPONSE]
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Implemented]]>
