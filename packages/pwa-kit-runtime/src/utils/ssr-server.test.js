@@ -472,13 +472,14 @@ describe('MetricsSender', () => {
         const calledParams = []
         let callCount = 0
         sender._CW = {
-            putMetricData: (params, callback) => {
+            putMetricData: (params) => {
                 callCount += 1
-                // This returns a fake error on the first call, and then
-                // accepts all subsequent calls.
-                const err = calledParams.length ? null : new Error('imaginary error')
                 params.MetricData.forEach((metric) => calledParams.push(metric))
-                callback(err, null)
+                // This returns a fake promise that resolves immediately
+                if (callCount === 1) {
+                    return Promise.reject(new Error('Some error'))
+                }
+                return Promise.resolve()
             }
         }
 
@@ -539,10 +540,8 @@ describe('MetricsSender', () => {
         // Set up a fake CloudWatch client that will return a Throttling
         // error every time it's called.
         sender._CW = {
-            putMetricData: (params, callback) => {
-                const err = new Error('Throttled')
-                err.code = 'Throttling'
-                callback(err)
+            putMetricData: (params) => {
+                return Promise.reject(new Error('Throttled'))
             }
         }
 
