@@ -29,8 +29,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     getPasswordLessAccessToken: noop,
     revokeToken: noop,
     introspectToken: noop,
-    startWebauthnRegistration: noop,
-    finishWebauthnRegistration: noop,
+    startWebauthnUserRegistration: noop,
+    finishWebauthnUserRegistration: noop,
     authorizeWebauthnRegistration: noop,
     startWebauthnAuthentication: noop,
     finishWebauthnAuthentication: noop
