@@ -2299,26 +2299,14 @@
       "value": "]"
     }
   ],
-  "checkout_confirmation.label.shipping.strikethrough.price": [
+  "checkout_confirmation.label.shipping.price": [
     {
       "type": 0,
       "value": "["
     },
     {
-      "type": 0,
-      "value": "Ǿřīɠīƞȧȧŀŀẏ "
-    },
-    {
       "type": 1,
-      "value": "originalPrice"
-    },
-    {
-      "type": 0,
-      "value": ", ƞǿǿẇ "
-    },
-    {
-      "type": 1,
-      "value": "newPrice"
+      "value": "price"
     },
     {
       "type": 0,
