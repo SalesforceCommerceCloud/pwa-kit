@@ -46,9 +46,8 @@ export class MetricsSender {
     _setup() {
         /* istanbul ignore next */
         if (!this._CW && (isRemote() || MetricsSender._override)) {
-            const {
-                CloudWatch: Cloudwatch
-            } = require('@aws-sdk/client-cloudwatch');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const {CloudWatch: Cloudwatch} = require('@aws-sdk/client-cloudwatch')
             this._CW = new Cloudwatch({
                 // The AWS_REGION variable is defined by the Lambda
                 // environment.
@@ -81,18 +80,20 @@ export class MetricsSender {
         }
 
         // v3 supports promises, so we can use that instead of a callback.
-        return cw.putMetricData({ 
-            MetricData: metrics, 
-            Namespace: 'ssr' 
-        }).catch((err) => {
-            logger.warn(`Metrics: error sending data: ${err}`, {
-                namespace: 'metrics-sender._putMetricData',
-                additionalProperties: {
-                    metrics,
-                    error: err
-                }
+        return cw
+            .putMetricData({
+                MetricData: metrics,
+                Namespace: 'ssr'
             })
-        })
+            .catch((err) => {
+                logger.warn(`Metrics: error sending data: ${err}`, {
+                    namespace: 'metrics-sender._putMetricData',
+                    additionalProperties: {
+                        metrics,
+                        error: err
+                    }
+                })
+            })
     }
 
     /**
@@ -164,12 +165,12 @@ export class MetricsSender {
                 MetricName: metric.name,
                 Value: metric.value || 0,
                 // This value must be a string
-                Timestamp: (metric.timestamp instanceof Date
-                    ? metric.timestamp
-                    : (typeof metric.timestamp === 'number'
+                Timestamp:
+                    metric.timestamp instanceof Date
+                        ? metric.timestamp
+                        : typeof metric.timestamp === 'number'
                         ? new Date(metric.timestamp)
-                        : now)
-                ),
+                        : now,
                 Unit: metric.unit || 'Count'
             }
 
