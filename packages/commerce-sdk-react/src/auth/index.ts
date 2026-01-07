@@ -1423,6 +1423,20 @@ class Auth {
             uido
         }
     }
+
+    async startWebauthnRegistration() {
+    }
+
+    async finishWebauthnRegistration() {
+    }
+
+    async authorizeWebauthnRegistration() {
+    }
+
+    async startWebauthnAuthentication() {
+    }
+
+    async finishWebauthnAuthentication() {
 }
 
 export default Auth
