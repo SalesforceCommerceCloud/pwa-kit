@@ -248,22 +248,18 @@ export default function ShippingOptions() {
         id: 'checkout_confirmation.label.free'
     })
 
-    let shippingPriceLabel = selectedMethodDisplayPrice
-    if (selectedMethodDisplayPrice !== shippingItem.price) {
-        const currentPrice =
-            selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
-
-        shippingPriceLabel = formatMessage(
-            {
-                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
-                id: 'checkout_confirmation.label.shipping.strikethrough.price'
-            },
-            {
-                originalPrice: shippingItem.price,
-                newPrice: currentPrice
-            }
-        )
-    }
+    const shippingPriceLabel =
+        selectedMethodDisplayPrice === 0
+            ? freeLabel
+            : formatMessage(
+                  {
+                      defaultMessage: '{price}',
+                      id: 'checkout_confirmation.label.shipping.price'
+                  },
+                  {
+                      price: selectedMethodDisplayPrice
+                  }
+              )
 
     return (
         <ToggleCard
@@ -398,7 +394,6 @@ export default function ShippingOptions() {
                     <SingleShipmentSummary
                         selectedShippingMethod={selectedShippingMethod}
                         selectedMethodDisplayPrice={selectedMethodDisplayPrice}
-                        shippingItem={shippingItem}
                         shippingPriceLabel={shippingPriceLabel}
                         currency={currency}
                         freeLabel={freeLabel}
@@ -497,7 +492,6 @@ MultiShipmentSummary.propTypes = {
 const SingleShipmentSummary = ({
     selectedShippingMethod,
     selectedMethodDisplayPrice,
-    shippingItem,
     shippingPriceLabel,
     currency,
     freeLabel
@@ -506,46 +500,21 @@ const SingleShipmentSummary = ({
         <ToggleCardSummary>
             <Flex justify="space-between" w="full">
                 <Text>{selectedShippingMethod.name}</Text>
-                <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                    <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                        {selectedMethodDisplayPrice === 0 ? (
-                            freeLabel
-                        ) : (
-                            <FormattedNumber
-                                value={selectedMethodDisplayPrice}
-                                style="currency"
-                                currency={currency}
-                            />
-                        )}
-                    </Text>
-                    {selectedMethodDisplayPrice !== shippingItem.price && (
-                        <Text
-                            fontWeight="normal"
-                            textDecoration="line-through"
-                            color="gray.600"
-                            marginLeft={1}
-                            aria-hidden="true"
-                            role="presentation"
-                        >
-                            <FormattedNumber
-                                style="currency"
-                                currency={currency}
-                                value={shippingItem.price}
-                            />
-                        </Text>
+                <Text fontWeight="bold" aria-label={shippingPriceLabel}>
+                    {selectedMethodDisplayPrice === 0 ? (
+                        freeLabel
+                    ) : (
+                        <FormattedNumber
+                            value={selectedMethodDisplayPrice}
+                            style="currency"
+                            currency={currency}
+                        />
                     )}
-                </Flex>
+                </Text>
             </Flex>
             <Text fontSize="sm" color="gray.700">
                 {selectedShippingMethod.description}
             </Text>
-            {shippingItem?.priceAdjustments?.map((adjustment) => {
-                return (
-                    <Text key={adjustment.priceAdjustmentId} fontSize="sm" color="green.600">
-                        {adjustment.itemText}
-                    </Text>
-                )
-            })}
         </ToggleCardSummary>
     )
 }
@@ -556,15 +525,6 @@ SingleShipmentSummary.propTypes = {
         description: PropTypes.string
     }).isRequired,
     selectedMethodDisplayPrice: PropTypes.number.isRequired,
-    shippingItem: PropTypes.shape({
-        price: PropTypes.number,
-        priceAdjustments: PropTypes.arrayOf(
-            PropTypes.shape({
-                priceAdjustmentId: PropTypes.string,
-                itemText: PropTypes.string
-            })
-        )
-    }),
     shippingPriceLabel: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     freeLabel: PropTypes.string.isRequired
