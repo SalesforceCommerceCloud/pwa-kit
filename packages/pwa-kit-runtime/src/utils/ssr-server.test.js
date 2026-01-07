@@ -621,6 +621,86 @@ describe('processLambdaResponse', () => {
             testCase.validate(res.headers)
         })
     })
+
+    test('preserves single cookie in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        expect(result.multiValueHeaders).toBeDefined()
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+        expect(result.headers['set-cookie']).toBeUndefined()
+    })
+
+    test('preserves multiple cookies in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/', 'test-value2', 'test-value3']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        expect(result.multiValueHeaders).toBeDefined()
+        expect(result.multiValueHeaders['set-cookie']).toEqual([
+            'test-cookie=test-value; Path=/',
+            'test-value2',
+            'test-value3'
+        ])
+        expect(result.headers['set-cookie']).toBeUndefined()
+    })
+
+    test('removes set-cookie from headers when cookies are in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/'],
+                'Accept-Language': ['en-US']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        // set-cookie should be removed from headers
+        expect(result.headers['set-cookie']).toBeUndefined()
+        // Other headers should still be present
+        expect(result.headers['accept-language']).toBe('en-US')
+        // Cookies should be in multiValueHeaders
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+    })
+
+    test('does not add multiValueHeaders when no cookies are present', () => {
+        const response = {
+            multiValueHeaders: {
+                'Accept-Language': ['en-US']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        // multiValueHeaders should be an empty object when no cookies are present
+        expect(result.multiValueHeaders).toEqual({})
+        expect(result.headers['accept-language']).toBe('en-US')
+    })
+
+    test('handles cookies with correlation ID', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/']
+            }
+        }
+        const event = {
+            headers: {'x-correlation-id': 'e46cd109-39b7-4173-963e-2c5de78ba087'}
+        }
+        const result = processLambdaResponse(response, event)
+
+        expect(result.headers['x-correlation-id']).toBe('e46cd109-39b7-4173-963e-2c5de78ba087')
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+        expect(result.headers['set-cookie']).toBeUndefined()
+    })
 })
 
 describe('processExpressResponse', () => {

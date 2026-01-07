@@ -49,14 +49,14 @@
     "playwright": "^1.49.0",
     "shelljs": "^0.9.2",
     "webdav": "^5.8.0",
-    "zod": "^3.25.56"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@babel/node": "^7.22.5",
     "@playwright/test": "^1.49.0",
-    "@salesforce/pwa-kit-dev": "3.15.0-dev",
+    "@salesforce/pwa-kit-dev": "3.16.0-dev",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.15.0-dev",
+    "internal-lib-build": "3.16.0-dev",
     "nodemon": "^2.0.22"
   },
   "engines": {

@@ -1,6 +1,6 @@
 {
   "name": "e2e-scripts",
-  "version": "3.15.0-dev",
+  "version": "3.16.0-dev",
   "description": "E2E test scripts for PWA Kit",
   "main": "index.js",
   "private": true,
@@ -13,9 +13,9 @@
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
-    "@aws-sdk/client-s3": "^3.450.0",
-    "@aws-sdk/client-sts": "^3.450.0",
-    "@salesforce/pwa-kit-dev": "3.15.0-dev",
+    "@aws-sdk/client-s3": "3.450.0",
+    "@aws-sdk/client-sts": "3.450.0",
+    "@salesforce/pwa-kit-dev": "3.16.0-dev",
     "jest": "^26.6.3"
   },
   "jest": {

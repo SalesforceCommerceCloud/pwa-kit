@@ -7,6 +7,7 @@
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
+    ShopperConfigurations,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
@@ -96,6 +97,7 @@ export interface ApiClients {
     shopperSearch?: ShopperSearch<ApiClientConfigParams>
     shopperSeo?: ShopperSEO<ApiClientConfigParams>
     shopperStores?: ShopperStores<ApiClientConfigParams>
+    shopperConfigurations?: ShopperConfigurations<ApiClientConfigParams>
 }
 
 export type ApiClient = NonNullable<ApiClients[keyof ApiClients]>

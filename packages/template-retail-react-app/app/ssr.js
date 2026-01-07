@@ -359,13 +359,17 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        'maps.googleapis.com',
+                        'places.googleapis.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
+                        'maps.googleapis.com',
+                        'places.googleapis.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],

@@ -25,7 +25,7 @@ describe('Utils', () => {
     describe('EmptyJsonSchema', () => {
         it('should be a valid JSON schema', () => {
             expect(EmptyJsonSchema).toEqual({
-                $schema: 'http://json-schema.org/draft-07/schema#',
+                $schema: 'https://json-schema.org/draft/2020-12/schema',
                 type: 'object',
                 properties: {},
                 additionalProperties: false

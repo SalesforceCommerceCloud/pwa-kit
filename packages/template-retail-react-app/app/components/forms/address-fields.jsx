@@ -11,12 +11,14 @@ import {
     Grid,
     GridItem,
     SimpleGrid,
-    Stack
+    Stack,
+    Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useAddressFields from '@salesforce/retail-react-app/app/components/forms/useAddressFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale'
+import AddressSuggestionDropdown from '@salesforce/retail-react-app/app/components/address-suggestion-dropdown'
 
 const defaultFormTitleAriaLabel = defineMessage({
     defaultMessage: 'Address Form',
@@ -51,7 +53,21 @@ const AddressFields = ({
             </SimpleGrid>
             <Field {...fields.phone} />
             <Field {...fields.countryCode} />
-            <Field {...fields.address1} />
+
+            <Box position="relative">
+                <Field {...fields.address1} />
+                <AddressSuggestionDropdown
+                    suggestions={fields.address1.autocomplete.suggestions}
+                    isVisible={
+                        fields.address1.autocomplete.showDropdown &&
+                        !fields.address1.autocomplete.isDismissed
+                    }
+                    onClose={fields.address1.autocomplete.onClose}
+                    onSelectSuggestion={fields.address1.autocomplete.onSelectSuggestion}
+                    position="absolute"
+                />
+            </Box>
+
             <Field {...fields.city} />
             <Grid templateColumns="repeat(8, 1fr)" gap={5}>
                 <GridItem colSpan={[4, 4, 4]}>
