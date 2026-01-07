@@ -17,6 +17,7 @@ import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import {setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const Registration = () => {
@@ -49,6 +50,8 @@ const Registration = () => {
 
     useEffect(() => {
         if (isRegistered) {
+            // Set flag for passkey toast on account page
+            setSessionJSONItem('newAccountCreated', true)
             navigate('/account')
         }
     }, [isRegistered])
