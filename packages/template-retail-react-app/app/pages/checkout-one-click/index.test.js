@@ -205,7 +205,7 @@ describe('Checkout One Click', () => {
             rest.post('*/baskets/:basketId/payment-instruments', (req, res, ctx) => {
                 currentBasket.paymentInstruments = [
                     {
-                        amount: 0,
+                        amount: 100,
                         paymentCard: {
                             cardType: 'Master Card',
                             creditCardExpired: false,
@@ -1137,6 +1137,7 @@ describe('Checkout One Click', () => {
         const basketWithPayment = JSON.parse(JSON.stringify(scapiBasketWithItem))
         basketWithPayment.paymentInstruments = [
             {
+                amount: 100,
                 paymentMethodId: 'CREDIT_CARD',
                 paymentCard: {
                     cardType: 'Visa',
@@ -1153,6 +1154,7 @@ describe('Checkout One Click', () => {
             ...scapiOrderResponse,
             paymentInstruments: [
                 {
+                    amount: 100,
                     paymentMethodId: 'CREDIT_CARD',
                     paymentCard: {
                         cardType: 'Visa',
@@ -1233,6 +1235,7 @@ describe('Checkout One Click', () => {
             ...scapiOrderResponse,
             paymentInstruments: [
                 {
+                    amount: 100,
                     paymentMethodId: 'CREDIT_CARD',
                     paymentCard: {
                         cardType: 'Visa',
