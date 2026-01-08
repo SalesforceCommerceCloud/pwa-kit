@@ -1366,7 +1366,7 @@ class Auth {
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
                 hint: parameters.hint || 'cross_device',
-                user_id: parameters.user_id,
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
