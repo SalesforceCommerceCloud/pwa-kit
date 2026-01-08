@@ -193,7 +193,7 @@ test('allows regular login via Enter key in password mode', async () => {
     await user.click(trigger)
 
     await waitFor(() => {
-        expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        expect(screen.getByText(/Continue/i)).toBeInTheDocument()
     })
 
     // enter email and switch to password mode
@@ -224,7 +224,7 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
     })
 
@@ -241,14 +241,14 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
 
         // enter a valid email address
         await user.type(screen.getByLabelText('Email'), validEmail)
 
         // initiate passwordless login
-        const passwordlessLoginButton = screen.getByText(/continue securely/i)
+        const passwordlessLoginButton = screen.getByText(/Continue/i)
         await user.click(passwordlessLoginButton)
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
@@ -305,7 +305,7 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
 
         // enter a valid email address
@@ -359,11 +359,11 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
 
         await user.type(screen.getByLabelText('Email'), validEmail)
-        await user.click(screen.getByText(/continue securely/i))
+        await user.click(screen.getByText(/Continue/i))
 
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync

@@ -53,7 +53,7 @@ const PasswordlessLogin = ({
                         isLoading={form.formState.isSubmitting}
                     >
                         <FormattedMessage
-                            defaultMessage="Continue Securely"
+                            defaultMessage="Continue"
                             id="login_form.button.continue_securely"
                         />
                     </Button>
