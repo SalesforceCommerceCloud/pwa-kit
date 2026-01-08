@@ -1496,7 +1496,7 @@ class Auth {
     /**
      * A wrapper method for the SLAS endpoint: finishWebauthnUserRegistration.
      */
-    async finishWebauthnUserRegistration(parameters: ShopperLoginTypes.finishWebauthnUserRegistrationBodyType) {
+    async finishWebauthnUserRegistration(parameters: ShopperLoginTypes.RegistrationFinishRequest) {
         const slasClient = this.client
 
         const options = {
@@ -1509,7 +1509,7 @@ class Auth {
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 pwd_action_token: parameters.pwd_action_token,
                 username: parameters.username,
-                credential_id: parameters.credential_id,
+                credential: parameters.credential,
             }
         }
 
@@ -1552,7 +1552,7 @@ class Auth {
     /**
      * A wrapper method for the SLAS endpoint: finishWebauthnAuthentication.
      */
-    async finishWebauthnAuthentication(parameters: ShopperLoginTypes.finishWebauthnAuthenticationBodyType) {
+    async finishWebauthnAuthentication(parameters: ShopperLoginTypes.AuthenticateFinishRequest) {
         const slasClient = this.client
 
         const options = {
@@ -1573,7 +1573,12 @@ class Auth {
         }
 
         const res = await slasClient.finishWebauthnAuthentication(options)
+
         const tokenResponse = res.tokenResponse
+        if (!tokenResponse) {
+            throw new Error('finishWebauthnAuthentication did not return a tokenResponse.')
+        }
+
         this.handleTokenResponse(tokenResponse, false)
 
         return tokenResponse

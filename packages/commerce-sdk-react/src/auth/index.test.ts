@@ -70,7 +70,12 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
-            }
+            },
+            authorizeWebauthnRegistration: jest.fn().mockResolvedValue({}),
+            startWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
+            finishWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
+            startWebauthnAuthentication: jest.fn().mockResolvedValue({}),
+            finishWebauthnAuthentication: jest.fn().mockResolvedValue({tokenResponse: TOKEN_RESPONSE})
         }))
     }
 })
@@ -1278,5 +1283,133 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
 
         // Verify the cookie was NOT cleared
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+})
+
+describe('Webauthn', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    const PUBLIC_KEY_CREDENTIAL_JSON: ShopperLoginTypes.PublicKeyCredentialJson = {
+        id: 'credential-id',
+        rawId: 'raw-credential-id',
+        type: 'public-key',
+        response: {
+            authenticatorData: [],
+            clientDataJSON: [],
+            signature: [],
+            userHandle: null
+        } as ShopperLoginTypes.AuthenticatorAssertionResponseJson
+    }
+
+    test('authorizeWebauthnRegistration', async () => {
+        const auth = new Auth(config)
+        await auth.authorizeWebauthnRegistration({
+            user_id: 'test-user-id',
+            mode: 'test-mode',
+            channel_id: 'test-channel-id'
+        })
+
+        expect((auth as any).client.authorizeWebauthnRegistration).toHaveBeenCalledWith({
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                user_id: 'test-user-id',
+                mode: 'test-mode',
+                channel_id: 'test-channel-id'
+            }
+        })
+    })
+
+    test('startWebauthnUserRegistration', async () => {
+        const auth = new Auth(config)
+        await auth.startWebauthnUserRegistration({
+            channel_id: 'test-channel-id',
+            display_name: 'test-display-name',
+            nick_name: 'test-nick-name',
+            client_id: 'test-client-id',
+            pwd_action_token: 'test-pwd-action-token',
+            user_id: 'test-user-id'
+        })
+
+        expect((auth as any).client.startWebauthnUserRegistration).toHaveBeenCalledWith({
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                display_name: 'test-display-name',
+                nick_name: 'test-nick-name',
+                client_id: 'test-client-id',
+                channel_id: 'test-channel-id',
+                pwd_action_token: 'test-pwd-action-token',
+                user_id: 'test-user-id'
+            }
+        })
+    })
+
+    test('finishWebauthnUserRegistration', async () => {
+        const auth = new Auth(config)
+        await auth.finishWebauthnUserRegistration({
+            client_id: 'test-client-id',
+            username: 'test-username',
+            credential: PUBLIC_KEY_CREDENTIAL_JSON,
+            channel_id: 'test-channel-id',
+            pwd_action_token: 'test-pwd-action-token'
+        })
+
+        expect((auth as any).client.finishWebauthnUserRegistration).toHaveBeenCalledWith({
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                client_id: 'test-client-id',
+                username: 'test-username',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON,
+                channel_id: 'test-channel-id',
+                pwd_action_token: 'test-pwd-action-token'
+            }
+        })
+    })
+
+    test('startWebauthnAuthentication', async () => {
+        const auth = new Auth(config)
+        await auth.startWebauthnAuthentication({
+            user_id: 'test-user-id',
+            channel_id: 'test-channel-id',
+            client_id: 'test-client-id'
+        })
+
+        expect((auth as any).client.startWebauthnAuthentication).toHaveBeenCalledWith({
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                user_id: 'test-user-id',
+                channel_id: 'test-channel-id',
+                client_id: 'test-client-id'
+            }
+        })
+    })
+
+    test('finishWebauthnAuthentication', async () => {
+        const auth = new Auth(config)
+        await auth.finishWebauthnAuthentication({
+            client_id: 'test-client-id',
+            channel_id: 'test-channel-id',
+            credential: PUBLIC_KEY_CREDENTIAL_JSON
+        })
+
+        expect((auth as any).client.finishWebauthnAuthentication).toHaveBeenCalledWith({
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                client_id: 'test-client-id',
+                channel_id: 'test-channel-id',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON
+            }
+        })
     })
 })

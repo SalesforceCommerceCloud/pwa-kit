@@ -32,8 +32,8 @@ export const AuthHelpers = {
     Register: 'register',
     ResetPassword: 'resetPassword',
     UpdateCustomerPassword: 'updateCustomerPassword',
-    StartWebauthnUserRegistration: 'startWebauthnRegistration',
-    FinishWebauthnUserRegistration: 'finishWebauthnRegistration',
+    StartWebauthnUserRegistration: 'startWebauthnUserRegistration',
+    FinishWebauthnUserRegistration: 'finishWebauthnUserRegistration',
     AuthorizeWebauthnRegistration: 'authorizeWebauthnRegistration',
     StartWebauthnAuthentication: 'startWebauthnAuthentication',
     FinishWebauthnAuthentication: 'finishWebauthnAuthentication'
