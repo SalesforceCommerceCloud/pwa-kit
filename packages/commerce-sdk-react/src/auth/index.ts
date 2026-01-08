@@ -1438,7 +1438,9 @@ class Auth {
     /**
      * A wrapper method for the SLAS endpoint: authorizeWebauthnRegistration.
      */
-    async authorizeWebauthnRegistration(parameters: ShopperLoginTypes.authorizeWebauthnRegistrationBodyType) {
+    async authorizeWebauthnRegistration(
+        parameters: ShopperLoginTypes.authorizeWebauthnRegistrationBodyType
+    ) {
         const slasClient = this.client
 
         const options = {
@@ -1449,7 +1451,7 @@ class Auth {
                 // Required params
                 user_id: parameters.user_id,
                 mode: parameters.mode,
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId
             }
         }
 
@@ -1466,10 +1468,12 @@ class Auth {
     /**
      * A wrapper method for the SLAS endpoint: startWebauthnUserRegistration.
      */
-    async startWebauthnUserRegistration(parameters: ShopperLoginTypes.startWebauthnUserRegistrationBodyType) {
+    async startWebauthnUserRegistration(
+        parameters: ShopperLoginTypes.startWebauthnUserRegistrationBodyType
+    ) {
         const slasClient = this.client
 
-        const options ={
+        const options = {
             headers: {
                 Authorization: ''
             },
@@ -1478,7 +1482,7 @@ class Auth {
                 nick_name: parameters.nick_name,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 // Required params
-                channel_id: parameters.channel_id || slasClient.    clientConfig.parameters.siteId,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 pwd_action_token: parameters.pwd_action_token,
                 user_id: parameters.user_id
             }
@@ -1509,7 +1513,7 @@ class Auth {
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 pwd_action_token: parameters.pwd_action_token,
                 username: parameters.username,
-                credential: parameters.credential,
+                credential: parameters.credential
             }
         }
 
@@ -1525,7 +1529,9 @@ class Auth {
     /**
      * A wrapper method for the SLAS endpoint: startWebauthnAuthentication.
      */
-    async startWebauthnAuthentication(parameters: ShopperLoginTypes.startWebauthnAuthenticationBodyType) {
+    async startWebauthnAuthentication(
+        parameters: ShopperLoginTypes.startWebauthnAuthenticationBodyType
+    ) {
         const slasClient = this.client
 
         const options = {
@@ -1536,7 +1542,7 @@ class Auth {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                user_id: parameters.user_id,
+                user_id: parameters.user_id
             }
         }
 

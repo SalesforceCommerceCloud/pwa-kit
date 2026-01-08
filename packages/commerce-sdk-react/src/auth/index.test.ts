@@ -75,7 +75,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
             startWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
             finishWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
             startWebauthnAuthentication: jest.fn().mockResolvedValue({}),
-            finishWebauthnAuthentication: jest.fn().mockResolvedValue({tokenResponse: TOKEN_RESPONSE})
+            finishWebauthnAuthentication: jest
+                .fn()
+                .mockResolvedValue({tokenResponse: TOKEN_RESPONSE})
         }))
     }
 })
