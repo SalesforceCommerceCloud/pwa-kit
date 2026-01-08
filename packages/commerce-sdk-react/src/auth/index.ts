@@ -1365,7 +1365,7 @@ class Auth {
                 // user_id is a valid param for resetPassword
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                ...(parameters.user_id && {code_challenge: parameters.user_id}),
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
