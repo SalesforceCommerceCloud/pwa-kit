@@ -2624,7 +2624,7 @@
   "login_form.button.continue_securely": [
     {
       "type": 0,
-      "value": "Continue Securely"
+      "value": "Continue"
     }
   ],
   "login_form.button.google": [

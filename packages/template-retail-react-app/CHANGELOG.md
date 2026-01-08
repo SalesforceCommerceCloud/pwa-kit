@@ -1,11 +1,11 @@
 ## v8.4.0-dev (Dec 17, 2025)
 - [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
+- Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492) [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
+- Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
 
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
 - Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
-
-- Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492) [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
 
 ## v8.2.0 (Nov 04, 2025)
 - Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
