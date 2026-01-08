@@ -117,7 +117,9 @@ const testMap: TestMap = {
     logoutCustomer: [OPTIONS, TOKEN_RESPONSE],
     startWebauthnUserRegistration: [OPTIONS, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS],
     finishWebauthnUserRegistration: [OPTIONS, undefined],
-    authorizeWebauthnRegistration: [OPTIONS, undefined]
+    authorizeWebauthnRegistration: [OPTIONS, undefined],
+    startWebauthnAuthentication: [OPTIONS, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS],
+    finishWebauthnAuthentication: [OPTIONS, TOKEN_RESPONSE]
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Implemented]]>
