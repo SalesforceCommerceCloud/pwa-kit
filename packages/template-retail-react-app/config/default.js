@@ -44,6 +44,10 @@ module.exports = {
             resetPassword: {
                 callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
                 landingPath: '/reset-password-landing'
+            },
+            passkey: {
+                enabled: false,
+                callbackURI: process.env.PASSKEY_CALLBACK_URI
             }
         },
         defaultSite: 'RefArchGlobal',
