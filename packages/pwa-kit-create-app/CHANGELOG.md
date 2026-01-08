@@ -1,6 +1,7 @@
 
 ## v3.15.0-dev (Nov 05, 2025)
 - Update `default.js` and `/_app-config/index.jsx` template to use email mode by default for passwordless login and password reset. [#3526] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3526) [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
+- Add `tokenLength` to passwordless login configuration [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 
 ## v3.15.0 (Dec 17, 2025)
 - Add new Google Cloud API configuration and Bonus Product configuration [#3523](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3523)
