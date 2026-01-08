@@ -362,7 +362,7 @@ describe('Passwordless login tests', () => {
         await user.type(screen.getByLabelText('Email'), testEmail)
 
         // Click the submit button
-        await user.click(screen.getByRole('button', {name: /Continue Securely/i}))
+        await user.click(screen.getByRole('button', {name: /Continue/i}))
 
         // Verify that authorizePasswordless is called with correct parameters
         await waitFor(() => {

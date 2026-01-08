@@ -33,8 +33,8 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
-    await page.getByRole('button', {name: 'Continue Securely'}).scrollIntoViewIfNeeded()
-    await page.getByRole('button', {name: 'Continue Securely'}).click()
+    await page.getByRole('button', {name: 'Continue'}).scrollIntoViewIfNeeded()
+    await page.getByRole('button', {name: 'Continue'}).click()
 
     await page.waitForResponse(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login'
