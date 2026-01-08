@@ -1355,7 +1355,6 @@ class Auth {
      *
      */
     async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
-        console.log('parameters', parameters)
         const slasClient = this.client
         const options = {
             headers: {
