@@ -70,7 +70,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
-            }
+            },
+            getPasswordResetToken: jest.fn().mockResolvedValue({}),
+            resetPassword: jest.fn().mockResolvedValue({})
         }))
     }
 })
@@ -957,6 +959,72 @@ describe('Auth', () => {
         expect(functionArg).toMatchObject({
             parameters: {pwdlessLoginToken: '12345678'}
         })
+    })
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                hint: 'custom_hint',
+                code_verifier: 'test-code-verifier',
+                user_id: 'userId'
+            },
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                hint: 'custom_hint',
+                code_verifier: 'test-code-verifier',
+                user_id: 'userId'
+            }
+        ],
+        [
+            'defaults all parameters when only required parameters are specified',
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123'
+            },
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: config.siteId,
+                client_id: config.clientId,
+                hint: 'cross_device'
+            }
+        ]
+    ])('resetPassword %s', async (_, input: any, expectedBody: any) => {
+        const auth = new Auth(config)
+        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
+        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
+        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+
+        const result = await auth.resetPassword(input)
+        expect(result).toBe(mockResponse)
+        expect(resetPasswordSpy).toHaveBeenCalled()
+        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
+        expect(callArgs.body).toMatchObject(expectedBody)
+    })
+
+    test('resetPassword with private client sets Authorization header', async () => {
+        const auth = new Auth(configSLASPrivate)
+        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
+        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
+        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+
+        await auth.resetPassword({
+            pwd_action_token: '12345678',
+            new_password: 'newPassword123'
+        } as any)
+
+        expect(resetPasswordSpy).toHaveBeenCalled()
+        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
+        expect(callArgs.headers.Authorization).toBeTruthy()
+        expect(callArgs.headers.Authorization).toContain('Basic ')
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
