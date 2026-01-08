@@ -1372,7 +1372,7 @@ class Auth {
                 new_password: parameters.new_password,
                 hint: parameters.hint || 'cross_device',
                 // hint='cross_device' and a defined user_id is required for code_verifier to be optional for this call
-                ...(parameters.code_verifier && {code_challenge: parameters.code_verifier})
+                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
 
