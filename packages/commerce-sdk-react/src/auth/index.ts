@@ -1361,12 +1361,18 @@ class Auth {
                 Authorization: ''
             },
             body: {
+                // TODO: remove the eslint disabled after updating OAS
+                // user_id is a valid param for resetPassword
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                hint: parameters.hint,
-                code_verifier: parameters.code_verifier
+                hint: parameters.hint || 'cross_device',
+                // hint='cross_device' and a defined user_id is required for code_verifier to be optional for this call
+                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
 
@@ -1376,9 +1382,6 @@ class Auth {
                 `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
             )}`
         }
-        // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const res = await this.client.resetPassword(options)
         return res
     }
