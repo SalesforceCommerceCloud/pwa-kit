@@ -157,6 +157,7 @@ const CheckoutOneClick = () => {
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
         const paymentInstrument = {
+            amount: basket?.orderTotal || 0,
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
