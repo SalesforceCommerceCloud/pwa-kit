@@ -29,12 +29,14 @@ import {
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    PASSWORDLESS_ERROR_MESSAGES,
+    INVALID_TOKEN_ERROR,
+    INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -79,6 +81,7 @@ export const AuthModal = ({
 
     const navigate = useNavigation()
     const [currentView, setCurrentView] = useState(initialView)
+    const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
     const form = useForm()
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
@@ -87,6 +90,7 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const passwordlessMode = passwordlessConfig?.mode
@@ -106,12 +110,44 @@ export const AuthModal = ({
                 mode: passwordlessMode,
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
-            setCurrentView(EMAIL_VIEW)
+            // Close AuthModal first, then open OtpAuth modal after a brief delay
+            onClose()
+            setTimeout(() => {
+                setIsOtpAuthOpen(true)
+            }, 150) // Small delay to allow AuthModal to close first
         } catch (error) {
             const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
+        }
+    }
+
+    const handleMergeBasket = () => {
+        const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+        // we only want to merge basket when the user is logged in as a recurring user
+        // only recurring users trigger the login mutation, new user triggers register mutation
+        // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+        // if you change logic here, also change it in login page
+        const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+        if (shouldMergeBasket) {
+            try {
+                mergeBasket.mutate({
+                    headers: {
+                        // This is not required since the request has no body
+                        // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                        'Content-Type': 'application/json'
+                    },
+                    parameters: {
+                        createDestinationBasket: true
+                    }
+                })
+            } catch (error) {
+                form.setError('global', {
+                    type: 'manual',
+                    message: formatMessage(API_ERROR_MESSAGE)
+                })
+            }
         }
     }
 
@@ -135,24 +171,6 @@ export const AuthModal = ({
                         username: data.email,
                         password: data.password
                     })
-                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
-                    // we only want to merge basket when the user is logged in as a recurring user
-                    // only recurring users trigger the login mutation, new user triggers register mutation
-                    // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
-                    // if you change logic here, also change it in login page
-                    const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
-                    if (shouldMergeBasket) {
-                        mergeBasket.mutate({
-                            headers: {
-                                // This is not required since the request has no body
-                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                                'Content-Type': 'application/json'
-                            },
-                            parameters: {
-                                createDestinationBasket: true
-                            }
-                        })
-                    }
                 } catch (error) {
                     const message = /Unauthorized/i.test(error.message)
                         ? formatMessage(LOGIN_ERROR)
@@ -191,12 +209,20 @@ export const AuthModal = ({
                             : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
                 }
-            },
-            email: async () => {
-                const email = form.getValues().email || initialEmail
-                await handlePasswordlessLogin(email)
             }
         }[currentView](data)
+    }
+
+    const handleOtpVerification = async (pwdlessLoginToken) => {
+        try {
+            await loginPasswordless.mutateAsync({pwdlessLoginToken})
+        } catch (e) {
+            const errorData = await e.response?.json()
+            const message = INVALID_TOKEN_ERROR.test(errorData.message)
+                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
     }
 
     // Reset form and local state when opening the modal
@@ -219,25 +245,23 @@ export const AuthModal = ({
     }, [form.control?.fieldsRef?.current])
 
     useEffect(() => {
-        // we don't want to reset the form on email view
-        // because we want to pass the email to PasswordlessEmailConfirmation
-        if (currentView !== EMAIL_VIEW) {
-            form.reset()
-        }
+        form.reset()
     }, [currentView])
 
     useEffect(() => {
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
-        const isNowRegistered = isOpen && isRegistered && (loggingIn || registering)
+        const isNowRegistered =
+            (isOpen || isOtpAuthOpen) && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
         if (!isNowRegistered) {
             return
         }
 
-        // We are done with the modal.
+        // We are done with the modal. Close any modals that are open.
         onClose()
+        setIsOtpAuthOpen(false)
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
@@ -263,6 +287,7 @@ export const AuthModal = ({
 
             // Execute action to be performed on successful login
             onLoginSuccess()
+            handleMergeBasket()
         }
 
         if (registering) {
@@ -275,67 +300,70 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
-        <Modal
-            size="sm"
-            closeOnOverlayClick={false}
-            data-testid="sf-auth-modal"
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onClose}
-            {...props}
-        >
-            <ModalOverlay />
-            <ModalContent>
-                <ModalCloseButton
-                    aria-label={formatMessage({
-                        id: 'auth_modal.button.close.assistive_msg',
-                        defaultMessage: 'Close login form'
-                    })}
-                />
-                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
-                    {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                        <LoginForm
-                            form={form}
-                            submitForm={(data) => {
-                                const shouldUsePasswordless =
-                                    isPasswordlessEnabled && !data.password
-                                return submitForm(data, shouldUsePasswordless)
-                            }}
-                            clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                            //TODO: potentially remove this prop in the next major release since
-                            // we don't need to use this props anymore
-                            handlePasswordlessLoginClick={noop}
-                            handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
-                            isPasswordlessEnabled={isPasswordlessEnabled}
-                            isSocialEnabled={isSocialEnabled}
-                            idps={idps}
-                            setLoginType={noop}
-                        />
-                    )}
-                    {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
-                        <RegisterForm
-                            form={form}
-                            submitForm={submitForm}
-                            clickSignIn={onBackToSignInClick}
-                        />
-                    )}
-                    {currentView === PASSWORD_VIEW && (
-                        <ResetPasswordForm
-                            form={form}
-                            submitForm={submitForm}
-                            clickSignIn={onBackToSignInClick}
-                        />
-                    )}
-                    {currentView === EMAIL_VIEW && (
-                        <PasswordlessEmailConfirmation
-                            form={form}
-                            submitForm={submitForm}
-                            email={form.getValues().email || initialEmail}
-                        />
-                    )}
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+        <>
+            <Modal
+                size="sm"
+                closeOnOverlayClick={false}
+                data-testid="sf-auth-modal"
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onClose={onClose}
+                {...props}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalCloseButton
+                        aria-label={formatMessage({
+                            id: 'auth_modal.button.close.assistive_msg',
+                            defaultMessage: 'Close login form'
+                        })}
+                    />
+                    <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
+                        {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                            <LoginForm
+                                form={form}
+                                submitForm={(data) => {
+                                    const shouldUsePasswordless =
+                                        isPasswordlessEnabled && !data.password
+                                    return submitForm(data, shouldUsePasswordless)
+                                }}
+                                clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                                //TODO: potentially remove this prop in the next major release since
+                                // we don't need to use this props anymore
+                                handlePasswordlessLoginClick={noop}
+                                handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                                isPasswordlessEnabled={isPasswordlessEnabled}
+                                isSocialEnabled={isSocialEnabled}
+                                idps={idps}
+                                setLoginType={noop}
+                            />
+                        )}
+                        {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
+                            <RegisterForm
+                                form={form}
+                                submitForm={submitForm}
+                                clickSignIn={onBackToSignInClick}
+                            />
+                        )}
+                        {currentView === PASSWORD_VIEW && (
+                            <ResetPasswordForm
+                                form={form}
+                                submitForm={submitForm}
+                                clickSignIn={onBackToSignInClick}
+                            />
+                        )}
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+            <OtpAuth
+                isOpen={isOtpAuthOpen}
+                onClose={() => setIsOtpAuthOpen(false)}
+                form={form}
+                handleSendEmailOtp={handlePasswordlessLogin}
+                handleOtpVerification={handleOtpVerification}
+                hideCheckoutAsGuestButton={true}
+            />
+        </>
     )
 }
 

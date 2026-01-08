@@ -53,7 +53,8 @@ const mockRegisteredCustomer = {
 const mockAuthHelperFunctions = {
     [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
     [AuthHelpers.Register]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
 }
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -256,23 +257,38 @@ describe('Passwordless enabled', () => {
             mode: 'email'
         })
 
-        // check that check email modal is open
+        // check that OTP auth modal is open
         await waitFor(
             () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
+                expect(
+                    screen.getByText(/To log in to your account, enter the code/i)
+                ).toBeInTheDocument()
             },
             {timeout: 5000}
         )
 
         // resend the email
-        await user.click(screen.getByText(/Resend Link/i))
+        await user.click(screen.getByText(/Resend Code/i))
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
             mode: 'email'
+        })
+
+        // enter the code manually
+        const code = '12345678'
+        const otpInputs = screen.getAllByRole('textbox')
+        for (let i = 0; i < 8; i++) {
+            await user.type(otpInputs[i], code[i])
+        }
+
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+            ).toHaveBeenCalledWith({
+                pwdlessLoginToken: code
+            })
         })
     })
 
@@ -306,12 +322,12 @@ describe('Passwordless enabled', () => {
             mode: 'email'
         })
 
-        // check that check email modal is open
+        // check that OTP auth modal is open
         await waitFor(
             () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
+                expect(
+                    screen.getByText(/To log in to your account, enter the code/i)
+                ).toBeInTheDocument()
             },
             {timeout: 5000}
         )

@@ -2597,12 +2597,6 @@
       "value": "Chinese (Taiwan)"
     }
   ],
-  "login.title.sign_in": [
-    {
-      "type": 0,
-      "value": "Sign In"
-    }
-  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -2825,6 +2819,76 @@
     {
       "type": 0,
       "value": "Tax"
+    }
+  ],
+  "otp.button.cancel_guest_registration": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "otp.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Checkout as a Guest"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "Resend Code"
+    }
+  ],
+  "otp.button.resend_timer": [
+    {
+      "type": 0,
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " seconds..."
+    }
+  ],
+  "otp.message.enter_code_for_account_guest": [
+    {
+      "type": 0,
+      "value": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below."
+    }
+  ],
+  "otp.message.enter_code_for_account_returning": [
+    {
+      "type": 0,
+      "value": "To log in to your account, enter the code sent to your email."
+    }
+  ],
+  "otp.message.verifying": [
+    {
+      "type": 0,
+      "value": "Verifying code..."
+    }
+  ],
+  "otp.title.confirm_its_you": [
+    {
+      "type": 0,
+      "value": "Confirm it's you"
+    }
+  ],
+  "otp.title.create_account": [
+    {
+      "type": 0,
+      "value": "Create an account"
     }
   ],
   "page_not_found.action.go_back": [

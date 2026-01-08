@@ -33,7 +33,8 @@ module.exports = {
             passwordless: {
                 enabled: false,
                 mode: 'email',
-                landingPath: '/passwordless-login-landing'
+                landingPath: '/passwordless-login-landing',
+                tokenLength: 8
             },
             social: {
                 enabled: false,

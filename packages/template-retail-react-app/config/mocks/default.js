@@ -35,7 +35,8 @@ module.exports = {
         login: {
             passwordless: {
                 enabled: false,
-                mode: 'email'
+                mode: 'email',
+                tokenLength: 8
             },
             social: {
                 enabled: false,

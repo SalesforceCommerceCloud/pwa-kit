@@ -71,7 +71,9 @@ module.exports = {
                 // callbackURI:
                 //     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 // The landing path for passwordless login
-                landingPath: '/passwordless-login-landing'
+                landingPath: '/passwordless-login-landing',
+                // The length of the token for passwordless login. Valid values include 6 or 8. Defaults to: 8
+                tokenLength: 8
             },
             social: {
                 // Enables or disables social login for the site. Defaults to: false

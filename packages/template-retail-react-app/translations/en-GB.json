@@ -1071,9 +1071,6 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
-  "login.title.sign_in": {
-    "defaultMessage": "Sign In"
-  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
@@ -1167,6 +1164,33 @@
   },
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
+  },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "Cancel"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "Checkout as a Guest"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Resend Code"
+  },
+  "otp.button.resend_timer": {
+    "defaultMessage": "Resend code in {timer} seconds..."
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the {otpLength}-digit code below."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "To log in to your account, enter the code sent to your email."
+  },
+  "otp.message.verifying": {
+    "defaultMessage": "Verifying code..."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "Confirm it's you"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "Create an account"
   },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
