@@ -57,8 +57,8 @@ export const transformAddressDetails = (billingDetails, shippingDetails) => {
         return address
     }
 
-    // For PayPal/Venmo, billing address might not be available or incomplete.
-    // Use shipping address as billing address if billing details are missing or incomplete.
+    // For PayPal/Venmo, billing address might not be available or incomplete
+    // Use shipping address as billing address if billing details are missing or incomplete
     const billingAddr = billingDetails?.address
     const hasBillingDetails = billingDetails?.name && billingAddr?.city
     const billingSource = hasBillingDetails ? billingDetails : shippingDetails
