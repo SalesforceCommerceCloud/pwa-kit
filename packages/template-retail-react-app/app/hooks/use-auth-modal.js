@@ -240,7 +240,8 @@ export const AuthModal = ({
         onClose()
 
         // Show a toast only for those registed users returning to the site.
-        if (loggingIn) {
+        // Only show toast when customer data is available (user is logged in and data is loaded)
+        if (loggingIn && customer.data) {
             toast({
                 variant: 'subtle',
                 title: `${formatMessage(
@@ -269,7 +270,7 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [isRegistered])
+    }, [isRegistered, customer.data])
 
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
