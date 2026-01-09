@@ -5,6 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {
+    PAYMENT_METHOD_TYPES,
+    PAYMENT_GATEWAYS,
+    SETUP_FUTURE_USAGE
+} from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Helper function to read the client secret from the payment instrument
  * @param {Object} paymentInstrument - Payment instrument object
@@ -131,7 +137,10 @@ export const isShippingMethodValid = (currentBasket, updatedShippingMethods) => 
  * @returns {boolean} Whether the payment method type uses PayPal
  */
 export const isPayPalPaymentMethodType = (paymentMethodType) => {
-    return paymentMethodType === 'paypal' || paymentMethodType === 'venmo'
+    return (
+        paymentMethodType === PAYMENT_METHOD_TYPES.PAYPAL ||
+        paymentMethodType === PAYMENT_METHOD_TYPES.VENMO
+    )
 }
 
 /**
@@ -166,17 +175,17 @@ export const getGatewayFromPaymentMethod = (paymentMethodType, paymentMethodSetA
 
     const account = findPaymentAccount(paymentMethodSetAccounts, paymentMethodType)
     if (!account) {
-        return paymentMethodType === 'card' ? 'stripe' : null
+        return null
     }
 
     const vendor = account.vendor?.toLowerCase()
-    if (vendor === 'stripe') {
-        return 'stripe'
-    } else if (vendor === 'adyen') {
-        return 'adyen'
+    if (vendor === PAYMENT_GATEWAYS.STRIPE) {
+        return PAYMENT_GATEWAYS.STRIPE
+    } else if (vendor === PAYMENT_GATEWAYS.ADYEN) {
+        return PAYMENT_GATEWAYS.ADYEN
     }
 
-    return paymentMethodType === 'card' ? 'stripe' : null
+    return null
 }
 
 /**
@@ -187,9 +196,9 @@ export const getGatewayFromPaymentMethod = (paymentMethodType, paymentMethodSetA
  */
 export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) => {
     if (futureUsageOffSession) {
-        return 'off_session'
+        return SETUP_FUTURE_USAGE.OFF_SESSION
     } else if (storePaymentMethod) {
-        return 'on_session'
+        return SETUP_FUTURE_USAGE.ON_SESSION
     }
     return null
 }
@@ -225,10 +234,10 @@ export const createPaymentInstrumentBody = (
 
     const gateway = getGatewayFromPaymentMethod(paymentMethodType, paymentMethodSetAccounts)
 
-    if (gateway === 'stripe' && (storePaymentMethod || futureUsageOffSession)) {
+    if (gateway === PAYMENT_GATEWAYS.STRIPE && (storePaymentMethod || futureUsageOffSession)) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
         if (setupFutureUsage) {
-            paymentReferenceRequest.gateway = 'stripe'
+            paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
             paymentReferenceRequest.gatewayProperties = {
                 stripe: {
                     setup_future_usage: setupFutureUsage
@@ -237,8 +246,8 @@ export const createPaymentInstrumentBody = (
         }
     }
 
-    if (gateway === 'adyen' && storePaymentMethod) {
-        paymentReferenceRequest.gateway = 'adyen'
+    if (gateway === PAYMENT_GATEWAYS.ADYEN && storePaymentMethod) {
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
     }
 
     return {

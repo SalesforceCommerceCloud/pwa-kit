@@ -106,6 +106,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
+
     const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
 
     const {step, STEPS, goToStep} = useCheckout()
@@ -198,6 +199,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
+        // Using destructuring to remove properties from the object...
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return await updateBillingAddressForBasket({
             body: address,
@@ -207,6 +210,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const createPaymentInstrument = async () => {
         let updatedBasket = await onBillingSubmit()
+
+        // Remove any existing Salesforce Payments instruments first
         await removeSFPaymentsInstruments(updatedBasket)
 
         updatedBasket = await addPaymentInstrumentToBasket({
@@ -221,8 +226,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentConfig?.paymentMethodSetAccounts
             )
         })
-
+    
+        // Store the updated basket for potential cleanup on cancel
         currentBasket.current = updatedBasket
+
+        // Find SF Payments payment instrument
         const updatedBasketPaymentInstrument = getSFPaymentsInstrument(updatedBasket)
 
         return {
@@ -231,10 +239,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }
 
     const createAndUpdateOrder = async (shouldSavePaymentMethod = false) => {
+        // Create order from the basket
         const order = await onCreateOrder()
+
+        // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
         try {
+            // Update order payment instrument to create payment
             const paymentInstrumentBody = createPaymentInstrumentBody(
                 order.orderTotal,
                 paymentMethodType.current,
@@ -258,15 +270,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const statusCode = error?.response?.status || error?.status
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
-            const requestBody = createPaymentInstrumentBody(
-                order.orderTotal,
-                paymentMethodType.current,
-                zoneId,
-                undefined,
-                shouldSavePaymentMethod,
-                futureUsageOffSession,
-                paymentConfig?.paymentMethodSetAccounts
-            )
 
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsSheet.createAndUpdateOrder',
@@ -274,7 +277,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     statusCode,
                     errorMessage,
                     errorDetails,
-                    requestBody: JSON.parse(JSON.stringify(requestBody)),
                     basketId: currentBasket.current?.basketId,
                     paymentMethodType: paymentMethodType.current,
                     orderTotal: order.orderTotal,
@@ -303,6 +305,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             })
             onError(message)
 
+            // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             error.message = message
             throw error
@@ -425,6 +428,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         namespace: 'SFPaymentsSheet.confirmPayment',
                         additionalProperties: {orderNo: updatedOrder.orderNo}
                     })
+
                     // Show error message to user - order was failed and basket reopened
                     const message = formatMessage({
                         defaultMessage:
@@ -477,7 +481,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
                     showSaveForFutureUsageCheckbox: !!(
                         customer?.isRegistered && customer?.customerId
-                    )
+                    ),
+                    // Suppress "Make payment method default" checkbox since we don't support default SPM yet
+                    showSaveAsDefaultCheckbox: false
                 }
             }
 
