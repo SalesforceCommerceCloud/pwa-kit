@@ -22,6 +22,7 @@ import {
 import {useForm} from 'react-hook-form'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
@@ -30,7 +31,8 @@ import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-s
 import {
     STATUS_SUCCESS,
     useSFPayments,
-    useAutomaticCapture
+    useAutomaticCapture,
+    useFutureUsageOffSession
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {
@@ -58,6 +60,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
+
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
         basket.shipments.every((shipment) => isPickupShipment(shipment))
@@ -82,6 +86,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const zoneId = useShopperConfiguration('zoneId')
     const cardCaptureAutomatic = useAutomaticCapture()
+    const futureUsageOffSession = useFutureUsageOffSession()
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -102,7 +107,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         'removePaymentInstrumentFromBasket'
     )
 
-    const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
+    // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
+    // const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
 
     const {step, STEPS, goToStep} = useCheckout()
 
@@ -121,17 +127,26 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const checkoutComponent = useRef(null)
     const paymentMethodType = useRef(null)
     const currentBasket = useRef(null)
+    const savePaymentMethodRef = useRef(false)
 
     const handlePaymentMethodSelected = (evt) => {
         paymentMethodType.current = evt.detail.selectedPaymentMethod
+        if (evt.detail.savePaymentMethodForFutureUse !== undefined) {
+            savePaymentMethodRef.current = evt.detail.savePaymentMethodForFutureUse === true
+        }
         if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
             onRequiresPayButtonChange(evt.detail.requiresPayButton)
         }
     }
 
-    const handlePaymentButtonApprove = async () => {
+    const handlePaymentButtonApprove = async (event) => {
         try {
-            const updatedOrder = await createAndUpdateOrder()
+            if (event?.detail?.savePaymentMethod !== undefined) {
+                savePaymentMethodRef.current = event.detail.savePaymentMethod === true
+            }
+            const updatedOrder = await createAndUpdateOrder(
+                savePaymentMethodRef.current && customer?.isRegistered
+            )
             // Clear the ref after successful order creation
             currentBasket.current = null
             navigate(`/checkout/confirmation/${updatedOrder.orderNo}`)
@@ -185,8 +200,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
-        // Using destructuring to remove properties from the object...
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return await updateBillingAddressForBasket({
             body: address,
@@ -196,8 +209,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const createPaymentInstrument = async () => {
         let updatedBasket = await onBillingSubmit()
-
-        // Remove any existing Salesforce Payments instruments first
         await removeSFPaymentsInstruments(updatedBasket)
 
         updatedBasket = await addPaymentInstrumentToBasket({
@@ -206,14 +217,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 updatedBasket.orderTotal,
                 paymentMethodType.current,
                 zoneId,
-                'SET_PROVIDED_ADDRESS'
+                'SET_PROVIDED_ADDRESS',
+                false,
+                futureUsageOffSession,
+                paymentConfig?.paymentMethodSetAccounts
             )
         })
 
-        // Store the updated basket for potential cleanup on cancel
         currentBasket.current = updatedBasket
-
-        // Find SF Payments payment instrument
         const updatedBasketPaymentInstrument = getSFPaymentsInstrument(updatedBasket)
 
         return {
@@ -221,25 +232,27 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
     }
 
-    const createAndUpdateOrder = async () => {
-        // Create order from the basket
+    const createAndUpdateOrder = async (shouldSavePaymentMethod = false) => {
         const order = await onCreateOrder()
-
-        // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
         try {
-            // Update order payment instrument to create payment
+            const paymentInstrumentBody = createPaymentInstrumentBody(
+                order.orderTotal,
+                paymentMethodType.current,
+                zoneId,
+                undefined,
+                shouldSavePaymentMethod,
+                futureUsageOffSession,
+                paymentConfig?.paymentMethodSetAccounts
+            )
+
             const updatedOrder = await updatePaymentInstrumentForOrder({
                 parameters: {
                     orderNo: order.orderNo,
                     paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
                 },
-                body: createPaymentInstrumentBody(
-                    order.orderTotal,
-                    paymentMethodType.current,
-                    zoneId
-                )
+                body: paymentInstrumentBody
             })
 
             return updatedOrder
@@ -247,6 +260,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const statusCode = error?.response?.status || error?.status
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
             const errorDetails = error?.response?.data || error?.body || {}
+            const requestBody = createPaymentInstrumentBody(
+                order.orderTotal,
+                paymentMethodType.current,
+                zoneId,
+                undefined,
+                shouldSavePaymentMethod,
+                futureUsageOffSession,
+                paymentConfig?.paymentMethodSetAccounts
+            )
 
             logger.error('Failed to patch payment instrument to order', {
                 namespace: 'SFPaymentsSheet.createAndUpdateOrder',
@@ -254,34 +276,36 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     statusCode,
                     errorMessage,
                     errorDetails,
+                    requestBody: JSON.parse(JSON.stringify(requestBody)),
                     basketId: currentBasket.current?.basketId,
                     paymentMethodType: paymentMethodType.current,
                     orderTotal: order.orderTotal,
+                    shouldSavePaymentMethod,
                     productSubTotal: currentBasket.current?.productSubTotal,
                     error: error
                 }
             })
             const createdOrderNo = order.orderNo
+            // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
             // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
-            await failOrder({
-                parameters: {
-                    orderNo: createdOrderNo,
-                    reopenBasket: true
-                },
-                body: {
-                    reasonCode: 'payment_confirm_failure'
-                }
-            })
+            // await failOrder({
+            //     parameters: {
+            //         orderNo: createdOrderNo,
+            //         reopenBasket: true
+            //     },
+            //     body: {
+            //         reasonCode: 'payment_confirm_failure'
+            //     }
+            // })
 
             // Show error message to user - order was failed and basket reopened
             const message = formatMessage({
                 defaultMessage:
-                    'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                    'Payment processing failed. Please try again or select a different payment method.',
                 id: 'checkout.message.payment_processing_failed'
             })
             onError(message)
 
-            // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             error.message = message
             throw error
@@ -308,14 +332,19 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             body: createPaymentInstrumentBody(
                 updatedBasket.orderTotal,
                 paymentMethodType.current,
-                zoneId
+                zoneId,
+                undefined,
+                false, // Don't save payment method at basket stage
+                futureUsageOffSession,
+                paymentConfig?.paymentMethodSetAccounts
             )
         })
 
         let updatedOrder = null
         try {
             // Update order payment instrument to create payment
-            updatedOrder = await createAndUpdateOrder()
+            const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+            updatedOrder = await createAndUpdateOrder(shouldSavePaymentMethod)
 
             // Find updated SF Payments payment instrument in updated order
             const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
@@ -363,15 +392,13 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
-            // Store orderNo before confirm in case confirm fails
-            const orderNo = updatedOrder.orderNo
-
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
                 () => paymentIntent,
                 billingDetails,
                 shippingDetails
             )
+
             if (result.responseCode !== STATUS_SUCCESS) {
                 throw new Error(result.data?.error)
             }
@@ -384,39 +411,54 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         } catch (error) {
             // Only fail order if createAndUpdateOrder succeeded but perhaps confirm fails
             if (updatedOrder && !error.orderNo) {
+                // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
                 // createAndUpdateOrder succeeded but confirm failed - need to fail the order
-                try {
-                    await failOrder({
-                        parameters: {
-                            orderNo: updatedOrder.orderNo,
-                            reopenBasket: true
-                        },
-                        body: {
-                            reasonCode: 'payment_confirm_failure'
-                        }
-                    })
-                    logger.info('Order failed successfully after confirm failure', {
-                        namespace: 'SFPaymentsSheet.confirmPayment',
-                        additionalProperties: {orderNo: updatedOrder.orderNo}
-                    })
+                // try {
+                //     await failOrder({
+                //         parameters: {
+                //             orderNo: updatedOrder.orderNo,
+                //             reopenBasket: true
+                //         },
+                //         body: {
+                //             reasonCode: 'payment_confirm_failure'
+                //         }
+                //     })
+                //     logger.info('Order failed successfully after confirm failure', {
+                //         namespace: 'SFPaymentsSheet.confirmPayment',
+                //         additionalProperties: {orderNo: updatedOrder.orderNo}
+                //     })
 
-                    // Show error message to user - order was failed and basket reopened
-                    const message = formatMessage({
-                        defaultMessage:
-                            'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
-                        id: 'checkout.message.payment_confirm_failure'
-                    })
-                    onError(message)
-                    error.message = message
-                } catch (failOrderError) {
-                    logger.error('Failed to fail order after confirm failure', {
-                        namespace: 'SFPaymentsSheet.confirmPayment',
-                        additionalProperties: {
-                            orderNo: updatedOrder.orderNo,
-                            failOrderError
-                        }
-                    })
-                }
+                //     // Show error message to user - order was failed and basket reopened
+                //     const message = formatMessage({
+                //         defaultMessage:
+                //             'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                //         id: 'checkout.message.payment_confirm_failure'
+                //     })
+                //     onError(message)
+                //     error.message = message
+                // } catch (failOrderError) {
+                //     logger.error('Failed to fail order after confirm failure', {
+                //         namespace: 'SFPaymentsSheet.confirmPayment',
+                //         additionalProperties: {
+                //             orderNo: updatedOrder.orderNo,
+                //             failOrderError
+                //         }
+                //     })
+                //     const message = formatMessage({
+                //         defaultMessage:
+                //             'Payment confirmation failed. Please try again or select a different payment method.',
+                //         id: 'checkout.message.payment_confirm_failure'
+                //     })
+                //     onError(message)
+                //     error.message = message
+                // }
+                const message = formatMessage({
+                    defaultMessage:
+                        'Payment confirmation failed. Please try again or select a different payment method.',
+                    id: 'checkout.message.payment_confirm_failure'
+                })
+                onError(message)
+                error.message = message
             }
             throw error
         } finally {
@@ -445,11 +487,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 theme: buildTheme(),
                 actions: {
                     createIntent: createPaymentInstrument,
-                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
+                    onClick: () => {}
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
-                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
+                    showSaveForFutureUsageCheckbox: !!(
+                        customer?.isRegistered && customer?.customerId
+                    )
                 }
             }
 
@@ -458,6 +503,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 currency: basket.currency,
                 country: 'US', // TODO: see W-18812582
                 locale: intl.locale
+                // Note: customerId is not included in paymentRequest (matches SFRA behavior)
+                // The SDK uses showSaveForFutureUsageCheckbox option instead
             }
 
             // Clear the container and create a new div element
@@ -471,6 +518,10 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             )
             paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
             paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
+            // Listen for save payment method changes from SDK UI
+            paymentElement.addEventListener('sfp:savepaymentmethodchange', (event) => {
+                savePaymentMethodRef.current = event.detail?.savePaymentMethod === true
+            })
 
             checkoutComponent.current = sfp.checkout(
                 metadata,
@@ -486,7 +537,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
-    }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
+    }, [
+        sfp,
+        metadata,
+        containerElementRef.current,
+        paymentConfig,
+        cardCaptureAutomatic,
+        customer?.customerId
+    ])
 
     useEffect(() => {
         if (checkoutComponent.current && basket?.orderTotal) {
