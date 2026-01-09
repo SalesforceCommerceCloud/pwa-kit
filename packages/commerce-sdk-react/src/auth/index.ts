@@ -1451,7 +1451,14 @@ class Auth {
                 // Required params
                 user_id: parameters.user_id,
                 mode: parameters.mode,
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                // Optional params
+                ...(parameters.locale && {locale: parameters.locale}),
+                ...(parameters.client_id && {client_id: parameters.client_id}),
+                ...(parameters.code_challenge && {code_challenge: parameters.code_challenge}),
+                ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
+                ...(parameters.idp_name && {idp_name: parameters.idp_name}),
+                ...(parameters.hint && {hint: parameters.hint})
             }
         }
 
@@ -1478,13 +1485,14 @@ class Auth {
                 Authorization: ''
             },
             body: {
-                display_name: parameters.display_name,
-                nick_name: parameters.nick_name,
-                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 // Required params
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 pwd_action_token: parameters.pwd_action_token,
-                user_id: parameters.user_id
+                user_id: parameters.user_id,
+                // Optional params
+                ...(parameters.display_name && {display_name: parameters.display_name}),
+                ...(parameters.nick_name && {nick_name: parameters.nick_name}),
+                ...(parameters.client_id && {client_id: parameters.client_id}),
             }
         }
 
@@ -1510,10 +1518,11 @@ class Auth {
             body: {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                pwd_action_token: parameters.pwd_action_token,
                 username: parameters.username,
-                credential: parameters.credential
+                credential: parameters.credential,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                pwd_action_token: parameters.pwd_action_token
+
             }
         }
 
@@ -1542,7 +1551,9 @@ class Auth {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                user_id: parameters.user_id
+                user_id: parameters.user_id,
+                // Optional params
+                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id}),
             }
         }
 
@@ -1569,7 +1580,12 @@ class Auth {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                credential: parameters.credential
+                credential: parameters.credential,
+                // Optional params
+                ...(parameters.user_id && {user_id: parameters.user_id}),
+                ...(parameters.email && {email: parameters.email}),
+                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id}),
+                ...(parameters.usid && {usid: parameters.usid}),
             }
         }
 
