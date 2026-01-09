@@ -20,6 +20,7 @@ export const usePasswordReset = () => {
     const appOrigin = useAppOrigin()
     const config = getConfig().app.login?.resetPassword
     const callbackURI = buildAbsoluteUrl(appOrigin, config?.callbackURI)
+    const resetPasswordLandingPath = config.app.login?.resetPassword?.landingPath
 
     const getPasswordResetTokenMutation = useAuthHelper(AuthHelpers.GetPasswordResetToken)
     const resetPasswordMutation = useAuthHelper(AuthHelpers.ResetPassword)
@@ -50,5 +51,5 @@ export const usePasswordReset = () => {
         )
     }
 
-    return {getPasswordResetToken, resetPassword}
+    return {getPasswordResetToken, resetPassword, resetPasswordLandingPath}
 }

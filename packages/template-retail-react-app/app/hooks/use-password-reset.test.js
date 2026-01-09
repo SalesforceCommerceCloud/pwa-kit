@@ -17,8 +17,7 @@ const mockToken = '123456'
 const mockNewPassword = 'new-password'
 
 const MockComponent = () => {
-    const {getPasswordResetToken, resetPassword} = usePasswordReset()
-
+    const {getPasswordResetToken, resetPassword, resetPasswordLandingPath} = usePasswordReset()
     return (
         <div>
             <button
@@ -35,6 +34,8 @@ const MockComponent = () => {
                     })
                 }
             />
+
+            <div data-testid="reset-password-landing-path">{resetPasswordLandingPath}</div>
         </div>
     )
 }
@@ -151,5 +152,12 @@ describe('usePasswordReset', () => {
             status: 'success',
             position: 'bottom-right'
         })
+    })
+
+    test('resetPasswordLandingPath is returned', () => {
+        renderWithProviders(<MockComponent />)
+        expect(screen.getByTestId('reset-password-landing-path')).toHaveTextContent(
+            mockConfig.app.login.resetPassword.landingPath
+        )
     })
 })

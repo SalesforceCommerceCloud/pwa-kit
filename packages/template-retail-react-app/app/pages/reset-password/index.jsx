@@ -20,7 +20,6 @@ import {useLocation} from 'react-router-dom'
 import {useRouteMatch} from 'react-router'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {
-    RESET_PASSWORD_LANDING_PATH,
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
@@ -33,7 +32,7 @@ const ResetPassword = () => {
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
-    const {getPasswordResetToken} = usePasswordReset()
+    const {getPasswordResetToken, resetPasswordLandingPath} = usePasswordReset()
 
     const submitForm = async ({email}) => {
         try {
@@ -71,7 +70,7 @@ const ResetPassword = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                {path === RESET_PASSWORD_LANDING_PATH ? (
+                {path.endsWith(resetPasswordLandingPath) ? (
                     <ResetPasswordLanding />
                 ) : (
                     <ResetPasswordForm
