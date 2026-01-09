@@ -1320,12 +1320,12 @@ class Auth {
      * Returns undefined if not using a private client.
      */
     private getBasicAuthHeader(client: ShopperLogin<ApiClientConfigParams>): string | undefined {
-        if (!this.clientSecret) {
-            return undefined
-        }
-        return `Basic ${stringToBase64(
-            `${client.clientConfig.parameters.clientId}:${this.clientSecret}`
-        )}`
+        return (
+            this.clientSecret &&
+            `Basic ${stringToBase64(
+                `${client.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        )
     }
 
     /**
@@ -1442,10 +1442,10 @@ class Auth {
         parameters: ShopperLoginTypes.authorizeWebauthnRegistrationBodyType
     ) {
         const slasClient = this.client
-
+        const authHeader = this.getBasicAuthHeader(slasClient)
         const options = {
             headers: {
-                Authorization: ''
+                Authorization: authHeader ?? ''
             },
             body: {
                 // Required params
@@ -1462,14 +1462,7 @@ class Auth {
             }
         }
 
-        const authHeader = this.getBasicAuthHeader(slasClient)
-        if (authHeader) {
-            options.headers.Authorization = authHeader
-        }
-
-        const res = await slasClient.authorizeWebauthnRegistration(options)
-
-        return res
+        return await slasClient.authorizeWebauthnRegistration(options)
     }
 
     /**
@@ -1479,10 +1472,10 @@ class Auth {
         parameters: ShopperLoginTypes.startWebauthnUserRegistrationBodyType
     ) {
         const slasClient = this.client
-
+        const authHeader = this.getBasicAuthHeader(slasClient)
         const options = {
             headers: {
-                Authorization: ''
+                Authorization: authHeader ?? ''
             },
             body: {
                 // Required params
@@ -1492,17 +1485,11 @@ class Auth {
                 // Optional params
                 ...(parameters.display_name && {display_name: parameters.display_name}),
                 ...(parameters.nick_name && {nick_name: parameters.nick_name}),
-                ...(parameters.client_id && {client_id: parameters.client_id}),
+                ...(parameters.client_id && {client_id: parameters.client_id})
             }
         }
 
-        const authHeader = this.getBasicAuthHeader(slasClient)
-        if (authHeader) {
-            options.headers.Authorization = authHeader
-        }
-
-        const res = await slasClient.startWebauthnUserRegistration(options)
-        return res
+        return await slasClient.startWebauthnUserRegistration(options)
     }
 
     /**
@@ -1510,10 +1497,11 @@ class Auth {
      */
     async finishWebauthnUserRegistration(parameters: ShopperLoginTypes.RegistrationFinishRequest) {
         const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
 
         const options = {
             headers: {
-                Authorization: ''
+                Authorization: authHeader ?? ''
             },
             body: {
                 // Required params
@@ -1522,17 +1510,10 @@ class Auth {
                 credential: parameters.credential,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 pwd_action_token: parameters.pwd_action_token
-
             }
         }
 
-        const authHeader = this.getBasicAuthHeader(slasClient)
-        if (authHeader) {
-            options.headers.Authorization = authHeader
-        }
-
-        const res = await slasClient.finishWebauthnUserRegistration(options)
-        return res
+        return await slasClient.finishWebauthnUserRegistration(options)
     }
 
     /**
@@ -1542,10 +1523,10 @@ class Auth {
         parameters: ShopperLoginTypes.startWebauthnAuthenticationBodyType
     ) {
         const slasClient = this.client
-
+        const authHeader = this.getBasicAuthHeader(slasClient)
         const options = {
             headers: {
-                Authorization: ''
+                Authorization: authHeader ?? ''
             },
             body: {
                 // Required params
@@ -1553,17 +1534,11 @@ class Auth {
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 user_id: parameters.user_id,
                 // Optional params
-                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id}),
+                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id})
             }
         }
 
-        const authHeader = this.getBasicAuthHeader(slasClient)
-        if (authHeader) {
-            options.headers.Authorization = authHeader
-        }
-
-        const res = await slasClient.startWebauthnAuthentication(options)
-        return res
+        return await slasClient.startWebauthnAuthentication(options)
     }
 
     /**
@@ -1571,10 +1546,10 @@ class Auth {
      */
     async finishWebauthnAuthentication(parameters: ShopperLoginTypes.AuthenticateFinishRequest) {
         const slasClient = this.client
-
+        const authHeader = this.getBasicAuthHeader(slasClient)
         const options = {
             headers: {
-                Authorization: ''
+                Authorization: authHeader ?? ''
             },
             body: {
                 // Required params
@@ -1585,13 +1560,8 @@ class Auth {
                 ...(parameters.user_id && {user_id: parameters.user_id}),
                 ...(parameters.email && {email: parameters.email}),
                 ...(parameters.tenant_id && {tenant_id: parameters.tenant_id}),
-                ...(parameters.usid && {usid: parameters.usid}),
+                ...(parameters.usid && {usid: parameters.usid})
             }
-        }
-
-        const authHeader = this.getBasicAuthHeader(slasClient)
-        if (authHeader) {
-            options.headers.Authorization = authHeader
         }
 
         const res = await slasClient.finishWebauthnAuthentication(options)
