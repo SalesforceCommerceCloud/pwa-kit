@@ -106,7 +106,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-
+    const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
 
     const {step, STEPS, goToStep} = useCheckout()
 
@@ -389,13 +389,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
+            // Store orderNo before confirm in case confirm fails
+            const orderNo = updatedOrder.orderNo
+
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
                 () => paymentIntent,
                 billingDetails,
                 shippingDetails
             )
-
             if (result.responseCode !== STATUS_SUCCESS) {
                 throw new Error(result.data?.error)
             }
@@ -423,7 +425,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         namespace: 'SFPaymentsSheet.confirmPayment',
                         additionalProperties: {orderNo: updatedOrder.orderNo}
                     })
-
                     // Show error message to user - order was failed and basket reopened
                     const message = formatMessage({
                         defaultMessage:
@@ -440,21 +441,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                             failOrderError
                         }
                     })
-                    const message = formatMessage({
-                        defaultMessage:
-                            'Payment confirmation failed. Please try again or select a different payment method.',
-                        id: 'checkout.message.payment_confirm_failure'
-                    })
-                    onError(message)
-                    error.message = message
                 }
-                const message = formatMessage({
-                    defaultMessage:
-                        'Payment confirmation failed. Please try again or select a different payment method.',
-                    id: 'checkout.message.payment_confirm_failure'
-                })
-                onError(message)
-                error.message = message
             }
             throw error
         } finally {
