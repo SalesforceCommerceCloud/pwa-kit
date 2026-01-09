@@ -57,8 +57,6 @@ export const transformAddressDetails = (billingDetails, shippingDetails) => {
         return address
     }
 
-    // For PayPal/Venmo, billing address might not be available or incomplete
-    // Use shipping address as billing address if billing details are missing or incomplete
     const billingAddr = billingDetails?.address
     const hasBillingDetails = billingDetails?.name && billingAddr?.city
     const billingSource = hasBillingDetails ? billingDetails : shippingDetails
@@ -135,28 +133,224 @@ export const isPayPalPaymentMethodType = (paymentMethodType) => {
 }
 
 /**
+ * Finds the payment account/gateway for a given payment method type from payment method set accounts.
+ * Similar to SFRA's findAccount function.
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @returns {Object|null} Payment account object with vendor property, or null if not found
+ */
+export const findPaymentAccount = (paymentMethodSetAccounts, paymentMethodType) => {
+    if (!paymentMethodSetAccounts || !Array.isArray(paymentMethodSetAccounts)) {
+        return null
+    }
+
+    // Find account that supports this payment method type
+    return (
+        paymentMethodSetAccounts.find((account) => {
+            return account.paymentMethods?.some((pm) => pm.id === paymentMethodType)
+        }) || null
+    )
+}
+
+/**
+ * Determines the gateway name from payment method type and payment method set accounts.
+ * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @returns {string|null} Gateway name ('stripe', 'adyen', or null)
+ */
+export const getGatewayFromPaymentMethod = (paymentMethodType, paymentMethodSetAccounts) => {
+    if (isPayPalPaymentMethodType(paymentMethodType)) {
+        return null
+    }
+
+    const account = findPaymentAccount(paymentMethodSetAccounts, paymentMethodType)
+    if (!account) {
+        return paymentMethodType === 'card' ? 'stripe' : null
+    }
+
+    const vendor = account.vendor?.toLowerCase()
+    if (vendor === 'stripe') {
+        return 'stripe'
+    } else if (vendor === 'adyen') {
+        return 'adyen'
+    }
+
+    return paymentMethodType === 'card' ? 'stripe' : null
+}
+
+/**
+ * Determines the setup_future_usage value for Stripe payment intents based on configuration and user preference.
+ * Follows SFRA pattern: if futureUsageOffSession is enabled, always use 'off_session';
+ * otherwise, use 'on_session' if user wants to save payment method.
+ * @param {boolean} storePaymentMethod - Whether the user wants to save the payment method
+ * @param {boolean} futureUsageOffSession - Whether off-session future usage is enabled in configuration
+ * @returns {string|null} 'on_session', 'off_session', or null
+ */
+export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) => {
+    if (futureUsageOffSession) {
+        return 'off_session'
+    } else if (storePaymentMethod) {
+        return 'on_session'
+    }
+    return null
+}
+
+/**
  * Creates a payment instrument body for Salesforce Payments (for basket or order).
+ * Follows SFRA pattern and OCAPI PATCH format with gatewayProperties.
  * @param {number} amount - Payment amount
  * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
  * @param {string} zoneId - Zone ID for payment processing
  * @param {string} shippingPreference - optional shipping preference for PayPal payment processing
+ * @param {boolean} storePaymentMethod - optional flag to save payment method for future use
+ * @param {boolean} futureUsageOffSession - optional flag indicating if off-session future usage is enabled (from payment config)
+ * @param {Array} paymentMethodSetAccounts - optional array of payment method set accounts to determine gateway
  * @returns {Object} Payment instrument body
  */
 export const createPaymentInstrumentBody = (
     amount,
     paymentMethodType,
     zoneId,
-    shippingPreference
+    shippingPreference,
+    storePaymentMethod = false,
+    futureUsageOffSession = false,
+    paymentMethodSetAccounts = null
 ) => {
+    const paymentReferenceRequest = {
+        paymentMethodType: paymentMethodType,
+        zoneId: zoneId ?? 'default'
+    }
+
+    if (shippingPreference !== undefined && shippingPreference !== null) {
+        paymentReferenceRequest.shippingPreference = shippingPreference
+    }
+
+    const gateway = getGatewayFromPaymentMethod(paymentMethodType, paymentMethodSetAccounts)
+
+    if (gateway === 'stripe' && (storePaymentMethod || futureUsageOffSession)) {
+        const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
+        if (setupFutureUsage) {
+            paymentReferenceRequest.gateway = 'stripe'
+            paymentReferenceRequest.gatewayProperties = {
+                stripe: {
+                    setup_future_usage: setupFutureUsage
+                }
+            }
+        }
+    }
+
+    if (gateway === 'adyen' && storePaymentMethod) {
+        paymentReferenceRequest.gateway = 'adyen'
+    }
+
     return {
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
-        paymentReferenceRequest: {
-            paymentMethodType: paymentMethodType,
-            zoneId: zoneId ?? 'default',
-            shippingPreference: shippingPreference
-        }
+        paymentReferenceRequest: paymentReferenceRequest
     }
+}
+
+/**
+ * Generates a display name for a saved payment method (matches SFRA format)
+ * @param {string} type - Payment method type
+ * @param {string} brand - Card brand (for cards only)
+ * @param {string} last4 - Last 4 digits (for cards only)
+ * @param {string} name - Generic name fallback
+ * @returns {string} Display name
+ */
+const generateDisplayName = (type, brand, last4, name) => {
+    if (type === 'card' && brand && last4) {
+        return `${brand} **** ${last4}`
+    }
+    return name || 'Saved Payment Method'
+}
+
+/**
+ * Formats Stripe saved payment method (matches SFRA's getStripeSavedPaymentMethods)
+ * @param {Object} paymentReference - Payment reference object
+ * @param {Object} stripeProps - Stripe gateway properties
+ * @param {Object} account - Payment method set account
+ * @param {string} paymentMethodType - Payment method type
+ * @returns {Object} Formatted saved payment method
+ */
+const formatStripeSavedPaymentMethod = (
+    paymentReference,
+    stripeProps,
+    account,
+    paymentMethodType
+) => {
+    const last4 = stripeProps.last4 || ''
+    const brand = stripeProps.brand || ''
+    const paymentMethodId = stripeProps.paymentMethodId || paymentReference.paymentReferenceId
+    const displayName = generateDisplayName(paymentMethodType, brand, last4, null)
+
+    return {
+        accountId: account.accountId,
+        name: displayName,
+        status: 'Active',
+        isDefault: false,
+        type: paymentMethodType,
+        accountHolderName: null,
+        id: paymentReference.paymentReferenceId,
+        gatewayTokenId: paymentMethodId,
+        usageType: 'OffSession',
+        gatewayId: account.accountId,
+        gatewayCustomerId: stripeProps.customerId || null,
+        last4: last4 || null,
+        network: brand?.toLowerCase() || null,
+        issuer: null,
+        expiryMonth: stripeProps.expMonth?.toString() || null,
+        expiryYear: stripeProps.expYear?.toString() || null,
+        bankName: null,
+        savedByMerchant: false
+    }
+}
+
+/**
+ * Formats payment method references from customer data into SDK's SavedPaymentMethod format
+ * Currently supports Stripe payment methods. Structure allows easy extension for Adyen.
+ * @param {Array} paymentMethodReferences - Array of payment method references from customer data
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts to match gateway info
+ * @returns {Array} Formatted saved payment methods for SDK
+ */
+export const formatSavedPaymentMethods = (
+    paymentMethodReferences = [],
+    paymentMethodSetAccounts = []
+) => {
+    if (!paymentMethodReferences || paymentMethodReferences.length === 0) {
+        return []
+    }
+
+    const savedPaymentMethods = []
+
+    paymentMethodReferences.forEach((ref) => {
+        const paymentReference = ref.paymentReference
+        if (!paymentReference?.paymentReferenceId) {
+            return
+        }
+
+        const gatewayProperties = paymentReference?.gatewayProperties || {}
+        const paymentMethodType = paymentReference.paymentMethodType || 'card'
+
+        const stripeProps = gatewayProperties?.stripe || {}
+        if (stripeProps && Object.keys(stripeProps).length > 0) {
+            const account = paymentMethodSetAccounts.find((acc) => acc.vendor === 'Stripe')
+            if (account) {
+                savedPaymentMethods.push(
+                    formatStripeSavedPaymentMethod(
+                        paymentReference,
+                        stripeProps,
+                        account,
+                        paymentMethodType
+                    )
+                )
+            }
+        }
+
+        // TODO: Adyen support for SPM
+    })
+
+    return savedPaymentMethods
 }
 
 /**
