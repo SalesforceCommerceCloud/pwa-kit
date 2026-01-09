@@ -30,11 +30,11 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
+            tokenLength: 8,
             passwordless: {
                 enabled: false,
                 mode: 'email',
-                landingPath: '/passwordless-login-landing',
-                tokenLength: 8
+                landingPath: '/passwordless-login-landing'
             },
             social: {
                 enabled: false,

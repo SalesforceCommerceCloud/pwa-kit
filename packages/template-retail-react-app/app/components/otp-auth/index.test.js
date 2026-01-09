@@ -127,10 +127,7 @@ describe('OtpAuth', () => {
                     ...mockConfig.app,
                     login: {
                         ...mockConfig.app.login,
-                        passwordless: {
-                            ...mockConfig.app.login.passwordless,
-                            tokenLength: tokenLength
-                        }
+                        tokenLength
                     }
                 }
             }))

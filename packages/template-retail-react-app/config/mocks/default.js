@@ -33,10 +33,10 @@ module.exports = {
             showDefaults: true
         },
         login: {
+            tokenLength: 8,
             passwordless: {
                 enabled: false,
-                mode: 'email',
-                tokenLength: 8
+                mode: 'email'
             },
             social: {
                 enabled: false,

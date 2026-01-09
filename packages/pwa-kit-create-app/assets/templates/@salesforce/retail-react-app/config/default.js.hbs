@@ -57,6 +57,9 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
+            // The length of the token for OTP authentication. Used by passwordless login and reset password.
+            // Valid values include 6 or 8. Defaults to: 8
+            tokenLength: 8,
             passwordless: {
                 // Enables or disables passwordless login for the site. Defaults to: false
                 {{#if answers.project.demo.enableDemoSettings}}
@@ -71,9 +74,7 @@ module.exports = {
                 // callbackURI:
                 //     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 // The landing path for passwordless login
-                landingPath: '/passwordless-login-landing',
-                // The length of the token for passwordless login. Valid values include 6 or 8. Defaults to: 8
-                tokenLength: 8
+                landingPath: '/passwordless-login-landing'
             },
             social: {
                 // Enables or disables social login for the site. Defaults to: false
