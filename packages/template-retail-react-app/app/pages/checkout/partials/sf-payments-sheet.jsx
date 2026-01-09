@@ -107,8 +107,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         'removePaymentInstrumentFromBasket'
     )
 
-    // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
-    // const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
 
     const {step, STEPS, goToStep} = useCheckout()
 
@@ -286,22 +284,21 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 }
             })
             const createdOrderNo = order.orderNo
-            // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
             // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
-            // await failOrder({
-            //     parameters: {
-            //         orderNo: createdOrderNo,
-            //         reopenBasket: true
-            //     },
-            //     body: {
-            //         reasonCode: 'payment_confirm_failure'
-            //     }
-            // })
+            await failOrder({
+                parameters: {
+                    orderNo: createdOrderNo,
+                    reopenBasket: true
+                },
+                body: {
+                    reasonCode: 'payment_confirm_failure'
+                }
+            })
 
             // Show error message to user - order was failed and basket reopened
             const message = formatMessage({
                 defaultMessage:
-                    'Payment processing failed. Please try again or select a different payment method.',
+                    'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
                 id: 'checkout.message.payment_processing_failed'
             })
             onError(message)
@@ -334,7 +331,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentMethodType.current,
                 zoneId,
                 undefined,
-                false, // Don't save payment method at basket stage
+                false,
                 futureUsageOffSession,
                 paymentConfig?.paymentMethodSetAccounts
             )
@@ -411,47 +408,46 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         } catch (error) {
             // Only fail order if createAndUpdateOrder succeeded but perhaps confirm fails
             if (updatedOrder && !error.orderNo) {
-                // TODO: Uncomment when failOrder mutation is fully implemented in SDK types
                 // createAndUpdateOrder succeeded but confirm failed - need to fail the order
-                // try {
-                //     await failOrder({
-                //         parameters: {
-                //             orderNo: updatedOrder.orderNo,
-                //             reopenBasket: true
-                //         },
-                //         body: {
-                //             reasonCode: 'payment_confirm_failure'
-                //         }
-                //     })
-                //     logger.info('Order failed successfully after confirm failure', {
-                //         namespace: 'SFPaymentsSheet.confirmPayment',
-                //         additionalProperties: {orderNo: updatedOrder.orderNo}
-                //     })
+                try {
+                    await failOrder({
+                        parameters: {
+                            orderNo: updatedOrder.orderNo,
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: 'payment_confirm_failure'
+                        }
+                    })
+                    logger.info('Order failed successfully after confirm failure', {
+                        namespace: 'SFPaymentsSheet.confirmPayment',
+                        additionalProperties: {orderNo: updatedOrder.orderNo}
+                    })
 
-                //     // Show error message to user - order was failed and basket reopened
-                //     const message = formatMessage({
-                //         defaultMessage:
-                //             'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
-                //         id: 'checkout.message.payment_confirm_failure'
-                //     })
-                //     onError(message)
-                //     error.message = message
-                // } catch (failOrderError) {
-                //     logger.error('Failed to fail order after confirm failure', {
-                //         namespace: 'SFPaymentsSheet.confirmPayment',
-                //         additionalProperties: {
-                //             orderNo: updatedOrder.orderNo,
-                //             failOrderError
-                //         }
-                //     })
-                //     const message = formatMessage({
-                //         defaultMessage:
-                //             'Payment confirmation failed. Please try again or select a different payment method.',
-                //         id: 'checkout.message.payment_confirm_failure'
-                //     })
-                //     onError(message)
-                //     error.message = message
-                // }
+                    // Show error message to user - order was failed and basket reopened
+                    const message = formatMessage({
+                        defaultMessage:
+                            'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                        id: 'checkout.message.payment_confirm_failure'
+                    })
+                    onError(message)
+                    error.message = message
+                } catch (failOrderError) {
+                    logger.error('Failed to fail order after confirm failure', {
+                        namespace: 'SFPaymentsSheet.confirmPayment',
+                        additionalProperties: {
+                            orderNo: updatedOrder.orderNo,
+                            failOrderError
+                        }
+                    })
+                    const message = formatMessage({
+                        defaultMessage:
+                            'Payment confirmation failed. Please try again or select a different payment method.',
+                        id: 'checkout.message.payment_confirm_failure'
+                    })
+                    onError(message)
+                    error.message = message
+                }
                 const message = formatMessage({
                     defaultMessage:
                         'Payment confirmation failed. Please try again or select a different payment method.',
@@ -487,7 +483,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 theme: buildTheme(),
                 actions: {
                     createIntent: createPaymentInstrument,
-                    onClick: () => {}
+                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
@@ -503,8 +499,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 currency: basket.currency,
                 country: 'US', // TODO: see W-18812582
                 locale: intl.locale
-                // Note: customerId is not included in paymentRequest (matches SFRA behavior)
-                // The SDK uses showSaveForFutureUsageCheckbox option instead
             }
 
             // Clear the container and create a new div element
@@ -518,7 +512,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             )
             paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
             paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
-            // Listen for save payment method changes from SDK UI
             paymentElement.addEventListener('sfp:savepaymentmethodchange', (event) => {
                 savePaymentMethodRef.current = event.detail?.savePaymentMethod === true
             })
@@ -543,7 +536,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic,
-        customer?.customerId
+        customer?.isRegistered
     ])
 
     useEffect(() => {
