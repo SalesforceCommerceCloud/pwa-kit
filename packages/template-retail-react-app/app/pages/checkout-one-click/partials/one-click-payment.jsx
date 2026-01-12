@@ -212,6 +212,7 @@ const Payment = ({
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
         const paymentInstrument = {
+            amount: basket?.orderTotal || 0,
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
@@ -290,6 +291,7 @@ const Payment = ({
                 await addPaymentInstrumentToBasket({
                     parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                     body: {
+                        amount: basket?.orderTotal || 0,
                         paymentMethodId: 'CREDIT_CARD',
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
                     }
@@ -357,6 +359,7 @@ const Payment = ({
             await addPaymentInstrumentToBasket({
                 parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                 body: {
+                    amount: basket?.orderTotal || 0,
                     paymentMethodId: 'CREDIT_CARD',
                     customerPaymentInstrumentId: paymentInstrumentId
                 }
