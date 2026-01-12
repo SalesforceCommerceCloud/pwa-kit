@@ -14,6 +14,16 @@ import {
 import ResetPassword from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+const mockUseRouteMatch = jest.fn(() => ({path: '/'}))
+
+jest.mock('react-router', () => {
+    const original = jest.requireActual('react-router')
+    return {
+        ...original,
+        useRouteMatch: () => mockUseRouteMatch()
+    }
+})
+
 const MockedComponent = () => {
     return (
         <div>
@@ -24,7 +34,10 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
+    // Reset useRouteMatch mock to return path based on window.location.pathname
+    mockUseRouteMatch.mockImplementation(() => ({
+        path: typeof window !== 'undefined' && window.location ? window.location.pathname : '/'
+    }))
     window.history.pushState({}, 'Reset Password', createPathWithDefaults('/reset-password'))
 })
 afterEach(() => {
@@ -73,5 +86,22 @@ test('Allows customer to generate password token', async () => {
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
+    })
+})
+
+test.each([
+    ['base path', '/reset-password-landing'],
+    ['path with site and locale', '/uk/en-GB/reset-password-landing']
+])('renders reset password landing page when using %s', async (_, landingPath) => {
+    window.history.pushState({}, 'Reset Password', createPathWithDefaults(landingPath))
+
+    // render our test component
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    // check if the landing page is rendered
+    await waitFor(() => {
+        expect(screen.getByText(/confirm new password/i)).toBeInTheDocument()
     })
 })
