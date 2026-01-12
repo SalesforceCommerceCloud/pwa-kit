@@ -30,6 +30,7 @@ import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
@@ -37,6 +38,7 @@ import {
     PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -92,6 +94,8 @@ export const AuthModal = ({
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -262,6 +266,8 @@ export const AuthModal = ({
                 isClosable: true
             })
 
+            showToast()
+
             // Execute action to be performed on successful login
             onLoginSuccess()
         }
@@ -276,6 +282,7 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
+        <>
         <Modal
             size="sm"
             closeOnOverlayClick={false}
@@ -337,6 +344,11 @@ export const AuthModal = ({
                 </ModalBody>
             </ModalContent>
         </Modal>
+        <PasskeyRegistrationModal
+            isOpen={passkeyModal.isOpen}
+            onClose={passkeyModal.onClose}
+        />
+    </>
     )
 }
 
