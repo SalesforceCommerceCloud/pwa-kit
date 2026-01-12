@@ -65,7 +65,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
 
     const resetState = () => {
         setPasskeyNickname('')
-        setVerificationCode('')
         setError(null)
     }
 

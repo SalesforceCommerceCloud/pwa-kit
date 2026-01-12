@@ -36,8 +36,7 @@ export const usePasskeyRegistration = () => {
                     maxWidth="400px"
                 >
                     <Box mb={3} fontWeight="medium">
-                        Account successfully created! Create a passkey for more secure and easier
-                        login next time
+                        Create a passkey for a more secure and easier login
                     </Box>
                     <Button
                         size="sm"

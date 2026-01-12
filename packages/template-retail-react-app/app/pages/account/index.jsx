@@ -46,6 +46,9 @@ import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
@@ -97,7 +100,16 @@ const Account = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
 
+    const {showToast, passkeyModal} = usePasskeyRegistration()
+
     const {buildUrl} = useMultiSite()
+
+    useEffect(() => {
+        if (isRegistered) {
+            showToast()
+        }
+    }, [isRegistered])
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -245,6 +257,10 @@ const Account = () => {
                     </Route>
                 </Switch>
             </Grid>
+            <PasskeyRegistrationModal
+                isOpen={passkeyModal.isOpen}
+                onClose={passkeyModal.onClose}
+            />
         </Box>
     )
 }
