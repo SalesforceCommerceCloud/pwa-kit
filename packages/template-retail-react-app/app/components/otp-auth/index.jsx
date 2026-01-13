@@ -36,6 +36,7 @@ const OtpAuth = ({
     handleOtpVerification,
     onCheckoutAsGuest,
     isGuestRegistration = false,
+    isPasskeyRegistration = false,
     hideCheckoutAsGuestButton = false
 }) => {
     const OTP_LENGTH = 8
@@ -209,6 +210,12 @@ const OtpAuth = ({
                                     id="otp.message.enter_code_for_account_guest"
                                     values={{otpLength: OTP_LENGTH}}
                                 />
+                            ) : isPasskeyRegistration ? (
+                                <FormattedMessage
+                                    defaultMessage="We sent a one-time password (OTP) to your email to confirm your identity. Enter the {otpLength}-digit code below to continue."
+                                    id="otp.message.enter_code_for_passkey_registration"
+                                    values={{otpLength: OTP_LENGTH}}
+                                />
                             ) : (
                                 <FormattedMessage
                                     defaultMessage="To log in to your account, enter the code sent to your email."
@@ -342,6 +349,7 @@ OtpAuth.propTypes = {
     handleOtpVerification: PropTypes.func.isRequired,
     onCheckoutAsGuest: PropTypes.func,
     isGuestRegistration: PropTypes.bool,
+    isPasskeyRegistration: PropTypes.bool,
     hideCheckoutAsGuestButton: PropTypes.bool
 }
 

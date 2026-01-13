@@ -45,6 +45,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
@@ -100,12 +101,14 @@ const Account = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
 
+    const config = getConfig()
     const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const {buildUrl} = useMultiSite()
 
     useEffect(() => {
-        if (isRegistered) {
+        // Show passkey registration modal only if Webauthn feature flag is enabled
+        if (isRegistered && config?.app?.login?.passkey?.enabled) {
             showToast()
         }
     }, [isRegistered])

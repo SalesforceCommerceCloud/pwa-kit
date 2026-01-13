@@ -67,13 +67,10 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                     callback_uri: webauthnConfig.callbackURI
                 })
             })
-            console.log('Passkey registration initiated. Check SLAS for OTP')
-            console.log('Passkey nickname:', passkeyNickname)
 
-            onClose()
             // Open OTP auth modal
+            onClose()
             setIsOtpAuthOpen(true)
-
         } catch (err) {
             console.error('Error authorizing passkey registration:', err)
             setError(err.message || 'Failed to authorize passkey registration')
@@ -120,6 +117,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                             id: 'auth_modal.passkey.button.close.assistive_msg',
                             defaultMessage: 'Close passkey form'
                         })}
+                        data-testid="passkey-registration-modal-close-button"
                     />
                     <ModalBody pb={6}>
                         {error && (
@@ -165,6 +163,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 form={form}
                 handleSendEmailOtp={handleRegisterPasskey}
                 handleOtpVerification={handleOtpVerification}
+                isPasskeyRegistration={true}
                 hideCheckoutAsGuestButton={true}
             />
         </>

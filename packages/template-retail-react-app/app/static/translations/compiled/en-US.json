@@ -2903,6 +2903,20 @@
       "value": "To log in to your account, enter the code sent to your email."
     }
   ],
+  "otp.message.enter_code_for_passkey_registration": [
+    {
+      "type": 0,
+      "value": "We sent a one-time password (OTP) to your email to confirm your identity. Enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below to continue."
+    }
+  ],
   "otp.message.verifying": [
     {
       "type": 0,

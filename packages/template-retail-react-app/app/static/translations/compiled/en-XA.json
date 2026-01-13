@@ -6079,6 +6079,28 @@
       "value": "]"
     }
   ],
+  "otp.message.enter_code_for_passkey_registration": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ şḗḗƞŧ ȧȧ ǿǿƞḗḗ-ŧīḿḗḗ ƥȧȧşşẇǿǿřḓ (ǾŦƤ) ŧǿǿ ẏǿǿŭŭř ḗḗḿȧȧīŀ ŧǿǿ ƈǿǿƞƒīřḿ ẏǿǿŭŭř īḓḗḗƞŧīŧẏ. Ḗƞŧḗḗř ŧħḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-ḓīɠīŧ ƈǿǿḓḗḗ ƀḗḗŀǿǿẇ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "otp.message.verifying": [
     {
       "type": 0,
