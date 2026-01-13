@@ -107,9 +107,26 @@ const Account = () => {
     const {buildUrl} = useMultiSite()
 
     useEffect(() => {
-        // Show passkey registration modal only if Webauthn feature flag is enabled
+        // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
         if (isRegistered && config?.app?.login?.passkey?.enabled) {
-            showToast()
+            if (
+                window.PublicKeyCredential &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                })
+            }
         }
     }, [isRegistered])
 
