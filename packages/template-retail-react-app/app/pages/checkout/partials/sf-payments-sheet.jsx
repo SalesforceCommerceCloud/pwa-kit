@@ -140,6 +140,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const handlePaymentButtonApprove = async (event) => {
         try {
+            // Update savePaymentMethodRef only if explicitly provided. May be missing if payment method doesn't
+            // support saving. If missing, preserve existing value set by handlePaymentMethodSelected.
             if (event?.detail?.savePaymentMethod !== undefined) {
                 savePaymentMethodRef.current = event.detail.savePaymentMethod === true
             }
@@ -226,7 +228,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentConfig?.paymentMethodSetAccounts
             )
         })
-    
+
         // Store the updated basket for potential cleanup on cancel
         currentBasket.current = updatedBasket
 
@@ -251,7 +253,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 order.orderTotal,
                 paymentMethodType.current,
                 zoneId,
-                undefined,
+                null,
                 shouldSavePaymentMethod,
                 futureUsageOffSession,
                 paymentConfig?.paymentMethodSetAccounts
@@ -333,7 +335,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 updatedBasket.orderTotal,
                 paymentMethodType.current,
                 zoneId,
-                undefined,
+                null,
                 false,
                 futureUsageOffSession,
                 paymentConfig?.paymentMethodSetAccounts
@@ -391,9 +393,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
-
-            // Store orderNo before confirm in case confirm fails
-            const orderNo = updatedOrder.orderNo
 
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
@@ -505,9 +504,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             )
             paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
             paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
-            paymentElement.addEventListener('sfp:savepaymentmethodchange', (event) => {
-                savePaymentMethodRef.current = event.detail?.savePaymentMethod === true
-            })
 
             checkoutComponent.current = sfp.checkout(
                 metadata,
