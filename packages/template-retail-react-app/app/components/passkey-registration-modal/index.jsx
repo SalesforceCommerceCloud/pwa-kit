@@ -8,6 +8,9 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
+
+// Components
+import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {
     Button,
     FormControl,
@@ -20,22 +23,32 @@ import {
     ModalHeader,
     ModalOverlay,
     Alert,
-    AlertIcon,
+    AlertIcon
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+
+// Hooks
+import {useForm} from 'react-hook-form'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+
+// Utils
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+// SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 
 /**
  * Modal for registering a new passkey with a nickname
  */
 const PasskeyRegistrationModal = ({isOpen, onClose}) => {
+    const {data: customer} = useCurrentCustomer()
     const {formatMessage} = useIntl()
     const [passkeyNickname, setPasskeyNickname] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
-    const {data: customer} = useCurrentCustomer()
-    
+    const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
+
+    const form = useForm()
+
     const config = getConfig()
     const commerceApiConfig = config.app.commerceAPI
     const webauthnConfig = config.app.login.passkey
@@ -44,23 +57,34 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const handleRegisterPasskey = async () => {
         setIsLoading(true)
         setError(null)
-        
+
         try {
             await authorizeWebauthnRegistration.mutateAsync({
                 user_id: customer.email,
                 mode: webauthnConfig.mode,
                 channel_id: commerceApiConfig.parameters.siteId,
-                ...(webauthnConfig.mode === 'callback' && {callback_uri: webauthnConfig.callbackURI})
+                ...(webauthnConfig.mode === 'callback' && {
+                    callback_uri: webauthnConfig.callbackURI
+                })
             })
             console.log('Passkey registration initiated. Check SLAS for OTP')
             console.log('Passkey nickname:', passkeyNickname)
-            
+
+            onClose()
+            // Open OTP auth modal
+            setIsOtpAuthOpen(true)
+
         } catch (err) {
             console.error('Error authorizing passkey registration:', err)
             setError(err.message || 'Failed to authorize passkey registration')
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const handleOtpVerification = async (code) => {
+        // TODO: Implement OTP verification
+        return {success: true}
     }
 
     const resetState = () => {
@@ -81,60 +105,69 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     }, [isOpen])
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} size="md">
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
-                    {formatMessage({
-                              defaultMessage: 'Create Passkey',
-                              id: 'auth_modal.passkey.title'
-                    })}
-                </ModalHeader>
-                <ModalCloseButton
-                    aria-label={formatMessage({
-                        id: 'auth_modal.passkey.button.close.assistive_msg',
-                        defaultMessage: 'Close passkey form'
-                    })}
-                />
-                <ModalBody pb={6}>
-                    {error && (
-                        <Alert status="error" mb={4}>
-                            <AlertIcon />
-                            {error}
-                        </Alert>
-                    )}
+        <>
+            <Modal isOpen={isOpen} onClose={handleClose} size="md">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        {formatMessage({
+                            defaultMessage: 'Create Passkey',
+                            id: 'auth_modal.passkey.title'
+                        })}
+                    </ModalHeader>
+                    <ModalCloseButton
+                        aria-label={formatMessage({
+                            id: 'auth_modal.passkey.button.close.assistive_msg',
+                            defaultMessage: 'Close passkey form'
+                        })}
+                    />
+                    <ModalBody pb={6}>
+                        {error && (
+                            <Alert status="error" mb={4}>
+                                <AlertIcon />
+                                {error}
+                            </Alert>
+                        )}
 
-                    <FormControl>
-                        <FormLabel>
-                            {formatMessage({
-                                defaultMessage: 'Passkey Nickname',
-                                id: 'auth_modal.passkey.label.nickname'
-                            })}
-                        </FormLabel>
-                        <Input
-                            placeholder="e.g., 'iPhone', 'Personal Laptop'"
-                            value={passkeyNickname}
-                            onChange={(e) => setPasskeyNickname(e.target.value)}
-                            mb={4}
-                            isDisabled={isLoading}
-                        />
-                        <Button
-                            width="full"
-                            colorScheme="blue"
-                            onClick={handleRegisterPasskey}
-                            isLoading={isLoading}
-                            loadingText="Registering..."
-                        >
-                            {formatMessage({
-                                defaultMessage: 'Register Passkey',
-                                id: 'auth_modal.passkey.button.register'
-                            })}
-                        </Button>
-                    </FormControl>
-
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+                        <FormControl>
+                            <FormLabel>
+                                {formatMessage({
+                                    defaultMessage: 'Passkey Nickname',
+                                    id: 'auth_modal.passkey.label.nickname'
+                                })}
+                            </FormLabel>
+                            <Input
+                                placeholder="e.g., 'iPhone', 'Personal Laptop'"
+                                value={passkeyNickname}
+                                onChange={(e) => setPasskeyNickname(e.target.value)}
+                                mb={4}
+                                isDisabled={isLoading}
+                            />
+                            <Button
+                                width="full"
+                                colorScheme="blue"
+                                onClick={handleRegisterPasskey}
+                                isLoading={isLoading}
+                                loadingText="Registering..."
+                            >
+                                {formatMessage({
+                                    defaultMessage: 'Register Passkey',
+                                    id: 'auth_modal.passkey.button.register'
+                                })}
+                            </Button>
+                        </FormControl>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+            <OtpAuth
+                isOpen={isOtpAuthOpen}
+                onClose={() => setIsOtpAuthOpen(false)}
+                form={form}
+                handleSendEmailOtp={handleRegisterPasskey}
+                handleOtpVerification={handleOtpVerification}
+                hideCheckoutAsGuestButton={true}
+            />
+        </>
     )
 }
 

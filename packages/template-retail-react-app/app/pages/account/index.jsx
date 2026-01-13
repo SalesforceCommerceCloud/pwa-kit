@@ -257,10 +257,7 @@ const Account = () => {
                     </Route>
                 </Switch>
             </Grid>
-            <PasskeyRegistrationModal
-                isOpen={passkeyModal.isOpen}
-                onClose={passkeyModal.onClose}
-            />
+            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </Box>
     )
 }

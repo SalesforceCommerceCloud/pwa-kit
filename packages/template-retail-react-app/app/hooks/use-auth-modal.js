@@ -30,7 +30,6 @@ import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
@@ -38,7 +37,6 @@ import {
     PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -94,8 +92,6 @@ export const AuthModal = ({
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
-
-    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -266,8 +262,6 @@ export const AuthModal = ({
                 isClosable: true
             })
 
-            showToast()
-
             // Execute action to be performed on successful login
             onLoginSuccess()
         }
@@ -283,72 +277,68 @@ export const AuthModal = ({
 
     return (
         <>
-        <Modal
-            size="sm"
-            closeOnOverlayClick={false}
-            data-testid="sf-auth-modal"
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onClose}
-            {...props}
-        >
-            <ModalOverlay />
-            <ModalContent>
-                <ModalCloseButton
-                    aria-label={formatMessage({
-                        id: 'auth_modal.button.close.assistive_msg',
-                        defaultMessage: 'Close login form'
-                    })}
-                />
-                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
-                    {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                        <LoginForm
-                            form={form}
-                            submitForm={(data) => {
-                                const shouldUsePasswordless =
-                                    isPasswordlessEnabled && !data.password
-                                return submitForm(data, shouldUsePasswordless)
-                            }}
-                            clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                            //TODO: potentially remove this prop in the next major release since
-                            // we don't need to use this props anymore
-                            handlePasswordlessLoginClick={noop}
-                            handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
-                            isPasswordlessEnabled={isPasswordlessEnabled}
-                            isSocialEnabled={isSocialEnabled}
-                            idps={idps}
-                            setLoginType={noop}
-                        />
-                    )}
-                    {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
-                        <RegisterForm
-                            form={form}
-                            submitForm={submitForm}
-                            clickSignIn={onBackToSignInClick}
-                        />
-                    )}
-                    {currentView === PASSWORD_VIEW && (
-                        <ResetPasswordForm
-                            form={form}
-                            submitForm={submitForm}
-                            clickSignIn={onBackToSignInClick}
-                        />
-                    )}
-                    {currentView === EMAIL_VIEW && (
-                        <PasswordlessEmailConfirmation
-                            form={form}
-                            submitForm={submitForm}
-                            email={form.getValues().email || initialEmail}
-                        />
-                    )}
-                </ModalBody>
-            </ModalContent>
-        </Modal>
-        <PasskeyRegistrationModal
-            isOpen={passkeyModal.isOpen}
-            onClose={passkeyModal.onClose}
-        />
-    </>
+            <Modal
+                size="sm"
+                closeOnOverlayClick={false}
+                data-testid="sf-auth-modal"
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onClose={onClose}
+                {...props}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalCloseButton
+                        aria-label={formatMessage({
+                            id: 'auth_modal.button.close.assistive_msg',
+                            defaultMessage: 'Close login form'
+                        })}
+                    />
+                    <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
+                        {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                            <LoginForm
+                                form={form}
+                                submitForm={(data) => {
+                                    const shouldUsePasswordless =
+                                        isPasswordlessEnabled && !data.password
+                                    return submitForm(data, shouldUsePasswordless)
+                                }}
+                                clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                                //TODO: potentially remove this prop in the next major release since
+                                // we don't need to use this props anymore
+                                handlePasswordlessLoginClick={noop}
+                                handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                                isPasswordlessEnabled={isPasswordlessEnabled}
+                                isSocialEnabled={isSocialEnabled}
+                                idps={idps}
+                                setLoginType={noop}
+                            />
+                        )}
+                        {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
+                            <RegisterForm
+                                form={form}
+                                submitForm={submitForm}
+                                clickSignIn={onBackToSignInClick}
+                            />
+                        )}
+                        {currentView === PASSWORD_VIEW && (
+                            <ResetPasswordForm
+                                form={form}
+                                submitForm={submitForm}
+                                clickSignIn={onBackToSignInClick}
+                            />
+                        )}
+                        {currentView === EMAIL_VIEW && (
+                            <PasswordlessEmailConfirmation
+                                form={form}
+                                submitForm={submitForm}
+                                email={form.getValues().email || initialEmail}
+                            />
+                        )}
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+        </>
     )
 }
 
