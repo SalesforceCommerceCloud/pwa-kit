@@ -119,7 +119,10 @@ const AccountOrderDetail = () => {
 
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
-            parameters: {orderNo: params.orderNo}
+            parameters: {
+                orderNo: params.orderNo,
+                expand: 'oms'
+            }
         },
         {
             enabled: onClient && !!params.orderNo
@@ -157,9 +160,9 @@ const AccountOrderDetail = () => {
         [storeData?.data]
     )
 
-    const paymentCard = order?.paymentInstruments[0]?.paymentCard
+    const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+    const itemCount = order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
 
     const headingRef = useRef()
     useEffect(() => {
@@ -233,7 +236,11 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                {(order.status || order.omsData?.status) && (
+                                    <Badge colorScheme="green">
+                                        {order.status || order.omsData?.status}
+                                    </Badge>
+                                )}
                             </Stack>
                         </Stack>
                     ) : (
@@ -384,10 +391,16 @@ const AccountOrderDetail = () => {
                                                 )}
                                             </Heading>
                                             <Box>
-                                                <Text fontSize="sm">
-                                                    {shipment.shippingAddress.firstName}{' '}
-                                                    {shipment.shippingAddress.lastName}
-                                                </Text>
+                                                {((shipment.shippingAddress.firstName &&
+                                                    shipment.shippingAddress.lastName) ||
+                                                    shipment.shippingAddress.fullName) && (
+                                                    <Text fontSize="sm">
+                                                        {shipment.shippingAddress.firstName &&
+                                                        shipment.shippingAddress.lastName
+                                                            ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
+                                                            : shipment.shippingAddress.fullName}
+                                                    </Text>
+                                                )}
                                                 <Text fontSize="sm">
                                                     {shipment.shippingAddress.address1}
                                                 </Text>
@@ -402,32 +415,34 @@ const AccountOrderDetail = () => {
                                 ))}
 
                                 {/* Payment Method */}
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Payment Method"
-                                            id="account_order_detail.heading.payment_method"
-                                        />
-                                    </Heading>
-                                    <Stack direction="row">
-                                        {CardIcon && (
-                                            <CardIcon layerStyle="ccIcon" aria-hidden="true" />
-                                        )}
-                                        <Box>
-                                            <Text fontSize="sm">{paymentCard?.cardType}</Text>
-                                            <Stack direction="row">
-                                                <Text fontSize="sm">
-                                                    &bull;&bull;&bull;&bull;{' '}
-                                                    {paymentCard?.numberLastDigits}
-                                                </Text>
-                                                <Text fontSize="sm">
-                                                    {paymentCard?.expirationMonth}/
-                                                    {paymentCard?.expirationYear}
-                                                </Text>
-                                            </Stack>
-                                        </Box>
+                                {paymentCard && (
+                                    <Stack spacing={1}>
+                                        <Heading as="h2" fontSize="sm" pt={1}>
+                                            <FormattedMessage
+                                                defaultMessage="Payment Method"
+                                                id="account_order_detail.heading.payment_method"
+                                            />
+                                        </Heading>
+                                        <Stack direction="row">
+                                            {CardIcon && (
+                                                <CardIcon layerStyle="ccIcon" aria-hidden="true" />
+                                            )}
+                                            <Box>
+                                                <Text fontSize="sm">{paymentCard?.cardType}</Text>
+                                                <Stack direction="row">
+                                                    <Text fontSize="sm">
+                                                        &bull;&bull;&bull;&bull;{' '}
+                                                        {paymentCard?.numberLastDigits}
+                                                    </Text>
+                                                    <Text fontSize="sm">
+                                                        {paymentCard?.expirationMonth}/
+                                                        {paymentCard?.expirationYear}
+                                                    </Text>
+                                                </Stack>
+                                            </Box>
+                                        </Stack>
                                     </Stack>
-                                </Stack>
+                                )}
 
                                 {/* Billing Address */}
                                 <Stack spacing={1}>
