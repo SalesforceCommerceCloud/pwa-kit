@@ -14,10 +14,13 @@ import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const Registration = () => {
     const {formatMessage} = useIntl()
@@ -28,6 +31,9 @@ const Registration = () => {
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
+
+    const config = getConfig()
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const submitForm = async (data) => {
         const body = {
@@ -53,6 +59,30 @@ const Registration = () => {
         }
     }, [isRegistered])
 
+    useEffect(() => {
+        // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+        if (isRegistered && config?.app?.login?.passkey?.enabled) {
+            if (
+                window.PublicKeyCredential &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                })
+            }
+        }
+    }, [isRegistered])
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
@@ -60,6 +90,7 @@ const Registration = () => {
     }, [])
 
     return (
+        <>
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
             <Heading as="h1" srOnly>
                 <FormattedMessage
@@ -84,6 +115,8 @@ const Registration = () => {
                 />
             </Container>
         </Box>
+        <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
+        </>
     )
 }
 

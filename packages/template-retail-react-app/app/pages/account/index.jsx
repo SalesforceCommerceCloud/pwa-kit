@@ -45,10 +45,6 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -101,34 +97,7 @@ const Account = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
 
-    const config = getConfig()
-    const {showToast, passkeyModal} = usePasskeyRegistration()
-
     const {buildUrl} = useMultiSite()
-
-    useEffect(() => {
-        // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
-        if (isRegistered && config?.app?.login?.passkey?.enabled) {
-            if (
-                window.PublicKeyCredential &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isConditionalMediationAvailable
-            ) {
-                Promise.all([
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {
-                    if (results.every((r) => r === true)) {
-                        showToast()
-                    }
-                })
-            }
-        }
-    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -277,7 +246,6 @@ const Account = () => {
                     </Route>
                 </Switch>
             </Grid>
-            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </Box>
     )
 }

@@ -29,6 +29,7 @@ import {
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
@@ -44,6 +45,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -85,10 +87,11 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
+    const config = getConfig()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
@@ -98,6 +101,8 @@ export const AuthModal = ({
         {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+
+    const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -239,6 +244,28 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
+        if ((loggingIn || registering) && customer.data && config?.app?.login?.passkey?.enabled) {
+            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+            if (
+                window.PublicKeyCredential &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                // eslint-disable-next-line no-undef
+                PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    // eslint-disable-next-line no-undef
+                    PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                })
+            }
+        }
+
         // Show a toast only for those registed users returning to the site.
         // Only show toast when customer data is available (user is logged in and data is loaded)
         if (loggingIn && customer.data) {
@@ -338,6 +365,7 @@ export const AuthModal = ({
                     </ModalBody>
                 </ModalContent>
             </Modal>
+            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </>
     )
 }
