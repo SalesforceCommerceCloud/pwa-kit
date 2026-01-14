@@ -124,7 +124,7 @@ const AccountOrderDetail = () => {
         {
             parameters: {
                 orderNo: params.orderNo,
-                expand: 'oms'
+                expand: 'oms, oms_shipments'
             }
         },
         {
@@ -239,11 +239,9 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                {(order.status || order.omsData?.status) && (
-                                    <Badge colorScheme="green">
-                                        {order.status || order.omsData?.status}
-                                    </Badge>
-                                )}
+                                <Badge colorScheme="green">
+                                    {order.status || order.omsData?.status}
+                                </Badge>
                             </Stack>
                         </Stack>
                     ) : (
@@ -394,16 +392,12 @@ const AccountOrderDetail = () => {
                                                 )}
                                             </Heading>
                                             <Box>
-                                                {((shipment.shippingAddress.firstName &&
-                                                    shipment.shippingAddress.lastName) ||
-                                                    shipment.shippingAddress.fullName) && (
-                                                    <Text fontSize="sm">
-                                                        {shipment.shippingAddress.firstName &&
-                                                        shipment.shippingAddress.lastName
-                                                            ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
-                                                            : shipment.shippingAddress.fullName}
-                                                    </Text>
-                                                )}
+                                                <Text fontSize="sm">
+                                                    {shipment.shippingAddress.firstName &&
+                                                    shipment.shippingAddress.lastName
+                                                        ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
+                                                        : shipment.shippingAddress.fullName}
+                                                </Text>
                                                 <Text fontSize="sm">
                                                     {shipment.shippingAddress.address1}
                                                 </Text>
