@@ -11,14 +11,22 @@ import {
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 
-// Error patterns for token-based auth features (passwordless login, password reset)
+// Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
     /callback_uri doesn't match/i,
-    /passwordless permissions error/i,
-    /client secret is not provided/i,
     /monthly quota/i
 ]
+
+// Passwordless-specific error patterns
+const PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS = [
+    ...TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS,
+    /passwordless permissions error/i,
+    /client secret is not provided/i
+]
+
+// Password reset error patterns (only shared errors)
+const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
@@ -30,14 +38,32 @@ const TOO_MANY_REQUESTS_ERROR_MESSAGE = defineMessage({
 
 /**
  * Maps an error message to the appropriate user-friendly error message descriptor
- * for token-based authentication features that send tokens via email (passwordless login, password reset).
+ * for passwordless login feature errors.
  * Checks for auth feature unavailable errors and too many requests errors.
  *
  * @param {string} errorMessage - The error message from the API
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
-export const getTokenBasedAuthErrorMessage = (errorMessage) => {
-    if (TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
+export const getPasswordlessErrorMessage = (errorMessage) => {
+    if (PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
+        return FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    }
+    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
+        return TOO_MANY_REQUESTS_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps an error message to the appropriate user-friendly error message descriptor
+ * for password reset feature errors.
+ * Checks for auth feature unavailable errors and too many requests errors.
+ *
+ * @param {string} errorMessage - The error message from the API
+ * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
+ */
+export const getPasswordResetErrorMessage = (errorMessage) => {
+    if (PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
     if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {

@@ -33,7 +33,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {getTokenBasedAuthErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
@@ -112,7 +112,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = formatMessage(getTokenBasedAuthErrorMessage(error.message))
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }

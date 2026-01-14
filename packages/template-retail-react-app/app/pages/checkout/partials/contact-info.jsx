@@ -45,7 +45,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
-import {getTokenBasedAuthErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -90,7 +90,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = formatMessage(getTokenBasedAuthErrorMessage(error.message))
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
             setError(message)
         }
     }
