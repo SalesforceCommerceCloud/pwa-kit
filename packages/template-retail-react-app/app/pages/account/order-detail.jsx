@@ -117,6 +117,9 @@ const AccountOrderDetail = () => {
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
+    // expand: 'oms' returns order data from OMS if the order is successfully
+    // ingested to OMS, otherwise returns data from ECOM
+    // For regular non-oms orders, the order data is returned from ECOM
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
             parameters: {
