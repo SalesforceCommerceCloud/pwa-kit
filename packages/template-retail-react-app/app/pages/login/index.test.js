@@ -334,9 +334,6 @@ describe('Passwordless login tests', () => {
     beforeEach(() => {
         // Clear the mock before each test
         mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockClear()
-    })
-
-    test('allows passwordless login', async () => {
         getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
@@ -348,6 +345,9 @@ describe('Passwordless login tests', () => {
                 }
             }
         })
+    })
+
+    test('allows passwordless login', async () => {
         const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -391,4 +391,37 @@ describe('Passwordless login tests', () => {
             mode: 'email'
         })
     })
+
+    test.each([
+        [
+            "callback_uri doesn't match the registered callbacks",
+            'This feature is not currently available.'
+        ],
+        [
+            'PasswordLess Permissions Error for clientId:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'This feature is not currently available.'
+        ],
+        ['client secret is not provided', 'This feature is not currently available.'],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when passwordless login fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            mockAuthHelperFunctions[
+                AuthHelpers.AuthorizePasswordless
+            ].mutateAsync.mockImplementation(() => {
+                throw new Error(apiErrorMessage)
+            })
+            const {user} = renderWithProviders(<MockedComponent />, {
+                wrapperProps: {
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockConfig.app,
+                    bypassAuth: false
+                }
+            })
+            await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+            await user.click(screen.getByRole('button', {name: /Continue/i}))
+            expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+        }
+    )
 })

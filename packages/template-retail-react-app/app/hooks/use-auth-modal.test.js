@@ -70,6 +70,19 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
+const mockGetPasswordResetToken = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-password-reset', () => {
+    const originalModule = jest.requireActual(
+        '@salesforce/retail-react-app/app/hooks/use-password-reset'
+    )
+    return {
+        usePasswordReset: jest.fn(() => ({
+            ...originalModule,
+            getPasswordResetToken: mockGetPasswordResetToken
+        }))
+    }
+})
+
 let authModal = undefined
 const MockedComponent = (props) => {
     const {initialView, isPasswordlessEnabled = false} = props
@@ -357,6 +370,45 @@ describe('Passwordless enabled', () => {
             callbackURI: 'https://callback.com/passwordless?redirectUrl=/'
         })
     })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many login requests were made. Please try again later.',
+            'Too many requests. For your security, please wait 10 minutes before trying again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when passwordless login fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+            const validEmail = 'test@salesforce.com'
+
+            // Mock the error
+            mockAuthHelperFunctions[
+                AuthHelpers.AuthorizePasswordless
+            ].mutateAsync.mockImplementation(() => {
+                throw new Error(apiErrorMessage)
+            })
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            await waitFor(() => {
+                expect(screen.getByText(/Continue/i)).toBeInTheDocument()
+            })
+
+            // enter email and submit
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            await user.click(screen.getByText(/Continue/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })
 
 // TODO: Fix flaky/broken test
@@ -592,4 +644,43 @@ describe('Reset password', function () {
         // check that the modal is closed
         expect(authModal.isOpen).toBe(false)
     })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many password reset requests were made. Please try again later.',
+            'Too many requests. For your security, please wait 10 minutes before trying again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when password reset fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            // Mock getPasswordResetToken to throw error
+            mockGetPasswordResetToken.mockRejectedValue(new Error(apiErrorMessage))
+
+            const {user} = renderWithProviders(<MockedComponent initialView="password" />, {
+                wrapperProps: {
+                    bypassAuth: false
+                }
+            })
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            // Wait for password reset form
+            let resetPwForm = await screen.findByTestId('sf-auth-modal-form')
+            expect(resetPwForm).toBeInTheDocument()
+            const withinForm = within(resetPwForm)
+
+            // Enter email and submit
+            await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+            await user.click(withinForm.getByText(/reset password/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(withinForm.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })

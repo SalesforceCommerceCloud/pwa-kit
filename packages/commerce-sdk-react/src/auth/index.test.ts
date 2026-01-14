@@ -1066,12 +1066,31 @@ describe('Auth', () => {
         const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
         getPasswordResetTokenSpy.mockResolvedValueOnce(mockResponse)
 
-        await auth.getPasswordResetToken({user_id: 'user@example.com'} as any)
+        await auth.getPasswordResetToken({
+            user_id: 'user@example.com',
+            mode: 'email',
+            channel_id: 'channel_id'
+        })
 
         expect(getPasswordResetTokenSpy).toHaveBeenCalled()
         const callArgs = getPasswordResetTokenSpy.mock.calls[0][0] as any
         expect(callArgs.headers.Authorization).toBeTruthy()
         expect(callArgs.headers.Authorization).toContain('Basic ')
+    })
+
+    test('getPasswordResetToken throws error on non-200 response', async () => {
+        const auth = new Auth(configSLASPrivate)
+
+        const mockErrorResponse = {
+            status: 400,
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+        }
+        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(mockErrorResponse)
+
+        await expect(
+            auth.getPasswordResetToken({user_id: 'userid', mode: 'email', channel_id: 'channel_id'})
+        ).rejects.toThrow('400 Invalid request')
     })
 
     test.each([

@@ -90,6 +90,38 @@ test('Allows customer to generate password token', async () => {
 })
 
 test.each([
+    ['no callback_uri is registered for client', 'This feature is not currently available.'],
+    [
+        'Too many password reset requests were made. Please try again later.',
+        'Too many requests. For your security, please wait 10 minutes before trying again.'
+    ],
+    ['unexpected error message', 'Something went wrong. Try again!']
+])(
+    'displays correct error message when password reset fails with "%s"',
+    async (apiErrorMessage, expectedMessage) => {
+        global.server.use(
+            rest.post('*/oauth2/password/reset', (req, res, ctx) =>
+                res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+            )
+        )
+        // render our test component
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        // enter credentials and submit
+        await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+        await user.click(
+            within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+        })
+    }
+)
+
+test.each([
     ['base path', '/reset-password-landing'],
     ['path with site and locale', '/uk/en-GB/reset-password-landing']
 ])('renders reset password landing page when using %s', async (_, landingPath) => {
