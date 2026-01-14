@@ -271,7 +271,6 @@ describe('ContactInfo Component', () => {
         expect(screen.getByText('(111) 222-3333')).toBeInTheDocument()
     })
 
-
     test('shows social login when enabled', () => {
         renderWithProviders(<ContactInfo isSocialEnabled={true} idps={['google', 'apple']} />)
 
