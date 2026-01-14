@@ -57,7 +57,7 @@ import {nanoid} from 'nanoid'
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, STEPS} = useCheckout()
+    const {step, STEPS, contactPhone} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
@@ -369,15 +369,19 @@ const CheckoutOneClick = () => {
                                     }
                                 })
                             }
+                        }
 
-                            // Also persist billing phone as phoneHome
-                            const phoneHome = order?.billingAddress?.phone
-                            if (phoneHome) {
-                                await updateCustomer.mutateAsync({
-                                    parameters: {customerId},
-                                    body: {phoneHome}
-                                })
-                            }
+                        // Persist phone number as phoneHome for all order types (delivery and pickup)
+                        // Try billing address phone first, then fall back to contact phone from context
+                        const phoneHome =
+                            order?.billingAddress?.phone ||
+                            contactPhone ||
+                            basket?.customerInfo?.phone
+                        if (phoneHome) {
+                            await updateCustomer.mutateAsync({
+                                parameters: {customerId},
+                                body: {phoneHome}
+                            })
                         }
                     } catch (_e) {
                         // Only surface error if shopper opted to register/save details; otherwise fail silently
