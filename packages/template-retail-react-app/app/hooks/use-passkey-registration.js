@@ -9,6 +9,7 @@ import React from 'react'
 import {
     Box,
     Button,
+    CloseButton,
     useDisclosure,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -26,7 +27,7 @@ export const usePasskeyRegistration = () => {
             position: 'top-right',
             duration: 9000,
             isClosable: true,
-            render: () => (
+            render: ({onClose}) => (
                 <Box
                     color="white"
                     p={4}
@@ -34,7 +35,16 @@ export const usePasskeyRegistration = () => {
                     borderRadius="md"
                     boxShadow="lg"
                     maxWidth="400px"
+                    position="relative"
                 >
+                    <CloseButton
+                        position="absolute"
+                        right={2}
+                        top={2}
+                        color="white"
+                        onClick={onClose}
+                        aria-label="Close toast"
+                    />
                     <Box mb={3} fontWeight="medium">
                         Create a passkey for a more secure and easier login
                     </Box>
