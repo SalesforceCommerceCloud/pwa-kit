@@ -31,13 +31,8 @@ import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    AUTH_FEATURE_UNAVAILABLE_ERRORS,
-    TOO_MANY_REQUESTS_ERROR,
-    TOO_MANY_REQUESTS_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {getTokenBasedAuthErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
@@ -110,9 +105,7 @@ export const AuthModal = ({
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getTokenBasedAuthErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -187,13 +180,7 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    const message = AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) =>
-                        msg.test(e.message)
-                    )
-                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                        : TOO_MANY_REQUESTS_ERROR.test(e.message)
-                        ? formatMessage(TOO_MANY_REQUESTS_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
+                    const message = formatMessage(getTokenBasedAuthErrorMessage(e.message))
                     form.setError('global', {type: 'manual', message})
                 }
             },

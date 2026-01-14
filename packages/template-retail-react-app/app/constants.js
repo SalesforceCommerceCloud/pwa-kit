@@ -105,11 +105,6 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'This feature is not currently available.',
     id: 'global.error.feature_unavailable'
 })
-export const TOO_MANY_REQUESTS_ERROR_MESSAGE = defineMessage({
-    defaultMessage:
-        'Too many requests. For your security, please wait 10 minutes before trying again.',
-    id: 'global.error.too_many_requests'
-})
 
 export const HOME_HREF = '/'
 
@@ -255,17 +250,6 @@ export const LOGIN_TYPES = {
     PASSWORDLESS: 'passwordless',
     SOCIAL: 'social'
 }
-
-// Error messages that indicate the passwordless feature is unavailable
-export const AUTH_FEATURE_UNAVAILABLE_ERRORS = [
-    /no callback_uri is registered/i,
-    /callback_uri doesn't match/i,
-    /passwordless permissions error/i,
-    /client secret is not provided/i,
-    /monthly quota/i
-]
-
-export const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
