@@ -21,7 +21,10 @@ import {useRouteMatch} from 'react-router'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {
     API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    AUTH_FEATURE_UNAVAILABLE_ERRORS,
+    TOO_MANY_REQUESTS_ERROR,
+    TOO_MANY_REQUESTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 
 const ResetPassword = () => {
@@ -38,10 +41,11 @@ const ResetPassword = () => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
-            const message =
-                e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+            const message = AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(e.message))
+                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : TOO_MANY_REQUESTS_ERROR.test(e.message)
+                ? formatMessage(TOO_MANY_REQUESTS_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
         }
     }

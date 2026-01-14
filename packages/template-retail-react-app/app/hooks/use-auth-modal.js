@@ -34,7 +34,9 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    AUTH_FEATURE_UNAVAILABLE_ERRORS,
+    TOO_MANY_REQUESTS_ERROR,
+    TOO_MANY_REQUESTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -108,7 +110,7 @@ export const AuthModal = ({
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+            const message = AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
@@ -185,10 +187,13 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    const message =
-                        e.response?.status === 400
-                            ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                            : formatMessage(API_ERROR_MESSAGE)
+                    const message = AUTH_FEATURE_UNAVAILABLE_ERRORS.some((msg) =>
+                        msg.test(e.message)
+                    )
+                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                        : TOO_MANY_REQUESTS_ERROR.test(e.message)
+                        ? formatMessage(TOO_MANY_REQUESTS_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
                 }
             },
