@@ -4253,12 +4253,6 @@
       "value": "Address saved successfully"
     }
   ],
-  "shipping_options.action.send_as_gift_wrapping": [
-    {
-      "type": 0,
-      "value": "Send as a gift (gift wrapping)"
-    }
-  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -4275,12 +4269,6 @@
     {
       "type": 0,
       "value": "Free"
-    }
-  ],
-  "shipping_options.help.notifications": [
-    {
-      "type": 0,
-      "value": "You can enable or disable notifications at any time."
     }
   ],
   "shipping_options.label.no_method_selected": [
