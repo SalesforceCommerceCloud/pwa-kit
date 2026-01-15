@@ -727,21 +727,6 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                     </RadioGroup>
                 ) : null
             })()}
-
-            <Box mt={4}>
-                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                    <FormattedMessage
-                        defaultMessage="Send as a gift (gift wrapping)"
-                        id="shipping_options.action.send_as_gift_wrapping"
-                    />
-                </Button>
-                <Text fontSize="sm" color="gray.500">
-                    <FormattedMessage
-                        defaultMessage="You can enable or disable notifications at any time."
-                        id="shipping_options.help.notifications"
-                    />
-                </Text>
-            </Box>
         </Box>
     )
 }
