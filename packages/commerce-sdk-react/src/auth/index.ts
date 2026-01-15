@@ -1316,6 +1316,19 @@ class Auth {
     }
 
     /**
+     * Get Basic auth header for private client requests.
+     * Returns undefined if not using a private client.
+     */
+    private getBasicAuthHeader(client: ShopperLogin<ApiClientConfigParams>): string | undefined {
+        return (
+            this.clientSecret &&
+            `Basic ${stringToBase64(
+                `${client.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        )
+    }
+
+    /**
      * A wrapper method for the SLAS endpoint: getPasswordResetToken.
      *
      */
@@ -1340,10 +1353,9 @@ class Auth {
         }
 
         // Only set authorization header if using private client
-        if (this.clientSecret) {
-            options.headers.Authorization = `Basic ${stringToBase64(
-                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
-            )}`
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        if (authHeader) {
+            options.headers.Authorization = authHeader
         }
 
         const res = await slasClient.getPasswordResetToken(options)
@@ -1371,10 +1383,9 @@ class Auth {
         }
 
         // Only set authorization header if using private client
-        if (this.clientSecret) {
-            options.headers.Authorization = `Basic ${stringToBase64(
-                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
-            )}`
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        if (authHeader) {
+            options.headers.Authorization = authHeader
         }
         // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1423,6 +1434,146 @@ class Auth {
             uido
         }
     }
-}
 
+    /**
+     * A wrapper method for the SLAS endpoint: authorizeWebauthnRegistration.
+     */
+    async authorizeWebauthnRegistration(
+        parameters: ShopperLoginTypes.authorizeWebauthnRegistrationBodyType
+    ) {
+        const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        const options = {
+            headers: {
+                Authorization: authHeader ?? ''
+            },
+            body: {
+                // Required params
+                user_id: parameters.user_id,
+                mode: parameters.mode,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                // Optional params
+                ...(parameters.locale && {locale: parameters.locale}),
+                ...(parameters.client_id && {client_id: parameters.client_id}),
+                ...(parameters.code_challenge && {code_challenge: parameters.code_challenge}),
+                ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
+                ...(parameters.idp_name && {idp_name: parameters.idp_name}),
+                ...(parameters.hint && {hint: parameters.hint})
+            }
+        }
+
+        return await slasClient.authorizeWebauthnRegistration(options)
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: startWebauthnUserRegistration.
+     */
+    async startWebauthnUserRegistration(
+        parameters: ShopperLoginTypes.startWebauthnUserRegistrationBodyType
+    ) {
+        const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        const options = {
+            headers: {
+                Authorization: authHeader ?? ''
+            },
+            body: {
+                // Required params
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                pwd_action_token: parameters.pwd_action_token,
+                user_id: parameters.user_id,
+                // Optional params
+                ...(parameters.display_name && {display_name: parameters.display_name}),
+                ...(parameters.nick_name && {nick_name: parameters.nick_name}),
+                ...(parameters.client_id && {client_id: parameters.client_id})
+            }
+        }
+
+        return await slasClient.startWebauthnUserRegistration(options)
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: finishWebauthnUserRegistration.
+     */
+    async finishWebauthnUserRegistration(parameters: ShopperLoginTypes.RegistrationFinishRequest) {
+        const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
+
+        const options = {
+            headers: {
+                Authorization: authHeader ?? ''
+            },
+            body: {
+                // Required params
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                username: parameters.username,
+                credential: parameters.credential,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                pwd_action_token: parameters.pwd_action_token
+            }
+        }
+
+        return await slasClient.finishWebauthnUserRegistration(options)
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: startWebauthnAuthentication.
+     */
+    async startWebauthnAuthentication(
+        parameters: ShopperLoginTypes.startWebauthnAuthenticationBodyType
+    ) {
+        const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        const options = {
+            headers: {
+                Authorization: authHeader ?? ''
+            },
+            body: {
+                // Required params
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                user_id: parameters.user_id,
+                // Optional params
+                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id})
+            }
+        }
+
+        return await slasClient.startWebauthnAuthentication(options)
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: finishWebauthnAuthentication.
+     */
+    async finishWebauthnAuthentication(parameters: ShopperLoginTypes.AuthenticateFinishRequest) {
+        const slasClient = this.client
+        const authHeader = this.getBasicAuthHeader(slasClient)
+        const options = {
+            headers: {
+                Authorization: authHeader ?? ''
+            },
+            body: {
+                // Required params
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                credential: parameters.credential,
+                // Optional params
+                ...(parameters.user_id && {user_id: parameters.user_id}),
+                ...(parameters.email && {email: parameters.email}),
+                ...(parameters.tenant_id && {tenant_id: parameters.tenant_id}),
+                ...(parameters.usid && {usid: parameters.usid})
+            }
+        }
+
+        const res = await slasClient.finishWebauthnAuthentication(options)
+
+        const tokenResponse = res.tokenResponse
+        if (!tokenResponse) {
+            throw new Error('finishWebauthnAuthentication did not return a tokenResponse.')
+        }
+
+        this.handleTokenResponse(tokenResponse, false)
+
+        return tokenResponse
+    }
+}
 export default Auth
