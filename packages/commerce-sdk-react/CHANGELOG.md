@@ -1,3 +1,6 @@
+## v4.4.0-nightly-20260115080223 (Jan 15, 2026)
+## v4.4.0-dev (Jan 15, 2026)
+## v3.16.0-nightly-20260115080223 (Jan 15, 2026)
 ## v4.4.0-dev (Dec 17, 2025)
 - [Bugfix]Ensure code_verifier can be optional in resetPassword call [#3567](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3567)
 
