@@ -145,19 +145,26 @@ export const isPayPalPaymentMethodType = (paymentMethodType) => {
 
 /**
  * Finds the payment account/gateway for a given payment method type from payment method set accounts.
+ * @param {Array} paymentMethods - Array of payment methods
  * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
  * @param {string} paymentMethodType - Type of payment method
  * @returns {Object|null} Payment account object with vendor property, or null if not found
  */
-export const findPaymentAccount = (paymentMethodSetAccounts, paymentMethodType) => {
+export const findPaymentAccount = (paymentMethods, paymentMethodSetAccounts, paymentMethodType) => {
     if (!paymentMethodSetAccounts || !Array.isArray(paymentMethodSetAccounts)) {
         return null
     }
 
-    // Find account that supports this payment method type
+    // Find payment method by type to get its accountId
+    const paymentMethod = paymentMethods?.find((pm) => pm.paymentMethodType === paymentMethodType)
+    if (!paymentMethod || !paymentMethod.accountId) {
+        return null
+    }
+
+    // Find account by accountId
     return (
         paymentMethodSetAccounts.find((account) => {
-            return account.paymentMethods?.some((pm) => pm.id === paymentMethodType)
+            return account.accountId === paymentMethod.accountId
         }) || null
     )
 }
@@ -165,15 +172,20 @@ export const findPaymentAccount = (paymentMethodSetAccounts, paymentMethodType) 
 /**
  * Determines the gateway name from payment method type and payment method set accounts.
  * @param {string} paymentMethodType - Type of payment method
+ * @param {Array} paymentMethods - Array of payment methods
  * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
  * @returns {string|null} Gateway name
  */
-export const getGatewayFromPaymentMethod = (paymentMethodType, paymentMethodSetAccounts) => {
+export const getGatewayFromPaymentMethod = (
+    paymentMethodType,
+    paymentMethods,
+    paymentMethodSetAccounts
+) => {
     if (isPayPalPaymentMethodType(paymentMethodType)) {
         return null
     }
 
-    const account = findPaymentAccount(paymentMethodSetAccounts, paymentMethodType)
+    const account = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, paymentMethodType)
     if (!account) {
         return null
     }
@@ -211,7 +223,9 @@ export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) =
  * @param {string} shippingPreference - optional shipping preference for PayPal payment processing
  * @param {boolean} storePaymentMethod - optional flag to save payment method for future use
  * @param {boolean} futureUsageOffSession - optional flag indicating if off-session future usage is enabled (from payment config)
+ * @param {Array} paymentMethods - optional array of payment methods to determine gateway
  * @param {Array} paymentMethodSetAccounts - optional array of payment method set accounts to determine gateway
+ * @param {boolean} isPostRequest - optional flag to indicate if this is a POST request (basket).
  * @returns {Object} Payment instrument body
  */
 export const createPaymentInstrumentBody = (
@@ -221,7 +235,9 @@ export const createPaymentInstrumentBody = (
     shippingPreference,
     storePaymentMethod = false,
     futureUsageOffSession = false,
-    paymentMethodSetAccounts = null
+    paymentMethods = null,
+    paymentMethodSetAccounts = null,
+    isPostRequest = false
 ) => {
     const paymentReferenceRequest = {
         paymentMethodType: paymentMethodType,
@@ -232,15 +248,23 @@ export const createPaymentInstrumentBody = (
         paymentReferenceRequest.shippingPreference = shippingPreference
     }
 
-    const gateway = getGatewayFromPaymentMethod(paymentMethodType, paymentMethodSetAccounts)
+    const gateway = getGatewayFromPaymentMethod(
+        paymentMethodType,
+        paymentMethods,
+        paymentMethodSetAccounts
+    )
 
-    if (gateway === PAYMENT_GATEWAYS.STRIPE && (storePaymentMethod || futureUsageOffSession)) {
+    if (
+        !isPostRequest &&
+        gateway === PAYMENT_GATEWAYS.STRIPE &&
+        (storePaymentMethod || futureUsageOffSession)
+    ) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
         if (setupFutureUsage) {
             paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
             paymentReferenceRequest.gatewayProperties = {
                 stripe: {
-                    setup_future_usage: setupFutureUsage
+                    setupFutureUsage: setupFutureUsage
                 }
             }
         }
