@@ -63,6 +63,7 @@ const CheckoutOneClick = () => {
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
+    const [isOtpLoading, setIsOtpLoading] = useState(false)
 
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -501,6 +502,7 @@ const CheckoutOneClick = () => {
                                 onIsEditingChange={setIsEditingPayment}
                                 billingSameAsShipping={billingSameAsShipping}
                                 setBillingSameAsShipping={setBillingSameAsShipping}
+                                onOtpLoadingChange={setIsOtpLoading}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -510,6 +512,7 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
+                                            disabled={isOtpLoading}
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
