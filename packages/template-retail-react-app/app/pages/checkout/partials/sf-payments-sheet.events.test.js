@@ -466,11 +466,23 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         }, {timeout: 3000})
 
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+        const requestParams = updateCall[0].parameters
         const requestBody = updateCall[0].body
 
+        // Verify API is called with correct order and payment instrument
+        expect(requestParams.orderNo).toBe('ORDER123')
+        expect(requestParams.paymentInstrumentId).toBe('PI123')
+
+        // Verify request includes all data needed for backend to create PaymentsCustomer record
+        expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
+        expect(requestBody.paymentReferenceRequest.gatewayProperties).toBeDefined()
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe).toBeDefined()
         expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
             'on_session'
         )
+
+        // Verify payment method type is included (needed for gateway determination)
+        expect(requestBody.paymentReferenceRequest.paymentMethodType).toBe('card')
     })
 
     describe('handlePaymentButtonCancel', () => {

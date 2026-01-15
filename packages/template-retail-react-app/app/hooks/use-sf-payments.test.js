@@ -12,6 +12,7 @@ import {
     useSFPayments,
     useSFPaymentsEnabled,
     useAutomaticCapture,
+    useFutureUsageOffSession,
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
     STATUS_SUCCESS,
@@ -633,5 +634,47 @@ describe('useAutomaticCapture hook', () => {
 
         expect(result.current).toBe(true)
         expect(mockUseShopperConfiguration).toHaveBeenCalledWith('cardCaptureAutomatic')
+    })
+})
+
+describe('useFutureUsageOffSession hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns true when futureUsageOffSession is true', () => {
+        mockUseShopperConfiguration.mockReturnValue(true)
+
+        const {result} = renderHook(() => useFutureUsageOffSession())
+
+        expect(result.current).toBe(true)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('futureUsageOffSession')
+    })
+
+    test('returns false when futureUsageOffSession is false', () => {
+        mockUseShopperConfiguration.mockReturnValue(false)
+
+        const {result} = renderHook(() => useFutureUsageOffSession())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('futureUsageOffSession')
+    })
+
+    test('returns false (default) when futureUsageOffSession is undefined', () => {
+        mockUseShopperConfiguration.mockReturnValue(undefined)
+
+        const {result} = renderHook(() => useFutureUsageOffSession())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('futureUsageOffSession')
+    })
+
+    test('returns false (default) when futureUsageOffSession is null', () => {
+        mockUseShopperConfiguration.mockReturnValue(null)
+
+        const {result} = renderHook(() => useFutureUsageOffSession())
+
+        expect(result.current).toBe(false)
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('futureUsageOffSession')
     })
 })
