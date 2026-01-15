@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import {FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -15,7 +15,10 @@ import {
     Heading,
     Badge,
     HStack,
-    useDisclosure
+    useDisclosure,
+    Portal,
+    Spinner,
+    Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -29,7 +32,8 @@ export default function UserRegistration({
     isDisabled = false,
     onSavePreferenceChange,
     onRegistered,
-    showNotice = false
+    showNotice = false,
+    onLoadingChange
 }) {
     const {data: basket} = useCurrentBasket()
     const {isGuest} = useCustomerType()
@@ -39,6 +43,7 @@ export default function UserRegistration({
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
     const [registrationSucceeded, setRegistrationSucceeded] = useState(false)
+    const [isLoadingOtp, setIsLoadingOtp] = useState(false)
 
     const handleOtpClose = () => {
         otpSentRef.current = false
@@ -53,9 +58,13 @@ export default function UserRegistration({
         // If user unchecks, allow OTP to be re-triggered upon re-check
         if (!checked) {
             otpSentRef.current = false
+            setIsLoadingOtp(false)
+            if (onLoadingChange) onLoadingChange(false)
         }
         // Kick off OTP for guests when they opt in
         if (checked && isGuest && basket?.customerInfo?.email && !otpSentRef.current) {
+            setIsLoadingOtp(true)
+            if (onLoadingChange) onLoadingChange(true)
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: basket.customerInfo.email,
@@ -69,9 +78,19 @@ export default function UserRegistration({
                 onOtpOpen()
             } catch (_e) {
                 // Silent failure; user can continue as guest
+                setIsLoadingOtp(false)
+                if (onLoadingChange) onLoadingChange(false)
             }
         }
     }
+
+    // Clear loading state when OTP modal opens
+    useEffect(() => {
+        if (isOtpOpen && isLoadingOtp) {
+            setIsLoadingOtp(false)
+            if (onLoadingChange) onLoadingChange(false)
+        }
+    }, [isOtpOpen, isLoadingOtp, onLoadingChange])
 
     const handleOtpVerification = async (otpCode) => {
         try {
@@ -182,6 +201,26 @@ export default function UserRegistration({
                 </Stack>
             </Box>
 
+            {/* Loading overlay when OTP is being initialized */}
+            {isLoadingOtp && (
+                <Portal>
+                    <Box
+                        position="fixed"
+                        top="0"
+                        left="0"
+                        right="0"
+                        bottom="0"
+                        bg="blackAlpha.600"
+                        zIndex={9999}
+                        data-testid="sf-otp-loading-overlay"
+                    >
+                        <Center h="100%">
+                            <Spinner size="xl" color="white" thickness="4px" />
+                        </Center>
+                    </Box>
+                </Portal>
+            )}
+
             {/* OTP modal lives with registration now */}
             <OtpAuth
                 isOpen={isOtpOpen}
@@ -221,5 +260,7 @@ UserRegistration.propTypes = {
     onSavePreferenceChange: PropTypes.func,
     onRegistered: PropTypes.func,
     /** When true, forces the success notice to show (e.g., after component would normally unmount) */
-    showNotice: PropTypes.bool
+    showNotice: PropTypes.bool,
+    /** Callback when loading state changes (for disabling Place Order button) */
+    onLoadingChange: PropTypes.func
 }

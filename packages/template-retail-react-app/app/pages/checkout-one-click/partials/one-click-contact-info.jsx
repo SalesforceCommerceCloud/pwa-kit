@@ -639,7 +639,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                 {(customer?.email || form.getValues('email')) && (
                     <ToggleCardSummary>
-                        <Text>{customer?.email || form.getValues('email')}</Text>
+                        <Stack spacing={1}>
+                            <Text>{customer?.email || form.getValues('email')}</Text>
+                            {(customer?.phoneHome || form.getValues('phone')) && (
+                                <Text fontSize="sm" color="gray.600">
+                                    {customer?.phoneHome || form.getValues('phone')}
+                                </Text>
+                            )}
+                        </Stack>
                     </ToggleCardSummary>
                 )}
             </ToggleCard>

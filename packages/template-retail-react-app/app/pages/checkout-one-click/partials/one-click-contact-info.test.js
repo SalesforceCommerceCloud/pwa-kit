@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {screen, waitFor, fireEvent, act} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -211,6 +211,64 @@ describe('ContactInfo Component', () => {
         const phoneInput = screen.getByLabelText('Phone')
         expect(phoneInput).toBeInTheDocument()
         expect(phoneInput).toHaveAttribute('disabled')
+    })
+
+    test('displays phone number in summary card for registered user', async () => {
+        jest.resetModules()
+        jest.doMock('@salesforce/commerce-sdk-react', () => {
+            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+            return {
+                ...originalModule,
+                useCustomerType: jest.fn(() => ({isRegistered: true})),
+                useAuthHelper: jest
+                    .fn()
+                    .mockImplementation(
+                        (helperType) =>
+                            mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
+                    )
+            }
+        })
+        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+            useCurrentCustomer: () => ({
+                data: {
+                    email: 'reg@salesforce.com',
+                    isRegistered: true,
+                    phoneHome: '(111) 222-3333'
+                }
+            })
+        }))
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+            () => {
+                return {
+                    useCheckout: jest.fn().mockReturnValue({
+                        customer: null,
+                        basket: {basketId: 'test-basket-id'},
+                        isGuestCheckout: false,
+                        setIsGuestCheckout: jest.fn(),
+                        step: 1, // Not on CONTACT_INFO step, so summary shows
+                        login: null,
+                        STEPS: {CONTACT_INFO: 0},
+                        goToStep: jest.fn(),
+                        goToNextStep: jest.fn(),
+                        setContactPhone: jest.fn()
+                    })
+                }
+            }
+        )
+        const {renderWithProviders: localRenderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const module = await import(
+            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
+        )
+        const Component = module.default
+
+        localRenderWithProviders(<Component />)
+
+        // Verify email and phone are displayed in summary
+        expect(screen.getByText('reg@salesforce.com')).toBeInTheDocument()
+        expect(screen.getByText('(111) 222-3333')).toBeInTheDocument()
     })
 
     test('shows social login when enabled', () => {
