@@ -50,7 +50,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const form = useForm()
 
     const config = getConfig()
-    const commerceApiConfig = config.app.commerceAPI
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
 
@@ -62,7 +61,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             await authorizeWebauthnRegistration.mutateAsync({
                 user_id: customer.email,
                 mode: webauthnConfig.mode,
-                channel_id: commerceApiConfig.parameters.siteId,
                 ...(webauthnConfig.mode === 'callback' && {
                     callback_uri: webauthnConfig.callbackURI
                 })
@@ -130,7 +128,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                         <FormControl>
                             <FormLabel>
                                 {formatMessage({
-                                    defaultMessage: 'Passkey Nickname',
+                                    defaultMessage: 'Passkey Nickname (optional)',
                                     id: 'auth_modal.passkey.label.nickname'
                                 })}
                             </FormLabel>
