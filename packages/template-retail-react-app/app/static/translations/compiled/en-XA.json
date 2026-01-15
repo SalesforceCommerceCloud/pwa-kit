@@ -983,62 +983,6 @@
       "value": "]"
     }
   ],
-  "auth_modal.passkey.button.close.assistive_msg": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈŀǿǿşḗḗ ƥȧȧşşķḗḗẏ ƒǿǿřḿ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "auth_modal.passkey.button.register": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗɠīşŧḗḗř Ƥȧȧşşķḗḗẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "auth_modal.passkey.label.nickname": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥȧȧşşķḗḗẏ Ƞīƈķƞȧȧḿḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "auth_modal.passkey.title": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈřḗḗȧȧŧḗḗ Ƥȧȧşşķḗḗẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "auth_modal.password_reset_success.button.back_to_sign_in": [
     {
       "type": 0,
@@ -6295,6 +6239,118 @@
     {
       "type": 0,
       "value": "Ƥřḗḗṽīǿǿŭŭş Ƥȧȧɠḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ƥȧȧşşķḗḗẏ ƒǿǿřḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.modal.button.register": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɠīşŧḗḗř Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.modal.error.authorize_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ȧȧŭŭŧħǿǿřīẑḗḗ ƥȧȧşşķḗḗẏ řḗḗɠīşŧřȧȧŧīǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.modal.label.nickname": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧşşķḗḗẏ Ƞīƈķƞȧȧḿḗḗ (ǿǿƥŧīǿǿƞȧȧŀ)"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.modal.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗ Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ŧǿǿȧȧşŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.button.create": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗ Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗ ȧȧ ƥȧȧşşķḗḗẏ ƒǿǿř ȧȧ ḿǿǿřḗḗ şḗḗƈŭŭřḗḗ ȧȧƞḓ ḗḗȧȧşīḗḗř ŀǿǿɠīƞ"
     },
     {
       "type": 0,

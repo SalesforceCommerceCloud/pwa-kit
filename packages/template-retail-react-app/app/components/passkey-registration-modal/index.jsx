@@ -70,8 +70,13 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             onClose()
             setIsOtpAuthOpen(true)
         } catch (err) {
-            console.error('Error authorizing passkey registration:', err)
-            setError(err.message || 'Failed to authorize passkey registration')
+            setError(
+                err.message ||
+                    formatMessage({
+                        id: 'passkey_registration.modal.error.authorize_failed',
+                        defaultMessage: 'Failed to authorize passkey registration'
+                    })
+            )
         } finally {
             setIsLoading(false)
         }
@@ -107,12 +112,12 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                     <ModalHeader>
                         {formatMessage({
                             defaultMessage: 'Create Passkey',
-                            id: 'auth_modal.passkey.title'
+                            id: 'passkey_registration.modal.title'
                         })}
                     </ModalHeader>
                     <ModalCloseButton
                         aria-label={formatMessage({
-                            id: 'auth_modal.passkey.button.close.assistive_msg',
+                            id: 'passkey_registration.modal.button.close.assistive_msg',
                             defaultMessage: 'Close passkey form'
                         })}
                         data-testid="passkey-registration-modal-close-button"
@@ -129,7 +134,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                             <FormLabel>
                                 {formatMessage({
                                     defaultMessage: 'Passkey Nickname (optional)',
-                                    id: 'auth_modal.passkey.label.nickname'
+                                    id: 'passkey_registration.modal.label.nickname'
                                 })}
                             </FormLabel>
                             <Input
@@ -148,7 +153,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                             >
                                 {formatMessage({
                                     defaultMessage: 'Register Passkey',
-                                    id: 'auth_modal.passkey.button.register'
+                                    id: 'passkey_registration.modal.button.register'
                                 })}
                             </Button>
                         </FormControl>
