@@ -10,9 +10,9 @@ import {
     Box,
     Button,
     CloseButton,
-    useDisclosure,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 /**
  * Custom hook to manage passkey registration prompt (toast and modal)
@@ -20,7 +20,7 @@ import {
  */
 export const usePasskeyRegistration = () => {
     const toast = useToast()
-    const passkeyModal = useDisclosure()
+    const {passkeyModal} = usePasskeyRegistrationContext()
 
     const showToast = () => {
         toast({
@@ -52,7 +52,7 @@ export const usePasskeyRegistration = () => {
                         size="sm"
                         colorScheme="whiteAlpha"
                         onClick={() => {
-                            toast.closeAll()
+                            onClose()
                             passkeyModal.onOpen()
                         }}
                     >
@@ -65,9 +65,6 @@ export const usePasskeyRegistration = () => {
 
     return {
         showToast,
-        passkeyModal: {
-            isOpen: passkeyModal.isOpen,
-            onClose: passkeyModal.onClose
-        }
+        passkeyModal
     }
 }

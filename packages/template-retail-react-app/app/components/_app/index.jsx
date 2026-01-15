@@ -33,7 +33,7 @@ import {
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
+import {CurrencyProvider, PasskeyRegistrationProvider} from '@salesforce/retail-react-app/app/contexts'
 
 // Local Project Components
 import Header from '@salesforce/retail-react-app/app/components/header'
@@ -325,7 +325,8 @@ const App = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
-                        <Seo>
+                        <PasskeyRegistrationProvider>
+                            <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
                             <link
@@ -463,6 +464,7 @@ const App = (props) => {
                                 </BonusProductSelectionModalProvider>
                             </AddToCartModalProvider>
                         </Box>
+                        </PasskeyRegistrationProvider>
                     </CurrencyProvider>
                 </IntlProvider>
             </StorefrontPreview>

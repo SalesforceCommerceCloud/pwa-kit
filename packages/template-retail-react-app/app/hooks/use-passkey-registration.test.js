@@ -10,7 +10,7 @@ import {rest} from 'msw'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal/index'
+import {PasskeyRegistrationProvider} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 // Mock PasskeyRegistrationModal
 jest.mock('@salesforce/retail-react-app/app/components/passkey-registration-modal/index', () => {
@@ -46,16 +46,23 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 }))
 
 const TestComponent = () => {
-    const {showToast, passkeyModal} = usePasskeyRegistration()
+    const {showToast} = usePasskeyRegistration()
 
     return (
         <div>
             <button data-testid="show-toast-button" onClick={showToast}>
                 Show Toast
             </button>
-            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </div>
     )
+}
+
+const TestComponentWithProvider = ({children}) => (
+    <PasskeyRegistrationProvider>{children}</PasskeyRegistrationProvider>
+)
+
+TestComponentWithProvider.propTypes = {
+    children: PropTypes.node.isRequired
 }
 
 describe('usePasskeyRegistration', () => {
@@ -84,13 +91,18 @@ describe('usePasskeyRegistration', () => {
                 return null
             }
 
-            renderWithProviders(<TestHook />)
+            renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestHook />
+                </TestComponentWithProvider>
+            )
 
             expect(hookResult).toBeDefined()
             expect(typeof hookResult.showToast).toBe('function')
             expect(hookResult.passkeyModal).toBeDefined()
             expect(typeof hookResult.passkeyModal.isOpen).toBe('boolean')
             expect(typeof hookResult.passkeyModal.onClose).toBe('function')
+            expect(typeof hookResult.passkeyModal.onOpen).toBe('function')
         })
 
         test('initializes with modal closed', () => {
@@ -100,7 +112,11 @@ describe('usePasskeyRegistration', () => {
                 return null
             }
 
-            renderWithProviders(<TestHook />)
+            renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestHook />
+                </TestComponentWithProvider>
+            )
 
             expect(hookResult.passkeyModal.isOpen).toBe(false)
         })
@@ -108,7 +124,11 @@ describe('usePasskeyRegistration', () => {
 
     describe('Toast Functionality', () => {
         test('displays toast when showToast is called', async () => {
-            const {user} = renderWithProviders(<TestComponent />)
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
 
             const showToastButton = screen.getByTestId('show-toast-button')
             await user.click(showToastButton)
@@ -121,7 +141,11 @@ describe('usePasskeyRegistration', () => {
         })
 
         test('toast contains Create Passkey button', async () => {
-            const {user} = renderWithProviders(<TestComponent />)
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
 
             const showToastButton = screen.getByTestId('show-toast-button')
             await user.click(showToastButton)
@@ -134,7 +158,11 @@ describe('usePasskeyRegistration', () => {
 
     describe('Modal Integration', () => {
         test('clicking Create Passkey button in toast opens modal', async () => {
-            const {user} = renderWithProviders(<TestComponent />)
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
 
             // Show toast
             const showToastButton = screen.getByTestId('show-toast-button')
@@ -155,7 +183,11 @@ describe('usePasskeyRegistration', () => {
         })
 
         test('can close modal using onClose', async () => {
-            const {user} = renderWithProviders(<TestComponent />)
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
 
             // Show toast and open modal
             const showToastButton = screen.getByTestId('show-toast-button')

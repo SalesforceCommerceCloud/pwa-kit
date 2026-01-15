@@ -14,7 +14,6 @@ import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
@@ -33,7 +32,7 @@ const Registration = () => {
     const register = useAuthHelper(AuthHelpers.Register)
 
     const config = getConfig()
-    const {showToast, passkeyModal} = usePasskeyRegistration()
+    const {showToast} = usePasskeyRegistration()
 
     const submitForm = async (data) => {
         const body = {
@@ -115,7 +114,6 @@ const Registration = () => {
                 />
             </Container>
         </Box>
-        <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </>
     )
 }

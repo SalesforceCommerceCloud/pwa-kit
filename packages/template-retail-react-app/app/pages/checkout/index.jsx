@@ -44,7 +44,6 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -62,7 +61,7 @@ const Checkout = () => {
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = config?.app?.multishipEnabled ?? true
 
-    const {showToast, passkeyModal} = usePasskeyRegistration()
+    const {showToast} = usePasskeyRegistration()
     const {isRegistered} = useCustomerType()
 
     // cart has both pickup and delivery orders
@@ -235,7 +234,6 @@ const Checkout = () => {
                     </Container>
                 </Box>
             )}
-            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </Box>
     )
 }

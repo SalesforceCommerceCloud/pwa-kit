@@ -29,7 +29,6 @@ import {
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
@@ -102,7 +101,7 @@ export const AuthModal = ({
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
-    const {showToast, passkeyModal} = usePasskeyRegistration()
+    const {showToast} = usePasskeyRegistration()
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -365,7 +364,6 @@ export const AuthModal = ({
                     </ModalBody>
                 </ModalContent>
             </Modal>
-            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </>
     )
 }
