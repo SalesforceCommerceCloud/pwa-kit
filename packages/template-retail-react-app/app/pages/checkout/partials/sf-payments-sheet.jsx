@@ -142,8 +142,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         try {
             // Update savePaymentMethodRef only if explicitly provided. May be missing if payment method doesn't
             // support saving. If missing, preserve existing value set by handlePaymentMethodSelected.
-            if (event?.detail?.savePaymentMethod !== undefined) {
-                savePaymentMethodRef.current = event.detail.savePaymentMethod === true
+            if (event?.detail?.savePaymentMethodForFutureUse !== undefined) {
+                savePaymentMethodRef.current = event.detail.savePaymentMethodForFutureUse === true
             }
             const updatedOrder = await createAndUpdateOrder(
                 savePaymentMethodRef.current && customer?.isRegistered
@@ -225,7 +225,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 'SET_PROVIDED_ADDRESS',
                 false,
                 futureUsageOffSession,
-                paymentConfig?.paymentMethodSetAccounts
+                paymentConfig?.paymentMethods,
+                paymentConfig?.paymentMethodSetAccounts,
+                true // isPostRequest - never include setupFutureUsage in POST
             )
         })
 
@@ -256,6 +258,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 null,
                 shouldSavePaymentMethod,
                 futureUsageOffSession,
+                paymentConfig?.paymentMethods,
                 paymentConfig?.paymentMethodSetAccounts
             )
 
@@ -338,14 +341,19 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 null,
                 false,
                 futureUsageOffSession,
-                paymentConfig?.paymentMethodSetAccounts
+                paymentConfig?.paymentMethods,
+                paymentConfig?.paymentMethodSetAccounts,
+                true
             )
         })
 
         let updatedOrder = null
         try {
             // Update order payment instrument to create payment
-            const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+            const checkbox = containerElementRef.current?.querySelector(
+                '.sfpp-save-payment-method-for-future-use input[type="checkbox"]'
+            )
+            const shouldSavePaymentMethod = checkbox?.checked && customer?.isRegistered
             updatedOrder = await createAndUpdateOrder(shouldSavePaymentMethod)
 
             // Find updated SF Payments payment instrument in updated order
@@ -355,6 +363,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentIntent = {
                 client_secret: getClientSecret(orderPaymentInstrument),
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
+            }
+
+            if (futureUsageOffSession) {
+                paymentIntent.setup_future_usage = 'off_session'
+            } else if (shouldSavePaymentMethod) {
+                paymentIntent.setup_future_usage = 'on_session'
             }
 
             // Create payment billing details from basket
@@ -394,9 +408,22 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
+            // Update Elements to match Payment Intent's setup_future_usage before SDK confirms
+            const paymentIntentFunction = async () => {
+                const selectedPaymentMethod = checkoutComponent.current?.selectedPaymentMethod
+                if (selectedPaymentMethod?.asSavedPaymentMethodComponent) {
+                    const spmComponent = selectedPaymentMethod.asSavedPaymentMethodComponent()
+                    if (spmComponent) {
+                        spmComponent.setSavePaymentMethodFuture(futureUsageOffSession)
+                    }
+                }
+
+                return paymentIntent
+            }
+
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
-                () => paymentIntent,
+                paymentIntentFunction,
                 billingDetails,
                 shippingDetails
             )

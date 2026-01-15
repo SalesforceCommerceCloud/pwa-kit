@@ -1117,7 +1117,8 @@ describe('sf-payments-utils', () => {
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage when storePaymentMethod is true', () => {
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', paymentMethods: [{id: 'card'}]}]
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = createPaymentInstrumentBody(
                 100.0,
                 'card',
@@ -1125,18 +1126,20 @@ describe('sf-payments-utils', () => {
                 undefined,
                 true, // storePaymentMethod
                 false, // futureUsageOffSession
+                paymentMethods,
                 paymentMethodSetAccounts
             )
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setup_future_usage).toBe(
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
                 'on_session'
             )
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage as off_session when futureUsageOffSession is true', () => {
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', paymentMethods: [{id: 'card'}]}]
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = createPaymentInstrumentBody(
                 100.0,
                 'card',
@@ -1144,18 +1147,20 @@ describe('sf-payments-utils', () => {
                 undefined,
                 false, // storePaymentMethod
                 true, // futureUsageOffSession
+                paymentMethods,
                 paymentMethodSetAccounts
             )
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setup_future_usage).toBe(
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
                 'off_session'
             )
         })
 
         test('does not include gatewayProperties when storePaymentMethod is false and futureUsageOffSession is false', () => {
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', paymentMethods: [{id: 'card'}]}]
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = createPaymentInstrumentBody(
                 100.0,
                 'card',
@@ -1163,6 +1168,7 @@ describe('sf-payments-utils', () => {
                 undefined,
                 false, // storePaymentMethod
                 false, // futureUsageOffSession
+                paymentMethods,
                 paymentMethodSetAccounts
             )
 
