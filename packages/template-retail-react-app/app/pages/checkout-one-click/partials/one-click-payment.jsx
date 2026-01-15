@@ -54,7 +54,8 @@ const Payment = ({
     onSelectedPaymentMethodChange,
     onIsEditingChange,
     billingSameAsShipping,
-    setBillingSameAsShipping
+    setBillingSameAsShipping,
+    onOtpLoadingChange
 }) => {
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
@@ -572,6 +573,7 @@ const Payment = ({
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
                                         setEnableUserRegistration={onUserRegistrationToggle}
+                                        onLoadingChange={onOtpLoadingChange}
                                         isGuestCheckout={registeredUserChoseGuest}
                                         isDisabled={
                                             !(
@@ -635,6 +637,7 @@ const Payment = ({
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
+                                onLoadingChange={onOtpLoadingChange}
                                 isGuestCheckout={registeredUserChoseGuest}
                                 isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
                                 onSavePreferenceChange={onSavePreferenceChange}
@@ -678,7 +681,9 @@ Payment.propTypes = {
     /** Whether billing address is same as shipping */
     billingSameAsShipping: PropTypes.bool.isRequired,
     /** Callback to set billing same as shipping state */
-    setBillingSameAsShipping: PropTypes.func.isRequired
+    setBillingSameAsShipping: PropTypes.func.isRequired,
+    /** Callback when OTP loading state changes */
+    onOtpLoadingChange: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {
