@@ -9301,20 +9301,6 @@
       "value": "]"
     }
   ],
-  "shipping_options.action.send_as_gift_wrapping": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şḗḗƞḓ ȧȧş ȧȧ ɠīƒŧ (ɠīƒŧ ẇřȧȧƥƥīƞɠ)"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -9351,20 +9337,6 @@
     {
       "type": 0,
       "value": "Ƒřḗḗḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_options.help.notifications": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẏǿǿŭŭ ƈȧȧƞ ḗḗƞȧȧƀŀḗḗ ǿǿř ḓīşȧȧƀŀḗḗ ƞǿǿŧīƒīƈȧȧŧīǿǿƞş ȧȧŧ ȧȧƞẏ ŧīḿḗḗ."
     },
     {
       "type": 0,
