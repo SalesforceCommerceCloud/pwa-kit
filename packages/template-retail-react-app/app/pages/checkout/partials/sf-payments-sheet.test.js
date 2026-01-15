@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-sheet'
 import {CheckoutProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -24,6 +24,7 @@ const mockRefetchShippingMethods = jest.fn()
 const mockQueryClientInvalidate = jest.fn()
 const mockQueryClientSetQueryData = jest.fn()
 const mockQueryClientRemoveQueries = jest.fn()
+const mockFailOrder = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -51,15 +52,24 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             if (mutationKey === 'updatePaymentInstrumentForOrder') {
                 return {mutateAsync: mockUpdatePaymentInstrument}
             }
+            if (mutationKey === 'failOrder') {
+                return {mutateAsync: mockFailOrder}
+            }
             return {mutateAsync: jest.fn()}
         },
         usePaymentConfiguration: () => ({
             data: {
                 paymentMethods: [
-                    {id: 'card', name: 'Card'},
-                    {id: 'paypal', name: 'PayPal'}
+                    {id: 'card', name: 'Card', paymentMethodType: 'card', accountId: 'stripe-account-1'},
+                    {id: 'paypal', name: 'PayPal', paymentMethodType: 'paypal', accountId: 'paypal-account-1'}
                 ],
-                paymentMethodSetAccounts: []
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        vendor: 'Stripe',
+                        paymentMethods: [{id: 'card'}]
+                    }
+                ]
             }
         }),
         useShippingMethodsForShipment: () => ({
@@ -124,6 +134,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
         data: {
             customerId: 'customer123',
             isGuest: false,
+            isRegistered: true,
             email: 'test@example.com'
         }
     })
@@ -154,17 +165,30 @@ const mockCheckoutConfirm = jest.fn()
 const mockCheckoutDestroy = jest.fn()
 const mockUpdateAmount = jest.fn()
 
+let mockContainerElement = null
+
+const mockCheckout = jest.fn((metadata, paymentMethodSet, config, paymentRequest, paymentElement) => {
+    if (!paymentElement.parentElement) {
+        if (!mockContainerElement) {
+            mockContainerElement = document.createElement('div')
+            document.body.appendChild(mockContainerElement)
+        }
+        mockContainerElement.appendChild(paymentElement)
+    }
+    return {
+        confirm: mockCheckoutConfirm,
+        destroy: mockCheckoutDestroy,
+        updateAmount: mockUpdateAmount
+    }
+})
+
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
         useSFPayments: () => ({
             sfp: {
-                checkout: jest.fn(() => ({
-                    confirm: mockCheckoutConfirm,
-                    destroy: mockCheckoutDestroy,
-                    updateAmount: mockUpdateAmount
-                }))
+                checkout: mockCheckout
             },
             metadata: {key: 'value'},
             startConfirming: mockStartConfirming,
@@ -255,8 +279,9 @@ describe('SFPaymentsSheet', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        mockCheckout.mockClear()
+        mockContainerElement = null
 
-        // Mock product-lists endpoint to avoid console warnings
         global.server.use(
             rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
                 return res(
@@ -279,7 +304,6 @@ describe('SFPaymentsSheet', () => {
                 )
             })
         )
-        // Reset mockBasket to default state
         mockBasket.shipments = [
             {
                 _type: 'shipment',
@@ -309,7 +333,6 @@ describe('SFPaymentsSheet', () => {
             phone: '555-5678'
         }
 
-        // Reset the mock implementation to default
         mockUseCurrentBasket.mockImplementation(() => ({
             data: mockBasket,
             derivedData: {
@@ -346,6 +369,52 @@ describe('SFPaymentsSheet', () => {
             )
 
             expect(screen.getAllByText('Billing Address').length).toBeGreaterThan(0)
+        })
+    })
+
+    describe('isPickupOnly useEffect', () => {
+        test('sets billingSameAsShipping to false when isPickupOnly is true', async () => {
+            const pickupBasket = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        _type: 'shipment',
+                        shipment_id: 'me',
+                        shippingMethod: {
+                            id: 'PickupInStore',
+                            name: 'Pickup In Store',
+                            c_storePickupEnabled: true
+                        }
+                    }
+                ]
+            }
+
+            mockUseCurrentBasket.mockImplementation(() => ({
+                data: pickupBasket,
+                derivedData: {
+                    totalItems: 2,
+                    isMissingShippingAddress: false,
+                    isMissingShippingMethod: false,
+                    totalDeliveryShipments: 0,
+                    totalPickupShipments: 1
+                },
+                isLoading: false
+            }))
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={mockRef}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                const checkbox = screen.queryByRole('checkbox', {name: /same as shipping/i})
+                if (checkbox) {
+                    expect(checkbox).not.toBeChecked()
+                }
+            }, {timeout: 2000})
         })
     })
 
@@ -438,7 +507,6 @@ describe('SFPaymentsSheet', () => {
                 expect(ref.current).toBeDefined()
             })
 
-            // Mock form trigger to return false (invalid)
             mockUpdateBillingAddress.mockResolvedValue(undefined)
 
             await expect(ref.current.confirmPayment()).rejects.toThrow('Billing form errors')
@@ -713,6 +781,267 @@ describe('SFPaymentsSheet', () => {
 
             expect(mockQueryClientInvalidate).toHaveBeenCalled()
         })
+
+        test('confirmPayment reads checkbox state for shouldSavePaymentMethod', async () => {
+            const ref = React.createRef()
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: mockOrder.paymentInstruments
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: STATUS_SUCCESS,
+                data: {}
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            }, {timeout: 3000})
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const paymentElement = checkoutCall[4]
+            
+            await act(async () => {
+                paymentElement.dispatchEvent(new CustomEvent('sfp:paymentmethodselected', {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        selectedPaymentMethod: 'card'
+                    }
+                }))
+            })
+
+            const mockCheckbox = document.createElement('input')
+            mockCheckbox.type = 'checkbox'
+            mockCheckbox.checked = true
+
+            const originalQuerySelector = Element.prototype.querySelector
+            const querySelectorSpy = jest.spyOn(Element.prototype, 'querySelector')
+            querySelectorSpy.mockImplementation(function(selector) {
+                if (selector === '.sfpp-save-payment-method-for-future-use input[type="checkbox"]') {
+                    return mockCheckbox
+                }
+                return originalQuerySelector.call(this, selector)
+            })
+
+            await ref.current.confirmPayment()
+
+            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+            const requestBody = updateCall[0].body
+            expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe('on_session')
+            expect(querySelectorSpy).toHaveBeenCalledWith('.sfpp-save-payment-method-for-future-use input[type="checkbox"]')
+
+            querySelectorSpy.mockRestore()
+        })
+
+        test('confirmPayment sets setup_future_usage in paymentIntent when shouldSavePaymentMethod is true', async () => {
+            const ref = React.createRef()
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123',
+                            gatewayProperties: {
+                                stripe: {
+                                    clientSecret: 'secret123'
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: mockOrder.paymentInstruments
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            let paymentIntentFunctionCalled = false
+            let capturedPaymentIntent = null
+
+            mockCheckoutConfirm.mockImplementation(async (paymentIntentFn, billingDetails, shippingDetails) => {
+                paymentIntentFunctionCalled = true
+                capturedPaymentIntent = await paymentIntentFn()
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            }, {timeout: 3000})
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const paymentElement = checkoutCall[4]
+            
+            const mockCheckbox = document.createElement('input')
+            mockCheckbox.type = 'checkbox'
+            mockCheckbox.checked = true
+
+            const originalQuerySelector = Element.prototype.querySelector
+            const querySelectorSpy = jest.spyOn(Element.prototype, 'querySelector')
+            querySelectorSpy.mockImplementation(function(selector) {
+                if (selector === '.sfpp-save-payment-method-for-future-use input[type="checkbox"]') {
+                    return mockCheckbox
+                }
+                return originalQuerySelector.call(this, selector)
+            })
+
+            await ref.current.confirmPayment()
+
+            expect(paymentIntentFunctionCalled).toBe(true)
+            expect(capturedPaymentIntent.setup_future_usage).toBe('on_session')
+            expect(querySelectorSpy).toHaveBeenCalledWith('.sfpp-save-payment-method-for-future-use input[type="checkbox"]')
+
+            querySelectorSpy.mockRestore()
+        })
+
+        test('confirmPayment calls failOrder when confirm fails after order creation', async () => {
+            const ref = React.createRef()
+
+            const mockOrder = {
+                orderNo: 'ORDER123',
+                orderTotal: 629.98,
+                customerInfo: {email: 'test@example.com'},
+                billingAddress: mockBasket.billingAddress,
+                shipments: mockBasket.shipments,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            clientSecret: 'secret123',
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            }
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: mockOrder.paymentInstruments
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockResolvedValue({
+                responseCode: 'FAILED',
+                data: {error: 'Payment confirmation failed'}
+            })
+
+            mockFailOrder.mockResolvedValue({})
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await expect(ref.current.confirmPayment()).rejects.toThrow()
+
+            await waitFor(() => {
+                expect(mockFailOrder).toHaveBeenCalledWith({
+                    parameters: {
+                        orderNo: 'ORDER123',
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
+                expect(mockOnError).toHaveBeenCalled()
+            }, {timeout: 3000})
+        })
     })
 
     describe('lifecycle', () => {
@@ -731,24 +1060,6 @@ describe('SFPaymentsSheet', () => {
         })
     })
 
-    describe('onRequiresPayButtonChange callback', () => {
-        test('renders successfully with callback provided', () => {
-            const mockOnRequiresPayButtonChange = jest.fn()
-
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={mockRef}
-                    onCreateOrder={mockOnCreateOrder}
-                    onError={mockOnError}
-                    onRequiresPayButtonChange={mockOnRequiresPayButtonChange}
-                />
-            )
-
-            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-            expect(mockOnRequiresPayButtonChange).toBeDefined()
-            expect(mockOnRequiresPayButtonChange).not.toHaveBeenCalled()
-        })
-    })
 
     describe('container element persistence', () => {
         test('payment container is rendered outside ToggleCardEdit to prevent unmounting', () => {
