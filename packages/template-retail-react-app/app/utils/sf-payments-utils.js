@@ -9,7 +9,7 @@ import {
     PAYMENT_METHOD_TYPES,
     PAYMENT_GATEWAYS,
     SETUP_FUTURE_USAGE
-} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/retail-react-app/app/utils/sf-payments-constants'
 
 /**
  * Helper function to read the client secret from the payment instrument
@@ -217,18 +217,19 @@ export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) =
 
 /**
  * Creates a payment instrument body for Salesforce Payments (for basket or order).
- * @param {number} amount - Payment amount
- * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
- * @param {string} zoneId - Zone ID for payment processing
- * @param {string} shippingPreference - optional shipping preference for PayPal payment processing
- * @param {boolean} storePaymentMethod - optional flag to save payment method for future use
- * @param {boolean} futureUsageOffSession - optional flag indicating if off-session future usage is enabled (from payment config)
- * @param {Array} paymentMethods - optional array of payment methods to determine gateway
- * @param {Array} paymentMethodSetAccounts - optional array of payment method set accounts to determine gateway
- * @param {boolean} isPostRequest - optional flag to indicate if this is a POST request (basket).
+ * @param {Object} params - Parameters for creating payment instrument body
+ * @param {number} params.amount - Payment amount
+ * @param {string} params.paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @param {string} params.zoneId - Zone ID for payment processing
+ * @param {string} [params.shippingPreference] - Optional shipping preference for PayPal payment processing
+ * @param {boolean} [params.storePaymentMethod=false] - Optional flag to save payment method for future use
+ * @param {boolean} [params.futureUsageOffSession=false] - Optional flag indicating if off-session future usage is enabled (from payment config)
+ * @param {Array} [params.paymentMethods] - Optional array of payment methods to determine gateway
+ * @param {Array} [params.paymentMethodSetAccounts] - Optional array of payment method set accounts to determine gateway
+ * @param {boolean} [params.isPostRequest=false] - Optional flag to indicate if this is a POST request (basket)
  * @returns {Object} Payment instrument body
  */
-export const createPaymentInstrumentBody = (
+export const createPaymentInstrumentBody = ({
     amount,
     paymentMethodType,
     zoneId,
@@ -238,7 +239,7 @@ export const createPaymentInstrumentBody = (
     paymentMethods = null,
     paymentMethodSetAccounts = null,
     isPostRequest = false
-) => {
+} = {}) => {
     const paymentReferenceRequest = {
         paymentMethodType: paymentMethodType,
         zoneId: zoneId ?? 'default'
@@ -257,7 +258,7 @@ export const createPaymentInstrumentBody = (
     if (
         !isPostRequest &&
         gateway === PAYMENT_GATEWAYS.STRIPE &&
-        (storePaymentMethod || futureUsageOffSession)
+        storePaymentMethod
     ) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
         if (setupFutureUsage) {

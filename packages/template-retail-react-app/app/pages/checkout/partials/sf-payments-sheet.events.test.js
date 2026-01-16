@@ -193,13 +193,55 @@ const renderWithCheckoutContext = (ui, options) => {
     return renderWithProviders(<CheckoutProvider>{ui}</CheckoutProvider>, options)
 }
 
+const mockRef = {current: null}
+
+const setupComponentAndGetPaymentElement = async () => {
+    renderWithCheckoutContext(
+        <SFPaymentsSheet
+            ref={mockRef}
+            onCreateOrder={mockOnCreateOrder}
+            onError={mockOnError}
+        />
+    )
+
+    await waitFor(() => {
+        expect(mockCheckout).toHaveBeenCalled()
+    }, {timeout: 3000})
+
+    const checkoutCall = mockCheckout.mock.calls[0]
+    return checkoutCall[4]
+}
+
+const firePaymentMethodSelectedEvent = async (paymentElement, detail = {}) => {
+    await act(async () => {
+        paymentElement.dispatchEvent(new CustomEvent('sfp:paymentmethodselected', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                selectedPaymentMethod: 'card',
+                ...detail
+            }
+        }))
+    })
+}
+
+const firePaymentApproveEvent = async (paymentElement, detail = {}) => {
+    await act(async () => {
+        paymentElement.dispatchEvent(new CustomEvent('sfp:paymentapprove', {
+            bubbles: true,
+            composed: true,
+            detail
+        }))
+    })
+}
+
 describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
-    const mockRef = {current: null}
     let paymentElement = null
 
     beforeEach(() => {
         jest.clearAllMocks()
         paymentElement = null
+        mockRef.current = null
         mockCheckout.mockClear()
 
         mockBasket.shipments = [
@@ -308,47 +350,11 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         )
     })
 
-    test('savePaymentMethodForFutureUse from sfp:paymentmethodselected flows to API request', async () => {
-        renderWithCheckoutContext(
-            <SFPaymentsSheet
-                ref={mockRef}
-                onCreateOrder={mockOnCreateOrder}
-                onError={mockOnError}
-            />
-        )
+    test('handlePaymentButtonApprove includes setupFutureUsage when savePaymentMethodForFutureUse is true', async () => {
+        const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await waitFor(() => {
-            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-        })
-
-        await waitFor(() => {
-            expect(mockCheckout).toHaveBeenCalled()
-        }, {timeout: 3000})
-
-        const checkoutCall = mockCheckout.mock.calls[0]
-        paymentElement = checkoutCall[4]
-        
-        expect(paymentElement).toBeTruthy()
-        expect(paymentElement.nodeType).toBe(1)
-
-        const paymentMethodSelectedEvent = new CustomEvent('sfp:paymentmethodselected', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                selectedPaymentMethod: 'card',
-                savePaymentMethodForFutureUse: true
-            }
-        })
-        paymentElement.dispatchEvent(paymentMethodSelectedEvent)
-
-        const paymentApproveEvent = new CustomEvent('sfp:paymentapprove', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                savePaymentMethodForFutureUse: true
-            }
-        })
-        paymentElement.dispatchEvent(paymentApproveEvent)
+        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
+        await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
         await waitFor(() => {
             expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
@@ -358,55 +364,14 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         const requestBody = updateCall[0].body
 
         expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
-        expect(requestBody.paymentReferenceRequest.gatewayProperties).toBeDefined()
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe).toBeDefined()
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-            'on_session'
-        )
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe('on_session')
     })
 
-    test('savePaymentMethodForFutureUse: false does not include setup_future_usage', async () => {
-        renderWithCheckoutContext(
-            <SFPaymentsSheet
-                ref={mockRef}
-                onCreateOrder={mockOnCreateOrder}
-                onError={mockOnError}
-            />
-        )
+    test('handlePaymentButtonApprove does not include setupFutureUsage when savePaymentMethodForFutureUse is false', async () => {
+        const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await waitFor(() => {
-            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-        })
-
-        await waitFor(() => {
-            expect(mockCheckout).toHaveBeenCalled()
-        }, {timeout: 3000})
-
-        const checkoutCall = mockCheckout.mock.calls[0]
-        paymentElement = checkoutCall[4]
-        expect(paymentElement).toBeTruthy()
-        expect(paymentElement.nodeType).toBe(1)
-
-        await act(async () => {
-            paymentElement.dispatchEvent(new CustomEvent('sfp:paymentmethodselected', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    selectedPaymentMethod: 'card',
-                    savePaymentMethodForFutureUse: false
-                }
-            }))
-        })
-
-        await act(async () => {
-            paymentElement.dispatchEvent(new CustomEvent('sfp:paymentapprove', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    savePaymentMethodForFutureUse: false
-                }
-            }))
-        })
+        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: false})
+        await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: false})
 
         await waitFor(() => {
             expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
@@ -418,48 +383,11 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         expect(requestBody.paymentReferenceRequest.gatewayProperties).toBeUndefined()
     })
 
-    test('registered customer with savePaymentMethodForFutureUse creates PaymentsCustomer record', async () => {
-        renderWithCheckoutContext(
-            <SFPaymentsSheet
-                ref={mockRef}
-                onCreateOrder={mockOnCreateOrder}
-                onError={mockOnError}
-            />
-        )
+    test('handlePaymentButtonApprove includes required fields for PaymentsCustomer record creation', async () => {
+        const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await waitFor(() => {
-            expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-        })
-
-        await waitFor(() => {
-            expect(mockCheckout).toHaveBeenCalled()
-        }, {timeout: 3000})
-
-        const checkoutCall = mockCheckout.mock.calls[0]
-        paymentElement = checkoutCall[4]
-        expect(paymentElement).toBeTruthy()
-        expect(paymentElement.nodeType).toBe(1)
-
-        await act(async () => {
-            paymentElement.dispatchEvent(new CustomEvent('sfp:paymentmethodselected', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    selectedPaymentMethod: 'card',
-                    savePaymentMethodForFutureUse: true
-                }
-            }))
-        })
-
-        await act(async () => {
-            paymentElement.dispatchEvent(new CustomEvent('sfp:paymentapprove', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    savePaymentMethodForFutureUse: true
-                }
-            }))
-        })
+        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
+        await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
         await waitFor(() => {
             expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
@@ -469,26 +397,15 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         const requestParams = updateCall[0].parameters
         const requestBody = updateCall[0].body
 
-        // Verify API is called with correct order and payment instrument
         expect(requestParams.orderNo).toBe('ORDER123')
         expect(requestParams.paymentInstrumentId).toBe('PI123')
-
-        // Verify request includes all data needed for backend to create PaymentsCustomer record
         expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
-        expect(requestBody.paymentReferenceRequest.gatewayProperties).toBeDefined()
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe).toBeDefined()
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-            'on_session'
-        )
-
-        // Verify payment method type is included (needed for gateway determination)
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe('on_session')
         expect(requestBody.paymentReferenceRequest.paymentMethodType).toBe('card')
     })
 
     describe('handlePaymentButtonCancel', () => {
-        test('removes payment instruments and calls onError when cancel event fires', async () => {
-            const ref = React.createRef()
-            
+        test('removes payment instruments and calls onError when basket exists', async () => {
             const basketWithInstrument = {
                 ...mockBasket,
                 paymentInstruments: [
@@ -505,30 +422,18 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             mockUpdateBillingAddress.mockResolvedValue(basketWithInstrument)
             mockAddPaymentInstrument.mockResolvedValue(basketWithInstrument)
 
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={ref}
-                    onCreateOrder={mockOnCreateOrder}
-                    onError={mockOnError}
-                />
-            )
-
-            // Wait for SDK to initialize
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            }, {timeout: 3000})
-
+            const paymentElement = await setupComponentAndGetPaymentElement()
             const checkoutCall = mockCheckout.mock.calls[0]
-            const paymentElement = checkoutCall[4]
             const config = checkoutCall[2]
 
             await config.actions.createIntent()
 
-            const cancelEvent = new CustomEvent('sfp:paymentcancel', {
-                bubbles: true,
-                composed: true
+            await act(async () => {
+                paymentElement.dispatchEvent(new CustomEvent('sfp:paymentcancel', {
+                    bubbles: true,
+                    composed: true
+                }))
             })
-            paymentElement.dispatchEvent(cancelEvent)
 
             await waitFor(() => {
                 expect(mockRemovePaymentInstrument).toHaveBeenCalled()
@@ -536,28 +441,15 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             }, {timeout: 3000})
         })
 
-        test('does nothing when cancel fires but no basket to cleanup', async () => {
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={mockRef}
-                    onCreateOrder={mockOnCreateOrder}
-                    onError={mockOnError}
-                />
-            )
+        test('does nothing when no basket to cleanup', async () => {
+            const paymentElement = await setupComponentAndGetPaymentElement()
 
-            // Wait for SDK to initialize
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            }, {timeout: 3000})
-
-            const checkoutCall = mockCheckout.mock.calls[0]
-            const paymentElement = checkoutCall[4]
-
-            const cancelEvent = new CustomEvent('sfp:paymentcancel', {
-                bubbles: true,
-                composed: true
+            await act(async () => {
+                paymentElement.dispatchEvent(new CustomEvent('sfp:paymentcancel', {
+                    bubbles: true,
+                    composed: true
+                }))
             })
-            paymentElement.dispatchEvent(cancelEvent)
 
             await new Promise(resolve => setTimeout(resolve, 500))
             expect(mockRemovePaymentInstrument).not.toHaveBeenCalled()
@@ -566,32 +458,11 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
 
     describe('handlePaymentButtonApprove error handling', () => {
         test('calls onError when createAndUpdateOrder fails', async () => {
-            renderWithCheckoutContext(
-                <SFPaymentsSheet
-                    ref={mockRef}
-                    onCreateOrder={mockOnCreateOrder}
-                    onError={mockOnError}
-                />
-            )
-
-            // Wait for SDK to initialize
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            }, {timeout: 3000})
-
-            const checkoutCall = mockCheckout.mock.calls[0]
-            const paymentElement = checkoutCall[4]
-
             mockOnCreateOrder.mockRejectedValue(new Error('Order creation failed'))
 
-            const approveEvent = new CustomEvent('sfp:paymentapprove', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    savePaymentMethodForFutureUse: true
-                }
-            })
-            paymentElement.dispatchEvent(approveEvent)
+            const paymentElement = await setupComponentAndGetPaymentElement()
+
+            await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
             await waitFor(() => {
                 expect(mockOnError).toHaveBeenCalled()
@@ -599,8 +470,8 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         })
     })
 
-    describe('onRequiresPayButtonChange callback', () => {
-        test('calls onRequiresPayButtonChange when payment method requires pay button', async () => {
+    describe('handlePaymentMethodSelected', () => {
+        test('calls onRequiresPayButtonChange when requiresPayButton is provided', async () => {
             const mockOnRequiresPayButtonChange = jest.fn()
 
             renderWithCheckoutContext(
@@ -612,7 +483,6 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
                 />
             )
 
-            // Wait for SDK to initialize
             await waitFor(() => {
                 expect(mockCheckout).toHaveBeenCalled()
             }, {timeout: 3000})
@@ -620,15 +490,7 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             const checkoutCall = mockCheckout.mock.calls[0]
             const paymentElement = checkoutCall[4]
 
-            const event = new CustomEvent('sfp:paymentmethodselected', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    selectedPaymentMethod: 'card',
-                    requiresPayButton: true
-                }
-            })
-            paymentElement.dispatchEvent(event)
+            await firePaymentMethodSelectedEvent(paymentElement, {requiresPayButton: true})
 
             await waitFor(() => {
                 expect(mockOnRequiresPayButtonChange).toHaveBeenCalledWith(true)

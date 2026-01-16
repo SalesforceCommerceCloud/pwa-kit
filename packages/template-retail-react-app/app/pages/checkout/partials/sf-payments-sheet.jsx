@@ -218,17 +218,17 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         updatedBasket = await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: createPaymentInstrumentBody(
-                updatedBasket.orderTotal,
-                paymentMethodType.current,
+            body: createPaymentInstrumentBody({
+                amount: updatedBasket.orderTotal,
+                paymentMethodType: paymentMethodType.current,
                 zoneId,
-                'SET_PROVIDED_ADDRESS',
-                false,
+                shippingPreference: 'SET_PROVIDED_ADDRESS',
+                storePaymentMethod: false,
                 futureUsageOffSession,
-                paymentConfig?.paymentMethods,
-                paymentConfig?.paymentMethodSetAccounts,
-                true // isPostRequest - never include setupFutureUsage in POST
-            )
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
+                isPostRequest: true // never include setupFutureUsage in POST
+            })
         })
 
         // Store the updated basket for potential cleanup on cancel
@@ -251,16 +251,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         try {
             // Update order payment instrument to create payment
-            const paymentInstrumentBody = createPaymentInstrumentBody(
-                order.orderTotal,
-                paymentMethodType.current,
+            const paymentInstrumentBody = createPaymentInstrumentBody({
+                amount: order.orderTotal,
+                paymentMethodType: paymentMethodType.current,
                 zoneId,
-                null,
-                shouldSavePaymentMethod,
+                shippingPreference: null,
+                storePaymentMethod: shouldSavePaymentMethod,
                 futureUsageOffSession,
-                paymentConfig?.paymentMethods,
-                paymentConfig?.paymentMethodSetAccounts
-            )
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts
+            })
 
             const updatedOrder = await updatePaymentInstrumentForOrder({
                 parameters: {
@@ -334,26 +334,23 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Create SF Payments basket payment instrument before creating order
         await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: createPaymentInstrumentBody(
-                updatedBasket.orderTotal,
-                paymentMethodType.current,
+            body: createPaymentInstrumentBody({
+                amount: updatedBasket.orderTotal,
+                paymentMethodType: paymentMethodType.current,
                 zoneId,
-                null,
-                false,
+                shippingPreference: null,
+                storePaymentMethod: false,
                 futureUsageOffSession,
-                paymentConfig?.paymentMethods,
-                paymentConfig?.paymentMethodSetAccounts,
-                true
-            )
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
+                isPostRequest: true
+            })
         })
 
         let updatedOrder = null
         try {
             // Update order payment instrument to create payment
-            const checkbox = containerElementRef.current?.querySelector(
-                '.sfpp-save-payment-method-for-future-use input[type="checkbox"]'
-            )
-            const shouldSavePaymentMethod = checkbox?.checked && customer?.isRegistered
+            const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
             updatedOrder = await createAndUpdateOrder(shouldSavePaymentMethod)
 
             // Find updated SF Payments payment instrument in updated order
