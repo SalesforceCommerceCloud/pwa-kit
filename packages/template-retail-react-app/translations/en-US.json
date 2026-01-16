@@ -744,6 +744,9 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
+  "global.error.too_many_requests": {
+    "defaultMessage": "Too many requests. For your security, please wait 10 minutes before trying again."
+  },
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },

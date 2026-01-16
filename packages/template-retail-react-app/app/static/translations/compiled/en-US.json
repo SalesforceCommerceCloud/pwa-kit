@@ -1881,6 +1881,12 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.error.too_many_requests": [
+    {
+      "type": 0,
+      "value": "Too many requests. For your security, please wait 10 minutes before trying again."
+    }
+  ],
   "global.info.added_to_wishlist": [
     {
       "type": 1,

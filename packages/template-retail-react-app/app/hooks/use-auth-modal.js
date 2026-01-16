@@ -32,10 +32,10 @@ import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
-} from '@salesforce/retail-react-app/app/constants'
+    getPasswordlessErrorMessage,
+    getPasswordResetErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
@@ -108,9 +108,7 @@ export const AuthModal = ({
             })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -185,10 +183,7 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    const message =
-                        e.response?.status === 400
-                            ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                            : formatMessage(API_ERROR_MESSAGE)
+                    const message = formatMessage(getPasswordResetErrorMessage(e.message))
                     form.setError('global', {type: 'manual', message})
                 }
             },

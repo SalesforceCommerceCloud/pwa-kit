@@ -3857,6 +3857,20 @@
       "value": "]"
     }
   ],
+  "global.error.too_many_requests": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧǿǿǿǿ ḿȧȧƞẏ řḗḗɋŭŭḗḗşŧş. Ƒǿǿř ẏǿǿŭŭř şḗḗƈŭŭřīŧẏ, ƥŀḗḗȧȧşḗḗ ẇȧȧīŧ 10 ḿīƞŭŭŧḗḗş ƀḗḗƒǿǿřḗḗ ŧřẏīƞɠ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "global.info.added_to_wishlist": [
     {
       "type": 0,

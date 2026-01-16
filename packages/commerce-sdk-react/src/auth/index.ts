@@ -1352,7 +1352,11 @@ class Auth {
             )}`
         }
 
-        const res = await slasClient.getPasswordResetToken(options)
+        const res = await slasClient.getPasswordResetToken(options, true)
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
         return res
     }
 

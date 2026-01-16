@@ -251,12 +251,6 @@ export const LOGIN_TYPES = {
     SOCIAL: 'social'
 }
 
-export const PASSWORDLESS_ERROR_MESSAGES = [
-    /callback_uri doesn't match/i,
-    /passwordless permissions error/i,
-    /client secret is not provided/i
-]
-
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
 /**
