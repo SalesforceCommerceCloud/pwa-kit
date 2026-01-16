@@ -196,7 +196,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
                     // eslint-disable-next-line no-undef
                     PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {  
+                ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
                     }
@@ -219,44 +219,45 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     return (
         <>
-        <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>
-            <Heading as="h1" srOnly>
-                <FormattedMessage defaultMessage="Sign In" id="login.title.sign_in" />
-            </Heading>
-            <Seo title="Sign in" description="Customer sign in" />
-            <Container
-                paddingTop={16}
-                width={['100%', '407px']}
-                bg="white"
-                paddingBottom={14}
-                marginTop={8}
-                marginBottom={8}
-                borderRadius="base"
-            >
-                {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                    <LoginForm
-                        form={form}
-                        submitForm={(data) => {
-                            const shouldUsePasswordless = isPasswordlessEnabled && !data.password
-                            return submitForm(data, shouldUsePasswordless)
-                        }}
-                        clickCreateAccount={() => navigate('/registration')}
-                        handlePasswordlessLoginClick={noop}
-                        handleForgotPasswordClick={() => navigate('/reset-password')}
-                        isPasswordlessEnabled={isPasswordlessEnabled}
-                        isSocialEnabled={isSocialEnabled}
-                        idps={idps}
-                    />
-                )}
-                {currentView === EMAIL_VIEW && (
-                    <PasswordlessEmailConfirmation
-                        form={form}
-                        submitForm={submitForm}
-                        email={passwordlessLoginEmail}
-                    />
-                )}
-            </Container>
-        </Box>
+            <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>
+                <Heading as="h1" srOnly>
+                    <FormattedMessage defaultMessage="Sign In" id="login.title.sign_in" />
+                </Heading>
+                <Seo title="Sign in" description="Customer sign in" />
+                <Container
+                    paddingTop={16}
+                    width={['100%', '407px']}
+                    bg="white"
+                    paddingBottom={14}
+                    marginTop={8}
+                    marginBottom={8}
+                    borderRadius="base"
+                >
+                    {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                        <LoginForm
+                            form={form}
+                            submitForm={(data) => {
+                                const shouldUsePasswordless =
+                                    isPasswordlessEnabled && !data.password
+                                return submitForm(data, shouldUsePasswordless)
+                            }}
+                            clickCreateAccount={() => navigate('/registration')}
+                            handlePasswordlessLoginClick={noop}
+                            handleForgotPasswordClick={() => navigate('/reset-password')}
+                            isPasswordlessEnabled={isPasswordlessEnabled}
+                            isSocialEnabled={isSocialEnabled}
+                            idps={idps}
+                        />
+                    )}
+                    {currentView === EMAIL_VIEW && (
+                        <PasswordlessEmailConfirmation
+                            form={form}
+                            submitForm={submitForm}
+                            email={passwordlessLoginEmail}
+                        />
+                    )}
+                </Container>
+            </Box>
         </>
     )
 }

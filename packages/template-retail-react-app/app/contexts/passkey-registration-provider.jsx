@@ -26,10 +26,7 @@ export const PasskeyRegistrationProvider = ({children}) => {
     return (
         <PasskeyRegistrationContext.Provider value={value}>
             {children}
-            <PasskeyRegistrationModal
-                isOpen={passkeyModal.isOpen}
-                onClose={passkeyModal.onClose}
-            />
+            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
         </PasskeyRegistrationContext.Provider>
     )
 }

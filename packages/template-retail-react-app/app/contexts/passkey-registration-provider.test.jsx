@@ -178,7 +178,9 @@ describe('PasskeyRegistrationProvider', () => {
 
             expect(() => {
                 render(<TestComponent />)
-            }).toThrow('usePasskeyRegistrationContext must be used within a PasskeyRegistrationProvider')
+            }).toThrow(
+                'usePasskeyRegistrationContext must be used within a PasskeyRegistrationProvider'
+            )
 
             consoleError.mockRestore()
         })
