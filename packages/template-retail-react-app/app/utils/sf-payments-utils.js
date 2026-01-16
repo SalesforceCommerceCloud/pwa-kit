@@ -9,7 +9,7 @@ import {
     PAYMENT_METHOD_TYPES,
     PAYMENT_GATEWAYS,
     SETUP_FUTURE_USAGE
-} from '@salesforce/retail-react-app/app/utils/sf-payments-constants'
+} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Helper function to read the client secret from the payment instrument
@@ -255,11 +255,7 @@ export const createPaymentInstrumentBody = ({
         paymentMethodSetAccounts
     )
 
-    if (
-        !isPostRequest &&
-        gateway === PAYMENT_GATEWAYS.STRIPE &&
-        storePaymentMethod
-    ) {
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
         if (setupFutureUsage) {
             paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE

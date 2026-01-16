@@ -60,8 +60,18 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         usePaymentConfiguration: () => ({
             data: {
                 paymentMethods: [
-                    {id: 'card', name: 'Card', paymentMethodType: 'card', accountId: 'stripe-account-1'},
-                    {id: 'paypal', name: 'PayPal', paymentMethodType: 'paypal', accountId: 'paypal-account-1'}
+                    {
+                        id: 'card',
+                        name: 'Card',
+                        paymentMethodType: 'card',
+                        accountId: 'stripe-account-1'
+                    },
+                    {
+                        id: 'paypal',
+                        name: 'PayPal',
+                        paymentMethodType: 'paypal',
+                        accountId: 'paypal-account-1'
+                    }
                 ],
                 paymentMethodSetAccounts: [
                     {
@@ -167,20 +177,22 @@ const mockUpdateAmount = jest.fn()
 
 let mockContainerElement = null
 
-const mockCheckout = jest.fn((metadata, paymentMethodSet, config, paymentRequest, paymentElement) => {
-    if (!paymentElement.parentElement) {
-        if (!mockContainerElement) {
-            mockContainerElement = document.createElement('div')
-            document.body.appendChild(mockContainerElement)
+const mockCheckout = jest.fn(
+    (metadata, paymentMethodSet, config, paymentRequest, paymentElement) => {
+        if (!paymentElement.parentElement) {
+            if (!mockContainerElement) {
+                mockContainerElement = document.createElement('div')
+                document.body.appendChild(mockContainerElement)
+            }
+            mockContainerElement.appendChild(paymentElement)
         }
-        mockContainerElement.appendChild(paymentElement)
+        return {
+            confirm: mockCheckoutConfirm,
+            destroy: mockCheckoutDestroy,
+            updateAmount: mockUpdateAmount
+        }
     }
-    return {
-        confirm: mockCheckoutConfirm,
-        destroy: mockCheckoutDestroy,
-        updateAmount: mockUpdateAmount
-    }
-})
+)
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
@@ -301,7 +313,6 @@ describe('SFPaymentsSheet', () => {
         mockCheckout.mockClear()
         mockContainerElement = null
 
-        // Mock product-lists endpoint to avoid console warnings
         global.server.use(
             rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
                 return res(
@@ -324,7 +335,6 @@ describe('SFPaymentsSheet', () => {
                 )
             })
         )
-        // Reset mockBasket to default state
         mockBasket.shipments = [
             {
                 _type: 'shipment',
@@ -430,10 +440,13 @@ describe('SFPaymentsSheet', () => {
                 />
             )
 
-            await waitFor(() => {
-                const checkbox = screen.queryByRole('checkbox', {name: /same as shipping/i})
-                expect(checkbox).not.toBeInTheDocument()
-            }, {timeout: 2000})
+            await waitFor(
+                () => {
+                    const checkbox = screen.queryByRole('checkbox', {name: /same as shipping/i})
+                    expect(checkbox).not.toBeInTheDocument()
+                },
+                {timeout: 2000}
+            )
         })
     })
 
@@ -743,7 +756,6 @@ describe('SFPaymentsSheet', () => {
             expect(mockQueryClientInvalidate).toHaveBeenCalled()
         })
 
-
         test('confirmPayment calls failOrder when confirm fails after order creation', async () => {
             const ref = React.createRef()
             const mockOrder = createMockOrder()
@@ -792,18 +804,21 @@ describe('SFPaymentsSheet', () => {
 
             await expect(ref.current.confirmPayment()).rejects.toThrow()
 
-            await waitFor(() => {
-                expect(mockFailOrder).toHaveBeenCalledWith({
-                    parameters: {
-                        orderNo: 'ORDER123',
-                        reopenBasket: true
-                    },
-                    body: {
-                        reasonCode: 'payment_confirm_failure'
-                    }
-                })
-                expect(mockOnError).toHaveBeenCalled()
-            }, {timeout: 3000})
+            await waitFor(
+                () => {
+                    expect(mockFailOrder).toHaveBeenCalledWith({
+                        parameters: {
+                            orderNo: 'ORDER123',
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: 'payment_confirm_failure'
+                        }
+                    })
+                    expect(mockOnError).toHaveBeenCalled()
+                },
+                {timeout: 3000}
+            )
         })
     })
 
@@ -822,7 +837,6 @@ describe('SFPaymentsSheet', () => {
             expect(mockCheckoutDestroy).toHaveBeenCalled()
         })
     })
-
 
     describe('container element persistence', () => {
         test('payment container is rendered outside ToggleCardEdit to prevent unmounting', () => {

@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor, act} from '@testing-library/react'
+import {waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-sheet'
 import {CheckoutProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -48,8 +48,18 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         usePaymentConfiguration: () => ({
             data: {
                 paymentMethods: [
-                    {id: 'card', name: 'Card', paymentMethodType: 'card', accountId: 'stripe-account-1'},
-                    {id: 'paypal', name: 'PayPal', paymentMethodType: 'paypal', accountId: 'paypal-account-1'}
+                    {
+                        id: 'card',
+                        name: 'Card',
+                        paymentMethodType: 'card',
+                        accountId: 'stripe-account-1'
+                    },
+                    {
+                        id: 'paypal',
+                        name: 'PayPal',
+                        paymentMethodType: 'paypal',
+                        accountId: 'paypal-account-1'
+                    }
                 ],
                 paymentMethodSetAccounts: [
                     {
@@ -168,6 +178,9 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
     const AddressDisplay = ({address}) => {
         return <div data-testid="address-display">{address?.fullName}</div>
     }
+    AddressDisplay.propTypes = {
+        address: () => null
+    }
     return AddressDisplay
 })
 
@@ -178,10 +191,21 @@ jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
             {children}
         </div>
     )
+    ToggleCard.propTypes = {
+        children: () => null,
+        title: () => null,
+        editing: () => null
+    }
     const ToggleCardEdit = ({children}) => <div data-testid="toggle-card-edit">{children}</div>
+    ToggleCardEdit.propTypes = {
+        children: () => null
+    }
     const ToggleCardSummary = ({children}) => (
         <div data-testid="toggle-card-summary">{children}</div>
     )
+    ToggleCardSummary.propTypes = {
+        children: () => null
+    }
     return {
         ToggleCard,
         ToggleCardEdit,
@@ -197,16 +221,15 @@ const mockRef = {current: null}
 
 const setupComponentAndGetPaymentElement = async () => {
     renderWithCheckoutContext(
-        <SFPaymentsSheet
-            ref={mockRef}
-            onCreateOrder={mockOnCreateOrder}
-            onError={mockOnError}
-        />
+        <SFPaymentsSheet ref={mockRef} onCreateOrder={mockOnCreateOrder} onError={mockOnError} />
     )
 
-    await waitFor(() => {
-        expect(mockCheckout).toHaveBeenCalled()
-    }, {timeout: 3000})
+    await waitFor(
+        () => {
+            expect(mockCheckout).toHaveBeenCalled()
+        },
+        {timeout: 3000}
+    )
 
     const checkoutCall = mockCheckout.mock.calls[0]
     return checkoutCall[4]
@@ -214,33 +237,34 @@ const setupComponentAndGetPaymentElement = async () => {
 
 const firePaymentMethodSelectedEvent = async (paymentElement, detail = {}) => {
     await act(async () => {
-        paymentElement.dispatchEvent(new CustomEvent('sfp:paymentmethodselected', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                selectedPaymentMethod: 'card',
-                ...detail
-            }
-        }))
+        paymentElement.dispatchEvent(
+            new CustomEvent('sfp:paymentmethodselected', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    selectedPaymentMethod: 'card',
+                    ...detail
+                }
+            })
+        )
     })
 }
 
 const firePaymentApproveEvent = async (paymentElement, detail = {}) => {
     await act(async () => {
-        paymentElement.dispatchEvent(new CustomEvent('sfp:paymentapprove', {
-            bubbles: true,
-            composed: true,
-            detail
-        }))
+        paymentElement.dispatchEvent(
+            new CustomEvent('sfp:paymentapprove', {
+                bubbles: true,
+                composed: true,
+                detail
+            })
+        )
     })
 }
 
 describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
-    let paymentElement = null
-
     beforeEach(() => {
         jest.clearAllMocks()
-        paymentElement = null
         mockRef.current = null
         mockCheckout.mockClear()
 
@@ -356,15 +380,20 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
-        await waitFor(() => {
-            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
-        }, {timeout: 3000})
+        await waitFor(
+            () => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            },
+            {timeout: 3000}
+        )
 
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
         const requestBody = updateCall[0].body
 
         expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe('on_session')
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
+            'on_session'
+        )
     })
 
     test('handlePaymentButtonApprove does not include setupFutureUsage when savePaymentMethodForFutureUse is false', async () => {
@@ -373,9 +402,12 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: false})
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: false})
 
-        await waitFor(() => {
-            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
-        }, {timeout: 3000})
+        await waitFor(
+            () => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            },
+            {timeout: 3000}
+        )
 
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
         const requestBody = updateCall[0].body
@@ -389,9 +421,12 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
-        await waitFor(() => {
-            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
-        }, {timeout: 3000})
+        await waitFor(
+            () => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            },
+            {timeout: 3000}
+        )
 
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
         const requestParams = updateCall[0].parameters
@@ -400,7 +435,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         expect(requestParams.orderNo).toBe('ORDER123')
         expect(requestParams.paymentInstrumentId).toBe('PI123')
         expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe('on_session')
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
+            'on_session'
+        )
         expect(requestBody.paymentReferenceRequest.paymentMethodType).toBe('card')
     })
 
@@ -429,29 +466,36 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             await config.actions.createIntent()
 
             await act(async () => {
-                paymentElement.dispatchEvent(new CustomEvent('sfp:paymentcancel', {
-                    bubbles: true,
-                    composed: true
-                }))
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentcancel', {
+                        bubbles: true,
+                        composed: true
+                    })
+                )
             })
 
-            await waitFor(() => {
-                expect(mockRemovePaymentInstrument).toHaveBeenCalled()
-                expect(mockOnError).toHaveBeenCalled()
-            }, {timeout: 3000})
+            await waitFor(
+                () => {
+                    expect(mockRemovePaymentInstrument).toHaveBeenCalled()
+                    expect(mockOnError).toHaveBeenCalled()
+                },
+                {timeout: 3000}
+            )
         })
 
         test('does nothing when no basket to cleanup', async () => {
             const paymentElement = await setupComponentAndGetPaymentElement()
 
             await act(async () => {
-                paymentElement.dispatchEvent(new CustomEvent('sfp:paymentcancel', {
-                    bubbles: true,
-                    composed: true
-                }))
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentcancel', {
+                        bubbles: true,
+                        composed: true
+                    })
+                )
             })
 
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise((resolve) => setTimeout(resolve, 500))
             expect(mockRemovePaymentInstrument).not.toHaveBeenCalled()
         })
     })
@@ -464,9 +508,12 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
 
             await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
-            await waitFor(() => {
-                expect(mockOnError).toHaveBeenCalled()
-            }, {timeout: 3000})
+            await waitFor(
+                () => {
+                    expect(mockOnError).toHaveBeenCalled()
+                },
+                {timeout: 3000}
+            )
         })
     })
 
@@ -483,9 +530,12 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
                 />
             )
 
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            }, {timeout: 3000})
+            await waitFor(
+                () => {
+                    expect(mockCheckout).toHaveBeenCalled()
+                },
+                {timeout: 3000}
+            )
 
             const checkoutCall = mockCheckout.mock.calls[0]
             const paymentElement = checkoutCall[4]
@@ -498,4 +548,3 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         })
     })
 })
-
