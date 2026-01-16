@@ -211,6 +211,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             },
             throwOnBadResponse: true,
             fetchOptions: {
+                credentials: 'same-origin',
                 ...options.fetchOptions,
                 ...fetchOptions
             }
@@ -252,7 +253,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency
             },
             throwOnBadResponse: true,
-            fetchOptions
+            fetchOptions: {
+                credentials: 'same-origin' as RequestCredentials,
+                ...fetchOptions
+            }
         }
 
         return {

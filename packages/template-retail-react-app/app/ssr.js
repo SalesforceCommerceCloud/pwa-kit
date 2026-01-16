@@ -79,7 +79,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: false,
+    localAllowCookies: true,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -342,7 +342,32 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
+const AUTH = {
+    username: 'storefront',
+    password: 'password'
+}
+
+function basicAuthMiddleware(req, res, next) {
+    const shouldSkipAuth =
+        req.path.startsWith('/proxy') ||
+        req.path.startsWith('/mobify') ||
+        req.path.startsWith('/callback')
+    if (shouldSkipAuth) {
+        return next()
+    }
+
+    const authorization = (req.get('authorization') || '').split(' ')[1] || ''
+    const [username, password] = Buffer.from(authorization, 'base64').toString().split(':')
+    const hasValidAuth = username == AUTH.username && password == AUTH.password
+    if (hasValidAuth) {
+        return next()
+    }
+
+    res.set('WWW-Authenticate', 'Basic realm="Storefront"')
+    res.status(401).send('Auth Required!')
+}
 const {handler} = runtime.createHandler(options, (app) => {
+    app.use(basicAuthMiddleware)
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
     // Set default HTTP security headers required by PWA Kit
