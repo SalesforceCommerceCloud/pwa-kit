@@ -147,7 +147,8 @@ const CheckoutOneClick = () => {
 
     // Form for billing address
     const billingAddressForm = useForm({
-        mode: 'onChange',
+        mode: 'onTouched',
+        reValidateMode: 'onChange',
         shouldUnregister: false,
         defaultValues: {...selectedBillingAddress}
     })
@@ -200,17 +201,66 @@ const CheckoutOneClick = () => {
         let billingAddress
         if (billingSameAsShipping && selectedShippingAddress) {
             billingAddress = selectedShippingAddress
+            // Validate that shipping address has required address fields
+            if (!billingAddress?.address1) {
+                showError(
+                    formatMessage({
+                        id: 'checkout.error.billing_address_required',
+                        defaultMessage: 'Please enter a billing address.'
+                    })
+                )
+                return
+            }
         } else {
-            const isFormValid = await billingAddressForm.trigger()
+            // Validate all required address fields (excluding phone for billing)
+            const fieldsToValidate = [
+                'address1',
+                'firstName',
+                'lastName',
+                'city',
+                'stateCode',
+                'postalCode',
+                'countryCode'
+            ]
+
+            // First, mark all fields as touched so errors will be displayed when validation runs
+            // This must happen BEFORE trigger() so errors show immediately
+            fieldsToValidate.forEach((field) => {
+                const currentValue = billingAddressForm.getValues(field) || ''
+                billingAddressForm.setValue(field, currentValue, {
+                    shouldValidate: false,
+                    shouldTouch: true
+                })
+            })
+
+            // Now trigger validation - errors will show because fields are already touched
+            const isFormValid = await billingAddressForm.trigger(fieldsToValidate)
 
             if (!isFormValid) {
+                // Payment section should already be open from onPlaceOrder
+                // Focus on the first name field (first field in the form)
+                setTimeout(() => {
+                    billingAddressForm.setFocus('firstName')
+                }, 100)
                 return
             }
             billingAddress = billingAddressForm.getValues()
+
+            // Double-check that address is present
+            if (!billingAddress?.address1) {
+                showError(
+                    formatMessage({
+                        id: 'checkout.error.billing_address_required',
+                        defaultMessage: 'Please enter a billing address.'
+                    })
+                )
+                setIsEditingPayment(true)
+                return
+            }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
+        const {addressId, creationDate, lastModified, preferred, phone, ...address} = billingAddress
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
         return await updateBillingAddressForBasket({
             body: address,
@@ -370,15 +420,20 @@ const CheckoutOneClick = () => {
                                     }
                                 })
                             }
+                        }
 
-                            // Also persist billing phone as phoneHome
-                            const phoneHome = order?.billingAddress?.phone
-                            if (phoneHome) {
-                                await updateCustomer.mutateAsync({
-                                    parameters: {customerId},
-                                    body: {phoneHome}
-                                })
-                            }
+                        // Persist phone number as phoneHome from shipping address or basket
+                        // Since billing address no longer has phone, get it from shipping address
+                        // For delivery orders, use shipping address phone; for pickup-only, use basket customerInfo phone
+                        const phoneHome =
+                            deliveryShipments.length > 0
+                                ? deliveryShipments[0]?.shippingAddress?.phone
+                                : basket?.customerInfo?.phone
+                        if (phoneHome) {
+                            await updateCustomer.mutateAsync({
+                                parameters: {customerId},
+                                body: {phoneHome}
+                            })
                         }
                     } catch (_e) {
                         // Only surface error if shopper opted to register/save details; otherwise fail silently
@@ -441,6 +496,13 @@ const CheckoutOneClick = () => {
                     await onPaymentSubmit(paymentFormValues)
                 }
             }
+
+            // Ensure payment section is open before validating billing address
+            // This ensures the billing form is rendered and visible when we validate
+            setIsEditingPayment(true)
+
+            // Wait for the payment section to open and billing form to render
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
             // submit, `undefined` is returned.

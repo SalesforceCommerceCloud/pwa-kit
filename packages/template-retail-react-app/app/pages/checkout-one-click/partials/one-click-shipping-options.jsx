@@ -18,7 +18,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     ToggleCard,
     ToggleCardEdit,

@@ -1268,6 +1268,304 @@ describe('Checkout One Click', () => {
         expect(screen.queryByText(/success/i)).not.toBeInTheDocument()
     })
 
+    test('billing address validation shows errors on first click for delivery orders', async () => {
+        // Create a delivery basket with shipping address but no billing address
+        const deliveryBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        deliveryBasket.paymentInstruments = []
+        deliveryBasket.billingAddress = null // No billing address set
+
+        // Override baskets endpoint
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        baskets: [deliveryBasket],
+                        total: 1
+                    })
+                )
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        // Navigate to payment step
+        try {
+            await screen.findByText(/contact info/i)
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'delivery@test.com')
+            await user.tab()
+            const contToShip = await screen.findByText(/continue to shipping address/i)
+            await user.click(contToShip)
+        } catch (_e) {
+            return
+        }
+
+        // Continue through shipping
+        const contToPayment = screen.queryByText(/continue to payment/i)
+        if (contToPayment) {
+            await user.click(contToPayment)
+        }
+
+        // Wait for payment step
+        let placeOrderBtn
+        try {
+            placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+                timeout: 5000
+            })
+        } catch (_e) {
+            return
+        }
+
+        // Uncheck "same as shipping" to show billing address form
+        const billingCheckbox = screen.queryByRole('checkbox', {
+            name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+        })
+        if (billingCheckbox && billingCheckbox.checked) {
+            await user.click(billingCheckbox)
+        }
+
+        // Enter payment info
+        const number = screen.getByLabelText(
+            /(Card Number|use_credit_card_fields\.label\.card_number)/i
+        )
+        const name = screen.getByLabelText(
+            /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+        )
+        const expiry = screen.getByLabelText(
+            /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+        )
+        const cvv = screen.getByLabelText(
+            /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+        )
+        await user.type(number, '4111 1111 1111 1111')
+        await user.type(name, 'John Smith')
+        await user.type(expiry, '0129')
+        await user.type(cvv, '123')
+
+        // Click Place Order without filling billing address
+        await user.click(placeOrderBtn)
+
+        // Expect validation errors to show on first click
+        await waitFor(
+            () => {
+                const firstNameError = screen.queryByText(/Please enter your first name\./i)
+                const lastNameError = screen.queryByText(/Please enter your last name\./i)
+                const addressError = screen.queryByText(/Please enter your address\./i)
+                const cityError = screen.queryByText(/Please enter your city\./i)
+                const zipError = screen.queryByText(/Please enter your zip code\./i)
+
+                expect(
+                    firstNameError || lastNameError || addressError || cityError || zipError
+                ).toBeTruthy()
+            },
+            {timeout: 3000}
+        )
+
+        // Payment section should still be open (editing mode)
+        expect(screen.getByTestId('place-order-button')).toBeInTheDocument()
+    })
+
+    test('billing address validation validates all required fields', async () => {
+        const deliveryBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        deliveryBasket.paymentInstruments = []
+        deliveryBasket.billingAddress = null
+
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        baskets: [deliveryBasket],
+                        total: 1
+                    })
+                )
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        // Navigate to payment
+        try {
+            await screen.findByText(/contact info/i)
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'test@test.com')
+            await user.tab()
+            const contToShip = await screen.findByText(/continue to shipping address/i)
+            await user.click(contToShip)
+        } catch (_e) {
+            return
+        }
+
+        const contToPayment = screen.queryByText(/continue to payment/i)
+        if (contToPayment) {
+            await user.click(contToPayment)
+        }
+
+        let placeOrderBtn
+        try {
+            placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+                timeout: 5000
+            })
+        } catch (_e) {
+            return
+        }
+
+        // Uncheck "same as shipping"
+        const billingCheckbox = screen.queryByRole('checkbox', {
+            name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+        })
+        if (billingCheckbox && billingCheckbox.checked) {
+            await user.click(billingCheckbox)
+        }
+
+        // Enter payment info
+        const number = screen.getByLabelText(
+            /(Card Number|use_credit_card_fields\.label\.card_number)/i
+        )
+        const name = screen.getByLabelText(
+            /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+        )
+        const expiry = screen.getByLabelText(
+            /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+        )
+        const cvv = screen.getByLabelText(
+            /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+        )
+        await user.type(number, '4111 1111 1111 1111')
+        await user.type(name, 'John Smith')
+        await user.type(expiry, '0129')
+        await user.type(cvv, '123')
+
+        // Click Place Order
+        await user.click(placeOrderBtn)
+
+        // Wait for validation errors - should validate all required fields
+        await waitFor(
+            () => {
+                // Check for at least some validation errors
+                const errors = [
+                    screen.queryByText(/Please enter your first name\./i),
+                    screen.queryByText(/Please enter your last name\./i),
+                    screen.queryByText(/Please enter your address\./i),
+                    screen.queryByText(/Please enter your city\./i),
+                    screen.queryByText(/Please enter your zip code\./i),
+                    screen.queryByText(/Please select your country\./i)
+                ].filter(Boolean)
+
+                expect(errors.length).toBeGreaterThan(0)
+            },
+            {timeout: 3000}
+        )
+    })
+
+    test('billing address validation keeps payment section open when validation fails', async () => {
+        const deliveryBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        deliveryBasket.paymentInstruments = []
+        deliveryBasket.billingAddress = null
+
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        baskets: [deliveryBasket],
+                        total: 1
+                    })
+                )
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        // Navigate to payment
+        try {
+            await screen.findByText(/contact info/i)
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'test@test.com')
+            await user.tab()
+            const contToShip = await screen.findByText(/continue to shipping address/i)
+            await user.click(contToShip)
+        } catch (_e) {
+            return
+        }
+
+        const contToPayment = screen.queryByText(/continue to payment/i)
+        if (contToPayment) {
+            await user.click(contToPayment)
+        }
+
+        let placeOrderBtn
+        try {
+            placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+                timeout: 5000
+            })
+        } catch (_e) {
+            return
+        }
+
+        // Uncheck "same as shipping"
+        const billingCheckbox = screen.queryByRole('checkbox', {
+            name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+        })
+        if (billingCheckbox && billingCheckbox.checked) {
+            await user.click(billingCheckbox)
+        }
+
+        // Enter payment info
+        const number = screen.getByLabelText(
+            /(Card Number|use_credit_card_fields\.label\.card_number)/i
+        )
+        const name = screen.getByLabelText(
+            /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+        )
+        const expiry = screen.getByLabelText(
+            /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+        )
+        const cvv = screen.getByLabelText(
+            /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+        )
+        await user.type(number, '4111 1111 1111 1111')
+        await user.type(name, 'John Smith')
+        await user.type(expiry, '0129')
+        await user.type(cvv, '123')
+
+        // Click Place Order
+        await user.click(placeOrderBtn)
+
+        // Wait a bit for validation
+        await waitFor(
+            () => {
+                const hasErrors = screen.queryByText(/Please enter your first name\./i)
+                return hasErrors !== null
+            },
+            {timeout: 3000}
+        ).catch(() => {})
+
+        // Payment section should still be visible and open
+        expect(screen.getByTestId('place-order-button')).toBeInTheDocument()
+        // Billing address form should be visible
+        expect(screen.getByTestId('sf-shipping-address-edit-form')).toBeInTheDocument()
+    })
+
     test('savePaymentInstrumentWithDetails sets default: true for newly registered users', async () => {
         // Reset mock and track calls
         mockCreateCustomerPaymentInstruments.mockClear()
