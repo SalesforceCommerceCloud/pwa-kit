@@ -89,32 +89,30 @@ const Registration = () => {
     }, [])
 
     return (
-        <>
-            <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
-                <Heading as="h1" srOnly>
-                    <FormattedMessage
-                        defaultMessage="Create Account"
-                        id="registration.title.create_account"
-                    />
-                </Heading>
-                <Seo title="Registration" description="Customer sign up" />
-                <Container
-                    paddingTop={16}
-                    width={['100%', '407px']}
-                    bg="white"
-                    paddingBottom={14}
-                    marginTop={8}
-                    marginBottom={8}
-                    borderRadius="base"
-                >
-                    <RegisterForm
-                        submitForm={submitForm}
-                        form={form}
-                        clickSignIn={() => navigate('/login')}
-                    />
-                </Container>
-            </Box>
-        </>
+        <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Create Account"
+                    id="registration.title.create_account"
+                />
+            </Heading>
+            <Seo title="Registration" description="Customer sign up" />
+            <Container
+                paddingTop={16}
+                width={['100%', '407px']}
+                bg="white"
+                paddingBottom={14}
+                marginTop={8}
+                marginBottom={8}
+                borderRadius="base"
+            >
+                <RegisterForm
+                    submitForm={submitForm}
+                    form={form}
+                    clickSignIn={() => navigate('/login')}
+                />
+            </Container>
+        </Box>
     )
 }
 
