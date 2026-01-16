@@ -88,9 +88,10 @@ const AccountOrderHistory = () => {
     const searchParams = useSearchParams(DEFAULT_ORDERS_SEARCH_PARAMS)
     const {limit, offset} = searchParams[0]
 
+    // expand: 'oms' returns order data from OMS if successfully ingested, otherwise from ECOM
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
         {
-            parameters: {customerId, limit, offset}
+            parameters: {customerId, limit, offset, expand: 'oms'}
         },
         {enabled: onClient && !!customerId}
     )
@@ -180,7 +181,9 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">{order.status}</Badge>
+                                        <Badge colorScheme="green">
+                                            {order.status || order.omsData?.status}
+                                        </Badge>
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
@@ -219,7 +222,12 @@ const AccountOrderHistory = () => {
                                             defaultMessage="Shipped to: {name}"
                                             id="account_order_history.label.shipped_to"
                                             values={{
-                                                name: `${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`
+                                                name:
+                                                    order.shipments[0].shippingAddress.firstName &&
+                                                    order.shipments[0].shippingAddress.lastName
+                                                        ? `${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`
+                                                        : order.shipments[0].shippingAddress
+                                                              .fullName
                                             }}
                                         />
                                     </Text>
