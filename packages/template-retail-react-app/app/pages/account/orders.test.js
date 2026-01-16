@@ -239,6 +239,122 @@ describe('Handles order with missing or partial data gracefully', () => {
     })
 })
 
+// Helper to setup order details page with mock order data
+const setupOrderDetailsPage = (mockOrder) => {
+    global.server.use(
+        rest.get('*/orders/:orderNo', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrder))
+        })
+    )
+    window.history.pushState(
+        {},
+        'Order Details',
+        createPathWithDefaults(`/account/orders/${mockOrder.orderNo}`)
+    )
+    renderWithProviders(<MockedComponent history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+}
+
+describe('Order with ECOM status (non-OMS)', () => {
+    beforeEach(async () => {
+        const ecomOrder = {
+            ...mockOrderHistory.data[0],
+            status: 'new'
+        }
+        setupOrderDetailsPage(ecomOrder)
+    })
+
+    test('should display ECOM status when present', async () => {
+        const statusBadge = await screen.findByText('new')
+        expect(statusBadge).toBeInTheDocument()
+    })
+})
+
+describe('Order with OMS data', () => {
+    beforeEach(async () => {
+        const omsOrder = {
+            ...mockOrderHistory.data[0],
+            status: undefined,
+            omsData: {status: 'SHIPPED'}
+        }
+        setupOrderDetailsPage(omsOrder)
+    })
+
+    test('should display OMS status when ECOM status is not present', async () => {
+        const statusBadge = await screen.findByText('SHIPPED')
+        expect(statusBadge).toBeInTheDocument()
+    })
+})
+
+describe('Order without payment data', () => {
+    beforeEach(async () => {
+        const orderWithoutPayment = {
+            ...mockOrderHistory.data[0],
+            paymentInstruments: []
+        }
+        setupOrderDetailsPage(orderWithoutPayment)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should not display payment method section', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByText(/payment method/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('Order with firstName and lastName for shipping address', () => {
+    beforeEach(async () => {
+        const orderWithNames = {
+            ...mockOrderHistory.data[0],
+            shipments: [
+                {
+                    ...mockOrderHistory.data[0].shipments[0],
+                    shippingAddress: {
+                        ...mockOrderHistory.data[0].shipments[0].shippingAddress,
+                        firstName: 'Jane',
+                        lastName: 'Doe',
+                        fullName: 'Should Not Display'
+                    }
+                }
+            ]
+        }
+        setupOrderDetailsPage(orderWithNames)
+    })
+
+    test('should display firstName + lastName when both present', async () => {
+        expect(await screen.findByText(/Jane Doe/i)).toBeInTheDocument()
+        expect(screen.queryByText(/Should Not Display/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('Order with fullName fallback for shipping address', () => {
+    beforeEach(async () => {
+        const orderWithFullName = {
+            ...mockOrderHistory.data[0],
+            shipments: [
+                {
+                    ...mockOrderHistory.data[0].shipments[0],
+                    shippingAddress: {
+                        ...mockOrderHistory.data[0].shipments[0].shippingAddress,
+                        firstName: undefined,
+                        lastName: undefined,
+                        fullName: 'John Smith'
+                    }
+                }
+            ]
+        }
+        setupOrderDetailsPage(orderWithFullName)
+    })
+
+    test('should display fullName when firstName and lastName are not present', async () => {
+        expect(await screen.findByText(/John Smith/i)).toBeInTheDocument()
+    })
+})
+
 describe('Order with multiple shipments (pickup and delivery)', () => {
     let orderNo
 

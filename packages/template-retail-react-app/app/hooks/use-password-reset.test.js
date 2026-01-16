@@ -9,14 +9,14 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const mockEmail = 'test@email.com'
 const mockToken = '123456'
 const mockNewPassword = 'new-password'
 
 const MockComponent = () => {
-    const {getPasswordResetToken, resetPassword} = usePasswordReset()
-
+    const {getPasswordResetToken, resetPassword, resetPasswordLandingPath} = usePasswordReset()
     return (
         <div>
             <button
@@ -33,6 +33,8 @@ const MockComponent = () => {
                     })
                 }
             />
+
+            <div data-testid="reset-password-landing-path">{resetPasswordLandingPath}</div>
         </div>
     )
 }
@@ -90,5 +92,12 @@ describe('usePasswordReset', () => {
                 expect.anything()
             )
         })
+    })
+
+    test('resetPasswordLandingPath is returned', () => {
+        renderWithProviders(<MockComponent />)
+        expect(screen.getByTestId('reset-password-landing-path')).toHaveTextContent(
+            mockConfig.app.login.resetPassword.landingPath
+        )
     })
 })
