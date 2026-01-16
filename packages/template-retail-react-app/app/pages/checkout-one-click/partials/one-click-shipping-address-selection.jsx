@@ -70,7 +70,7 @@ const ShippingAddressEditForm = ({
                         form={form}
                         formTitleAriaLabel={formTitleAriaLabel}
                         isBillingAddress={isBillingAddress}
-                        hidePhone={hidePhone}
+                        hidePhone={hidePhone || !isBillingAddress}
                         hidePreferred={true}
                     />
 
@@ -357,7 +357,7 @@ const ShippingAddressSelection = ({
                                                             toggleAddressEdit={toggleAddressEdit}
                                                             hideSubmitButton={hideSubmitButton}
                                                             form={form}
-                                                            hidePhone={!isBillingAddress}
+                                                            hidePhone={isBillingAddress}
                                                             submitButtonLabel={submitButtonLabel}
                                                             formTitleAriaLabel={formTitleAriaLabel}
                                                         />
@@ -416,7 +416,7 @@ const ShippingAddressSelection = ({
                         hideSubmitButton={hideSubmitButton}
                         form={form}
                         isBillingAddress={isBillingAddress}
-                        hidePhone={!isBillingAddress}
+                        hidePhone={isBillingAddress}
                         hidePreferred={true}
                         submitButtonLabel={submitButtonLabel}
                         formTitleAriaLabel={formTitleAriaLabel}

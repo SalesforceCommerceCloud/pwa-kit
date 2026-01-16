@@ -983,6 +983,12 @@
       "value": "Place Order"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "Please enter a billing address."
+    }
+  ],
   "checkout.error.cannot_save_address": [
     {
       "type": 0,

@@ -1927,6 +1927,20 @@
       "value": "]"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ȧȧ ƀīŀŀīƞɠ ȧȧḓḓřḗḗşş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout.error.cannot_save_address": [
     {
       "type": 0,
