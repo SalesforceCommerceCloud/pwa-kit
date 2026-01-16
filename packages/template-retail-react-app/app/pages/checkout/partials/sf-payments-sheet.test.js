@@ -850,7 +850,7 @@ describe('SFPaymentsSheet', () => {
             )
         })
 
-        test('confirmPayment calls confirm with setup_future_usage when savePaymentMethodForFutureUse event was fired', async () => {
+        test('confirmPayment includes setup_future_usage when savePaymentMethodForFutureUse is true', async () => {
             const ref = React.createRef()
             setupConfirmPaymentMocks()
 
@@ -898,7 +898,7 @@ describe('SFPaymentsSheet', () => {
             expect(paymentIntent.setup_future_usage).toBe('on_session')
         })
 
-        test('confirmPayment reads savePaymentMethodRef and passes it to createAndUpdateOrder when event was fired', async () => {
+        test('confirmPayment passes savePaymentMethodRef to createAndUpdateOrder', async () => {
             const ref = React.createRef()
             setupConfirmPaymentMocks()
 
@@ -948,7 +948,7 @@ describe('SFPaymentsSheet', () => {
             ).toBe('on_session')
         })
 
-        test('confirmPayment calls confirm without setup_future_usage when savePaymentMethodForFutureUse was false', async () => {
+        test('confirmPayment excludes setup_future_usage when savePaymentMethodForFutureUse is false', async () => {
             const ref = React.createRef()
             setupConfirmPaymentMocks()
 
