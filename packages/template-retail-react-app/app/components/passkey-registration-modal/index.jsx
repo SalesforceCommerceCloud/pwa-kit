@@ -53,6 +53,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const commerceApiConfig = config.app.commerceAPI
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
+    const startWebauthnUserRegistration = useAuthHelper(AuthHelpers.StartWebauthnUserRegistration)
 
     const handleRegisterPasskey = async () => {
         setIsLoading(true)
@@ -80,8 +81,14 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     }
 
     const handleOtpVerification = async (code) => {
-        // TODO: Implement OTP verification
-        return {success: true}
+        try {
+            await startWebauthnUserRegistration.mutateAsync({
+                user_id: customer.email,
+                pwd_action_token: code
+            })
+        } catch (err) {
+            setError(err.message || 'Failed to start webauthn user registration')
+        }
     }
 
     const resetState = () => {
