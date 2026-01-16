@@ -354,6 +354,9 @@
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "Please enter a billing address."
+  },
   "checkout.error.cannot_save_address": {
     "defaultMessage": "Could not save shipping address."
   },
