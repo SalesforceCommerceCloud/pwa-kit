@@ -305,6 +305,35 @@ const createMockOrder = (overrides = {}) => ({
     ...overrides
 })
 
+const setupConfirmPaymentMocks = () => {
+    const mockOrder = createMockOrder()
+    mockUpdateBillingAddress.mockResolvedValue({
+        ...mockBasket,
+        billingAddress: mockBasket.shipments[0].shippingAddress,
+        paymentInstruments: []
+    })
+    mockAddPaymentInstrument.mockResolvedValue({
+        ...mockBasket,
+        paymentInstruments: [
+            {
+                paymentInstrumentId: 'PI123',
+                paymentMethodId: 'Salesforce Payments',
+                paymentReference: {
+                    clientSecret: 'secret123',
+                    paymentReferenceId: 'ref123'
+                }
+            }
+        ]
+    })
+    mockOnCreateOrder.mockResolvedValue(mockOrder)
+    mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+    mockCheckoutConfirm.mockResolvedValue({
+        responseCode: STATUS_SUCCESS,
+        data: {}
+    })
+    return mockOrder
+}
+
 describe('SFPaymentsSheet', () => {
     const mockRef = {current: null}
 
@@ -819,6 +848,152 @@ describe('SFPaymentsSheet', () => {
                 },
                 {timeout: 3000}
             )
+        })
+
+        test('confirmPayment calls confirm with setup_future_usage when savePaymentMethodForFutureUse event was fired', async () => {
+            const ref = React.createRef()
+            setupConfirmPaymentMocks()
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'card',
+                            savePaymentMethodForFutureUse: true
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockCheckoutConfirm).toHaveBeenCalled()
+            })
+
+            const confirmCall = mockCheckoutConfirm.mock.calls[0]
+            const paymentIntentFunction = confirmCall[0]
+            const paymentIntent = await paymentIntentFunction()
+
+            expect(paymentIntent.setup_future_usage).toBe('on_session')
+        })
+
+        test('confirmPayment reads savePaymentMethodRef and passes it to createAndUpdateOrder when event was fired', async () => {
+            const ref = React.createRef()
+            setupConfirmPaymentMocks()
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'card',
+                            savePaymentMethodForFutureUse: true
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            })
+
+            const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+            const requestBody = updateCall[0].body
+
+            expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
+            expect(
+                requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage
+            ).toBe('on_session')
+        })
+
+        test('confirmPayment calls confirm without setup_future_usage when savePaymentMethodForFutureUse was false', async () => {
+            const ref = React.createRef()
+            setupConfirmPaymentMocks()
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'card',
+                            savePaymentMethodForFutureUse: false
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockCheckoutConfirm).toHaveBeenCalled()
+            })
+
+            const confirmCall = mockCheckoutConfirm.mock.calls[0]
+            const paymentIntentFunction = confirmCall[0]
+            const paymentIntent = await paymentIntentFunction()
+
+            expect(paymentIntent.setup_future_usage).toBeUndefined()
         })
     })
 
