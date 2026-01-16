@@ -236,8 +236,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     <LoginForm
                         form={form}
                         submitForm={(data) => {
-                            const shouldUsePasswordless =
-                                isPasswordlessEnabled && !data.password
+                            const shouldUsePasswordless = isPasswordlessEnabled && !data.password
                             return submitForm(data, shouldUsePasswordless)
                         }}
                         clickCreateAccount={() => navigate('/registration')}
@@ -257,7 +256,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 )}
             </Container>
         </Box>
-
     )
 }
 
