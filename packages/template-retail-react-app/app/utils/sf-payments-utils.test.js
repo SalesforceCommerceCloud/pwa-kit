@@ -1323,7 +1323,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct'}]
             const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'paypal_acct'}]
 
-            const result = getGatewayFromPaymentMethod('paypal', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'paypal',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBeNull()
         })
@@ -1332,7 +1336,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'venmo', accountId: 'venmo_acct'}]
             const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'venmo_acct'}]
 
-            const result = getGatewayFromPaymentMethod('venmo', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'venmo',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBeNull()
         })
@@ -1341,7 +1349,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'stripe_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_acct_123'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBe('stripe')
         })
@@ -1350,7 +1362,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBe('adyen')
         })
@@ -1359,7 +1375,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'other', accountId: 'other_acct'}]
             const paymentMethodSetAccounts = [{vendor: 'Other', accountId: 'other_acct'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBeNull()
         })
@@ -1368,7 +1388,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'stripe_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'different_acct'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBeNull()
         })
@@ -1393,7 +1417,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'stripe_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'STRIPE', accountId: 'stripe_acct_123'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBe('stripe')
         })
@@ -1402,7 +1430,11 @@ describe('sf-payments-utils', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'other_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'OtherGateway', accountId: 'other_acct_123'}]
 
-            const result = getGatewayFromPaymentMethod('card', paymentMethods, paymentMethodSetAccounts)
+            const result = getGatewayFromPaymentMethod(
+                'card',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
 
             expect(result).toBeNull()
         })
