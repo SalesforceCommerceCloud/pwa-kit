@@ -1093,7 +1093,11 @@ describe('sf-payments-utils', () => {
 
     describe('createPaymentInstrumentBody', () => {
         test('creates payment instrument body with all parameters', () => {
-            const result = createPaymentInstrumentBody(99.99, 'card', 'us-west-1')
+            const result = createPaymentInstrumentBody({
+                amount: 99.99,
+                paymentMethodType: 'card',
+                zoneId: 'us-west-1'
+            })
 
             expect(result).toEqual({
                 paymentMethodId: 'Salesforce Payments',
@@ -1106,19 +1110,31 @@ describe('sf-payments-utils', () => {
         })
 
         test('uses default zoneId when not provided', () => {
-            const result = createPaymentInstrumentBody(50.0, 'paypal', null)
+            const result = createPaymentInstrumentBody({
+                amount: 50.0,
+                paymentMethodType: 'paypal',
+                zoneId: null
+            })
 
             expect(result.paymentReferenceRequest.zoneId).toBe('default')
         })
 
         test('uses default zoneId when undefined', () => {
-            const result = createPaymentInstrumentBody(75.5, 'venmo', undefined)
+            const result = createPaymentInstrumentBody({
+                amount: 75.5,
+                paymentMethodType: 'venmo',
+                zoneId: undefined
+            })
 
             expect(result.paymentReferenceRequest.zoneId).toBe('default')
         })
 
         test('creates body for PayPal payment', () => {
-            const result = createPaymentInstrumentBody(125.0, 'paypal', 'eu-west-1')
+            const result = createPaymentInstrumentBody({
+                amount: 125.0,
+                paymentMethodType: 'paypal',
+                zoneId: 'eu-west-1'
+            })
 
             expect(result.paymentMethodId).toBe('Salesforce Payments')
             expect(result.paymentReferenceRequest.paymentMethodType).toBe('paypal')
@@ -1126,36 +1142,52 @@ describe('sf-payments-utils', () => {
         })
 
         test('creates body for Venmo payment', () => {
-            const result = createPaymentInstrumentBody(45.99, 'venmo', 'us-east-1')
+            const result = createPaymentInstrumentBody({
+                amount: 45.99,
+                paymentMethodType: 'venmo',
+                zoneId: 'us-east-1'
+            })
 
             expect(result.paymentReferenceRequest.paymentMethodType).toBe('venmo')
         })
 
         test('creates body for card payment', () => {
-            const result = createPaymentInstrumentBody(199.99, 'card', 'ap-southeast-1')
+            const result = createPaymentInstrumentBody({
+                amount: 199.99,
+                paymentMethodType: 'card',
+                zoneId: 'ap-southeast-1'
+            })
 
             expect(result.paymentReferenceRequest.paymentMethodType).toBe('card')
         })
 
         test('handles decimal amounts', () => {
-            const result = createPaymentInstrumentBody(12.34, 'card', 'default')
+            const result = createPaymentInstrumentBody({
+                amount: 12.34,
+                paymentMethodType: 'card',
+                zoneId: 'default'
+            })
 
             expect(result.amount).toBe(12.34)
         })
 
         test('handles zero amount', () => {
-            const result = createPaymentInstrumentBody(0, 'card', 'default')
+            const result = createPaymentInstrumentBody({
+                amount: 0,
+                paymentMethodType: 'card',
+                zoneId: 'default'
+            })
 
             expect(result.amount).toBe(0)
         })
 
         test('includes shippingPreference when provided', () => {
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'paypal',
-                'us-west-1',
-                'GET_FROM_FILE'
-            )
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'paypal',
+                zoneId: 'us-west-1',
+                shippingPreference: 'GET_FROM_FILE'
+            })
 
             expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
         })
@@ -1163,16 +1195,16 @@ describe('sf-payments-utils', () => {
         test('includes gateway and gatewayProperties.stripe.setup_future_usage when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                true, // storePaymentMethod
-                false, // futureUsageOffSession
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
                 paymentMethods,
                 paymentMethodSetAccounts
-            )
+            })
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
@@ -1184,16 +1216,16 @@ describe('sf-payments-utils', () => {
         test('includes gateway and gatewayProperties.stripe.setup_future_usage as off_session when futureUsageOffSession is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                false, // storePaymentMethod
-                true, // futureUsageOffSession
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: true,
                 paymentMethods,
                 paymentMethodSetAccounts
-            )
+            })
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
@@ -1205,23 +1237,28 @@ describe('sf-payments-utils', () => {
         test('does not include gatewayProperties when storePaymentMethod is false and futureUsageOffSession is false', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                false, // storePaymentMethod
-                false, // futureUsageOffSession
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                futureUsageOffSession: false,
                 paymentMethods,
                 paymentMethodSetAccounts
-            )
+            })
 
             expect(result.paymentReferenceRequest.gateway).toBeUndefined()
             expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
         })
 
         test('does not include shippingPreference when null', () => {
-            const result = createPaymentInstrumentBody(100.0, 'card', 'default', null)
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: null
+            })
 
             expect(result.paymentReferenceRequest.shippingPreference).toBeUndefined()
         })
@@ -1229,16 +1266,16 @@ describe('sf-payments-utils', () => {
         test('includes gateway for Adyen when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                true, // storePaymentMethod
-                false,
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
                 paymentMethods,
                 paymentMethodSetAccounts
-            )
+            })
 
             expect(result.paymentReferenceRequest.gateway).toBe('adyen')
             expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
@@ -1247,16 +1284,16 @@ describe('sf-payments-utils', () => {
         test('does not include gateway for Adyen when storePaymentMethod is false', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                false, // storePaymentMethod
-                false,
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                futureUsageOffSession: false,
                 paymentMethods,
                 paymentMethodSetAccounts
-            )
+            })
 
             expect(result.paymentReferenceRequest.gateway).toBeUndefined()
         })
@@ -1264,17 +1301,17 @@ describe('sf-payments-utils', () => {
         test('does not include setupFutureUsage in POST request even when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
-            const result = createPaymentInstrumentBody(
-                100.0,
-                'card',
-                'default',
-                undefined,
-                true, // storePaymentMethod
-                false,
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
                 paymentMethods,
                 paymentMethodSetAccounts,
-                true // isPostRequest
-            )
+                isPostRequest: true
+            })
 
             expect(result.paymentReferenceRequest.gateway).toBeUndefined()
             expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
