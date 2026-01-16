@@ -243,7 +243,7 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
-        if ((loggingIn || registering) && customer.data && config?.app?.login?.passkey?.enabled) {
+        if (config?.app?.login?.passkey?.enabled) {
             // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
