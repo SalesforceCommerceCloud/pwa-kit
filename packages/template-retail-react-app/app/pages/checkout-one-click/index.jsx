@@ -57,7 +57,7 @@ import {nanoid} from 'nanoid'
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, STEPS} = useCheckout()
+    const {step, STEPS, contactPhone} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
@@ -422,11 +422,12 @@ const CheckoutOneClick = () => {
                             }
                         }
 
-                        // Persist phone number as phoneHome from shipping address or basket
-                        // Since billing address no longer has phone, get it from shipping address
-                        // For delivery orders, use shipping address phone; for pickup-only, use basket customerInfo phone
+                        // Persist phone number as phoneHome from contact info, shipping address, or basket
+                        // Priority: contactPhone (from contact info form) > shipping address phone > basket customerInfo phone
                         const phoneHome =
-                            deliveryShipments.length > 0
+                            contactPhone && contactPhone.length > 0
+                                ? contactPhone
+                                : deliveryShipments.length > 0
                                 ? deliveryShipments[0]?.shippingAddress?.phone
                                 : basket?.customerInfo?.phone
                         if (phoneHome) {

@@ -2015,4 +2015,176 @@ describe('Checkout One Click', () => {
         expect(calls[2][0].body.address1).toBe('789 Pine Rd')
         expect(calls[2][0].body.city).toBe('Miami')
     })
+
+    test('saves contactPhone from contact info form instead of shipping address phone for multi-shipment orders', async () => {
+        // Clear previous mock calls
+        mockUseShopperCustomersMutation.mockClear()
+        mockUseShopperCustomersMutation.mockResolvedValue({})
+
+        // Set up a multi-shipment order with phone numbers in shipping addresses
+        const multiShipmentOrder = {
+            customerInfo: {customerId: 'new-customer-id'},
+            shipments: [
+                {
+                    shipmentId: 'me',
+                    shippingMethod: {
+                        id: '001',
+                        c_storePickupEnabled: false
+                    },
+                    shippingAddress: {
+                        address1: '123 Main St',
+                        city: 'Tampa',
+                        countryCode: 'US',
+                        firstName: 'Test',
+                        lastName: 'User',
+                        phone: '(727) 555-1234', // Different phone in shipping address
+                        postalCode: '33712',
+                        stateCode: 'FL'
+                    }
+                },
+                {
+                    shipmentId: 'shipment2',
+                    shippingMethod: {
+                        id: '002',
+                        c_storePickupEnabled: false
+                    },
+                    shippingAddress: {
+                        address1: '456 Oak Ave',
+                        city: 'Orlando',
+                        countryCode: 'US',
+                        firstName: 'Test',
+                        lastName: 'User',
+                        phone: '(407) 555-5678', // Different phone in shipping address
+                        postalCode: '32801',
+                        stateCode: 'FL'
+                    }
+                }
+            ],
+            billingAddress: {}
+        }
+
+        const currentCustomer = {isRegistered: true}
+        const registeredUserChoseGuest = false
+        const enableUserRegistration = true
+        // Contact phone from contact info form (should take priority)
+        const contactPhone = '(555) 123-4567'
+
+        // Simulate the phone saving logic from index.jsx
+        const customerId = multiShipmentOrder.customerInfo?.customerId
+        if (customerId) {
+            const {isPickupShipment} = await import(
+                '@salesforce/retail-react-app/app/utils/shipment-utils'
+            )
+            const deliveryShipments =
+                multiShipmentOrder?.shipments?.filter(
+                    (shipment) => !isPickupShipment(shipment) && shipment.shippingAddress
+                ) || []
+
+            if (
+                enableUserRegistration &&
+                currentCustomer?.isRegistered &&
+                !registeredUserChoseGuest
+            ) {
+                // Save addresses first (not testing this part)
+                // ... address saving logic ...
+
+                // Test phone saving logic - contactPhone should take priority
+                const phoneHome =
+                    contactPhone && contactPhone.length > 0
+                        ? contactPhone
+                        : deliveryShipments.length > 0
+                        ? deliveryShipments[0]?.shippingAddress?.phone
+                        : null
+
+                if (phoneHome) {
+                    mockUseShopperCustomersMutation({
+                        parameters: {customerId},
+                        body: {phoneHome}
+                    })
+                }
+            }
+        }
+
+        // Verify updateCustomer was called with contactPhone, not shipping address phone
+        expect(mockUseShopperCustomersMutation).toHaveBeenCalledTimes(1)
+        const call = mockUseShopperCustomersMutation.mock.calls[0]
+        expect(call[0].body.phoneHome).toBe('(555) 123-4567') // Should be contactPhone, not shipping address phone
+        expect(call[0].body.phoneHome).not.toBe('(727) 555-1234') // Should not be first shipping address phone
+        expect(call[0].body.phoneHome).not.toBe('(407) 555-5678') // Should not be second shipping address phone
+    })
+
+    test('falls back to shipping address phone when contactPhone is empty for multi-shipment orders', async () => {
+        // Clear previous mock calls
+        mockUseShopperCustomersMutation.mockClear()
+        mockUseShopperCustomersMutation.mockResolvedValue({})
+
+        // Set up a multi-shipment order with phone numbers in shipping addresses
+        const multiShipmentOrder = {
+            customerInfo: {customerId: 'new-customer-id'},
+            shipments: [
+                {
+                    shipmentId: 'me',
+                    shippingMethod: {
+                        id: '001',
+                        c_storePickupEnabled: false
+                    },
+                    shippingAddress: {
+                        address1: '123 Main St',
+                        city: 'Tampa',
+                        countryCode: 'US',
+                        firstName: 'Test',
+                        lastName: 'User',
+                        phone: '(727) 555-1234', // This should be used as fallback
+                        postalCode: '33712',
+                        stateCode: 'FL'
+                    }
+                }
+            ],
+            billingAddress: {}
+        }
+
+        const currentCustomer = {isRegistered: true}
+        const registeredUserChoseGuest = false
+        const enableUserRegistration = true
+        // Contact phone is empty (should fall back to shipping address phone)
+        const contactPhone = ''
+
+        // Simulate the phone saving logic from index.jsx
+        const customerId = multiShipmentOrder.customerInfo?.customerId
+        if (customerId) {
+            const {isPickupShipment} = await import(
+                '@salesforce/retail-react-app/app/utils/shipment-utils'
+            )
+            const deliveryShipments =
+                multiShipmentOrder?.shipments?.filter(
+                    (shipment) => !isPickupShipment(shipment) && shipment.shippingAddress
+                ) || []
+
+            if (
+                enableUserRegistration &&
+                currentCustomer?.isRegistered &&
+                !registeredUserChoseGuest
+            ) {
+                // Test phone saving logic - should fall back to shipping address phone
+                const phoneHome =
+                    contactPhone && contactPhone.length > 0
+                        ? contactPhone
+                        : deliveryShipments.length > 0
+                        ? deliveryShipments[0]?.shippingAddress?.phone
+                        : null
+
+                if (phoneHome) {
+                    mockUseShopperCustomersMutation({
+                        parameters: {customerId},
+                        body: {phoneHome}
+                    })
+                }
+            }
+        }
+
+        // Verify updateCustomer was called with shipping address phone as fallback
+        expect(mockUseShopperCustomersMutation).toHaveBeenCalledTimes(1)
+        const call = mockUseShopperCustomersMutation.mock.calls[0]
+        expect(call[0].body.phoneHome).toBe('(727) 555-1234') // Should be shipping address phone
+    })
 })

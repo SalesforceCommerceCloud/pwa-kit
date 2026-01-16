@@ -404,7 +404,7 @@ describe('UserRegistration', () => {
     test('shows loading overlay when guest user clicks registration checkbox', async () => {
         const user = userEvent.setup()
         const onLoadingChange = jest.fn()
-        const {} = setup({
+        setup({
             onLoadingChange,
             authorizeMutate: jest.fn().mockImplementation(() => {
                 // Simulate async delay
