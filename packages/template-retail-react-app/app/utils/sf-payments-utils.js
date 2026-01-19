@@ -5,6 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {
+    PAYMENT_METHOD_TYPES,
+    PAYMENT_GATEWAYS,
+    SETUP_FUTURE_USAGE
+} from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Helper function to read the client secret from the payment instrument
  * @param {Object} paymentInstrument - Payment instrument object
@@ -131,31 +137,144 @@ export const isShippingMethodValid = (currentBasket, updatedShippingMethods) => 
  * @returns {boolean} Whether the payment method type uses PayPal
  */
 export const isPayPalPaymentMethodType = (paymentMethodType) => {
-    return paymentMethodType === 'paypal' || paymentMethodType === 'venmo'
+    return (
+        paymentMethodType === PAYMENT_METHOD_TYPES.PAYPAL ||
+        paymentMethodType === PAYMENT_METHOD_TYPES.VENMO
+    )
+}
+
+/**
+ * Finds the payment account/gateway for a given payment method type from payment method set accounts.
+ * @param {Array} paymentMethods - Array of payment methods
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @param {string} paymentMethodType - Type of payment method
+ * @returns {Object|null} Payment account object with vendor property, or null if not found
+ */
+export const findPaymentAccount = (paymentMethods, paymentMethodSetAccounts, paymentMethodType) => {
+    if (!paymentMethodSetAccounts || !Array.isArray(paymentMethodSetAccounts)) {
+        return null
+    }
+
+    // Find payment method by type to get its accountId
+    const paymentMethod = paymentMethods?.find((pm) => pm.paymentMethodType === paymentMethodType)
+    if (!paymentMethod || !paymentMethod.accountId) {
+        return null
+    }
+
+    // Find account by accountId
+    return (
+        paymentMethodSetAccounts.find((account) => {
+            return account.accountId === paymentMethod.accountId
+        }) || null
+    )
+}
+
+/**
+ * Determines the gateway name from payment method type and payment method set accounts.
+ * @param {string} paymentMethodType - Type of payment method
+ * @param {Array} paymentMethods - Array of payment methods
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @returns {string|null} Gateway name
+ */
+export const getGatewayFromPaymentMethod = (
+    paymentMethodType,
+    paymentMethods,
+    paymentMethodSetAccounts
+) => {
+    if (isPayPalPaymentMethodType(paymentMethodType)) {
+        return null
+    }
+
+    const account = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, paymentMethodType)
+    if (!account) {
+        return null
+    }
+
+    const vendor = account.vendor?.toLowerCase()
+    if (vendor === PAYMENT_GATEWAYS.STRIPE) {
+        return PAYMENT_GATEWAYS.STRIPE
+    } else if (vendor === PAYMENT_GATEWAYS.ADYEN) {
+        return PAYMENT_GATEWAYS.ADYEN
+    }
+
+    return null
+}
+
+/**
+ * Determines the setup_future_usage value for Stripe payment intents based on configuration and user preference.
+ * @param {boolean} storePaymentMethod - Whether the user wants to save the payment method
+ * @param {boolean} futureUsageOffSession - Whether off-session future usage is enabled in configuration
+ * @returns {string|null} 'on_session', 'off_session', or null
+ */
+export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) => {
+    if (futureUsageOffSession) {
+        return SETUP_FUTURE_USAGE.OFF_SESSION
+    } else if (storePaymentMethod) {
+        return SETUP_FUTURE_USAGE.ON_SESSION
+    }
+    return null
 }
 
 /**
  * Creates a payment instrument body for Salesforce Payments (for basket or order).
- * @param {number} amount - Payment amount
- * @param {string} paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
- * @param {string} zoneId - Zone ID for payment processing
- * @param {string} shippingPreference - optional shipping preference for PayPal payment processing
+ * @param {Object} params - Parameters for creating payment instrument body
+ * @param {number} params.amount - Payment amount
+ * @param {string} params.paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
+ * @param {string} params.zoneId - Zone ID for payment processing
+ * @param {string} [params.shippingPreference] - Optional shipping preference for PayPal payment processing
+ * @param {boolean} [params.storePaymentMethod=false] - Optional flag to save payment method for future use
+ * @param {boolean} [params.futureUsageOffSession=false] - Optional flag indicating if off-session future usage is enabled (from payment config)
+ * @param {Array} [params.paymentMethods] - Optional array of payment methods to determine gateway
+ * @param {Array} [params.paymentMethodSetAccounts] - Optional array of payment method set accounts to determine gateway
+ * @param {boolean} [params.isPostRequest=false] - Optional flag to indicate if this is a POST request (basket)
  * @returns {Object} Payment instrument body
  */
-export const createPaymentInstrumentBody = (
+export const createPaymentInstrumentBody = ({
     amount,
     paymentMethodType,
     zoneId,
-    shippingPreference
-) => {
+    shippingPreference,
+    storePaymentMethod = false,
+    futureUsageOffSession = false,
+    paymentMethods = null,
+    paymentMethodSetAccounts = null,
+    isPostRequest = false
+} = {}) => {
+    const paymentReferenceRequest = {
+        paymentMethodType: paymentMethodType,
+        zoneId: zoneId ?? 'default'
+    }
+
+    if (shippingPreference !== undefined && shippingPreference !== null) {
+        paymentReferenceRequest.shippingPreference = shippingPreference
+    }
+
+    const gateway = getGatewayFromPaymentMethod(
+        paymentMethodType,
+        paymentMethods,
+        paymentMethodSetAccounts
+    )
+
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
+        const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
+        if (setupFutureUsage) {
+            paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
+            paymentReferenceRequest.gatewayProperties = {
+                stripe: {
+                    setupFutureUsage: setupFutureUsage
+                }
+            }
+        }
+    }
+
+    if (gateway === PAYMENT_GATEWAYS.ADYEN && storePaymentMethod) {
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
+    }
+
     return {
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
-        paymentReferenceRequest: {
-            paymentMethodType: paymentMethodType,
-            zoneId: zoneId ?? 'default',
-            shippingPreference: shippingPreference
-        }
+        paymentReferenceRequest: paymentReferenceRequest
     }
 }
 

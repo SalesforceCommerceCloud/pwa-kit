@@ -22,6 +22,7 @@ import {
 import {useForm} from 'react-hook-form'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
@@ -30,7 +31,8 @@ import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-s
 import {
     STATUS_SUCCESS,
     useSFPayments,
-    useAutomaticCapture
+    useAutomaticCapture,
+    useFutureUsageOffSession
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {
@@ -58,6 +60,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
+
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
         basket.shipments.every((shipment) => isPickupShipment(shipment))
@@ -82,6 +86,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const zoneId = useShopperConfiguration('zoneId')
     const cardCaptureAutomatic = useAutomaticCapture()
+    const futureUsageOffSession = useFutureUsageOffSession()
 
     useEffect(() => {
         if (isPickupOnly) {
@@ -121,17 +126,28 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const checkoutComponent = useRef(null)
     const paymentMethodType = useRef(null)
     const currentBasket = useRef(null)
+    const savePaymentMethodRef = useRef(false)
 
     const handlePaymentMethodSelected = (evt) => {
         paymentMethodType.current = evt.detail.selectedPaymentMethod
+        if (evt.detail.savePaymentMethodForFutureUse !== undefined) {
+            savePaymentMethodRef.current = evt.detail.savePaymentMethodForFutureUse === true
+        }
         if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
             onRequiresPayButtonChange(evt.detail.requiresPayButton)
         }
     }
 
-    const handlePaymentButtonApprove = async () => {
+    const handlePaymentButtonApprove = async (event) => {
         try {
-            const updatedOrder = await createAndUpdateOrder()
+            // Update savePaymentMethodRef only if explicitly provided. May be missing if payment method doesn't
+            // support saving. If missing, preserve existing value set by handlePaymentMethodSelected.
+            if (event?.detail?.savePaymentMethodForFutureUse !== undefined) {
+                savePaymentMethodRef.current = event.detail.savePaymentMethodForFutureUse === true
+            }
+            const updatedOrder = await createAndUpdateOrder(
+                savePaymentMethodRef.current && customer?.isRegistered
+            )
             // Clear the ref after successful order creation
             currentBasket.current = null
             navigate(`/checkout/confirmation/${updatedOrder.orderNo}`)
@@ -202,12 +218,17 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         updatedBasket = await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: createPaymentInstrumentBody(
-                updatedBasket.orderTotal,
-                paymentMethodType.current,
+            body: createPaymentInstrumentBody({
+                amount: updatedBasket.orderTotal,
+                paymentMethodType: paymentMethodType.current,
                 zoneId,
-                'SET_PROVIDED_ADDRESS'
-            )
+                shippingPreference: 'SET_PROVIDED_ADDRESS',
+                storePaymentMethod: false,
+                futureUsageOffSession,
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
+                isPostRequest: true // never include setupFutureUsage in POST
+            })
         })
 
         // Store the updated basket for potential cleanup on cancel
@@ -221,7 +242,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
     }
 
-    const createAndUpdateOrder = async () => {
+    const createAndUpdateOrder = async (shouldSavePaymentMethod = false) => {
         // Create order from the basket
         const order = await onCreateOrder()
 
@@ -230,16 +251,23 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
         try {
             // Update order payment instrument to create payment
+            const paymentInstrumentBody = createPaymentInstrumentBody({
+                amount: order.orderTotal,
+                paymentMethodType: paymentMethodType.current,
+                zoneId,
+                shippingPreference: null,
+                storePaymentMethod: shouldSavePaymentMethod,
+                futureUsageOffSession,
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts
+            })
+
             const updatedOrder = await updatePaymentInstrumentForOrder({
                 parameters: {
                     orderNo: order.orderNo,
                     paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
                 },
-                body: createPaymentInstrumentBody(
-                    order.orderTotal,
-                    paymentMethodType.current,
-                    zoneId
-                )
+                body: paymentInstrumentBody
             })
 
             return updatedOrder
@@ -257,6 +285,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     basketId: currentBasket.current?.basketId,
                     paymentMethodType: paymentMethodType.current,
                     orderTotal: order.orderTotal,
+                    shouldSavePaymentMethod,
                     productSubTotal: currentBasket.current?.productSubTotal,
                     error: error
                 }
@@ -305,17 +334,24 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Create SF Payments basket payment instrument before creating order
         await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
-            body: createPaymentInstrumentBody(
-                updatedBasket.orderTotal,
-                paymentMethodType.current,
-                zoneId
-            )
+            body: createPaymentInstrumentBody({
+                amount: updatedBasket.orderTotal,
+                paymentMethodType: paymentMethodType.current,
+                zoneId,
+                shippingPreference: null,
+                storePaymentMethod: false,
+                futureUsageOffSession,
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
+                isPostRequest: true
+            })
         })
 
         let updatedOrder = null
         try {
             // Update order payment instrument to create payment
-            updatedOrder = await createAndUpdateOrder()
+            const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+            updatedOrder = await createAndUpdateOrder(shouldSavePaymentMethod)
 
             // Find updated SF Payments payment instrument in updated order
             const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
@@ -324,6 +360,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentIntent = {
                 client_secret: getClientSecret(orderPaymentInstrument),
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
+            }
+
+            if (futureUsageOffSession) {
+                paymentIntent.setup_future_usage = 'off_session'
+            } else if (shouldSavePaymentMethod) {
+                paymentIntent.setup_future_usage = 'on_session'
             }
 
             // Create payment billing details from basket
@@ -363,12 +405,22 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
-            // Store orderNo before confirm in case confirm fails
-            const orderNo = updatedOrder.orderNo
+            // Update Elements to match Payment Intent's setup_future_usage before SDK confirms
+            const paymentIntentFunction = async () => {
+                const selectedPaymentMethod = checkoutComponent.current?.selectedPaymentMethod
+                if (selectedPaymentMethod?.asSavedPaymentMethodComponent) {
+                    const spmComponent = selectedPaymentMethod.asSavedPaymentMethodComponent()
+                    if (spmComponent) {
+                        spmComponent.setSavePaymentMethodFuture(futureUsageOffSession)
+                    }
+                }
+
+                return paymentIntent
+            }
 
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
-                () => paymentIntent,
+                paymentIntentFunction,
                 billingDetails,
                 shippingDetails
             )
@@ -449,7 +501,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
-                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
+                    showSaveForFutureUsageCheckbox: !!(
+                        customer?.isRegistered && customer?.customerId
+                    ),
+                    // Suppress "Make payment method default" checkbox since we don't support default SPM yet
+                    showSaveAsDefaultCheckbox: false
                 }
             }
 
@@ -486,7 +543,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
-    }, [sfp, metadata, containerElementRef.current, paymentConfig, cardCaptureAutomatic])
+    }, [
+        sfp,
+        metadata,
+        containerElementRef.current,
+        paymentConfig,
+        cardCaptureAutomatic,
+        customer?.isRegistered
+    ])
 
     useEffect(() => {
         if (checkoutComponent.current && basket?.orderTotal) {
