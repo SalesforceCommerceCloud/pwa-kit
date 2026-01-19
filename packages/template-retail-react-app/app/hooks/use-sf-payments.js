@@ -110,3 +110,14 @@ export const useAutomaticCapture = () => {
     const cardCaptureAutomatic = useShopperConfiguration('cardCaptureAutomatic')
     return cardCaptureAutomatic ?? true
 }
+
+/**
+ * Custom hook to determine if payments should be set up for off-session reuse.
+ * If true, always set up payments for off-session reuse.
+ * If false, only set up payments when user explicitly saves payment method (on-session reuse).
+ * @returns {boolean} True if off-session future usage is enabled, false otherwise (default)
+ */
+export const useFutureUsageOffSession = () => {
+    const futureUsageOffSession = useShopperConfiguration('futureUsageOffSession')
+    return futureUsageOffSession ?? false
+}
