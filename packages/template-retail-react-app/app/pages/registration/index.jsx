@@ -63,16 +63,14 @@ const Registration = () => {
         if (isRegistered && config?.app?.login?.passkey?.enabled) {
             if (
                 window.PublicKeyCredential &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isConditionalMediationAvailable
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isConditionalMediationAvailable()
+
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
