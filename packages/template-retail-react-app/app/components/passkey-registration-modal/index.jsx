@@ -53,6 +53,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
     const startWebauthnUserRegistration = useAuthHelper(AuthHelpers.StartWebauthnUserRegistration)
+    const finishWebauthnUserRegistration = useAuthHelper(AuthHelpers.FinishWebauthnUserRegistration)
 
     const handleRegisterPasskey = async () => {
         setIsLoading(true)
@@ -83,14 +84,100 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         }
     }
 
+    /**
+     * Convert base64url string to ArrayBuffer
+     */
+    const base64UrlToArrayBuffer = (base64Url) => {
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const binaryString = atob(base64)
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i)
+        }
+        return bytes.buffer
+    }
+
+    /**
+     * Convert ArrayBuffer to base64url string
+     */
+    const arrayBufferToBase64Url = (buffer) => {
+        const bytes = new Uint8Array(buffer)
+        let binary = ''
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i])
+        }
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    }
+
     const handleOtpVerification = async (code) => {
+        setIsLoading(true)
+        setError(null)
+
         try {
-            await startWebauthnUserRegistration.mutateAsync({
+            // Step 1: Start WebAuthn registration and get options
+            const response = await startWebauthnUserRegistration.mutateAsync({
                 user_id: customer.email,
+                pwd_action_token: code,
+                ...(passkeyNickname && {nick_name: passkeyNickname})
+            })
+
+            // Step 2: Convert response to WebAuthn PublicKeyCredentialCreationOptions format
+            const publicKey = {
+                challenge: base64UrlToArrayBuffer(response.challenge),
+                rp: response.rp,
+                user: {
+                    ...response.user,
+                    id: base64UrlToArrayBuffer(response.user.id)
+                },
+                pubKeyCredParams: response.pubKeyCredParams,
+                authenticatorSelection: response.authenticatorSelection,
+                timeout: response.timeout,
+                attestation: response.attestation
+            }
+
+            // Step 3: Call navigator.credentials.create()
+            const credential = await navigator.credentials.create({
+                publicKey
+            })
+
+            // Step 4: Convert credential to JSON format for the server
+            const credentialJson = {
+                id: credential.id,
+                rawId: arrayBufferToBase64Url(credential.rawId),
+                type: credential.type,
+                response: {
+                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+                    attestationObject: arrayBufferToBase64Url(credential.response.attestationObject)
+                }
+            }
+
+            // Step 5: Finish WebAuthn registration
+            await finishWebauthnUserRegistration.mutateAsync({
+                username: customer.email,
+                credential: credentialJson,
                 pwd_action_token: code
             })
+
+            // Step 6: Close OTP modal and main modal on success
+            setIsOtpAuthOpen(false)
+            onClose()
+
+            return {success: true}
         } catch (err) {
-            setError(err.message || 'Failed to start webauthn user registration')
+            const errorMessage =
+                err.message ||
+                formatMessage({
+                    id: 'passkey_registration.modal.error.registration_failed',
+                    defaultMessage: 'Failed to register passkey'
+                })
+
+            // Return error result for OTP component to display
+            return {
+                success: false,
+                error: errorMessage
+            }
+        } finally {
+            setIsLoading(false)
         }
     }
 
