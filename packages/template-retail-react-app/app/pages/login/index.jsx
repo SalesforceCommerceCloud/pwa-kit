@@ -186,17 +186,13 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isConditionalMediationAvailable
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {  
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
                     }
@@ -218,7 +214,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [])
 
     return (
-        <>
         <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>
             <Heading as="h1" srOnly>
                 <FormattedMessage defaultMessage="Sign In" id="login.title.sign_in" />
@@ -257,7 +252,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 )}
             </Container>
         </Box>
-        </>
     )
 }
 

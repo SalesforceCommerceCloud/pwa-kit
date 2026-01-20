@@ -479,30 +479,6 @@
       "value": ","
     }
   ],
-  "auth_modal.passkey.button.close.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Close passkey form"
-    }
-  ],
-  "auth_modal.passkey.button.register": [
-    {
-      "type": 0,
-      "value": "Register Passkey"
-    }
-  ],
-  "auth_modal.passkey.label.nickname": [
-    {
-      "type": 0,
-      "value": "Passkey Nickname"
-    }
-  ],
-  "auth_modal.passkey.title": [
-    {
-      "type": 0,
-      "value": "Create Passkey"
-    }
-  ],
   "auth_modal.password_reset_success.button.back_to_sign_in": [
     {
       "type": 0,
@@ -3003,6 +2979,54 @@
     {
       "type": 0,
       "value": "Previous Page"
+    }
+  ],
+  "passkey_registration.modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close passkey form"
+    }
+  ],
+  "passkey_registration.modal.button.register": [
+    {
+      "type": 0,
+      "value": "Register Passkey"
+    }
+  ],
+  "passkey_registration.modal.error.authorize_failed": [
+    {
+      "type": 0,
+      "value": "Failed to authorize passkey registration"
+    }
+  ],
+  "passkey_registration.modal.label.nickname": [
+    {
+      "type": 0,
+      "value": "Passkey Nickname (optional)"
+    }
+  ],
+  "passkey_registration.modal.title": [
+    {
+      "type": 0,
+      "value": "Create Passkey"
+    }
+  ],
+  "passkey_registration.toast.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close toast"
+    }
+  ],
+  "passkey_registration.toast.button.create": [
+    {
+      "type": 0,
+      "value": "Create Passkey"
+    }
+  ],
+  "passkey_registration.toast.message": [
+    {
+      "type": 0,
+      "value": "Create a passkey for a more secure and easier login"
     }
   ],
   "password_card.info.password_updated": [

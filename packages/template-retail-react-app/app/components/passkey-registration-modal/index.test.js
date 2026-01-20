@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
 import {screen, waitFor} from '@testing-library/react'
 import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -30,12 +29,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 // Mock OtpAuth component
 jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     const PropTypes = jest.requireActual('prop-types')
-    const MockOtpAuth = ({isOpen, onClose}) => {
+    const MockOtpAuth = ({isOpen}) => {
         return isOpen ? <div data-testid="otp-auth-modal">OTP Auth Modal</div> : null
     }
     MockOtpAuth.propTypes = {
-        isOpen: PropTypes.bool,
-        onClose: PropTypes.func
+        isOpen: PropTypes.bool
     }
     return MockOtpAuth
 })

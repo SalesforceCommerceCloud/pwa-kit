@@ -42,8 +42,6 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
-import {useCustomerType} from '@salesforce/commerce-sdk-react'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -54,15 +52,12 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const config = getConfig()
-    const {passwordless = {}, social = {}, passkey = {}} = config.app.login || {}
+    const {passwordless = {}, social = {}} = config.app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = config?.app?.multishipEnabled ?? true
-
-    const {showToast} = usePasskeyRegistration()
-    const {isRegistered} = useCustomerType()
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -89,31 +84,6 @@ const Checkout = () => {
             removeEmptyShipments(basket)
         }
     }, [basket?.basketId])
-
-    // Passkey registration
-    useEffect(() => {
-        // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
-        if (isRegistered && passkey?.enabled) {
-            if (
-                window.PublicKeyCredential &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isConditionalMediationAvailable
-            ) {
-                Promise.all([
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {
-                    if (results.every((r) => r === true)) {
-                        showToast()
-                    }
-                })
-            }
-        }
-    }, [isRegistered])
 
     const submitOrder = async () => {
         setIsLoading(true)

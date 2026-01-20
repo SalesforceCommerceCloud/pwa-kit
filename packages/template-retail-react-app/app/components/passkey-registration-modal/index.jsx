@@ -50,7 +50,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const form = useForm()
 
     const config = getConfig()
-    const commerceApiConfig = config.app.commerceAPI
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
     const startWebauthnUserRegistration = useAuthHelper(AuthHelpers.StartWebauthnUserRegistration)
@@ -63,7 +62,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             await authorizeWebauthnRegistration.mutateAsync({
                 user_id: customer.email,
                 mode: webauthnConfig.mode,
-                channel_id: commerceApiConfig.parameters.siteId,
                 ...(webauthnConfig.mode === 'callback' && {
                     callback_uri: webauthnConfig.callbackURI
                 })
@@ -73,8 +71,13 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             onClose()
             setIsOtpAuthOpen(true)
         } catch (err) {
-            console.error('Error authorizing passkey registration:', err)
-            setError(err.message || 'Failed to authorize passkey registration')
+            setError(
+                err.message ||
+                    formatMessage({
+                        id: 'passkey_registration.modal.error.authorize_failed',
+                        defaultMessage: 'Failed to authorize passkey registration'
+                    })
+            )
         } finally {
             setIsLoading(false)
         }
@@ -116,12 +119,12 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                     <ModalHeader>
                         {formatMessage({
                             defaultMessage: 'Create Passkey',
-                            id: 'auth_modal.passkey.title'
+                            id: 'passkey_registration.modal.title'
                         })}
                     </ModalHeader>
                     <ModalCloseButton
                         aria-label={formatMessage({
-                            id: 'auth_modal.passkey.button.close.assistive_msg',
+                            id: 'passkey_registration.modal.button.close.assistive_msg',
                             defaultMessage: 'Close passkey form'
                         })}
                         data-testid="passkey-registration-modal-close-button"
@@ -137,8 +140,8 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                         <FormControl>
                             <FormLabel>
                                 {formatMessage({
-                                    defaultMessage: 'Passkey Nickname',
-                                    id: 'auth_modal.passkey.label.nickname'
+                                    defaultMessage: 'Passkey Nickname (optional)',
+                                    id: 'passkey_registration.modal.label.nickname'
                                 })}
                             </FormLabel>
                             <Input
@@ -157,7 +160,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                             >
                                 {formatMessage({
                                     defaultMessage: 'Register Passkey',
-                                    id: 'auth_modal.passkey.button.register'
+                                    id: 'passkey_registration.modal.button.register'
                                 })}
                             </Button>
                         </FormControl>

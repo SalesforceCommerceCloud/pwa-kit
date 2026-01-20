@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import {useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -21,6 +22,7 @@ import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/co
 export const usePasskeyRegistration = () => {
     const toast = useToast()
     const {passkeyModal} = usePasskeyRegistrationContext()
+    const {formatMessage} = useIntl()
 
     const showToast = () => {
         toast({
@@ -43,10 +45,16 @@ export const usePasskeyRegistration = () => {
                         top={2}
                         color="white"
                         onClick={onClose}
-                        aria-label="Close toast"
+                        aria-label={formatMessage({
+                            id: 'passkey_registration.toast.button.close.assistive_msg',
+                            defaultMessage: 'Close toast'
+                        })}
                     />
                     <Box mb={3} fontWeight="medium">
-                        Create a passkey for a more secure and easier login
+                        {formatMessage({
+                            id: 'passkey_registration.toast.message',
+                            defaultMessage: 'Create a passkey for a more secure and easier login'
+                        })}
                     </Box>
                     <Button
                         size="sm"
@@ -56,7 +64,10 @@ export const usePasskeyRegistration = () => {
                             passkeyModal.onOpen()
                         }}
                     >
-                        Create Passkey
+                        {formatMessage({
+                            id: 'passkey_registration.toast.button.create',
+                            defaultMessage: 'Create Passkey'
+                        })}
                     </Button>
                 </Box>
             )

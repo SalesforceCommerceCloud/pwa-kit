@@ -243,20 +243,18 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
-        if ((loggingIn || registering) && customer.data && config?.app?.login?.passkey?.enabled) {
+        if (config?.app?.login?.passkey?.enabled) {
             // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                // eslint-disable-next-line no-undef
-                PublicKeyCredential.isConditionalMediationAvailable
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    // eslint-disable-next-line no-undef
-                    PublicKeyCredential.isConditionalMediationAvailable()
+
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
@@ -302,69 +300,67 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
-        <>
-            <Modal
-                size="sm"
-                closeOnOverlayClick={false}
-                data-testid="sf-auth-modal"
-                isOpen={isOpen}
-                onOpen={onOpen}
-                onClose={onClose}
-                {...props}
-            >
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalCloseButton
-                        aria-label={formatMessage({
-                            id: 'auth_modal.button.close.assistive_msg',
-                            defaultMessage: 'Close login form'
-                        })}
-                    />
-                    <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
-                        {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                            <LoginForm
-                                form={form}
-                                submitForm={(data) => {
-                                    const shouldUsePasswordless =
-                                        isPasswordlessEnabled && !data.password
-                                    return submitForm(data, shouldUsePasswordless)
-                                }}
-                                clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                                //TODO: potentially remove this prop in the next major release since
-                                // we don't need to use this props anymore
-                                handlePasswordlessLoginClick={noop}
-                                handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
-                                isPasswordlessEnabled={isPasswordlessEnabled}
-                                isSocialEnabled={isSocialEnabled}
-                                idps={idps}
-                                setLoginType={noop}
-                            />
-                        )}
-                        {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
-                            <RegisterForm
-                                form={form}
-                                submitForm={submitForm}
-                                clickSignIn={onBackToSignInClick}
-                            />
-                        )}
-                        {currentView === PASSWORD_VIEW && (
-                            <ResetPasswordForm
-                                form={form}
-                                submitForm={submitForm}
-                                clickSignIn={onBackToSignInClick}
-                            />
-                        )}
-                        {currentView === EMAIL_VIEW && (
-                            <PasswordlessEmailConfirmation
-                                form={form}
-                                submitForm={submitForm}
-                                email={form.getValues().email || initialEmail}
-                            />
-                        )}
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
-        </>
+        <Modal
+            size="sm"
+            closeOnOverlayClick={false}
+            data-testid="sf-auth-modal"
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            {...props}
+        >
+            <ModalOverlay />
+            <ModalContent>
+                <ModalCloseButton
+                    aria-label={formatMessage({
+                        id: 'auth_modal.button.close.assistive_msg',
+                        defaultMessage: 'Close login form'
+                    })}
+                />
+                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={14}>
+                    {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                        <LoginForm
+                            form={form}
+                            submitForm={(data) => {
+                                const shouldUsePasswordless =
+                                    isPasswordlessEnabled && !data.password
+                                return submitForm(data, shouldUsePasswordless)
+                            }}
+                            clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                            //TODO: potentially remove this prop in the next major release since
+                            // we don't need to use this props anymore
+                            handlePasswordlessLoginClick={noop}
+                            handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                            isPasswordlessEnabled={isPasswordlessEnabled}
+                            isSocialEnabled={isSocialEnabled}
+                            idps={idps}
+                            setLoginType={noop}
+                        />
+                    )}
+                    {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
+                        <RegisterForm
+                            form={form}
+                            submitForm={submitForm}
+                            clickSignIn={onBackToSignInClick}
+                        />
+                    )}
+                    {currentView === PASSWORD_VIEW && (
+                        <ResetPasswordForm
+                            form={form}
+                            submitForm={submitForm}
+                            clickSignIn={onBackToSignInClick}
+                        />
+                    )}
+                    {currentView === EMAIL_VIEW && (
+                        <PasswordlessEmailConfirmation
+                            form={form}
+                            submitForm={submitForm}
+                            email={form.getValues().email || initialEmail}
+                        />
+                    )}
+                </ModalBody>
+            </ModalContent>
+        </Modal>
     )
 }
 
