@@ -1168,6 +1168,36 @@
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
   },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "Cancel"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "Checkout as a Guest"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Resend Code"
+  },
+  "otp.button.resend_timer": {
+    "defaultMessage": "Resend code in {timer} seconds..."
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the {otpLength}-digit code below."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "To log in to your account, enter the code sent to your email."
+  },
+  "otp.message.enter_code_for_passkey_registration": {
+    "defaultMessage": "We sent a one-time password (OTP) to your email to confirm your identity. Enter the {otpLength}-digit code below to continue."
+  },
+  "otp.message.verifying": {
+    "defaultMessage": "Verifying code..."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "Confirm it's you"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "Create an account"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
   },
@@ -1200,6 +1230,30 @@
   },
   "pagination.link.prev.assistive_msg": {
     "defaultMessage": "Previous Page"
+  },
+  "passkey_registration.modal.button.close.assistive_msg": {
+    "defaultMessage": "Close passkey form"
+  },
+  "passkey_registration.modal.button.register": {
+    "defaultMessage": "Register Passkey"
+  },
+  "passkey_registration.modal.error.authorize_failed": {
+    "defaultMessage": "Failed to authorize passkey registration"
+  },
+  "passkey_registration.modal.label.nickname": {
+    "defaultMessage": "Passkey Nickname (optional)"
+  },
+  "passkey_registration.modal.title": {
+    "defaultMessage": "Create Passkey"
+  },
+  "passkey_registration.toast.button.close.assistive_msg": {
+    "defaultMessage": "Close toast"
+  },
+  "passkey_registration.toast.button.create": {
+    "defaultMessage": "Create Passkey"
+  },
+  "passkey_registration.toast.message": {
+    "defaultMessage": "Create a passkey for a more secure and easier login"
   },
   "password_card.info.password_updated": {
     "defaultMessage": "Password updated"

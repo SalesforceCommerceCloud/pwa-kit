@@ -98,6 +98,7 @@ const Account = () => {
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)

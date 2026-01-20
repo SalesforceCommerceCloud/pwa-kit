@@ -44,6 +44,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -85,10 +86,11 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
+    const config = getConfig()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
@@ -98,6 +100,8 @@ export const AuthModal = ({
         {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+
+    const {showToast} = usePasskeyRegistration()
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -239,8 +243,28 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
+        if (config?.app?.login?.passkey?.enabled) {
+            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+            if (
+                window.PublicKeyCredential &&
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                })
+            }
+        }
+
         // Show a toast only for those registed users returning to the site.
-        if (loggingIn) {
+        // Only show toast when customer data is available (user is logged in and data is loaded)
+        if (loggingIn && customer.data) {
             toast({
                 variant: 'subtle',
                 title: `${formatMessage(
@@ -269,7 +293,7 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [isRegistered])
+    }, [isRegistered, customer.data])
 
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)

@@ -51,12 +51,13 @@ const Checkout = () => {
     const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const config = getConfig()
+    const {passwordless = {}, social = {}} = config.app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
-    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const multishipEnabled = config?.app?.multishipEnabled ?? true
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
