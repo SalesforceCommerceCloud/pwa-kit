@@ -326,11 +326,33 @@ const AccountOrderDetail = () => {
                                     )
                                 })}
 
-                                {/* Delivery Shipments */}
+                                {/* Delivery Shipments - Orders shipped to customer addresses
+                                    
+                                    Each delivery shipment displays two columns:
+                                    1. Shipping Method Column:
+                                       - Status (shipped, not_shipped, part_shipped, or OMS status)
+                                       - Method name (e.g., "Ground", "Express")
+                                       - Tracking number (clickable link if trackingUrl is available)
+                                    2. Shipping Address Column:
+                                       - Recipient name (firstName + lastName, or fullName fallback)
+                                       - Street address, City, State, Postal Code
+                                    
+                                    Multi-Shipment Display:
+                                    - When order has multiple shipments, each gets its own pair of columns
+                                    - Headings are numbered: "Shipping Method 1", "Shipping Address 1", etc.
+                                    - Single shipment orders show headings without numbers
+                                    
+                                    OMS Integration:
+                                    - order.shipments and order.omsData.shipments are matched by index
+                                    - Note: Index correlation may not be accurate - OMS shipments may not
+                                      directly map to ECOM shipments as there is no shared ID between them
+                                    - OMS data takes priority: status, trackingNumber, trackingUrl
+                                    - When OMS data exists, ECOM shippingStatus may not be present
+                                    - trackingUrl makes tracking number a clickable external link
+                                */}
                                 {deliveryShipments.map((shipment, index) => {
                                     // Use index to match with omsData.shipments
                                     const omsShipment = order?.omsData?.shipments?.[index]
-                                    // OMS data takes priority, fallback to ECOM
                                     const shippingStatus =
                                         omsShipment?.status || shipment.shippingStatus
                                     const trackingNumber =

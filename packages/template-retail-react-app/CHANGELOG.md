@@ -4,6 +4,7 @@
 - [Feature] PWA Integration with OMS
   - Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
   - Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
+  - Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
 
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
