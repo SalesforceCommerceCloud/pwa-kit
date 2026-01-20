@@ -13,7 +13,10 @@ import {
     Container,
     Grid,
     GridItem,
-    Stack
+    Stack,
+    Portal,
+    Spinner,
+    Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
@@ -64,6 +67,7 @@ const CheckoutOneClick = () => {
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isOtpLoading, setIsOtpLoading] = useState(false)
+    const [isPlacingOrder, setIsPlacingOrder] = useState(false)
 
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -455,12 +459,15 @@ const CheckoutOneClick = () => {
                 defaultMessage: 'An unexpected error occurred during checkout.'
             })
             showError(message)
+            setIsPlacingOrder(false)
         } finally {
             setIsLoading(false)
         }
     }
 
     const onPlaceOrder = async () => {
+        // Show overlay immediately to prevent double-clicking
+        setIsPlacingOrder(true)
         try {
             // If using a new card (no applied saved payment), validate fields to surface errors
             const isUsingNewCard = !appliedPayment
@@ -469,6 +476,7 @@ const CheckoutOneClick = () => {
                 if (!isValid) {
                     // Keep payment section open and show field errors
                     setIsEditingPayment(true)
+                    setIsPlacingOrder(false)
                     return
                 }
             }
@@ -511,9 +519,13 @@ const CheckoutOneClick = () => {
 
             if (updatedBasket) {
                 await submitOrder(fullCardDetails)
+            } else {
+                // Billing validation failed, clear overlay
+                setIsPlacingOrder(false)
             }
         } catch (error) {
             showError()
+            setIsPlacingOrder(false)
         }
     }
 
@@ -575,7 +587,7 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
-                                            disabled={isOtpLoading}
+                                            disabled={isOtpLoading || isPlacingOrder}
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
@@ -601,6 +613,26 @@ const CheckoutOneClick = () => {
                     </GridItem>
                 </Grid>
             </Container>
+
+            {/* Loading overlay when Place Order is clicked */}
+            {isPlacingOrder && (
+                <Portal>
+                    <Box
+                        position="fixed"
+                        top="0"
+                        left="0"
+                        right="0"
+                        bottom="0"
+                        bg="blackAlpha.600"
+                        zIndex={9999}
+                        data-testid="sf-place-order-loading-overlay"
+                    >
+                        <Center h="100%">
+                            <Spinner size="xl" color="white" thickness="4px" />
+                        </Center>
+                    </Box>
+                </Portal>
+            )}
         </Box>
     )
 }
