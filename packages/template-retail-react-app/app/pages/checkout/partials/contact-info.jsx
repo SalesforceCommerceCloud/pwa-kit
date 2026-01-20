@@ -64,7 +64,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    const {startPasskeyLogin} = usePasskeyLogin()
+    const {loginWithPasskey} = usePasskeyLogin()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -161,7 +161,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }, [showPasswordField])
 
     useEffect(() => {
-        startPasskeyLogin()
+        loginWithPasskey()
     }, [])
 
     const onPasswordlessLoginClick = async (e) => {
