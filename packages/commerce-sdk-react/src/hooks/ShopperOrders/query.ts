@@ -40,7 +40,12 @@ export const useOrder = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
+    // Include 'expand' param for SOM integration (not yet in commerce-sdk-isomorphic paramKeys)
+    const validParams = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
+    const parameters = {
+        ...validParams,
+        ...(netOptions.parameters?.expand && {expand: netOptions.parameters.expand})
+    }
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

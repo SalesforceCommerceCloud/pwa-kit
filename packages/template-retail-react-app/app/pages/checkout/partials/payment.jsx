@@ -99,6 +99,8 @@ const Payment = () => {
 
         const paymentInstrument = {
             paymentMethodId: 'CREDIT_CARD',
+            // Include amount with currency for SOM compatibility
+            amount: basket?.orderTotal,
             paymentCard: {
                 holder: formValue.holder,
                 maskedNumber: getMaskCreditCardNumber(formValue.number),
