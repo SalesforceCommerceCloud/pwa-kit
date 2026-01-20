@@ -11,6 +11,11 @@ export {
     StoreLocatorContext,
     StoreLocatorProvider
 } from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+export {
+    PasskeyRegistrationContext,
+    PasskeyRegistrationProvider,
+    usePasskeyRegistrationContext
+} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 /**
  * This is the global state for the multiples sites and locales supported in the App.

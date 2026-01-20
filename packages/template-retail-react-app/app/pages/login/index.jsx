@@ -26,6 +26,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
@@ -59,7 +60,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const config = getConfig()
+    const {passwordless = {}, social = {}, passkey = {}} = config.app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
@@ -74,6 +76,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const [currentView, setCurrentView] = useState(initialView)
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
     const [redirectPath, setRedirectPath] = useState('')
+    const {showToast} = usePasskeyRegistration()
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -172,11 +175,36 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     // If customer is registered push to account page and merge the basket
     useEffect(() => {
-        if (isRegistered) {
-            handleMergeBasket()
-            const redirectTo = redirectPath ? redirectPath : '/account'
-            navigate(redirectTo)
+        if (!isRegistered) {
+            return
         }
+
+        handleMergeBasket()
+        const redirectTo = redirectPath ? redirectPath : '/account'
+
+        if (passkey?.enabled) {
+            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+            if (
+                window.PublicKeyCredential &&
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                    // Navigate after passkey check completes (whether toast is shown or not)
+                    navigate(redirectTo)
+                })
+                return
+            }
+        }
+
+        // Navigate immediately if passkey is not enabled or not available
+        navigate(redirectTo)
     }, [isRegistered, redirectPath])
 
     /**************** Einstein ****************/

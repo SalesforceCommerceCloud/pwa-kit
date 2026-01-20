@@ -1,0 +1,203 @@
+/*
+ * Copyright (c) 2026, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import React from 'react'
+import {screen, waitFor} from '@testing-library/react'
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal/index'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {rest} from 'msw'
+
+// Mock Commerce SDK hooks
+const mockMutateAsync = jest.fn()
+const mockUseAuthHelper = jest.fn()
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useAuthHelper: (param) => mockUseAuthHelper(param)
+}))
+
+// Mock useCurrentCustomer
+const mockUseCurrentCustomer = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
+// Mock OtpAuth component
+jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
+    const PropTypes = jest.requireActual('prop-types')
+    const MockOtpAuth = ({isOpen}) => {
+        return isOpen ? <div data-testid="otp-auth-modal">OTP Auth Modal</div> : null
+    }
+    MockOtpAuth.propTypes = {
+        isOpen: PropTypes.bool
+    }
+    return MockOtpAuth
+})
+
+describe('PasskeyRegistrationModal', () => {
+    const mockOnClose = jest.fn()
+    const mockCustomer = {
+        email: 'test@example.com'
+    }
+
+    function PasskeyRegistrationModalWrapper() {
+        const [isOpen, setIsOpen] = React.useState(true)
+
+        return <PasskeyRegistrationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer
+        })
+        mockUseAuthHelper.mockReturnValue({
+            mutateAsync: mockMutateAsync
+        })
+
+        // Mock product API calls that may be triggered by components in the provider tree
+        global.server.use(
+            rest.get('*/products*', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({data: []}))
+            })
+        )
+    })
+
+    describe('Rendering', () => {
+        test('renders modal when isOpen is true', () => {
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
+
+            expect(screen.getByText('Create Passkey')).toBeInTheDocument()
+            expect(screen.getByText('Passkey Nickname')).toBeInTheDocument()
+            expect(
+                screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
+            ).toBeInTheDocument()
+            expect(screen.getByText('Register Passkey')).toBeInTheDocument()
+        })
+
+        test('does not render modal when isOpen is false', () => {
+            renderWithProviders(<PasskeyRegistrationModal isOpen={false} onClose={mockOnClose} />)
+
+            expect(screen.queryByText('Create Passkey')).not.toBeInTheDocument()
+        })
+    })
+
+    describe('User Interactions', () => {
+        test('allows user to type in nickname input', async () => {
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const input = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
+            await user.type(input, 'My iPhone')
+
+            expect(input).toHaveValue('My iPhone')
+        })
+
+        test('calls onClose when close button is clicked', async () => {
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const closeButton = screen.getByLabelText('Close passkey form')
+            await user.click(closeButton)
+
+            expect(mockOnClose).toHaveBeenCalledTimes(1)
+        })
+
+        test('resets form state when modal opens', async () => {
+            const {user} = renderWithProviders(<PasskeyRegistrationModalWrapper />)
+
+            const input = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
+            await user.type(input, 'Test Nickname')
+            expect(input).toHaveValue('Test Nickname')
+
+            // Close modal
+            const closeButton = screen.getByTestId('passkey-registration-modal-close-button')
+            await user.click(closeButton)
+
+            await waitFor(() => {
+                expect(
+                    screen.queryByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
+                ).not.toBeInTheDocument()
+            })
+
+            // Reopen modal - state should be reset
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />)
+            const newInput = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
+            expect(newInput).toHaveValue('')
+        })
+    })
+
+    describe('Passkey Registration', () => {
+        test('calls authorizeWebauthnRegistration on register button click', async () => {
+            mockMutateAsync.mockResolvedValue({})
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(mockMutateAsync).toHaveBeenCalledWith({
+                    user_id: 'test@example.com',
+                    mode: 'callback',
+                    channel_id: 'site-1',
+                    callback_uri: 'https://webhook.site/ee47be40-e9fc-4313-8b56-18e4fe819043'
+                })
+            })
+        })
+
+        test('closes modal and opens OTP auth modal on successful registration', async () => {
+            mockMutateAsync.mockResolvedValue({})
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(mockOnClose).toHaveBeenCalled()
+                expect(screen.getByTestId('otp-auth-modal')).toBeInTheDocument()
+            })
+        })
+
+        test('displays error message when registration fails', async () => {
+            const errorMessage = 'Registration failed'
+            mockMutateAsync.mockRejectedValue(new Error(errorMessage))
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(screen.getByText(errorMessage)).toBeInTheDocument()
+            })
+        })
+
+        test('shows loading state during registration', async () => {
+            mockMutateAsync.mockImplementation(
+                () => new Promise((resolve) => setTimeout(resolve, 100))
+            )
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            expect(screen.getByText('Registering...')).toBeInTheDocument()
+            expect(registerButton).toBeDisabled()
+        })
+    })
+})
