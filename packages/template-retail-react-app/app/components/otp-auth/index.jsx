@@ -146,6 +146,7 @@ const OtpAuth = ({
             })
             await handleSendEmailOtp(form.getValues('email'))
             otpInputs.clear()
+
         } catch (error) {
             setResendTimer(0)
             await track('/otp-resend-failed', {
