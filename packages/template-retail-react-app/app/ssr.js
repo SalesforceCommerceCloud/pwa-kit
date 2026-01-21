@@ -18,6 +18,7 @@
 
 import crypto from 'crypto'
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import {createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
 import path from 'path'
@@ -26,7 +27,12 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
-import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
+import standalonePaymentMethodsHandler from '@salesforce/retail-react-app/app/api/adyen/paymentMethods/standalone.js'
+
+// SLAS Token Security - Proxy Endpoints
+import {registerExpressProxyEndpoints} from '@salesforce/retail-react-app/app/api/express/index.js'
+import {registerMiawRoutes} from '@salesforce/retail-react-app/app/api/miaw/customer-data.js'
+import {errorHandlerMiddleware} from '@salesforce/retail-react-app/app/api/utils/error-handler.js'
 
 const config = getConfig()
 
@@ -305,6 +311,7 @@ export async function jwksCaching(req, res, options) {
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
+    app.use(cookieParser()) // Parse cookies for SLAS token extraction
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
@@ -344,7 +351,13 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Allow Google Pay Specific frames
                         'https://pay.google.com'
                     ],
-                    'frame-ancestors': ['self']
+                    'frame-ancestors': [
+                                        'self',
+                                        'https://payments-agent-production.mrt-storefront-staging.com',
+                                        '*.mrt-storefront-staging.com',
+                                        // Allow Salesforce site.com domains (for Commerce Agent/MIAW)
+                                        '*.site.com'
+                                    ]
                 }
             }
         })
@@ -439,6 +452,42 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    /* -----------------SLAS Token Security - Proxy Endpoints Begin ------------------------ */
+    /**
+     * Express Payments Proxy Endpoints
+     *
+     * These endpoints extract SLAS tokens from HTTP-only cookies instead of
+     * requiring clients to send tokens in headers. This ensures tokens are
+     * never exposed to client-side JavaScript.
+     *
+     * Endpoints:
+     * - PUT  /api/express/baskets/:basketId/shipping-address
+     * - GET  /api/express/baskets/:basketId/shipping-methods
+     * - PUT  /api/express/baskets/:basketId/shipping-methods
+     * - POST /api/express/payments
+     * - POST /api/express/baskets/temporary
+     * - GET  /api/express/baskets/:basketId
+     * - DELETE /api/express/baskets/:basketId
+     * - POST /api/express/baskets/:basketId/calculate
+     */
+    registerExpressProxyEndpoints(app)
+
+    /**
+     * MIAW (Messaging for In-App and Web) Proxy Endpoints
+     *
+     * These endpoints provide customer data to MIAW without exposing
+     * SLAS tokens to the MIAW iframe.
+     *
+     * Endpoints:
+     * - POST /api/miaw/customer-data
+     * - POST /api/miaw/prechat
+     */
+    registerMiawRoutes(app)
+    /* -----------------SLAS Token Security - Proxy Endpoints End ------------------------ */
+
+    // Error handling middleware for proxy endpoints (must be after routes)
+    app.use(errorHandlerMiddleware)
 
     app.get('*', runtime.render)
 })

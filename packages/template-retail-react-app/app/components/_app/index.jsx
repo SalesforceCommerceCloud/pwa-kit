@@ -88,6 +88,7 @@ import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-ag
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {useExpressPaymentHeight} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
+import {useExpressApiRelay} from '@salesforce/retail-react-app/app/hooks/use-express-api-relay'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -199,6 +200,10 @@ const App = (props) => {
 
     // Get dynamic height for express payments
     const expressPaymentHeight = useExpressPaymentHeight()
+
+    // SLAS Token Security: Enable PostMessage relay for Express Payment iframes
+    // This allows nested iframes to make authenticated API calls without accessing tokens
+    useExpressApiRelay({enabled: true})
 
     const {l10n} = site
     // Get the current currency to be used through out the app

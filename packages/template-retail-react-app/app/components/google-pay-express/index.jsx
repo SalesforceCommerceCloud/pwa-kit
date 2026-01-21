@@ -13,14 +13,13 @@ import {
     getGPShippingOptionParameters,
     getGooglePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+// SLAS Token Security: Use PostMessage services for secure API calls
 import {
-    createTemporaryBasket,
-    deleteTemporaryBasket,
-    cleanupTemporaryBasket
-} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+    PostMessageShippingMethodsService,
+    PostMessageShippingAddressService,
+    PostMessagePaymentsService,
+    PostMessageBasketsService
+} from '@salesforce/retail-react-app/app/components/express/utils/postmessage-api'
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
 import {
     validateExpressPaymentSetup,
@@ -75,10 +74,11 @@ export const getCustomerBillingDetails = (inputAddress) => {
     }
 }
 
-export const updateShippingAddress = async (authToken, site, basket, shippingAddress) => {
+// SLAS Token Security: Use PostMessage services for secure API calls
+export const updateShippingAddress = async (site, basket, shippingAddress) => {
     try {
-        const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
-        const response = await adyenShippingAddressService.updateShippingAddress(
+        const shippingAddressService = new PostMessageShippingAddressService(site)
+        const response = await shippingAddressService.updateShippingAddress(
             basket.basketId,
             getCustomerShippingDetails(shippingAddress, basket?.customerInfo?.email)
         )
@@ -93,8 +93,8 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             }
         }
 
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(
+        const shippingMethodsService = new PostMessageShippingMethodsService(site)
+        const shippingMethodResponse = await shippingMethodsService.getShippingMethods(
             basket.basketId
         )
         let shippingOptionId = shippingMethodResponse.defaultShippingMethodId
@@ -109,7 +109,6 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         }
         return updateShippingOption(
-            authToken,
             site,
             basket,
             shippingOptionId,
@@ -126,16 +125,16 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
     }
 }
 
+// SLAS Token Security: Use PostMessage services for secure API calls
 export const updateShippingOption = async (
-    authToken,
     site,
     basket,
     shippingOptionId,
     shippingMethodResponse = null
 ) => {
     try {
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-        const response = await adyenShippingMethodsService.updateShippingMethod(
+        const shippingMethodsService = new PostMessageShippingMethodsService(site)
+        const response = await shippingMethodsService.updateShippingMethod(
             shippingOptionId,
             basket.basketId
         )
@@ -182,7 +181,7 @@ export const updateShippingOption = async (
 }
 
 export const getGoogleButtonConfig = (
-    authToken,
+    authToken, // Note: authToken kept for backward compatibility but not used for API calls
     site,
     basket,
     googlePayConfig,
@@ -200,6 +199,11 @@ export const getGoogleButtonConfig = (
     let googlePayAmount = basketRef?.orderTotal || 0
     let googlePayCurrency = basketRef?.currency || currency || 'USD'
 
+    // SLAS Token Security: Initialize PostMessage services (no authToken needed)
+    // These services use HTTP-only cookies via the parent relay
+    const basketsService = new PostMessageBasketsService(site)
+    const paymentsService = new PostMessagePaymentsService(site)
+
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
         // If we already have a basket reference, return it
@@ -210,11 +214,9 @@ export const getGoogleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             try {
-                const newBasket = await createTemporaryBasket(
-                    sku,
-                    authToken,
-                    site,
-                    quantity,
+                // SLAS Token Security: Use PostMessage service for basket creation
+                const newBasket = await basketsService.createTemporaryBasket(
+                    [{productId: sku, quantity}],
                     currency
                 )
                 basketRef = newBasket // Update basket reference immediately
@@ -233,6 +235,20 @@ export const getGoogleButtonConfig = (
         }
 
         return null
+    }
+
+    // Helper function to cleanup temporary baskets
+    const cleanupBasket = async () => {
+        if (isPdpMode && basketRef?.basketId) {
+            try {
+                await basketsService.deleteBasket(basketRef.basketId)
+                if (setTempBasket) {
+                    setTempBasket(null)
+                }
+            } catch (cleanupError) {
+                console.warn('Failed to cleanup temporary basket:', cleanupError)
+            }
+        }
     }
 
     const buttonConfig = {
@@ -273,13 +289,7 @@ export const getGoogleButtonConfig = (
                 // Get or create basket using basket reference
                 let basketToUse = await getOrCreateBasket()
                 if (!basketToUse || !basketToUse.basketId) {
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
@@ -292,13 +302,7 @@ export const getGoogleButtonConfig = (
 
                 // Ensure we have a valid order total before proceeding
                 if (basketToUse.orderTotal === null || basketToUse.orderTotal === undefined) {
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
@@ -310,8 +314,8 @@ export const getGoogleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, site)
-                const paymentsResponse = await adyenPaymentService.submitPayment(
+                // SLAS Token Security: Use PostMessage service for payment submission
+                const paymentsResponse = await paymentsService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
                     basketToUse?.customerInfo?.customerId
@@ -325,20 +329,14 @@ export const getGoogleButtonConfig = (
                     })
                 } else {
                     // Clean up temporary basket on payment failure
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                await cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                await cleanupBasket()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -375,8 +373,8 @@ export const getGoogleButtonConfig = (
                                 return
                             }
 
+                            // SLAS Token Security: Use PostMessage-based shipping update
                             const updateShippingAddressResponse = await updateShippingAddress(
-                                authToken,
                                 site,
                                 basketToUse,
                                 shippingAddress
@@ -410,8 +408,8 @@ export const getGoogleButtonConfig = (
                                 return
                             }
 
+                            // SLAS Token Security: Use PostMessage-based shipping update
                             const updateShippingOptionResponse = await updateShippingOption(
-                                authToken,
                                 site,
                                 basketToUse,
                                 shippingOptionData?.id
@@ -438,12 +436,12 @@ export const getGoogleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Google Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                cleanupBasket()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                cleanupBasket()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -490,11 +488,13 @@ export const GooglePayExpress = ({
     useEffect(() => {
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
-            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch(() => {})
+            // SLAS Token Security: Use PostMessage service for cleanup
+            if (isPdpMode && currentSku && tempBasket?.basketId && finalSite) {
+                const basketsService = new PostMessageBasketsService(finalSite)
+                basketsService.deleteBasket(tempBasket.basketId).catch(() => {})
             }
         }
-    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
+    }, [tempBasket?.basketId, finalSite?.id, currentSku, isPdpMode])
 
     useEffect(
         () => {

@@ -12,18 +12,13 @@ import {
     getCurrencyValueForApi,
     getApplePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+// SLAS Token Security: Use PostMessage services for secure API calls
 import {
-    createTemporaryBasket,
-    deleteTemporaryBasket,
-    cleanupTemporaryBasket
-} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
-import {
-    getBasketWithTotals,
-    forceOrderCalculation
-} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+    PostMessageShippingMethodsService,
+    PostMessageShippingAddressService,
+    PostMessagePaymentsService,
+    PostMessageBasketsService
+} from '@salesforce/retail-react-app/app/components/express/utils/postmessage-api'
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
 import {
     validateExpressPaymentSetup,
@@ -79,7 +74,7 @@ export const getCustomerBillingDetails = (billingContact) => {
 }
 
 export const getAppleButtonConfig = (
-    authToken,
+    authToken, // Note: authToken kept for backward compatibility but not used for API calls
     site,
     basket,
     shippingMethods,
@@ -98,6 +93,13 @@ export const getAppleButtonConfig = (
     let applePayAmount = basketRef?.orderTotal || 0
     let applePayCurrency = basketRef?.currency || currency || 'USD'
 
+    // SLAS Token Security: Initialize PostMessage services (no authToken needed)
+    // These services use HTTP-only cookies via the parent relay
+    const basketsService = new PostMessageBasketsService(site)
+    const shippingAddressService = new PostMessageShippingAddressService(site)
+    const shippingMethodsService = new PostMessageShippingMethodsService(site)
+    const paymentsService = new PostMessagePaymentsService(site)
+
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
         // If we already have a basket reference, return it
@@ -107,7 +109,11 @@ export const getAppleButtonConfig = (
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity, currency)
+            // SLAS Token Security: Use PostMessage service for basket creation
+            const newBasket = await basketsService.createTemporaryBasket(
+                [{productId: sku, quantity}],
+                currency
+            )
             basketRef = newBasket // Update basket reference immediately
             setTempBasket(newBasket) // Update React state for re-renders
             return newBasket
@@ -115,6 +121,20 @@ export const getAppleButtonConfig = (
 
         // Return null if no basket can be created/found
         return null
+    }
+
+    // Helper function to cleanup temporary baskets
+    const cleanupBasket = async () => {
+        if (isPdpMode && basketRef?.basketId) {
+            try {
+                await basketsService.deleteBasket(basketRef.basketId)
+                if (setTempBasket) {
+                    setTempBasket(null)
+                }
+            } catch (cleanupError) {
+                console.warn('Failed to cleanup temporary basket:', cleanupError)
+            }
+        }
     }
 
     const buttonConfig = {
@@ -163,13 +183,7 @@ export const getAppleButtonConfig = (
                     }
                     resolve(priceUpdate)
                 } catch (error) {
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     reject()
                 }
             } else {
@@ -196,13 +210,7 @@ export const getAppleButtonConfig = (
                 // Get or create basket using basket reference
                 let basketToUse = await getOrCreateBasket()
                 if (!basketToUse || !basketToUse.basketId) {
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -215,10 +223,9 @@ export const getAppleButtonConfig = (
                 // CRITICAL: Force final order calculation before payment
                 // This ensures orderTotal is calculated and not null
                 try {
-                    const finalizedBasket = await forceOrderCalculation(
-                        basketToUse.basketId,
-                        authToken,
-                        site
+                    // SLAS Token Security: Use PostMessage service for basket calculation
+                    const finalizedBasket = await basketsService.calculateBasket(
+                        basketToUse.basketId
                     )
                     basketToUse = finalizedBasket
                     basketRef = finalizedBasket // Update basket reference
@@ -228,13 +235,7 @@ export const getAppleButtonConfig = (
 
                     // Ensure we have a valid order total before proceeding
                     if (basketToUse.orderTotal === null || basketToUse.orderTotal === undefined) {
-                        await cleanupTemporaryBasket(
-                            isPdpMode,
-                            basketRef,
-                            authToken,
-                            site,
-                            setTempBasket
-                        )
+                        await cleanupBasket()
                         reject()
                         sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                             PAYMENT_METHOD
@@ -243,13 +244,7 @@ export const getAppleButtonConfig = (
                     }
                 } catch (calculationError) {
                     // This is a critical error - we cannot proceed without order total
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -262,8 +257,8 @@ export const getAppleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, site)
-                const paymentsResponse = await adyenPaymentService.submitPayment(
+                // SLAS Token Security: Use PostMessage service for payment submission
+                const paymentsResponse = await paymentsService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
                     basketToUse?.customerInfo?.customerId
@@ -287,13 +282,7 @@ export const getAppleButtonConfig = (
                     })
                 } else {
                     // Clean up temporary basket on payment failure
-                    await cleanupTemporaryBasket(
-                        isPdpMode,
-                        basketRef,
-                        authToken,
-                        site,
-                        setTempBasket
-                    )
+                    await cleanupBasket()
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -301,7 +290,7 @@ export const getAppleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                await cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                await cleanupBasket()
                 reject()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
@@ -320,27 +309,17 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
-                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
+                // SLAS Token Security: Use PostMessage services for shipping operations
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
-                await adyenShippingAddressService.updateShippingAddress(
+                await shippingAddressService.updateShippingAddress(
                     basketToUse.basketId,
                     customerShippingDetails
                 )
 
-                // Get shipping methods - use fetchShippingMethods if available, otherwise use our service
+                // Get shipping methods using PostMessage service
                 let newShippingMethods
-                if (fetchShippingMethods && typeof fetchShippingMethods === 'function') {
-                    newShippingMethods = await fetchShippingMethods(
-                        basketToUse?.basketId,
-                        site,
-                        authToken
-                    )
-                } else {
-                    // Fallback for "Buy Now" mode - use our shipping methods service
                     try {
-                        const shippingMethodsResponse =
-                            await adyenShippingMethodsService.getShippingMethods(
+                    const shippingMethodsResponse = await shippingMethodsService.getShippingMethods(
                                 basketToUse.basketId
                             )
 
@@ -362,13 +341,12 @@ export const getAppleButtonConfig = (
                     } catch (error) {
                         // API call failed - fail the Apple Pay flow (no free shipping fallback)
                         newShippingMethods = null
-                    }
                 }
 
                 if (!newShippingMethods?.applicableShippingMethods?.length) {
                     reject()
                 } else {
-                    const response = await adyenShippingMethodsService.updateShippingMethod(
+                    const response = await shippingMethodsService.updateShippingMethod(
                         newShippingMethods.applicableShippingMethods[0].id,
                         basketToUse.basketId
                     )
@@ -377,10 +355,8 @@ export const getAppleButtonConfig = (
                     let finalResponse = response
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
-                            const calculatedBasket = await getBasketWithTotals(
-                                basketToUse.basketId,
-                                authToken,
-                                site
+                            const calculatedBasket = await basketsService.getBasket(
+                                basketToUse.basketId
                             )
                             finalResponse = calculatedBasket
                         }
@@ -432,8 +408,8 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-                const response = await adyenShippingMethodsService.updateShippingMethod(
+                // SLAS Token Security: Use PostMessage service for shipping method update
+                const response = await shippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
                     basketToUse.basketId
                 )
@@ -444,10 +420,8 @@ export const getAppleButtonConfig = (
                     let finalResponse = response
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
-                            const calculatedBasket = await getBasketWithTotals(
-                                basketToUse.basketId,
-                                authToken,
-                                site
+                            const calculatedBasket = await basketsService.getBasket(
+                                basketToUse.basketId
                             )
                             finalResponse = calculatedBasket
                         }
@@ -483,12 +457,12 @@ export const getAppleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Apple Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                cleanupBasket()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                cleanupBasket()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -535,13 +509,17 @@ export const ApplePayExpress = ({
     useEffect(() => {
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
-            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch((error) =>
+            // SLAS Token Security: Use PostMessage service for cleanup
+            if (isPdpMode && currentSku && tempBasket?.basketId && finalSite) {
+                const basketsService = new PostMessageBasketsService(finalSite)
+                basketsService
+                    .deleteBasket(tempBasket.basketId)
+                    .catch((error) =>
                     console.warn('Failed to cleanup temporary basket on unmount:', error)
                 )
             }
         }
-    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
+    }, [tempBasket?.basketId, finalSite?.id, currentSku, isPdpMode])
 
     useEffect(
         () => {
@@ -681,6 +659,7 @@ ApplePayExpress.propTypes = {
     basket: PropTypes.object,
     sku: PropTypes.string,
     quantity: PropTypes.number,
+    currency: PropTypes.string,
     isPdpMode: PropTypes.bool,
     manager: PropTypes.object
 }
