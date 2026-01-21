@@ -218,4 +218,36 @@ describe('usePasskeyLogin', () => {
         expect(startWebauthnAuthentication.mutateAsync).not.toHaveBeenCalled()
         expect(mockGetCredentials).not.toHaveBeenCalled()
     })
+
+    test('falls back to manual encoding when toJSON() is not supported', async () => {
+        // Create a credential mock where toJSON() doesn't exist
+        const credentialWithoutToJSON = mockCredential
+        delete credentialWithoutToJSON.toJSON
+
+        mockGetCredentials.mockResolvedValue(credentialWithoutToJSON)
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+        fireEvent.click(trigger)
+
+        await waitFor(() => {
+            expect(finishWebauthnAuthentication.mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    credential: expect.objectContaining({
+                        id: 'test-credential-id',
+                        rawId: expect.any(String),
+                        type: 'public-key',
+                        clientExtensionResults: {},
+                        response: expect.objectContaining({
+                            authenticatorData: expect.any(String),
+                            clientDataJSON: expect.any(String),
+                            signature: expect.any(String),
+                            userHandle: expect.any(String)
+                        })
+                    })
+                })
+            )
+        })
+    })
 })
