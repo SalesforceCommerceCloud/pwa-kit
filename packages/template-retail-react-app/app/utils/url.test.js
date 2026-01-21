@@ -16,8 +16,7 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath,
-    serverSafeEncode,
-    buildAbsoluteUrl
+    serverSafeEncode
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -46,6 +45,13 @@ jest.mock('./site-utils', () => {
     return {
         ...original,
         getUrlConfig: jest.fn()
+    }
+})
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
+    return {
+        ...original,
+        getEnvBasePath: jest.fn(() => '')
     }
 })
 
@@ -389,6 +395,11 @@ describe('removeQueryParamsFromPath test', () => {
 })
 
 describe('absoluteUrl', function () {
+    test('return undefined when path is not provided', () => {
+        const url = absoluteUrl()
+        expect(url).toBeUndefined()
+    })
+
     test('return expected when path is a relative url', () => {
         const url = absoluteUrl('/uk/en/women/dresses')
         expect(url).toBe('https://www.example.com/uk/en/women/dresses')
@@ -396,6 +407,19 @@ describe('absoluteUrl', function () {
 
     test('return expected when path is an absolute url', () => {
         const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
+        expect(url).toBe('https://www.example.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is a relative url and appOrigin is provided', () => {
+        const url = absoluteUrl('uk/en/women/dresses', 'https://www.custom.com')
+        expect(url).toBe('https://www.custom.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is an absolute url and appOrigin is provided', () => {
+        const url = absoluteUrl(
+            'https://www.example.com/uk/en/women/dresses',
+            'https://www.should-be-ignored.com'
+        )
         expect(url).toBe('https://www.example.com/uk/en/women/dresses')
     })
 })
@@ -475,17 +499,5 @@ describe('serverSafeEncode', () => {
         // Decode should give us original string
         const decoded = decodeURIComponent(encoded)
         expect(decoded).toBe(input)
-    })
-})
-
-describe('buildAbsoluteUrl', () => {
-    test.each([
-        ['absolute callbackURI', 'https://callback.com/', 'https://callback.com/'],
-        ['relative callbackURI', '/callback', 'https://www.example.com/callback'],
-        ['empty callbackURI', '', undefined],
-        ['undefined callbackURI', undefined, undefined]
-    ])('returns correct URL for %s', (_, callbackURI, expected) => {
-        const result = buildAbsoluteUrl('https://www.example.com', callbackURI)
-        expect(result).toBe(expected)
     })
 })
