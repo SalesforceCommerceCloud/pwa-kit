@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* global PublicKeyCredential */
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-import {decode as base64Decode, encode as base64Encode} from 'base64-arraybuffer'
+import {encode as base64Encode} from 'base64-arraybuffer'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the passkey login flow.
@@ -17,9 +16,8 @@ export const usePasskeyLogin = () => {
     const finishWebauthnAuthentication = useAuthHelper(AuthHelpers.FinishWebauthnAuthentication)
 
     const uint8arrayToBase64url = (input) => {
-        // Accept either ArrayBuffer or Uint8Array
-        const buffer = new Uint8Array(input)
-        const base64 = base64Encode(buffer)
+        const uint8array = new Uint8Array(input)
+        const base64 = base64Encode(uint8array.buffer)
         return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
     }
 
@@ -31,7 +29,7 @@ export const usePasskeyLogin = () => {
             return
         }
 
-        // Availability of window.PublicKeyCredential means WebAuthn is usable
+        // Availability of window.PublicKeyCredential means WebAuthn is supported in this browser
         if (!window.PublicKeyCredential || !PublicKeyCredential.isConditionalMediationAvailable) {
             return
         }
@@ -63,33 +61,31 @@ export const usePasskeyLogin = () => {
         }
 
         // Encode credential before sending to SLAS
-        const encodedCredential = {
-            id: credential.id,
-            rawId: uint8arrayToBase64url(credential.rawId),
-            type: credential.type,
-            clientExtensionResults: credential.getClientExtensionResults(),
-            response: {
-                authenticatorData: uint8arrayToBase64url(credential.response.authenticatorData),
-                clientDataJSON: uint8arrayToBase64url(credential.response.clientDataJSON),
-                signature: uint8arrayToBase64url(credential.response.signature),
-                userHandle: uint8arrayToBase64url(credential.response.userHandle)
+        // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
+        let encodedCredential
+        try {
+            encodedCredential = credential.toJSON()
+        } catch (error) {
+            // Fallback to manual encoding if toJSON() fails.
+            // Some passkey providers (e.g., 1Password) may not support the toJSON() method and return an error.
+            // In this case, we manually encode the credential.
+            encodedCredential = {
+                id: credential.id,
+                rawId: uint8arrayToBase64url(credential.rawId),
+                type: credential.type,
+                clientExtensionResults: credential.getClientExtensionResults(),
+                response: {
+                    authenticatorData: uint8arrayToBase64url(credential.response.authenticatorData),
+                    clientDataJSON: uint8arrayToBase64url(credential.response.clientDataJSON),
+                    signature: uint8arrayToBase64url(credential.response.signature),
+                    userHandle: uint8arrayToBase64url(credential.response.userHandle)
+                }
             }
         }
 
-        const finishWebauthnAuthenticationResponse = await finishWebauthnAuthentication.mutateAsync(
-            {
-                credential: encodedCredential
-            }
-        )
-
-        console.log('finishWebauthnAuthenticationResponse ->', finishWebauthnAuthenticationResponse)
-
-        if (!finishWebauthnAuthenticationResponse) {
-            throw new Error(
-                'Error finishing passkey authentication:',
-                finishWebauthnAuthenticationResponse
-            )
-        }
+        await finishWebauthnAuthentication.mutateAsync({
+            credential: encodedCredential
+        })
         return
     }
 
