@@ -97,57 +97,70 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         return bytes.buffer
     }
 
-    /**
-     * Convert ArrayBuffer to base64url string
-     */
-    const arrayBufferToBase64Url = (buffer) => {
-        const bytes = new Uint8Array(buffer)
-        let binary = ''
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i])
-        }
-        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-    }
-
     const handleOtpVerification = async (code) => {
         setIsLoading(true)
         setError(null)
 
         try {
-            // Step 1: Start WebAuthn registration and get options
+            // Step 1: Start WebAuthn registration
             const response = await startWebauthnUserRegistration.mutateAsync({
                 user_id: customer.email,
                 pwd_action_token: code,
                 ...(passkeyNickname && {nick_name: passkeyNickname})
             })
 
+            // Get current domain for rp.id (WebAuthn security requirement)
+            const currentHost = window.location.hostname
+
             // Step 2: Convert response to WebAuthn PublicKeyCredentialCreationOptions format
             const publicKey = {
                 challenge: base64UrlToArrayBuffer(response.challenge),
-                rp: response.rp,
+                rp: {
+                    ...response.rp,
+                    id: currentHost
+                },
                 user: {
                     ...response.user,
                     id: base64UrlToArrayBuffer(response.user.id)
                 },
-                pubKeyCredParams: response.pubKeyCredParams,
+                pubKeyCredParams: response.pubKeyCredParams || [],
                 authenticatorSelection: response.authenticatorSelection,
                 timeout: response.timeout,
-                attestation: response.attestation
+                attestation: response.attestation || 'none'
             }
 
             // Step 3: Call navigator.credentials.create()
-            const credential = await navigator.credentials.create({
-                publicKey
-            })
+            if (!navigator.credentials || !navigator.credentials.create) {
+                throw new Error('WebAuthn API not available in this browser')
+            }
 
-            // Step 4: Convert credential to JSON format for the server
+            // navigator.credentials.create() will show a browser/system prompt
+            // This may appear to hang if the user doesn't interact with the prompt
+            let credential
+            try {
+                credential = await navigator.credentials.create({
+                    publicKey
+                })
+            } catch (createError) {
+                // Handle user cancellation or other errors from the WebAuthn API
+                if (createError.name === 'NotAllowedError' || createError.name === 'AbortError') {
+                    throw new Error('Passkey registration was cancelled or timed out')
+                }
+                throw createError
+            }
+
+            if (!credential) {
+                throw new Error('Failed to create credential: user cancelled or operation failed')
+            }
+
+            // Step 4: Convert credential to JSON format
             const credentialJson = {
-                id: credential.id,
-                rawId: arrayBufferToBase64Url(credential.rawId),
                 type: credential.type,
+                id: credential.id,
+                rawId: credential.rawId,
                 response: {
-                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
-                    attestationObject: arrayBufferToBase64Url(credential.response.attestationObject)
+                    attestationObject: credential.response.attestationObject,
+                    clientDataJSON: credential.response.clientDataJSON
                 }
             }
 
