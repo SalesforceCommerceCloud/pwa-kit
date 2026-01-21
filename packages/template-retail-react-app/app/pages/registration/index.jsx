@@ -63,13 +63,12 @@ const Registration = () => {
         if (isRegistered && config?.app?.login?.passkey?.enabled) {
             if (
                 window.PublicKeyCredential &&
-                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                window.PublicKeyCredential.isConditionalMediationAvailable
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-
-                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()

@@ -186,12 +186,12 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
-                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                window.PublicKeyCredential.isConditionalMediationAvailable
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
