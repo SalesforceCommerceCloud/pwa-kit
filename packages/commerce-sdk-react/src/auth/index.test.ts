@@ -70,7 +70,8 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
-            }
+            },
+            authorizePasswordlessCustomer: jest.fn().mockResolvedValue({})
         }))
     }
 })
@@ -923,29 +924,36 @@ describe('Auth', () => {
 
     test('authorizePasswordless calls isomorphic authorizePasswordless', async () => {
         const auth = new Auth(config)
+        const slasClient = (auth as any).client
         await auth.authorizePasswordless({
             callbackURI: 'callbackURI',
             userid: 'userid',
             mode: 'callback'
         })
-        expect(helpers.authorizePasswordless).toHaveBeenCalled()
-        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
+        expect(slasClient.authorizePasswordlessCustomer).toHaveBeenCalled()
+        const functionArg = (slasClient.authorizePasswordlessCustomer as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {
-                callbackURI: 'callbackURI',
-                userid: 'userid',
-                mode: 'callback'
+            body: {
+                user_id: 'userid',
+                mode: 'callback',
+                channel_id: 'siteId',
+                callback_uri: 'callbackURI'
             }
         })
     })
 
     test('authorizePasswordless sets mode to sms as configured', async () => {
         const auth = new Auth(configPasswordlessSms)
+        const slasClient = (auth as any).client
         await auth.authorizePasswordless({userid: 'userid'})
-        expect(helpers.authorizePasswordless).toHaveBeenCalled()
-        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
+        expect(slasClient.authorizePasswordlessCustomer).toHaveBeenCalled()
+        const functionArg = (slasClient.authorizePasswordlessCustomer as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {userid: 'userid', mode: 'sms'}
+            body: {
+                user_id: 'userid',
+                mode: 'sms',
+                channel_id: 'siteId'
+            }
         })
     })
 
