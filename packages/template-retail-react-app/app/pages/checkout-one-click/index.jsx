@@ -111,6 +111,9 @@ const CheckoutOneClick = () => {
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.AddPaymentInstrumentToBasket
     )
+    const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
+        ShopperBasketsMutations.RemovePaymentInstrumentFromBasket
+    )
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
@@ -469,8 +472,14 @@ const CheckoutOneClick = () => {
         // Show overlay immediately to prevent double-clicking
         setIsPlacingOrder(true)
         try {
-            // If using a new card (no applied saved payment), validate fields to surface errors
-            const isUsingNewCard = !appliedPayment
+            // Check if we have form values (new card entered)
+            const paymentFormValues = paymentMethodForm.getValues()
+            const hasFormValues = paymentFormValues && paymentFormValues.expiry
+            // Check if user selected to enter a new card (vs using a saved payment)
+            const isEnteringNewCard = selectedPaymentMethod === 'cc' || !selectedPaymentMethod
+
+            // If using a new card (either no applied payment OR user selected 'cc' and entered form values), validate fields
+            const isUsingNewCard = !appliedPayment || (isEnteringNewCard && hasFormValues)
             if (isUsingNewCard) {
                 const isValid = await paymentMethodForm.trigger()
                 if (!isValid) {
@@ -480,9 +489,6 @@ const CheckoutOneClick = () => {
                     return
                 }
             }
-            // Check if we have form values (new card entered)
-            const paymentFormValues = paymentMethodForm.getValues()
-            const hasFormValues = paymentFormValues && paymentFormValues.expiry
 
             // Prepare full card details for saving (only if we have form values for new cards)
             let fullCardDetails = null
@@ -499,8 +505,37 @@ const CheckoutOneClick = () => {
             // For saved payments (appliedPayment), we don't need fullCardDetails
             // because we're not saving them again - they're already saved
 
-            if (!appliedPayment) {
-                // No payment applied, need to add a new payment instrument
+            // Handle payment submission
+            if (isEnteringNewCard && hasFormValues) {
+                // User entered a new card - need to replace existing payment if one exists
+                if (appliedPayment) {
+                    // Remove the existing payment before adding the new one
+                    try {
+                        await removePaymentInstrumentFromBasket({
+                            parameters: {
+                                basketId: basket?.basketId,
+                                paymentInstrumentId: appliedPayment.paymentInstrumentId
+                            }
+                        })
+                        // Refetch basket to ensure we have the latest state
+                        await currentBasketQuery.refetch()
+                    } catch (error) {
+                        showError(
+                            formatMessage({
+                                defaultMessage:
+                                    'Could not remove the existing payment. Please try again.',
+                                id: 'checkout_payment.error.cannot_remove_existing_payment'
+                            })
+                        )
+                        setIsPlacingOrder(false)
+                        return
+                    }
+                }
+                // Add the new payment instrument
+                await onPaymentSubmit(paymentFormValues)
+            } else if (!appliedPayment) {
+                // No payment applied yet - this shouldn't happen if validation passed,
+                // but handle it as a safety check
                 if (hasFormValues) {
                     await onPaymentSubmit(paymentFormValues)
                 }
