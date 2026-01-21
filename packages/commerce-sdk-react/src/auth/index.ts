@@ -54,7 +54,6 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
-    locale: string
 }
 
 interface JWTHeaders {
@@ -96,6 +95,7 @@ type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: 'email' | 'callback'
+    locale?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -273,7 +273,6 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
-    private locale: string
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -370,8 +369,6 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
-
-        this.locale = config.locale
     }
 
     get(name: AuthDataKeys) {
@@ -1275,7 +1272,6 @@ class Auth {
         // do not pass the mode parameter. Newer versions should explicitly pass the mode.
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const locale = this.locale
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1285,7 +1281,7 @@ class Auth {
             parameters: {
                 ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
-                ...(locale && {locale}),
+                ...(parameters.locale && {locale: parameters.locale}),
                 userid: parameters.userid,
                 mode
             }
@@ -1339,7 +1335,7 @@ class Auth {
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
                 hint: parameters.hint || 'cross_device',
-                locale: parameters.locale || this.locale,
+                ...(parameters.locale && {locale: parameters.locale}),
                 ...(parameters.idp_name && {idp_name: parameters.idp_name}),
                 ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }

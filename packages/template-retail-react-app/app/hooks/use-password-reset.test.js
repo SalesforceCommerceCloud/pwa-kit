@@ -87,7 +87,8 @@ describe('usePasswordReset', () => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
                 mode: mockConfig.app.login.resetPassword.mode,
-                callback_uri: mockConfig.app.login.resetPassword.callbackURI
+                callback_uri: mockConfig.app.login.resetPassword.callbackURI,
+                locale: 'en-GB'
             })
         })
     })
@@ -118,7 +119,8 @@ describe('usePasswordReset', () => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
                 mode: mockMode,
-                callback_uri: mockCallbackURI
+                callback_uri: mockCallbackURI,
+                locale: 'en-GB'
             })
         })
     })

@@ -35,6 +35,7 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
@@ -54,6 +55,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {isRegistered, customerType} = useCustomerType()
+    const {locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -107,7 +109,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         try {
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
-                mode: passwordlessMode
+                mode: passwordlessMode,
+                locale: locale.id
             })
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)

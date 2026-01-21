@@ -10,6 +10,7 @@ import {useIntl} from 'react-intl'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the reset password flow.
@@ -18,6 +19,7 @@ export const usePasswordReset = () => {
     const showToast = useToast()
     const {formatMessage} = useIntl()
     const appOrigin = useAppOrigin()
+    const {locale} = useMultiSite()
     const config = getConfig().app.login?.resetPassword
     const callbackURI = buildAbsoluteUrl(appOrigin, config?.callbackURI)
     const resetPasswordLandingPath = config?.landingPath
@@ -29,7 +31,8 @@ export const usePasswordReset = () => {
         await getPasswordResetTokenMutation.mutateAsync({
             user_id: email,
             callback_uri: callbackURI,
-            mode: config.mode
+            mode: config.mode,
+            locale: locale.id
         })
     }
 

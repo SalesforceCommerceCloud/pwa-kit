@@ -43,6 +43,7 @@ import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -84,6 +85,7 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
+    const {locale} = useMultiSite()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -104,6 +106,7 @@ export const AuthModal = ({
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessMode,
+                locale: locale.id,
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             setCurrentView(EMAIL_VIEW)

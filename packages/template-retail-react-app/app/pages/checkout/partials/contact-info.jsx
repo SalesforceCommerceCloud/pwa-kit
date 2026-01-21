@@ -46,10 +46,12 @@ import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
+    const {locale} = useMultiSite()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const appOrigin = useAppOrigin()
@@ -85,6 +87,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessConfigMode,
+                locale: locale.id,
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             setAuthModalView(EMAIL_VIEW)

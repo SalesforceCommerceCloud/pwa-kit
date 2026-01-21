@@ -97,8 +97,7 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI',
-    locale: 'en-US'
+    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI'
 }
 
 const configSLASPrivate = {
@@ -912,12 +911,12 @@ describe('Auth', () => {
     test.each([
         [
             'with all parameters specified',
-            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'},
+            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback', locale: 'en-US'},
             {
                 callbackURI: 'callbackURI',
                 userid: 'userid',
                 mode: 'callback',
-                locale: configSLASPrivate.locale
+                locale: 'en-US'
             }
         ],
         [
@@ -1043,8 +1042,7 @@ describe('Auth', () => {
                 mode: 'callback',
                 channel_id: config.siteId,
                 client_id: config.clientId,
-                hint: 'cross_device',
-                locale: config.locale
+                hint: 'cross_device'
             }
         ]
     ])('getPasswordResetToken %s', async (_, input: any, expectedBody: any) => {

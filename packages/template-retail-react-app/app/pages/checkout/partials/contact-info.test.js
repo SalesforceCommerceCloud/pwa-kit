@@ -202,7 +202,8 @@ describe('passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            mode: 'email'
+            mode: 'email',
+            locale: 'en-GB'
         })
 
         // check that check email modal is open
@@ -218,7 +219,8 @@ describe('passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: validEmail,
-            mode: 'email'
+            mode: 'email',
+            locale: 'en-GB'
         })
     })
 
@@ -253,7 +255,8 @@ describe('passwordless enabled', () => {
         ).toHaveBeenCalledWith({
             userid: validEmail,
             mode: 'callback',
-            callbackURI: 'https://callback.com/passwordless?redirectUrl=/checkout'
+            callbackURI: 'https://callback.com/passwordless?redirectUrl=/checkout',
+            locale: 'en-GB'
         })
     })
 

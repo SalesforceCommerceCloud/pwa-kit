@@ -370,7 +370,8 @@ describe('Passwordless login tests', () => {
                 mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
             ).toHaveBeenCalledWith({
                 userid: testEmail,
-                mode: 'email'
+                mode: 'email',
+                locale: 'en-GB'
             })
         })
 
@@ -388,7 +389,8 @@ describe('Passwordless login tests', () => {
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
             userid: testEmail,
-            mode: 'email'
+            mode: 'email',
+            locale: 'en-GB'
         })
     })
 
