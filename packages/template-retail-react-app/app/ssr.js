@@ -351,13 +351,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Allow Google Pay Specific frames
                         'https://pay.google.com'
                     ],
-                    'frame-ancestors': [
-                                        'self',
-                                        'https://payments-agent-production.mrt-storefront-staging.com',
-                                        '*.mrt-storefront-staging.com',
-                                        // Allow Salesforce site.com domains (for Commerce Agent/MIAW)
-                                        '*.site.com'
-                                    ]
+                    'frame-ancestors': ['self']
                 }
             }
         })
