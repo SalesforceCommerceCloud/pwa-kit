@@ -957,8 +957,8 @@ describe('Auth', () => {
         const auth = new Auth(configSLASPrivate)
 
         await auth.authorizePasswordless({userid: 'userid'})
-        expect(helpers.authorizePasswordless).toHaveBeenCalled()
-        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
+        expect(slasClient.authorizePasswordlessCustomer).toHaveBeenCalled()
+        const functionArg = (slasClient.authorizePasswordlessCustomer as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
             parameters: {
                 userid: 'userid',
