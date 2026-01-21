@@ -32,29 +32,46 @@ describe('ssr-namespace-paths tests', () => {
             expect(getEnvBasePath()).toBe('')
         })
 
-        test('getEnvBasePath returns empty string if envBasePath is not a string', () => {
-            process.env.MRT_ENV_BASE_PATH = 123
-            expect(getEnvBasePath()).toBe('')
-        })
-
-        test('getEnvBasePath removes trailing slash', () => {
+        test('getEnvBasePath throws error for base path with trailing slash', () => {
             process.env.MRT_ENV_BASE_PATH = '/sample/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for just a slash', () => {
+            process.env.MRT_ENV_BASE_PATH = '/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error if invalid characters are detected in envBasePath', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample<script>'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath trims whitespace from envBasePath', () => {
+            process.env.MRT_ENV_BASE_PATH = '  /sample  '
             expect(getEnvBasePath()).toBe('/sample')
         })
 
-        test('getEnvBasePath returns empty string if invalid characters are detected in envBasePath', () => {
-            process.env.MRT_ENV_BASE_PATH = '/sample.*'
-            expect(getEnvBasePath()).toBe('')
+        test('getEnvBasePath throws error for multi-part base paths with slashes', () => {
+            process.env.MRT_ENV_BASE_PATH = '/test/sample'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
-        test('getEnvBasePath normalizes envBasePath', () => {
-            process.env.MRT_ENV_BASE_PATH = '  //sample/  '
-            expect(getEnvBasePath()).toBe('/sample')
+        test('getEnvBasePath allows special characters: . + $ ~ " \' @ : -', () => {
+            process.env.MRT_ENV_BASE_PATH = '/a.b+c$d~e"f\'g@h:i-j_k'
+            expect(getEnvBasePath()).toBe('/a.b+c$d~e"f\'g@h:i-j_k')
         })
 
-        test('getEnvBasePath works with multiple part base path', () => {
-            process.env.MRT_ENV_BASE_PATH = '//test/sample/  '
-            expect(getEnvBasePath()).toBe('/test/sample')
+        test('getEnvBasePath throws error if base path exceeds 64 characters', () => {
+            // 65 characters total (1 slash + 64 chars)
+            process.env.MRT_ENV_BASE_PATH = '/' + 'a'.repeat(64)
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath allows base path of exactly 64 characters', () => {
+            // 64 characters total (1 slash + 63 chars)
+            process.env.MRT_ENV_BASE_PATH = '/' + 'a'.repeat(63)
+            expect(getEnvBasePath()).toBe('/' + 'a'.repeat(63))
         })
     })
 
@@ -72,19 +89,24 @@ describe('ssr-namespace-paths tests', () => {
             expect(getEnvBasePath()).toBe('')
         })
 
-        test('getEnvBasePath removes trailing slash from window global', () => {
+        test('getEnvBasePath throws error for base path with trailing slash from window global', () => {
             global.window.__MRT_ENV_BASE_PATH__ = '/sample/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath trims whitespace from window global value', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '  /sample  '
             expect(getEnvBasePath()).toBe('/sample')
         })
 
-        test('getEnvBasePath normalizes window global value', () => {
-            global.window.__MRT_ENV_BASE_PATH__ = '  //sample/  '
-            expect(getEnvBasePath()).toBe('/sample')
+        test('getEnvBasePath throws error if invalid characters in window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample<script>'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
-        test('getEnvBasePath returns empty string if invalid characters in window global', () => {
-            global.window.__MRT_ENV_BASE_PATH__ = '/sample.*'
-            expect(getEnvBasePath()).toBe('')
+        test('getEnvBasePath throws error for multi-part base paths in window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/test/sample'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
     })
 })

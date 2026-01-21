@@ -97,7 +97,7 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
-        envBasePath: '/store', /* This is a test base path. Remove this when merging to main. */
+        envBasePath: '/store' /* This is a test base path. Remove this when merging to main. */,
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',

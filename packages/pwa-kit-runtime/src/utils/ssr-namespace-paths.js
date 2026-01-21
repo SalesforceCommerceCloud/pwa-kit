@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import logger from './logger-instance'
-
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
  *
@@ -36,35 +34,25 @@ export const getEnvBasePath = () => {
         basePath = process.env.MRT_ENV_BASE_PATH || ''
     }
 
-    if (typeof basePath !== 'string') {
-        logger.warn('Invalid envBasePath configuration. No base path is applied.', {
-            namespace: 'ssr-namespace-paths.getEnvBasePath'
-        })
+    // Trim whitespace
+    basePath = basePath.trim()
+
+    // Return empty string if no base path is set
+    if (!basePath) {
         return ''
     }
 
-    // Normalize the base path
-    basePath = basePath
-        .trim()
-        .replace(/^\/?/, '/') // Ensure leading slash
-        .replace(/\/+/g, '/') // Normalize multiple slashes
-        .replace(/\/$/, '') // Remove trailing slash
-
-    // Return empty string for root path or empty result
-    if (basePath === '/' || !basePath) {
-        return ''
-    }
-
-    // only allow simple, safe characters
-    // eslint-disable-next-line no-useless-escape
-    if (!/^\/[a-zA-Z0-9\-_\/]*$/.test(basePath)) {
-        logger.warn(
-            'Invalid envBasePath configuration. Only letters, numbers, hyphens, underscores, and slashes allowed. No base path is applied.',
-            {
-                namespace: 'ssr-namespace-paths.getEnvBasePath'
-            }
+    // MRT will throw an error on bundle upload if the base path does not match
+    // the following regex: /^\/[a-zA-Z0-9_.+$~"'@:-]{1,63}$/
+    // This validates:
+    // - Starts with /
+    // - Followed by 1-63 characters (letters, numbers, and special chars: - _ . + $ ~ " ' @ :)
+    // - No additional slashes (multi-part paths not allowed)
+    // - Total max length of 64 characters (1 slash + 63 chars)
+    if (!/^\/[a-zA-Z0-9_.+$~"'@:-]{1,63}$/.test(basePath)) {
+        throw new Error(
+            "Invalid envBasePath configuration. Base path must start with '/' followed by 1-63 characters. Only letters, numbers, and the following special characters are allowed: - _ . + $ ~ \" ' @ :"
         )
-        return ''
     }
 
     return basePath
