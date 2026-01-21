@@ -30,6 +30,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import CompareButton from '@salesforce/retail-react-app/app/components/compare-button'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -85,6 +86,7 @@ const ProductTile = (props) => {
     const {
         dynamicImageProps,
         enableFavourite = false,
+        enableComparison = false,
         imageViewType = PRODUCT_TILE_IMAGE_VIEW_TYPE,
         isFavourite,
         onFavouriteToggle,
@@ -308,6 +310,24 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
+            {enableComparison && (
+                <Box
+                    position="absolute"
+                    top="2"
+                    right={enableFavourite ? "12" : "2"}
+                    onClick={(e) => {
+                        // stop click event from bubbling
+                        e.preventDefault()
+                    }}
+                >
+                    <CompareButton
+                        product={product}
+                        variant="icon"
+                        size="sm"
+                        data-testid="compare-button"
+                    />
+                </Box>
+            )}
             {filteredLabels.size > 0 && (
                 <HStack {...styles.badgeGroup}>
                     {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
@@ -369,6 +389,11 @@ ProductTile.propTypes = {
      * Use case: wishlist.
      */
     enableFavourite: PropTypes.bool,
+    /**
+     * Enable adding/removing product from comparison.
+     * Use case: product comparison.
+     */
+    enableComparison: PropTypes.bool,
     /**
      * Display the product as a favourite.
      */

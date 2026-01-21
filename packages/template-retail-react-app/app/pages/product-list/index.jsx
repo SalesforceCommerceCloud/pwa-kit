@@ -623,6 +623,7 @@ const ProductList = (props) => {
                                                               data-testid={`sf-product-tile-${productSearchItem.productId}`}
                                                               product={productSearchItem}
                                                               enableFavourite={true}
+                                                              enableComparison={true}
                                                               isFavourite={isInWishlist}
                                                               isRefreshingData={
                                                                   isRefetching && isFetched
