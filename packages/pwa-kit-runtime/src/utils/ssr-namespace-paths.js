@@ -34,9 +34,6 @@ export const getEnvBasePath = () => {
         basePath = process.env.MRT_ENV_BASE_PATH || ''
     }
 
-    // Trim whitespace
-    basePath = basePath.trim()
-
     // Return empty string if no base path is set
     if (!basePath) {
         return ''
@@ -47,7 +44,8 @@ export const getEnvBasePath = () => {
     // This validates:
     // - Starts with /
     // - Followed by 1-63 characters (letters, numbers, and special chars: - _ . + $ ~ " ' @ :)
-    // - No additional slashes (multi-part paths not allowed)
+    // - No additional slashes (multi-part paths not allowed, no trailing slashes)
+    // - No spaces
     // - Total max length of 64 characters (1 slash + 63 chars)
     if (!/^\/[a-zA-Z0-9_.+$~"'@:-]{1,63}$/.test(basePath)) {
         throw new Error(

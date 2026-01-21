@@ -47,9 +47,9 @@ describe('ssr-namespace-paths tests', () => {
             expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
-        test('getEnvBasePath trims whitespace from envBasePath', () => {
+        test('getEnvBasePath throws error for envBasePath with whitespace', () => {
             process.env.MRT_ENV_BASE_PATH = '  /sample  '
-            expect(getEnvBasePath()).toBe('/sample')
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
         test('getEnvBasePath throws error for multi-part base paths with slashes', () => {
@@ -94,9 +94,9 @@ describe('ssr-namespace-paths tests', () => {
             expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
-        test('getEnvBasePath trims whitespace from window global value', () => {
+        test('getEnvBasePath throws error for window global value with whitespace', () => {
             global.window.__MRT_ENV_BASE_PATH__ = '  /sample  '
-            expect(getEnvBasePath()).toBe('/sample')
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
         })
 
         test('getEnvBasePath throws error if invalid characters in window global', () => {
