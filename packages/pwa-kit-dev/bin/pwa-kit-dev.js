@@ -254,10 +254,15 @@ const main = async () => {
                 process.exit(1)
             }
 
+            // Load config to get envBasePath for local development
+            const config = getConfig() || {}
+            const envBasePath = config.ssrParameters?.envBasePath || ''
+
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {})
+                    ...(noHMR ? {HMR: 'false'} : {}),
+                    ...(envBasePath ? {MRT_ENV_BASE_PATH: envBasePath} : {})
                 }
             })
         })

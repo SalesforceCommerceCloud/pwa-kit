@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './ssr-config'
 import logger from './logger-instance'
 
 /**
@@ -29,8 +28,13 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
  * Returns an empty string if the base path is not set or is '/'.
  */
 export const getEnvBasePath = () => {
-    const config = getConfig()
-    let basePath = config?.envBasePath || ''
+    let basePath = ''
+
+    if (typeof window !== 'undefined') {
+        basePath = window.__MRT_ENV_BASE_PATH__ || ''
+    } else {
+        basePath = process.env.MRT_ENV_BASE_PATH || ''
+    }
 
     if (typeof basePath !== 'string') {
         logger.warn('Invalid envBasePath configuration. No base path is applied.', {

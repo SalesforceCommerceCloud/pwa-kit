@@ -5,43 +5,86 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {getEnvBasePath} from './ssr-namespace-paths'
-import * as ssrConfig from './ssr-config'
-
-jest.mock('./ssr-config')
 
 describe('ssr-namespace-paths tests', () => {
-    test('getEnvBasePath returns base path from config', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample'})
-        expect(getEnvBasePath()).toBe('/sample')
+    const originalEnv = process.env
+
+    beforeEach(() => {
+        jest.resetModules()
+        process.env = {...originalEnv}
+        delete process.env.MRT_ENV_BASE_PATH
+        // Ensure we're in Node environment (no window)
+        delete global.window
     })
 
-    test('getEnvBasePath returns empty string if no base path is set', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
-        expect(getEnvBasePath()).toBe('')
+    afterEach(() => {
+        process.env = originalEnv
+        delete global.window
     })
 
-    test('getEnvBasePath returns empty string if envBasePath is not a string', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: 123})
-        expect(getEnvBasePath()).toBe('')
+    describe('Node environment (process.env)', () => {
+        test('getEnvBasePath returns base path from environment variable', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath returns empty string if no base path is set', () => {
+            expect(getEnvBasePath()).toBe('')
+        })
+
+        test('getEnvBasePath returns empty string if envBasePath is not a string', () => {
+            process.env.MRT_ENV_BASE_PATH = 123
+            expect(getEnvBasePath()).toBe('')
+        })
+
+        test('getEnvBasePath removes trailing slash', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample/'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath returns empty string if invalid characters are detected in envBasePath', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample.*'
+            expect(getEnvBasePath()).toBe('')
+        })
+
+        test('getEnvBasePath normalizes envBasePath', () => {
+            process.env.MRT_ENV_BASE_PATH = '  //sample/  '
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath works with multiple part base path', () => {
+            process.env.MRT_ENV_BASE_PATH = '//test/sample/  '
+            expect(getEnvBasePath()).toBe('/test/sample')
+        })
     })
 
-    test('getEnvBasePath removes trailing slash', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample/'})
-        expect(getEnvBasePath()).toBe('/sample')
-    })
+    describe('Browser environment (window)', () => {
+        beforeEach(() => {
+            global.window = {}
+        })
 
-    test('getEnvBasePath returns empty string if invalid cahracters are detected in envBasePath', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*'})
-        expect(getEnvBasePath()).toBe('')
-    })
+        test('getEnvBasePath returns base path from window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
 
-    test('getEnvBasePath normalizes envBasePath', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '  //sample/  '})
-        expect(getEnvBasePath()).toBe('/sample')
-    })
+        test('getEnvBasePath returns empty string if window global is not set', () => {
+            expect(getEnvBasePath()).toBe('')
+        })
 
-    test('getEnvBasePath works with multiple part base path', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '//test/sample/  '})
-        expect(getEnvBasePath()).toBe('/test/sample')
+        test('getEnvBasePath removes trailing slash from window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample/'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath normalizes window global value', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '  //sample/  '
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath returns empty string if invalid characters in window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample.*'
+            expect(getEnvBasePath()).toBe('')
+        })
     })
 })
