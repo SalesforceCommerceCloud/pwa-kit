@@ -1,4 +1,5 @@
 name: check_clean
+description: Check if repository has uncommitted changes
 runs:
   using: composite
   steps:
