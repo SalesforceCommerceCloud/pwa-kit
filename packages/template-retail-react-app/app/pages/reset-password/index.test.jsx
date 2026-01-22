@@ -13,6 +13,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const mockUseRouteMatch = jest.fn(() => ({path: '/'}))
 
@@ -93,7 +94,7 @@ test.each([
     ['no callback_uri is registered for client', 'This feature is not currently available.'],
     [
         'Too many password reset requests were made. Please try again later.',
-        'Too many requests. For your security, please wait 10 minutes before trying again.'
+        'You reached the limit for password resets. For your security, wait 10 minutes and try again.'
     ],
     ['unexpected error message', 'Something went wrong. Try again!']
 ])(

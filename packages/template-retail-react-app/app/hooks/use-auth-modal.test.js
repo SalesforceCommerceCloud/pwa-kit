@@ -379,7 +379,7 @@ describe('Passwordless enabled', () => {
         ['no callback_uri is registered for client', 'This feature is not currently available.'],
         [
             'Too many login requests were made. Please try again later.',
-            'Too many requests. For your security, please wait 10 minutes before trying again.'
+            'You reached the limit for login attempts. For your security, wait 10 minutes and try again.'
         ],
         ['unexpected error message', 'Something went wrong. Try again!']
     ])(
@@ -653,7 +653,7 @@ describe('Reset password', function () {
         ['no callback_uri is registered for client', 'This feature is not currently available.'],
         [
             'Too many password reset requests were made. Please try again later.',
-            'Too many requests. For your security, please wait 10 minutes before trying again.'
+            'You reached the limit for password resets. For your security, wait 10 minutes and try again.'
         ],
         ['unexpected error message', 'Something went wrong. Try again!']
     ])(

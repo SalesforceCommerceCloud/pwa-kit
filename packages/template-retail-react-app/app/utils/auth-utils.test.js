@@ -11,7 +11,8 @@ import {
 import {
     getPasswordlessErrorMessage,
     getPasswordResetErrorMessage,
-    TOO_MANY_REQUESTS_ERROR_MESSAGE
+    TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
+    TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 describe('getPasswordlessErrorMessage', () => {
@@ -29,7 +30,7 @@ describe('getPasswordlessErrorMessage', () => {
         ['client secret is not provided', FEATURE_UNAVAILABLE_ERROR_MESSAGE],
         [
             'Too many login requests were made. Please try again later.',
-            TOO_MANY_REQUESTS_ERROR_MESSAGE
+            TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
         ],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
@@ -51,7 +52,7 @@ describe('getPasswordResetErrorMessage', () => {
         ],
         [
             'Too many password reset requests were made. Please try again later.',
-            TOO_MANY_REQUESTS_ERROR_MESSAGE
+            TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
         ],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]

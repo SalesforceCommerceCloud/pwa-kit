@@ -11,10 +11,16 @@ import {
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 
-export const TOO_MANY_REQUESTS_ERROR_MESSAGE = defineMessage({
+export const TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     defaultMessage:
-        'Too many requests. For your security, please wait 10 minutes before trying again.',
-    id: 'global.error.too_many_requests'
+        'You reached the limit for login attempts. For your security, wait 10 minutes and try again.',
+    id: 'global.error.too_many_login_attempts'
+})
+
+export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
+    defaultMessage:
+        'You reached the limit for password resets. For your security, wait 10 minutes and try again.',
+    id: 'global.error.too_many_password_reset_requests'
 })
 
 // Shared error patterns for token-based auth features (passwordless login, password reset)
@@ -46,7 +52,7 @@ export const getPasswordlessErrorMessage = (errorMessage) => {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
     if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
-        return TOO_MANY_REQUESTS_ERROR_MESSAGE
+        return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
 }
@@ -63,7 +69,7 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
     if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
-        return TOO_MANY_REQUESTS_ERROR_MESSAGE
+        return TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
 }

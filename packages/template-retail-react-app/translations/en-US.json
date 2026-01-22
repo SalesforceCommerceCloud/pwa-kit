@@ -744,8 +744,11 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
-  "global.error.too_many_requests": {
-    "defaultMessage": "Too many requests. For your security, please wait 10 minutes before trying again."
+  "global.error.too_many_login_attempts": {
+    "defaultMessage": "You reached the limit for login attempts. For your security, wait 10 minutes and try again."
+  },
+  "global.error.too_many_password_reset_requests": {
+    "defaultMessage": "You reached the limit for password resets. For your security, wait 10 minutes and try again."
   },
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
