@@ -97,6 +97,19 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         return bytes.buffer
     }
 
+    /**
+     * Convert ArrayBuffer to base64url string
+     */
+    const arrayBufferToBase64Url = (buffer) => {
+        const bytes = new Uint8Array(buffer)
+        let binary = ''
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i])
+        }
+        const base64 = btoa(binary)
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    }
+
     const handleOtpVerification = async (code) => {
         setIsLoading(true)
         setError(null)
@@ -157,11 +170,13 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             const credentialJson = {
                 type: credential.type,
                 id: credential.id,
-                rawId: credential.rawId,
+                rawId: arrayBufferToBase64Url(credential.rawId),
                 response: {
-                    attestationObject: credential.response.attestationObject,
-                    clientDataJSON: credential.response.clientDataJSON
-                }
+                    attestationObject: arrayBufferToBase64Url(credential.response.attestationObject),
+                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+                    transports: credential.response.getTransports()
+                },
+                clientExtensionResults: credential.getClientExtensionResults()
             }
 
             // Step 5: Finish WebAuthn registration
