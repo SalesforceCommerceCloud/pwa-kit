@@ -1,4 +1,5 @@
 name: smoke_tests
+description: Run smoke tests on npm scripts
 inputs:
   dir:
     required: false

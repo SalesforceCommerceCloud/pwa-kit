@@ -22,6 +22,100 @@ import {
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+// Simple mock order for SOM integration tests
+const createMockOrder = (overrides = {}) => ({
+    orderNo: '00099999',
+    orderTotal: 99.99,
+    currency: 'USD',
+    creationDate: '2025-01-15T10:00:00.000Z',
+    status: 'open',
+    productItems: [{productId: 'test-product-1', productName: 'Test Product', quantity: 1}],
+    shipments: [
+        {
+            shippingMethod: {name: 'Ground'},
+            shippingStatus: 'not_shipped',
+            shippingAddress: {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Test St',
+                city: 'Boston',
+                stateCode: 'MA',
+                postalCode: '02101'
+            }
+        }
+    ],
+    billingAddress: {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        address1: '456 Bill St',
+        city: 'Boston',
+        stateCode: 'MA',
+        postalCode: '02101'
+    },
+    paymentInstruments: [
+        {paymentCard: {cardType: 'Visa', numberLastDigits: '1111', holder: 'Jane Smith'}}
+    ],
+    ...overrides
+})
+
+// Mock OMS order (based on real API response structure)
+const createMockOmsOrder = (overrides = {}) => ({
+    orderNo: 'dec1625xxx00000601',
+    orderTotal: 366.43,
+    currency: 'USD',
+    creationDate: '2026-01-14T01:43:00.000Z',
+    // Note: No 'status' field - OMS orders use omsData.status
+    omsData: {
+        status: 'Created',
+        shipments: [
+            {
+                id: '0OBLT0000000Nav4AE',
+                status: 'Allocated',
+                provider: 'UPS',
+                trackingNumber: '123456789',
+                trackingUrl: 'https://www.ups.com/track?loc=en_US&tracknum=123456789',
+                expectedDeliveryDate: '2026-01-16T00:00:00.000Z'
+            }
+        ]
+    },
+    productItems: [
+        {
+            productId: '640188017003M',
+            productName: 'Charcoal Flat Front Athletic Fit Shadow Striped Wool Suit',
+            quantity: 1,
+            omsData: {status: 'allocated', quantityAvailableToCancel: 0}
+        }
+    ],
+    shipments: [
+        {
+            shipmentId: '0agLT00000Q4Sd3YAF',
+            shippingMethod: {
+                name: 'Ground',
+                description: 'Order received within 7-10 business days'
+            },
+            // Note: OMS uses fullName instead of firstName/lastName
+            shippingAddress: {
+                fullName: 'Alex Johnson',
+                address1: '2030 NE 8th st',
+                city: 'Seattle',
+                stateCode: 'WA',
+                postalCode: '98121',
+                countryCode: 'US'
+            }
+        }
+    ],
+    billingAddress: {
+        fullName: 'Alex Johnson',
+        address1: '2030 NE 8th st',
+        city: 'Seattle',
+        stateCode: 'WA',
+        postalCode: '98121'
+    },
+    // Note: OMS orders may not have payment data
+    paymentInstruments: [],
+    ...overrides
+})
+
 const MockedComponent = () => {
     return (
         <Switch>
@@ -256,44 +350,9 @@ const setupOrderDetailsPage = (mockOrder) => {
     })
 }
 
-describe('Order with ECOM status (non-OMS)', () => {
-    beforeEach(async () => {
-        const ecomOrder = {
-            ...mockOrderHistory.data[0],
-            status: 'new'
-        }
-        setupOrderDetailsPage(ecomOrder)
-    })
-
-    test('should display ECOM status when present', async () => {
-        const statusBadge = await screen.findByText('new')
-        expect(statusBadge).toBeInTheDocument()
-    })
-})
-
-describe('Order with OMS data', () => {
-    beforeEach(async () => {
-        const omsOrder = {
-            ...mockOrderHistory.data[0],
-            status: undefined,
-            omsData: {status: 'SHIPPED'}
-        }
-        setupOrderDetailsPage(omsOrder)
-    })
-
-    test('should display OMS status when ECOM status is not present', async () => {
-        const statusBadge = await screen.findByText('SHIPPED')
-        expect(statusBadge).toBeInTheDocument()
-    })
-})
-
 describe('Order without payment data', () => {
     beforeEach(async () => {
-        const orderWithoutPayment = {
-            ...mockOrderHistory.data[0],
-            paymentInstruments: []
-        }
-        setupOrderDetailsPage(orderWithoutPayment)
+        setupOrderDetailsPage(createMockOrder({paymentInstruments: []}))
     })
 
     test('should render order details page', async () => {
@@ -306,52 +365,98 @@ describe('Order without payment data', () => {
     })
 })
 
-describe('Order with firstName and lastName for shipping address', () => {
-    beforeEach(async () => {
-        const orderWithNames = {
-            ...mockOrderHistory.data[0],
-            shipments: [
-                {
-                    ...mockOrderHistory.data[0].shipments[0],
-                    shippingAddress: {
-                        ...mockOrderHistory.data[0].shipments[0].shippingAddress,
-                        firstName: 'Jane',
-                        lastName: 'Doe',
-                        fullName: 'Should Not Display'
-                    }
-                }
-            ]
-        }
-        setupOrderDetailsPage(orderWithNames)
+describe('OMS/SOM Integration - Order Details', () => {
+    // ECOM order tests - uses order.status, firstName/lastName, and has payment data
+    test('should display ECOM order status from order.status', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('open')).toBeInTheDocument()
     })
 
-    test('should display firstName + lastName when both present', async () => {
-        expect(await screen.findByText(/Jane Doe/i)).toBeInTheDocument()
-        expect(screen.queryByText(/Should Not Display/i)).not.toBeInTheDocument()
+    test('should display firstName + lastName for ECOM shipping address', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+    })
+
+    test('should display payment method for ECOM order', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+    })
+
+    // OMS order tests - uses omsData.status, fullName, and has no payment data
+    test('should display OMS status from omsData.status', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Created')).toBeInTheDocument()
+    })
+
+    test('should display fullName for OMS shipping address', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display payment method for OMS order', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
     })
 })
 
-describe('Order with fullName fallback for shipping address', () => {
-    beforeEach(async () => {
-        const orderWithFullName = {
-            ...mockOrderHistory.data[0],
-            shipments: [
-                {
-                    ...mockOrderHistory.data[0].shipments[0],
-                    shippingAddress: {
-                        ...mockOrderHistory.data[0].shipments[0].shippingAddress,
-                        firstName: undefined,
-                        lastName: undefined,
-                        fullName: 'John Smith'
-                    }
-                }
-            ]
-        }
-        setupOrderDetailsPage(orderWithFullName)
+describe('OMS/SOM Integration - Order History', () => {
+    // Helper to setup order history with mock data
+    const setupOrderHistoryMock = (orderData) => {
+        global.server.use(
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({limit: 10, offset: 0, total: 1, data: [orderData]})
+                )
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+    }
+
+    // ECOM order tests - uses order.status and firstName/lastName
+    test('should display ECOM order status from order.status', async () => {
+        setupOrderHistoryMock(createMockOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('open')).toBeInTheDocument()
     })
 
-    test('should display fullName when firstName and lastName are not present', async () => {
-        expect(await screen.findByText(/John Smith/i)).toBeInTheDocument()
+    test('should display firstName + lastName for ECOM shipping address', async () => {
+        setupOrderHistoryMock(createMockOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Shipped to: John Doe/i)).toBeInTheDocument()
+    })
+
+    // OMS order tests - uses omsData.status and fullName
+    test('should display OMS status from omsData.status', async () => {
+        setupOrderHistoryMock(createMockOmsOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Created')).toBeInTheDocument()
+    })
+
+    test('should display fullName for OMS shipping address', async () => {
+        setupOrderHistoryMock(createMockOmsOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Shipped to: Alex Johnson/i)).toBeInTheDocument()
     })
 })
 
