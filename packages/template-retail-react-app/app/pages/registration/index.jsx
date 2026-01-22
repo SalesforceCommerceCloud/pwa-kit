@@ -17,8 +17,9 @@ import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import {setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const Registration = () => {
     const {formatMessage} = useIntl()
@@ -29,6 +30,9 @@ const Registration = () => {
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
+
+    const config = getConfig()
+    const {showToast} = usePasskeyRegistration()
 
     const submitForm = async (data) => {
         const body = {
@@ -53,6 +57,27 @@ const Registration = () => {
             // Set flag for passkey toast on account page
             setSessionJSONItem('newAccountCreated', true)
             navigate('/account')
+        }
+    }, [isRegistered])
+
+    useEffect(() => {
+        // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+        if (isRegistered && config?.app?.login?.passkey?.enabled) {
+            if (
+                window.PublicKeyCredential &&
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
+            ) {
+                Promise.all([
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
+                ]).then((results) => {
+                    if (results.every((r) => r === true)) {
+                        showToast()
+                    }
+                })
+            }
         }
     }, [isRegistered])
 

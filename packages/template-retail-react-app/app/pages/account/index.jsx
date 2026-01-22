@@ -102,12 +102,6 @@ const Account = () => {
     const {showToast, passkeyModal} = usePasskeyRegistration()
 
     const {buildUrl} = useMultiSite()
-    
-    // Show passkey toast when user is on the account page
-    useEffect(() => {
-        showToast()
-    }, [])
-    
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)

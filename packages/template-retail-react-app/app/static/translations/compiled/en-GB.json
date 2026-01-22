@@ -2827,6 +2827,90 @@
       "value": "Tax"
     }
   ],
+  "otp.button.cancel_guest_registration": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "otp.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Checkout as a Guest"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "Resend Code"
+    }
+  ],
+  "otp.button.resend_timer": [
+    {
+      "type": 0,
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " seconds..."
+    }
+  ],
+  "otp.message.enter_code_for_account_guest": [
+    {
+      "type": 0,
+      "value": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below."
+    }
+  ],
+  "otp.message.enter_code_for_account_returning": [
+    {
+      "type": 0,
+      "value": "To log in to your account, enter the code sent to your email."
+    }
+  ],
+  "otp.message.enter_code_for_passkey_registration": [
+    {
+      "type": 0,
+      "value": "We sent a one-time password (OTP) to your email to confirm your identity. Enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below to continue."
+    }
+  ],
+  "otp.message.verifying": [
+    {
+      "type": 0,
+      "value": "Verifying code..."
+    }
+  ],
+  "otp.title.confirm_its_you": [
+    {
+      "type": 0,
+      "value": "Confirm it's you"
+    }
+  ],
+  "otp.title.create_account": [
+    {
+      "type": 0,
+      "value": "Create an account"
+    }
+  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2895,6 +2979,54 @@
     {
       "type": 0,
       "value": "Previous Page"
+    }
+  ],
+  "passkey_registration.modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close passkey form"
+    }
+  ],
+  "passkey_registration.modal.button.register": [
+    {
+      "type": 0,
+      "value": "Register Passkey"
+    }
+  ],
+  "passkey_registration.modal.error.authorize_failed": [
+    {
+      "type": 0,
+      "value": "Failed to authorize passkey registration"
+    }
+  ],
+  "passkey_registration.modal.label.nickname": [
+    {
+      "type": 0,
+      "value": "Passkey Nickname (optional)"
+    }
+  ],
+  "passkey_registration.modal.title": [
+    {
+      "type": 0,
+      "value": "Create Passkey"
+    }
+  ],
+  "passkey_registration.toast.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close toast"
+    }
+  ],
+  "passkey_registration.toast.button.create": [
+    {
+      "type": 0,
+      "value": "Create Passkey"
+    }
+  ],
+  "passkey_registration.toast.message": [
+    {
+      "type": 0,
+      "value": "Create a passkey for a more secure and easier login"
     }
   ],
   "password_card.info.password_updated": [
