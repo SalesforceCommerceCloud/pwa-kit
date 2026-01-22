@@ -16,7 +16,6 @@ module.exports = {
         }
     },
     env: {
-        es2025: true,
         node: true,
         browser: true
     },
