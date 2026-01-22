@@ -46,19 +46,17 @@ export const usePasskeyLogin = () => {
         )
 
         // Transform response for WebAuthn API to send to navigator.credentials.get()
-        // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get
+        // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static
         const options = PublicKeyCredential.parseRequestOptionsFromJSON(
             startWebauthnAuthenticationResponse.publicKey
         )
 
+        // Get passkey credential from browser
+        // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get
         const credential = await navigator.credentials.get({
             publicKey: options,
             mediation: 'conditional'
         })
-
-        if (!credential) {
-            throw new Error('Error getting passkey credential:', credential)
-        }
 
         // Encode credential before sending to SLAS
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON

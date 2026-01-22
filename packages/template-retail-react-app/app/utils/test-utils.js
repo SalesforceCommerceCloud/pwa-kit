@@ -24,7 +24,8 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
     CurrencyProvider,
     MultiSiteProvider,
-    StoreLocatorProvider
+    StoreLocatorProvider,
+    PasskeyRegistrationProvider
 } from '@salesforce/retail-react-app/app/contexts'
 
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
@@ -164,7 +165,9 @@ export const TestProviders = ({
                                     <ChakraProvider theme={theme}>
                                         <AddToCartModalProvider>
                                             <BonusProductSelectionModalProvider>
-                                                {children}
+                                                <PasskeyRegistrationProvider>
+                                                    {children}
+                                                </PasskeyRegistrationProvider>
                                             </BonusProductSelectionModalProvider>
                                         </AddToCartModalProvider>
                                     </ChakraProvider>

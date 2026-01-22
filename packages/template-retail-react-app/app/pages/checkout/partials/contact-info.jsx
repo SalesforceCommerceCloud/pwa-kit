@@ -161,7 +161,14 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }, [showPasswordField])
 
     useEffect(() => {
-        loginWithPasskey()
+        const handlePasskeyLogin = async () => {
+            try {
+                await loginWithPasskey()
+            } catch (error) {
+                setError(formatMessage(API_ERROR_MESSAGE))
+            }
+        }
+        handlePasskeyLogin()
     }, [])
 
     const onPasswordlessLoginClick = async (e) => {
