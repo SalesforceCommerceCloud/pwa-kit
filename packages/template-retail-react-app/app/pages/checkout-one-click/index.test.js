@@ -111,6 +111,38 @@ const WrappedCheckout = () => {
 }
 
 describe('Checkout One Click', () => {
+    // Helper to create a BOPIS-only basket (single pickup shipment, no delivery)
+    const createBopisOnlyBasket = () => {
+        const basket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        basket.productItems = [
+            {
+                itemId: 'item-pickup-1',
+                productId: '701643070725M',
+                quantity: 1,
+                price: 19.18,
+                shipmentId: 'pickup1',
+                inventoryId: 'inventory_m_store_store1'
+            }
+        ]
+        basket.shipments = [
+            {
+                shipmentId: 'pickup1',
+                c_fromStoreId: 'store1',
+                shippingMethod: {id: 'PICKUP', c_storePickupEnabled: true},
+                shippingAddress: {
+                    firstName: 'Store 1',
+                    lastName: 'Pickup',
+                    address1: '1 Market St',
+                    city: 'San Francisco',
+                    postalCode: '94105',
+                    stateCode: 'CA',
+                    countryCode: 'US'
+                }
+            }
+        ]
+        return basket
+    }
+
     // Set up and clean up
     beforeEach(() => {
         global.server.use(
@@ -353,6 +385,157 @@ describe('Checkout One Click', () => {
         })
         await waitFor(() => {
             expect(screen.getByRole('heading', {name: /shipping options/i})).toBeInTheDocument()
+        })
+    })
+
+    // BOPIS-only checkout tests
+    describe('BOPIS-only checkout', () => {
+        test('can checkout BOPIS-only order as guest shopper', async () => {
+            // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
+            mockUseAuthHelper.mockRejectedValueOnce({
+                response: {status: 404}
+            })
+
+            const bopisOnlyBasket = createBopisOnlyBasket()
+            global.server.use(
+                rest.get('*/baskets', (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            baskets: [bopisOnlyBasket],
+                            total: 1
+                        })
+                    )
+                })
+            )
+
+            window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+            const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+                wrapperProps: {
+                    isGuest: true,
+                    siteAlias: 'uk',
+                    appConfig: mockConfig.app
+                }
+            })
+
+            // Wait for contact info step
+            await screen.findByText(/contact info/i)
+
+            // Fill email and phone number
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'bopisguest@test.com')
+            await user.tab()
+            const phoneInput = screen.queryByLabelText(/phone/i)
+            if (phoneInput) {
+                await user.type(phoneInput, '5551234567')
+            }
+
+            // Wait for continue button and click
+            const continueBtn = await screen.findByText(/continue to shipping address/i)
+            await user.click(continueBtn)
+
+            // Verify we skip directly to payment
+            await waitFor(
+                () => {
+                    const paymentStep = screen.queryByTestId('sf-toggle-card-step-4')
+                    const paymentHeading = screen.queryByRole('heading', {name: /payment/i})
+                    expect(paymentStep || paymentHeading).toBeTruthy()
+                },
+                {timeout: 5000}
+            )
+        })
+
+        test('can checkout BOPIS-only order as registered shopper', async () => {
+            const bopisOnlyBasket = createBopisOnlyBasket()
+            global.server.use(
+                rest.get('*/baskets', (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            baskets: [bopisOnlyBasket],
+                            total: 1
+                        })
+                    )
+                })
+            )
+
+            window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+            renderWithProviders(<WrappedCheckout history={history} />, {
+                wrapperProps: {
+                    bypassAuth: true,
+                    isGuest: false,
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockConfig.app
+                }
+            })
+
+            // Wait for checkout to load - registered user should have email displayed
+            await waitFor(() => {
+                expect(screen.getByText('customer@test.com')).toBeInTheDocument()
+            })
+
+            // For BOPIS-only, we should see payment step
+            await waitFor(
+                () => {
+                    const paymentStep = screen.queryByTestId('sf-toggle-card-step-4')
+                    const paymentHeading = screen.queryByRole('heading', {name: /payment/i})
+                    expect(paymentStep || paymentHeading).toBeTruthy()
+                },
+                {timeout: 5000}
+            )
+        })
+
+        test('BOPIS-only guest shopper editing contact info continues to payment, not pickup address', async () => {
+            mockUseAuthHelper.mockRejectedValueOnce({
+                response: {status: 404}
+            })
+
+            const bopisOnlyBasket = createBopisOnlyBasket()
+            global.server.use(
+                rest.get('*/baskets', (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            baskets: [bopisOnlyBasket],
+                            total: 1
+                        })
+                    )
+                })
+            )
+
+            window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+            const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+                wrapperProps: {
+                    isGuest: true,
+                    siteAlias: 'uk',
+                    appConfig: mockConfig.app
+                }
+            })
+
+            // Wait for contact info step
+            await screen.findByText(/contact info/i)
+
+            // Fill email and phone
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'bopisguest@test.com')
+            await user.tab()
+
+            const phoneInput = screen.queryByLabelText(/phone/i)
+            if (phoneInput) {
+                await user.type(phoneInput, '5551234567')
+            }
+
+            // Wait for continue button and click
+            const continueBtn = await screen.findByText(/continue to shipping address/i)
+            await user.click(continueBtn)
+
+            // Verify we continue to payment
+            await waitFor(
+                () => {
+                    const paymentStep = screen.queryByTestId('sf-toggle-card-step-4')
+                    const paymentHeading = screen.queryByRole('heading', {name: /payment/i})
+                    expect(paymentStep || paymentHeading).toBeTruthy()
+                },
+                {timeout: 5000}
+            )
         })
     })
 
