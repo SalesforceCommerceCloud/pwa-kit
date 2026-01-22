@@ -42,12 +42,7 @@ export const EXPRESS_RELAY_MESSAGES = {
  * Allowed API endpoints that can be relayed
  * This prevents the relay from being used for arbitrary requests
  */
-const ALLOWED_ENDPOINTS = [
-    '/api/express/baskets',
-    '/api/express/payments',
-    '/api/miaw/customer-data',
-    '/api/miaw/prechat'
-]
+const ALLOWED_ENDPOINTS = ['/api/express/baskets', '/api/express/payments']
 
 /**
  * Validates that an endpoint is allowed for relaying

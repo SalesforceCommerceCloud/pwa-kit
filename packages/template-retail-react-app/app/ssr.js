@@ -31,7 +31,6 @@ import standalonePaymentMethodsHandler from '@salesforce/retail-react-app/app/ap
 
 // SLAS Token Security - Proxy Endpoints
 import {registerExpressProxyEndpoints} from '@salesforce/retail-react-app/app/api/express/index.js'
-import {registerMiawRoutes} from '@salesforce/retail-react-app/app/api/miaw/customer-data.js'
 import {errorHandlerMiddleware} from '@salesforce/retail-react-app/app/api/utils/error-handler.js'
 
 const config = getConfig()
@@ -351,7 +350,13 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Allow Google Pay Specific frames
                         'https://pay.google.com'
                     ],
-                    'frame-ancestors': ['self']
+                    'frame-ancestors': [
+                                        'self',
+                                        'https://payments-agent-production.mrt-storefront-staging.com',
+                                        '*.mrt-storefront-staging.com',
+                                        // Allow Salesforce site.com domains (for Commerce Agent/MIAW)
+                                        '*.site.com'
+                                    ]
                 }
             }
         })
@@ -466,18 +471,6 @@ const {handler} = runtime.createHandler(options, (app) => {
      * - POST /api/express/baskets/:basketId/calculate
      */
     registerExpressProxyEndpoints(app)
-
-    /**
-     * MIAW (Messaging for In-App and Web) Proxy Endpoints
-     *
-     * These endpoints provide customer data to MIAW without exposing
-     * SLAS tokens to the MIAW iframe.
-     *
-     * Endpoints:
-     * - POST /api/miaw/customer-data
-     * - POST /api/miaw/prechat
-     */
-    registerMiawRoutes(app)
     /* -----------------SLAS Token Security - Proxy Endpoints End ------------------------ */
 
     // Error handling middleware for proxy endpoints (must be after routes)
