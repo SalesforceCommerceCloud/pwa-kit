@@ -1943,6 +1943,12 @@
       "value": "View"
     }
   ],
+  "header.button.assistive_msg.agent": [
+    {
+      "type": 0,
+      "value": "Agent"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,

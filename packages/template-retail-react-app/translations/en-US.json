@@ -759,6 +759,9 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
   },
+  "header.button.assistive_msg.agent": {
+    "defaultMessage": "Agent"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },

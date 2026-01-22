@@ -3959,6 +3959,20 @@
       "value": "]"
     }
   ],
+  "header.button.assistive_msg.agent": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧɠḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
