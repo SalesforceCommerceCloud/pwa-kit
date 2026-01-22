@@ -523,8 +523,8 @@ const CheckoutOneClick = () => {
                         showError(
                             formatMessage({
                                 defaultMessage:
-                                    'Could not remove the existing payment. Please try again.',
-                                id: 'checkout_payment.error.cannot_remove_existing_payment'
+                                    'Could not remove the applied payment. Please try again or use the current payment to place your order.',
+                                id: 'checkout_payment.error.cannot_remove_applied_payment'
                             })
                         )
                         setIsPlacingOrder(false)
