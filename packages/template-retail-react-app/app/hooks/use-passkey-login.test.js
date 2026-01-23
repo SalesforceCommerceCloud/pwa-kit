@@ -211,7 +211,6 @@ describe('usePasskeyLogin', () => {
         }
 
         // Reset and set the mock for this specific test to ensure it returns the credential
-        mockGetCredentials.mockReset()
         mockGetCredentials.mockResolvedValue(credentialWithoutToJSON)
 
         global.server.use(
@@ -257,5 +256,29 @@ describe('usePasskeyLogin', () => {
         await waitFor(() => {
             expect(mockGetCredentials).toHaveBeenCalled()
         })
+    })
+
+    test('returns early without error when NotAllowedError is thrown from navigator.credentials.get', async () => {
+        // Create a NotAllowedError (typically thrown when user cancels passkey login)
+        const notAllowedError = new Error('User cancelled')
+        notAllowedError.name = 'NotAllowedError'
+
+        // Mock navigator.credentials.get to throw NotAllowedError
+        mockGetCredentials.mockRejectedValue(notAllowedError)
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+
+        // Click the button - should not throw an error even though NotAllowedError is thrown
+        fireEvent.click(trigger)
+
+        // Wait for navigator.credentials.get to be called
+        await waitFor(() => {
+            expect(mockGetCredentials).toHaveBeenCalled()
+        })
+
+        // Verify that no error message is displayed
+        expect(screen.queryByText('Something went wrong. Try again!')).not.toBeInTheDocument()
     })
 })

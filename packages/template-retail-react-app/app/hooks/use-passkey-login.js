@@ -54,10 +54,20 @@ export const usePasskeyLogin = () => {
 
         // Get passkey credential from browser
         // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get
-        const credential = await navigator.credentials.get({
-            publicKey: options,
-            mediation: 'conditional'
-        })
+        let credential
+        try {
+            credential = await navigator.credentials.get({
+                publicKey: options,
+                mediation: 'conditional'
+            })
+        } catch (error) {
+            // NotAllowedError is thrown when the user cancels the passkey login
+            // We return early in this case to avoid showing an error to the user
+            if (error.name == 'NotAllowedError') {
+                return
+            }
+            throw error
+        }
 
         // Encode credential before sending to SLAS
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
