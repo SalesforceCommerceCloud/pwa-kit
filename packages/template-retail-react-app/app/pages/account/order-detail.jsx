@@ -329,17 +329,22 @@ const AccountOrderDetail = () => {
                                 {/* Delivery Shipments */}
                                 {deliveryShipments.map((shipment, index) => {
                                     // Hide shipping address for OMS multi-shipment orders
-                                    // (can't reliably correlate OMS shipments to ECOM addresses by index)
+                                    // Can't reliably correlate OMS shipments to ECOM addresses by index
 
-                                    const hasOmsData = order?.omsData;
-                                    const isOmsMultiShipment = hasOmsData && (
-                                        order?.omsData?.shipments?.length > 1 ||
-                                        order?.shipments?.length > 1)
+                                    const hasOmsData = order?.omsData
+                                    const isOmsMultiShipment =
+                                        hasOmsData &&
+                                        (order?.omsData?.shipments?.length > 1 ||
+                                            order?.shipments?.length > 1)
 
-                                    const omsShipment = hasOmsData && order?.omsData?.shipments?.[index]
-                                    const shippingMethodName = omsShipment?.provider || shipment.shippingMethod.name
-                                    const shippingStatus = omsShipment?.status || shipment.shippingStatus
-                                    const trackingNumber = omsShipment?.trackingNumber || shipment.trackingNumber
+                                    const omsShipment =
+                                        hasOmsData && order?.omsData?.shipments?.[index]
+                                    const shippingMethodName =
+                                        omsShipment?.provider || shipment.shippingMethod.name
+                                    const shippingStatus =
+                                        omsShipment?.status || shipment.shippingStatus
+                                    const trackingNumber =
+                                        omsShipment?.trackingNumber || shipment.trackingNumber
                                     const trackingUrl = omsShipment?.trackingUrl
 
                                     return (
@@ -361,26 +366,22 @@ const AccountOrderDetail = () => {
                                                 </Heading>
                                                 <Box>
                                                     <Text fontSize="sm" textTransform="titlecase">
-                                                        {
-                                                            {
-                                                                not_shipped: formatMessage({
-                                                                    defaultMessage: 'Not shipped',
-                                                                    id: 'account_order_detail.shipping_status.not_shipped'
-                                                                }),
-                                                                part_shipped: formatMessage({
-                                                                    defaultMessage: 'Partially shipped',
-                                                                    id: 'account_order_detail.shipping_status.part_shipped'
-                                                                }),
-                                                                shipped: formatMessage({
-                                                                    defaultMessage: 'Shipped',
-                                                                    id: 'account_order_detail.shipping_status.shipped'
-                                                                })
-                                                            }[shippingStatus] || shippingStatus
-                                                        }
+                                                        {{
+                                                            not_shipped: formatMessage({
+                                                                defaultMessage: 'Not shipped',
+                                                                id: 'account_order_detail.shipping_status.not_shipped'
+                                                            }),
+                                                            part_shipped: formatMessage({
+                                                                defaultMessage: 'Partially shipped',
+                                                                id: 'account_order_detail.shipping_status.part_shipped'
+                                                            }),
+                                                            shipped: formatMessage({
+                                                                defaultMessage: 'Shipped',
+                                                                id: 'account_order_detail.shipping_status.shipped'
+                                                            })
+                                                        }[shippingStatus] || shippingStatus}
                                                     </Text>
-                                                    <Text fontSize="sm">
-                                                        {shippingMethodName}
-                                                    </Text>
+                                                    <Text fontSize="sm">{shippingMethodName}</Text>
                                                     {trackingNumber && (
                                                         <Text fontSize="sm">
                                                             <FormattedMessage

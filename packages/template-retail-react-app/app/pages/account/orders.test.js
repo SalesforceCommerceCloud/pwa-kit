@@ -536,18 +536,40 @@ describe('OMS Multi-shipment - Shipping address hidden', () => {
         shipments: [
             {
                 shippingMethod: {name: 'Ground'},
-                shippingAddress: {fullName: 'Alice Johnson', address1: '123 First St', city: 'Seattle', stateCode: 'WA', postalCode: '98101'}
+                shippingAddress: {
+                    fullName: 'Alice Johnson',
+                    address1: '123 First St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
             },
             {
                 shippingMethod: {name: 'Express'},
-                shippingAddress: {fullName: 'Bob Smith', address1: '456 Second St', city: 'Portland', stateCode: 'OR', postalCode: '97201'}
+                shippingAddress: {
+                    fullName: 'Bob Smith',
+                    address1: '456 Second St',
+                    city: 'Portland',
+                    stateCode: 'OR',
+                    postalCode: '97201'
+                }
             }
         ],
         omsData: {
             status: 'Processing',
             shipments: [
-                {status: 'SHIPPED', trackingNumber: 'OMS-001', trackingUrl: 'https://track.example.com/OMS-001', provider: 'FedEx'},
-                {status: 'PENDING', trackingNumber: 'OMS-002', trackingUrl: 'https://track.example.com/OMS-002', provider: 'UPS'}
+                {
+                    status: 'SHIPPED',
+                    trackingNumber: 'OMS-001',
+                    trackingUrl: 'https://track.example.com/OMS-001',
+                    provider: 'FedEx'
+                },
+                {
+                    status: 'PENDING',
+                    trackingNumber: 'OMS-002',
+                    trackingUrl: 'https://track.example.com/OMS-002',
+                    provider: 'UPS'
+                }
             ]
         }
     })
@@ -597,12 +619,26 @@ describe('ECOM Multi-shipment - Shipping address shown', () => {
                 shippingMethod: {name: 'Ground'},
                 shippingStatus: 'shipped',
                 trackingNumber: 'ECOM-001',
-                shippingAddress: {firstName: 'John', lastName: 'Doe', address1: '123 First St', city: 'Boston', stateCode: 'MA', postalCode: '02101'}
+                shippingAddress: {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    address1: '123 First St',
+                    city: 'Boston',
+                    stateCode: 'MA',
+                    postalCode: '02101'
+                }
             },
             {
                 shippingMethod: {name: 'Express'},
                 shippingStatus: 'not_shipped',
-                shippingAddress: {firstName: 'Jane', lastName: 'Smith', address1: '456 Second St', city: 'Chicago', stateCode: 'IL', postalCode: '60601'}
+                shippingAddress: {
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Second St',
+                    city: 'Chicago',
+                    stateCode: 'IL',
+                    postalCode: '60601'
+                }
             }
         ]
     })
@@ -621,15 +657,19 @@ describe('ECOM Multi-shipment - Shipping address shown', () => {
     })
 
     test('should display numbered shipping address headings for ECOM multi-shipment', async () => {
-        expect(await screen.findByRole('heading', {name: /shipping address 1/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping address 2/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 1/i})
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 2/i})
+        ).toBeInTheDocument()
     })
 
     test('should display both shipping addresses', async () => {
         expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
         // Jane Smith appears in both shipping and billing address
         const janeSmithElements = await screen.findAllByText(/Jane Smith/i)
-        expect(janeSmithElements.length).toBe(2)
+        expect(janeSmithElements).toHaveLength(2)
     })
 
     test('should display ECOM shipping statuses', async () => {
@@ -645,13 +685,24 @@ describe('OMS Single shipment with tracking URL', () => {
         shipments: [
             {
                 shippingMethod: {name: 'Standard'},
-                shippingAddress: {fullName: 'Alex Johnson', address1: '789 Main St', city: 'Seattle', stateCode: 'WA', postalCode: '98101'}
+                shippingAddress: {
+                    fullName: 'Alex Johnson',
+                    address1: '789 Main St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
             }
         ],
         omsData: {
             status: 'SHIPPED',
             shipments: [
-                {status: 'DELIVERED', trackingNumber: 'TRACK-12345', trackingUrl: 'https://tracking.fedex.com/TRACK-12345', provider: 'FedEx Ground'}
+                {
+                    status: 'DELIVERED',
+                    trackingNumber: 'TRACK-12345',
+                    trackingUrl: 'https://tracking.fedex.com/TRACK-12345',
+                    provider: 'FedEx Ground'
+                }
             ]
         }
     })
@@ -661,7 +712,9 @@ describe('OMS Single shipment with tracking URL', () => {
     })
 
     test('should display shipping address for single OMS shipment', async () => {
-        expect(await screen.findByRole('heading', {name: /^shipping address$/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /^shipping address$/i})
+        ).toBeInTheDocument()
         expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
     })
 
@@ -685,7 +738,13 @@ describe('OMS Single shipment with partial data (missing provider, trackingUrl)'
         shipments: [
             {
                 shippingMethod: {name: 'Ground Shipping'},
-                shippingAddress: {fullName: 'Mike Brown', address1: '100 Oak St', city: 'Denver', stateCode: 'CO', postalCode: '80201'}
+                shippingAddress: {
+                    fullName: 'Mike Brown',
+                    address1: '100 Oak St',
+                    city: 'Denver',
+                    stateCode: 'CO',
+                    postalCode: '80201'
+                }
             }
         ],
         omsData: {
