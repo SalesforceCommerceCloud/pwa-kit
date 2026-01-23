@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* global PublicKeyCredential */
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {encode as base64Encode} from 'base64-arraybuffer'
