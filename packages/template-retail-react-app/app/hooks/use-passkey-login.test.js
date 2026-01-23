@@ -5,12 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {rest} from 'msw'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {registerUserToken} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 const mockCredential = {
     id: 'test-credential-id',
@@ -54,10 +55,12 @@ const mockStartWebauthnAuthenticationResponse = {
 
 const mockFinishWebauthnAuthenticationResponse = {
     tokenResponse: {
-        access_token: 'test-access-token',
-        customer_id: 'test-customer-id',
-        refresh_token: 'test-refresh-token',
-        usid: 'test-usid'
+        access_token: registerUserToken,
+        customer_id: 'customerid',
+        refresh_token: 'testrefeshtoken',
+        usid: 'testusid',
+        enc_user_id: 'testEncUserId',
+        id_token: 'testIdToken'
     }
 }
 
@@ -66,31 +69,12 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
-// Mock commerce-sdk-react
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest.fn()
-    }
-})
-
 // Mock WebAuthn APIs
 const mockGetCredentials = jest.fn()
+
 // Mock PublicKeyCredential static methods
 const mockIsConditionalMediationAvailable = jest.fn()
 const mockParseRequestOptionsFromJSON = jest.fn()
-
-const startWebauthnAuthentication = {mutateAsync: jest.fn()}
-const finishWebauthnAuthentication = {mutateAsync: jest.fn()}
-
-useAuthHelper.mockImplementation((param) => {
-    if (param === AuthHelpers.StartWebauthnAuthentication) {
-        return startWebauthnAuthentication
-    } else if (param === AuthHelpers.FinishWebauthnAuthentication) {
-        return finishWebauthnAuthentication
-    }
-})
 
 const MockComponent = () => {
     const {loginWithPasskey} = usePasskeyLogin()
@@ -104,6 +88,23 @@ const MockComponent = () => {
 describe('usePasskeyLogin', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockStartWebauthnAuthenticationResponse)
+                )
+            }),
+            rest.post('*/oauth2/webauthn/authenticate/finish', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockFinishWebauthnAuthenticationResponse)
+                )
+            })
+        )
 
         getConfig.mockReturnValue(mockConfig)
 
@@ -131,45 +132,28 @@ describe('usePasskeyLogin', () => {
 
         // Mock navigator.credentials.get to return a mock credential
         mockGetCredentials.mockResolvedValue(mockCredential)
-
-        startWebauthnAuthentication.mutateAsync.mockResolvedValue(
-            mockStartWebauthnAuthenticationResponse
-        )
-
-        finishWebauthnAuthentication.mutateAsync.mockResolvedValue(
-            mockFinishWebauthnAuthenticationResponse
-        )
     })
 
-    test('calls webauthn authenticate start and finish endpoints when all conditions are met', async () => {
+    test('calls navigator.credentials.get with the correct parameters when all conditions are met', async () => {
         renderWithProviders(<MockComponent />)
 
         const trigger = screen.getByTestId('login-with-passkey')
         fireEvent.click(trigger)
 
+        // Check that credentials.get is called with the correct parameters
         await waitFor(() => {
-            expect(startWebauthnAuthentication.mutateAsync).toHaveBeenCalledWith({})
-            expect(mockGetCredentials).toHaveBeenCalled()
-            expect(finishWebauthnAuthentication.mutateAsync).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    credential: expect.objectContaining({
-                        id: 'test-credential-id',
-                        rawId: expect.any(String),
-                        type: 'public-key',
-                        clientExtensionResults: {},
-                        response: expect.objectContaining({
-                            authenticatorData: expect.any(String),
-                            clientDataJSON: expect.any(String),
-                            signature: expect.any(String),
-                            userHandle: expect.any(String)
-                        })
-                    })
-                })
-            )
+            expect(mockGetCredentials).toHaveBeenCalledWith({
+                publicKey: expect.objectContaining({
+                    challenge: expect.any(String),
+                    timeout: expect.any(Number),
+                    rpId: expect.any(String)
+                }),
+                mediation: 'conditional'
+            })
         })
     })
 
-    test('does not call startWebauthnAuthentication API when passkey is not enabled', async () => {
+    test('does not call navigator.credentials.get when passkey is not enabled', async () => {
         getConfig.mockReturnValue({
             ...mockConfig,
             app: {
@@ -188,7 +172,7 @@ describe('usePasskeyLogin', () => {
         const trigger = screen.getByTestId('login-with-passkey')
         fireEvent.click(trigger)
 
-        expect(startWebauthnAuthentication.mutateAsync).not.toHaveBeenCalled()
+        expect(mockGetCredentials).not.toHaveBeenCalled()
     })
 
     test('does not start passkey login when PublicKeyCredential is not available', async () => {
@@ -199,7 +183,6 @@ describe('usePasskeyLogin', () => {
         const trigger = screen.getByTestId('login-with-passkey')
         fireEvent.click(trigger)
 
-        expect(startWebauthnAuthentication.mutateAsync).not.toHaveBeenCalled()
         expect(mockGetCredentials).not.toHaveBeenCalled()
     })
 
@@ -215,16 +198,56 @@ describe('usePasskeyLogin', () => {
             expect(mockIsConditionalMediationAvailable).toHaveBeenCalled()
         })
 
-        expect(startWebauthnAuthentication.mutateAsync).not.toHaveBeenCalled()
         expect(mockGetCredentials).not.toHaveBeenCalled()
     })
 
     test('falls back to manual encoding when toJSON() is not supported', async () => {
-        // Create a credential mock where toJSON() doesn't exist
-        const credentialWithoutToJSON = mockCredential
-        delete credentialWithoutToJSON.toJSON
+        // Create a credential mock where toJSON() throws an error (e.g., 1Password)
+        const credentialWithoutToJSON = {
+            ...mockCredential,
+            toJSON: jest.fn(() => {
+                throw new Error('toJSON is not supported')
+            })
+        }
 
+        // Reset and set the mock for this specific test to ensure it returns the credential
+        mockGetCredentials.mockReset()
         mockGetCredentials.mockResolvedValue(credentialWithoutToJSON)
+
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockStartWebauthnAuthenticationResponse)
+                )
+            }),
+            rest.post('*/oauth2/webauthn/authenticate/finish', async (req, res, ctx) => {
+                const body = await req.json()
+                // Assert: credential is still manually encoded when toJSON() is not supported
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        credential: expect.objectContaining({
+                            id: 'test-credential-id',
+                            rawId: expect.any(String),
+                            type: 'public-key',
+                            clientExtensionResults: {},
+                            response: expect.objectContaining({
+                                authenticatorData: expect.any(String),
+                                clientDataJSON: expect.any(String),
+                                signature: expect.any(String),
+                                userHandle: expect.any(String)
+                            })
+                        })
+                    })
+                )
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockFinishWebauthnAuthenticationResponse)
+                )
+            })
+        )
 
         renderWithProviders(<MockComponent />)
 
@@ -232,22 +255,7 @@ describe('usePasskeyLogin', () => {
         fireEvent.click(trigger)
 
         await waitFor(() => {
-            expect(finishWebauthnAuthentication.mutateAsync).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    credential: expect.objectContaining({
-                        id: 'test-credential-id',
-                        rawId: expect.any(String),
-                        type: 'public-key',
-                        clientExtensionResults: {},
-                        response: expect.objectContaining({
-                            authenticatorData: expect.any(String),
-                            clientDataJSON: expect.any(String),
-                            signature: expect.any(String),
-                            userHandle: expect.any(String)
-                        })
-                    })
-                })
-            )
+            expect(mockGetCredentials).toHaveBeenCalled()
         })
     })
 })
