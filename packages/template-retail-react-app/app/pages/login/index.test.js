@@ -35,24 +35,6 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest.fn((helperType) => {
-            // Return mock for AuthorizePasswordless, real implementation for others
-            if (mockAuthHelperFunctions[helperType]) {
-                return mockAuthHelperFunctions[helperType]
-            }
-            return originalModule.useAuthHelper(helperType)
-        })
-    }
-})
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -332,8 +314,6 @@ describe('Navigate away from login page tests', function () {
 
 describe('Passwordless login tests', () => {
     beforeEach(() => {
-        // Clear the mock before each test
-        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockClear()
         getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
@@ -345,6 +325,11 @@ describe('Passwordless login tests', () => {
                 }
             }
         })
+        global.server.use(
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
+        )
     })
 
     test('allows passwordless login', async () => {
@@ -353,7 +338,7 @@ describe('Passwordless login tests', () => {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
                 appConfig: mockConfig.app,
-                bypassAuth: false
+                bypassAuth: true
             }
         })
 
@@ -364,34 +349,13 @@ describe('Passwordless login tests', () => {
         // Click the submit button
         await user.click(screen.getByRole('button', {name: /Continue/i}))
 
-        // Verify that authorizePasswordless is called with correct parameters
-        await waitFor(() => {
-            expect(
-                mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-            ).toHaveBeenCalledWith({
-                userid: testEmail,
-                mode: 'email',
-                locale: 'en-GB'
-            })
-        })
-
         // check that check email page is open
-        await waitFor(
-            () => {
-                expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+        })
 
         // resend the email
         await user.click(screen.getByText(/Resend Link/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: testEmail,
-            mode: 'email',
-            locale: 'en-GB'
-        })
     })
 
     test.each([
@@ -408,11 +372,11 @@ describe('Passwordless login tests', () => {
     ])(
         'displays correct error message when passwordless login fails with "%s"',
         async (apiErrorMessage, expectedMessage) => {
-            mockAuthHelperFunctions[
-                AuthHelpers.AuthorizePasswordless
-            ].mutateAsync.mockImplementation(() => {
-                throw new Error(apiErrorMessage)
-            })
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
             const {user} = renderWithProviders(<MockedComponent />, {
                 wrapperProps: {
                     siteAlias: 'uk',

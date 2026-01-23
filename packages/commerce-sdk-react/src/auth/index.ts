@@ -1348,6 +1348,7 @@ class Auth {
             )}`
         }
 
+        // Set rawResponse to true to access the response body message for error handling
         const res = await slasClient.getPasswordResetToken(options, true)
         if (res && res.status !== 200) {
             const errorData = await res.json()

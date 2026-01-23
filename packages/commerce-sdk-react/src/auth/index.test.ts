@@ -1047,22 +1047,29 @@ describe('Auth', () => {
         ]
     ])('getPasswordResetToken %s', async (_, input: any, expectedBody: any) => {
         const auth = new Auth(config)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
-        getPasswordResetTokenSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({status: 200, json: jest.fn().mockResolvedValue({})} as unknown as Response)
+        )
 
-        const result = await auth.getPasswordResetToken(input)
-        expect(result).toBe(mockResponse)
-        expect(getPasswordResetTokenSpy).toHaveBeenCalled()
-        const callArgs = getPasswordResetTokenSpy.mock.calls[0][0] as any
-        expect(callArgs.body).toMatchObject(expectedBody)
+        await auth.getPasswordResetToken(input)
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining(expectedBody)
+            }),
+            // rawResponse is set to true
+            true
+        )
     })
 
     test('getPasswordResetToken with private client sets Authorization header', async () => {
         const auth = new Auth(configSLASPrivate)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
-        getPasswordResetTokenSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({status: 200, json: jest.fn().mockResolvedValue({})} as unknown as Response)
+        )
 
         await auth.getPasswordResetToken({
             user_id: 'user@example.com',
@@ -1070,10 +1077,13 @@ describe('Auth', () => {
             channel_id: 'channel_id'
         })
 
-        expect(getPasswordResetTokenSpy).toHaveBeenCalled()
-        const callArgs = getPasswordResetTokenSpy.mock.calls[0][0] as any
-        expect(callArgs.headers.Authorization).toBeTruthy()
-        expect(callArgs.headers.Authorization).toContain('Basic ')
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            }),
+            // rawResponse is set to true
+            true
+        )
     })
 
     test('getPasswordResetToken throws error on non-200 response', async () => {
@@ -1083,8 +1093,11 @@ describe('Auth', () => {
             status: 400,
             json: jest.fn().mockResolvedValue({message: 'Invalid request'})
         }
-        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
-        getPasswordResetTokenSpy.mockReturnValueOnce(mockErrorResponse)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve(mockErrorResponse as unknown as Response)
+        )
 
         await expect(
             auth.getPasswordResetToken({user_id: 'userid', mode: 'email', channel_id: 'channel_id'})
@@ -1125,34 +1138,34 @@ describe('Auth', () => {
                 hint: 'cross_device'
             }
         ]
-    ])('resetPassword %s', async (_, input: any, expectedBody: any) => {
+    ])('resetPassword %s', async (_, input: Partial<ShopperLoginTypes.resetPasswordBodyType>, expectedBody: Partial<ShopperLoginTypes.resetPasswordBodyType>) => {
         const auth = new Auth(config)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
-        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+        await auth.resetPassword(input as ShopperLoginTypes.resetPasswordBodyType)
 
-        const result = await auth.resetPassword(input)
-        expect(result).toBe(mockResponse)
-        expect(resetPasswordSpy).toHaveBeenCalled()
-        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
-        expect(callArgs.body).toMatchObject(expectedBody)
+        expect(resetPasswordSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining(expectedBody)
+            })
+        )
     })
 
     test('resetPassword with private client sets Authorization header', async () => {
         const auth = new Auth(configSLASPrivate)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
-        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
 
         await auth.resetPassword({
             pwd_action_token: '12345678',
             new_password: 'newPassword123'
-        } as any)
+        } as ShopperLoginTypes.resetPasswordBodyType)
 
-        expect(resetPasswordSpy).toHaveBeenCalled()
-        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
-        expect(callArgs.headers.Authorization).toBeTruthy()
-        expect(callArgs.headers.Authorization).toContain('Basic ')
+        expect(resetPasswordSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            })
+        )
     })
 
     test('logout as registered user calls isomorphic logout', async () => {

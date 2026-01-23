@@ -1,11 +1,7 @@
 ## v4.4.0-dev (Dec 17, 2025)
 - [Bugfix]Ensure code_verifier can be optional in resetPassword call [#3567](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3567)
 - [Improvement] Strengthening typescript types on custom endpoint options and fetchOptions types [#3589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3589)
-
-- Update `authorizePasswordless` to pass locale and simplify mode selection to respect user's explicit mode choice while still defaulting to callback mode for backward compatibility [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492)
-- Update `getPasswordResetToken` to pass locale, callback_uri and idp_name only when they are defined [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
-- Update `resetPassword` to default hint to `cross_device` and pass code_verifier only when it is defined [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
-- Update `getPasswordResetToken` to return raw response and throw an error with the error message if the status code is not 200 [#3574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3574)
+- [Feature] update `authorizePasswordless`, `getPasswordResetToken`, and `resetPassword` to support use of `email` mode [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 
 ## v4.3.0 (Dec 17, 2025)
 

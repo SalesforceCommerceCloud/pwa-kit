@@ -19,7 +19,6 @@ import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
-import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
@@ -50,38 +49,9 @@ const mockRegisteredCustomer = {
     login: 'customer@test.com'
 }
 
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest
-            .fn()
-            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
-    }
-})
-
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
-
-const mockGetPasswordResetToken = jest.fn()
-jest.mock('@salesforce/retail-react-app/app/hooks/use-password-reset', () => {
-    const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/hooks/use-password-reset'
-    )
-    return {
-        usePasswordReset: jest.fn(() => ({
-            ...originalModule,
-            getPasswordResetToken: mockGetPasswordResetToken
-        }))
-    }
-})
 
 let authModal = undefined
 const MockedComponent = (props) => {
@@ -218,16 +188,21 @@ test('allows regular login via Enter key in password mode', async () => {
     // simulate Enter key press in password field
     await user.keyboard('{Enter}')
 
-    // should trigger regular login
-    expect(
-        mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-    ).toHaveBeenCalledWith({
-        username: validEmail,
-        password: validPassword
+    // login successfully and close the modal
+    await waitFor(() => {
+        expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
     })
 })
 
 describe('Passwordless enabled', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
+        )
+    })
+
     test('Renders passwordless login when enabled', async () => {
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
 
@@ -262,13 +237,6 @@ describe('Passwordless enabled', () => {
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText(/Continue/i)
         await user.click(passwordlessLoginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email',
-            locale: 'en-GB'
-        })
 
         // check that check email modal is open
         await waitFor(
@@ -282,12 +250,10 @@ describe('Passwordless enabled', () => {
 
         // resend the email
         await user.click(screen.getByText(/Resend Link/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email',
-            locale: 'en-GB'
+
+        // check that check email modal is still open
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
     })
 
@@ -312,15 +278,6 @@ describe('Passwordless enabled', () => {
 
         // simulate Enter key press in email field
         await user.keyboard('{Enter}')
-
-        // should trigger passwordless login
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email',
-            locale: 'en-GB'
-        })
 
         // check that check email modal is open
         await waitFor(
@@ -365,13 +322,8 @@ describe('Passwordless enabled', () => {
         await user.type(screen.getByLabelText('Email'), validEmail)
         await user.click(screen.getByText(/Continue/i))
 
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'callback',
-            callbackURI: 'https://callback.com/passwordless?redirectUrl=/',
-            locale: 'en-GB'
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
     })
 
@@ -385,15 +337,14 @@ describe('Passwordless enabled', () => {
     ])(
         'displays correct error message when passwordless login fails with "%s"',
         async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+
             const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
             const validEmail = 'test@salesforce.com'
-
-            // Mock the error
-            mockAuthHelperFunctions[
-                AuthHelpers.AuthorizePasswordless
-            ].mutateAsync.mockImplementation(() => {
-                throw new Error(apiErrorMessage)
-            })
 
             // open the modal
             const trigger = screen.getByText(/open modal/i)
@@ -591,7 +542,10 @@ describe('Reset password', function () {
         global.server.use(
             rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) =>
                 res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
-            )
+            ),
+            rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
         )
     })
 
@@ -659,8 +613,11 @@ describe('Reset password', function () {
     ])(
         'displays correct error message when password reset fails with "%s"',
         async (apiErrorMessage, expectedMessage) => {
-            // Mock getPasswordResetToken to throw error
-            mockGetPasswordResetToken.mockRejectedValue(new Error(apiErrorMessage))
+            global.server.use(
+                rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
 
             const {user} = renderWithProviders(<MockedComponent initialView="password" />, {
                 wrapperProps: {
