@@ -1050,7 +1050,10 @@ describe('Auth', () => {
         // @ts-expect-error private property
         const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
         getPasswordResetTokenSpy.mockReturnValueOnce(
-            Promise.resolve({status: 200, json: jest.fn().mockResolvedValue({})} as unknown as Response)
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
         )
 
         await auth.getPasswordResetToken(input)
@@ -1068,7 +1071,10 @@ describe('Auth', () => {
         // @ts-expect-error private property
         const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
         getPasswordResetTokenSpy.mockReturnValueOnce(
-            Promise.resolve({status: 200, json: jest.fn().mockResolvedValue({})} as unknown as Response)
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
         )
 
         await auth.getPasswordResetToken({
@@ -1138,18 +1144,25 @@ describe('Auth', () => {
                 hint: 'cross_device'
             }
         ]
-    ])('resetPassword %s', async (_, input: Partial<ShopperLoginTypes.resetPasswordBodyType>, expectedBody: Partial<ShopperLoginTypes.resetPasswordBodyType>) => {
-        const auth = new Auth(config)
-        // @ts-expect-error private property
-        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
-        await auth.resetPassword(input as ShopperLoginTypes.resetPasswordBodyType)
+    ])(
+        'resetPassword %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.resetPasswordBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.resetPasswordBodyType>
+        ) => {
+            const auth = new Auth(config)
+            // @ts-expect-error private property
+            const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+            await auth.resetPassword(input as ShopperLoginTypes.resetPasswordBodyType)
 
-        expect(resetPasswordSpy).toHaveBeenCalledWith(
-            expect.objectContaining({
-                body: expect.objectContaining(expectedBody)
-            })
-        )
-    })
+            expect(resetPasswordSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: expect.objectContaining(expectedBody)
+                })
+            )
+        }
+    )
 
     test('resetPassword with private client sets Authorization header', async () => {
         const auth = new Auth(configSLASPrivate)
