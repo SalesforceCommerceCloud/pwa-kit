@@ -84,7 +84,6 @@ module.exports = {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
-    envBasePath: '/',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

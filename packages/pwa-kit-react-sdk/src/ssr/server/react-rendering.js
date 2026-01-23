@@ -365,6 +365,7 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
+        __MRT_ENV_BASE_PATH__: process.env.MRT_ENV_BASE_PATH || '',
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
