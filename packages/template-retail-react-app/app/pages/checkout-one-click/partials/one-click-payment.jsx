@@ -581,7 +581,9 @@ const Payment = ({
                                                 paymentMethodForm.formState.isValid ||
                                                 (isPickupOnly &&
                                                     billingAddressForm.formState.isValid)
-                                            )
+                                            ) ||
+                                            (!effectiveBillingSameAsShipping &&
+                                                !billingAddressForm.formState.isValid)
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}
                                         onRegistered={handleRegistrationSuccess}
@@ -639,7 +641,11 @@ const Payment = ({
                                 setEnableUserRegistration={setEnableUserRegistration}
                                 onLoadingChange={onOtpLoadingChange}
                                 isGuestCheckout={registeredUserChoseGuest}
-                                isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
+                                isDisabled={
+                                    (!appliedPayment && !paymentMethodForm.formState.isValid) ||
+                                    (!effectiveBillingSameAsShipping &&
+                                        !billingAddressForm.formState.isValid)
+                                }
                                 onSavePreferenceChange={onSavePreferenceChange}
                                 onRegistered={handleRegistrationSuccess}
                                 showNotice={showRegistrationNotice}
