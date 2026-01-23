@@ -254,7 +254,8 @@ const main = async () => {
                 process.exit(1)
             }
 
-            // Load config to get envBasePath for local development
+            // Load config to get envBasePath from ssrParameters for local development
+            // This mimics how MRT sets the MRT_ENV_BASE_PATH system environment variable
             const config = getConfig() || {}
             const envBasePath = config.ssrParameters?.envBasePath || ''
 
