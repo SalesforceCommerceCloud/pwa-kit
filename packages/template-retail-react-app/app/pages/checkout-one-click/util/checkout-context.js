@@ -102,7 +102,7 @@ export const CheckoutProvider = ({children}) => {
             )
             const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
             // Skip to appropriate next step; when mixed, go to SHIPPING_ADDRESS
-            setStep(hasDeliveryShipments ? STEPS.SHIPPING_ADDRESS : STEPS.PICKUP_ADDRESS)
+            setStep(hasDeliveryShipments ? STEPS.SHIPPING_ADDRESS : STEPS.PAYMENT)
         } else {
             setStep(step + 1)
         }
