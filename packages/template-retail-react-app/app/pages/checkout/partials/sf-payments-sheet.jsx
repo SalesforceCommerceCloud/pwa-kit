@@ -48,6 +48,7 @@ import {
     buildTheme,
     getSFPaymentsInstrument,
     createPaymentInstrumentBody,
+    transformPaymentMethodReferences,
     getClientSecret
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -486,18 +487,35 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         confirmPayment
     }))
 
+    const savedPaymentMethods = useMemo(() => {
+        if (!customer?.paymentMethodReferences || !paymentConfig?.paymentMethodSetAccounts) {
+            return []
+        }
+        return transformPaymentMethodReferences(
+            customer.paymentMethodReferences,
+            paymentConfig.paymentMethodSetAccounts
+        )
+    }, [customer?.paymentMethodReferences, paymentConfig?.paymentMethodSetAccounts])
+
     useEffect(() => {
         if (sfp && metadata && containerElementRef.current && paymentConfig) {
+            const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
+                (account) => ({
+                    ...account,
+                    gatewayId: account.gatewayId || account.accountId
+                })
+            )
+
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+                paymentMethodSetAccounts: paymentMethodSetAccounts
             }
 
             config.current = {
                 theme: buildTheme(),
                 actions: {
                     createIntent: createPaymentInstrument,
-                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
+                    onClick: () => {}
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
@@ -505,8 +523,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     showSaveForFutureUsageCheckbox: !!(
                         customer?.isRegistered && customer?.customerId
                     ),
-                    // Suppress "Make payment method default" checkbox since we don't support default SPM yet
-                    showSaveAsDefaultCheckbox: false
+                    showSaveAsDefaultCheckbox: false,
+                    savedPaymentMethods: savedPaymentMethods
                 }
             }
 
@@ -549,7 +567,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic,
-        customer?.isRegistered
+        customer?.isRegistered,
+        customer?.customerId,
+        savedPaymentMethods
     ])
 
     useEffect(() => {
