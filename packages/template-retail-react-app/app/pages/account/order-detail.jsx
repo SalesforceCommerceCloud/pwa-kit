@@ -330,15 +330,15 @@ const AccountOrderDetail = () => {
                                 {deliveryShipments.map((shipment, index) => {
                                     // Hide shipping address for OMS multi-shipment orders
                                     // Can't reliably correlate OMS shipments to ECOM addresses by index
-
-                                    const hasOmsData = order?.omsData
+                                    const isOmsOrder = !!order?.omsData
+                                    const omsShipment = isOmsOrder
+                                        ? order.omsData.shipments?.[index]
+                                        : null
                                     const isOmsMultiShipment =
-                                        hasOmsData &&
-                                        (order?.omsData?.shipments?.length > 1 ||
-                                            order?.shipments?.length > 1)
+                                        isOmsOrder &&
+                                        (order.omsData.shipments?.length > 1 ||
+                                            order.shipments?.length > 1)
 
-                                    const omsShipment =
-                                        hasOmsData && order?.omsData?.shipments?.[index]
                                     const shippingMethodName =
                                         omsShipment?.provider || shipment.shippingMethod.name
                                     const shippingStatus =
