@@ -279,6 +279,82 @@ export const createPaymentInstrumentBody = ({
 }
 
 /**
+ * Transforms payment method references from API format to SF Payments SDK format.
+ * @param {Array} paymentMethodReferences - Array of payment method references
+ * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @returns {Array} Transformed payment method references for SF Payments SDK
+ */
+export const transformPaymentMethodReferences = (
+    paymentMethodReferences,
+    paymentMethodSetAccounts = []
+) => {
+    if (!paymentMethodReferences || !Array.isArray(paymentMethodReferences)) {
+        return []
+    }
+
+    return paymentMethodReferences
+        .map((pmr) => {
+            const generateDisplayName = () => {
+                if (pmr.brand && pmr.last4) {
+                    const brandName = pmr.brand.charAt(0).toUpperCase() + pmr.brand.slice(1)
+                    return `${brandName} •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'card' && pmr.last4) {
+                    return `Card •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'sepa_debit' && pmr.last4) {
+                    return `Account ending in ${pmr.last4}`
+                }
+                return 'Saved Payment Method'
+            }
+
+            // Determine gatewayId for SDK matching
+            if (
+                !pmr.accountId ||
+                !paymentMethodSetAccounts ||
+                !Array.isArray(paymentMethodSetAccounts)
+            ) {
+                return null
+            }
+
+            const matchingAccount = paymentMethodSetAccounts.find(
+                (account) => account.accountId === pmr.accountId
+            )
+            if (!matchingAccount) {
+                return null
+            }
+
+            const gatewayId = matchingAccount.gatewayId || matchingAccount.accountId
+
+            if (!gatewayId || typeof gatewayId !== 'string') {
+                return null
+            }
+
+            return {
+                accountId: pmr.accountId || null,
+                name: generateDisplayName(),
+                status: 'Active',
+                isDefault: false,
+                type: pmr.type || null,
+                accountHolderName: null,
+                id: pmr.id || null,
+                gatewayTokenId: pmr.id || null,
+                usageType: 'OffSession',
+                gatewayId: gatewayId,
+                gatewayCustomerId: null,
+                last4: pmr.last4 || null,
+                network: pmr.brand || null,
+                issuer: null,
+                expiryMonth: null,
+                expiryYear: null,
+                bankName: null,
+                savedByMerchant: false
+            }
+        })
+        .filter((spm) => spm !== null)
+}
+
+/**
  * Returns a theme object containing CSS information for use with SF Payments components.
  * @param {*} options - theme override options
  * @returns SF Payments theme
