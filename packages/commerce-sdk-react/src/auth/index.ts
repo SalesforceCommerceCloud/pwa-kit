@@ -1467,53 +1467,79 @@ class Auth {
 
     /**
      * A wrapper method for the SLAS endpoint: startWebauthnUserRegistration.
+     * Direct implementation since commerce-sdk-isomorphic doesn't support it yet.
      */
     async startWebauthnUserRegistration(
-        parameters: ShopperLoginTypes.startWebauthnUserRegistrationBodyType
+        parameters: any
     ) {
         const slasClient = this.client
         const authHeader = this.getBasicAuthHeader(slasClient)
-        const options = {
+        const {organizationId} = slasClient.clientConfig.parameters
+        
+        const body: Record<string, string> = {
+            channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+            pwd_action_token: parameters.pwd_action_token,
+            user_id: parameters.user_id
+        }
+        
+        // Optional params
+        if (parameters.client_id) body.client_id = parameters.client_id
+        if (parameters.display_name) body.display_name = parameters.display_name
+        if (parameters.nick_name) body.nick_name = parameters.nick_name
+
+        const url = `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/webauthn/register/start`
+        
+        const response = await fetch(url, {
+            method: 'POST',
             headers: {
-                Authorization: authHeader ?? ''
+                'Content-Type': 'application/x-www-form-urlencoded',
+                ...(authHeader && {Authorization: authHeader})
             },
-            body: {
-                // Required params
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                pwd_action_token: parameters.pwd_action_token,
-                user_id: parameters.user_id,
-                // Optional params
-                ...(parameters.display_name && {display_name: parameters.display_name}),
-                ...(parameters.nick_name && {nick_name: parameters.nick_name}),
-                ...(parameters.client_id && {client_id: parameters.client_id})
-            }
+            body: new URLSearchParams(body).toString()
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(`WebAuthn registration start failed: ${error.message || response.statusText}`)
         }
 
-        return await slasClient.startWebauthnUserRegistration(options)
+        return await response.json()
     }
 
     /**
      * A wrapper method for the SLAS endpoint: finishWebauthnUserRegistration.
+     * Direct implementation since commerce-sdk-isomorphic doesn't support it yet.
      */
-    async finishWebauthnUserRegistration(parameters: ShopperLoginTypes.RegistrationFinishRequest) {
+    async finishWebauthnUserRegistration(parameters: any) {
         const slasClient = this.client
         const authHeader = this.getBasicAuthHeader(slasClient)
+        const {organizationId} = slasClient.clientConfig.parameters
 
-        const options = {
-            headers: {
-                Authorization: authHeader ?? ''
-            },
-            body: {
-                // Required params
-                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                username: parameters.username,
-                credential: parameters.credential,
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                pwd_action_token: parameters.pwd_action_token
-            }
+        const body: Record<string, any> = {
+            client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+            username: parameters.username,
+            credential: parameters.credential,
+            channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+            pwd_action_token: parameters.pwd_action_token
         }
 
-        return await slasClient.finishWebauthnUserRegistration(options)
+        const url = `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/webauthn/register/finish`
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(authHeader && {Authorization: authHeader})
+            },
+            body: JSON.stringify(body)
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(`WebAuthn registration finish failed: ${error.message || response.statusText}`)
+        }
+
+        return await response.json()
     }
 
     /**
@@ -1532,12 +1558,14 @@ class Auth {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                user_id: parameters.user_id,
                 // Optional params
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 ...(parameters.tenant_id && {tenant_id: parameters.tenant_id})
             }
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore TODO: user_id is optional, but commerce-sdk-isomorphic expects it to be required. Remove this comment after commerce-sdk-isomorphic is updated.
         return await slasClient.startWebauthnAuthentication(options)
     }
 
@@ -1564,6 +1592,8 @@ class Auth {
             }
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore TODO: commerce-sdk-isomorphic WebAuthn support is pending. Remove this comment after commerce-sdk-isomorphic is updated.
         const res = await slasClient.finishWebauthnAuthentication(options)
 
         const tokenResponse = res.tokenResponse

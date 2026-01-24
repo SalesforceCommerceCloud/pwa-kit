@@ -6245,6 +6245,20 @@
       "value": "]"
     }
   ],
+  "passkey_registration.error.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɠīşŧřȧȧŧīǿǿƞ Ƒȧȧīŀḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "passkey_registration.modal.button.close.assistive_msg": [
     {
       "type": 0,
@@ -6287,6 +6301,20 @@
       "value": "]"
     }
   ],
+  "passkey_registration.modal.error.registration_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ řḗḗɠīşŧḗḗř ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "passkey_registration.modal.label.nickname": [
     {
       "type": 0,
@@ -6309,6 +6337,34 @@
     {
       "type": 0,
       "value": "Ƈřḗḗȧȧŧḗḗ Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.success.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭř ƥȧȧşşķḗḗẏ ħȧȧş ƀḗḗḗḗƞ řḗḗɠīşŧḗḗřḗḗḓ şŭŭƈƈḗḗşşƒŭŭŀŀẏ!"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.success.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧşşķḗḗẏ Ƈřḗḗȧȧŧḗḗḓ"
     },
     {
       "type": 0,

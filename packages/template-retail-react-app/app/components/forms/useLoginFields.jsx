@@ -21,7 +21,8 @@ export default function useLoginFields({
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
-            autoComplete: 'email',
+            // Include 'webauthn' for passkey autofill support
+            autoComplete: 'email webauthn',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your email address.',

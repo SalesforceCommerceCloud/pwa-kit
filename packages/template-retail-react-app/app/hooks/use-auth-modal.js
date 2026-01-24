@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
@@ -46,6 +46,29 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 
+// WebAuthn configuration - these should come from config
+// Hardcoded values removed - will use config values below
+
+// Helper functions for base64url encoding/decoding using native browser APIs
+const base64urlToUint8Array = (base64url) => {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/')
+    const binary = atob(base64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+    }
+    return bytes
+}
+
+const uint8arrayToBase64url = (uint8array) => {
+    let binary = ''
+    for (let i = 0; i < uint8array.byteLength; i++) {
+        binary += String.fromCharCode(uint8array[i])
+    }
+    const base64 = btoa(binary)
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
+
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
 export const PASSWORD_VIEW = 'password'
@@ -66,6 +89,7 @@ export const AuthModal = ({
     onClose,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
+    isWebAuthnEnabled = false,
     idps = [],
     ...props
 }) => {
@@ -87,9 +111,16 @@ export const AuthModal = ({
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
     const config = getConfig()
+    
+    // Track if a WebAuthn request is in progress to prevent "A request is already pending" error
+    const webAuthnInProgress = useRef(false)
+    // AbortController to cancel pending WebAuthn requests
+    const webAuthnAbortController = useRef(null)
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const startWebauthnAuth = useAuthHelper(AuthHelpers.StartWebauthnAuthentication)
+    const finishWebauthnAuth = useAuthHelper(AuthHelpers.FinishWebauthnAuthentication)
     const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -119,6 +150,131 @@ export const AuthModal = ({
         }
     }
 
+    const handleWebAuthnLogin = async (email = '') => {
+        // Abort any existing pending WebAuthn request
+        if (webAuthnAbortController.current) {
+            console.log('Aborting previous WebAuthn request')
+            webAuthnAbortController.current.abort()
+            webAuthnAbortController.current = null
+        }
+
+        // Early return if conditional mediation is not available
+        if (!window.PublicKeyCredential || !PublicKeyCredential.isConditionalMediationAvailable) {
+            console.log('WebAuthN is not supported')
+            return false
+        }
+
+        // Check if conditional mediation is available
+        const isCMA = await PublicKeyCredential.isConditionalMediationAvailable()
+        if (!isCMA) {
+            console.log('WebAuthN is not supported: Conditional mediation is not available')
+            return false
+        }
+
+        console.log('WebAuthN supported')
+        webAuthnInProgress.current = true
+        
+        // Create a new AbortController for this request
+        webAuthnAbortController.current = new AbortController()
+        
+        try {
+            // Step 1: Start WebAuthn authentication using commerce-sdk-react
+            const startData = await startWebauthnAuth.mutateAsync({
+                ...(email && { user_id: email })
+            })
+            
+            console.log('WebAuthn /start', startData)
+            
+            // Step 2: Transform response for WebAuthn API
+            const credentialRequestOptions = {
+                publicKey: {
+                    challenge: base64urlToUint8Array(startData.publicKey.challenge),
+                    timeout: startData.publicKey.timeout || 60000,
+                    rpId: startData.publicKey.rpId,
+                    allowCredentials: (startData.publicKey.allowCredentials || []).map(credential => ({
+                        type: credential.type || 'public-key',
+                        id: base64urlToUint8Array(credential.id),
+                        transports: credential.transports
+                    }))
+                }
+            }
+
+            // Step 3: Get the passkey credential
+            // Use 'conditional' for discoverable credentials (autofill in input field)
+            // Use 'optional' for non-discoverable (shows browser modal dialog)
+            const mediationMode = email ? 'optional' : 'conditional'
+            console.log(`WebAuthn calling navigator.credentials.get with mediation: ${mediationMode}`, credentialRequestOptions)
+            const credential = await navigator.credentials.get({
+                ...credentialRequestOptions,
+                mediation: mediationMode,
+                signal: webAuthnAbortController.current.signal
+            })
+            
+            if (!credential) {
+                throw new Error('No credential returned')
+            }
+
+            // Step 4: Encode credential for finish endpoint
+            const encodedCredential = {
+                id: credential.id,
+                rawId: uint8arrayToBase64url(new Uint8Array(credential.rawId)),
+                type: credential.type,
+                clientExtensionResults: credential.getClientExtensionResults(),
+                response: {
+                    authenticatorData: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.authenticatorData)
+                    ),
+                    clientDataJSON: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.clientDataJSON)
+                    ),
+                    signature: uint8arrayToBase64url(
+                        new Uint8Array(credential.response.signature)
+                    ),
+                    userHandle: credential.response.userHandle
+                        ? uint8arrayToBase64url(new Uint8Array(credential.response.userHandle))
+                        : null
+                }
+            }
+
+            // Step 5: Finish WebAuthn authentication using commerce-sdk-react
+            const finishRequest = {
+                credential: encodedCredential,
+                ...(email && { user_id: email })
+            }
+            console.log('WebAuthn calling /authenticate/finish', finishRequest)
+            const finishData = await finishWebauthnAuth.mutateAsync(finishRequest)
+            
+            console.log('WebAuthn /authenticate/finish', finishData)
+            
+            // Close modal - the auth success will be handled by useEffect
+            onClose()
+            
+            return true
+
+        } catch (err) {
+            // Check if this was an intentional abort
+            if (err.name === 'AbortError') {
+                console.log('WebAuthn request was aborted')
+                return false
+            }
+            
+            // For non-discoverable credentials (with email), fall back to passwordless
+            if (email) {
+                console.log('WebAuthn failed, falling back to passwordless:', err.message)
+                return false
+            }
+            
+            // For discoverable credentials, just log the error and don't fall back
+            // The user can still manually enter email/password if needed
+            console.log('WebAuthn conditional mediation error:', err.message)
+            return false
+        } finally {
+            // Reset the flag and clear the controller reference
+            webAuthnInProgress.current = false
+            webAuthnAbortController.current = null
+        }
+    }
+
     const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
@@ -130,6 +286,16 @@ export const AuthModal = ({
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
+                    // Try WebAuthn first if enabled
+                    if (isWebAuthnEnabled) {
+                        console.log('WebAuthn enabled, trying to login with WebAuthn')
+                        // Prompt user to login with username (non-discoverable credentials)
+                        const webAuthnSuccess = await handleWebAuthnLogin(email)
+                        if (webAuthnSuccess) {
+                            return // WebAuthn succeeded, we're done
+                        }
+                        // WebAuthn failed, fall through to passwordless
+                    }
                     await handlePasswordlessLogin(email)
                     return
                 }
@@ -208,8 +374,28 @@ export const AuthModal = ({
         if (isOpen) {
             setCurrentView(initialView)
             form.reset()
+            // Prompt user to login without username (discoverable credentials)
+            handleWebAuthnLogin()
+        } else {
+            // Abort any pending WebAuthn request when modal closes
+            if (webAuthnAbortController.current) {
+                console.log('Modal closed, aborting WebAuthn request')
+                webAuthnAbortController.current.abort()
+                webAuthnAbortController.current = null
+            }
+            webAuthnInProgress.current = false
         }
     }, [isOpen])
+
+    // Cleanup: abort pending WebAuthn request on component unmount
+    useEffect(() => {
+        return () => {
+            if (webAuthnAbortController.current) {
+                console.log('Component unmounting, aborting WebAuthn request')
+                webAuthnAbortController.current.abort()
+            }
+        }
+    }, [])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
@@ -377,6 +563,7 @@ AuthModal.propTypes = {
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
     isSocialEnabled: PropTypes.bool,
+    isWebAuthnEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
@@ -387,7 +574,7 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const {passwordless = {}, social = {}, passkey = {}} = getConfig().app.login || {}
 
     return {
         initialView,
@@ -396,6 +583,7 @@ export const useAuthModal = (initialView = LOGIN_VIEW) => {
         onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,
         isSocialEnabled: !!social?.enabled,
+        isWebAuthnEnabled: !!passkey?.enabled,
         idps: social?.idps
     }
 }
