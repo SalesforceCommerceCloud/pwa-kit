@@ -67,6 +67,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
     }
 })
 
+const mockLoginWithPasskey = jest.fn().mockResolvedValue(undefined)
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-passkey-login', () => {
+    return {
+        __esModule: true,
+        usePasskeyLogin: jest.fn(() => ({
+            loginWithPasskey: mockLoginWithPasskey
+        }))
+    }
+})
+
 afterEach(() => {
     jest.resetModules()
     jest.restoreAllMocks()
@@ -374,5 +385,28 @@ describe('navigation based on shipment context', () => {
 
         expect(mockGoToNextStep).toHaveBeenCalled()
         expect(mockGoToStep).not.toHaveBeenCalled()
+    })
+})
+
+describe('passkey login', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('calls loginWithPasskey on component render', async () => {
+        renderWithProviders(<ContactInfo />)
+
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).toHaveBeenCalled()
+        })
+    })
+
+    test('sets error when loginWithPasskey fails', async () => {
+        mockLoginWithPasskey.mockRejectedValue(new Error('Passkey authentication failed'))
+        renderWithProviders(<ContactInfo />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Try again!')).toBeInTheDocument()
+        })
     })
 })

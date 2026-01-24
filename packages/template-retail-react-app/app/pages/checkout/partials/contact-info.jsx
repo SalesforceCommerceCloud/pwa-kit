@@ -46,6 +46,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
@@ -63,6 +64,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const {loginWithPasskey} = usePasskeyLogin()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -79,7 +81,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const config = getConfig()
+    const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
@@ -156,6 +159,17 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             form.unregister('password')
         }
     }, [showPasswordField])
+
+    useEffect(() => {
+        const handlePasskeyLogin = async () => {
+            try {
+                await loginWithPasskey()
+            } catch (error) {
+                setError(formatMessage(API_ERROR_MESSAGE))
+            }
+        }
+        handlePasskeyLogin()
+    }, [])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')
