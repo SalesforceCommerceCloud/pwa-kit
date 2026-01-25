@@ -1547,6 +1547,12 @@
       "value": "Checkout as Guest"
     }
   ],
+  "contact_info.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
+    }
+  ],
   "contact_info.button.continue_to_shipping_address": [
     {
       "type": 0,
