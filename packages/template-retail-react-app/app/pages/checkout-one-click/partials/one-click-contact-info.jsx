@@ -50,6 +50,7 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -69,6 +70,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const {locale} = useMultiSite()
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
+
+    // Determine if this order has delivery shipments
+    const shipments = basket?.shipments || []
+    const productItems = basket?.productItems || []
+    const shipmentsWithItems = shipments.filter((s) =>
+        productItems.some((i) => i.shipmentId === s.shipmentId)
+    )
+    const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
 
     const form = useForm({
         defaultValues: {
@@ -615,10 +624,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             isLoading={isSubmitting}
                                             disabled={isSubmitting}
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Continue to Shipping Address"
-                                                id="contact_info.button.continue_to_shipping_address"
-                                            />
+                                            {hasDeliveryShipments ? (
+                                                <FormattedMessage
+                                                    defaultMessage="Continue to Shipping Address"
+                                                    id="contact_info.button.continue_to_shipping_address"
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    defaultMessage="Continue to Payment"
+                                                    id="contact_info.button.continue_to_payment"
+                                                />
+                                            )}
                                         </Button>
                                     )}
                                 </Stack>
