@@ -30,7 +30,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                         postalCode: '94105',
                         countryCode: 'US',
                         phone: '555-123-4567',
-                        storeHours: 'Mon-Fri: 9AM-6PM',
+                        c_customerServiceEmail: 'store@example.com',
+                        storeHours: '<p>Mon-Fri: 9AM-6PM</p>',
                         storeType: 'retail'
                     }
                 ]
@@ -74,10 +75,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
                     shipmentId: 'me',
                     shipmentTotal: 25.17,
                     shippingStatus: 'not_shipped',
-                    shippingTotal: 5.99
+                    shippingTotal: 5.99,
+                    c_fromStoreId: 'store-123',
+                    c_deliveryType: 'pickup'
                 }
-            ],
-            c_fromStoreId: 'store-123'
+            ]
         },
         derivedData: {
             hasBasket: true,
@@ -125,8 +127,18 @@ describe('PickupAddress', () => {
         expect(screen.getByText('Store Information')).toBeInTheDocument()
         expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
 
+        // Verify store name is displayed
+        expect(screen.getByText('Test Store')).toBeInTheDocument()
+
+        // Verify store address is displayed
         expect(screen.getByText('123 Main Street')).toBeInTheDocument()
         expect(screen.getByText('San Francisco, CA 94105')).toBeInTheDocument()
+
+        // Verify Store Hours accordion is present
+        expect(screen.getByText('Store Hours')).toBeInTheDocument()
+
+        // Verify Store Contact Info accordion is present
+        expect(screen.getByText('Store Contact Info')).toBeInTheDocument()
     })
 
     test('submits pickup address and continues to payment', async () => {
@@ -156,6 +168,38 @@ describe('PickupAddress', () => {
                     phone: '555-123-4567'
                 }
             })
+        })
+    })
+
+    test('displays store hours when accordion is expanded', async () => {
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Store Hours')).toBeInTheDocument()
+        })
+
+        // Click to expand the Store Hours accordion
+        await user.click(screen.getByText('Store Hours'))
+
+        await waitFor(() => {
+            expect(screen.getByText('Mon-Fri: 9AM-6PM')).toBeInTheDocument()
+        })
+    })
+
+    test('displays store contact info when accordion is expanded', async () => {
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Store Contact Info')).toBeInTheDocument()
+        })
+
+        // Click to expand the Store Contact Info accordion
+        await user.click(screen.getByText('Store Contact Info'))
+
+        await waitFor(() => {
+            // Email and phone are in the same element separated by <br />, use substring matcher
+            expect(screen.getByText(/Email: store@example\.com/)).toBeInTheDocument()
+            expect(screen.getByText(/Phone: 555-123-4567/)).toBeInTheDocument()
         })
     })
 })

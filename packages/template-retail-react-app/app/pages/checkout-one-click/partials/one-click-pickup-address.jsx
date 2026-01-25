@@ -13,7 +13,7 @@ import {
     ToggleCard,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -38,8 +38,6 @@ const PickupAddress = () => {
     )
     const pickupShipment = shipmentsWithItems.find((s) => isPickupShipment(s))
 
-    const selectedShippingAddress = pickupShipment?.shippingAddress
-
     // Check if basket is a pickup order
     const isPickupOrder = !!pickupShipment
     const storeId = pickupShipment?.c_fromStoreId
@@ -54,6 +52,7 @@ const PickupAddress = () => {
         }
     )
     const store = storeData?.data?.[0]
+    // Build address object for shipping API update (required for order processing)
     const pickupAddress = {
         address1: store?.address1,
         city: store?.city,
@@ -64,8 +63,6 @@ const PickupAddress = () => {
         lastName: 'Pickup',
         phone: store?.phone
     }
-    // Prefer store-derived address; only fall back to shipment shippingAddress if store unavailable
-    const displayAddress = pickupAddress || selectedShippingAddress
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -111,8 +108,21 @@ const PickupAddress = () => {
                             id="pickup_address.title.store_information"
                         />
                     </Text>
-                    {displayAddress ? (
-                        <AddressDisplay address={displayAddress} />
+                    {store ? (
+                        <Box mb={4}>
+                            <StoreDisplay
+                                store={store}
+                                showDistance={true}
+                                showStoreHours={true}
+                                showPhone={true}
+                                showEmail={true}
+                                nameStyle={{
+                                    fontSize: 'sm',
+                                    fontWeight: 'normal'
+                                }}
+                                textSize="sm"
+                            />
+                        </Box>
                     ) : isStoreLoading ? (
                         <Text>
                             <FormattedMessage
@@ -133,7 +143,7 @@ const PickupAddress = () => {
                     </Box>
                 </>
             )}
-            {isPickupOrder && (displayAddress || isStoreLoading) && (
+            {isPickupOrder && (store || isStoreLoading) && (
                 <ToggleCardSummary>
                     <Text fontWeight="bold" fontSize="md" mb={2}>
                         <FormattedMessage
@@ -141,8 +151,19 @@ const PickupAddress = () => {
                             id="pickup_address.title.store_information"
                         />
                     </Text>
-                    {displayAddress ? (
-                        <AddressDisplay address={displayAddress} />
+                    {store ? (
+                        <StoreDisplay
+                            store={store}
+                            showDistance={true}
+                            showStoreHours={true}
+                            showPhone={true}
+                            showEmail={true}
+                            nameStyle={{
+                                fontSize: 'sm',
+                                fontWeight: 'normal'
+                            }}
+                            textSize="sm"
+                        />
                     ) : (
                         <Text>
                             <FormattedMessage
