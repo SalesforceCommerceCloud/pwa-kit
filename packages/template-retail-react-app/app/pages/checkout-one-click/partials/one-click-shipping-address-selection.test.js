@@ -44,6 +44,13 @@ jest.mock('react-intl', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 jest.mock('@salesforce/commerce-sdk-react')
 
+// Mock AddressFields to avoid react-hook-form complexity in billing address tests
+jest.mock('@salesforce/retail-react-app/app/components/forms/address-fields', () => {
+    return function MockAddressFields() {
+        return <div data-testid="mock-address-fields">Address Fields</div>
+    }
+})
+
 const mockCustomer = {
     addresses: []
 }
@@ -100,6 +107,86 @@ describe('ShippingAddressSelection Component', () => {
             render(<ShippingAddressSelection hideSubmitButton={true} />)
 
             expect(screen.queryByText('Submit')).not.toBeInTheDocument()
+        })
+
+        test('auto-populates form with selectedAddress when isBillingAddress is true', () => {
+            const mockForm = {
+                handleSubmit: jest.fn(() => (e) => e?.preventDefault?.()),
+                reset: jest.fn(),
+                watch: jest.fn(),
+                register: jest.fn(),
+                control: {},
+                trigger: jest.fn(),
+                formState: {isSubmitting: false, errors: {}}
+            }
+            const selectedAddress = {
+                address1: '456 Billing St',
+                city: 'Billing City',
+                stateCode: 'CA',
+                postalCode: '90210',
+                countryCode: 'US',
+                firstName: 'Jane',
+                lastName: 'Doe'
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: []
+                },
+                isLoading: false,
+                isFetching: false
+            })
+
+            render(
+                <ShippingAddressSelection
+                    form={mockForm}
+                    isBillingAddress={true}
+                    selectedAddress={selectedAddress}
+                />
+            )
+
+            // Verify the form was reset with the selected billing address
+            expect(mockForm.reset).toHaveBeenCalledWith(selectedAddress)
+        })
+
+        test('auto-populates form with preferred address when no selectedAddress provided', () => {
+            const mockForm = {
+                handleSubmit: jest.fn(() => (e) => e?.preventDefault?.()),
+                reset: jest.fn(),
+                watch: jest.fn(),
+                register: jest.fn(),
+                control: {},
+                trigger: jest.fn(),
+                formState: {isSubmitting: false, errors: {}}
+            }
+            const preferredAddress = {
+                addressId: 'addr-preferred',
+                address1: '789 Preferred St',
+                city: 'Preferred City',
+                stateCode: 'NY',
+                postalCode: '10001',
+                countryCode: 'US',
+                firstName: 'John',
+                lastName: 'Smith',
+                preferred: true
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'test-customer-id',
+                    isRegistered: true,
+                    addresses: [preferredAddress]
+                },
+                isLoading: false,
+                isFetching: false
+            })
+
+            render(<ShippingAddressSelection form={mockForm} isBillingAddress={true} />)
+
+            // Verify the form was reset with the preferred address
+            expect(mockForm.reset).toHaveBeenCalledWith(preferredAddress)
         })
     })
 
