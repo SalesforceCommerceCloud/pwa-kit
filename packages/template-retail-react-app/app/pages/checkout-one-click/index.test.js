@@ -430,7 +430,7 @@ describe('Checkout One Click', () => {
             }
 
             // Wait for continue button and click
-            const continueBtn = await screen.findByText(/continue to shipping address/i)
+            const continueBtn = await screen.findByText(/continue to payment/i)
             await user.click(continueBtn)
 
             // Verify we skip directly to payment
@@ -524,7 +524,7 @@ describe('Checkout One Click', () => {
             }
 
             // Wait for continue button and click
-            const continueBtn = await screen.findByText(/continue to shipping address/i)
+            const continueBtn = await screen.findByText(/continue to payment/i)
             await user.click(continueBtn)
 
             // Verify we continue to payment

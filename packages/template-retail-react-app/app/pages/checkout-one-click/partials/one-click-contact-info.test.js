@@ -48,7 +48,9 @@ const mockUseCurrentBasket = jest.fn(() => ({
         basketId: 'test-basket-id',
         customerInfo: {
             email: null
-        }
+        },
+        shipments: [{shipmentId: 'shipment-1', shipmentType: 'delivery'}],
+        productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}]
     },
     derivedData: {
         hasBasket: true,
@@ -126,6 +128,17 @@ beforeEach(() => {
     jest.clearAllMocks()
     // Default: allow OTP authorization so modal can open unless a test overrides it
     mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
+    // Reset basket mock to default (delivery shipment)
+    mockUseCurrentBasket.mockReturnValue({
+        data: {
+            basketId: 'test-basket-id',
+            customerInfo: {email: null},
+            shipments: [{shipmentId: 'shipment-1', shipmentType: 'delivery'}],
+            productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}]
+        },
+        derivedData: {hasBasket: true, totalItems: 1},
+        refetch: jest.fn()
+    })
 })
 
 afterEach(() => {})
@@ -403,6 +416,43 @@ describe('ContactInfo Component', () => {
             })
             expect(continueBtn).toBeEnabled()
         })
+    })
+
+    test('renders "Continue to Payment" button for BOPIS-only orders', async () => {
+        // Mock BOPIS-only basket
+        mockUseCurrentBasket.mockReturnValue({
+            data: {
+                basketId: 'test-basket-id',
+                customerInfo: {email: null},
+                shipments: [{shipmentId: 'pickup-1', c_fromStoreId: 'store-123'}],
+                productItems: [{productId: 'product-1', shipmentId: 'pickup-1'}]
+            },
+            derivedData: {hasBasket: true, totalItems: 1},
+            refetch: jest.fn()
+        })
+
+        // Mock the passwordless login to fail (guest checkout)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        await waitFor(() => {
+            const continueBtn = screen.getByRole('button', {
+                name: /continue to payment/i
+            })
+            expect(continueBtn).toBeEnabled()
+        })
+
+        // Verify "Continue to Shipping Address" is NOT shown
+        expect(
+            screen.queryByRole('button', {name: /continue to shipping address/i})
+        ).not.toBeInTheDocument()
     })
 
     test('requires phone for guest shoppers on submit', async () => {
