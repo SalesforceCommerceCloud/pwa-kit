@@ -18,6 +18,7 @@ import {
     Button,
     Divider,
     Grid,
+    Link as ChakraLink,
     SimpleGrid,
     Skeleton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -326,27 +327,46 @@ const AccountOrderDetail = () => {
                                 })}
 
                                 {/* Delivery Shipments */}
-                                {deliveryShipments.map((shipment, index) => (
-                                    <React.Fragment key={`delivery-${index}`}>
-                                        <Stack spacing={1}>
-                                            <Heading as="h2" fontSize="sm" pt={1}>
-                                                {deliveryShipments.length > 1 ? (
-                                                    <FormattedMessage
-                                                        defaultMessage="Shipping Method {number}"
-                                                        id="account_order_detail.heading.shipping_method_number"
-                                                        values={{number: index + 1}}
-                                                    />
-                                                ) : (
-                                                    <FormattedMessage
-                                                        defaultMessage="Shipping Method"
-                                                        id="account_order_detail.heading.shipping_method"
-                                                    />
-                                                )}
-                                            </Heading>
-                                            <Box>
-                                                <Text fontSize="sm" textTransform="titlecase">
-                                                    {
-                                                        {
+                                {deliveryShipments.map((shipment, index) => {
+                                    // Hide shipping address for OMS multi-shipment orders
+                                    // Can't reliably correlate OMS shipments to ECOM addresses by index
+                                    const isOmsOrder = !!order?.omsData
+                                    const omsShipment = isOmsOrder
+                                        ? order.omsData.shipments?.[index]
+                                        : null
+                                    const isOmsMultiShipment =
+                                        isOmsOrder &&
+                                        (order.omsData.shipments?.length > 1 ||
+                                            order.shipments?.length > 1)
+
+                                    const shippingMethodName =
+                                        omsShipment?.provider || shipment.shippingMethod.name
+                                    const shippingStatus =
+                                        omsShipment?.status || shipment.shippingStatus
+                                    const trackingNumber =
+                                        omsShipment?.trackingNumber || shipment.trackingNumber
+                                    const trackingUrl = omsShipment?.trackingUrl
+
+                                    return (
+                                        <React.Fragment key={`delivery-${index}`}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h2" fontSize="sm" pt={1}>
+                                                    {deliveryShipments.length > 1 ? (
+                                                        <FormattedMessage
+                                                            defaultMessage="Shipping Method {number}"
+                                                            id="account_order_detail.heading.shipping_method_number"
+                                                            values={{number: index + 1}}
+                                                        />
+                                                    ) : (
+                                                        <FormattedMessage
+                                                            defaultMessage="Shipping Method"
+                                                            id="account_order_detail.heading.shipping_method"
+                                                        />
+                                                    )}
+                                                </Heading>
+                                                <Box>
+                                                    <Text fontSize="sm" textTransform="titlecase">
+                                                        {{
                                                             not_shipped: formatMessage({
                                                                 defaultMessage: 'Not shipped',
                                                                 id: 'account_order_detail.shipping_status.not_shipped'
@@ -359,57 +379,68 @@ const AccountOrderDetail = () => {
                                                                 defaultMessage: 'Shipped',
                                                                 id: 'account_order_detail.shipping_status.shipped'
                                                             })
-                                                        }[shipment.shippingStatus]
-                                                    }
-                                                </Text>
-                                                <Text fontSize="sm">
-                                                    {shipment.shippingMethod.name}
-                                                </Text>
-                                                {shipment.trackingNumber && (
-                                                    <Text fontSize="sm">
-                                                        <FormattedMessage
-                                                            defaultMessage="Tracking Number"
-                                                            id="account_order_detail.label.tracking_number"
-                                                        />
-                                                        : {shipment.trackingNumber}
+                                                        }[shippingStatus] || shippingStatus}
                                                     </Text>
-                                                )}
-                                            </Box>
-                                        </Stack>
-                                        <Stack spacing={1}>
-                                            <Heading as="h2" fontSize="sm" pt={1}>
-                                                {deliveryShipments.length > 1 ? (
-                                                    <FormattedMessage
-                                                        defaultMessage="Shipping Address {number}"
-                                                        id="account_order_detail.heading.shipping_address_number"
-                                                        values={{number: index + 1}}
-                                                    />
-                                                ) : (
-                                                    <FormattedMessage
-                                                        defaultMessage="Shipping Address"
-                                                        id="account_order_detail.heading.shipping_address"
-                                                    />
-                                                )}
-                                            </Heading>
-                                            <Box>
-                                                <Text fontSize="sm">
-                                                    {shipment.shippingAddress.firstName &&
-                                                    shipment.shippingAddress.lastName
-                                                        ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
-                                                        : shipment.shippingAddress.fullName}
-                                                </Text>
-                                                <Text fontSize="sm">
-                                                    {shipment.shippingAddress.address1}
-                                                </Text>
-                                                <Text fontSize="sm">
-                                                    {shipment.shippingAddress.city},{' '}
-                                                    {shipment.shippingAddress.stateCode}{' '}
-                                                    {shipment.shippingAddress.postalCode}
-                                                </Text>
-                                            </Box>
-                                        </Stack>
-                                    </React.Fragment>
-                                ))}
+                                                    <Text fontSize="sm">{shippingMethodName}</Text>
+                                                    {trackingNumber && (
+                                                        <Text fontSize="sm">
+                                                            <FormattedMessage
+                                                                defaultMessage="Tracking Number"
+                                                                id="account_order_detail.label.tracking_number"
+                                                            />
+                                                            :{' '}
+                                                            {trackingUrl ? (
+                                                                <ChakraLink
+                                                                    href={trackingUrl}
+                                                                    isExternal
+                                                                    color="blue.600"
+                                                                >
+                                                                    {trackingNumber}
+                                                                </ChakraLink>
+                                                            ) : (
+                                                                trackingNumber
+                                                            )}
+                                                        </Text>
+                                                    )}
+                                                </Box>
+                                            </Stack>
+                                            {!isOmsMultiShipment && (
+                                                <Stack spacing={1}>
+                                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                                        {deliveryShipments.length > 1 ? (
+                                                            <FormattedMessage
+                                                                defaultMessage="Shipping Address {number}"
+                                                                id="account_order_detail.heading.shipping_address_number"
+                                                                values={{number: index + 1}}
+                                                            />
+                                                        ) : (
+                                                            <FormattedMessage
+                                                                defaultMessage="Shipping Address"
+                                                                id="account_order_detail.heading.shipping_address"
+                                                            />
+                                                        )}
+                                                    </Heading>
+                                                    <Box>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.firstName &&
+                                                            shipment.shippingAddress.lastName
+                                                                ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
+                                                                : shipment.shippingAddress.fullName}
+                                                        </Text>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.address1}
+                                                        </Text>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.city},{' '}
+                                                            {shipment.shippingAddress.stateCode}{' '}
+                                                            {shipment.shippingAddress.postalCode}
+                                                        </Text>
+                                                    </Box>
+                                                </Stack>
+                                            )}
+                                        </React.Fragment>
+                                    )
+                                })}
 
                                 {/* Payment Method */}
                                 {paymentCard && (
