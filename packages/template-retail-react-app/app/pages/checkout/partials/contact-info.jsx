@@ -114,15 +114,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 })
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
-
-                const hasBasketItem = basket.productItems?.length > 0
-                if (hasBasketItem) {
-                    mergeBasket.mutate({
-                        parameters: {
-                            createDestinationBasket: true
-                        }
-                    })
-                }
             }
             goToNextStep()
         } catch (error) {
@@ -154,6 +145,17 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         authModal.onOpen()
     }
 
+    const handleMergeBasket = () => {
+        const hasBasketItem = basket.productItems?.length > 0
+        if (hasBasketItem) {
+            mergeBasket.mutate({
+                parameters: {
+                    createDestinationBasket: true
+                }
+            })
+        }
+    }
+
     useEffect(() => {
         if (!showPasswordField) {
             form.unregister('password')
@@ -168,8 +170,13 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 setError(formatMessage(API_ERROR_MESSAGE))
             }
         }
-        handlePasskeyLogin()
-    }, [])
+
+        if (customer.isRegistered) {
+            handleMergeBasket()
+        } else {
+            handlePasskeyLogin()
+        }
+    }, [customer.isRegistered])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')
