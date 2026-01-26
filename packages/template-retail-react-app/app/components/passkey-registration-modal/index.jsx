@@ -122,15 +122,12 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 ...(passkeyNickname && {nick_name: passkeyNickname})
             })
 
-            // Get current domain for rp.id (WebAuthn security requirement)
-            const currentHost = window.location.hostname
-
             // Step 2: Convert response to WebAuthn PublicKeyCredentialCreationOptions format
             const publicKey = {
                 challenge: base64UrlToArrayBuffer(response.challenge),
                 rp: {
-                    ...response.rp,
-                    id: currentHost
+                    name: response.rp.name,
+                    id: response.rp.id
                 },
                 user: {
                     ...response.user,
@@ -167,9 +164,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             }
 
             // Step 4: Convert credential to JSON format
-            const transports = credential.response.getTransports?.() || null
             const clientExtensionResults = credential.getClientExtensionResults?.() || {}
-
             const credentialJson = {
                 type: credential.type,
                 id: credential.id,
@@ -182,9 +177,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 },
                 ...(Object.keys(clientExtensionResults).length > 0 && {clientExtensionResults})
             }
-
-            const clientDataJSON = arrayBufferToBase64Url(credential.response.clientDataJSON)
-            console.log('clientDataJSON', clientDataJSON)
 
             // Step 5: Finish WebAuthn registration
             await finishWebauthnUserRegistration.mutateAsync({

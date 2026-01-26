@@ -78,14 +78,6 @@ describe('PasskeyRegistrationModal', () => {
             create: jest.fn()
         }
 
-        // Mock window.location.hostname
-        Object.defineProperty(window, 'location', {
-            value: {
-                hostname: 'example.com'
-            },
-            writable: true
-        })
-
         // Mock product API calls that may be triggered by components in the provider tree
         global.server.use(
             rest.get('*/products*', (req, res, ctx) => {
@@ -646,62 +638,6 @@ describe('PasskeyRegistrationModal', () => {
             expect(result).toEqual({
                 success: false,
                 error: 'Passkey registration was cancelled or timed out'
-            })
-        })
-
-        test('uses current hostname for rp.id in WebAuthn options', async () => {
-            const otpCode = '12345678'
-            window.location.hostname = 'custom-domain.com'
-
-            const mockStartResponse = {
-                challenge: 'dGVzdA==',
-                rp: {
-                    name: 'Test RP',
-                    id: 'original-id.com'
-                },
-                user: {id: 'dGVzdA==', name: 'test@example.com'},
-                pubKeyCredParams: [],
-                timeout: 60000
-            }
-
-            const mockCredential = {
-                type: 'public-key',
-                id: 'test-id',
-                rawId: new ArrayBuffer(8),
-                response: {
-                    attestationObject: new ArrayBuffer(16),
-                    clientDataJSON: new ArrayBuffer(16)
-                }
-            }
-
-            mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
-            global.navigator.credentials.create.mockResolvedValue(mockCredential)
-            mockFinishWebauthnRegistration.mockResolvedValue({})
-
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
-
-            await waitFor(() => {
-                expect(otpVerificationHandler).toBeTruthy()
-            })
-
-            await otpVerificationHandler(otpCode)
-
-            // Verify rp.id was overridden with current hostname
-            expect(global.navigator.credentials.create).toHaveBeenCalledWith({
-                publicKey: expect.objectContaining({
-                    rp: expect.objectContaining({
-                        id: 'custom-domain.com'
-                    })
-                })
             })
         })
     })
