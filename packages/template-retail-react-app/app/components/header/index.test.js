@@ -62,7 +62,7 @@ beforeEach(() => {
     )
     // Default mock for getCommerceAgentConfig
     getCommerceAgentConfig.mockReturnValue({
-        enableLaunchAgentFromHeader: 'false'
+        enableAgentFromHeader: 'false'
     })
 })
 afterEach(() => {
@@ -337,9 +337,9 @@ test('handles search functionality', async () => {
 })
 
 describe('Agent button (SparkleIcon)', () => {
-    test('renders agent button when enableLaunchAgentFromHeader is true', async () => {
+    test('renders agent button when enableAgentFromHeader is true', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'true'
+            enableAgentFromHeader: 'true'
         })
 
         renderWithProviders(<Header />)
@@ -350,9 +350,9 @@ describe('Agent button (SparkleIcon)', () => {
         })
     })
 
-    test('does not render agent button when enableLaunchAgentFromHeader is false', async () => {
+    test('does not render agent button when enableAgentFromHeader is false', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'false'
+            enableAgentFromHeader: 'false'
         })
 
         renderWithProviders(<Header />)
@@ -363,9 +363,9 @@ describe('Agent button (SparkleIcon)', () => {
         })
     })
 
-    test('does not render agent button when enableLaunchAgentFromHeader is undefined', async () => {
+    test('does not render agent button when enableAgentFromHeader is undefined', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: undefined
+            enableAgentFromHeader: undefined
         })
 
         renderWithProviders(<Header />)
@@ -376,9 +376,9 @@ describe('Agent button (SparkleIcon)', () => {
         })
     })
 
-    test('does not render agent button when enableLaunchAgentFromHeader is not "true"', async () => {
+    test('does not render agent button when enableAgentFromHeader is not "true"', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'someOtherValue'
+            enableAgentFromHeader: 'someOtherValue'
         })
 
         renderWithProviders(<Header />)
@@ -392,7 +392,7 @@ describe('Agent button (SparkleIcon)', () => {
     test('calls onAgentClick when agent button is clicked', async () => {
         const onAgentClick = jest.fn()
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'true'
+            enableAgentFromHeader: 'true'
         })
 
         renderWithProviders(<Header onAgentClick={onAgentClick} />)
@@ -410,7 +410,7 @@ describe('Agent button (SparkleIcon)', () => {
 
     test('agent button has correct aria-label', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'true'
+            enableAgentFromHeader: 'true'
         })
 
         renderWithProviders(<Header />)
@@ -424,7 +424,7 @@ describe('Agent button (SparkleIcon)', () => {
 
     test('calls getCommerceAgentConfig to check configuration', async () => {
         getCommerceAgentConfig.mockReturnValue({
-            enableLaunchAgentFromHeader: 'true'
+            enableAgentFromHeader: 'true'
         })
 
         renderWithProviders(<Header />)
