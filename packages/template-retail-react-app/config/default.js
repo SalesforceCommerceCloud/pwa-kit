@@ -31,13 +31,13 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: false,
+                enabled: true,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
-                enabled: false,
+                enabled: true,
                 idps: ['google', 'apple'],
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
@@ -46,8 +46,9 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             },
             passkey: {
-                enabled: false,
-                callbackURI: process.env.PASSKEY_CALLBACK_URI
+                enabled: true,
+                mode: 'callback',
+                callbackURI: 'https://webhook.site/566b6fe3-84c7-4204-9270-3b0552d7d76e'
             }
         },
         defaultSite: 'RefArchGlobal',
@@ -59,9 +60,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: 'bb1e8c16-7767-4ed8-bc5d-83efc59a208a',
+                // secret: FctBOLiYAMFFJVu4NiuxYYON6pTIcXjsf_4Wtj7zd80
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'staging-001',
                 siteId: 'RefArchGlobal'
             }
         },
