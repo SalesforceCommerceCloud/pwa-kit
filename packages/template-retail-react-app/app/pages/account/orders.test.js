@@ -528,3 +528,269 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
         expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
     })
 })
+
+describe('OMS Multi-shipment - Shipping address hidden', () => {
+    // When OMS has multiple shipments, shipping address should be hidden
+    // (can't reliably correlate OMS shipments to ECOM addresses by index)
+    const omsMultiShipmentOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground'},
+                shippingAddress: {
+                    fullName: 'Alice Johnson',
+                    address1: '123 First St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            },
+            {
+                shippingMethod: {name: 'Express'},
+                shippingAddress: {
+                    fullName: 'Bob Smith',
+                    address1: '456 Second St',
+                    city: 'Portland',
+                    stateCode: 'OR',
+                    postalCode: '97201'
+                }
+            }
+        ],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'SHIPPED',
+                    trackingNumber: 'OMS-001',
+                    trackingUrl: 'https://track.example.com/OMS-001',
+                    provider: 'FedEx'
+                },
+                {
+                    status: 'PENDING',
+                    trackingNumber: 'OMS-002',
+                    trackingUrl: 'https://track.example.com/OMS-002',
+                    provider: 'UPS'
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsMultiShipmentOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping method headings', async () => {
+        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address headings for OMS multi-shipment', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+    })
+
+    test('should display OMS provider name instead of ECOM shipping method', async () => {
+        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
+        expect(await screen.findByText(/UPS/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS shipment status', async () => {
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
+        expect(await screen.findByText(/PENDING/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking numbers as clickable links', async () => {
+        const trackingLink1 = await screen.findByRole('link', {name: /OMS-001/i})
+        expect(trackingLink1).toHaveAttribute('href', 'https://track.example.com/OMS-001')
+
+        const trackingLink2 = await screen.findByRole('link', {name: /OMS-002/i})
+        expect(trackingLink2).toHaveAttribute('href', 'https://track.example.com/OMS-002')
+    })
+})
+
+describe('ECOM Multi-shipment - Shipping address shown', () => {
+    // When ECOM has multiple shipments but NO OMS data, shipping address should be shown
+    const ecomMultiShipmentOrder = createMockOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground'},
+                shippingStatus: 'shipped',
+                trackingNumber: 'ECOM-001',
+                shippingAddress: {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    address1: '123 First St',
+                    city: 'Boston',
+                    stateCode: 'MA',
+                    postalCode: '02101'
+                }
+            },
+            {
+                shippingMethod: {name: 'Express'},
+                shippingStatus: 'not_shipped',
+                shippingAddress: {
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Second St',
+                    city: 'Chicago',
+                    stateCode: 'IL',
+                    postalCode: '60601'
+                }
+            }
+        ]
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(ecomMultiShipmentOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping method headings', async () => {
+        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping address headings for ECOM multi-shipment', async () => {
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 1/i})
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 2/i})
+        ).toBeInTheDocument()
+    })
+
+    test('should display both shipping addresses', async () => {
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+        // Jane Smith appears in both shipping and billing address
+        const janeSmithElements = await screen.findAllByText(/Jane Smith/i)
+        expect(janeSmithElements).toHaveLength(2)
+    })
+
+    test('should display ECOM shipping statuses', async () => {
+        // Use exact match to avoid "Not shipped" matching "Shipped"
+        expect(await screen.findByText('Shipped')).toBeInTheDocument()
+        expect(await screen.findByText('Not shipped')).toBeInTheDocument()
+    })
+})
+
+describe('OMS Single shipment with tracking URL', () => {
+    // Single OMS shipment should show shipping address and tracking as clickable link
+    const omsSingleShipmentOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Standard'},
+                shippingAddress: {
+                    fullName: 'Alex Johnson',
+                    address1: '789 Main St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            }
+        ],
+        omsData: {
+            status: 'SHIPPED',
+            shipments: [
+                {
+                    status: 'DELIVERED',
+                    trackingNumber: 'TRACK-12345',
+                    trackingUrl: 'https://tracking.fedex.com/TRACK-12345',
+                    provider: 'FedEx Ground'
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsSingleShipmentOrder)
+    })
+
+    test('should display shipping address for single OMS shipment', async () => {
+        expect(
+            await screen.findByRole('heading', {name: /^shipping address$/i})
+        ).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS provider instead of ECOM method name', async () => {
+        expect(await screen.findByText(/FedEx Ground/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking number as clickable link', async () => {
+        const trackingLink = await screen.findByRole('link', {name: /TRACK-12345/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/TRACK-12345')
+    })
+
+    test('should display OMS shipment status (fallback to raw value)', async () => {
+        expect(await screen.findByText(/DELIVERED/i)).toBeInTheDocument()
+    })
+})
+
+describe('OMS Single shipment with partial data (missing provider, trackingUrl)', () => {
+    // Tests fallback behavior when OMS data is partially available
+    const omsPartialDataOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground Shipping'},
+                shippingAddress: {
+                    fullName: 'Mike Brown',
+                    address1: '100 Oak St',
+                    city: 'Denver',
+                    stateCode: 'CO',
+                    postalCode: '80201'
+                }
+            }
+        ],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'ALLOCATED',
+                    trackingNumber: 'OMS-TRACK-999'
+                    // No provider field
+                    // No trackingUrl - tracking number displayed as plain text
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsPartialDataOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should fallback to ECOM shipping method name when OMS provider is missing', async () => {
+        expect(await screen.findByText(/Ground Shipping/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS status even when other OMS fields are missing', async () => {
+        expect(await screen.findByText(/ALLOCATED/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS tracking number (takes priority over ECOM)', async () => {
+        expect(await screen.findByText(/OMS-TRACK-999/i)).toBeInTheDocument()
+        // ECOM tracking should NOT be displayed
+        expect(screen.queryByText(/ECOM-TRACK-999/i)).not.toBeInTheDocument()
+    })
+
+    test('should display tracking number as plain text when trackingUrl is missing', async () => {
+        // Should NOT be a link
+        expect(screen.queryByRole('link', {name: /OMS-TRACK-999/i})).not.toBeInTheDocument()
+        // But should still show the tracking number as text
+        expect(await screen.findByText(/OMS-TRACK-999/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping address with fullName', async () => {
+        expect(await screen.findByText(/Mike Brown/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Oak St/i)).toBeInTheDocument()
+    })
+})
