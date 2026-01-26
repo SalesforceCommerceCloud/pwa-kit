@@ -192,6 +192,9 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             
             console.log('Passkey registration completed successfully!')
             
+            // Mark that user has a passkey registered
+            localStorage.setItem('hasPasskey', 'true')
+            
             // Show success message
             toast({
                 title: formatMessage({

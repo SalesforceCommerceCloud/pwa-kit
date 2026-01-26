@@ -27,6 +27,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
@@ -77,6 +78,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
     const [redirectPath, setRedirectPath] = useState('')
     const {showToast} = usePasskeyRegistration()
+    const {loginWithPasskey} = usePasskeyLogin()
+    const isWebAuthnEnabled = !!passkey?.enabled
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -126,6 +129,18 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
+                    // Try WebAuthn first if enabled
+                    if (isWebAuthnEnabled) {
+                        console.log('WebAuthn enabled, trying to login with WebAuthn')
+                        try {
+                            await loginWithPasskey()
+                            // If successful, navigate to account
+                            navigate('/account')
+                            return
+                        } catch (error) {
+                            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+                        }
+                    }
                     await handlePasswordlessLogin(email)
                     return
                 }
@@ -183,8 +198,16 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         const redirectTo = redirectPath ? redirectPath : '/account'
 
         if (passkey?.enabled) {
-            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
+            // Check if user already has a passkey registered
+            const hasPasskey = localStorage.getItem('hasPasskey') === 'true'
+            console.log('Login page - Checking hasPasskey flag:', localStorage.getItem('hasPasskey'), 'hasPasskey:', hasPasskey)
+            
+            // Show passkey registration modal only if:
+            // 1. Webauthn feature flag is enabled
+            // 2. Compatible with the browser
+            // 3. User doesn't already have a passkey
             if (
+                !hasPasskey &&
                 window.PublicKeyCredential &&
                 PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
                 PublicKeyCredential.isConditionalMediationAvailable
@@ -206,6 +229,20 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         // Navigate immediately if passkey is not enabled or not available
         navigate(redirectTo)
     }, [isRegistered, redirectPath])
+
+    // Setup passkey conditional mediation when page loads
+    useEffect(() => {
+        if (isWebAuthnEnabled) {
+            // Call loginWithPasskey to setup conditional mediation
+            // This allows passkeys to appear in the email field autofill
+            try {
+                loginWithPasskey()
+            } catch (error) {
+                // Silently fail - conditional mediation just won't be available
+                console.log('Passkey conditional mediation not started:', error?.message || error)
+            }
+        }
+    }, [])
 
     /**************** Einstein ****************/
     useEffect(() => {

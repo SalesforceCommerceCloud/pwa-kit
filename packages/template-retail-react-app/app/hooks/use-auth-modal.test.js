@@ -482,6 +482,435 @@ test.skip('Allows customer to sign in to their account', async () => {
     )
 })
 
+describe('Passkey login', () => {
+    let mockStartWebauthnAuthentication
+    let mockFinishWebauthnAuthentication
+    let mockCredentialsGet
+    let mockPublicKeyCredential
+
+    beforeEach(() => {
+        // Mock WebAuthn API
+        mockCredentialsGet = jest.fn()
+        mockPublicKeyCredential = {
+            parseRequestOptionsFromJSON: jest.fn(),
+            isConditionalMediationAvailable: jest.fn().mockResolvedValue(true),
+            isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true)
+        }
+
+        global.PublicKeyCredential = mockPublicKeyCredential
+        global.window.PublicKeyCredential = mockPublicKeyCredential
+        global.navigator.credentials = {
+            get: mockCredentialsGet
+        }
+
+        mockStartWebauthnAuthentication = jest.fn()
+        mockFinishWebauthnAuthentication = jest.fn()
+
+        mockAuthHelperFunctions[AuthHelpers.StartWebauthnAuthentication] = {
+            mutateAsync: mockStartWebauthnAuthentication
+        }
+        mockAuthHelperFunctions[AuthHelpers.FinishWebauthnAuthentication] = {
+            mutateAsync: mockFinishWebauthnAuthentication
+        }
+    })
+
+    afterEach(() => {
+        delete global.PublicKeyCredential
+        delete global.window.PublicKeyCredential
+    })
+
+    test('Triggers passkey login when modal opens with passkey enabled', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passkey: {enabled: true}
+            }
+        }
+
+        const mockPublicKeyOptions = {
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        }
+
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: mockPublicKeyOptions
+        })
+
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
+
+        // Mock credential that will be returned from navigator.credentials.get
+        const mockCredential = {
+            id: 'mock-credential-id',
+            rawId: new ArrayBuffer(32),
+            type: 'public-key',
+            response: {
+                authenticatorData: new ArrayBuffer(37),
+                clientDataJSON: new ArrayBuffer(128),
+                signature: new ArrayBuffer(64),
+                userHandle: new ArrayBuffer(16)
+            },
+            getClientExtensionResults: jest.fn().mockReturnValue({}),
+            toJSON: jest.fn().mockReturnValue({
+                id: 'mock-credential-id',
+                rawId: 'mock-raw-id',
+                type: 'public-key',
+                response: {
+                    authenticatorData: 'mock-auth-data',
+                    clientDataJSON: 'mock-client-data',
+                    signature: 'mock-signature',
+                    userHandle: 'mock-user-handle'
+                }
+            })
+        }
+
+        mockCredentialsGet.mockResolvedValue(mockCredential)
+
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(mockStartWebauthnAuthentication).toHaveBeenCalled()
+        })
+    })
+
+    test('Successfully logs in with passkey in passwordless mode', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passwordless: {enabled: true},
+                passkey: {enabled: true}
+            }
+        }
+
+        const mockPublicKeyOptions = {
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        }
+
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: mockPublicKeyOptions
+        })
+
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
+
+        const mockCredential = {
+            id: 'mock-credential-id',
+            rawId: new ArrayBuffer(32),
+            type: 'public-key',
+            response: {
+                authenticatorData: new ArrayBuffer(37),
+                clientDataJSON: new ArrayBuffer(128),
+                signature: new ArrayBuffer(64),
+                userHandle: new ArrayBuffer(16)
+            },
+            getClientExtensionResults: jest.fn().mockReturnValue({}),
+            toJSON: jest.fn().mockReturnValue({
+                id: 'mock-credential-id',
+                rawId: 'mock-raw-id',
+                type: 'public-key',
+                response: {
+                    authenticatorData: 'mock-auth-data',
+                    clientDataJSON: 'mock-client-data',
+                    signature: 'mock-signature',
+                    userHandle: 'mock-user-handle'
+                }
+            })
+        }
+
+        mockCredentialsGet.mockResolvedValue(mockCredential)
+        mockFinishWebauthnAuthentication.mockResolvedValue({
+            customer_id: 'customerid_1',
+            access_token: registerUserToken
+        })
+
+        // Mock customer as registered after passkey login
+        global.server.use(
+            rest.post('*/oauth2/token', (req, res, ctx) =>
+                res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'customerid_1',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken_1',
+                        usid: 'testusid_1',
+                        enc_user_id: 'testEncUserId_1',
+                        id_token: 'testIdToken_1'
+                    })
+                )
+            )
+        )
+
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        })
+
+        // Enter email and attempt passwordless login (which should try passkey first)
+        const validEmail = 'test@salesforce.com'
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/continue securely/i))
+
+        await waitFor(
+            () => {
+                expect(mockStartWebauthnAuthentication).toHaveBeenCalled()
+                expect(mockFinishWebauthnAuthentication).toHaveBeenCalledWith({
+                    credential: expect.objectContaining({
+                        id: 'mock-credential-id'
+                    })
+                })
+            },
+            {timeout: 5000}
+        )
+    })
+
+    test('Falls back to passwordless when passkey login is cancelled', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passwordless: {enabled: true},
+                passkey: {enabled: true}
+            }
+        }
+
+        const mockPublicKeyOptions = {
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        }
+
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: mockPublicKeyOptions
+        })
+
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
+
+        // Simulate user cancelling passkey selection (NotAllowedError)
+        const notAllowedError = new Error('User cancelled')
+        notAllowedError.name = 'NotAllowedError'
+        mockCredentialsGet.mockRejectedValue(notAllowedError)
+
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        })
+
+        // Enter email and attempt passwordless login
+        const validEmail = 'test@salesforce.com'
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/continue securely/i))
+
+        // Should not show error for cancelled passkey
+        await waitFor(() => {
+            expect(mockStartWebauthnAuthentication).toHaveBeenCalled()
+            // Should not have attempted to finish authentication
+            expect(mockFinishWebauthnAuthentication).not.toHaveBeenCalled()
+        })
+    })
+
+    test('Shows error when passkey authentication fails', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passwordless: {enabled: true},
+                passkey: {enabled: true}
+            }
+        }
+
+        const mockPublicKeyOptions = {
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        }
+
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: mockPublicKeyOptions
+        })
+
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
+
+        // Simulate other error (not NotAllowedError)
+        mockCredentialsGet.mockRejectedValue(new Error('Authentication failed'))
+
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        })
+
+        // Enter email and attempt passwordless login
+        const validEmail = 'test@salesforce.com'
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/continue securely/i))
+
+        // Should show error
+        await waitFor(() => {
+            expect(mockStartWebauthnAuthentication).toHaveBeenCalled()
+            expect(screen.getByText(/Something went wrong/i)).toBeInTheDocument()
+        })
+    })
+
+    test('Does not trigger passkey when not enabled', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passkey: {enabled: false}
+            }
+        }
+
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
+        })
+
+        // Should not have called WebAuthn APIs
+        expect(mockStartWebauthnAuthentication).not.toHaveBeenCalled()
+    })
+
+    test('Sets hasPasskey flag in localStorage after successful passkey login', async () => {
+        const mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passwordless: {enabled: true},
+                passkey: {enabled: true}
+            }
+        }
+
+        const mockPublicKeyOptions = {
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        }
+
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: mockPublicKeyOptions
+        })
+
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
+
+        const mockCredential = {
+            id: 'mock-credential-id',
+            rawId: new ArrayBuffer(32),
+            type: 'public-key',
+            response: {
+                authenticatorData: new ArrayBuffer(37),
+                clientDataJSON: new ArrayBuffer(128),
+                signature: new ArrayBuffer(64),
+                userHandle: new ArrayBuffer(16)
+            },
+            getClientExtensionResults: jest.fn().mockReturnValue({}),
+            toJSON: jest.fn().mockReturnValue({
+                id: 'mock-credential-id',
+                rawId: 'mock-raw-id',
+                type: 'public-key',
+                response: {
+                    authenticatorData: 'mock-auth-data',
+                    clientDataJSON: 'mock-client-data',
+                    signature: 'mock-signature',
+                    userHandle: 'mock-user-handle'
+                }
+            })
+        }
+
+        mockCredentialsGet.mockResolvedValue(mockCredential)
+        mockFinishWebauthnAuthentication.mockResolvedValue({})
+
+        // Mock customer as registered after passkey login
+        global.server.use(
+            rest.post('*/oauth2/token', (req, res, ctx) =>
+                res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'customerid_1',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken_1',
+                        usid: 'testusid_1',
+                        enc_user_id: 'testEncUserId_1',
+                        id_token: 'testIdToken_1'
+                    })
+                )
+            )
+        )
+
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Clear localStorage before test
+        localStorage.clear()
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        // Enter email and attempt passwordless login
+        const validEmail = 'test@salesforce.com'
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/continue securely/i))
+
+        await waitFor(
+            () => {
+                expect(mockFinishWebauthnAuthentication).toHaveBeenCalled()
+                // Verify localStorage flag is set
+                expect(localStorage.getItem('hasPasskey')).toBe('true')
+            },
+            {timeout: 5000}
+        )
+    })
+})
+
 describe('Reset password', function () {
     beforeEach(() => {
         global.server.use(
