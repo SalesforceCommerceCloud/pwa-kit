@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* global PublicKeyCredential */
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
@@ -33,7 +32,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 
 // Utils
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {encode as base64Encode} from 'base64-arraybuffer'
 
 // SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
@@ -54,14 +52,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const config = getConfig()
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
-    const startWebauthnUserRegistration = useAuthHelper(AuthHelpers.StartWebauthnUserRegistration)
-    const finishWebauthnUserRegistration = useAuthHelper(AuthHelpers.FinishWebauthnUserRegistration)
-
-    const uint8arrayToBase64url = (input) => {
-        const uint8array = new Uint8Array(input)
-        const base64 = base64Encode(uint8array.buffer)
-        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-    }
 
     const handleRegisterPasskey = async () => {
         setIsLoading(true)
@@ -93,77 +83,8 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     }
 
     const handleOtpVerification = async (code) => {
-        try {
-            setIsLoading(true)
-
-            // Step 1: Start WebAuthn registration with OTP code as pwd_action_token
-            const startResponse = await startWebauthnUserRegistration.mutateAsync({
-                user_id: customer.email,
-                pwd_action_token: code,
-                ...(passkeyNickname && {nick_name: passkeyNickname})
-            })
-
-            console.log('creationOptions', startResponse)
-            const options = PublicKeyCredential.parseCreationOptionsFromJSON(startResponse)
-
-            // Step 3: Create passkey credential using browser WebAuthn API
-            // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create
-            const credential = await navigator.credentials.create({
-                publicKey: options
-            })
-
-            if (!credential) {
-                throw new Error('Failed to create passkey credential')
-            }
-
-            // Step 4: Encode credential before sending to SLAS
-            // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
-            let encodedCredential
-            try {
-                encodedCredential = credential.toJSON()
-            } catch (error) {
-                // Fallback to manual encoding if toJSON() fails
-                // Some passkey providers may not support the toJSON() method
-                encodedCredential = {
-                    id: credential.id,
-                    rawId: uint8arrayToBase64url(credential.rawId),
-                    type: credential.type,
-                    clientExtensionResults: credential.getClientExtensionResults(),
-                    response: {
-                        attestationObject: uint8arrayToBase64url(
-                            credential.response.attestationObject
-                        ),
-                        clientDataJSON: uint8arrayToBase64url(credential.response.clientDataJSON)
-                    }
-                }
-            }
-
-            // Step 5: Finish WebAuthn registration
-            await finishWebauthnUserRegistration.mutateAsync({
-                username: customer.email,
-                credential: encodedCredential,
-                pwd_action_token: code
-            })
-
-            // Close OTP modal on success
-            setIsOtpAuthOpen(false)
-            onClose()
-
-            return {success: true}
-        } catch (err) {
-            const errorMessage =
-                err.message ||
-                formatMessage({
-                    id: 'passkey_registration.modal.error.registration_failed',
-                    defaultMessage: 'Failed to register passkey'
-                })
-            return {
-                success: false,
-                error: errorMessage
-            }
-        } finally {
-            setIsLoading(false)
-        }
+        // TODO: Implement OTP verification
+        return {success: true}
     }
 
     const resetState = () => {
