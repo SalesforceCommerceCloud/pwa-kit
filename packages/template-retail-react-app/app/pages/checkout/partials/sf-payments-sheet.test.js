@@ -139,16 +139,24 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: () => mockUseCurrentBasket()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-    useCurrentCustomer: () => ({
-        data: {
-            customerId: 'customer123',
-            isGuest: false,
-            isRegistered: true,
-            email: 'test@example.com'
-        }
-    })
-}))
+const mockCustomer = {
+    customerId: 'customer123',
+    isGuest: false,
+    isRegistered: true,
+    email: 'test@example.com',
+    paymentMethodReferences: []
+}
+
+let mockUseCurrentCustomer
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => {
+    mockUseCurrentCustomer = jest.fn(() => ({
+        data: mockCustomer
+    }))
+    return {
+        useCurrentCustomer: mockUseCurrentCustomer
+    }
+})
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => {
     return jest.fn(() => ({
@@ -995,6 +1003,186 @@ describe('SFPaymentsSheet', () => {
 
             expect(paymentIntent.setup_future_usage).toBeUndefined()
         })
+
+        test('confirmPayment sets setup_future_usage to off_session when futureUsageOffSession is true', async () => {
+            const ref = React.createRef()
+            setupConfirmPaymentMocks()
+
+            const useShopperConfigurationModule = require('@salesforce/retail-react-app/app/hooks/use-shopper-configuration')
+            const originalMock = useShopperConfigurationModule.useShopperConfiguration
+
+            useShopperConfigurationModule.useShopperConfiguration = jest.fn((configId) => {
+                if (configId === 'futureUsageOffSession') return true
+                if (configId === 'cardCaptureAutomatic') return true
+                if (configId === 'zoneId') return 'default'
+                return undefined
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'card',
+                            savePaymentMethodForFutureUse: true
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockCheckoutConfirm).toHaveBeenCalled()
+            })
+
+            const confirmCall = mockCheckoutConfirm.mock.calls[0]
+            const paymentIntentFunction = confirmCall[0]
+            const paymentIntent = await paymentIntentFunction()
+
+            expect(paymentIntent.setup_future_usage).toBe('off_session')
+
+            useShopperConfigurationModule.useShopperConfiguration = originalMock
+        })
+    })
+
+    describe('SPM (Saved Payment Methods) Display', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            mockCustomer.paymentMethodReferences = []
+            mockUseCurrentCustomer.mockImplementation(() => ({
+                data: {...mockCustomer}
+            }))
+        })
+
+        test('passes empty savedPaymentMethods to SDK when customer has no payment method references', async () => {
+            mockCustomer.paymentMethodReferences = []
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const config = checkoutCall[2]
+
+            expect(config.options.savedPaymentMethods).toEqual([])
+        })
+
+        test('passes empty savedPaymentMethods to SDK when paymentMethodReferences is null', async () => {
+            mockCustomer.paymentMethodReferences = null
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const config = checkoutCall[2]
+
+            expect(config.options.savedPaymentMethods).toEqual([])
+        })
+
+        test('passes empty savedPaymentMethods to SDK when paymentMethodReferences is undefined', async () => {
+            mockCustomer.paymentMethodReferences = undefined
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const config = checkoutCall[2]
+
+            expect(config.options.savedPaymentMethods).toEqual([])
+        })
+
+        test('passes empty savedPaymentMethods to SDK when paymentMethodSetAccounts is missing', async () => {
+            mockCustomer.paymentMethodReferences = [
+                {
+                    id: 'pm_123',
+                    accountId: 'stripe-account-1',
+                    type: 'card',
+                    brand: 'visa',
+                    last4: '4242'
+                }
+            ]
+
+            jest.spyOn(
+                require('@salesforce/commerce-sdk-react'),
+                'usePaymentConfiguration'
+            ).mockReturnValue({
+                data: {
+                    paymentMethods: [
+                        {
+                            id: 'card',
+                            name: 'Card',
+                            paymentMethodType: 'card',
+                            accountId: 'stripe-account-1'
+                        }
+                    ],
+                    paymentMethodSetAccounts: null
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
+
+            const checkoutCall = mockCheckout.mock.calls[0]
+            const config = checkoutCall[2]
+
+            expect(config.options.savedPaymentMethods).toEqual([])
+        })
+
     })
 
     describe('lifecycle', () => {
