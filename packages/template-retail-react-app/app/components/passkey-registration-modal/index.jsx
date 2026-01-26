@@ -167,17 +167,24 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             }
 
             // Step 4: Convert credential to JSON format
+            const transports = credential.response.getTransports?.() || null
+            const clientExtensionResults = credential.getClientExtensionResults?.() || {}
+
             const credentialJson = {
                 type: credential.type,
                 id: credential.id,
                 rawId: arrayBufferToBase64Url(credential.rawId),
                 response: {
-                    attestationObject: arrayBufferToBase64Url(credential.response.attestationObject),
-                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
-                    transports: credential.response.getTransports()
+                    attestationObject: arrayBufferToBase64Url(
+                        credential.response.attestationObject
+                    ),
+                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
                 },
-                clientExtensionResults: credential.getClientExtensionResults()
+                ...(Object.keys(clientExtensionResults).length > 0 && {clientExtensionResults})
             }
+
+            const clientDataJSON = arrayBufferToBase64Url(credential.response.clientDataJSON)
+            console.log('clientDataJSON', clientDataJSON)
 
             // Step 5: Finish WebAuthn registration
             await finishWebauthnUserRegistration.mutateAsync({

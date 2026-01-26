@@ -330,7 +330,7 @@ describe('PasskeyRegistrationModal', () => {
             // Verify navigator.credentials.create was called
             expect(global.navigator.credentials.create).toHaveBeenCalled()
             const publicKeyOptions = global.navigator.credentials.create.mock.calls[0][0].publicKey
-            
+
             // Verify structure and key properties
             expect(publicKeyOptions.challenge).toBeDefined()
             expect(publicKeyOptions.rp).toMatchObject({
