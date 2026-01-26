@@ -237,7 +237,9 @@ describe('usePasskeyLogin', () => {
                                 signature: expect.any(String),
                                 userHandle: expect.any(String)
                             })
-                        })
+                        }),
+                        // usid used in the test environment
+                        usid: '8e883973-68eb-41fe-a3c5-756232652ff5'
                     })
                 )
                 return res(
