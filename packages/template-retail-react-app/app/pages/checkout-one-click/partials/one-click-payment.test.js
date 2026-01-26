@@ -666,6 +666,132 @@ describe('Payment Component', () => {
             expect(checkboxAfter).toBeChecked()
         })
 
+        test('does not add payment again during registration when payment already exists on basket', async () => {
+            const user = userEvent.setup()
+            const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            useShopperBasketsMutation.mockImplementation((mutationType) => {
+                switch (mutationType) {
+                    case 'addPaymentInstrumentToBasket':
+                        return {mutateAsync: mockAddPaymentInstrument}
+                    case 'updateBillingAddressForBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    case 'removePaymentInstrumentFromBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    default:
+                        return {mutateAsync: jest.fn()}
+                }
+            })
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={true}
+                    paymentMethodForm={{
+                        handleSubmit: jest.fn((callback) => (e) => {
+                            e?.preventDefault?.()
+                            callback({})
+                        }),
+                        watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                        getValues: jest.fn(() => ({
+                            number: '4111111111111111',
+                            holder: 'John Doe',
+                            expiry: '12/25'
+                        })),
+                        formState: {isSubmitting: false, isValid: true}
+                    }}
+                />
+            )
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify payment was NOT added again (payment already exists on basket)
+            // Payment should be transferred during basket merge, not added again
+            expect(mockAddPaymentInstrument).not.toHaveBeenCalled()
+        })
+
+        test('does not add payment during registration even when payment form has values', async () => {
+            const user = userEvent.setup()
+            const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+
+            // Basket without payment initially, but payment will be on basket before registration
+            // (since registration checkbox is disabled until payment is filled)
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            useShopperBasketsMutation.mockImplementation((mutationType) => {
+                switch (mutationType) {
+                    case 'addPaymentInstrumentToBasket':
+                        return {mutateAsync: mockAddPaymentInstrument}
+                    case 'updateBillingAddressForBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    case 'removePaymentInstrumentFromBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    default:
+                        return {mutateAsync: jest.fn()}
+                }
+            })
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                getValues: jest.fn(() => ({
+                    number: '4111111111111111',
+                    holder: 'John Doe',
+                    expiry: '12/25',
+                    cardType: 'Visa'
+                })),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={true}
+                    paymentMethodForm={mockPaymentMethodForm}
+                />
+            )
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify payment was NOT added again
+            // Payment is already on basket (registration requires payment to be filled first)
+            // Basket transfer/merge will preserve the payment, no need to add it again
+            expect(mockAddPaymentInstrument).not.toHaveBeenCalled()
+        })
+
         test('disables user registration checkbox when payment is not filled in', () => {
             const mockPaymentMethodForm = {
                 handleSubmit: jest.fn((callback) => (e) => {
