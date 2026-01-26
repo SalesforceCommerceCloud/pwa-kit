@@ -243,17 +243,6 @@ const Payment = ({
             }
             setShowRegistrationNotice(true)
             setShouldSavePaymentMethod(true)
-            try {
-                const values = paymentMethodForm?.getValues?.()
-                const hasEnteredCard = values?.number && values?.holder && values?.expiry
-                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
-                if (hasEnteredCard && !hasApplied && newBasketId) {
-                    await onPaymentSubmit(values, newBasketId)
-                    await currentBasketQuery.refetch()
-                }
-            } catch (_e) {
-                // non-blocking
-            }
             showToast({
                 variant: 'subtle',
                 title: formatMessage({
@@ -265,7 +254,7 @@ const Payment = ({
                 isClosable: true
             })
         },
-        [paymentMethodForm, currentBasketQuery, onPaymentSubmit, showToast, formatMessage]
+        [showToast, formatMessage]
     )
 
     // Auto-select a saved payment instrument for registered customers (run at most once)
