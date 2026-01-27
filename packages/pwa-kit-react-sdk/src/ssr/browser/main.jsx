@@ -17,6 +17,7 @@ import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -44,10 +45,11 @@ export const registerServiceWorker = (url) => {
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
+    const basepath = getEnvBasePath()
 
     return (
         <ServerContext.Provider value={{}}>
-            <Router ref={onHydrate}>
+            <Router ref={onHydrate} basename={basepath}>
                 <CorrelationIdProvider
                     correlationId={() => {
                         // If we are hydrating an error page use the server correlation id.

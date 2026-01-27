@@ -97,6 +97,7 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
+        envBasePath: '/store',
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',

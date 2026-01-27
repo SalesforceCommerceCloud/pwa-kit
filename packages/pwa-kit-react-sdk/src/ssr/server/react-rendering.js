@@ -40,6 +40,8 @@ import logger from '../../utils/logger-instance'
 import PerformanceTimer from '../../utils/performance'
 import {PERFORMANCE_MARKS} from '../../utils/performance-marks'
 
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
@@ -270,9 +272,10 @@ export const render = (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
+    const basepath = getEnvBasePath()
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext} basename={basepath}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
