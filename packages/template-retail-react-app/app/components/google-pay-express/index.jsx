@@ -13,13 +13,44 @@ import {
     getGPShippingOptionParameters,
     getGooglePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
-// SLAS Token Security: Use PostMessage services for secure API calls
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+// SLAS Token Security: PostMessage services for secure API calls (default)
+// These use HTTP-only cookies via the parent relay - tokens never exposed to JS
 import {
     PostMessageShippingMethodsService,
     PostMessageShippingAddressService,
     PostMessagePaymentsService,
     PostMessageBasketsService
 } from '@salesforce/retail-react-app/app/components/express/utils/postmessage-api'
+
+// Legacy services that use direct token auth (for instances without SLAS security fix)
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {
+    createTemporaryBasket as legacyCreateTemporaryBasket,
+    deleteTemporaryBasket as legacyDeleteTemporaryBasket
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+
+/**
+ * Check if legacy token auth mode is enabled.
+ *
+ * WARNING: Legacy mode will NOT work if your Commerce Cloud instance has the
+ * SLAS security fix enabled (HTTP-only cookies for access tokens). In that case,
+ * tokens are not accessible from client-side JavaScript, so you MUST use the
+ * default PostMessage relay pattern (useLegacyTokenAuth: false).
+ *
+ * @returns {boolean} True if legacy token auth is enabled
+ */
+const isLegacyTokenAuthEnabled = () => {
+    try {
+        const config = getConfig()
+        return config?.app?.expressPayments?.useLegacyTokenAuth === true
+    } catch {
+        return false
+    }
+}
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
 import {
     validateExpressPaymentSetup,
@@ -74,10 +105,22 @@ export const getCustomerBillingDetails = (inputAddress) => {
     }
 }
 
-// SLAS Token Security: Use PostMessage services for secure API calls
-export const updateShippingAddress = async (site, basket, shippingAddress) => {
+/**
+ * Updates the shipping address for a basket.
+ * Uses PostMessage relay by default, or legacy direct auth if configured.
+ *
+ * @param {string} authToken - Auth token (only used in legacy mode)
+ * @param {Object} site - Site configuration
+ * @param {Object} basket - Current basket
+ * @param {Object} shippingAddress - Shipping address from Google Pay
+ */
+export const updateShippingAddress = async (authToken, site, basket, shippingAddress) => {
+    const useLegacy = isLegacyTokenAuthEnabled()
+
     try {
-        const shippingAddressService = new PostMessageShippingAddressService(site)
+        const shippingAddressService = useLegacy
+            ? new AdyenShippingAddressService(authToken, site)
+            : new PostMessageShippingAddressService(site)
         const response = await shippingAddressService.updateShippingAddress(
             basket.basketId,
             getCustomerShippingDetails(shippingAddress, basket?.customerInfo?.email)
@@ -93,7 +136,9 @@ export const updateShippingAddress = async (site, basket, shippingAddress) => {
             }
         }
 
-        const shippingMethodsService = new PostMessageShippingMethodsService(site)
+        const shippingMethodsService = useLegacy
+            ? new AdyenShippingMethodsService(authToken, site)
+            : new PostMessageShippingMethodsService(site)
         const shippingMethodResponse = await shippingMethodsService.getShippingMethods(
             basket.basketId
         )
@@ -109,6 +154,7 @@ export const updateShippingAddress = async (site, basket, shippingAddress) => {
             shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         }
         return updateShippingOption(
+            authToken,
             site,
             basket,
             shippingOptionId,
@@ -125,15 +171,29 @@ export const updateShippingAddress = async (site, basket, shippingAddress) => {
     }
 }
 
-// SLAS Token Security: Use PostMessage services for secure API calls
+/**
+ * Updates the shipping option for a basket.
+ * Uses PostMessage relay by default, or legacy direct auth if configured.
+ *
+ * @param {string} authToken - Auth token (only used in legacy mode)
+ * @param {Object} site - Site configuration
+ * @param {Object} basket - Current basket
+ * @param {string} shippingOptionId - Selected shipping option ID
+ * @param {Object} shippingMethodResponse - Optional shipping method response
+ */
 export const updateShippingOption = async (
+    authToken,
     site,
     basket,
     shippingOptionId,
     shippingMethodResponse = null
 ) => {
+    const useLegacy = isLegacyTokenAuthEnabled()
+
     try {
-        const shippingMethodsService = new PostMessageShippingMethodsService(site)
+        const shippingMethodsService = useLegacy
+            ? new AdyenShippingMethodsService(authToken, site)
+            : new PostMessageShippingMethodsService(site)
         const response = await shippingMethodsService.updateShippingMethod(
             shippingOptionId,
             basket.basketId
@@ -181,7 +241,7 @@ export const updateShippingOption = async (
 }
 
 export const getGoogleButtonConfig = (
-    authToken, // Note: authToken kept for backward compatibility but not used for API calls
+    authToken,
     site,
     basket,
     googlePayConfig,
@@ -199,10 +259,16 @@ export const getGoogleButtonConfig = (
     let googlePayAmount = basketRef?.orderTotal || 0
     let googlePayCurrency = basketRef?.currency || currency || 'USD'
 
-    // SLAS Token Security: Initialize PostMessage services (no authToken needed)
-    // These services use HTTP-only cookies via the parent relay
-    const basketsService = new PostMessageBasketsService(site)
-    const paymentsService = new PostMessagePaymentsService(site)
+    // Check if legacy token auth is enabled
+    const useLegacy = isLegacyTokenAuthEnabled()
+
+    // Initialize services based on auth mode:
+    // - Legacy mode: Uses authToken directly (for instances without SLAS security fix)
+    // - Default mode: Uses PostMessage relay (tokens stay in HTTP-only cookies)
+    const basketsService = useLegacy ? null : new PostMessageBasketsService(site)
+    const paymentsService = useLegacy
+        ? new AdyenPaymentsService(authToken, site)
+        : new PostMessagePaymentsService(site)
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
@@ -214,11 +280,23 @@ export const getGoogleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             try {
-                // SLAS Token Security: Use PostMessage service for basket creation
-                const newBasket = await basketsService.createTemporaryBasket(
-                    [{productId: sku, quantity}],
-                    currency
-                )
+                let newBasket
+                if (useLegacy) {
+                    // Legacy mode: Use direct API with authToken
+                    newBasket = await legacyCreateTemporaryBasket(
+                        sku,
+                        authToken,
+                        site,
+                        quantity,
+                        currency
+                    )
+                } else {
+                    // Default mode: Use PostMessage relay (secure)
+                    newBasket = await basketsService.createTemporaryBasket(
+                        [{productId: sku, quantity}],
+                        currency
+                    )
+                }
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
                 return newBasket
@@ -241,7 +319,13 @@ export const getGoogleButtonConfig = (
     const cleanupBasket = async () => {
         if (isPdpMode && basketRef?.basketId) {
             try {
-                await basketsService.deleteBasket(basketRef.basketId)
+                if (useLegacy) {
+                    // Legacy mode: Use direct API with authToken
+                    await legacyDeleteTemporaryBasket(basketRef.basketId, authToken, site)
+                } else {
+                    // Default mode: Use PostMessage relay (secure)
+                    await basketsService.deleteBasket(basketRef.basketId)
+                }
                 if (setTempBasket) {
                     setTempBasket(null)
                 }
@@ -314,7 +398,6 @@ export const getGoogleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                // SLAS Token Security: Use PostMessage service for payment submission
                 const paymentsResponse = await paymentsService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
@@ -373,8 +456,8 @@ export const getGoogleButtonConfig = (
                                 return
                             }
 
-                            // SLAS Token Security: Use PostMessage-based shipping update
                             const updateShippingAddressResponse = await updateShippingAddress(
+                                authToken,
                                 site,
                                 basketToUse,
                                 shippingAddress
@@ -408,8 +491,8 @@ export const getGoogleButtonConfig = (
                                 return
                             }
 
-                            // SLAS Token Security: Use PostMessage-based shipping update
                             const updateShippingOptionResponse = await updateShippingOption(
+                                authToken,
                                 site,
                                 basketToUse,
                                 shippingOptionData?.id
@@ -488,13 +571,20 @@ export const GooglePayExpress = ({
     useEffect(() => {
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
-            // SLAS Token Security: Use PostMessage service for cleanup
             if (isPdpMode && currentSku && tempBasket?.basketId && finalSite) {
-                const basketsService = new PostMessageBasketsService(finalSite)
-                basketsService.deleteBasket(tempBasket.basketId).catch(() => {})
+                if (isLegacyTokenAuthEnabled()) {
+                    // Legacy mode: Use direct API with authToken
+                    legacyDeleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch(
+                        () => {}
+                    )
+                } else {
+                    // Default mode: Use PostMessage relay (secure)
+                    const basketsService = new PostMessageBasketsService(finalSite)
+                    basketsService.deleteBasket(tempBasket.basketId).catch(() => {})
+                }
             }
         }
-    }, [tempBasket?.basketId, finalSite?.id, currentSku, isPdpMode])
+    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
 
     useEffect(
         () => {

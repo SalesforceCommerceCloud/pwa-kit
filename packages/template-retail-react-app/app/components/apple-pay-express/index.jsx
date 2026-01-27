@@ -12,13 +12,48 @@ import {
     getCurrencyValueForApi,
     getApplePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
-// SLAS Token Security: Use PostMessage services for secure API calls
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+// SLAS Token Security: PostMessage services for secure API calls (default)
+// These use HTTP-only cookies via the parent relay - tokens never exposed to JS
 import {
     PostMessageShippingMethodsService,
     PostMessageShippingAddressService,
     PostMessagePaymentsService,
     PostMessageBasketsService
 } from '@salesforce/retail-react-app/app/components/express/utils/postmessage-api'
+
+// Legacy services that use direct token auth (for instances without SLAS security fix)
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {
+    createTemporaryBasket as legacyCreateTemporaryBasket,
+    deleteTemporaryBasket as legacyDeleteTemporaryBasket
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+import {
+    forceOrderCalculation as legacyForceOrderCalculation,
+    getBasketWithTotals as legacyGetBasketWithTotals
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+
+/**
+ * Check if legacy token auth mode is enabled.
+ *
+ * WARNING: Legacy mode will NOT work if your Commerce Cloud instance has the
+ * SLAS security fix enabled (HTTP-only cookies for access tokens). In that case,
+ * tokens are not accessible from client-side JavaScript, so you MUST use the
+ * default PostMessage relay pattern (useLegacyTokenAuth: false).
+ *
+ * @returns {boolean} True if legacy token auth is enabled
+ */
+const isLegacyTokenAuthEnabled = () => {
+    try {
+        const config = getConfig()
+        return config?.app?.expressPayments?.useLegacyTokenAuth === true
+    } catch {
+        return false
+    }
+}
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
 import {
     validateExpressPaymentSetup,
@@ -74,7 +109,7 @@ export const getCustomerBillingDetails = (billingContact) => {
 }
 
 export const getAppleButtonConfig = (
-    authToken, // Note: authToken kept for backward compatibility but not used for API calls
+    authToken,
     site,
     basket,
     shippingMethods,
@@ -93,12 +128,22 @@ export const getAppleButtonConfig = (
     let applePayAmount = basketRef?.orderTotal || 0
     let applePayCurrency = basketRef?.currency || currency || 'USD'
 
-    // SLAS Token Security: Initialize PostMessage services (no authToken needed)
-    // These services use HTTP-only cookies via the parent relay
-    const basketsService = new PostMessageBasketsService(site)
-    const shippingAddressService = new PostMessageShippingAddressService(site)
-    const shippingMethodsService = new PostMessageShippingMethodsService(site)
-    const paymentsService = new PostMessagePaymentsService(site)
+    // Check if legacy token auth is enabled
+    const useLegacy = isLegacyTokenAuthEnabled()
+
+    // Initialize services based on auth mode:
+    // - Legacy mode: Uses authToken directly (for instances without SLAS security fix)
+    // - Default mode: Uses PostMessage relay (tokens stay in HTTP-only cookies)
+    const basketsService = useLegacy ? null : new PostMessageBasketsService(site)
+    const shippingAddressService = useLegacy
+        ? new AdyenShippingAddressService(authToken, site)
+        : new PostMessageShippingAddressService(site)
+    const shippingMethodsService = useLegacy
+        ? new AdyenShippingMethodsService(authToken, site)
+        : new PostMessageShippingMethodsService(site)
+    const paymentsService = useLegacy
+        ? new AdyenPaymentsService(authToken, site)
+        : new PostMessagePaymentsService(site)
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
@@ -109,11 +154,23 @@ export const getAppleButtonConfig = (
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            // SLAS Token Security: Use PostMessage service for basket creation
-            const newBasket = await basketsService.createTemporaryBasket(
-                [{productId: sku, quantity}],
-                currency
-            )
+            let newBasket
+            if (useLegacy) {
+                // Legacy mode: Use direct API with authToken
+                newBasket = await legacyCreateTemporaryBasket(
+                    sku,
+                    authToken,
+                    site,
+                    quantity,
+                    currency
+                )
+            } else {
+                // Default mode: Use PostMessage relay (secure)
+                newBasket = await basketsService.createTemporaryBasket(
+                    [{productId: sku, quantity}],
+                    currency
+                )
+            }
             basketRef = newBasket // Update basket reference immediately
             setTempBasket(newBasket) // Update React state for re-renders
             return newBasket
@@ -127,7 +184,13 @@ export const getAppleButtonConfig = (
     const cleanupBasket = async () => {
         if (isPdpMode && basketRef?.basketId) {
             try {
-                await basketsService.deleteBasket(basketRef.basketId)
+                if (useLegacy) {
+                    // Legacy mode: Use direct API with authToken
+                    await legacyDeleteTemporaryBasket(basketRef.basketId, authToken, site)
+                } else {
+                    // Default mode: Use PostMessage relay (secure)
+                    await basketsService.deleteBasket(basketRef.basketId)
+                }
                 if (setTempBasket) {
                     setTempBasket(null)
                 }
@@ -223,10 +286,18 @@ export const getAppleButtonConfig = (
                 // CRITICAL: Force final order calculation before payment
                 // This ensures orderTotal is calculated and not null
                 try {
-                    // SLAS Token Security: Use PostMessage service for basket calculation
-                    const finalizedBasket = await basketsService.calculateBasket(
-                        basketToUse.basketId
-                    )
+                    let finalizedBasket
+                    if (useLegacy) {
+                        // Legacy mode: Use direct API with authToken
+                        finalizedBasket = await legacyForceOrderCalculation(
+                            basketToUse.basketId,
+                            authToken,
+                            site
+                        )
+                    } else {
+                        // Default mode: Use PostMessage relay (secure)
+                        finalizedBasket = await basketsService.calculateBasket(basketToUse.basketId)
+                    }
                     basketToUse = finalizedBasket
                     basketRef = finalizedBasket // Update basket reference
 
@@ -257,7 +328,6 @@ export const getAppleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                // SLAS Token Security: Use PostMessage service for payment submission
                 const paymentsResponse = await paymentsService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
@@ -309,38 +379,37 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                // SLAS Token Security: Use PostMessage services for shipping operations
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await shippingAddressService.updateShippingAddress(
                     basketToUse.basketId,
                     customerShippingDetails
                 )
 
-                // Get shipping methods using PostMessage service
+                // Get shipping methods
                 let newShippingMethods
-                    try {
+                try {
                     const shippingMethodsResponse = await shippingMethodsService.getShippingMethods(
-                                basketToUse.basketId
-                            )
+                        basketToUse.basketId
+                    )
 
-                        // Ensure the response has the expected format
-                        if (
-                            shippingMethodsResponse &&
-                            shippingMethodsResponse.applicableShippingMethods
-                        ) {
-                            newShippingMethods = shippingMethodsResponse
-                        } else if (Array.isArray(shippingMethodsResponse)) {
-                            // Handle case where response is directly an array
-                            newShippingMethods = {
-                                applicableShippingMethods: shippingMethodsResponse
-                            }
-                        } else {
-                            // No valid shipping methods available - fail the Apple Pay flow
-                            newShippingMethods = null
+                    // Ensure the response has the expected format
+                    if (
+                        shippingMethodsResponse &&
+                        shippingMethodsResponse.applicableShippingMethods
+                    ) {
+                        newShippingMethods = shippingMethodsResponse
+                    } else if (Array.isArray(shippingMethodsResponse)) {
+                        // Handle case where response is directly an array
+                        newShippingMethods = {
+                            applicableShippingMethods: shippingMethodsResponse
                         }
-                    } catch (error) {
-                        // API call failed - fail the Apple Pay flow (no free shipping fallback)
+                    } else {
+                        // No valid shipping methods available - fail the Apple Pay flow
                         newShippingMethods = null
+                    }
+                } catch (error) {
+                    // API call failed - fail the Apple Pay flow (no free shipping fallback)
+                    newShippingMethods = null
                 }
 
                 if (!newShippingMethods?.applicableShippingMethods?.length) {
@@ -355,9 +424,18 @@ export const getAppleButtonConfig = (
                     let finalResponse = response
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
-                            const calculatedBasket = await basketsService.getBasket(
-                                basketToUse.basketId
-                            )
+                            let calculatedBasket
+                            if (useLegacy) {
+                                calculatedBasket = await legacyGetBasketWithTotals(
+                                    basketToUse.basketId,
+                                    authToken,
+                                    site
+                                )
+                            } else {
+                                calculatedBasket = await basketsService.getBasket(
+                                    basketToUse.basketId
+                                )
+                            }
                             finalResponse = calculatedBasket
                         }
                     } catch (calculationError) {
@@ -408,7 +486,6 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                // SLAS Token Security: Use PostMessage service for shipping method update
                 const response = await shippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
                     basketToUse.basketId
@@ -420,9 +497,18 @@ export const getAppleButtonConfig = (
                     let finalResponse = response
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
-                            const calculatedBasket = await basketsService.getBasket(
-                                basketToUse.basketId
-                            )
+                            let calculatedBasket
+                            if (useLegacy) {
+                                calculatedBasket = await legacyGetBasketWithTotals(
+                                    basketToUse.basketId,
+                                    authToken,
+                                    site
+                                )
+                            } else {
+                                calculatedBasket = await basketsService.getBasket(
+                                    basketToUse.basketId
+                                )
+                            }
                             finalResponse = calculatedBasket
                         }
                     } catch (calculationError) {
@@ -509,17 +595,25 @@ export const ApplePayExpress = ({
     useEffect(() => {
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
-            // SLAS Token Security: Use PostMessage service for cleanup
             if (isPdpMode && currentSku && tempBasket?.basketId && finalSite) {
-                const basketsService = new PostMessageBasketsService(finalSite)
-                basketsService
-                    .deleteBasket(tempBasket.basketId)
-                    .catch((error) =>
-                    console.warn('Failed to cleanup temporary basket on unmount:', error)
-                )
+                if (isLegacyTokenAuthEnabled()) {
+                    // Legacy mode: Use direct API with authToken
+                    legacyDeleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch(
+                        (error) =>
+                            console.warn('Failed to cleanup temporary basket on unmount:', error)
+                    )
+                } else {
+                    // Default mode: Use PostMessage relay (secure)
+                    const basketsService = new PostMessageBasketsService(finalSite)
+                    basketsService
+                        .deleteBasket(tempBasket.basketId)
+                        .catch((error) =>
+                            console.warn('Failed to cleanup temporary basket on unmount:', error)
+                        )
+                }
             }
         }
-    }, [tempBasket?.basketId, finalSite?.id, currentSku, isPdpMode])
+    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
 
     useEffect(
         () => {
