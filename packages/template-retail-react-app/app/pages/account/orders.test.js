@@ -794,3 +794,598 @@ describe('OMS Single shipment with partial data (missing provider, trackingUrl)'
         expect(await screen.findByText(/100 Oak St/i)).toBeInTheDocument()
     })
 })
+
+describe('BOPIS Order with OMS - Pickup and Delivery', () => {
+    // Helper to create BOPIS order with OMS data
+    const createBopisOmsOrder = (overrides = {}) => ({
+        orderNo: 'BOPIS-OMS-001',
+        currency: 'USD',
+        productItems: [{productId: 'product-1', quantity: 1}],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'SHIPPED',
+                    provider: 'FedEx',
+                    trackingNumber: 'BOPIS-TRACK-123',
+                    trackingUrl: 'https://tracking.fedex.com/BOPIS-TRACK-123'
+                }
+            ]
+        },
+        shipments: [
+            {
+                shipmentId: 'pickup1',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00001'
+            },
+            {
+                shipmentId: 'delivery1',
+                shippingMethod: {
+                    name: 'Ground'
+                },
+                trackingNumber: 'ECOM-TRACK-OLD',
+                shippingAddress: {
+                    fullName: 'Sarah Johnson',
+                    address1: '456 Delivery St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            }
+        ],
+        billingAddress: {
+            firstName: 'Sarah',
+            lastName: 'Johnson',
+            address1: '456 Delivery St',
+            city: 'Seattle',
+            stateCode: 'WA',
+            postalCode: '98101'
+        },
+        paymentInstruments: [],
+        ...overrides
+    })
+
+    test('should display OMS status for BOPIS order', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Processing')).toBeInTheDocument()
+    })
+
+    test('should display pickup address section for BOPIS order', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+    })
+
+    test('should display pickup address details (store name, address, phone)', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Market St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/San Francisco, CA 94105/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Phone: \(415\) 555-0001/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS provider for delivery shipment in BOPIS order', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /^shipping method$/i})).toBeInTheDocument()
+        expect(await screen.findByText('Shipping Method')).toBeInTheDocument()
+        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
+        expect(screen.queryByText(/Ground/i)).not.toBeInTheDocument()
+    })
+
+    test('should display OMS tracking number as clickable link for delivery shipment', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const trackingLink = await screen.findByRole('link', {name: /BOPIS-TRACK-123/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/BOPIS-TRACK-123')
+    })
+
+    test('should display OMS shipment status for delivery shipment', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address for BOPIS OMS order with multiple shipments', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // Shipping address should be hidden for OMS multi-shipment orders
+        // (can't reliably correlate OMS shipments to ECOM addresses by index)
+        expect(screen.queryByRole('heading', {name: /^shipping address$/i})).not.toBeInTheDocument()
+        expect(screen.queryByText(/Sarah Johnson/i)).not.toBeInTheDocument()
+    })
+
+    test('should NOT display payment method for BOPIS OMS order', async () => {
+        setupOrderDetailsPage(createBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
+    })
+})
+
+describe('BOPIS Order with OMS - Single Pickup Only', () => {
+    // OMS BOPIS order with only pickup shipment, no delivery
+    const createOmsBopisPickupOnly = () => ({
+        orderNo: 'OMS-BOPIS-PICKUP-001',
+        currency: 'USD',
+        productItems: [{productId: 'product-1', quantity: 1}],
+        omsData: {
+            status: 'Ready for Pickup',
+            shipments: [
+                {
+                    status: 'READY_FOR_PICKUP',
+                    provider: 'Store Pickup',
+                    trackingNumber: 'PICKUP-12345',
+                    trackingUrl: 'https://tracking.example.com/PICKUP-12345'
+                }
+            ]
+        },
+        shipments: [
+            {
+                shipmentId: 'pickup1',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00001'
+            }
+        ],
+        billingAddress: {
+            firstName: 'Alex',
+            lastName: 'Johnson',
+            address1: '2030 NE 8th st',
+            city: 'Seattle',
+            stateCode: 'WA',
+            postalCode: '98121'
+        },
+        paymentInstruments: []
+    })
+
+    test('should display OMS status for pickup-only BOPIS order', async () => {
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Ready for Pickup/i)).toBeInTheDocument()
+    })
+
+    test('should display pickup address section', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+    })
+
+    test('should display pickup address details for OMS pickup-only order', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Market St/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display payment method for OMS pickup-only order', async () => {
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
+    })
+
+    test('should NOT display shipping method section (pickup only)', async () => {
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /shipping method/i})).not.toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address section (pickup only)', async () => {
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+    })
+
+    test('should display billing address', async () => {
+        setupOrderDetailsPage(createOmsBopisPickupOnly())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+    })
+})
+
+describe('BOPIS Order with OMS - Multiple Pickup Locations', () => {
+    // BOPIS order with multiple pickup locations and OMS data
+    const createMultiPickupBopisOmsOrder = () => ({
+        orderNo: 'BOPIS-MULTI-001',
+        currency: 'USD',
+        productItems: [{productId: 'product-1', quantity: 1}],
+        omsData: {
+            status: 'Partially Ready',
+            shipments: [
+                {
+                    status: 'SHIPPED',
+                    provider: 'UPS',
+                    trackingNumber: 'MULTI-TRACK-456',
+                    trackingUrl: 'https://www.ups.com/track?loc=en_US&tracknum=MULTI-TRACK-456'
+                },
+                {
+                    status: 'PENDING',
+                    provider: 'FedEx',
+                    trackingNumber: 'MULTI-TRACK-789',
+                    trackingUrl: 'https://tracking.fedex.com/MULTI-TRACK-789'
+                }
+            ]
+        },
+        shipments: [
+            {
+                shipmentId: 'pickup1',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00001'
+            },
+            {
+                shipmentId: 'pickup2',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00002'
+            },
+            {
+                shipmentId: 'delivery1',
+                shippingAddress: {
+                    fullName: 'Jane Smith',
+                    address1: '321 Delivery Ave',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            }
+        ],
+        billingAddress: {
+            firstName: 'Tom',
+            lastName: 'Wilson',
+            address1: '789 Ship St',
+            city: 'Portland',
+            stateCode: 'OR',
+            postalCode: '97201'
+        },
+        paymentInstruments: []
+    })
+
+    test('should display multiple pickup addresses', async () => {
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address 1')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address 2')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address 2/i})).toBeInTheDocument()
+    })
+
+    test('should display pickup address details for multiple stores', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        data: [
+                            {
+                                id: '00001',
+                                name: 'Downtown Store',
+                                address1: '100 Market St',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                phone: '(415) 555-0001'
+                            },
+                            {
+                                id: '00002',
+                                name: 'Uptown Store',
+                                address1: '200 Main St',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94102',
+                                phone: '(415) 555-0002'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address 1')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address 2')).toBeInTheDocument()
+        // First store
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Market St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/San Francisco, CA 94105/i)).toBeInTheDocument()
+        // Second store
+        expect(await screen.findByText(/Uptown Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/200 Main St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/San Francisco, CA 94102/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS status for multi-pickup BOPIS order', async () => {
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Partially Ready/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS provider and tracking for delivery shipment', async () => {
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/UPS/i)).toBeInTheDocument()
+        const trackingLink = await screen.findByRole('link', {name: /MULTI-TRACK-456/i})
+        expect(trackingLink).toHaveAttribute(
+            'href',
+            'https://www.ups.com/track?loc=en_US&tracknum=MULTI-TRACK-456'
+        )
+    })
+
+    test('should NOT display shipping address for multi-pickup BOPIS OMS order', async () => {
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /^shipping address$/i})).not.toBeInTheDocument()
+        expect(screen.queryByText(/Tom Wilson/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('BOPIS Order with OMS - Pickup and Delivery Shipments', () => {
+    // OMS BOPIS order with both pickup and delivery shipments
+    const createOmsBopisWithDelivery = () => ({
+        orderNo: 'OMS-BOPIS-001',
+        currency: 'USD',
+        productItems: [{productId: 'product-1', quantity: 1}],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'SHIPPED',
+                    provider: 'FedEx',
+                    trackingNumber: 'OMS-TRACK-456',
+                    trackingUrl: 'https://tracking.fedex.com/OMS-TRACK-456'
+                }
+            ]
+        },
+        shipments: [
+            {
+                shipmentId: 'pickup1',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00001'
+            },
+            {
+                shipmentId: 'delivery1',
+                shippingMethod: {
+                    name: 'Ground'
+                },
+                shippingStatus: 'shipped',
+                trackingNumber: 'ECOM-TRACK-OLD',
+                shippingAddress: {
+                    firstName: 'John',
+                    lastName: 'Doe'
+                }
+            }
+        ],
+        billingAddress: {
+            firstName: 'John',
+            lastName: 'Doe',
+            address1: '123 Main St',
+            city: 'Boston',
+            stateCode: 'MA',
+            postalCode: '02101'
+        },
+        paymentInstruments: []
+    })
+
+    test('should display OMS order status', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Processing')).toBeInTheDocument()
+    })
+
+    test('should display pickup address section', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+    })
+
+    test('should display pickup address details for OMS BOPIS with delivery', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockStore))
+            })
+        )
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+        expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Market St/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS provider for delivery shipment', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
+        expect(screen.queryByText(/Ground/i)).not.toBeInTheDocument()
+    })
+
+    test('should display OMS tracking number as clickable link for delivery', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const trackingLink = await screen.findByRole('link', {name: /OMS-TRACK-456/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/OMS-TRACK-456')
+    })
+
+    test('should display OMS shipment status for delivery', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address for OMS BOPIS order with multiple shipments', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // Shipping address should be hidden for OMS multi-shipment orders
+        // (order has 2 shipments: 1 pickup + 1 delivery, so order.shipments?.length > 1)
+        expect(screen.queryByRole('heading', {name: /^shipping address$/i})).not.toBeInTheDocument()
+        expect(screen.queryByText(/John Doe/i)).not.toBeInTheDocument()
+    })
+
+    test('should NOT display payment method for OMS BOPIS order', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
+    })
+
+    test('should display billing address for OMS BOPIS order', async () => {
+        setupOrderDetailsPage(createOmsBopisWithDelivery())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
+    })
+})
+
+describe('BOPIS Order - ECOM Only (No OMS)', () => {
+    // Pure ECOM BOPIS order without OMS data
+    const createEcomBopisOrder = () => ({
+        orderNo: '00095551',
+        currency: 'GBP',
+        status: 'created',
+        productItems: [{productId: 'product-1', quantity: 1}],
+        shipments: [
+            {
+                shipmentId: 'me',
+                shippingMethod: {
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: '00019'
+            }
+        ],
+        billingAddress: {
+            firstName: 'Deepali',
+            lastName: 'Bharmal',
+            address1: '2030 NE',
+            city: 'Seattle',
+            stateCode: 'WA',
+            postalCode: '98121'
+        },
+        paymentInstruments: [
+            {
+                paymentCard: {
+                    cardType: 'Visa',
+                    numberLastDigits: '1111'
+                }
+            }
+        ]
+    })
+
+    beforeEach(async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        data: [{id: '00019', name: 'Burlington Retail Store'}]
+                    })
+                )
+            })
+        )
+    })
+
+    test('should display ECOM order status for BOPIS order', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('created')).toBeInTheDocument()
+    })
+
+    test('should display pickup address section for ECOM BOPIS order', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /pickup address/i})).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+    })
+
+    test('should display pickup address details (store name, address, phone)', async () => {
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        data: [
+                            {
+                                id: '00019',
+                                name: 'Burlington Retail Store',
+                                address1: '75 Middlesex Turnpike',
+                                city: 'Burlington',
+                                stateCode: 'MA',
+                                postalCode: '01803',
+                                phone: '111-111-1111'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Pickup Address')).toBeInTheDocument()
+        expect(await screen.findByText(/Burlington Retail Store/i)).toBeInTheDocument()
+        expect(await screen.findByText(/75 Middlesex Turnpike/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Burlington, MA 01803/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Phone: 111-111-1111/i)).toBeInTheDocument()
+    })
+
+    test('should display payment method for ECOM BOPIS order', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+    })
+
+    test('should display billing address for ECOM BOPIS order', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
+        expect(await screen.findByText(/Deepali Bharmal/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display shipping method section (pickup only, no delivery)', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // No delivery shipments, so no shipping method section
+        expect(screen.queryByRole('heading', {name: /shipping method/i})).not.toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address section (pickup only, no delivery)', async () => {
+        setupOrderDetailsPage(createEcomBopisOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // No delivery shipments, so no shipping address section
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+    })
+})
