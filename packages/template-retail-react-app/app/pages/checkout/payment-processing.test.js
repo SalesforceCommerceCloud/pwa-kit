@@ -16,6 +16,10 @@ const mockNavigate = jest.fn()
 const mockToast = jest.fn()
 const mockHandleRedirect = jest.fn()
 const mockUseSFPayments = jest.fn()
+const mockUseOrder = jest.fn()
+const mockUpdatePaymentInstrumentForOrder = jest.fn()
+const mockFailOrder = jest.fn()
+const mockGetSFPaymentsInstrument = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     __esModule: true,
@@ -32,6 +36,27 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => ({
     STATUS_SUCCESS: 0
 }))
 
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        useShopperOrdersMutation: (mutationKey) => {
+            if (mutationKey === 'updatePaymentInstrumentForOrder') {
+                return {mutateAsync: mockUpdatePaymentInstrumentForOrder}
+            }
+            if (mutationKey === 'failOrder') {
+                return {mutateAsync: mockFailOrder}
+            }
+            return {mutateAsync: jest.fn()}
+        },
+        useOrder: () => mockUseOrder()
+    }
+})
+
+jest.mock('@salesforce/retail-react-app/app/utils/sf-payments-utils', () => ({
+    getSFPaymentsInstrument: () => mockGetSFPaymentsInstrument()
+}))
+
 // Mock useLocation
 const mockLocation = {search: ''}
 jest.mock('react-router-dom', () => ({
@@ -44,7 +69,7 @@ describe('PaymentProcessing', () => {
         jest.clearAllMocks()
 
         // Default location with orderNo
-        mockLocation.search = '?orderNo=12345'
+        mockLocation.search = '?vendor=Stripe&orderNo=12345'
 
         // Default mock implementations
         mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
@@ -55,6 +80,16 @@ describe('PaymentProcessing', () => {
                 handleRedirect: mockHandleRedirect
             }
         })
+
+        mockUseOrder.mockReturnValue({
+            data: {
+                orderNo: '12345'
+            }
+        })
+
+        mockUpdatePaymentInstrumentForOrder.mockReturnValue({})
+
+        mockGetSFPaymentsInstrument.mockReturnValue({})
     })
 
     afterEach(() => {
@@ -68,14 +103,15 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Payment Processing')).toBeInTheDocument()
         })
 
-        test('renders working message when orderNo is present', () => {
+        test('renders working message for valid URL', () => {
             renderWithProviders(<PaymentProcessing />)
 
             expect(screen.getByText('Working on your payment...')).toBeInTheDocument()
         })
 
-        test('renders error message when orderNo is missing', () => {
+        test('renders error message for missing vendor', async () => {
             mockLocation.search = ''
+            mockUseOrder.mockReturnValue({data: null})
 
             renderWithProviders(<PaymentProcessing />)
 
@@ -83,6 +119,151 @@ describe('PaymentProcessing', () => {
                 screen.getByText('There was an unexpected error processing your payment.')
             ).toBeInTheDocument()
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            // Wait a bit to ensure failOrder is not called
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockFailOrder).not.toHaveBeenCalled()
+        })
+
+        test('renders error message for unknown vendor', async () => {
+            mockLocation.search = '?vendor=Unknown'
+            mockUseOrder.mockReturnValue({data: null})
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            // Wait a bit to ensure failOrder is not called
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockFailOrder).not.toHaveBeenCalled()
+        })
+
+        test('renders error message for invalid Stripe URL missing order no', async () => {
+            mockLocation.search = '?vendor=Stripe'
+            mockUseOrder.mockReturnValue({data: null})
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            // Wait a bit to ensure failOrder is not called
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockFailOrder).not.toHaveBeenCalled()
+        })
+
+        test('renders error message for invalid Stripe URL with empty order no', async () => {
+            mockLocation.search = '?vendor=Stripe&orderNo='
+            mockUseOrder.mockReturnValue({data: null})
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            // Wait a bit to ensure failOrder is not called
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockFailOrder).not.toHaveBeenCalled()
+        })
+
+        test('renders error message for invalid Adyen URL missing order no', async () => {
+            mockLocation.search = '?vendor=Adyen&type=klarna&zoneId=default&redirectResult=ABC123'
+            mockUseOrder.mockReturnValue({data: null})
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            // Wait a bit to ensure failOrder is not called
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            expect(mockFailOrder).not.toHaveBeenCalled()
+        })
+
+        test('renders error message for invalid Adyen URL missing type', async () => {
+            mockLocation.search = '?vendor=Adyen&orderNo=12345&zoneId=default&redirectResult=ABC123'
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            await waitFor(() => {
+                expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                expect(mockFailOrder).toHaveBeenCalledWith({
+                    parameters: {
+                        orderNo: '12345',
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
+            })
+        })
+
+        test('renders error message for invalid Adyen URL missing zone id', async () => {
+            mockLocation.search = '?vendor=Adyen&orderNo=12345&type=klarna&redirectResult=ABC123'
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            await waitFor(() => {
+                expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                expect(mockFailOrder).toHaveBeenCalledWith({
+                    parameters: {
+                        orderNo: '12345',
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
+            })
+        })
+
+        test('renders error message for invalid Adyen URL missing redirect result', async () => {
+            mockLocation.search = '?vendor=Adyen&orderNo=12345&type=klarna&zoneId=default'
+
+            renderWithProviders(<PaymentProcessing />)
+
+            expect(
+                screen.getByText('There was an unexpected error processing your payment.')
+            ).toBeInTheDocument()
+            expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
+
+            await waitFor(() => {
+                expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                expect(mockFailOrder).toHaveBeenCalledWith({
+                    parameters: {
+                        orderNo: '12345',
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
+            })
         })
 
         test('error state includes link to checkout page', () => {
@@ -96,187 +277,295 @@ describe('PaymentProcessing', () => {
         })
     })
 
-    describe('payment processing', () => {
-        test('calls handleRedirect when sfp is available and orderNo exists', async () => {
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
-            mockUseSFPayments.mockReturnValue({
-                sfp: {
-                    handleRedirect: mockHandleRedirect
-                }
+    describe('Stripe', () => {
+        describe('payment processing', () => {
+            test('calls handleRedirect when sfp is available and orderNo exists', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
+                mockUseSFPayments.mockReturnValue({
+                    sfp: {
+                        handleRedirect: mockHandleRedirect
+                    }
+                })
+
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockHandleRedirect).toHaveBeenCalledTimes(1)
+                })
             })
 
-            renderWithProviders(<PaymentProcessing />)
+            test('does not call handleRedirect when orderNo is missing', async () => {
+                mockLocation.search = '?vendor=Stripe'
 
-            await waitFor(() => {
+                renderWithProviders(<PaymentProcessing />)
+
+                // Wait a bit to ensure handleRedirect is not called
+                await new Promise((resolve) => setTimeout(resolve, 100))
+
+                expect(mockHandleRedirect).not.toHaveBeenCalled()
+            })
+
+            test('does not call handleRedirect when sfp is not available', async () => {
+                mockUseSFPayments.mockReturnValue({sfp: null})
+
+                renderWithProviders(<PaymentProcessing />)
+
+                // Wait a bit to ensure handleRedirect is not called
+                await new Promise((resolve) => setTimeout(resolve, 100))
+
+                expect(mockHandleRedirect).not.toHaveBeenCalled()
+            })
+        })
+
+        describe('successful payment', () => {
+            test('navigates to confirmation page on successful payment', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
+
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/12345')
+                })
+
+                expect(mockToast).not.toHaveBeenCalled()
+            })
+
+            test('handles orderNo with special characters', async () => {
+                mockLocation.search = '?vendor=Stripe&orderNo=ORDER-123-ABC'
+                mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
+
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockNavigate).toHaveBeenCalledWith(
+                        '/checkout/confirmation/ORDER-123-ABC'
+                    )
+                })
+
+                expect(mockToast).not.toHaveBeenCalled()
+            })
+
+            test('does not call handleRedirect multiple times on re-renders', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
+
+                const {rerender} = renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockHandleRedirect).toHaveBeenCalledTimes(1)
+                })
+
+                // Rerender component
+                rerender(<PaymentProcessing />)
+
+                // Wait a bit
+                await new Promise((resolve) => setTimeout(resolve, 100))
+
+                // Should still only be called once
                 expect(mockHandleRedirect).toHaveBeenCalledTimes(1)
             })
         })
 
-        test('does not call handleRedirect when orderNo is missing', async () => {
-            mockLocation.search = ''
+        describe('failed payment', () => {
+            test('shows error toast on failed payment', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: 1})
 
-            renderWithProviders(<PaymentProcessing />)
+                renderWithProviders(<PaymentProcessing />)
 
-            // Wait a bit to ensure handleRedirect is not called
-            await new Promise((resolve) => setTimeout(resolve, 100))
-
-            expect(mockHandleRedirect).not.toHaveBeenCalled()
-        })
-
-        test('does not call handleRedirect when sfp is not available', async () => {
-            mockUseSFPayments.mockReturnValue({sfp: null})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            // Wait a bit to ensure handleRedirect is not called
-            await new Promise((resolve) => setTimeout(resolve, 100))
-
-            expect(mockHandleRedirect).not.toHaveBeenCalled()
-        })
-
-        test('does not call handleRedirect when sfp initially unavailable', async () => {
-            // Start with no sfp
-            mockUseSFPayments.mockReturnValue({sfp: null})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            // Wait a bit to ensure handleRedirect is not called
-            await new Promise((resolve) => setTimeout(resolve, 100))
-
-            expect(mockHandleRedirect).not.toHaveBeenCalled()
-        })
-    })
-
-    describe('successful payment', () => {
-        test('navigates to confirmation page on successful payment', async () => {
-            mockLocation.search = '?orderNo=12345'
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/12345')
-            })
-
-            expect(mockToast).not.toHaveBeenCalled()
-        })
-
-        test('navigates with correct orderNo from URL', async () => {
-            mockLocation.search = '?orderNo=67890'
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/67890')
-            })
-        })
-    })
-
-    describe('failed payment', () => {
-        test('shows error toast on failed payment', async () => {
-            mockHandleRedirect.mockResolvedValue({responseCode: 1})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockToast).toHaveBeenCalledWith({
-                    title: expect.stringContaining('unsuccessful'),
-                    status: 'error',
-                    duration: 30000
+                await waitFor(() => {
+                    expect(mockToast).toHaveBeenCalledWith({
+                        title: expect.stringContaining('unsuccessful'),
+                        status: 'error',
+                        duration: 30000
+                    })
                 })
             })
-        })
 
-        test('navigates back to checkout on failed payment', async () => {
-            mockHandleRedirect.mockResolvedValue({responseCode: 1})
+            test('navigates back to checkout on failed payment', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: 1})
 
-            renderWithProviders(<PaymentProcessing />)
+                renderWithProviders(<PaymentProcessing />)
 
-            await waitFor(() => {
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
-            })
-        })
-
-        test('shows toast before navigating on failed payment', async () => {
-            mockHandleRedirect.mockResolvedValue({responseCode: 1})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockToast).toHaveBeenCalled()
+                await waitFor(() => {
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                })
             })
 
-            expect(mockNavigate).toHaveBeenCalledWith('/checkout')
-        })
-
-        test('handles different error response codes', async () => {
-            const errorCodes = [1, 2, -1, 999]
-
-            for (const code of errorCodes) {
-                jest.clearAllMocks()
-                mockHandleRedirect.mockResolvedValue({responseCode: code})
+            test('shows toast and calls failOrder before navigating on failed payment', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: 1})
 
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
                     expect(mockToast).toHaveBeenCalled()
-                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
-            }
+
+                await waitFor(() => {
+                    expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                    expect(mockFailOrder).toHaveBeenCalledWith({
+                        parameters: {
+                            orderNo: '12345',
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: 'payment_confirm_failure'
+                        }
+                    })
+                })
+
+                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+            })
+
+            test('handles different error response codes', async () => {
+                const errorCodes = [1, 2, -1, 999]
+
+                for (const code of errorCodes) {
+                    jest.clearAllMocks()
+                    mockHandleRedirect.mockResolvedValue({responseCode: code})
+
+                    renderWithProviders(<PaymentProcessing />)
+
+                    await waitFor(() => {
+                        expect(mockToast).toHaveBeenCalled()
+                        expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                    })
+                }
+            })
         })
     })
 
-    describe('edge cases', () => {
-        test('handles orderNo with special characters', async () => {
-            mockLocation.search = '?orderNo=ORDER-123-ABC'
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
-
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/ORDER-123-ABC')
+    describe('Adyen', () => {
+        beforeEach(() => {
+            mockLocation.search =
+                '?vendor=Adyen&orderNo=12345&type=klarna&zoneId=default&redirectResult=ABC123'
+            mockGetSFPaymentsInstrument.mockReturnValue({
+                paymentInstrumentId: 'xyz789',
+                paymentReference: {
+                    gatewayProperties: {
+                        adyen: {
+                            adyenPaymentIntent: {
+                                resultCode: 'AUTHORISED'
+                            }
+                        }
+                    }
+                }
             })
         })
 
-        test('handles multiple query parameters', async () => {
-            mockLocation.search = '?orderNo=12345&other=value&foo=bar'
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
+        describe('payment processing', () => {
+            test('submits redirect result when dependencies are met', async () => {
+                renderWithProviders(<PaymentProcessing />)
 
-            renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/12345')
+                await waitFor(() => {
+                    expect(mockGetSFPaymentsInstrument).toHaveBeenCalledTimes(2)
+                    expect(mockUpdatePaymentInstrumentForOrder).toHaveBeenCalledTimes(1)
+                    expect(mockUpdatePaymentInstrumentForOrder).toHaveBeenCalledWith({
+                        parameters: {
+                            orderNo: '12345',
+                            paymentInstrumentId: 'xyz789'
+                        },
+                        body: {
+                            paymentMethodId: 'Salesforce Payments',
+                            paymentReferenceRequest: {
+                                paymentMethodType: 'klarna',
+                                zoneId: 'default',
+                                gateway: 'adyen',
+                                gatewayProperties: {
+                                    adyen: {
+                                        redirectResult: 'ABC123'
+                                    }
+                                }
+                            }
+                        }
+                    })
+                })
             })
         })
 
-        test('handles empty orderNo parameter', async () => {
-            mockLocation.search = '?orderNo='
+        describe('successful payment', () => {
+            test('navigates to confirmation page on successful payment', async () => {
+                renderWithProviders(<PaymentProcessing />)
 
-            renderWithProviders(<PaymentProcessing />)
+                await waitFor(() => {
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout/confirmation/12345')
+                })
 
-            // Empty string is falsy, so it's treated as missing orderNo
-            // But the param exists, so isError should be false and we see the working message
-            expect(screen.getByText('Working on your payment...')).toBeInTheDocument()
-        })
-
-        test('does not call handleRedirect multiple times on re-renders', async () => {
-            mockHandleRedirect.mockResolvedValue({responseCode: STATUS_SUCCESS})
-
-            const {rerender} = renderWithProviders(<PaymentProcessing />)
-
-            await waitFor(() => {
-                expect(mockHandleRedirect).toHaveBeenCalledTimes(1)
+                expect(mockToast).not.toHaveBeenCalled()
             })
 
-            // Rerender component
-            rerender(<PaymentProcessing />)
+            test('does not call updatePaymentInstrumentForOrder multiple times on re-renders', async () => {
+                const {rerender} = renderWithProviders(<PaymentProcessing />)
 
-            // Wait a bit
-            await new Promise((resolve) => setTimeout(resolve, 100))
+                await waitFor(() => {
+                    expect(mockUpdatePaymentInstrumentForOrder).toHaveBeenCalledTimes(1)
+                })
 
-            // Should still only be called once
-            expect(mockHandleRedirect).toHaveBeenCalledTimes(1)
+                // Rerender component
+                rerender(<PaymentProcessing />)
+
+                // Wait a bit
+                await new Promise((resolve) => setTimeout(resolve, 100))
+
+                // Should still only be called once
+                expect(mockUpdatePaymentInstrumentForOrder).toHaveBeenCalledTimes(1)
+            })
+        })
+
+        describe('failed payment', () => {
+            beforeEach(() => {
+                mockGetSFPaymentsInstrument.mockReturnValue({
+                    paymentInstrumentId: 'xyz789',
+                    paymentReference: {
+                        gatewayProperties: {
+                            adyen: {
+                                resultCode: 'ERROR'
+                            }
+                        }
+                    }
+                })
+            })
+
+            test('shows error toast on failed payment', async () => {
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockToast).toHaveBeenCalledWith({
+                        title: expect.stringContaining('unsuccessful'),
+                        status: 'error',
+                        duration: 30000
+                    })
+                })
+            })
+
+            test('navigates back to checkout on failed payment', async () => {
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                })
+            })
+
+            test('shows toast and calls failOrder before navigating on failed payment', async () => {
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockToast).toHaveBeenCalled()
+                })
+
+                await waitFor(() => {
+                    expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                    expect(mockFailOrder).toHaveBeenCalledWith({
+                        parameters: {
+                            orderNo: '12345',
+                            reopenBasket: true
+                        },
+                        body: {
+                            reasonCode: 'payment_confirm_failure'
+                        }
+                    })
+                })
+
+                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+            })
         })
     })
 
