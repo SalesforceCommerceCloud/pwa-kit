@@ -59,6 +59,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         },
         usePaymentConfiguration: () => ({
             data: {
+                zoneId: 'default',
                 paymentMethods: [
                     {
                         id: 'card',
@@ -71,6 +72,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                         name: 'PayPal',
                         paymentMethodType: 'paypal',
                         accountId: 'paypal-account-1'
+                    },
+                    {
+                        id: 'klarna',
+                        name: 'Klarna',
+                        paymentMethodType: 'klarna',
+                        accountId: 'adyen-account-1'
                     }
                 ],
                 paymentMethodSetAccounts: [
@@ -78,6 +85,16 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                         accountId: 'stripe-account-1',
                         vendor: 'Stripe',
                         paymentMethods: [{id: 'card'}]
+                    },
+                    {
+                        accountId: 'paypal-account-1',
+                        vendor: 'Paypal',
+                        paymentMethods: [{id: 'paypal'}]
+                    },
+                    {
+                        accountId: 'adyen-account-1',
+                        vendor: 'Adyen',
+                        paymentMethods: [{id: 'klarna'}]
                     }
                 ]
             }
@@ -318,7 +335,7 @@ const createMockOrder = (overrides = {}) => ({
     ...overrides
 })
 
-const setupConfirmPaymentMocks = () => {
+const setupConfirmPaymentMocks = (paymentIntentRef) => {
     const mockOrder = createMockOrder()
     mockUpdateBillingAddress.mockResolvedValue({
         ...mockBasket,
@@ -340,9 +357,14 @@ const setupConfirmPaymentMocks = () => {
     })
     mockOnCreateOrder.mockResolvedValue(mockOrder)
     mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
-    mockCheckoutConfirm.mockResolvedValue({
-        responseCode: STATUS_SUCCESS,
-        data: {}
+    mockCheckoutConfirm.mockImplementation(async () => {
+        const config = mockCheckout.mock.calls[0][2]
+        paymentIntentRef.current = await config.actions.createIntent()
+
+        return {
+            responseCode: STATUS_SUCCESS,
+            data: {}
+        }
     })
     return mockOrder
 }
@@ -613,9 +635,14 @@ describe('SFPaymentsSheet', () => {
             mockOnCreateOrder.mockResolvedValue(mockOrder)
             mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
 
-            mockCheckoutConfirm.mockResolvedValue({
-                responseCode: STATUS_SUCCESS,
-                data: {}
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent()
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
             })
 
             renderWithCheckoutContext(
@@ -643,7 +670,7 @@ describe('SFPaymentsSheet', () => {
             expect(result.orderNo).toBe('ORDER123')
         })
 
-        test('confirmPayment creates payment instrument and processes payment', async () => {
+        test('confirmPayment creates payment instrument and processes Stripe payment', async () => {
             const ref = React.createRef()
             const mockOrder = createMockOrder()
 
@@ -670,9 +697,14 @@ describe('SFPaymentsSheet', () => {
             mockOnCreateOrder.mockResolvedValue(mockOrder)
             mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
 
-            mockCheckoutConfirm.mockResolvedValue({
-                responseCode: STATUS_SUCCESS,
-                data: {}
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent()
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
             })
 
             renderWithCheckoutContext(
@@ -689,16 +721,146 @@ describe('SFPaymentsSheet', () => {
 
             await ref.current.confirmPayment()
 
-            expect(mockAddPaymentInstrument).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    body: expect.objectContaining({
-                        paymentMethodId: 'Salesforce Payments'
+            await waitFor(() => {
+                expect(mockAddPaymentInstrument).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        body: expect.objectContaining({
+                            paymentMethodId: 'Salesforce Payments'
+                        })
                     })
+                )
+
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+                expect(mockCheckoutConfirm).toHaveBeenCalled()
+            })
+        })
+
+        test('confirmPayment creates payment instrument and processes Adyen payment', async () => {
+            const ref = React.createRef()
+            const mockOrder = createMockOrder({
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123',
+                            gateway: 'adyen',
+                            gatewayProperties: {
+                                adyen: {
+                                    adyenPaymentIntent: {
+                                        id: 'PI123',
+                                        resultCode: 'AUTHORISED',
+                                        adyenPaymentAction: 'action'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent({
+                    paymentMethod: 'payment method',
+                    returnUrl: 'http://test.com?name=value',
+                    origin: 'http://mystore.com',
+                    lineItems: [],
+                    billingDetails: {}
                 })
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
             )
 
-            expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
-            expect(mockCheckoutConfirm).toHaveBeenCalled()
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'klarna'
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockAddPaymentInstrument).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        body: expect.objectContaining({
+                            paymentMethodId: 'Salesforce Payments',
+                            paymentReferenceRequest: {
+                                paymentMethodType: 'klarna',
+                                zoneId: 'default'
+                            }
+                        })
+                    })
+                )
+
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        body: expect.objectContaining({
+                            paymentReferenceRequest: expect.objectContaining({
+                                paymentMethodType: 'klarna',
+                                zoneId: 'default',
+                                gateway: 'adyen',
+                                gatewayProperties: {
+                                    adyen: {
+                                        paymentMethod: 'payment method',
+                                        returnUrl:
+                                            'http://test.com?name=value&orderNo=ORDER123&zoneId=default&type=klarna',
+                                        origin: 'http://mystore.com',
+                                        lineItems: [],
+                                        billingDetails: {}
+                                    }
+                                }
+                            })
+                        })
+                    })
+                )
+                expect(mockCheckoutConfirm).toHaveBeenCalled()
+            })
         })
 
         test('confirmPayment handles payment failure', async () => {
@@ -825,9 +987,14 @@ describe('SFPaymentsSheet', () => {
             mockOnCreateOrder.mockResolvedValue(mockOrder)
             mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
 
-            mockCheckoutConfirm.mockResolvedValue({
-                responseCode: 'FAILED',
-                data: {error: 'Payment confirmation failed'}
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent()
+
+                return {
+                    responseCode: 'FAILED',
+                    data: {error: 'Payment confirmation failed'}
+                }
             })
 
             mockFailOrder.mockResolvedValue({})
@@ -865,7 +1032,8 @@ describe('SFPaymentsSheet', () => {
 
         test('confirmPayment includes setup_future_usage when savePaymentMethodForFutureUse is true', async () => {
             const ref = React.createRef()
-            setupConfirmPaymentMocks()
+            const paymentIntentRef = React.createRef()
+            setupConfirmPaymentMocks(paymentIntentRef)
 
             renderWithCheckoutContext(
                 <SFPaymentsSheet
@@ -904,16 +1072,13 @@ describe('SFPaymentsSheet', () => {
                 expect(mockCheckoutConfirm).toHaveBeenCalled()
             })
 
-            const confirmCall = mockCheckoutConfirm.mock.calls[0]
-            const paymentIntentFunction = confirmCall[0]
-            const paymentIntent = await paymentIntentFunction()
-
-            expect(paymentIntent.setup_future_usage).toBe('on_session')
+            expect(paymentIntentRef.current.setup_future_usage).toBe('on_session')
         })
 
         test('confirmPayment passes savePaymentMethodRef to createAndUpdateOrder', async () => {
             const ref = React.createRef()
-            setupConfirmPaymentMocks()
+            const paymentIntentRef = React.createRef()
+            setupConfirmPaymentMocks(paymentIntentRef)
 
             renderWithCheckoutContext(
                 <SFPaymentsSheet
@@ -963,7 +1128,8 @@ describe('SFPaymentsSheet', () => {
 
         test('confirmPayment excludes setup_future_usage when savePaymentMethodForFutureUse is false', async () => {
             const ref = React.createRef()
-            setupConfirmPaymentMocks()
+            const paymentIntentRef = React.createRef()
+            setupConfirmPaymentMocks(paymentIntentRef)
 
             renderWithCheckoutContext(
                 <SFPaymentsSheet
@@ -1002,16 +1168,13 @@ describe('SFPaymentsSheet', () => {
                 expect(mockCheckoutConfirm).toHaveBeenCalled()
             })
 
-            const confirmCall = mockCheckoutConfirm.mock.calls[0]
-            const paymentIntentFunction = confirmCall[0]
-            const paymentIntent = await paymentIntentFunction()
-
-            expect(paymentIntent.setup_future_usage).toBeUndefined()
+            expect(paymentIntentRef.current.setup_future_usage).toBeUndefined()
         })
 
         test('confirmPayment sets setup_future_usage to off_session when futureUsageOffSession is true', async () => {
             const ref = React.createRef()
-            setupConfirmPaymentMocks()
+            const paymentIntentRef = React.createRef()
+            setupConfirmPaymentMocks(paymentIntentRef)
 
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const useShopperConfigurationModule = require('@salesforce/retail-react-app/app/hooks/use-shopper-configuration')
@@ -1061,11 +1224,7 @@ describe('SFPaymentsSheet', () => {
                 expect(mockCheckoutConfirm).toHaveBeenCalled()
             })
 
-            const confirmCall = mockCheckoutConfirm.mock.calls[0]
-            const paymentIntentFunction = confirmCall[0]
-            const paymentIntent = await paymentIntentFunction()
-
-            expect(paymentIntent.setup_future_usage).toBe('off_session')
+            expect(paymentIntentRef.current.setup_future_usage).toBe('off_session')
 
             useShopperConfigurationModule.useShopperConfiguration = originalMock
         })

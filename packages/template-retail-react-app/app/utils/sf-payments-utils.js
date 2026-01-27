@@ -181,10 +181,6 @@ export const getGatewayFromPaymentMethod = (
     paymentMethods,
     paymentMethodSetAccounts
 ) => {
-    if (isPayPalPaymentMethodType(paymentMethodType)) {
-        return null
-    }
-
     const account = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, paymentMethodType)
     if (!account) {
         return null
@@ -195,6 +191,8 @@ export const getGatewayFromPaymentMethod = (
         return PAYMENT_GATEWAYS.STRIPE
     } else if (vendor === PAYMENT_GATEWAYS.ADYEN) {
         return PAYMENT_GATEWAYS.ADYEN
+    } else if (vendor === PAYMENT_GATEWAYS.PAYPAL) {
+        return PAYMENT_GATEWAYS.PAYPAL
     }
 
     return null
@@ -222,6 +220,7 @@ export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) =
  * @param {string} params.paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
  * @param {string} params.zoneId - Zone ID for payment processing
  * @param {string} [params.shippingPreference] - Optional shipping preference for PayPal payment processing
+ * @param {string} [params.paymentData] - Optional Adyen client payment data object
  * @param {boolean} [params.storePaymentMethod=false] - Optional flag to save payment method for future use
  * @param {boolean} [params.futureUsageOffSession=false] - Optional flag indicating if off-session future usage is enabled (from payment config)
  * @param {Array} [params.paymentMethods] - Optional array of payment methods to determine gateway
@@ -234,6 +233,7 @@ export const createPaymentInstrumentBody = ({
     paymentMethodType,
     zoneId,
     shippingPreference,
+    paymentData = null,
     storePaymentMethod = false,
     futureUsageOffSession = false,
     paymentMethods = null,
@@ -245,15 +245,24 @@ export const createPaymentInstrumentBody = ({
         zoneId: zoneId ?? 'default'
     }
 
-    if (shippingPreference !== undefined && shippingPreference !== null) {
-        paymentReferenceRequest.shippingPreference = shippingPreference
-    }
-
     const gateway = getGatewayFromPaymentMethod(
         paymentMethodType,
         paymentMethods,
         paymentMethodSetAccounts
     )
+
+    if (
+        gateway === PAYMENT_GATEWAYS.PAYPAL &&
+        shippingPreference !== undefined &&
+        shippingPreference !== null
+    ) {
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.PAYPAL
+        paymentReferenceRequest.gatewayProperties = {
+            paypal: {
+                shippingPreference
+            }
+        }
+    }
 
     if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
@@ -261,8 +270,27 @@ export const createPaymentInstrumentBody = ({
             paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
             paymentReferenceRequest.gatewayProperties = {
                 stripe: {
-                    setupFutureUsage: setupFutureUsage
+                    setupFutureUsage
                 }
+            }
+        }
+    }
+
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.ADYEN) {
+        // Create Adyen payment reference request
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
+        paymentReferenceRequest.gatewayProperties = {
+            adyen: {
+                ...(paymentData && {
+                    paymentMethod: paymentData.paymentMethod,
+                    returnUrl: paymentData.returnUrl,
+                    origin: paymentData.origin,
+                    lineItems: paymentData.lineItems,
+                    billingDetails: paymentData.billingDetails
+                }),
+                ...(storePaymentMethod === true && {
+                    storePaymentMethod: true
+                })
             }
         }
     }
