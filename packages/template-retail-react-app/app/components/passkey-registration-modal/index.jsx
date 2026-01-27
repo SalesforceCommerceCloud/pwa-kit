@@ -52,6 +52,8 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     const config = getConfig()
     const webauthnConfig = config.app.login.passkey
     const authorizeWebauthnRegistration = useAuthHelper(AuthHelpers.AuthorizeWebauthnRegistration)
+    const startWebauthnUserRegistration = useAuthHelper(AuthHelpers.StartWebauthnUserRegistration)
+    const finishWebauthnUserRegistration = useAuthHelper(AuthHelpers.FinishWebauthnUserRegistration)
 
     const handleRegisterPasskey = async () => {
         setIsLoading(true)
@@ -82,9 +84,109 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         }
     }
 
+    /**
+     * Convert ArrayBuffer to base64url string
+     */
+    const arrayBufferToBase64Url = (buffer) => {
+        const bytes = new Uint8Array(buffer)
+        let binary = ''
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i])
+        }
+        const base64 = btoa(binary)
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    }
+
     const handleOtpVerification = async (code) => {
-        // TODO: Implement OTP verification
-        return {success: true}
+        setIsLoading(true)
+        setError(null)
+
+        try {
+            // Step 1: Start WebAuthn registration
+            const response = await startWebauthnUserRegistration.mutateAsync({
+                user_id: customer.email,
+                pwd_action_token: code,
+                ...(passkeyNickname && {nick_name: passkeyNickname})
+            })
+
+            // Step 2: Convert response to WebAuthn PublicKeyCredentialCreationOptions format
+            const publicKey = window.PublicKeyCredential.parseCreationOptionsFromJSON(response)
+
+            // Step 3: Call navigator.credentials.create()
+            if (!navigator.credentials || !navigator.credentials.create) {
+                throw new Error('WebAuthn API not available in this browser')
+            }
+
+            // navigator.credentials.create() will show a browser/system prompt
+            // This may appear to hang if the user doesn't interact with the prompt
+            let credential
+            try {
+                credential = await navigator.credentials.create({
+                    publicKey
+                })
+            } catch (createError) {
+                // Handle user cancellation or other errors from the WebAuthn API
+                if (createError.name === 'NotAllowedError' || createError.name === 'AbortError') {
+                    throw new Error('Passkey registration was cancelled or timed out')
+                }
+                throw createError
+            }
+
+            if (!credential) {
+                throw new Error('Failed to create credential: user cancelled or operation failed')
+            }
+
+            // Step 4: Convert credential to JSON format before sending to SLAS
+            // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
+            let credentialJson
+            try {
+                credentialJson = credential.toJSON()
+            } catch (error) {
+                // Fallback to manual encoding if toJSON() fails
+                // Some passkey providers (e.g., 1Password) may not support the toJSON() method and return an error
+                const clientExtensionResults = credential.getClientExtensionResults?.() || {}
+                credentialJson = {
+                    type: credential.type,
+                    id: credential.id,
+                    rawId: arrayBufferToBase64Url(credential.rawId),
+                    response: {
+                        attestationObject: arrayBufferToBase64Url(
+                            credential.response.attestationObject
+                        ),
+                        clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
+                    },
+                    ...(Object.keys(clientExtensionResults).length > 0 && {clientExtensionResults})
+                }
+            }
+
+            // Step 5: Finish WebAuthn registration
+            await finishWebauthnUserRegistration.mutateAsync({
+                username: customer.email,
+                credential: credentialJson,
+                pwd_action_token: code
+            })
+
+            // Step 6: Close OTP modal and main modal on success
+            setIsOtpAuthOpen(false)
+            onClose()
+
+            return {success: true}
+        } catch (err) {
+            const errorMessage =
+                err.message ||
+                formatMessage({
+                    id: 'passkey_registration.modal.error.registration_failed',
+                    defaultMessage: 'Failed to register passkey'
+                })
+
+            // Return error result for OTP component to display
+            return {
+                success: false,
+                error: errorMessage
+            }
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const resetState = () => {

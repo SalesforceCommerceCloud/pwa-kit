@@ -252,7 +252,6 @@ export const AuthModal = ({
             ) {
                 Promise.all([
                     window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-
                     window.PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
