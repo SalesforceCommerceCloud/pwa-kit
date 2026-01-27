@@ -40,7 +40,7 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {isServer, setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
@@ -93,6 +93,7 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const passwordlessMode = config.app.login?.passwordless?.mode || 'email'
     const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -109,10 +110,17 @@ export const AuthModal = ({
     const handlePasswordlessLogin = async (email) => {
         try {
             const redirectPath = window.location.pathname + (window.location.search || '')
-            await authorizePasswordlessLogin.mutateAsync({
+            const params = {
                 userid: email,
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
-            })
+                mode: passwordlessMode
+            }
+            
+            // Only include callbackURI if mode is 'callback'
+            if (passwordlessMode === 'callback') {
+                params.callbackURI = `${callbackURL}?redirectUrl=${redirectPath}`
+            }
+            
+            await authorizePasswordlessLogin.mutateAsync(params)
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
             const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
@@ -320,8 +328,6 @@ export const AuthModal = ({
         }
 
         if (registering) {
-            // Set flag for passkey toast on account page
-            setSessionJSONItem('newAccountCreated', true)
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }

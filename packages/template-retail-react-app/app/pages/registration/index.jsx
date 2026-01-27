@@ -54,8 +54,6 @@ const Registration = () => {
 
     useEffect(() => {
         if (isRegistered) {
-            // Set flag for passkey toast on account page
-            setSessionJSONItem('newAccountCreated', true)
             navigate('/account')
         }
     }, [isRegistered])

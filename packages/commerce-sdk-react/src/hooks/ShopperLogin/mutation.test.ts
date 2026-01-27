@@ -34,9 +34,9 @@ const PUBLIC_KEY_CREDENTIAL_JSON: ShopperLoginTypes.PublicKeyCredentialJson = {
     rawId: 'raw-credential-id',
     type: 'public-key',
     response: {
-        authenticatorData: 'mock-authenticator-data',
-        clientDataJSON: 'mock-client-data-json',
-        signature: 'mock-signature',
+        authenticatorData: [],
+        clientDataJSON: [],
+        signature: [],
         userHandle: null
     } as ShopperLoginTypes.AuthenticatorAssertionResponseJson
 }
