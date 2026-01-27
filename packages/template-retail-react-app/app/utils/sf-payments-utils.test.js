@@ -1271,6 +1271,96 @@ describe('sf-payments-utils', () => {
             expect(result.paymentReferenceRequest.shippingPreference).toBeUndefined()
         })
 
+        test('includes gateway for Adyen when storePaymentMethod is true', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({
+                storePaymentMethod: true
+            })
+        })
+
+        test('includes gateway for Adyen when payment data provided', () => {
+            const paymentData = {
+                paymentMethod: 'payment method',
+                returnUrl: 'return URL',
+                origin: 'origin',
+                lineItems: 'line items',
+                billingDetails: 'billing details',
+                otherStuff: 'to be ignored'
+            }
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                paymentData,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({
+                paymentMethod: 'payment method',
+                returnUrl: 'return URL',
+                origin: 'origin',
+                lineItems: 'line items',
+                billingDetails: 'billing details'
+            })
+        })
+
+        test('includes empty gateway properties for Adyen', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({})
+        })
+
+        test('does not include gateway for Adyen POST request even when storePaymentMethod is true', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts,
+                isPostRequest: true
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBeUndefined()
+            expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
+        })
+
         test('does not include setupFutureUsage in POST request even when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
