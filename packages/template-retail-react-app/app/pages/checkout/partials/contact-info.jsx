@@ -167,6 +167,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         const handlePasskeyLogin = async () => {
             try {
                 await loginWithPasskey()
+                handleMergeBasket()
             } catch (error) {
                 setError(formatMessage(API_ERROR_MESSAGE))
             }
@@ -174,7 +175,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
         if (!customer.isRegistered) {
             handlePasskeyLogin()
-            handleMergeBasket()
         }
     }, [customer.isRegistered])
 
