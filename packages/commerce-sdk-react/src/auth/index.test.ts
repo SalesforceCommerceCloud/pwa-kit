@@ -1343,17 +1343,26 @@ describe('Webauthn', () => {
                 channel_id: config.siteId
             }
         ]
-    ])('authorizeWebauthnRegistration %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        await auth.authorizeWebauthnRegistration(input)
+    ])(
+        'authorizeWebauthnRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.authorizeWebauthnRegistrationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.authorizeWebauthnRegistrationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.authorizeWebauthnRegistration(
+                input as ShopperLoginTypes.authorizeWebauthnRegistrationBodyType
+            )
 
-        expect((auth as any).client.authorizeWebauthnRegistration).toHaveBeenCalledWith({
-            headers: {
-                Authorization: ''
-            },
-            body: expectedBody
-        })
-    })
+            expect((auth as any).client.authorizeWebauthnRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 
     test.each([
         [
@@ -1387,17 +1396,26 @@ describe('Webauthn', () => {
                 channel_id: config.siteId
             }
         ]
-    ])('startWebauthnUserRegistration %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        await auth.startWebauthnUserRegistration(input)
+    ])(
+        'startWebauthnUserRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.startWebauthnUserRegistrationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.startWebauthnUserRegistrationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.startWebauthnUserRegistration(
+                input as ShopperLoginTypes.startWebauthnUserRegistrationBodyType
+            )
 
-        expect((auth as any).client.startWebauthnUserRegistration).toHaveBeenCalledWith({
-            headers: {
-                Authorization: ''
-            },
-            body: expectedBody
-        })
-    })
+            expect((auth as any).client.startWebauthnUserRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 
     test.each([
         [
@@ -1432,17 +1450,26 @@ describe('Webauthn', () => {
                 client_id: config.clientId
             }
         ]
-    ])('finishWebauthnUserRegistration %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        await auth.finishWebauthnUserRegistration(input)
+    ])(
+        'finishWebauthnUserRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.RegistrationFinishRequest>,
+            expectedBody: Partial<ShopperLoginTypes.RegistrationFinishRequest>
+        ) => {
+            const auth = new Auth(config)
+            await auth.finishWebauthnUserRegistration(
+                input as ShopperLoginTypes.RegistrationFinishRequest
+            )
 
-        expect((auth as any).client.finishWebauthnUserRegistration).toHaveBeenCalledWith({
-            headers: {
-                Authorization: ''
-            },
-            body: expectedBody
-        })
-    })
+            expect((auth as any).client.finishWebauthnUserRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 
     test.each([
         [
@@ -1468,17 +1495,26 @@ describe('Webauthn', () => {
                 client_id: config.clientId
             }
         ]
-    ])('startWebauthnAuthentication %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        await auth.startWebauthnAuthentication(input)
+    ])(
+        'startWebauthnAuthentication %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.startWebauthnAuthenticationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.startWebauthnAuthenticationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.startWebauthnAuthentication(
+                input as ShopperLoginTypes.startWebauthnAuthenticationBodyType
+            )
 
-        expect((auth as any).client.startWebauthnAuthentication).toHaveBeenCalledWith({
-            headers: {
-                Authorization: ''
-            },
-            body: expectedBody
-        })
-    })
+            expect((auth as any).client.startWebauthnAuthentication).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 
     test.each([
         [
@@ -1513,15 +1549,24 @@ describe('Webauthn', () => {
                 credential: PUBLIC_KEY_CREDENTIAL_JSON
             }
         ]
-    ])('finishWebauthnAuthentication %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        await auth.finishWebauthnAuthentication(input)
+    ])(
+        'finishWebauthnAuthentication %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.AuthenticateFinishRequest>,
+            expectedBody: Partial<ShopperLoginTypes.AuthenticateFinishRequest>
+        ) => {
+            const auth = new Auth(config)
+            await auth.finishWebauthnAuthentication(
+                input as ShopperLoginTypes.AuthenticateFinishRequest
+            )
 
-        expect((auth as any).client.finishWebauthnAuthentication).toHaveBeenCalledWith({
-            headers: {
-                Authorization: ''
-            },
-            body: expectedBody
-        })
-    })
+            expect((auth as any).client.finishWebauthnAuthentication).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 })

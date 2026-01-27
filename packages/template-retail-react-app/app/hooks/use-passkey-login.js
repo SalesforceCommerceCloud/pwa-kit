@@ -6,7 +6,7 @@
  */
 /* global PublicKeyCredential */
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {useAuthHelper, AuthHelpers, useUsid} from '@salesforce/commerce-sdk-react'
 import {encode as base64Encode} from 'base64-arraybuffer'
 
 /**
@@ -15,6 +15,7 @@ import {encode as base64Encode} from 'base64-arraybuffer'
 export const usePasskeyLogin = () => {
     const startWebauthnAuthentication = useAuthHelper(AuthHelpers.StartWebauthnAuthentication)
     const finishWebauthnAuthentication = useAuthHelper(AuthHelpers.FinishWebauthnAuthentication)
+    const {usid} = useUsid()
 
     const uint8arrayToBase64url = (input) => {
         const uint8array = new Uint8Array(input)
@@ -100,7 +101,8 @@ export const usePasskeyLogin = () => {
         }
 
         await finishWebauthnAuthentication.mutateAsync({
-            credential: encodedCredential
+            credential: encodedCredential,
+            usid
         })
         
         return

@@ -78,6 +78,15 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-passkey-login', () => {
     }
 })
 
+const mockUseCurrentCustomer = jest.fn(() => ({
+    data: {
+        isRegistered: false
+    }
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
 afterEach(() => {
     jest.resetModules()
     jest.restoreAllMocks()
@@ -391,6 +400,12 @@ describe('navigation based on shipment context', () => {
 describe('passkey login', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        // Default to guest user (not registered)
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: false
+            }
+        })
     })
 
     test('calls loginWithPasskey on component render', async () => {
@@ -407,6 +422,23 @@ describe('passkey login', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Try again!')).toBeInTheDocument()
+        })
+    })
+
+    test('does not call loginWithPasskey when customer is registered', async () => {
+        // Mock registered customer
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: true,
+                email: 'test@example.com'
+            }
+        })
+
+        renderWithProviders(<ContactInfo />)
+
+        // Wait a bit to ensure useEffect has run
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).not.toHaveBeenCalled()
         })
     })
 })
