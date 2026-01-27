@@ -2999,6 +2999,12 @@
       "value": "Failed to authorize passkey registration"
     }
   ],
+  "passkey_registration.modal.error.registration_failed": [
+    {
+      "type": 0,
+      "value": "Failed to register passkey"
+    }
+  ],
   "passkey_registration.modal.label.nickname": [
     {
       "type": 0,
