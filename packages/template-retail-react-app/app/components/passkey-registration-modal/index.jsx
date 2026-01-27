@@ -85,19 +85,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
     }
 
     /**
-     * Convert base64url string to ArrayBuffer
-     */
-    const base64UrlToArrayBuffer = (base64Url) => {
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-        const binaryString = atob(base64)
-        const bytes = new Uint8Array(binaryString.length)
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i)
-        }
-        return bytes.buffer
-    }
-
-    /**
      * Convert ArrayBuffer to base64url string
      */
     const arrayBufferToBase64Url = (buffer) => {
@@ -123,21 +110,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             })
 
             // Step 2: Convert response to WebAuthn PublicKeyCredentialCreationOptions format
-            const publicKey = {
-                challenge: base64UrlToArrayBuffer(response.challenge),
-                rp: {
-                    name: response.rp.name,
-                    id: response.rp.id
-                },
-                user: {
-                    ...response.user,
-                    id: base64UrlToArrayBuffer(response.user.id)
-                },
-                pubKeyCredParams: response.pubKeyCredParams || [],
-                authenticatorSelection: response.authenticatorSelection,
-                timeout: response.timeout,
-                attestation: response.attestation || 'none'
-            }
+            const publicKey = window.PublicKeyCredential.parseCreationOptionsFromJSON(response)
 
             // Step 3: Call navigator.credentials.create()
             if (!navigator.credentials || !navigator.credentials.create) {
@@ -163,19 +136,27 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 throw new Error('Failed to create credential: user cancelled or operation failed')
             }
 
-            // Step 4: Convert credential to JSON format
-            const clientExtensionResults = credential.getClientExtensionResults?.() || {}
-            const credentialJson = {
-                type: credential.type,
-                id: credential.id,
-                rawId: arrayBufferToBase64Url(credential.rawId),
-                response: {
-                    attestationObject: arrayBufferToBase64Url(
-                        credential.response.attestationObject
-                    ),
-                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
-                },
-                ...(Object.keys(clientExtensionResults).length > 0 && {clientExtensionResults})
+            // Step 4: Convert credential to JSON format before sending to SLAS
+            // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
+            let credentialJson
+            try {
+                credentialJson = credential.toJSON()
+            } catch (error) {
+                // Fallback to manual encoding if toJSON() fails
+                // Some passkey providers (e.g., 1Password) may not support the toJSON() method and return an error
+                const clientExtensionResults = credential.getClientExtensionResults?.() || {}
+                credentialJson = {
+                    type: credential.type,
+                    id: credential.id,
+                    rawId: arrayBufferToBase64Url(credential.rawId),
+                    response: {
+                        attestationObject: arrayBufferToBase64Url(
+                            credential.response.attestationObject
+                        ),
+                        clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON)
+                    },
+                    ...(Object.keys(clientExtensionResults).length > 0 && {clientExtensionResults})
+                }
             }
 
             // Step 5: Finish WebAuthn registration
