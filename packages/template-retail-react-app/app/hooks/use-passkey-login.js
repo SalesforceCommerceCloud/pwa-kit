@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* global PublicKeyCredential */
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers, useUsid} from '@salesforce/commerce-sdk-react'
 import {encode as base64Encode} from 'base64-arraybuffer'
@@ -32,13 +31,16 @@ export const usePasskeyLogin = () => {
         }
 
         // Availability of window.PublicKeyCredential means WebAuthn is supported in this browser
-        if (!window.PublicKeyCredential || !PublicKeyCredential.isConditionalMediationAvailable) {
+        if (
+            !window.PublicKeyCredential ||
+            !window.PublicKeyCredential.isConditionalMediationAvailable
+        ) {
             return
         }
 
         // Check if conditional mediation is available. Conditional mediation is a feature of the WebAuthn API that allows passkeys to appear in the browser's standard autofill suggestions, alongside saved passwords. This allows users to sign in with a passkey using the standard username input field, rather than clicking a dedicated passkey login button.
         // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/isConditionalMediationAvailable
-        const isCMA = await PublicKeyCredential.isConditionalMediationAvailable()
+        const isCMA = await window.PublicKeyCredential.isConditionalMediationAvailable()
         if (!isCMA) {
             return
         }
@@ -49,7 +51,7 @@ export const usePasskeyLogin = () => {
 
         // Transform response for WebAuthn API to send to navigator.credentials.get()
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static
-        const options = PublicKeyCredential.parseRequestOptionsFromJSON(
+        const options = window.PublicKeyCredential.parseRequestOptionsFromJSON(
             startWebauthnAuthenticationResponse.publicKey
         )
 

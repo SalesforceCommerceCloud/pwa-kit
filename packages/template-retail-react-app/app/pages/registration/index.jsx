@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* global PublicKeyCredential */
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -63,12 +62,12 @@ const Registration = () => {
         if (isRegistered && config?.app?.login?.passkey?.enabled) {
             if (
                 window.PublicKeyCredential &&
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                PublicKeyCredential.isConditionalMediationAvailable
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    PublicKeyCredential.isConditionalMediationAvailable()
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
