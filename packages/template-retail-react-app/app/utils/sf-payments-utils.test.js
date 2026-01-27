@@ -1182,15 +1182,22 @@ describe('sf-payments-utils', () => {
             expect(result.amount).toBe(0)
         })
 
-        test('includes shippingPreference when provided', () => {
+        test('includes shippingPreference when provided for PayPal', () => {
+            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Paypal', accountId: 'paypal_acct_123'}]
             const result = createPaymentInstrumentBody({
                 amount: 100.0,
                 paymentMethodType: 'paypal',
                 zoneId: 'us-west-1',
-                shippingPreference: 'GET_FROM_FILE'
+                shippingPreference: 'GET_FROM_FILE',
+                paymentMethods,
+                paymentMethodSetAccounts
             })
 
-            expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
+            expect(result.paymentReferenceRequest.gateway).toBe('paypal')
+            expect(result.paymentReferenceRequest.gatewayProperties.paypal).toEqual({
+                shippingPreference: 'GET_FROM_FILE'
+            })
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage when storePaymentMethod is true', () => {
@@ -1209,9 +1216,9 @@ describe('sf-payments-utils', () => {
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-                'on_session'
-            )
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({
+                setupFutureUsage: 'on_session'
+            })
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage as off_session when futureUsageOffSession is true', () => {
@@ -1230,9 +1237,9 @@ describe('sf-payments-utils', () => {
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-                'off_session'
-            )
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({
+                setupFutureUsage: 'off_session'
+            })
         })
 
         test('does not include gatewayProperties when storePaymentMethod is false and futureUsageOffSession is false', () => {
@@ -1285,9 +1292,9 @@ describe('sf-payments-utils', () => {
     })
 
     describe('getGatewayFromPaymentMethod', () => {
-        test('returns null for PayPal payment method type', () => {
+        test('returns Paypal for PayPal gateway', () => {
             const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct'}]
-            const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'paypal_acct'}]
+            const paymentMethodSetAccounts = [{vendor: 'Paypal', accountId: 'paypal_acct'}]
 
             const result = getGatewayFromPaymentMethod(
                 'paypal',
@@ -1295,20 +1302,7 @@ describe('sf-payments-utils', () => {
                 paymentMethodSetAccounts
             )
 
-            expect(result).toBeNull()
-        })
-
-        test('returns null for Venmo payment method type', () => {
-            const paymentMethods = [{paymentMethodType: 'venmo', accountId: 'venmo_acct'}]
-            const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'venmo_acct'}]
-
-            const result = getGatewayFromPaymentMethod(
-                'venmo',
-                paymentMethods,
-                paymentMethodSetAccounts
-            )
-
-            expect(result).toBeNull()
+            expect(result).toBe('paypal')
         })
 
         test('returns Stripe for Stripe gateway', () => {
