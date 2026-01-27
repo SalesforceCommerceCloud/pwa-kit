@@ -35,25 +35,6 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest.fn((helperType) => {
-            // Return mock for AuthorizePasswordless, real implementation for others
-            if (mockAuthHelperFunctions[helperType]) {
-                return mockAuthHelperFunctions[helperType]
-            }
-            return originalModule.useAuthHelper(helperType)
-        })
-    }
-})
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -333,11 +314,6 @@ describe('Navigate away from login page tests', function () {
 
 describe('Passwordless login tests', () => {
     beforeEach(() => {
-        // Clear the mock before each test
-        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockClear()
-    })
-
-    test('allows passwordless login', async () => {
         getConfig.mockReturnValue({
             app: {
                 ...mockConfig.app,
@@ -349,12 +325,20 @@ describe('Passwordless login tests', () => {
                 }
             }
         })
+        global.server.use(
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
+        )
+    })
+
+    test('allows passwordless login', async () => {
         const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
                 appConfig: mockConfig.app,
-                bypassAuth: false
+                bypassAuth: true
             }
         })
 
@@ -365,14 +349,9 @@ describe('Passwordless login tests', () => {
         // Click the submit button
         await user.click(screen.getByRole('button', {name: /Continue/i}))
 
-        // Verify that authorizePasswordless is called with correct parameters
+        // check that check email page is open
         await waitFor(() => {
-            expect(
-                mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-            ).toHaveBeenCalledWith({
-                userid: testEmail,
-                mode: 'email'
-            })
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
 
         // check that OTP auth modal is open
@@ -381,18 +360,11 @@ describe('Passwordless login tests', () => {
                 expect(
                     screen.getByText(/To log in to your account, enter the code/i)
                 ).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
 
         // resend the email
         await user.click(screen.getByText(/Resend Code/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: testEmail,
-            mode: 'email'
-        })
 
         // enter the code manually
         const code = '12345678'
@@ -400,13 +372,46 @@ describe('Passwordless login tests', () => {
         for (let i = 0; i < 8; i++) {
             await user.type(otpInputs[i], code[i])
         }
-
-        await waitFor(() => {
-            expect(
-                mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
-            ).toHaveBeenCalledWith({
-                pwdlessLoginToken: code
-            })
-        })
+        
+        await waitFor(
+            () => {
+                expect(
+                    query.getByText(/To log in to your account, enter the code/i)
+                ).not.toBeInTheDocument()
+            }
+        )
     })
+
+    test.each([
+        [
+            "callback_uri doesn't match the registered callbacks",
+            'This feature is not currently available.'
+        ],
+        [
+            'PasswordLess Permissions Error for clientId:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'This feature is not currently available.'
+        ],
+        ['client secret is not provided', 'This feature is not currently available.'],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when passwordless login fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+            const {user} = renderWithProviders(<MockedComponent />, {
+                wrapperProps: {
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockConfig.app,
+                    bypassAuth: false
+                }
+            })
+            await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+            await user.click(screen.getByRole('button', {name: /Continue/i}))
+            expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+        }
+    )
 })

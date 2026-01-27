@@ -97,8 +97,7 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI',
-    locale: 'en-US'
+    passwordlessLoginCallbackURI: 'passwordlessLoginCallbackURI'
 }
 
 const configSLASPrivate = {
@@ -912,12 +911,12 @@ describe('Auth', () => {
     test.each([
         [
             'with all parameters specified',
-            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'},
+            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback', locale: 'en-US'},
             {
                 callbackURI: 'callbackURI',
                 userid: 'userid',
                 mode: 'callback',
-                locale: configSLASPrivate.locale
+                locale: 'en-US'
             }
         ],
         [
@@ -1043,35 +1042,72 @@ describe('Auth', () => {
                 mode: 'callback',
                 channel_id: config.siteId,
                 client_id: config.clientId,
-                hint: 'cross_device',
-                locale: config.locale
+                hint: 'cross_device'
             }
         ]
     ])('getPasswordResetToken %s', async (_, input: any, expectedBody: any) => {
         const auth = new Auth(config)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
-        getPasswordResetTokenSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
+        )
 
-        const result = await auth.getPasswordResetToken(input)
-        expect(result).toBe(mockResponse)
-        expect(getPasswordResetTokenSpy).toHaveBeenCalled()
-        const callArgs = getPasswordResetTokenSpy.mock.calls[0][0] as any
-        expect(callArgs.body).toMatchObject(expectedBody)
+        await auth.getPasswordResetToken(input)
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining(expectedBody)
+            }),
+            // rawResponse is set to true
+            true
+        )
     })
 
     test('getPasswordResetToken with private client sets Authorization header', async () => {
         const auth = new Auth(configSLASPrivate)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const getPasswordResetTokenSpy = jest.spyOn((auth as any).client, 'getPasswordResetToken')
-        getPasswordResetTokenSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
+        )
 
-        await auth.getPasswordResetToken({user_id: 'user@example.com'} as any)
+        await auth.getPasswordResetToken({
+            user_id: 'user@example.com',
+            mode: 'email',
+            channel_id: 'channel_id'
+        })
 
-        expect(getPasswordResetTokenSpy).toHaveBeenCalled()
-        const callArgs = getPasswordResetTokenSpy.mock.calls[0][0] as any
-        expect(callArgs.headers.Authorization).toBeTruthy()
-        expect(callArgs.headers.Authorization).toContain('Basic ')
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            }),
+            // rawResponse is set to true
+            true
+        )
+    })
+
+    test('getPasswordResetToken throws error on non-200 response', async () => {
+        const auth = new Auth(configSLASPrivate)
+
+        const mockErrorResponse = {
+            status: 400,
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+        }
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve(mockErrorResponse as unknown as Response)
+        )
+
+        await expect(
+            auth.getPasswordResetToken({user_id: 'userid', mode: 'email', channel_id: 'channel_id'})
+        ).rejects.toThrow('400 Invalid request')
     })
 
     test.each([
@@ -1108,34 +1144,41 @@ describe('Auth', () => {
                 hint: 'cross_device'
             }
         ]
-    ])('resetPassword %s', async (_, input: any, expectedBody: any) => {
-        const auth = new Auth(config)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
-        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+    ])(
+        'resetPassword %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.resetPasswordBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.resetPasswordBodyType>
+        ) => {
+            const auth = new Auth(config)
+            // @ts-expect-error private property
+            const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+            await auth.resetPassword(input as ShopperLoginTypes.resetPasswordBodyType)
 
-        const result = await auth.resetPassword(input)
-        expect(result).toBe(mockResponse)
-        expect(resetPasswordSpy).toHaveBeenCalled()
-        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
-        expect(callArgs.body).toMatchObject(expectedBody)
-    })
+            expect(resetPasswordSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: expect.objectContaining(expectedBody)
+                })
+            )
+        }
+    )
 
     test('resetPassword with private client sets Authorization header', async () => {
         const auth = new Auth(configSLASPrivate)
-        const mockResponse = {status: 200, json: jest.fn().mockResolvedValue({})}
-        const resetPasswordSpy = jest.spyOn((auth as any).client, 'resetPassword')
-        resetPasswordSpy.mockResolvedValueOnce(mockResponse)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
 
         await auth.resetPassword({
             pwd_action_token: '12345678',
             new_password: 'newPassword123'
-        } as any)
+        } as ShopperLoginTypes.resetPasswordBodyType)
 
-        expect(resetPasswordSpy).toHaveBeenCalled()
-        const callArgs = resetPasswordSpy.mock.calls[0][0] as any
-        expect(callArgs.headers.Authorization).toBeTruthy()
-        expect(callArgs.headers.Authorization).toContain('Basic ')
+        expect(resetPasswordSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            })
+        )
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
@@ -1363,7 +1406,7 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         const configWithFetchOptions = {
             ...config,
             fetchOptions: {
-                credentials: 'include'
+                credentials: 'include' as RequestCredentials
             }
         }
         const auth = new Auth(configWithFetchOptions)
@@ -1392,7 +1435,7 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         const configWithFetchOptions = {
             ...config,
             fetchOptions: {
-                cache: 'no-cache'
+                cache: 'no-cache' as RequestCache
             }
         }
         const auth = new Auth(configWithFetchOptions)

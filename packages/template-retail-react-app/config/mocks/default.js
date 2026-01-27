@@ -36,14 +36,16 @@ module.exports = {
             tokenLength: 8,
             passwordless: {
                 enabled: false,
-                mode: 'email'
+                mode: 'email',
+                landingPath: '/passwordless-login-landing'
             },
             social: {
                 enabled: false,
                 idps: ['google', 'apple']
             },
             resetPassword: {
-                mode: 'email'
+                mode: 'email',
+                landingPath: '/reset-password-landing'
             }
         },
         siteAliases: {

@@ -1,6 +1,11 @@
 ## v8.4.0-dev (Dec 17, 2025)
 - [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
-- Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3492](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3492) [#3547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3547)
+- [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)
+- [Feature] PWA Integration with OMS
+  - Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
+  - Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
+  - Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
+- [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
 - Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 

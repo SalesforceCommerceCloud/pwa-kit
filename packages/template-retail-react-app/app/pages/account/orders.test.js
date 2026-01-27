@@ -22,6 +22,100 @@ import {
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+// Simple mock order for SOM integration tests
+const createMockOrder = (overrides = {}) => ({
+    orderNo: '00099999',
+    orderTotal: 99.99,
+    currency: 'USD',
+    creationDate: '2025-01-15T10:00:00.000Z',
+    status: 'open',
+    productItems: [{productId: 'test-product-1', productName: 'Test Product', quantity: 1}],
+    shipments: [
+        {
+            shippingMethod: {name: 'Ground'},
+            shippingStatus: 'not_shipped',
+            shippingAddress: {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Test St',
+                city: 'Boston',
+                stateCode: 'MA',
+                postalCode: '02101'
+            }
+        }
+    ],
+    billingAddress: {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        address1: '456 Bill St',
+        city: 'Boston',
+        stateCode: 'MA',
+        postalCode: '02101'
+    },
+    paymentInstruments: [
+        {paymentCard: {cardType: 'Visa', numberLastDigits: '1111', holder: 'Jane Smith'}}
+    ],
+    ...overrides
+})
+
+// Mock OMS order (based on real API response structure)
+const createMockOmsOrder = (overrides = {}) => ({
+    orderNo: 'dec1625xxx00000601',
+    orderTotal: 366.43,
+    currency: 'USD',
+    creationDate: '2026-01-14T01:43:00.000Z',
+    // Note: No 'status' field - OMS orders use omsData.status
+    omsData: {
+        status: 'Created',
+        shipments: [
+            {
+                id: '0OBLT0000000Nav4AE',
+                status: 'Allocated',
+                provider: 'UPS',
+                trackingNumber: '123456789',
+                trackingUrl: 'https://www.ups.com/track?loc=en_US&tracknum=123456789',
+                expectedDeliveryDate: '2026-01-16T00:00:00.000Z'
+            }
+        ]
+    },
+    productItems: [
+        {
+            productId: '640188017003M',
+            productName: 'Charcoal Flat Front Athletic Fit Shadow Striped Wool Suit',
+            quantity: 1,
+            omsData: {status: 'allocated', quantityAvailableToCancel: 0}
+        }
+    ],
+    shipments: [
+        {
+            shipmentId: '0agLT00000Q4Sd3YAF',
+            shippingMethod: {
+                name: 'Ground',
+                description: 'Order received within 7-10 business days'
+            },
+            // Note: OMS uses fullName instead of firstName/lastName
+            shippingAddress: {
+                fullName: 'Alex Johnson',
+                address1: '2030 NE 8th st',
+                city: 'Seattle',
+                stateCode: 'WA',
+                postalCode: '98121',
+                countryCode: 'US'
+            }
+        }
+    ],
+    billingAddress: {
+        fullName: 'Alex Johnson',
+        address1: '2030 NE 8th st',
+        city: 'Seattle',
+        stateCode: 'WA',
+        postalCode: '98121'
+    },
+    // Note: OMS orders may not have payment data
+    paymentInstruments: [],
+    ...overrides
+})
+
 const MockedComponent = () => {
     return (
         <Switch>
@@ -239,6 +333,133 @@ describe('Handles order with missing or partial data gracefully', () => {
     })
 })
 
+// Helper to setup order details page with mock order data
+const setupOrderDetailsPage = (mockOrder) => {
+    global.server.use(
+        rest.get('*/orders/:orderNo', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.json(mockOrder))
+        })
+    )
+    window.history.pushState(
+        {},
+        'Order Details',
+        createPathWithDefaults(`/account/orders/${mockOrder.orderNo}`)
+    )
+    renderWithProviders(<MockedComponent history={history} />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+}
+
+describe('Order without payment data', () => {
+    beforeEach(async () => {
+        setupOrderDetailsPage(createMockOrder({paymentInstruments: []}))
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should not display payment method section', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByText(/payment method/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('OMS/SOM Integration - Order Details', () => {
+    // ECOM order tests - uses order.status, firstName/lastName, and has payment data
+    test('should display ECOM order status from order.status', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('open')).toBeInTheDocument()
+    })
+
+    test('should display firstName + lastName for ECOM shipping address', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+    })
+
+    test('should display payment method for ECOM order', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+    })
+
+    // OMS order tests - uses omsData.status, fullName, and has no payment data
+    test('should display OMS status from omsData.status', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Created')).toBeInTheDocument()
+    })
+
+    test('should display fullName for OMS shipping address', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+    })
+
+    test('should NOT display payment method for OMS order', async () => {
+        setupOrderDetailsPage(createMockOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
+    })
+})
+
+describe('OMS/SOM Integration - Order History', () => {
+    // Helper to setup order history with mock data
+    const setupOrderHistoryMock = (orderData) => {
+        global.server.use(
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({limit: 10, offset: 0, total: 1, data: [orderData]})
+                )
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+    }
+
+    // ECOM order tests - uses order.status and firstName/lastName
+    test('should display ECOM order status from order.status', async () => {
+        setupOrderHistoryMock(createMockOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('open')).toBeInTheDocument()
+    })
+
+    test('should display firstName + lastName for ECOM shipping address', async () => {
+        setupOrderHistoryMock(createMockOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Shipped to: John Doe/i)).toBeInTheDocument()
+    })
+
+    // OMS order tests - uses omsData.status and fullName
+    test('should display OMS status from omsData.status', async () => {
+        setupOrderHistoryMock(createMockOmsOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Created')).toBeInTheDocument()
+    })
+
+    test('should display fullName for OMS shipping address', async () => {
+        setupOrderHistoryMock(createMockOmsOrder())
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText(/Shipped to: Alex Johnson/i)).toBeInTheDocument()
+    })
+})
+
 describe('Order with multiple shipments (pickup and delivery)', () => {
     let orderNo
 
@@ -305,5 +526,271 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
     test('should display both payment method and billing address', async () => {
         expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
         expect(await screen.findByRole('heading', {name: /billing address/i})).toBeInTheDocument()
+    })
+})
+
+describe('OMS Multi-shipment - Shipping address hidden', () => {
+    // When OMS has multiple shipments, shipping address should be hidden
+    // (can't reliably correlate OMS shipments to ECOM addresses by index)
+    const omsMultiShipmentOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground'},
+                shippingAddress: {
+                    fullName: 'Alice Johnson',
+                    address1: '123 First St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            },
+            {
+                shippingMethod: {name: 'Express'},
+                shippingAddress: {
+                    fullName: 'Bob Smith',
+                    address1: '456 Second St',
+                    city: 'Portland',
+                    stateCode: 'OR',
+                    postalCode: '97201'
+                }
+            }
+        ],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'SHIPPED',
+                    trackingNumber: 'OMS-001',
+                    trackingUrl: 'https://track.example.com/OMS-001',
+                    provider: 'FedEx'
+                },
+                {
+                    status: 'PENDING',
+                    trackingNumber: 'OMS-002',
+                    trackingUrl: 'https://track.example.com/OMS-002',
+                    provider: 'UPS'
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsMultiShipmentOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping method headings', async () => {
+        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    })
+
+    test('should NOT display shipping address headings for OMS multi-shipment', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+    })
+
+    test('should display OMS provider name instead of ECOM shipping method', async () => {
+        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
+        expect(await screen.findByText(/UPS/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS shipment status', async () => {
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
+        expect(await screen.findByText(/PENDING/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking numbers as clickable links', async () => {
+        const trackingLink1 = await screen.findByRole('link', {name: /OMS-001/i})
+        expect(trackingLink1).toHaveAttribute('href', 'https://track.example.com/OMS-001')
+
+        const trackingLink2 = await screen.findByRole('link', {name: /OMS-002/i})
+        expect(trackingLink2).toHaveAttribute('href', 'https://track.example.com/OMS-002')
+    })
+})
+
+describe('ECOM Multi-shipment - Shipping address shown', () => {
+    // When ECOM has multiple shipments but NO OMS data, shipping address should be shown
+    const ecomMultiShipmentOrder = createMockOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground'},
+                shippingStatus: 'shipped',
+                trackingNumber: 'ECOM-001',
+                shippingAddress: {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    address1: '123 First St',
+                    city: 'Boston',
+                    stateCode: 'MA',
+                    postalCode: '02101'
+                }
+            },
+            {
+                shippingMethod: {name: 'Express'},
+                shippingStatus: 'not_shipped',
+                shippingAddress: {
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Second St',
+                    city: 'Chicago',
+                    stateCode: 'IL',
+                    postalCode: '60601'
+                }
+            }
+        ]
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(ecomMultiShipmentOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping method headings', async () => {
+        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    })
+
+    test('should display numbered shipping address headings for ECOM multi-shipment', async () => {
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 1/i})
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 2/i})
+        ).toBeInTheDocument()
+    })
+
+    test('should display both shipping addresses', async () => {
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+        // Jane Smith appears in both shipping and billing address
+        const janeSmithElements = await screen.findAllByText(/Jane Smith/i)
+        expect(janeSmithElements).toHaveLength(2)
+    })
+
+    test('should display ECOM shipping statuses', async () => {
+        // Use exact match to avoid "Not shipped" matching "Shipped"
+        expect(await screen.findByText('Shipped')).toBeInTheDocument()
+        expect(await screen.findByText('Not shipped')).toBeInTheDocument()
+    })
+})
+
+describe('OMS Single shipment with tracking URL', () => {
+    // Single OMS shipment should show shipping address and tracking as clickable link
+    const omsSingleShipmentOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Standard'},
+                shippingAddress: {
+                    fullName: 'Alex Johnson',
+                    address1: '789 Main St',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98101'
+                }
+            }
+        ],
+        omsData: {
+            status: 'SHIPPED',
+            shipments: [
+                {
+                    status: 'DELIVERED',
+                    trackingNumber: 'TRACK-12345',
+                    trackingUrl: 'https://tracking.fedex.com/TRACK-12345',
+                    provider: 'FedEx Ground'
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsSingleShipmentOrder)
+    })
+
+    test('should display shipping address for single OMS shipment', async () => {
+        expect(
+            await screen.findByRole('heading', {name: /^shipping address$/i})
+        ).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS provider instead of ECOM method name', async () => {
+        expect(await screen.findByText(/FedEx Ground/i)).toBeInTheDocument()
+    })
+
+    test('should display tracking number as clickable link', async () => {
+        const trackingLink = await screen.findByRole('link', {name: /TRACK-12345/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/TRACK-12345')
+    })
+
+    test('should display OMS shipment status (fallback to raw value)', async () => {
+        expect(await screen.findByText(/DELIVERED/i)).toBeInTheDocument()
+    })
+})
+
+describe('OMS Single shipment with partial data (missing provider, trackingUrl)', () => {
+    // Tests fallback behavior when OMS data is partially available
+    const omsPartialDataOrder = createMockOmsOrder({
+        shipments: [
+            {
+                shippingMethod: {name: 'Ground Shipping'},
+                shippingAddress: {
+                    fullName: 'Mike Brown',
+                    address1: '100 Oak St',
+                    city: 'Denver',
+                    stateCode: 'CO',
+                    postalCode: '80201'
+                }
+            }
+        ],
+        omsData: {
+            status: 'Processing',
+            shipments: [
+                {
+                    status: 'ALLOCATED',
+                    trackingNumber: 'OMS-TRACK-999'
+                    // No provider field
+                    // No trackingUrl - tracking number displayed as plain text
+                }
+            ]
+        }
+    })
+
+    beforeEach(async () => {
+        setupOrderDetailsPage(omsPartialDataOrder)
+    })
+
+    test('should render order details page', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+    })
+
+    test('should fallback to ECOM shipping method name when OMS provider is missing', async () => {
+        expect(await screen.findByText(/Ground Shipping/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS status even when other OMS fields are missing', async () => {
+        expect(await screen.findByText(/ALLOCATED/i)).toBeInTheDocument()
+    })
+
+    test('should display OMS tracking number (takes priority over ECOM)', async () => {
+        expect(await screen.findByText(/OMS-TRACK-999/i)).toBeInTheDocument()
+        // ECOM tracking should NOT be displayed
+        expect(screen.queryByText(/ECOM-TRACK-999/i)).not.toBeInTheDocument()
+    })
+
+    test('should display tracking number as plain text when trackingUrl is missing', async () => {
+        // Should NOT be a link
+        expect(screen.queryByRole('link', {name: /OMS-TRACK-999/i})).not.toBeInTheDocument()
+        // But should still show the tracking number as text
+        expect(await screen.findByText(/OMS-TRACK-999/i)).toBeInTheDocument()
+    })
+
+    test('should display shipping address with fullName', async () => {
+        expect(await screen.findByText(/Mike Brown/i)).toBeInTheDocument()
+        expect(await screen.findByText(/100 Oak St/i)).toBeInTheDocument()
     })
 })

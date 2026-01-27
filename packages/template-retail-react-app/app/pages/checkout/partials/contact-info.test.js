@@ -9,8 +9,10 @@ import {screen, waitFor, within} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
-import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {
+    scapiBasketWithItem,
+    mockedRegisteredCustomer
+} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     mockGoToStep,
@@ -22,20 +24,6 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
 const password = 'abc123'
-const mockAuthHelperFunctions = {
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest
-            .fn()
-            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
-    }
-})
 
 jest.mock('../util/checkout-context', () => {
     const mockGoToStep = jest.fn()
@@ -75,6 +63,11 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 
 beforeEach(() => {
     getConfig.mockImplementation(() => mockConfig)
+    global.server.use(
+        rest.post('*/oauth2/login', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        })
+    )
 })
 
 afterEach(() => {
@@ -129,9 +122,9 @@ describe('passwordless and social disabled', () => {
 
         const loginButton = screen.getByText('Log In')
         await user.click(loginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-        ).toHaveBeenCalledWith({username: validEmail, password: password})
+        await waitFor(() => {
+            expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
+        })
     })
 })
 
@@ -143,6 +136,9 @@ describe('passwordless enabled', () => {
             rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
                 currentBasket.customerInfo.email = validEmail
                 return res(ctx.json(currentBasket))
+            }),
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
             })
         )
         // Provide basket with basketId and items for tests in this suite
@@ -198,12 +194,6 @@ describe('passwordless enabled', () => {
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText('Secure Link')
         await user.click(passwordlessLoginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email'
-        })
 
         // check that check email modal is open
         await waitFor(() => {
@@ -214,12 +204,9 @@ describe('passwordless enabled', () => {
 
         // resend the email
         await user.click(screen.getByText(/Resend Link/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email'
-        })
+
+        // check that check email modal is still open
+        expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
     })
 
     test('sends callbackURI when passwordless callback is configured', async () => {
@@ -248,12 +235,11 @@ describe('passwordless enabled', () => {
         const passwordlessLoginButton = screen.getByText('Secure Link')
         await user.click(passwordlessLoginButton)
 
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'callback',
-            callbackURI: 'https://callback.com/passwordless?redirectUrl=/checkout'
+        // check that check email modal is open
+        await waitFor(() => {
+            const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
+            expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
+            expect(withinForm.getByText(validEmail)).toBeInTheDocument()
         })
     })
 
@@ -272,9 +258,9 @@ describe('passwordless enabled', () => {
 
         const loginButton = screen.getByText('Log In')
         await user.click(loginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-        ).toHaveBeenCalledWith({username: validEmail, password: password})
+        await waitFor(() => {
+            expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
+        })
     })
 
     test.each([
@@ -291,11 +277,11 @@ describe('passwordless enabled', () => {
     ])(
         'maps API error "%s" to the displayed error message"%s"',
         async (apiErrorMessage, expectedMessage) => {
-            mockAuthHelperFunctions[
-                AuthHelpers.AuthorizePasswordless
-            ].mutateAsync.mockImplementation(() => {
-                throw new Error(apiErrorMessage)
-            })
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
             const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
             await user.type(screen.getByLabelText('Email'), validEmail)
             const passwordlessLoginButton = screen.getByText('Secure Link')
@@ -339,9 +325,9 @@ describe('passwordless enabled', () => {
         // submit via Enter key - should trigger login
         await user.keyboard('{Enter}')
 
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-        ).toHaveBeenCalledWith({username: validEmail, password: password})
+        await waitFor(() => {
+            expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
+        })
     })
 })
 

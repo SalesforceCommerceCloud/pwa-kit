@@ -38,13 +38,18 @@ import {
     INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
+import {
+    getPasswordlessErrorMessage,
+    getPasswordResetErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAbsoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -86,7 +91,7 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
-    const appOrigin = useAppOrigin()
+    const {locale} = useMultiSite()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -94,7 +99,7 @@ export const AuthModal = ({
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const passwordlessMode = passwordlessConfig?.mode
-    const callbackURL = buildAbsoluteUrl(appOrigin, passwordlessConfigCallback)
+    const callbackURL = absoluteUrl(passwordlessConfigCallback)
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -108,6 +113,7 @@ export const AuthModal = ({
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 mode: passwordlessMode,
+                locale: locale.id,
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             // Close AuthModal first, then open OtpAuth modal after a brief delay
@@ -116,9 +122,7 @@ export const AuthModal = ({
                 setIsOtpAuthOpen(true)
             }, 150) // Small delay to allow AuthModal to close first
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -203,10 +207,7 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    const message =
-                        e.response?.status === 400
-                            ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                            : formatMessage(API_ERROR_MESSAGE)
+                    const message = formatMessage(getPasswordResetErrorMessage(e.message))
                     form.setError('global', {type: 'manual', message})
                 }
             }

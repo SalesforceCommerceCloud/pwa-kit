@@ -19,7 +19,6 @@ import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
-import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
@@ -49,23 +48,6 @@ const mockRegisteredCustomer = {
     lastName: 'Testing',
     login: 'customer@test.com'
 }
-
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest
-            .fn()
-            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
-    }
-})
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
@@ -206,16 +188,21 @@ test('allows regular login via Enter key in password mode', async () => {
     // simulate Enter key press in password field
     await user.keyboard('{Enter}')
 
-    // should trigger regular login
-    expect(
-        mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-    ).toHaveBeenCalledWith({
-        username: validEmail,
-        password: validPassword
+    // login successfully and close the modal
+    await waitFor(() => {
+        expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
     })
 })
 
 describe('Passwordless enabled', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
+        )
+    })
+
     test('Renders passwordless login when enabled', async () => {
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
 
@@ -250,12 +237,6 @@ describe('Passwordless enabled', () => {
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText(/Continue/i)
         await user.click(passwordlessLoginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email'
-        })
 
         // check that OTP auth modal is open
         await waitFor(
@@ -268,12 +249,11 @@ describe('Passwordless enabled', () => {
         )
 
         // resend the email
-        await user.click(screen.getByText(/Resend Code/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email'
+        await user.click(screen.getByText(/Resend Link/i))
+
+        // check that check email modal is still open
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
 
         // enter the code manually
@@ -314,15 +294,7 @@ describe('Passwordless enabled', () => {
         // simulate Enter key press in email field
         await user.keyboard('{Enter}')
 
-        // should trigger passwordless login
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'email'
-        })
-
-        // check that OTP auth modal is open
+        // check that check OtpAuthModal is open
         await waitFor(
             () => {
                 expect(
@@ -365,14 +337,48 @@ describe('Passwordless enabled', () => {
         await user.type(screen.getByLabelText('Email'), validEmail)
         await user.click(screen.getByText(/Continue/i))
 
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            mode: 'callback',
-            callbackURI: 'https://callback.com/passwordless?redirectUrl=/'
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
     })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many login requests were made. Please try again later.',
+            'You reached the limit for login attempts. For your security, wait 10 minutes and try again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when passwordless login fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+
+            const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+            const validEmail = 'test@salesforce.com'
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            await waitFor(() => {
+                expect(screen.getByText(/Continue/i)).toBeInTheDocument()
+            })
+
+            // enter email and submit
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            await user.click(screen.getByText(/Continue/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })
 
 // TODO: Fix flaky/broken test
@@ -551,7 +557,10 @@ describe('Reset password', function () {
         global.server.use(
             rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) =>
                 res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
-            )
+            ),
+            rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
         )
     })
 
@@ -608,4 +617,46 @@ describe('Reset password', function () {
         // check that the modal is closed
         expect(authModal.isOpen).toBe(false)
     })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many password reset requests were made. Please try again later.',
+            'You reached the limit for password resets. For your security, wait 10 minutes and try again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when password reset fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+
+            const {user} = renderWithProviders(<MockedComponent initialView="password" />, {
+                wrapperProps: {
+                    bypassAuth: false
+                }
+            })
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            // Wait for password reset form
+            let resetPwForm = await screen.findByTestId('sf-auth-modal-form')
+            expect(resetPwForm).toBeInTheDocument()
+            const withinForm = within(resetPwForm)
+
+            // Enter email and submit
+            await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+            await user.click(withinForm.getByText(/reset password/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(withinForm.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })

@@ -19,14 +19,21 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
  *
- * @param {string} path - The relative URL path to be appended to the origin.
+ * @param {string} path - The relative URL path or absolute URL to be resolved.
  * @param {string} [appOrigin] - The optional application origin (e.g., "https://example.com").
  *                                If not provided, the function will call `getAppOrigin()`.
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {
+    // If path is not provided or already an absolute URL, return it as-is
+    if (!path || isAbsoluteURL(path)) {
+        return path
+    }
+
+    // Construct the full path with envBasePath between origin and path
+    const fullPath = `${getEnvBasePath()}${path}`
     // absoluteUrl is not a react hook so we cannot use the useAppOrigin hook here
-    return new URL(path, appOrigin || getAppOrigin()).toString()
+    return new URL(fullPath, appOrigin || getAppOrigin()).toString()
 }
 
 /**
@@ -313,23 +320,4 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
 export const serverSafeEncode = (input) => {
     // WARNING: only use this because server double-decodes URL components
     return encodeURIComponent(input)
-}
-
-/**
- * Resolves a URL or path to an absolute application URL.
- *
- * If the input is already an absolute URL, it is returned as-is. If it is
- * a relative path, it is prefixed with the application origin and the env
- * base path. If the input is falsy, undefined is returned.
- *
- * @param {string} appOrigin - The application origin, e.g. "https://example.com".
- * @param {string} urlOrPath - An absolute URL or a relative path.
- * @returns {string|undefined} - The fully-qualified URL, or undefined if no input is provided.
- */
-export const buildAbsoluteUrl = (appOrigin, urlOrPath) => {
-    if (!urlOrPath) {
-        return undefined
-    }
-
-    return isAbsoluteURL(urlOrPath) ? urlOrPath : `${appOrigin}${getEnvBasePath()}${urlOrPath}`
 }

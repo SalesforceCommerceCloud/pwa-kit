@@ -17,8 +17,7 @@ const mockToken = '123456'
 const mockNewPassword = 'new-password'
 
 const MockComponent = () => {
-    const {getPasswordResetToken, resetPassword} = usePasswordReset()
-
+    const {getPasswordResetToken, resetPassword, resetPasswordLandingPath} = usePasswordReset()
     return (
         <div>
             <button
@@ -35,6 +34,8 @@ const MockComponent = () => {
                     })
                 }
             />
+
+            <div data-testid="reset-password-landing-path">{resetPasswordLandingPath}</div>
         </div>
     )
 }
@@ -86,7 +87,8 @@ describe('usePasswordReset', () => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
                 mode: mockConfig.app.login.resetPassword.mode,
-                callback_uri: mockConfig.app.login.resetPassword.callbackURI
+                callback_uri: mockConfig.app.login.resetPassword.callbackURI,
+                locale: 'en-GB'
             })
         })
     })
@@ -117,7 +119,8 @@ describe('usePasswordReset', () => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
                 mode: mockMode,
-                callback_uri: mockCallbackURI
+                callback_uri: mockCallbackURI,
+                locale: 'en-GB'
             })
         })
     })
@@ -151,5 +154,12 @@ describe('usePasswordReset', () => {
             status: 'success',
             position: 'bottom-right'
         })
+    })
+
+    test('resetPasswordLandingPath is returned', () => {
+        renderWithProviders(<MockComponent />)
+        expect(screen.getByTestId('reset-password-landing-path')).toHaveTextContent(
+            mockConfig.app.login.resetPassword.landingPath
+        )
     })
 })

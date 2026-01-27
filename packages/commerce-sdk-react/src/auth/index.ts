@@ -54,7 +54,6 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
-    locale: string
 }
 
 interface JWTHeaders {
@@ -96,6 +95,7 @@ type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: 'email' | 'callback'
+    locale?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -273,7 +273,6 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
-    private locale: string
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -370,8 +369,6 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
-
-        this.locale = config.locale
     }
 
     get(name: AuthDataKeys) {
@@ -1275,7 +1272,6 @@ class Auth {
         // do not pass the mode parameter. Newer versions should explicitly pass the mode.
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const locale = this.locale
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1285,7 +1281,7 @@ class Auth {
             parameters: {
                 ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
-                ...(locale && {locale}),
+                ...(parameters.locale && {locale: parameters.locale}),
                 userid: parameters.userid,
                 mode
             }
@@ -1339,7 +1335,7 @@ class Auth {
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
                 hint: parameters.hint || 'cross_device',
-                locale: parameters.locale || this.locale,
+                ...(parameters.locale && {locale: parameters.locale}),
                 ...(parameters.idp_name && {idp_name: parameters.idp_name}),
                 ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }
@@ -1352,7 +1348,12 @@ class Auth {
             )}`
         }
 
-        const res = await slasClient.getPasswordResetToken(options)
+        // Set rawResponse to true to access the response body message for error handling
+        const res = await slasClient.getPasswordResetToken(options, true)
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
         return res
     }
 
@@ -1367,11 +1368,17 @@ class Auth {
                 Authorization: ''
             },
             body: {
+                // TODO: remove the eslint disabled after updating OAS
+                // user_id is a valid param for resetPassword
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
                 hint: parameters.hint || 'cross_device',
+                // hint='cross_device' and a defined user_id is required for code_verifier to be optional for this call
                 ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
@@ -1382,9 +1389,6 @@ class Auth {
                 `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
             )}`
         }
-        // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const res = await this.client.resetPassword(options)
         return res
     }
