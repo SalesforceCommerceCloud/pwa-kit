@@ -1347,6 +1347,8 @@ describe('SFPaymentsSheet', () => {
             const config = checkoutCall[2]
 
             expect(config.options.savedPaymentMethods).toEqual([])
+=======
+>>>>>>> f09e9e5fd (W-20508465: Add support for Adyen payments)
         })
     })
 
