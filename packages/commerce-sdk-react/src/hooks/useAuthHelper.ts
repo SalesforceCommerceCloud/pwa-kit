@@ -32,7 +32,6 @@ export const AuthHelpers = {
     Register: 'register',
     ResetPassword: 'resetPassword',
     UpdateCustomerPassword: 'updateCustomerPassword',
-    // WebAuthn helpers - using direct fetch implementation until commerce-sdk-isomorphic supports them
     StartWebauthnUserRegistration: 'startWebauthnUserRegistration',
     FinishWebauthnUserRegistration: 'finishWebauthnUserRegistration',
     AuthorizeWebauthnRegistration: 'authorizeWebauthnRegistration',
