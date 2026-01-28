@@ -27,6 +27,7 @@ module.exports = {
             site: 'path',
             locale: 'path',
             showDefaults: true,
+            showBasename: false,
             interpretPlusSignAsSpace: false
         },
         login: {
@@ -97,7 +98,6 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
-        envBasePath: '/store',
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',
