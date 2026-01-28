@@ -22,6 +22,8 @@ const mockAuthHelperFunctions = {
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
 const mockTransferBasket = {mutate: jest.fn(), mutateAsync: jest.fn()}
+const mockUpdateBillingAddressForBasket = {mutateAsync: jest.fn()}
+const mockUpdateCustomer = {mutateAsync: jest.fn()}
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -34,10 +36,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateCustomerForBasket') return mockUpdateCustomerForBasket
             if (mutationType === 'transferBasket') return mockTransferBasket
+            if (mutationType === 'updateBillingAddressForBasket')
+                return mockUpdateBillingAddressForBasket
             return {mutate: jest.fn()}
         }),
         useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
-            if (mutationType === 'updateCustomer') return {mutateAsync: jest.fn()}
+            if (mutationType === 'updateCustomer') return mockUpdateCustomer
             return {mutateAsync: jest.fn()}
         })
     }
@@ -62,13 +66,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: (...args) => mockUseCurrentBasket(...args)
 }))
 
+const mockUseCurrentCustomer = jest.fn(() => ({
+    data: {
+        email: null,
+        isRegistered: false
+    }
+}))
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-    useCurrentCustomer: () => ({
-        data: {
-            email: null,
-            isRegistered: false
-        }
-    })
+    useCurrentCustomer: (...args) => mockUseCurrentCustomer(...args)
 }))
 
 const mockSetContactPhone = jest.fn()
@@ -134,11 +139,25 @@ beforeEach(() => {
             basketId: 'test-basket-id',
             customerInfo: {email: null},
             shipments: [{shipmentId: 'shipment-1', shipmentType: 'delivery'}],
-            productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}]
+            productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}],
+            billingAddress: null
         },
         derivedData: {hasBasket: true, totalItems: 1},
         refetch: jest.fn()
     })
+    // Reset billing address mutation mock
+    mockUpdateBillingAddressForBasket.mutateAsync.mockResolvedValue({})
+    // Reset customer mock to default
+    mockUseCurrentCustomer.mockReturnValue({
+        data: {
+            email: null,
+            isRegistered: false
+        }
+    })
+    // Reset update customer mock
+    mockUpdateCustomer.mutateAsync.mockResolvedValue({})
+    // Reset useCustomerType mock to ensure phone input is not disabled
+    useCustomerType.mockReturnValue({isRegistered: false})
 })
 
 afterEach(() => {})
@@ -327,12 +346,11 @@ describe('ContactInfo Component', () => {
         await user.type(emailInput, '{enter}')
 
         // The validation should prevent submission and show error
-        // Since the form doesn't have a visible submit button in this state,
-        // we test that the email field validation works on blur
-        await user.click(emailInput)
-        await user.tab()
-
-        expect(screen.getAllByText('Please enter your email address.').length).toBeGreaterThan(0)
+        await waitFor(() => {
+            expect(screen.getAllByText('Please enter your email address.').length).toBeGreaterThan(
+                0
+            )
+        })
     })
 
     test('validates email format on form submission', async () => {
@@ -698,5 +716,116 @@ describe('ContactInfo Component', () => {
             expect(transferArgs?.parameters).toMatchObject({merge: true})
         })
         // Updating basket email may occur asynchronously or be skipped if unchanged; don't hard-require it here
+    })
+
+    test('defaults phone number from basket billing address when customer phone is not available', () => {
+        // Mock basket with billing address phone
+        mockUseCurrentBasket.mockReturnValue({
+            data: {
+                basketId: 'test-basket-id',
+                customerInfo: {email: null},
+                shipments: [{shipmentId: 'shipment-1', shipmentType: 'delivery'}],
+                productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}],
+                billingAddress: {phone: '(555) 123-4567'}
+            },
+            derivedData: {hasBasket: true, totalItems: 1},
+            refetch: jest.fn()
+        })
+
+        renderWithProviders(<ContactInfo />)
+
+        const phoneInput = screen.getByLabelText('Phone')
+        expect(phoneInput.value).toBe('(555) 123-4567')
+    })
+
+    test('saves phone number to billing address when guest checks out via "Checkout as Guest" button', async () => {
+        // Mock successful OTP authorization to open modal
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
+        mockUpdateCustomerForBasket.mutateAsync.mockResolvedValue({})
+        mockUpdateBillingAddressForBasket.mutateAsync.mockResolvedValue({})
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        const phoneInput = screen.getByLabelText('Phone')
+
+        // Enter phone first - use fireEvent to ensure value is set
+        fireEvent.change(phoneInput, {target: {value: '(727) 555-1234'}})
+
+        // Enter email and wait for OTP modal to open
+        await user.type(emailInput, validEmail)
+        fireEvent.change(emailInput, {target: {value: validEmail}})
+        fireEvent.blur(emailInput)
+
+        // Wait for OTP modal to open
+        await screen.findByTestId('otp-verify')
+
+        // Click "Checkout as a guest" button
+        await user.click(screen.getByText(/Checkout as a guest/i))
+
+        await waitFor(() => {
+            expect(mockUpdateBillingAddressForBasket.mutateAsync).toHaveBeenCalled()
+            const callArgs = mockUpdateBillingAddressForBasket.mutateAsync.mock.calls[0]?.[0]
+            expect(callArgs?.parameters).toMatchObject({basketId: 'test-basket-id'})
+            expect(callArgs?.body?.phone).toMatch(/727/)
+        })
+    })
+
+    test('uses phone from billing address when persisting to customer profile after OTP verification', async () => {
+        // Mock basket with billing address phone
+        const billingPhone = '(555) 123-4567'
+        mockUseCurrentBasket.mockReturnValue({
+            data: {
+                basketId: 'test-basket-id',
+                customerInfo: {email: null},
+                shipments: [{shipmentId: 'shipment-1', shipmentType: 'delivery'}],
+                productItems: [{productId: 'product-1', shipmentId: 'shipment-1'}],
+                billingAddress: {phone: billingPhone}
+            },
+            derivedData: {hasBasket: true, totalItems: 1},
+            refetch: jest.fn().mockResolvedValue({
+                data: {
+                    basketId: 'test-basket-id',
+                    billingAddress: {phone: billingPhone}
+                }
+            })
+        })
+
+        // Mock OTP verification flow
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
+        mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync.mockResolvedValue({})
+        mockTransferBasket.mutateAsync.mockResolvedValue({basketId: 'test-basket-id'})
+        mockUpdateCustomerForBasket.mutateAsync.mockResolvedValue({})
+
+        // Mock customer with customerId after login - update mock to return customer with ID
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                email: validEmail,
+                isRegistered: true,
+                customerId: 'customer-123'
+            }
+        })
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.change(emailInput, {target: {value: validEmail}})
+        fireEvent.blur(emailInput)
+
+        // Wait for OTP modal and verify
+        await screen.findByTestId('otp-verify')
+        await user.click(screen.getByTestId('otp-verify'))
+
+        // Simulate auth state change to registered
+        useCustomerType.mockReturnValue({isRegistered: true})
+
+        await waitFor(() => {
+            // Verify updateCustomer was called with phone from billing address
+            expect(mockUpdateCustomer.mutateAsync).toHaveBeenCalledWith({
+                parameters: {customerId: 'customer-123'},
+                body: {phoneHome: billingPhone}
+            })
+        })
     })
 })

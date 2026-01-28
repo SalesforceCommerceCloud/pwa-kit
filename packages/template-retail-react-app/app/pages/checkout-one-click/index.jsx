@@ -266,11 +266,9 @@ const CheckoutOneClick = () => {
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {addressId, creationDate, lastModified, preferred, phone, ...address} = billingAddress
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
         return await updateBillingAddressForBasket({
-            body: address,
+            body: billingAddress,
             parameters: {basketId: latestBasketId}
         })
     }
@@ -429,14 +427,8 @@ const CheckoutOneClick = () => {
                             }
                         }
 
-                        // Persist phone number as phoneHome from contact info, shipping address, or basket
-                        // Priority: contactPhone (from contact info form) > shipping address phone > basket customerInfo phone
-                        const phoneHome =
-                            contactPhone && contactPhone.length > 0
-                                ? contactPhone
-                                : deliveryShipments.length > 0
-                                ? deliveryShipments[0]?.shippingAddress?.phone
-                                : basket?.customerInfo?.phone
+                        // Persist phone number as phoneHome for newly registered guest shoppers
+                        const phoneHome = basket?.billingAddress?.phone || contactPhone
                         if (phoneHome) {
                             await updateCustomer.mutateAsync({
                                 parameters: {customerId},
@@ -613,6 +605,7 @@ const CheckoutOneClick = () => {
                                 billingSameAsShipping={billingSameAsShipping}
                                 setBillingSameAsShipping={setBillingSameAsShipping}
                                 onOtpLoadingChange={setIsOtpLoading}
+                                onBillingSubmit={onBillingSubmit}
                             />
 
                             {step >= STEPS.PAYMENT && (

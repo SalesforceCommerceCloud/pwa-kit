@@ -65,6 +65,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const transferBasket = useShopperBasketsMutation('transferBasket')
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
+    const updateBillingAddressForBasket = useShopperBasketsMutation('updateBillingAddressForBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
@@ -82,7 +83,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const form = useForm({
         defaultValues: {
             email: customer?.email || basket?.customerInfo?.email || '',
-            phone: customer?.phoneHome || '',
+            phone: customer?.phoneHome || basket?.billingAddress?.phone || '',
             password: '',
             otp: ''
         }
@@ -261,11 +262,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const handleCheckoutAsGuest = async () => {
         try {
             const email = form.getValues('email')
+            const phone = form.getValues('phone')
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: {email: email}
             })
+
+            // Save phone number to basket billing address for guest shoppers
+            if (phone) {
+                await updateBillingAddressForBasket.mutateAsync({
+                    parameters: {basketId: basket.basketId},
+                    body: {
+                        ...basket?.billingAddress,
+                        phone: phone
+                    }
+                })
+            }
 
             // Set the flag that "Checkout as Guest" was clicked
             setRegisteredUserChoseGuest(true)
@@ -321,7 +334,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
 
             // Persist phone number to the newly registered customer's profile
-            const phone = form.getValues('phone')
+            const phone = basket?.billingAddress?.phone || form.getValues('phone')
             if (phone && customer?.customerId) {
                 try {
                     await updateCustomer.mutateAsync({
@@ -470,6 +483,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         parameters: {basketId: basket.basketId},
                         body: {email: formData.email}
                     })
+
+                    // Save phone number to basket billing address for guest shoppers
+                    if (phone) {
+                        await updateBillingAddressForBasket.mutateAsync({
+                            parameters: {basketId: basket.basketId},
+                            body: {
+                                ...basket?.billingAddress,
+                                phone: phone
+                            }
+                        })
+                    }
 
                     // Update basket and immediately advance to next step for smooth UX
                     goToNextStep()
