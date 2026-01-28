@@ -16,8 +16,12 @@ import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config')
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => ({
+    getEnvBasePath: jest.fn()
+}))
 
 describe('getProxyConfigs (server-side)', () => {
     test('should return the currently used proxy configs', () => {
@@ -25,50 +29,50 @@ describe('getProxyConfigs (server-side)', () => {
     })
 })
 
-describe('getBasename (server-side)', () => {
+describe('getRouterBasePath (server-side)', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
-    test('should return basename when showBasename is true', () => {
-        const mockBasename = '/test-base'
-        getEnvBasePath.mockReturnValue(mockBasename)
+    test('should return base path when showBasePath is true', () => {
+        const mockBasePath = '/test-base'
+        getEnvBasePath.mockReturnValue(mockBasePath)
         getConfig.mockReturnValue({
             app: {
                 url: {
-                    showBasename: true
+                    showBasePath: true
                 }
             }
         })
 
-        expect(utils.getBasename()).toBe(mockBasename)
+        expect(utils.getRouterBasePath()).toBe(mockBasePath)
     })
 
-    test('should return empty string when showBasename is undefined', () => {
+    test('should return empty string when showBasePath is undefined', () => {
         getConfig.mockReturnValue({
             app: {
                 url: {}
             }
         })
 
-        expect(utils.getBasename()).toBe('')
+        expect(utils.getRouterBasePath()).toBe('')
     })
 
-    test('should return empty string when showBasename is false', () => {
+    test('should return empty string when showBasePath is false', () => {
         getConfig.mockReturnValue({
             app: {
                 url: {
-                    showBasename: false
+                    showBasePath: false
                 }
             }
         })
 
-        expect(utils.getBasename()).toBe('')
+        expect(utils.getRouterBasePath()).toBe('')
     })
 
     test('should return empty string when app config is missing', () => {
         getConfig.mockReturnValue({})
 
-        expect(utils.getBasename()).toBe('')
+        expect(utils.getRouterBasePath()).toBe('')
     })
 })

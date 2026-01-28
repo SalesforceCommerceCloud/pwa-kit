@@ -11,7 +11,7 @@ import {
     resolveSiteFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
@@ -30,14 +30,14 @@ jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
     return {
         ...original,
-        getBasename: jest.fn(() => '')
+        getRouterBasePath: jest.fn(() => '')
     }
 })
 
 beforeEach(() => {
     jest.resetModules()
     // Reset the mock after resetModules
-    getBasename.mockReturnValue('')
+    getRouterBasePath.mockReturnValue('')
 })
 
 afterEach(() => {
@@ -322,9 +322,9 @@ describe('getParamsFromPath', function () {
         })
     })
 
-    describe('getParamsFromPath with basename', () => {
-        test('should remove basename from path when showBasename is true', () => {
-            const basename = '/test-base'
+    describe('getParamsFromPath with base path', () => {
+        test('should remove base path from path when showBasePath is true', () => {
+            const basePath = '/test-base'
             // Re-require modules to get fresh imports with mocks
             // This is because these modules are first imported at module load time before mocks were set
             // and have references to the original functions.
@@ -336,23 +336,23 @@ describe('getParamsFromPath', function () {
                 getConfig: getConfigFresh
             } = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
             const {
-                getBasename: getBasenameFresh
+                getRouterBasePath: getRouterBasePathFresh
             } = require('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
             /* eslint-enable @typescript-eslint/no-var-requires */
 
-            getBasenameFresh.mockReturnValue(basename)
+            getRouterBasePathFresh.mockReturnValue(basePath)
             getConfigFresh.mockImplementation(() => ({
                 ...mockConfig,
                 app: {
                     ...mockConfig.app,
                     url: {
                         ...mockConfig.app.url,
-                        showBasename: true
+                        showBasePath: true
                     }
                 }
             }))
 
-            const path = `${basename}/us/en-US/category/womens`
+            const path = `${basePath}/us/en-US/category/womens`
             const result = getParamsFromPathFresh(path)
             expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
         })

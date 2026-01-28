@@ -56,14 +56,19 @@ export const getProxyConfigs = () => {
 }
 
 /**
- * Returns the basename (envBasePath) if showBasename is enabled in the app config.
- * This is used for URLs that bypass React Router (e.g., window.location, href attributes).
- * React Router handles basename via its basename prop when showBasename is enabled.
+ * Returns the base path (defined in config.ssrParameters.envBasePath)
+ * for React Router routes when showBasePath is enabled in the app config.
  *
- * @returns {string} - The basename if showBasename is true, otherwise an empty string
+ * This function should be used when working with a React Router route
+ * (The route is defined in routes.jsx).
+ *
+ * Use getEnvBasePath (pwa-kit-runtime) if you are working with an express route\
+ * (The route is defined in ssr.js).
+ *
+ * @returns {string} - The base path if showBasePath is true, otherwise an empty string
  */
-export const getBasename = () => {
+export const getRouterBasePath = () => {
     const config = getConfig()
-    const showBasename = config?.app?.url?.showBasename === true
-    return showBasename ? getEnvBasePath() : ''
+    const showBasePath = config?.app?.url?.showBasePath === true
+    return showBasePath ? getEnvBasePath() : ''
 }

@@ -18,7 +18,7 @@ import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {getBasename} from '../universal/utils'
+import {getRouterBasePath} from '../universal/utils'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -46,7 +46,7 @@ export const registerServiceWorker = (url) => {
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
-    const routerBasename = getBasename() || undefined
+    const routerBasename = getRouterBasePath() || undefined
 
     return (
         <ServerContext.Provider value={{}}>

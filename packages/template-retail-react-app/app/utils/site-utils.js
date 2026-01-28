@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -104,12 +104,12 @@ export const getSiteByReference = (siteRef) => {
 export const getParamsFromPath = (path) => {
     let {pathname, search} = getPathnameAndSearch(path)
 
-    // Remove the basename from the pathname if present since
+    // Remove the base path from the pathname if present since
     // it shifts the location of the site and locale in the pathname
-    // Respect showBasename config setting
-    const basename = getBasename()
-    if (basename && pathname.startsWith(basename)) {
-        pathname = pathname.substring(basename.length)
+    // Respect showBasePath config setting
+    const basePath = getRouterBasePath()
+    if (basePath && pathname.startsWith(basePath)) {
+        pathname = pathname.substring(basePath.length)
     }
 
     const config = getConfig()

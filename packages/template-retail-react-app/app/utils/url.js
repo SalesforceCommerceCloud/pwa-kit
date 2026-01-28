@@ -13,8 +13,7 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
@@ -141,11 +140,11 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
 
-    // Remove basename from pathname if present before processing
-    // Respect showBasename config setting
-    const basenameToRemove = getBasename()
-    if (basenameToRemove && pathname.startsWith(basenameToRemove)) {
-        pathname = pathname.substring(basenameToRemove.length)
+    // Remove base path from pathname if present before processing
+    // Respect showBasePath config setting
+    const basePathToRemove = getRouterBasePath()
+    if (basePathToRemove && pathname.startsWith(basePathToRemove)) {
+        pathname = pathname.substring(basePathToRemove.length)
     }
 
     // sanitize the site from current url if existing
@@ -187,11 +186,11 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         locale?.alias || locale?.id
     )
 
-    // Add basename for locale selection URLs since they bypass React Router
-    // (React Router handles basename for navigation via basename prop)
-    // Respect showBasename config setting
-    const basenameToAdd = getBasename()
-    return basenameToAdd ? `${basenameToAdd}${newUrl}` : newUrl
+    // Add base path for locale selection URLs since they bypass React Router
+    // (React Router handles base path for navigation via basename prop)
+    // Respect showBasePath config setting
+    const basePathToAdd = getRouterBasePath()
+    return basePathToAdd ? `${basePathToAdd}${newUrl}` : newUrl
 }
 
 /**
