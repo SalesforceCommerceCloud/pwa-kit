@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* global PublicKeyCredential */
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
@@ -276,12 +275,12 @@ export const AuthModal = ({
             // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
-                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                PublicKeyCredential.isConditionalMediationAvailable
+                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+                window.PublicKeyCredential.isConditionalMediationAvailable
             ) {
                 Promise.all([
-                    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    PublicKeyCredential.isConditionalMediationAvailable()
+                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+                    window.PublicKeyCredential.isConditionalMediationAvailable()
                 ]).then((results) => {
                     if (results.every((r) => r === true)) {
                         showToast()
