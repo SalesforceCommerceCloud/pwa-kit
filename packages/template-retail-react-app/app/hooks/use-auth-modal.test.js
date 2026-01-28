@@ -65,9 +65,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useAuthHelper: jest
-            .fn()
-            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
+        useAuthHelper: jest.fn().mockImplementation((helperType) => {
+            // Return the specific mock if defined, otherwise return a default mock
+            return mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
+        })
     }
 })
 

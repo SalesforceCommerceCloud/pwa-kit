@@ -19,6 +19,33 @@ import Registration from '@salesforce/retail-react-app/app/pages/registration'
 import ResetPassword from '@salesforce/retail-react-app/app/pages/reset-password'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+// Mock getConfig for passkey tests
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
+// Mock Commerce SDK Auth Helpers
+const mockStartWebauthnAuthentication = jest.fn()
+const mockFinishWebauthnAuthentication = jest.fn()
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        useAuthHelper: (helperType) => {
+            if (helperType === actual.AuthHelpers.StartWebauthnAuthentication) {
+                return {mutateAsync: mockStartWebauthnAuthentication}
+            }
+            if (helperType === actual.AuthHelpers.FinishWebauthnAuthentication) {
+                return {mutateAsync: mockFinishWebauthnAuthentication}
+            }
+            // Return actual for other helper types
+            return actual.useAuthHelper(helperType)
+        }
+    }
+})
 
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
@@ -53,6 +80,8 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    // Setup getConfig mock with default config for all tests
+    getConfig.mockReturnValue(mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -269,14 +298,17 @@ describe('Error while logging in', function () {
     })
 })
 describe('Passkey login', () => {
-    let mockStartWebauthnAuthentication
-    let mockFinishWebauthnAuthentication
     let mockCredentialsGet
     let mockPublicKeyCredential
 
     beforeEach(() => {
-        // Mock WebAuthn API
-        mockCredentialsGet = jest.fn()
+        // Clear all mocks
+        jest.clearAllMocks()
+        mockStartWebauthnAuthentication.mockClear()
+        mockFinishWebauthnAuthentication.mockClear()
+
+        // Mock WebAuthn API - default to never resolving (simulating no user action)
+        mockCredentialsGet = jest.fn().mockImplementation(() => new Promise(() => {}))
         mockPublicKeyCredential = {
             parseRequestOptionsFromJSON: jest.fn(),
             isConditionalMediationAvailable: jest.fn().mockResolvedValue(true),
@@ -291,6 +323,26 @@ describe('Passkey login', () => {
 
         // Clear localStorage
         localStorage.clear()
+
+        // Setup mock responses for auth helpers
+        mockStartWebauthnAuthentication.mockResolvedValue({
+            publicKey: {
+                challenge: 'mock-challenge-data',
+                rpId: 'example.com',
+                allowCredentials: [],
+                timeout: 60000
+            }
+        })
+
+        mockFinishWebauthnAuthentication.mockResolvedValue({
+            customer_id: 'customerid_passkey',
+            access_token:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494',
+            refresh_token: 'testrefeshtoken_passkey',
+            usid: 'testusid_passkey',
+            enc_user_id: 'testEncUserId_passkey',
+            id_token: 'testIdToken_passkey'
+        })
     })
 
     afterEach(() => {
@@ -423,10 +475,18 @@ describe('Passkey login', () => {
         await user.type(screen.getByLabelText('Email'), 'test@salesforce.com')
         await user.click(screen.getByRole('button', {name: /sign in/i}))
 
-        // Should redirect to account page after successful passkey login
+        // Should trigger passkey authentication with credentials.get
         await waitFor(
             () => {
-                expect(mockFinishWebauthnAuthentication).toHaveBeenCalled()
+                expect(mockCredentialsGet).toHaveBeenCalled()
+            },
+            {timeout: 5000}
+        )
+
+        // After successful passkey login, should redirect to account page
+        await waitFor(
+            () => {
+                expect(window.location.pathname).toBe('/uk/en-GB/account')
             },
             {timeout: 5000}
         )
@@ -441,6 +501,12 @@ describe('Passkey login', () => {
             }
         }
 
+        // Override getConfig to return config with passkey disabled
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: mockAppConfig
+        })
+
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -454,8 +520,13 @@ describe('Passkey login', () => {
             expect(screen.getByTestId('login-page')).toBeInTheDocument()
         })
 
+        // Give it a moment for any async effects to run
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         // Should not call credentials API when passkey is disabled
         expect(mockCredentialsGet).not.toHaveBeenCalled()
+        // Should not call auth helpers when passkey is disabled
+        expect(mockStartWebauthnAuthentication).not.toHaveBeenCalled()
     })
 
     test('Handles passkey login cancellation gracefully', async () => {
