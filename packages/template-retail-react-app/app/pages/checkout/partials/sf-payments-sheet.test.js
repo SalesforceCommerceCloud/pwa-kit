@@ -101,7 +101,14 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                 defaultShippingMethodId: 'DefaultShippingMethod'
             },
             refetch: mockRefetchShippingMethods
-        })
+        }),
+        useCustomerId: () => 'customer123',
+        useCustomerType: () => ({
+            isRegistered: true,
+            isGuest: false,
+            customerType: 'registered'
+        }),
+        useCustomer: jest.fn()
     }
 })
 
@@ -147,16 +154,14 @@ const mockCustomer = {
     paymentMethodReferences: []
 }
 
-let mockUseCurrentCustomer
+// Get the mocked useCustomer from commerce-sdk-react
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => {
-    mockUseCurrentCustomer = jest.fn(() => ({
-        data: mockCustomer
-    }))
-    return {
-        useCurrentCustomer: mockUseCurrentCustomer
-    }
-})
+// Set default implementation
+mockUseCustomer.mockImplementation(() => ({
+    data: mockCustomer
+}))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => {
     return jest.fn(() => ({
@@ -1069,7 +1074,7 @@ describe('SFPaymentsSheet', () => {
         beforeEach(() => {
             jest.clearAllMocks()
             mockCustomer.paymentMethodReferences = []
-            mockUseCurrentCustomer.mockImplementation(() => ({
+            mockUseCustomer.mockImplementation(() => ({
                 data: {...mockCustomer}
             }))
         })
@@ -1182,7 +1187,6 @@ describe('SFPaymentsSheet', () => {
 
             expect(config.options.savedPaymentMethods).toEqual([])
         })
-
     })
 
     describe('lifecycle', () => {

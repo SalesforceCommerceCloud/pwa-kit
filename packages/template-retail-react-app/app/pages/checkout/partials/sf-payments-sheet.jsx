@@ -20,9 +20,13 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsMutation,
+    useCustomer,
+    useCustomerId,
+    useCustomerType
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
@@ -48,8 +52,7 @@ import {
     buildTheme,
     getSFPaymentsInstrument,
     createPaymentInstrumentBody,
-    transformPaymentMethodReferences,
-    getClientSecret
+    transformPaymentMethodReferences
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
@@ -61,7 +64,25 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
-    const {data: customer} = useCurrentCustomer()
+    const customerId = useCustomerId()
+    const {isRegistered} = useCustomerType()
+    const {data: customerData} = useCustomer(
+        {
+            parameters: {
+                customerId,
+                expand: ['paymentmethodreferences']
+            }
+        },
+        {enabled: !!customerId && isRegistered}
+    )
+    // Add customerId and isRegistered to customer data for consistency with useCurrentCustomer
+    const customer = customerData
+        ? {
+              ...customerData,
+              customerId,
+              isRegistered
+          }
+        : null
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -359,11 +380,20 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
             // Track created payment intent
             const paymentIntent = {
-                client_secret: getClientSecret(orderPaymentInstrument),
+                client_secret:
+                    orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
+                        ?.clientSecret,
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId
             }
 
-            if (futureUsageOffSession) {
+            // Read setup_future_usage from backend response, fallback to manual calculation if not available
+            // TODO: The fallback is temporary that's to be removed in next iteration.
+            const setupFutureUsage =
+                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
+                    ?.setup_future_usage
+            if (setupFutureUsage) {
+                paymentIntent.setup_future_usage = setupFutureUsage
+            } else if (futureUsageOffSession) {
                 paymentIntent.setup_future_usage = 'off_session'
             } else if (shouldSavePaymentMethod) {
                 paymentIntent.setup_future_usage = 'on_session'
@@ -406,22 +436,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Update the redirect return URL to include the related order no
             config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
 
-            // Update Elements to match Payment Intent's setup_future_usage before SDK confirms
-            const paymentIntentFunction = async () => {
-                const selectedPaymentMethod = checkoutComponent.current?.selectedPaymentMethod
-                if (selectedPaymentMethod?.asSavedPaymentMethodComponent) {
-                    const spmComponent = selectedPaymentMethod.asSavedPaymentMethodComponent()
-                    if (spmComponent) {
-                        spmComponent.setSavePaymentMethodFuture(futureUsageOffSession)
-                    }
-                }
-
-                return paymentIntent
-            }
-
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
-                paymentIntentFunction,
+                async () => paymentIntent,
                 billingDetails,
                 shippingDetails
             )
@@ -487,15 +504,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         confirmPayment
     }))
 
-    const savedPaymentMethods = useMemo(() => {
-        if (!customer?.paymentMethodReferences || !paymentConfig?.paymentMethodSetAccounts) {
-            return []
-        }
-        return transformPaymentMethodReferences(
-            customer.paymentMethodReferences,
-            paymentConfig.paymentMethodSetAccounts
-        )
-    }, [customer?.paymentMethodReferences, paymentConfig?.paymentMethodSetAccounts])
+    const savedPaymentMethods = useMemo(
+        () =>
+            transformPaymentMethodReferences(
+                customer?.paymentMethodReferences,
+                paymentConfig?.paymentMethodSetAccounts
+            ),
+        [customer?.paymentMethodReferences, paymentConfig?.paymentMethodSetAccounts]
+    )
 
     useEffect(() => {
         if (sfp && metadata && containerElementRef.current && paymentConfig) {
@@ -515,7 +531,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 theme: buildTheme(),
                 actions: {
                     createIntent: createPaymentInstrument,
-                    onClick: () => {}
+                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
                 },
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
@@ -523,6 +539,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     showSaveForFutureUsageCheckbox: !!(
                         customer?.isRegistered && customer?.customerId
                     ),
+                    // Suppress "Make payment method default" checkbox since we don't support default SPM yet
                     showSaveAsDefaultCheckbox: false,
                     savedPaymentMethods: savedPaymentMethods
                 }
