@@ -110,17 +110,10 @@ export const AuthModal = ({
     const handlePasswordlessLogin = async (email) => {
         try {
             const redirectPath = window.location.pathname + (window.location.search || '')
-            const params = {
+            await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
-                mode: passwordlessMode
-            }
-            
-            // Only include callbackURI if mode is 'callback'
-            if (passwordlessMode === 'callback') {
-                params.callbackURI = `${callbackURL}?redirectUrl=${redirectPath}`
-            }
-            
-            await authorizePasswordlessLogin.mutateAsync(params)
+                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+            })
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
             const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
@@ -129,7 +122,6 @@ export const AuthModal = ({
             form.setError('global', {type: 'manual', message})
         }
     }
-
 
     const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
@@ -275,9 +267,7 @@ export const AuthModal = ({
         onClose()
 
         if (config?.app?.login?.passkey?.enabled) {
-            // Show passkey registration modal if:
-            // 1. Webauthn feature flag is enabled
-            // 2. Compatible with the browser
+            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
                 PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
@@ -331,16 +321,15 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
-        <>
-            <Modal
-                size="sm"
-                closeOnOverlayClick={false}
-                data-testid="sf-auth-modal"
-                isOpen={isOpen}
-                onOpen={onOpen}
-                onClose={onClose}
-                {...props}
-            >
+        <Modal
+            size="sm"
+            closeOnOverlayClick={false}
+            data-testid="sf-auth-modal"
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            {...props}
+        >
             <ModalOverlay />
             <ModalContent>
                 <ModalCloseButton
@@ -393,7 +382,6 @@ export const AuthModal = ({
                 </ModalBody>
             </ModalContent>
         </Modal>
-        </>
     )
 }
 

@@ -86,7 +86,6 @@ const OtpAuth = ({
 
     useEffect(() => {
         if (isOpen) {
-            otpInputs.clear()
             setError('')
             form.setValue('otp', '')
 
