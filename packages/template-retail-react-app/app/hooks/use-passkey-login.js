@@ -70,13 +70,6 @@ export const usePasskeyLogin = () => {
             throw error
         }
 
-        // Mark that user has a passkey as soon as they select/use one
-        // This needs to happen BEFORE finishWebauthnAuthentication to avoid race conditions
-        // with useEffects that check this flag when isRegistered changes
-        console.log('Setting hasPasskey flag to true (after credential obtained)')
-        localStorage.setItem('hasPasskey', 'true')
-        console.log('hasPasskey flag set:', localStorage.getItem('hasPasskey'))
-
         // Encode credential before sending to SLAS
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
         let encodedCredential

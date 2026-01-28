@@ -816,7 +816,7 @@ describe('Passkey login', () => {
         expect(mockStartWebauthnAuthentication).not.toHaveBeenCalled()
     })
 
-    test('Sets hasPasskey flag in localStorage after successful passkey login', async () => {
+    test('Successfully logs in with passkey', async () => {
         const mockAppConfig = {
             ...mockConfig.app,
             login: {
@@ -888,9 +888,6 @@ describe('Passkey login', () => {
             }
         })
 
-        // Clear localStorage before test
-        localStorage.clear()
-
         // Open the modal
         const trigger = screen.getByText(/open modal/i)
         await user.click(trigger)
@@ -903,8 +900,6 @@ describe('Passkey login', () => {
         await waitFor(
             () => {
                 expect(mockFinishWebauthnAuthentication).toHaveBeenCalled()
-                // Verify localStorage flag is set
-                expect(localStorage.getItem('hasPasskey')).toBe('true')
             },
             {timeout: 5000}
         )

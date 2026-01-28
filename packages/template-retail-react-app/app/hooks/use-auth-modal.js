@@ -275,16 +275,10 @@ export const AuthModal = ({
         onClose()
 
         if (config?.app?.login?.passkey?.enabled) {
-            // Check if user already has a passkey registered
-            const hasPasskey = localStorage.getItem('hasPasskey') === 'true'
-            console.log('Checking hasPasskey flag:', localStorage.getItem('hasPasskey'), 'hasPasskey:', hasPasskey)
-            
-            // Show passkey registration modal only if:
+            // Show passkey registration modal if:
             // 1. Webauthn feature flag is enabled
             // 2. Compatible with the browser
-            // 3. User doesn't already have a passkey
             if (
-                !hasPasskey &&
                 window.PublicKeyCredential &&
                 PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
                 PublicKeyCredential.isConditionalMediationAvailable

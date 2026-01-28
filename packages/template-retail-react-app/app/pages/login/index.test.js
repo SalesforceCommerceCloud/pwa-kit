@@ -426,7 +426,7 @@ describe('Passkey login', () => {
         // Should redirect to account page after successful passkey login
         await waitFor(
             () => {
-                expect(localStorage.getItem('hasPasskey')).toBe('true')
+                expect(mockFinishWebauthnAuthentication).toHaveBeenCalled()
             },
             {timeout: 5000}
         )
@@ -511,9 +511,6 @@ describe('Passkey login', () => {
             challenge: 'mock-challenge',
             allowCredentials: []
         })
-
-        // Don't set hasPasskey flag
-        localStorage.removeItem('hasPasskey')
 
         const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
