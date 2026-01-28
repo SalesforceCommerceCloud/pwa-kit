@@ -267,10 +267,6 @@ export const createPaymentInstrumentBody = ({
         }
     }
 
-    if (gateway === PAYMENT_GATEWAYS.ADYEN && storePaymentMethod) {
-        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
-    }
-
     return {
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
@@ -288,7 +284,7 @@ export const transformPaymentMethodReferences = (
     paymentMethodReferences,
     paymentMethodSetAccounts = []
 ) => {
-    if (!paymentMethodReferences || !Array.isArray(paymentMethodReferences)) {
+    if (!Array.isArray(paymentMethodReferences) || !Array.isArray(paymentMethodSetAccounts)) {
         return []
     }
 
@@ -309,11 +305,7 @@ export const transformPaymentMethodReferences = (
             }
 
             // Determine gatewayId for SDK matching
-            if (
-                !pmr.accountId ||
-                !paymentMethodSetAccounts ||
-                !Array.isArray(paymentMethodSetAccounts)
-            ) {
+            if (!pmr.accountId) {
                 return null
             }
 
