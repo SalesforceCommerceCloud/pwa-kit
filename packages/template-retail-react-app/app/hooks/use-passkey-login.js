@@ -6,7 +6,7 @@
  */
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers, useUsid} from '@salesforce/commerce-sdk-react'
-import {encode as base64Encode} from 'base64-arraybuffer'
+import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the passkey login flow.
@@ -15,12 +15,6 @@ export const usePasskeyLogin = () => {
     const startWebauthnAuthentication = useAuthHelper(AuthHelpers.StartWebauthnAuthentication)
     const finishWebauthnAuthentication = useAuthHelper(AuthHelpers.FinishWebauthnAuthentication)
     const {usid} = useUsid()
-
-    const uint8arrayToBase64url = (input) => {
-        const uint8array = new Uint8Array(input)
-        const base64 = base64Encode(uint8array.buffer)
-        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-    }
 
     const loginWithPasskey = async () => {
         const config = getConfig()
@@ -83,14 +77,16 @@ export const usePasskeyLogin = () => {
             // In this case, we manually encode the credential.
             encodedCredential = {
                 id: credential.id,
-                rawId: uint8arrayToBase64url(credential.rawId),
+                rawId: arrayBufferToBase64Url(credential.rawId),
                 type: credential.type,
                 clientExtensionResults: credential.getClientExtensionResults(),
                 response: {
-                    authenticatorData: uint8arrayToBase64url(credential.response.authenticatorData),
-                    clientDataJSON: uint8arrayToBase64url(credential.response.clientDataJSON),
-                    signature: uint8arrayToBase64url(credential.response.signature),
-                    userHandle: uint8arrayToBase64url(credential.response.userHandle)
+                    authenticatorData: arrayBufferToBase64Url(
+                        credential.response.authenticatorData
+                    ),
+                    clientDataJSON: arrayBufferToBase64Url(credential.response.clientDataJSON),
+                    signature: arrayBufferToBase64Url(credential.response.signature),
+                    userHandle: arrayBufferToBase64Url(credential.response.userHandle)
                 }
             }
         }

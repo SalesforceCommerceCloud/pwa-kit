@@ -32,6 +32,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 
 // Utils
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/utils'
 
 // SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
@@ -82,19 +83,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
         } finally {
             setIsLoading(false)
         }
-    }
-
-    /**
-     * Convert ArrayBuffer to base64url string
-     */
-    const arrayBufferToBase64Url = (buffer) => {
-        const bytes = new Uint8Array(buffer)
-        let binary = ''
-        for (let i = 0; i < bytes.length; i++) {
-            binary += String.fromCharCode(bytes[i])
-        }
-        const base64 = btoa(binary)
-        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
     }
 
     const handleOtpVerification = async (code) => {
