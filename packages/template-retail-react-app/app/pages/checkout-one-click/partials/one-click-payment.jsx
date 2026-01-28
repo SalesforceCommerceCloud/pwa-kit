@@ -55,7 +55,8 @@ const Payment = ({
     onIsEditingChange,
     billingSameAsShipping,
     setBillingSameAsShipping,
-    onOtpLoadingChange
+    onOtpLoadingChange,
+    onBillingSubmit
 }) => {
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
@@ -382,27 +383,6 @@ const Payment = ({
         }
     }
 
-    const onBillingSubmit = async () => {
-        // When billing is same as shipping, skip form validation and use shipping address directly
-        let billingAddress
-        if (billingSameAsShipping) {
-            billingAddress = selectedShippingAddress
-        } else {
-            const isFormValid = await billingAddressForm.trigger()
-            if (!isFormValid) {
-                return
-            }
-            billingAddress = billingAddressForm.getValues()
-        }
-        // Using destructuring to remove properties from the object...
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
-        return await updateBillingAddressForBasket({
-            body: address,
-            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
-        })
-    }
-
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
@@ -678,7 +658,9 @@ Payment.propTypes = {
     /** Callback to set billing same as shipping state */
     setBillingSameAsShipping: PropTypes.func.isRequired,
     /** Callback when OTP loading state changes */
-    onOtpLoadingChange: PropTypes.func
+    onOtpLoadingChange: PropTypes.func,
+    /** Callback to submit billing address */
+    onBillingSubmit: PropTypes.func.isRequired
 }
 
 const PaymentCardSummary = ({payment}) => {
