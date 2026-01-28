@@ -17,7 +17,6 @@ import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {getRouterBasePath} from '../universal/utils'
 
 /* istanbul ignore next */

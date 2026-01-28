@@ -55,7 +55,6 @@ const Error = (props) => {
                         // as the application is in an error state. We need to force a
                         // hard navigation to get back to the normal state.
                         // Include base path since this bypasses React Router
-                        // Respect showBasePath config setting
                         onClick={() => {
                             const basePath = getRouterBasePath()
                             window.location.href = basePath ? `${basePath}/` : '/'

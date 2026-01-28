@@ -106,7 +106,6 @@ export const getParamsFromPath = (path) => {
 
     // Remove the base path from the pathname if present since
     // it shifts the location of the site and locale in the pathname
-    // Respect showBasePath config setting
     const basePath = getRouterBasePath()
     if (basePath && pathname.startsWith(basePath)) {
         pathname = pathname.substring(basePath.length)

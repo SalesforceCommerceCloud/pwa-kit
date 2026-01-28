@@ -40,7 +40,6 @@ import logger from '../../utils/logger-instance'
 import PerformanceTimer from '../../utils/performance'
 import {PERFORMANCE_MARKS} from '../../utils/performance-marks'
 
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {getRouterBasePath} from '../universal/utils'
 
 const CWD = process.cwd()

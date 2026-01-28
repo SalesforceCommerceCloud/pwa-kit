@@ -141,7 +141,6 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     let {pathname, search} = location
 
     // Remove base path from pathname if present before processing
-    // Respect showBasePath config setting
     const basePathToRemove = getRouterBasePath()
     if (basePathToRemove && pathname.startsWith(basePathToRemove)) {
         pathname = pathname.substring(basePathToRemove.length)
@@ -174,23 +173,19 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     const site = getSiteByReference(siteRef)
     const locale = getLocaleByReference(site, shortCode)
 
-    // Build the path without basename
-    const url = `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`
-
     // rebuild the url with new locale
     const newUrl = buildUrl(
-        url,
+        `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
         site.alias || site.id,
         locale?.alias || locale?.id
     )
 
-    // Add base path for locale selection URLs since they bypass React Router
-    // (React Router handles base path for navigation via basename prop)
-    // Respect showBasePath config setting
-    const basePathToAdd = getRouterBasePath()
-    return basePathToAdd ? `${basePathToAdd}${newUrl}` : newUrl
+    // Add base path for locale selection URLs since we update window.location directly
+    // bypassing React Router
+    const basePath = getRouterBasePath()
+    return basePath ? `${basePath}${newUrl}` : newUrl
 }
 
 /**
