@@ -9,6 +9,7 @@
  */
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getEnvBasePath, bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
 
@@ -52,4 +53,17 @@ export const getProxyConfigs = () => {
 
     // Clone to avoid accidental mutation of important configuration variables.
     return configs.map((config) => ({...config}))
+}
+
+/**
+ * Returns the basename (envBasePath) if showBasename is enabled in the app config.
+ * This is used for URLs that bypass React Router (e.g., window.location, href attributes).
+ * React Router handles basename via its basename prop when showBasename is enabled.
+ *
+ * @returns {string} - The basename if showBasename is true, otherwise an empty string
+ */
+export const getBasename = () => {
+    const config = getConfig()
+    const showBasename = config?.app?.url?.showBasename !== false
+    return showBasename ? getEnvBasePath() : ''
 }

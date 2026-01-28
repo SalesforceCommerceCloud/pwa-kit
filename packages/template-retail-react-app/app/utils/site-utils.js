@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -104,11 +104,12 @@ export const getSiteByReference = (siteRef) => {
 export const getParamsFromPath = (path) => {
     let {pathname, search} = getPathnameAndSearch(path)
 
-    // Remove the envBasePath from the pathname if present since
+    // Remove the basename from the pathname if present since
     // it shifts the location of the site and locale in the pathname
-    const envBasePath = getEnvBasePath()
-    if (pathname.startsWith(envBasePath)) {
-        pathname = pathname.substring(envBasePath.length)
+    // Respect showBasename config setting
+    const basename = getBasename()
+    if (basename && pathname.startsWith(basename)) {
+        pathname = pathname.substring(basename.length)
     }
 
     const config = getConfig()

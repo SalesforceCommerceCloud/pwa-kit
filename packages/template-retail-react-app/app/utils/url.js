@@ -14,6 +14,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
@@ -128,7 +129,7 @@ export const searchUrlBuilder = (searchTerm) => '/search?q=' + encodeURIComponen
  * window.location to force a hard refresh of the page.
  * Because this bypasses React Router, we need to manually add the basename to the url, if one is
  * defined in the app config.
- * 
+ *
  * @param {String} shortCode - The locale short code.
  * @param {function(*, *, *, *=): string} - Generates a site URL from the provided path, site and locale.
  * @param {string[]} opts.disallowParams - URL parameters to remove
@@ -184,10 +185,12 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         site.alias || site.id,
         locale?.alias || locale?.id
     )
-    
+
     // Add basename for locale selection URLs since they bypass React Router
     // (React Router handles basename for navigation via basename prop)
-    return envBasePath ? `${envBasePath}${newUrl}` : newUrl
+    // Respect showBasename config setting
+    const basename = getBasename()
+    return basename ? `${basename}${newUrl}` : newUrl
 }
 
 /**
