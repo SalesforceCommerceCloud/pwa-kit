@@ -21,7 +21,7 @@ import {
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {getConfig} from '@salesforce/retail-react-app/../../app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -34,8 +34,8 @@ jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
         getAppOrigin: jest.fn(() => 'https://www.example.com')
     }
 })
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
         getConfig: jest.fn(() => mockConfig)
