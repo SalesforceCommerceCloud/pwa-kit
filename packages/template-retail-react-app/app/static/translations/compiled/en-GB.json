@@ -2981,12 +2981,6 @@
       "value": "Previous Page"
     }
   ],
-  "passkey_registration.error.title": [
-    {
-      "type": 0,
-      "value": "Registration Failed"
-    }
-  ],
   "passkey_registration.modal.button.close.assistive_msg": [
     {
       "type": 0,
@@ -3005,12 +2999,6 @@
       "value": "Failed to authorize passkey registration"
     }
   ],
-  "passkey_registration.modal.error.registration_failed": [
-    {
-      "type": 0,
-      "value": "Failed to register passkey"
-    }
-  ],
   "passkey_registration.modal.label.nickname": [
     {
       "type": 0,
@@ -3021,18 +3009,6 @@
     {
       "type": 0,
       "value": "Create Passkey"
-    }
-  ],
-  "passkey_registration.success.description": [
-    {
-      "type": 0,
-      "value": "Your passkey has been registered successfully!"
-    }
-  ],
-  "passkey_registration.success.title": [
-    {
-      "type": 0,
-      "value": "Passkey Created"
     }
   ],
   "passkey_registration.toast.button.close.assistive_msg": [
