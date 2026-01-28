@@ -92,7 +92,6 @@ export const AuthModal = ({
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const passwordlessMode = config.app.login?.passwordless?.mode || 'email'
     const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback

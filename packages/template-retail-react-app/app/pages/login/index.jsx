@@ -216,7 +216,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 loginWithPasskey()
             } catch (error) {
                 // Silently fail
-                console.log('Passkey conditional mediation not started:', error?.message || error)
             }
         }
     }, [])
