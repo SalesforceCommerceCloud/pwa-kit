@@ -230,16 +230,6 @@ export default function ShippingOptions() {
         shippingMethods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) ||
         []
 
-    const hasApplicableMethods = Boolean(filteredShippingMethods.length > 0)
-    const isSelectedMethodValid =
-        hasApplicableMethods &&
-        Boolean(
-            selectedShippingMethod?.id &&
-                shippingMethods.applicableShippingMethods?.some(
-                    (m) => m.id === selectedShippingMethod.id
-                )
-        )
-
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
@@ -382,7 +372,7 @@ export default function ShippingOptions() {
 
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
-                isSelectedMethodValid &&
+                selectedShippingMethod &&
                 selectedShippingAddress && (
                     <SingleShipmentSummary
                         selectedShippingMethod={selectedShippingMethod}
