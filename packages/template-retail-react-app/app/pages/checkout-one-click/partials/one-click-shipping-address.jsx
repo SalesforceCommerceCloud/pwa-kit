@@ -103,9 +103,12 @@ export default function ShippingAddress(props) {
                 postalCode,
                 stateCode
             } = address
-            const phoneValue = customer?.isRegistered
-                ? customer?.phoneHome || address?.phone || selectedShippingAddress?.phone
-                : contactPhone || address?.phone || selectedShippingAddress?.phone
+            const phoneValue =
+                (customer?.isRegistered
+                    ? customer?.phoneHome
+                    : contactPhone || basket?.billingAddress?.phone) ||
+                address?.phone ||
+                selectedShippingAddress?.phone
 
             const targetShipment = findExistingDeliveryShipment(basket)
             const targetShipmentId = targetShipment?.shipmentId || DEFAULT_SHIPMENT_ID
