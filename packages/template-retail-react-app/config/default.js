@@ -30,7 +30,7 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
-            tokenLength: 8,
+            tokenLength: process.env.OTP_TOKEN_LENGTH || 8,
             passwordless: {
                 enabled: false,
                 mode: 'email',
