@@ -20,13 +20,9 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {
-    useShopperBasketsMutation,
-    useCustomer,
-    useCustomerId,
-    useCustomerType
-} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
@@ -64,25 +60,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
-    const customerId = useCustomerId()
-    const {isRegistered} = useCustomerType()
-    const {data: customerData} = useCustomer(
-        {
-            parameters: {
-                customerId,
-                expand: ['paymentmethodreferences']
-            }
-        },
-        {enabled: !!customerId && isRegistered}
-    )
-    // Add customerId and isRegistered to customer data for consistency with useCurrentCustomer
-    const customer = customerData
-        ? {
-              ...customerData,
-              customerId,
-              isRegistered
-          }
-        : null
+    const {data: customer} = useCurrentCustomer(['paymentmethodreferences'])
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -505,12 +483,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }))
 
     const savedPaymentMethods = useMemo(
-        () =>
-            transformPaymentMethodReferences(
-                customer?.paymentMethodReferences,
-                paymentConfig?.paymentMethodSetAccounts
-            ),
-        [customer?.paymentMethodReferences, paymentConfig?.paymentMethodSetAccounts]
+        () => transformPaymentMethodReferences(customer, paymentConfig),
+        [customer, paymentConfig]
     )
 
     useEffect(() => {
@@ -518,7 +492,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
                 (account) => ({
                     ...account,
-                    gatewayId: account.gatewayId || account.accountId
+                    gatewayId: account.accountId
                 })
             )
 
