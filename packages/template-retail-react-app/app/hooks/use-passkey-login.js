@@ -97,7 +97,7 @@ export const usePasskeyLogin = () => {
             credential: encodedCredential,
             usid
         })
-        
+
         return
     }
 

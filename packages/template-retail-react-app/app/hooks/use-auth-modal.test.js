@@ -11,7 +11,8 @@ import userEvent from '@testing-library/user-event'
 import {
     renderWithProviders,
     createPathWithDefaults,
-    guestToken
+    guestToken,
+    registerUserToken
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -20,6 +21,12 @@ import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 
 jest.setTimeout(60000)
 
@@ -89,6 +96,8 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
+    // Set default config mock (passkey enabled by default in mockConfig)
+    getConfig.mockReturnValue(mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -225,6 +234,17 @@ describe('Passwordless enabled', () => {
             pathname: '/',
             origin: 'https://example.com'
         })
+        // Disable passkey to test passwordless in isolation
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                login: {
+                    ...mockConfig.app.login,
+                    passkey: {enabled: false}
+                }
+            }
+        })
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
@@ -273,6 +293,17 @@ describe('Passwordless enabled', () => {
         jest.spyOn(window, 'location', 'get').mockReturnValue({
             pathname: '/',
             origin: 'https://example.com'
+        })
+        // Disable passkey to test passwordless in isolation
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                login: {
+                    ...mockConfig.app.login,
+                    passkey: {enabled: false}
+                }
+            }
         })
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
@@ -673,11 +704,14 @@ describe('Passkey login', () => {
         await waitFor(
             () => {
                 expect(mockStartWebauthnAuthentication).toHaveBeenCalled()
-                expect(mockFinishWebauthnAuthentication).toHaveBeenCalledWith({
-                    credential: expect.objectContaining({
-                        id: 'mock-credential-id'
+                expect(mockFinishWebauthnAuthentication).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        credential: expect.objectContaining({
+                            id: 'mock-credential-id'
+                        }),
+                        usid: expect.any(String)
                     })
-                })
+                )
             },
             {timeout: 5000}
         )
@@ -796,6 +830,12 @@ describe('Passkey login', () => {
                 passkey: {enabled: false}
             }
         }
+
+        // Override getConfig to return config with passkey disabled
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: mockAppConfig
+        })
 
         const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {

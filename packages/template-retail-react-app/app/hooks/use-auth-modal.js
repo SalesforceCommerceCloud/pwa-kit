@@ -144,7 +144,12 @@ export const AuthModal = ({
                             navigate('/account')
                             return
                         } catch (error) {
-                            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+                            // Show error and stop - don't fall back to passwordless
+                            form.setError('global', {
+                                type: 'manual',
+                                message: formatMessage(API_ERROR_MESSAGE)
+                            })
+                            return
                         }
                     }
                     await handlePasswordlessLogin(email)
@@ -226,13 +231,14 @@ export const AuthModal = ({
             setCurrentView(initialView)
             form.reset()
             // Prompt user to login without username (discoverable credentials)
-            try {
-                loginWithPasskey()
-            } catch (error) {
-                setError(formatMessage(API_ERROR_MESSAGE))
+            if (isWebAuthnEnabled) {
+                loginWithPasskey().catch((error) => {
+                    // Silently fail passkey login, user can still use other methods
+                    console.log('Passkey login failed:', error)
+                })
             }
         }
-    }, [isOpen])
+    }, [isOpen, isWebAuthnEnabled])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
