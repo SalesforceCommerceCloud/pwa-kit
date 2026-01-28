@@ -33,8 +33,6 @@ import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES,
     INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
@@ -42,7 +40,6 @@ import {
     getPasswordlessErrorMessage,
     getPasswordResetErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
