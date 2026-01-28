@@ -64,6 +64,6 @@ export const getProxyConfigs = () => {
  */
 export const getBasename = () => {
     const config = getConfig()
-    const showBasename = config?.app?.url?.showBasename !== false
+    const showBasename = config?.app?.url?.showBasename === true
     return showBasename ? getEnvBasePath() : ''
 }

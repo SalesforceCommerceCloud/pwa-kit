@@ -20,6 +20,8 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getConfig} from '@salesforce/retail-react-app/../../app/utils/utils'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -45,6 +47,14 @@ jest.mock('./site-utils', () => {
     return {
         ...original,
         getUrlConfig: jest.fn()
+    }
+})
+
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getBasename: jest.fn(() => '')
     }
 })
 
@@ -186,6 +196,33 @@ describe('getPathWithLocale', () => {
 
         const relativeUrl = getPathWithLocale('en-GB', buildUrl, {location})
         expect(relativeUrl).toBe(`/`)
+    })
+
+    describe('getPathWithLocale with basename and showBasename', () => {
+        test('should include basename when showBasename is true', () => {
+            const basename = '/test-base'
+
+            getBasename.mockReturnValue(basename)
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasename: true
+                    }
+                }
+            })
+
+            // Location pathname should have a basename when showBasename is true
+            const location = new URL(
+                `http://localhost:3000${basename}/uk/it-IT/category/newarrivals-womens`
+            )
+            const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+
+            const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
+            expect(relativeUrl).toBe(`${basename}/uk/fr/category/newarrivals-womens`)
+        })
     })
 })
 

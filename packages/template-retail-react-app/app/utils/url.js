@@ -142,9 +142,10 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     let {pathname, search} = location
 
     // Remove basename from pathname if present before processing
-    const envBasePath = getEnvBasePath()
-    if (envBasePath && pathname.startsWith(envBasePath)) {
-        pathname = pathname.substring(envBasePath.length)
+    // Respect showBasename config setting
+    const basenameToRemove = getBasename()
+    if (basenameToRemove && pathname.startsWith(basenameToRemove)) {
+        pathname = pathname.substring(basenameToRemove.length)
     }
 
     // sanitize the site from current url if existing
@@ -189,8 +190,8 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     // Add basename for locale selection URLs since they bypass React Router
     // (React Router handles basename for navigation via basename prop)
     // Respect showBasename config setting
-    const basename = getBasename()
-    return basename ? `${basename}${newUrl}` : newUrl
+    const basenameToAdd = getBasename()
+    return basenameToAdd ? `${basenameToAdd}${newUrl}` : newUrl
 }
 
 /**

@@ -11,6 +11,7 @@ import {
     resolveSiteFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getBasename} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
@@ -25,8 +26,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getBasename: jest.fn(() => '')
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
+    // Reset the mock after resetModules
+    getBasename.mockReturnValue('')
 })
 
 afterEach(() => {
@@ -308,6 +319,42 @@ describe('getParamsFromPath', function () {
             //     return
             // })
             expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
+    })
+
+    describe('getParamsFromPath with basename', () => {
+        test('should remove basename from path when showBasename is true', () => {
+            const basename = '/test-base'
+            // Re-require modules to get fresh imports with mocks
+            // This is because these modules are first imported at module load time before mocks were set
+            // and have references to the original functions.
+            /* eslint-disable @typescript-eslint/no-var-requires */
+            const {
+                getParamsFromPath: getParamsFromPathFresh
+            } = require('@salesforce/retail-react-app/app/utils/site-utils')
+            const {
+                getConfig: getConfigFresh
+            } = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+            const {
+                getBasename: getBasenameFresh
+            } = require('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+            /* eslint-enable @typescript-eslint/no-var-requires */
+
+            getBasenameFresh.mockReturnValue(basename)
+            getConfigFresh.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasename: true
+                    }
+                }
+            }))
+
+            const path = `${basename}/us/en-US/category/womens`
+            const result = getParamsFromPathFresh(path)
+            expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
         })
     })
 })
