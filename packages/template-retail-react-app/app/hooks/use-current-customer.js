@@ -11,7 +11,7 @@ import {useCustomer, useCustomerId, useCustomerType} from '@salesforce/commerce-
  * A hook that returns the current customer.
  * @param {Array<string>} [expand] - Optional array of fields to expand in the customer query
  */
-export const useCurrentCustomer = (expand = undefined) => {
+export const useCurrentCustomer = (expand) => {
     const customerId = useCustomerId()
     const {isRegistered, isGuest, customerType} = useCustomerType()
     const parameters = {
