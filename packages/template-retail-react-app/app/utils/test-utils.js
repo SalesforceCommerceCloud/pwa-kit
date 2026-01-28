@@ -157,6 +157,7 @@ export const TestProviders = ({
                         proxy={`${window.location.origin}/${commerceApiConfig.proxyPath}`}
                         redirectURI={`${window.location.origin}/testcallback`}
                         fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
+                        clientSecret={'test-client-secret'}
                     >
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <Router>

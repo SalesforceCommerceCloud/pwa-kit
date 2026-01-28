@@ -1,4 +1,5 @@
 name: lighthouse_ci
+description: Run Lighthouse CI performance tests
 runs:
   using: composite
   steps:
