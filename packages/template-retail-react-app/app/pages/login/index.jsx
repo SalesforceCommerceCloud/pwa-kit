@@ -129,18 +129,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
-                    // Try WebAuthn first if enabled
-                    if (isWebAuthnEnabled) {
-                        console.log('WebAuthn enabled, trying to login with WebAuthn')
-                        try {
-                            await loginWithPasskey()
-                            // If successful, navigate to account
-                            navigate('/account')
-                            return
-                        } catch (error) {
-                            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
-                        }
-                    }
                     await handlePasswordlessLogin(email)
                     return
                 }
