@@ -490,20 +490,19 @@ const CheckoutOneClick = () => {
                 }
             }
 
-            // Prepare full card details for saving (only if we have form values for new cards)
+            // PCI: Cardholder data (CHD) - use only for single submission to API. Do not log, persist, or expose.
             let fullCardDetails = null
             if (hasFormValues) {
                 const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
                 fullCardDetails = {
                     holder: paymentFormValues.holder,
-                    number: paymentFormValues.number, // Full card number from form
+                    number: paymentFormValues.number,
                     cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
                     expirationMonth: parseInt(expirationMonth),
                     expirationYear: parseInt(`20${expirationYear}`)
                 }
             }
-            // For saved payments (appliedPayment), we don't need fullCardDetails
-            // because we're not saving them again - they're already saved
+            // For saved payments (appliedPayment), we don't need fullCardDetails - they're already saved
 
             // Handle payment submission
             if (isEnteringNewCard && hasFormValues) {
@@ -554,6 +553,7 @@ const CheckoutOneClick = () => {
 
             if (updatedBasket) {
                 await submitOrder(fullCardDetails)
+                fullCardDetails = null // Clear reference to CHD after use (PCI: minimize retention)
             } else {
                 // Billing validation failed, clear overlay
                 setIsPlacingOrder(false)
