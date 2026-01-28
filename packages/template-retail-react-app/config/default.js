@@ -31,7 +31,7 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: false,
+                enabled: true,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
@@ -46,7 +46,7 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -55,10 +55,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: '0862025d-be6e-4ec8-a2e2-f0ee027297f6',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                shortCode: 'staging-001',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
@@ -103,7 +103,7 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'staging-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
