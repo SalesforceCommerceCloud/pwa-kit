@@ -198,9 +198,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         const redirectTo = redirectPath ? redirectPath : '/account'
 
         if (passkey?.enabled) {
-            // Show passkey registration modal if:
-            // 1. Webauthn feature flag is enabled
-            // 2. Compatible with the browser
+            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
             if (
                 window.PublicKeyCredential &&
                 PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
@@ -224,15 +222,12 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         navigate(redirectTo)
     }, [isRegistered, redirectPath])
 
-    // Setup passkey conditional mediation when page loads
     useEffect(() => {
         if (isWebAuthnEnabled) {
-            // Call loginWithPasskey to setup conditional mediation
-            // This allows passkeys to appear in the email field autofill
             try {
                 loginWithPasskey()
             } catch (error) {
-                // Silently fail - conditional mediation just won't be available
+                // Silently fail
                 console.log('Passkey conditional mediation not started:', error?.message || error)
             }
         }
