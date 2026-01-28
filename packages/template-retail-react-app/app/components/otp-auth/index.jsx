@@ -39,7 +39,17 @@ const OtpAuth = ({
     isGuestRegistration = false,
     hideCheckoutAsGuestButton = false
 }) => {
-    const OTP_LENGTH = getConfig().app.login.tokenLength || 8
+    const {tokenLength} = getConfig().app.login
+    const parsedLength = Number(tokenLength)
+    const isValidOtpLength = parsedLength === 6 || parsedLength === 8
+    const OTP_LENGTH = isValidOtpLength ? parsedLength : 8
+
+    if (tokenLength != null && !isValidOtpLength) {
+        console.warn(
+            `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to ${OTP_LENGTH}.`
+        )
+    }
+
     const [isVerifying, setIsVerifying] = useState(false)
     const [error, setError] = useState('')
     const [resendTimer, setResendTimer] = useCountdown(0)

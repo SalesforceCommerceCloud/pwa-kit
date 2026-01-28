@@ -112,30 +112,6 @@ describe('OtpAuth', () => {
             expect(screen.getByText(/Resend code/i)).toBeInTheDocument()
         })
 
-        test('renders 8 OTP input fields by default', () => {
-            renderWithProviders(<WrapperComponent />)
-
-            const otpInputs = screen.getAllByRole('textbox')
-            expect(otpInputs).toHaveLength(8)
-        })
-
-        test('renders OTP input fields based on token length configuration', () => {
-            const tokenLength = 6
-            getConfig.mockImplementation(() => ({
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    login: {
-                        ...mockConfig.app.login,
-                        tokenLength
-                    }
-                }
-            }))
-            renderWithProviders(<WrapperComponent />)
-            const otpInputs = screen.getAllByRole('textbox')
-            expect(otpInputs).toHaveLength(tokenLength)
-        })
-
         test('renders phone icon', () => {
             renderWithProviders(<WrapperComponent />)
 
@@ -152,6 +128,58 @@ describe('OtpAuth', () => {
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
         })
+    })
+
+    describe('OTP token length configuration', () => {
+        test.each([
+            [6, 6],
+            [8, 8],
+            ['6', 6],
+            ['8', 8]
+        ])(
+            'renders %s OTP input fields when tokenLength is set to %s',
+            (tokenLength, expectedLength) => {
+                getConfig.mockImplementation(() => ({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        login: {
+                            ...mockConfig.app.login,
+                            tokenLength
+                        }
+                    }
+                }))
+                renderWithProviders(<WrapperComponent />)
+                const otpInputs = screen.getAllByRole('textbox')
+                expect(otpInputs).toHaveLength(expectedLength)
+            }
+        )
+
+        test.each([7, 'abc', null, undefined])(
+            'defaults to 8 OTP input fields when tokenLength is invalid (%s)',
+            (tokenLength) => {
+                const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+                getConfig.mockImplementation(() => ({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        login: {
+                            ...mockConfig.app.login,
+                            tokenLength
+                        }
+                    }
+                }))
+                renderWithProviders(<WrapperComponent />)
+                const otpInputs = screen.getAllByRole('textbox')
+                expect(otpInputs).toHaveLength(8)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining(
+                        `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to 8.`
+                    )
+                )
+                consoleWarnSpy.mockRestore()
+            }
+        )
     })
 
     describe('OTP Input Functionality', () => {
