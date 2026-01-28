@@ -1013,6 +1013,7 @@ describe('SFPaymentsSheet', () => {
             const ref = React.createRef()
             setupConfirmPaymentMocks()
 
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const useShopperConfigurationModule = require('@salesforce/retail-react-app/app/hooks/use-shopper-configuration')
             const originalMock = useShopperConfigurationModule.useShopperConfiguration
 
@@ -1154,6 +1155,7 @@ describe('SFPaymentsSheet', () => {
             ]
 
             jest.spyOn(
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
                 require('@salesforce/commerce-sdk-react'),
                 'usePaymentConfiguration'
             ).mockReturnValue({
