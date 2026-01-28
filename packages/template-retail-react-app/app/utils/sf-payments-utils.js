@@ -267,15 +267,83 @@ export const createPaymentInstrumentBody = ({
         }
     }
 
-    if (gateway === PAYMENT_GATEWAYS.ADYEN && storePaymentMethod) {
-        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
-    }
-
     return {
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
         paymentReferenceRequest: paymentReferenceRequest
     }
+}
+
+/**
+ * Transforms payment method references from API format to SF Payments SDK format.
+ * @param {Object} customer - Customer object with paymentMethodReferences property
+ * @param {Object} paymentConfig - Payment configuration object with paymentMethodSetAccounts property
+ * @returns {Array} Transformed payment method references for SF Payments SDK
+ */
+export const transformPaymentMethodReferences = (customer, paymentConfig) => {
+    const paymentMethodReferences = customer?.paymentMethodReferences
+    const paymentMethodSetAccounts = paymentConfig?.paymentMethodSetAccounts || []
+
+    if (!Array.isArray(paymentMethodReferences) || !Array.isArray(paymentMethodSetAccounts)) {
+        return []
+    }
+
+    return paymentMethodReferences
+        .map((pmr) => {
+            const generateDisplayName = () => {
+                if (pmr.brand && pmr.last4) {
+                    const brandName = pmr.brand.charAt(0).toUpperCase() + pmr.brand.slice(1)
+                    return `${brandName} •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'card' && pmr.last4) {
+                    return `Card •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'sepa_debit' && pmr.last4) {
+                    return `Account ending in ${pmr.last4}`
+                }
+                return 'Saved Payment Method'
+            }
+
+            // Determine gatewayId for SDK matching
+            if (!pmr.accountId) {
+                return null
+            }
+
+            const matchingAccount = paymentMethodSetAccounts.find(
+                (account) => account.accountId === pmr.accountId
+            )
+            if (!matchingAccount) {
+                return null
+            }
+
+            const gatewayId = matchingAccount.accountId
+
+            if (!gatewayId || typeof gatewayId !== 'string') {
+                return null
+            }
+
+            return {
+                accountId: pmr.accountId || null,
+                name: generateDisplayName(),
+                status: 'Active',
+                isDefault: false,
+                type: pmr.type || null,
+                accountHolderName: null,
+                id: pmr.id || null,
+                gatewayTokenId: pmr.id || null,
+                usageType: 'OffSession',
+                gatewayId: gatewayId,
+                gatewayCustomerId: null,
+                last4: pmr.last4 || null,
+                network: pmr.brand || null,
+                issuer: null,
+                expiryMonth: null,
+                expiryYear: null,
+                bankName: null,
+                savedByMerchant: false
+            }
+        })
+        .filter((spm) => spm !== null)
 }
 
 /**
