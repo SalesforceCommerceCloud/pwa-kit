@@ -276,14 +276,14 @@ export const createPaymentInstrumentBody = ({
 
 /**
  * Transforms payment method references from API format to SF Payments SDK format.
- * @param {Array} paymentMethodReferences - Array of payment method references
- * @param {Array} paymentMethodSetAccounts - Array of payment method set accounts
+ * @param {Object} customer - Customer object with paymentMethodReferences property
+ * @param {Object} paymentConfig - Payment configuration object with paymentMethodSetAccounts property
  * @returns {Array} Transformed payment method references for SF Payments SDK
  */
-export const transformPaymentMethodReferences = (
-    paymentMethodReferences,
-    paymentMethodSetAccounts = []
-) => {
+export const transformPaymentMethodReferences = (customer, paymentConfig) => {
+    const paymentMethodReferences = customer?.paymentMethodReferences
+    const paymentMethodSetAccounts = paymentConfig?.paymentMethodSetAccounts || []
+
     if (!Array.isArray(paymentMethodReferences) || !Array.isArray(paymentMethodSetAccounts)) {
         return []
     }
@@ -316,7 +316,7 @@ export const transformPaymentMethodReferences = (
                 return null
             }
 
-            const gatewayId = matchingAccount.gatewayId || matchingAccount.accountId
+            const gatewayId = matchingAccount.accountId
 
             if (!gatewayId || typeof gatewayId !== 'string') {
                 return null
