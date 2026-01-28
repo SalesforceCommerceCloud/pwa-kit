@@ -31,14 +31,11 @@ import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
-import {
-    getPasswordlessErrorMessage,
-    getPasswordResetErrorMessage
+    getAuthorizePasswordlessErrorMessage,
+    getPasswordResetErrorMessage,
+    getLoginPasswordlessErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -119,7 +116,7 @@ export const AuthModal = ({
                 setIsOtpAuthOpen(true)
             }, 150) // Small delay to allow AuthModal to close first
         } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -214,12 +211,11 @@ export const AuthModal = ({
     const handleOtpVerification = async (pwdlessLoginToken) => {
         try {
             await loginPasswordless.mutateAsync({pwdlessLoginToken})
+            return {success: true}
         } catch (e) {
             const errorData = await e.response?.json()
-            const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', {type: 'manual', message})
+            const message = formatMessage(getLoginPasswordlessErrorMessage(errorData.message))
+            return {success: false, error: message}
         }
     }
 

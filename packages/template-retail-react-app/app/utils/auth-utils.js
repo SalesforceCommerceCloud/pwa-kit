@@ -8,7 +8,9 @@
 import {defineMessage} from 'react-intl'
 import {
     API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR,
+    INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 
 export const TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE = defineMessage({
@@ -41,13 +43,13 @@ const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVA
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
 /**
- * Maps an error message to the appropriate user-friendly error message descriptor
+ * Maps error message from authorizePasswordless mutation to the appropriate user-friendly error message descriptor
  * for passwordless login feature errors.
  *
  * @param {string} errorMessage - The error message from the API
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
-export const getPasswordlessErrorMessage = (errorMessage) => {
+export const getAuthorizePasswordlessErrorMessage = (errorMessage) => {
     if (PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
@@ -58,7 +60,7 @@ export const getPasswordlessErrorMessage = (errorMessage) => {
 }
 
 /**
- * Maps an error message to the appropriate user-friendly error message descriptor
+ * Maps error message from getPasswordResetToken mutation to the appropriate user-friendly error message descriptor
  * for password reset feature errors.
  *
  * @param {string} errorMessage - The error message from the API
@@ -70,6 +72,20 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
     }
     if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
         return TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps error message from loginPasswordless mutation to the appropriate user-friendly error message descriptor
+ * for OTP verification errors (passwordless login token verification).
+ *
+ * @param {string} errorMessage - The error message from the API
+ * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
+ */
+export const getLoginPasswordlessErrorMessage = (errorMessage) => {
+    if (INVALID_TOKEN_ERROR.test(errorMessage)) {
+        return INVALID_TOKEN_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
 }

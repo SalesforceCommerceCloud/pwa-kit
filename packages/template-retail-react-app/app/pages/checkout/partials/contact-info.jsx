@@ -44,7 +44,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getAuthorizePasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
@@ -91,7 +91,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             setError(message)
         }
     }

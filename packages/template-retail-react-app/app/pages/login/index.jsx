@@ -26,14 +26,13 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
-import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {
+    getAuthorizePasswordlessErrorMessage,
+    getLoginPasswordlessErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
@@ -117,7 +116,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             })
             setIsOtpAuthOpen(true)
         } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -125,12 +124,11 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const handleOtpVerification = async (pwdlessLoginToken) => {
         try {
             await loginPasswordless.mutateAsync({pwdlessLoginToken})
+            return {success: true}
         } catch (e) {
             const errorData = await e.response?.json()
-            const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', {type: 'manual', message})
+            const message = formatMessage(getLoginPasswordlessErrorMessage(errorData.message))
+            return {success: false, error: message}
         }
     }
 
