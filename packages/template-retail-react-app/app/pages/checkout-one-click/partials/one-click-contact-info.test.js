@@ -177,6 +177,11 @@ describe('ContactInfo Component', () => {
     test('updates checkout contact phone when user types phone (guest)', async () => {
         const {user} = renderWithProviders(<ContactInfo />)
         const phoneInput = screen.getByLabelText('Phone')
+        // Wait for ContactInfo's auto-focus on email (100ms) to run first so it doesn't
+        // steal focus during user.type() and send keystrokes to the email field (CI race).
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 150))
+        })
         // Type the phone number and wait for it to be formatted
         await user.type(phoneInput, '7275551234')
         // Wait for the phone input to have a value (formatted phone number)
