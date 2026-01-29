@@ -327,6 +327,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Payment gateways
                         '*.stripe.com',
                         '*.paypal.com',
+                        '*.adyen.com',
                         // TODO: Used to load a valid sfp.js
                         '*.demandware.net'
                     ],
@@ -337,6 +338,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.c360a.salesforce.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
+                        // Payment gateways
+                        '*.adyen.com',
                         // TODO: Used to load metadata
                         '*.demandware.net'
                     ],
@@ -345,7 +348,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.site.com',
                         // Payment gateways
                         '*.stripe.com',
-                        '*.paypal.com'
+                        '*.paypal.com',
+                        '*.adyen.com'
                     ]
                 }
             }
