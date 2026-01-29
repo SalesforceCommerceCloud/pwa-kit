@@ -283,7 +283,8 @@ export const PAYMENT_METHOD_TYPES = {
 
 export const PAYMENT_GATEWAYS = {
     STRIPE: 'stripe',
-    ADYEN: 'adyen'
+    ADYEN: 'adyen',
+    PAYPAL: 'paypal'
 }
 
 export const SETUP_FUTURE_USAGE = {
