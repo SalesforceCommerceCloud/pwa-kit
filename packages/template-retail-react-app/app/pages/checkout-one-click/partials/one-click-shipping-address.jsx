@@ -31,6 +31,7 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import PropTypes from 'prop-types'
 
@@ -46,8 +47,7 @@ const shippingAddressAriaLabel = defineMessage({
 export default function ShippingAddress(props) {
     const {enableUserRegistration = false} = props
     const {formatMessage} = useIntl()
-    const [isLoading, setIsLoading] = useState()
-    const [hasAutoSelected, setHasAutoSelected] = useState(false)
+    const [isManualSubmitLoading, setIsManualSubmitLoading] = useState(false)
     const [isMultiShipping, setIsMultiShipping] = useState(false)
     const [openedByUser, setOpenedByUser] = useState(false)
     const {data: customer} = useCurrentCustomer()
@@ -91,7 +91,7 @@ export default function ShippingAddress(props) {
     )
 
     const submitAndContinue = async (address) => {
-        setIsLoading(true)
+        setIsManualSubmitLoading(true)
         try {
             const {
                 addressId,
@@ -198,60 +198,45 @@ export default function ShippingAddress(props) {
                 console.error('Error submitting shipping address:', error)
             }
         } finally {
-            setIsLoading(false)
+            setIsManualSubmitLoading(false)
         }
     }
 
-    // Auto-select and apply preferred shipping address for registered users
-    useEffect(() => {
-        const autoSelectPreferredAddress = async () => {
-            // Only auto-select when on this step and haven't already auto-selected
-            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) {
-                return
-            }
-
-            // If user explicitly opened this card, do not auto-advance
-            if (openedByUser) {
-                return
-            }
-
-            // Only proceed if customer is registered and has addresses
-            if (!customer?.isRegistered || !customer?.addresses?.length) {
-                return
-            }
-
-            // Skip to next step if basket already has a shipping address
+    const {isLoading: isAutoSelectLoading, reset} = useCheckoutAutoSelect({
+        currentStep: step,
+        targetStep: STEPS.SHIPPING_ADDRESS,
+        isCustomerRegistered: customer?.isRegistered,
+        items: customer?.addresses,
+        getPreferredItem: (addresses) =>
+            addresses.find((addr) => addr.preferred === true) || addresses[0],
+        shouldSkip: () => {
+            if (openedByUser) return true
             if (selectedShippingAddress?.address1) {
-                setHasAutoSelected(true) // Prevent further attempts
                 if (typeof goToNextStep === 'function') {
                     goToNextStep()
                 }
-                return
+                return true
             }
-
-            // Choose preferred address if set; otherwise fallback to first address
-            const preferredAddress =
-                customer.addresses.find((addr) => addr.preferred === true) || customer.addresses[0]
-
-            //Auto-selecting preferred shipping address
-            // This works for both single and multi-shipment orders:
-            // - For single shipment: applies address directly
-            // - For multi-shipment: consolidates all items to one shipment with the preferred address
-            if (preferredAddress) {
-                setHasAutoSelected(true)
-
-                try {
-                    // Apply the preferred address and continue to next step
-                    await submitAndContinue(preferredAddress)
-                } catch (error) {
-                    // Reset on error so user can manually select
-                    setHasAutoSelected(false)
-                }
-            }
+            return false
+        },
+        isAlreadyApplied: () => Boolean(selectedShippingAddress?.address1),
+        applyItem: async (address) => {
+            await submitAndContinue(address)
+        },
+        // Navigation is already handled inside submitAndContinue (goToStep/goToNextStep)
+        onSuccess: () => {},
+        onError: (error) => {
+            console.error('Failed to auto-select address:', error)
         }
+    })
 
-        autoSelectPreferredAddress()
-    }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading, openedByUser])
+    const isLoading = isAutoSelectLoading || isManualSubmitLoading
+
+    const handleEdit = () => {
+        setOpenedByUser(true)
+        reset()
+        goToStep(STEPS.SHIPPING_ADDRESS)
+    }
 
     // Reset manual-open flag when leaving this step
     useEffect(() => {
@@ -270,10 +255,7 @@ export default function ShippingAddress(props) {
             editing={step === STEPS.SHIPPING_ADDRESS}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
-            onEdit={() => {
-                setOpenedByUser(true)
-                goToStep(STEPS.SHIPPING_ADDRESS)
-            }}
+            onEdit={handleEdit}
             editLabel={formatMessage({
                 defaultMessage: 'Change',
                 id: 'toggle_card.action.change'

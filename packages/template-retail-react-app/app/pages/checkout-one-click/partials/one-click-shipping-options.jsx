@@ -29,6 +29,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {
     isPickupShipment,
@@ -47,8 +48,6 @@ export default function ShippingOptions() {
     const {data: customer} = useCurrentCustomer()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
-    const [hasAutoSelected, setHasAutoSelected] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     // Identify delivery shipments (exclude pickup and those without shipping addresses)
@@ -95,6 +94,48 @@ export default function ShippingOptions() {
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
+    // Filter out pickup methods for delivery shipment
+    const deliveryMethods =
+        (shippingMethods?.applicableShippingMethods || []).filter(
+            (method) => !isPickupMethod(method)
+        ) || []
+
+    const {isLoading: isAutoSelectLoading} = useCheckoutAutoSelect({
+        currentStep: step,
+        targetStep: STEPS.SHIPPING_OPTIONS,
+        isCustomerRegistered: customer?.isRegistered,
+        items: deliveryMethods,
+        getPreferredItem: (methods) => {
+            const defaultMethodId = shippingMethods?.defaultShippingMethodId
+            return methods.find((m) => m.id === defaultMethodId) || methods[0]
+        },
+        shouldSkip: () => {
+            if (selectedShippingMethod?.id && !isPickupMethod(selectedShippingMethod)) {
+                const stillValid = deliveryMethods.some((m) => m.id === selectedShippingMethod.id)
+                if (stillValid) {
+                    goToNextStep()
+                    return true
+                }
+            }
+            return false
+        },
+        isAlreadyApplied: () => false,
+        applyItem: async (method) => {
+            await updateShippingMethod.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: targetDeliveryShipment?.shipmentId || 'me'
+                },
+                body: {id: method.id}
+            })
+        },
+        onSuccess: () => goToNextStep(),
+        onError: (error) => {
+            console.error('Failed to auto-select shipping method:', error)
+        },
+        enabled: !hasMultipleDeliveryShipments
+    })
+
     // Calculate if we should show loading state immediately for auto-selection
     const shouldShowInitialLoading = useMemo(() => {
         const filteredMethods =
@@ -110,7 +151,6 @@ export default function ShippingOptions() {
 
         return (
             step === STEPS.SHIPPING_OPTIONS &&
-            !hasAutoSelected &&
             customer?.isRegistered &&
             !selectedShippingMethod?.id &&
             filteredMethods.length > 0 &&
@@ -118,10 +158,10 @@ export default function ShippingOptions() {
             defaultMethod &&
             !isPickupMethod(defaultMethod)
         )
-    }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
+    }, [step, customer, selectedShippingMethod, shippingMethods, STEPS.SHIPPING_OPTIONS])
 
-    // Use calculated loading state or manual loading state
-    const effectiveIsLoading = Boolean(isLoading) || Boolean(shouldShowInitialLoading)
+    // Use calculated loading state or auto-select loading state
+    const effectiveIsLoading = Boolean(isAutoSelectLoading) || Boolean(shouldShowInitialLoading)
 
     const form = useForm({
         shouldUnregister: false,
@@ -165,94 +205,6 @@ export default function ShippingOptions() {
         }
     }, [selectedShippingMethod, shippingMethods])
 
-    // Validate existing shipping method for new address or auto-select default for authenticated users
-    useEffect(() => {
-        const handleShippingMethodForReturningShopper = async () => {
-            // Only auto-select when on this step and haven't already auto-selected
-            if (step !== STEPS.SHIPPING_OPTIONS || hasAutoSelected || isLoading) {
-                return
-            }
-
-            // Wait for shipping methods to load and filter out pickup methods
-            const applicable =
-                shippingMethods?.applicableShippingMethods?.filter(
-                    (method) => !isPickupMethod(method)
-                ) || []
-
-            if (!applicable.length) {
-                return
-            }
-
-            // If we already have a shipping method on the basket, validate it against the new address' methods.
-            // Skip validation if the current method is a pickup method
-            if (selectedShippingMethod?.id && !isPickupMethod(selectedShippingMethod)) {
-                const stillValid = applicable.some((m) => m.id === selectedShippingMethod.id)
-                setHasAutoSelected(true)
-                if (stillValid) {
-                    // Do not update the basket – keep existing method and proceed to payment
-                    goToNextStep()
-                    return
-                }
-                // If existing method is no longer valid, fall through to select/apply a default
-            }
-
-            // Only proceed with auto-apply for authenticated users when no valid method is present
-            if (!customer?.isRegistered) {
-                return
-            }
-
-            // Find default method, but skip if it's a pickup method
-            const defaultMethodId = shippingMethods.defaultShippingMethodId
-            const defaultMethod =
-                (defaultMethodId &&
-                    !isPickupMethod(
-                        shippingMethods.applicableShippingMethods.find(
-                            (m) => m.id === defaultMethodId
-                        )
-                    ) &&
-                    applicable.find((method) => method.id === defaultMethodId)) ||
-                applicable[0]
-
-            if (defaultMethod) {
-                //Auto-selecting default shipping method
-                setHasAutoSelected(true)
-                setIsLoading(true) // Show loading state immediately
-
-                try {
-                    // Apply the default shipping method and continue to next step
-                    await updateShippingMethod.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: targetDeliveryShipment?.shipmentId || 'me'
-                        },
-                        body: {
-                            id: defaultMethodId
-                        }
-                    })
-                    //Default shipping method auto-applied successfully
-                    setIsLoading(false) // Clear loading state before navigation
-                    goToNextStep()
-                } catch (error) {
-                    // Reset on error so user can manually select
-                    setHasAutoSelected(false)
-                    setIsLoading(false) // Hide loading state on error
-                }
-            }
-        }
-
-        handleShippingMethodForReturningShopper()
-    }, [
-        step,
-        selectedShippingMethod,
-        customer,
-        shippingMethods,
-        hasAutoSelected,
-        basket?.basketId,
-        isLoading,
-        goToNextStep,
-        updateShippingMethod
-    ])
-
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({
             parameters: {
@@ -277,16 +229,6 @@ export default function ShippingOptions() {
     const filteredShippingMethods =
         shippingMethods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) ||
         []
-
-    const hasApplicableMethods = Boolean(filteredShippingMethods.length > 0)
-    const isSelectedMethodValid =
-        hasApplicableMethods &&
-        Boolean(
-            selectedShippingMethod?.id &&
-                shippingMethods.applicableShippingMethods?.some(
-                    (m) => m.id === selectedShippingMethod.id
-                )
-        )
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
@@ -430,7 +372,7 @@ export default function ShippingOptions() {
 
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
-                isSelectedMethodValid &&
+                selectedShippingMethod &&
                 selectedShippingAddress && (
                     <SingleShipmentSummary
                         selectedShippingMethod={selectedShippingMethod}

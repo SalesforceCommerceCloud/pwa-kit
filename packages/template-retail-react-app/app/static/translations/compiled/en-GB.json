@@ -17,12 +17,6 @@
       "value": "Log Out"
     }
   ],
-  "account.payments.action.refresh": [
-    {
-      "type": 0,
-      "value": "Refresh"
-    }
-  ],
   "account.payments.action.retry": [
     {
       "type": 0,

@@ -337,25 +337,12 @@ const AccountPayments = () => {
     return (
         <Container layerStyle="page">
             <Stack spacing={6}>
-                <Flex justify="space-between" align="center">
-                    <Heading as="h1" fontSize="2xl">
-                        <FormattedMessage
-                            defaultMessage="Payment Methods"
-                            id="account.payments.heading.payment_methods"
-                        />
-                    </Heading>
-                    <Button
-                        onClick={() => refetch()}
-                        isLoading={isLoadingCustomer}
-                        size="sm"
-                        variant="outline"
-                    >
-                        <FormattedMessage
-                            defaultMessage="Refresh"
-                            id="account.payments.action.refresh"
-                        />
-                    </Button>
-                </Flex>
+                <Heading as="h1" fontSize="2xl">
+                    <FormattedMessage
+                        defaultMessage="Payment Methods"
+                        id="account.payments.heading.payment_methods"
+                    />
+                </Heading>
 
                 <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
                     {!isSalesforcePaymentsEnabled && (
