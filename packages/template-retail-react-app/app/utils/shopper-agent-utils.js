@@ -18,7 +18,7 @@ export function launchChat() {
     try {
         // Launch chat using the embedded service bootstrap API
         if (
-            window.embeddedservice_bootstrap &&
+            window.embeddedservice_bootstrap?.utilAPI &&
             typeof window.embeddedservice_bootstrap.utilAPI.launchChat === 'function'
         ) {
             window.embeddedservice_bootstrap.utilAPI.launchChat()

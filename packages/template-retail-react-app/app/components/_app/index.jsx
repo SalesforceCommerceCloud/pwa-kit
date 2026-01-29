@@ -87,7 +87,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
-import {openShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {useOpenShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-open-shopper-agent'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -286,10 +286,7 @@ const App = (props) => {
         history.push(path)
     }
 
-    const onAgentClick = () => {
-        // Open the shopper agent chat window
-        openShopperAgent()
-    }
+    const openShopperAgent= useOpenShopperAgent()
 
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
@@ -297,7 +294,7 @@ const App = (props) => {
 
     useEffect(() => {
         trackPage()
-    }, [location])
+    }, [location])    
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -399,7 +396,7 @@ const App = (props) => {
                                                 onMyAccountClick={onAccountClick}
                                                 onWishlistClick={onWishlistClick}
                                                 onStoreLocatorClick={onOpenStoreLocator}
-                                                onAgentClick={onAgentClick}
+                                                onAgentClick={openShopperAgent}
                                             >
                                                 <HideOnDesktop>
                                                     <DrawerMenu
