@@ -5,6 +5,7 @@
   - Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
   - Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
   - Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
+  - BOPIS multishipment with OMS [#3613] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
 - [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
 

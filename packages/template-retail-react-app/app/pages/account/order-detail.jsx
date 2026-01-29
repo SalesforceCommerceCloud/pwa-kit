@@ -137,11 +137,9 @@ const AccountOrderDetail = () => {
     // Check if order has OMS data
     const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
 
-    // Check if order is OMS multi-shipment order
-    const isOmsMultiShipment = useMemo(
-        () =>
-            isOmsOrder &&
-            ((order?.omsData?.shipments?.length ?? 0) > 1 || (order?.shipments?.length ?? 0) > 1),
+    // Check if order is multi-shipment order
+    const isMultiShipmentOrder = useMemo(
+        () => (order?.omsData?.shipments?.length ?? 0) > 1 || (order?.shipments?.length ?? 0) > 1,
         [isOmsOrder, order?.omsData?.shipments?.length, order?.shipments?.length]
     )
 
@@ -397,8 +395,8 @@ const AccountOrderDetail = () => {
                                         </Stack>
                                     )
                                 })}
-                                {/* Delivery Shipments */}
-                                {!isOmsMultiShipment &&
+                                {/* Any type of Non-OMS or any type of single shipment order: show DeliveryMethods and Shipments info*/}
+                                {(!isOmsOrder || !isMultiShipmentOrder) &&
                                     deliveryShipments.map((shipment, index) => {
                                         const omsShipment = isOmsOrder
                                             ? order.omsData.shipments?.[index]
@@ -458,8 +456,9 @@ const AccountOrderDetail = () => {
                                         )
                                     })}
 
-                                {/* OMS multi-shipment: show OMS shipment info only;*/}
-                                {isOmsMultiShipment &&
+                                {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
+                                {isOmsOrder &&
+                                    isMultiShipmentOrder &&
                                     order?.omsData?.shipments?.map((shipment, index) => (
                                         <React.Fragment key={`oms-shipment-${index}`}>
                                             {renderShippingMethod(
