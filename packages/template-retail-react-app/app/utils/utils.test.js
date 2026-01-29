@@ -203,3 +203,39 @@ describe('buildRedirectURI', function () {
         expect(result).toBe('')
     })
 })
+
+describe('arrayBufferToBase64Url', () => {
+    test.each([
+        ['empty ArrayBuffer', new ArrayBuffer(0), ''],
+        ['single byte', new Uint8Array([65]).buffer, 'QQ'],
+        ['multiple bytes', new Uint8Array([72, 101, 108, 108, 111]).buffer, 'SGVsbG8'],
+        ['bytes with padding', new Uint8Array([77, 97, 110]).buffer, 'TWFu'],
+        ['binary data', new Uint8Array([0, 1, 2, 255, 254, 253]).buffer, 'AAEC__79']
+    ])('converts %s to base64url', (_, input, expected) => {
+        const result = utils.arrayBufferToBase64Url(input)
+        expect(result).toBe(expected)
+    })
+
+    test.each([
+        ['Uint8Array', new Uint8Array([72, 101, 108, 108, 111])],
+        ['ArrayBuffer', new Uint8Array([72, 101, 108, 108, 111]).buffer]
+    ])('accepts %s input type', (_, input) => {
+        const result = utils.arrayBufferToBase64Url(input)
+        expect(result).toBe('SGVsbG8')
+    })
+
+    test('produces URL-safe base64 (no +, /, or = characters)', () => {
+        // Use data that would produce +, /, or = in standard base64
+        const input = new Uint8Array([251, 239, 191]) // Produces base64 with + and /
+        const result = utils.arrayBufferToBase64Url(input)
+        expect(result).not.toMatch(/[+/=]/)
+        expect(result).toMatch(/^[A-Za-z0-9_-]*$/)
+    })
+
+    test('handles large buffers', () => {
+        const largeArray = new Uint8Array(1000).fill(65) // 1000 'A' characters
+        const result = utils.arrayBufferToBase64Url(largeArray)
+        expect(result.length).toBeGreaterThan(0)
+        expect(result).not.toMatch(/[+/=]/)
+    })
+})
