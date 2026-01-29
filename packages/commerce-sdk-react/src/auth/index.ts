@@ -1296,15 +1296,17 @@ class Auth {
                 userid: parameters.userid,
                 mode,
                 ...(parameters.register_customer !== undefined && {
-                    register_customer:
+                    registerCustomer:
                         typeof parameters.register_customer === 'boolean'
-                            ? String(parameters.register_customer)
-                            : parameters.register_customer
+                            ? parameters.register_customer
+                            : parameters.register_customer === 'true'
+                            ? true
+                            : false
                 }),
-                ...(parameters.last_name && {last_name: parameters.last_name}),
+                ...(parameters.last_name && {lastName: parameters.last_name}),
                 ...(parameters.email && {email: parameters.email}),
-                ...(parameters.first_name && {first_name: parameters.first_name}),
-                ...(parameters.phone_number && {phone_number: parameters.phone_number})
+                ...(parameters.first_name && {firstName: parameters.first_name}),
+                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
         })
         if (res && res.status !== 200) {
