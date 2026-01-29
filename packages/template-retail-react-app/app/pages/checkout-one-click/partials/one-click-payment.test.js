@@ -1348,8 +1348,14 @@ describe('Payment Component', () => {
                     }
                 ]
             }
-            render(<TestWrapper isRegistered={true} customerData={customerWithSaved} />)
-            // Wait for form to appear (auto-apply may temporarily hide it)
+            // Use isEditing so auto-apply is skipped and the form stays visible (avoids CI race)
+            render(
+                <TestWrapper
+                    isRegistered={true}
+                    customerData={customerWithSaved}
+                    isEditing={true}
+                />
+            )
             await screen.findByTestId('payment-form')
             await user.click(screen.getByText('Select Saved'))
             // If no error thrown, the path executed successfully
@@ -1383,11 +1389,13 @@ describe('Payment Component', () => {
                     }
                 ]
             }
+            // Use isEditing so auto-apply is skipped and the form stays visible (avoids CI race)
             render(
                 <TestWrapper
                     basketData={pickupBasket}
                     isRegistered={true}
                     customerData={customerWithSaved}
+                    isEditing={true}
                 />
             )
             await screen.findByTestId('payment-form')

@@ -8,9 +8,6 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
-  "account.payments.action.refresh": {
-    "defaultMessage": "Refresh"
-  },
   "account.payments.action.retry": {
     "defaultMessage": "Retry"
   },

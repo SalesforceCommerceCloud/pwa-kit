@@ -41,20 +41,6 @@
       "value": "]"
     }
   ],
-  "account.payments.action.refresh": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗƒřḗḗşħ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account.payments.action.retry": [
     {
       "type": 0,
