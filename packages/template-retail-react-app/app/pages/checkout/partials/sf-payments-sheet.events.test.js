@@ -66,6 +66,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                         accountId: 'stripe-account-1',
                         vendor: 'Stripe',
                         paymentMethods: [{id: 'card'}]
+                    },
+                    {
+                        accountId: 'paypal-account-1',
+                        vendor: 'Paypal',
+                        paymentMethods: [{id: 'paypal'}]
                     }
                 ]
             }
@@ -235,14 +240,18 @@ const setupComponentAndGetPaymentElement = async () => {
     return checkoutCall[4]
 }
 
-const firePaymentMethodSelectedEvent = async (paymentElement, detail = {}) => {
+const firePaymentMethodSelectedEvent = async (
+    paymentElement,
+    selectedPaymentMethod = 'card',
+    detail = {}
+) => {
     await act(async () => {
         paymentElement.dispatchEvent(
             new CustomEvent('sfp:paymentmethodselected', {
                 bubbles: true,
                 composed: true,
                 detail: {
-                    selectedPaymentMethod: 'card',
+                    selectedPaymentMethod,
                     ...detail
                 }
             })
@@ -377,7 +386,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
     test('handlePaymentButtonApprove includes setupFutureUsage when savePaymentMethodForFutureUse is true', async () => {
         const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
+        await firePaymentMethodSelectedEvent(paymentElement, 'card', {
+            savePaymentMethodForFutureUse: true
+        })
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
         await waitFor(
@@ -399,7 +410,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
     test('handlePaymentButtonApprove does not include setupFutureUsage when savePaymentMethodForFutureUse is false', async () => {
         const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: false})
+        await firePaymentMethodSelectedEvent(paymentElement, 'card', {
+            savePaymentMethodForFutureUse: false
+        })
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: false})
 
         await waitFor(
@@ -418,7 +431,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
     test('handlePaymentButtonApprove includes required fields for PaymentsCustomer record creation', async () => {
         const paymentElement = await setupComponentAndGetPaymentElement()
 
-        await firePaymentMethodSelectedEvent(paymentElement, {savePaymentMethodForFutureUse: true})
+        await firePaymentMethodSelectedEvent(paymentElement, 'card', {
+            savePaymentMethodForFutureUse: true
+        })
         await firePaymentApproveEvent(paymentElement, {savePaymentMethodForFutureUse: true})
 
         await waitFor(
@@ -462,6 +477,10 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             const paymentElement = await setupComponentAndGetPaymentElement()
             const checkoutCall = mockCheckout.mock.calls[0]
             const config = checkoutCall[2]
+
+            await firePaymentMethodSelectedEvent(paymentElement, 'paypal', {
+                requiresPayButton: false
+            })
 
             await config.actions.createIntent()
 
@@ -540,7 +559,7 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
             const checkoutCall = mockCheckout.mock.calls[0]
             const paymentElement = checkoutCall[4]
 
-            await firePaymentMethodSelectedEvent(paymentElement, {requiresPayButton: true})
+            await firePaymentMethodSelectedEvent(paymentElement, 'card', {requiresPayButton: true})
 
             await waitFor(() => {
                 expect(mockOnRequiresPayButtonChange).toHaveBeenCalledWith(true)
