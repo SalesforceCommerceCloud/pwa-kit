@@ -79,7 +79,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const [redirectPath, setRedirectPath] = useState('')
     const {showToast} = usePasskeyRegistration()
     const {loginWithPasskey} = usePasskeyLogin()
-    const isWebAuthnEnabled = !!passkey?.enabled
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -211,12 +210,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        if (isWebAuthnEnabled) {
-            try {
-                loginWithPasskey()
-            } catch (error) {
-                // Silently fail
-            }
+        try {
+            loginWithPasskey()
+        } catch (error) {
+            // TODO W-21056536: Add error message handling
         }
     }, [])
 

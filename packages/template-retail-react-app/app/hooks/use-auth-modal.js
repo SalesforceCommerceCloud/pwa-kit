@@ -67,7 +67,6 @@ export const AuthModal = ({
     onClose,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
-    isWebAuthnEnabled = false,
     idps = [],
     ...props
 }) => {
@@ -132,24 +131,6 @@ export const AuthModal = ({
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
-                    // Try WebAuthn first if enabled
-                    if (isWebAuthnEnabled) {
-                        console.log('WebAuthn enabled, trying to login with WebAuthn')
-                        try {
-                            await loginWithPasskey()
-                            // If successful, close modal and navigate
-                            onClose()
-                            navigate('/account')
-                            return
-                        } catch (error) {
-                            // Show error and stop - don't fall back to passwordless
-                            form.setError('global', {
-                                type: 'manual',
-                                message: formatMessage(API_ERROR_MESSAGE)
-                            })
-                            return
-                        }
-                    }
                     await handlePasswordlessLogin(email)
                     return
                 }
@@ -229,14 +210,11 @@ export const AuthModal = ({
             setCurrentView(initialView)
             form.reset()
             // Prompt user to login without username (discoverable credentials)
-            if (isWebAuthnEnabled) {
-                loginWithPasskey().catch((error) => {
-                    // Silently fail passkey login, user can still use other methods
-                    console.log('Passkey login failed:', error)
-                })
-            }
+            loginWithPasskey().catch((error) => {
+                // TODO W-21056536: Add error message handling
+            })
         }
-    }, [isOpen, isWebAuthnEnabled])
+    }, [isOpen])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
@@ -399,7 +377,6 @@ AuthModal.propTypes = {
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
     isSocialEnabled: PropTypes.bool,
-    isWebAuthnEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
@@ -419,7 +396,6 @@ export const useAuthModal = (initialView = LOGIN_VIEW) => {
         onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,
         isSocialEnabled: !!social?.enabled,
-        isWebAuthnEnabled: !!passkey?.enabled,
         idps: social?.idps
     }
 }
