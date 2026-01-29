@@ -286,7 +286,7 @@ const App = (props) => {
         history.push(path)
     }
 
-    const openShopperAgent= useOpenShopperAgent()
+    const openShopperAgent = useOpenShopperAgent()
 
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
@@ -294,7 +294,7 @@ const App = (props) => {
 
     useEffect(() => {
         trackPage()
-    }, [location])    
+    }, [location])
 
     return (
         <Box className="sf-app" {...styles.container}>
