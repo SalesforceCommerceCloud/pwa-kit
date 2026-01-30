@@ -37,7 +37,8 @@ const OtpAuth = ({
     handleOtpVerification,
     onCheckoutAsGuest,
     isGuestRegistration = false,
-    hideCheckoutAsGuestButton = false
+    hideCheckoutAsGuestButton = false,
+    resendCooldownDuration = 30
 }) => {
     const {tokenLength} = getConfig().app.login
     const parsedLength = Number(tokenLength)
@@ -99,6 +100,8 @@ const OtpAuth = ({
             otpInputs.clear()
             setError('')
             form.setValue('otp', '')
+            // Start resend cooldown when modal opens
+            setResendTimer(resendCooldownDuration)
 
             // Track OTP modal view activity
             track('/otp-authentication', {
@@ -108,7 +111,7 @@ const OtpAuth = ({
 
             setTimeout(() => otpInputs.inputRefs.current[0]?.focus(), 100)
         }
-    }, [isOpen])
+    }, [isOpen, resendCooldownDuration])
 
     const handleVerify = async (code = otpInputs.values.join('')) => {
         if (code.length !== OTP_LENGTH) return
@@ -147,14 +150,14 @@ const OtpAuth = ({
     }
 
     const handleResend = async () => {
-        setResendTimer(5)
+        setResendTimer(resendCooldownDuration)
         try {
             await track('/otp-resend', {
                 activity: 'otp_code_resent',
                 context: 'authentication',
                 resendAttempt: true
             })
-            await handleSendEmailOtp(form.getValues('email'))
+            await handleSendEmailOtp(form.getValues('email'), true)
         } catch (error) {
             setResendTimer(0)
             await track('/otp-resend-failed', {
@@ -213,7 +216,7 @@ const OtpAuth = ({
                 <ModalCloseButton disabled={isVerifying} />
                 <ModalBody pb={6}>
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
-                        <Text fontSize="md" maxWidth="300px" textAlign="center">
+                        <Text fontSize="md" maxWidth={80} textAlign="center">
                             {isGuestRegistration ? (
                                 <FormattedMessage
                                     defaultMessage="We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the {otpLength}-digit code below."
@@ -228,116 +231,122 @@ const OtpAuth = ({
                             )}
                         </Text>
 
-                        {/* OTP Input */}
-                        <SimpleGrid columns={OTP_LENGTH} spacing={3}>
-                            {Array.from({length: OTP_LENGTH}).map((_, index) => (
-                                <Input
-                                    key={index}
-                                    ref={(el) => (otpInputs.inputRefs.current[index] = el)}
-                                    value={otpInputs.values[index]}
-                                    onChange={(e) => handleInputChange(index, e.target.value)}
-                                    onKeyDown={(e) => otpInputs.handleKeyDown(index, e)}
-                                    onPaste={otpInputs.handlePaste}
-                                    type="text"
-                                    inputMode="numeric"
-                                    maxLength={1}
-                                    textAlign="center"
-                                    fontSize="lg"
-                                    fontWeight="bold"
-                                    size="lg"
-                                    width="48px"
-                                    height="56px"
-                                    borderRadius="md"
-                                    borderColor="gray.300"
-                                    borderWidth="2px"
-                                    disabled={isVerifying}
-                                    _focus={{
-                                        borderColor: 'blue.500',
-                                        boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
-                                    }}
-                                    _hover={{
-                                        borderColor: 'gray.400'
-                                    }}
-                                />
-                            ))}
-                        </SimpleGrid>
+                        <Stack spacing={6} width="100%" alignItems="center">
+                            {/* OTP Input */}
+                            <SimpleGrid columns={OTP_LENGTH} spacing={3}>
+                                {Array.from({length: OTP_LENGTH}).map((_, index) => (
+                                    <Input
+                                        key={index}
+                                        ref={(el) => (otpInputs.inputRefs.current[index] = el)}
+                                        value={otpInputs.values[index]}
+                                        onChange={(e) => handleInputChange(index, e.target.value)}
+                                        onKeyDown={(e) => otpInputs.handleKeyDown(index, e)}
+                                        onPaste={otpInputs.handlePaste}
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={1}
+                                        textAlign="center"
+                                        fontSize="lg"
+                                        fontWeight="bold"
+                                        size="lg"
+                                        width={12}
+                                        height={14}
+                                        borderRadius="md"
+                                        borderColor="gray.300"
+                                        borderWidth={2}
+                                        disabled={isVerifying}
+                                        _focus={{
+                                            borderColor: 'blue.500',
+                                            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+                                        }}
+                                        _hover={{
+                                            borderColor: 'gray.400'
+                                        }}
+                                    />
+                                ))}
+                            </SimpleGrid>
 
-                        {/* Loading indicator during verification */}
-                        {isVerifying && (
-                            <Text fontSize="sm" color="blue.500">
-                                <FormattedMessage
-                                    defaultMessage="Verifying code..."
-                                    id="otp.message.verifying"
-                                />
-                            </Text>
-                        )}
-
-                        {/* Error message */}
-                        {error && (
-                            <Text fontSize="sm" color="red.500" textAlign="center">
-                                {error}
-                            </Text>
-                        )}
-
-                        {/* Buttons */}
-                        <HStack spacing={4} width="100%" justifyContent="center">
-                            {!hideCheckoutAsGuestButton && (
-                                <Button
-                                    onClick={handleCheckoutAsGuest}
-                                    variant="solid"
-                                    size="lg"
-                                    minWidth="160px"
-                                    isDisabled={isVerifying}
-                                    bg="gray.50"
-                                    color="gray.800"
-                                    fontWeight="bold"
-                                    border="none"
-                                    _hover={{
-                                        bg: 'gray.100'
-                                    }}
-                                    _active={{
-                                        bg: 'gray.200'
-                                    }}
-                                >
-                                    {isGuestRegistration ? (
-                                        <FormattedMessage
-                                            defaultMessage="Cancel"
-                                            id="otp.button.cancel_guest_registration"
-                                        />
-                                    ) : (
-                                        <FormattedMessage
-                                            defaultMessage="Checkout as a Guest"
-                                            id="otp.button.checkout_as_guest"
-                                        />
-                                    )}
-                                </Button>
+                            {/* Loading indicator during verification */}
+                            {isVerifying && (
+                                <Text fontSize="sm" color="blue.500">
+                                    <FormattedMessage
+                                        defaultMessage="Verifying code..."
+                                        id="otp.message.verifying"
+                                    />
+                                </Text>
                             )}
 
-                            <Button
-                                onClick={handleResend}
-                                variant="solid"
-                                size="lg"
-                                colorScheme={isResendDisabled ? 'gray' : 'blue'}
-                                bg={isResendDisabled ? 'gray.300' : 'blue.500'}
-                                minWidth="160px"
-                                isDisabled={isResendDisabled}
-                                _hover={isResendDisabled ? {} : {bg: 'blue.600'}}
-                                _disabled={{bg: 'gray.300', color: 'gray.600'}}
-                            >
-                                {resendTimer > 0 ? (
+                            {/* Error message */}
+                            {error && (
+                                <Text fontSize="sm" color="red.500" textAlign="center">
+                                    {error}
+                                </Text>
+                            )}
+
+                            {/* Resend cooldown message */}
+                            {resendTimer > 0 && (
+                                <Text fontSize="sm" color="gray.600" textAlign="center">
                                     <FormattedMessage
-                                        defaultMessage="Resend code in {timer} seconds..."
-                                        id="otp.button.resend_timer"
+                                        defaultMessage="You can request a new code in {timer} seconds."
+                                        id="otp.message.resend_cooldown"
                                         values={{timer: resendTimer}}
                                     />
-                                ) : (
+                                </Text>
+                            )}
+
+                            {/* Buttons */}
+                            <HStack spacing={4} width="100%" justifyContent="flex-end">
+                                {!hideCheckoutAsGuestButton && (
+                                    <Button
+                                        onClick={handleCheckoutAsGuest}
+                                        variant="solid"
+                                        size="lg"
+                                        minWidth={40}
+                                        isDisabled={isVerifying}
+                                        bg="gray.50"
+                                        color="gray.800"
+                                        fontWeight="bold"
+                                        border="none"
+                                        _hover={{
+                                            bg: 'gray.100'
+                                        }}
+                                        _active={{
+                                            bg: 'gray.200'
+                                        }}
+                                    >
+                                        {isGuestRegistration ? (
+                                            <FormattedMessage
+                                                defaultMessage="Cancel"
+                                                id="otp.button.cancel_guest_registration"
+                                            />
+                                        ) : (
+                                            <FormattedMessage
+                                                defaultMessage="Checkout as a Guest"
+                                                id="otp.button.checkout_as_guest"
+                                            />
+                                        )}
+                                    </Button>
+                                )}
+
+                                <Button
+                                    onClick={handleResend}
+                                    variant="solid"
+                                    size="lg"
+                                    colorScheme={isResendDisabled ? 'gray' : 'blue'}
+                                    bg={isResendDisabled ? 'gray.300' : 'blue.500'}
+                                    minWidth={40}
+                                    isDisabled={isResendDisabled}
+                                    _hover={isResendDisabled ? {} : {bg: 'blue.600'}}
+                                    _disabled={{bg: 'gray.300', color: 'gray.600'}}
+                                    aria-disabled={isResendDisabled}
+                                >
                                     <FormattedMessage
                                         defaultMessage="Resend Code"
                                         id="otp.button.resend_code"
                                     />
-                                )}
-                            </Button>
-                        </HStack>
+                                </Button>
+                            </HStack>
+                        </Stack>
                     </Stack>
                 </ModalBody>
             </ModalContent>
@@ -353,7 +362,9 @@ OtpAuth.propTypes = {
     handleOtpVerification: PropTypes.func.isRequired,
     onCheckoutAsGuest: PropTypes.func,
     isGuestRegistration: PropTypes.bool,
-    hideCheckoutAsGuestButton: PropTypes.bool
+    hideCheckoutAsGuestButton: PropTypes.bool,
+    /** Resend cooldown (in seconds). Default 30. */
+    resendCooldownDuration: PropTypes.number
 }
 
 export default OtpAuth
