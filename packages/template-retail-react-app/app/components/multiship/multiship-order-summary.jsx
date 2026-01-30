@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {defineMessages, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -22,13 +22,17 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 
 const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     // Group shipments by type (pickup vs delivery)
-    const pickupShipments = []
-    const deliveryShipments = []
+    const {pickupShipments, deliveryShipments} = useMemo(() => {
+        return storeLocatorEnabled
+            ? groupShipmentsByDeliveryOption(order)
+            : {pickupShipments: [], deliveryShipments: order?.shipments || []}
+    }, [order?.shipments, storeLocatorEnabled])
 
     const messages = defineMessages({
         pickupItems: {
@@ -38,16 +42,6 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
         deliveryItems: {
             id: 'order_summary.label.delivery_items',
             defaultMessage: 'Delivery Items'
-        }
-    })
-
-    order.shipments.forEach((shipment) => {
-        const isPickup = storeLocatorEnabled && isPickupShipment(shipment)
-
-        if (isPickup) {
-            pickupShipments.push(shipment)
-        } else {
-            deliveryShipments.push(shipment)
         }
     })
 
@@ -78,6 +72,7 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                 <Stack spacing={4}>
                     {shipments.map((shipment) => {
                         const items = getItemsForShipment(shipment)
+                        const consolidatedItems = consolidateDuplicateBonusProducts(items)
 
                         return (
                             <Box key={shipment.shipmentId}>
@@ -92,7 +87,7 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                                     width="full"
                                     divider={<Divider />}
                                 >
-                                    {items.map((product, idx) => {
+                                    {consolidatedItems.map((product, idx) => {
                                         const productDetail =
                                             productItemsMap?.[product.productId] || {}
                                         const variant = {
@@ -103,7 +98,9 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
                                         return (
                                             <ItemVariantProvider
-                                                key={product.productId}
+                                                key={`${product.productId}-${
+                                                    product.itemId || idx
+                                                }`}
                                                 index={idx}
                                                 variant={variant}
                                             >

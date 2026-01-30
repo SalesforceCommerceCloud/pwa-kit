@@ -36,6 +36,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {serverSafeEncode} from '@salesforce/retail-react-app/app/utils/url'
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -183,7 +184,7 @@ const AccountAddresses = () => {
                     body,
                     parameters: {
                         customerId,
-                        addressName: selectedAddressId
+                        addressName: serverSafeEncode(selectedAddressId)
                     }
                 })
             } else {
@@ -222,7 +223,7 @@ const AccountAddresses = () => {
                 {
                     parameters: {
                         customerId,
-                        addressName: addressId
+                        addressName: serverSafeEncode(addressId)
                     }
                 },
                 {

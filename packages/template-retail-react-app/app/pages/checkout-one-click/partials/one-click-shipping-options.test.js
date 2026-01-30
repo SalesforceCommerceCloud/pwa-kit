@@ -432,7 +432,7 @@ describe('ShippingOptions Component', () => {
     })
 
     describe('in summary view (PAYMENT step)', () => {
-        test('renders SingleShipmentSummary with price adjustments and strikethrough price', async () => {
+        test('renders SingleShipmentSummary without price adjustments and strikethrough price', async () => {
             jest.resetModules()
 
             jest.doMock(
@@ -500,7 +500,81 @@ describe('ShippingOptions Component', () => {
 
             expect(screen.getAllByText('Standard Shipping').length).toBeGreaterThan(0)
             expect(screen.getAllByText('5-7 business days').length).toBeGreaterThan(0)
-            expect(screen.getByText('50% off shipping!')).toBeInTheDocument()
+            // Verify promotion text is NOT shown in summary view
+            expect(screen.queryByText('50% off shipping!')).not.toBeInTheDocument()
+            // Verify only the final price is shown (no strikethrough)
+            // Price is formatted with currency code (US$4.99)
+            expect(screen.getByText(/4\.99/)).toBeInTheDocument()
+            // Verify original price with strikethrough is NOT shown
+            expect(screen.queryByText(/9\.99/)).not.toBeInTheDocument()
+        })
+
+        test('renders only final price in summary view when price differs from original', async () => {
+            jest.resetModules()
+
+            jest.doMock(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+                () => ({
+                    useCheckout: jest.fn().mockReturnValue({
+                        step: 4,
+                        STEPS: {
+                            CONTACT_INFO: 0,
+                            PICKUP_ADDRESS: 1,
+                            SHIPPING_ADDRESS: 2,
+                            SHIPPING_OPTIONS: 3,
+                            PAYMENT: 4
+                        },
+                        goToStep: mockGoToStep,
+                        goToNextStep: mockGoToNextStep
+                    })
+                })
+            )
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+                useCurrentCustomer: () => ({
+                    data: {customerId: 'test-customer-id', isRegistered: true}
+                })
+            }))
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+                useCurrentBasket: () => ({
+                    data: {
+                        basketId: 'test-basket-id',
+                        shipments: [
+                            {
+                                shipmentId: 'me',
+                                shippingAddress: {address1: '123 Main St', city: 'Test City'},
+                                shippingMethod: {
+                                    id: 'standard-shipping',
+                                    name: 'Standard Shipping',
+                                    description: '5-7 business days'
+                                }
+                            }
+                        ],
+                        shippingItems: [
+                            {
+                                price: 9.99,
+                                priceAfterItemDiscount: 0,
+                                priceAdjustments: []
+                            }
+                        ]
+                    },
+                    derivedData: {hasBasket: true, totalItems: 1, totalShippingCost: 0}
+                })
+            }))
+
+            const {renderWithProviders: localRenderWithProviders} = await import(
+                '@salesforce/retail-react-app/app/utils/test-utils'
+            )
+            const module = await import(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+            )
+
+            localRenderWithProviders(<module.default />)
+
+            // Verify "Free" is shown (final price is 0)
+            // There may be multiple instances (edit view and summary view), so use getAllByText
+            expect(screen.getAllByText('Free').length).toBeGreaterThan(0)
+            // Verify original price is NOT shown
+            expect(screen.queryByText(/9\.99/)).not.toBeInTheDocument()
         })
 
         test('renders "Free" label when shipping cost is zero', async () => {
@@ -580,7 +654,8 @@ describe('ShippingOptions Component', () => {
 
             localRenderWithProviders(<module.default />)
 
-            expect(screen.getByText('Free')).toBeInTheDocument()
+            // There may be multiple instances (edit view and summary view), so use getAllByText
+            expect(screen.getAllByText('Free').length).toBeGreaterThan(0)
         })
     })
 
@@ -1013,6 +1088,96 @@ describe('ShippingOptions Component', () => {
             expect(
                 screen.getByText('Jane Doe, 456 Oak Avenue, Seattle, WA, 98101')
             ).toBeInTheDocument()
+        })
+
+        test('displays shipping promotions in edit view for multi-shipment', async () => {
+            jest.resetModules()
+
+            const methodsWithPromos = {
+                defaultShippingMethodId: 'std',
+                applicableShippingMethods: [
+                    {
+                        id: 'std',
+                        name: 'Standard Shipping',
+                        description: '4-5 days',
+                        price: 5.99,
+                        shippingPromotions: [
+                            {
+                                promotionId: 'promo1',
+                                calloutMsg: 'Free Shipping Amount Above 50'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'exp',
+                        name: 'Express Shipping',
+                        description: 'Overnight',
+                        price: 10,
+                        shippingPromotions: []
+                    }
+                ]
+            }
+
+            jest.doMock(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+                () => ({
+                    useCheckout: jest.fn().mockReturnValue({
+                        step: 3,
+                        STEPS: {
+                            CONTACT_INFO: 0,
+                            PICKUP_ADDRESS: 1,
+                            SHIPPING_ADDRESS: 2,
+                            SHIPPING_OPTIONS: 3,
+                            PAYMENT: 4
+                        },
+                        goToStep: mockGoToStep,
+                        goToNextStep: mockGoToNextStep
+                    })
+                })
+            )
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+                useCurrentCustomer: () => ({
+                    data: {customerId: null, isRegistered: false}
+                })
+            }))
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+                useCurrentBasket: () => ({
+                    data: {
+                        basketId: 'test-basket-id',
+                        shipments: [
+                            {
+                                shipmentId: 'ship1',
+                                shippingAddress: {
+                                    firstName: 'John',
+                                    lastName: 'Smith',
+                                    address1: '789 Elm Street',
+                                    city: 'Portland',
+                                    stateCode: 'OR',
+                                    postalCode: '97201'
+                                },
+                                shippingMethod: null
+                            }
+                        ],
+                        shippingItems: [{shipmentId: 'ship1', price: 0}]
+                    },
+                    derivedData: {hasBasket: true, totalItems: 1}
+                })
+            }))
+
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockReturnValue({data: methodsWithPromos})
+
+            const {renderWithProviders: localRenderWithProviders} = await import(
+                '@salesforce/retail-react-app/app/utils/test-utils'
+            )
+            const module = await import(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+            )
+
+            localRenderWithProviders(<module.default />)
+
+            // Verify promotion text is shown in edit view
+            expect(screen.getByText('Free Shipping Amount Above 50')).toBeInTheDocument()
         })
     })
 

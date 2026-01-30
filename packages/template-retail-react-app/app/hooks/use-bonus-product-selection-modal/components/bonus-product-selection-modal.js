@@ -135,10 +135,17 @@ export const BonusProductSelectionModal = () => {
                                             width="100%"
                                         >
                                             {uniqueBonusProducts.map((product) => {
-                                                const foundProductData =
+                                                // Try to get product data from useProducts first (for list-based)
+                                                let foundProductData =
                                                     productData?.productData?.data?.find(
                                                         (p) => p.id === product.productId
                                                     )
+
+                                                // If not found, use the search data from rule-based products
+                                                if (!foundProductData && product._searchData) {
+                                                    foundProductData = product._searchData
+                                                }
+
                                                 const isInWishlist = isProductInWishlist(
                                                     product.productId
                                                 )

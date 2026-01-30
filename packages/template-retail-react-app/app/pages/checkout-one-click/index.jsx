@@ -13,7 +13,10 @@ import {
     Container,
     Grid,
     GridItem,
-    Stack
+    Stack,
+    Portal,
+    Spinner,
+    Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
@@ -57,12 +60,14 @@ import {nanoid} from 'nanoid'
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, STEPS} = useCheckout()
+    const {step, STEPS, contactPhone} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
+    const [isOtpLoading, setIsOtpLoading] = useState(false)
+    const [isPlacingOrder, setIsPlacingOrder] = useState(false)
 
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -94,6 +99,7 @@ const CheckoutOneClick = () => {
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
+    const [isShipmentCleanupComplete, setIsShipmentCleanupComplete] = useState(false)
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
         deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
@@ -105,6 +111,9 @@ const CheckoutOneClick = () => {
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.AddPaymentInstrumentToBasket
+    )
+    const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
+        ShopperBasketsMutations.RemovePaymentInstrumentFromBasket
     )
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.UpdateBillingAddressForBasket
@@ -127,8 +136,23 @@ const CheckoutOneClick = () => {
     // Remove any empty shipments whenever navigating to the checkout page
     // Using basketId ensures that the basket is in a valid state before removing empty shipments
     useEffect(() => {
-        if (basket?.shipments?.length > 1) {
-            removeEmptyShipments(basket)
+        if (!basket?.basketId) {
+            return
+        }
+        if (basket?.shipments?.length <= 1) {
+            setIsShipmentCleanupComplete(true)
+            return
+        }
+
+        let cancelled = false
+        setIsShipmentCleanupComplete(false)
+        removeEmptyShipments(basket).then(() => {
+            if (!cancelled) {
+                setIsShipmentCleanupComplete(true)
+            }
+        })
+        return () => {
+            cancelled = true
         }
     }, [basket?.basketId])
 
@@ -146,7 +170,8 @@ const CheckoutOneClick = () => {
 
     // Form for billing address
     const billingAddressForm = useForm({
-        mode: 'onChange',
+        mode: 'onTouched',
+        reValidateMode: 'onChange',
         shouldUnregister: false,
         defaultValues: {...selectedBillingAddress}
     })
@@ -157,6 +182,7 @@ const CheckoutOneClick = () => {
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
         const paymentInstrument = {
+            amount: basket?.orderTotal || 0,
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
@@ -198,20 +224,67 @@ const CheckoutOneClick = () => {
         let billingAddress
         if (billingSameAsShipping && selectedShippingAddress) {
             billingAddress = selectedShippingAddress
+            // Validate that shipping address has required address fields
+            if (!billingAddress?.address1) {
+                showError(
+                    formatMessage({
+                        id: 'checkout.error.billing_address_required',
+                        defaultMessage: 'Please enter a billing address.'
+                    })
+                )
+                return
+            }
         } else {
-            const isFormValid = await billingAddressForm.trigger()
+            // Validate all required address fields (excluding phone for billing)
+            const fieldsToValidate = [
+                'address1',
+                'firstName',
+                'lastName',
+                'city',
+                'stateCode',
+                'postalCode',
+                'countryCode'
+            ]
+
+            // First, mark all fields as touched so errors will be displayed when validation runs
+            // This must happen BEFORE trigger() so errors show immediately
+            fieldsToValidate.forEach((field) => {
+                const currentValue = billingAddressForm.getValues(field) || ''
+                billingAddressForm.setValue(field, currentValue, {
+                    shouldValidate: false,
+                    shouldTouch: true
+                })
+            })
+
+            // Now trigger validation - errors will show because fields are already touched
+            const isFormValid = await billingAddressForm.trigger(fieldsToValidate)
 
             if (!isFormValid) {
+                // Payment section should already be open from onPlaceOrder
+                // Focus on the first name field (first field in the form)
+                setTimeout(() => {
+                    billingAddressForm.setFocus('firstName')
+                }, 100)
                 return
             }
             billingAddress = billingAddressForm.getValues()
+
+            // Double-check that address is present
+            if (!billingAddress?.address1) {
+                showError(
+                    formatMessage({
+                        id: 'checkout.error.billing_address_required',
+                        defaultMessage: 'Please enter a billing address.'
+                    })
+                )
+                setIsEditingPayment(true)
+                return
+            }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
         return await updateBillingAddressForBasket({
-            body: address,
+            body: billingAddress,
             parameters: {basketId: latestBasketId}
         })
     }
@@ -368,15 +441,15 @@ const CheckoutOneClick = () => {
                                     }
                                 })
                             }
+                        }
 
-                            // Also persist billing phone as phoneHome
-                            const phoneHome = order?.billingAddress?.phone
-                            if (phoneHome) {
-                                await updateCustomer.mutateAsync({
-                                    parameters: {customerId},
-                                    body: {phoneHome}
-                                })
-                            }
+                        // Persist phone number as phoneHome for newly registered guest shoppers
+                        const phoneHome = basket?.billingAddress?.phone || contactPhone
+                        if (phoneHome) {
+                            await updateCustomer.mutateAsync({
+                                parameters: {customerId},
+                                body: {phoneHome}
+                            })
                         }
                     } catch (_e) {
                         // Only surface error if shopper opted to register/save details; otherwise fail silently
@@ -397,48 +470,90 @@ const CheckoutOneClick = () => {
                 defaultMessage: 'An unexpected error occurred during checkout.'
             })
             showError(message)
+            setIsPlacingOrder(false)
         } finally {
             setIsLoading(false)
         }
     }
 
     const onPlaceOrder = async () => {
+        // Show overlay immediately to prevent double-clicking
+        setIsPlacingOrder(true)
         try {
-            // If using a new card (no applied saved payment), validate fields to surface errors
-            const isUsingNewCard = !appliedPayment
+            // Check if we have form values (new card entered)
+            const paymentFormValues = paymentMethodForm.getValues()
+            const hasFormValues = paymentFormValues && paymentFormValues.expiry
+            // Check if user selected to enter a new card (vs using a saved payment)
+            const isEnteringNewCard = selectedPaymentMethod === 'cc' || !selectedPaymentMethod
+
+            // If using a new card (either no applied payment OR user selected 'cc' and entered form values), validate fields
+            const isUsingNewCard = !appliedPayment || (isEnteringNewCard && hasFormValues)
             if (isUsingNewCard) {
                 const isValid = await paymentMethodForm.trigger()
                 if (!isValid) {
                     // Keep payment section open and show field errors
                     setIsEditingPayment(true)
+                    setIsPlacingOrder(false)
                     return
                 }
             }
-            // Check if we have form values (new card entered)
-            const paymentFormValues = paymentMethodForm.getValues()
-            const hasFormValues = paymentFormValues && paymentFormValues.expiry
 
-            // Prepare full card details for saving (only if we have form values for new cards)
+            // PCI: Cardholder data (CHD) - use only for single submission to API. Do not log, persist, or expose.
             let fullCardDetails = null
             if (hasFormValues) {
                 const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
                 fullCardDetails = {
                     holder: paymentFormValues.holder,
-                    number: paymentFormValues.number, // Full card number from form
+                    number: paymentFormValues.number,
                     cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
                     expirationMonth: parseInt(expirationMonth),
                     expirationYear: parseInt(`20${expirationYear}`)
                 }
             }
-            // For saved payments (appliedPayment), we don't need fullCardDetails
-            // because we're not saving them again - they're already saved
+            // For saved payments (appliedPayment), we don't need fullCardDetails - they're already saved
 
-            if (!appliedPayment) {
-                // No payment applied, need to add a new payment instrument
+            // Handle payment submission
+            if (isEnteringNewCard && hasFormValues) {
+                // User entered a new card - need to replace existing payment if one exists
+                if (appliedPayment) {
+                    // Remove the existing payment before adding the new one
+                    try {
+                        await removePaymentInstrumentFromBasket({
+                            parameters: {
+                                basketId: basket?.basketId,
+                                paymentInstrumentId: appliedPayment.paymentInstrumentId
+                            }
+                        })
+                        // Refetch basket to ensure we have the latest state
+                        await currentBasketQuery.refetch()
+                    } catch (error) {
+                        showError(
+                            formatMessage({
+                                defaultMessage:
+                                    'Could not remove the applied payment. Please try again or use the current payment to place your order.',
+                                id: 'checkout_payment.error.cannot_remove_applied_payment'
+                            })
+                        )
+                        setIsPlacingOrder(false)
+                        return
+                    }
+                }
+                // Add the new payment instrument
+                await onPaymentSubmit(paymentFormValues)
+            } else if (!appliedPayment) {
+                // No payment applied yet - this shouldn't happen if validation passed,
+                // but handle it as a safety check
                 if (hasFormValues) {
                     await onPaymentSubmit(paymentFormValues)
                 }
             }
+
+            // Ensure payment section is open before validating billing address
+            // This ensures the billing form is rendered and visible when we validate
+            setIsEditingPayment(true)
+
+            // Wait for the payment section to open and billing form to render
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
             // submit, `undefined` is returned.
@@ -446,9 +561,14 @@ const CheckoutOneClick = () => {
 
             if (updatedBasket) {
                 await submitOrder(fullCardDetails)
+                fullCardDetails = null // Clear reference to CHD after use (PCI: minimize retention)
+            } else {
+                // Billing validation failed, clear overlay
+                setIsPlacingOrder(false)
             }
         } catch (error) {
             showError()
+            setIsPlacingOrder(false)
         }
     }
 
@@ -483,7 +603,10 @@ const CheckoutOneClick = () => {
                             />
                             {hasPickupShipments && <PickupAddress />}
                             {hasDeliveryShipments && (
-                                <ShippingAddress enableUserRegistration={enableUserRegistration} />
+                                <ShippingAddress
+                                    enableUserRegistration={enableUserRegistration}
+                                    isShipmentCleanupComplete={isShipmentCleanupComplete}
+                                />
                             )}
                             {hasDeliveryShipments && <ShippingOptions />}
                             <Payment
@@ -500,6 +623,8 @@ const CheckoutOneClick = () => {
                                 onIsEditingChange={setIsEditingPayment}
                                 billingSameAsShipping={billingSameAsShipping}
                                 setBillingSameAsShipping={setBillingSameAsShipping}
+                                onOtpLoadingChange={setIsOtpLoading}
+                                onBillingSubmit={onBillingSubmit}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -509,6 +634,11 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
+                                            disabled={
+                                                isOtpLoading ||
+                                                isPlacingOrder ||
+                                                !isShipmentCleanupComplete
+                                            }
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
@@ -534,6 +664,26 @@ const CheckoutOneClick = () => {
                     </GridItem>
                 </Grid>
             </Container>
+
+            {/* Loading overlay when Place Order is clicked */}
+            {isPlacingOrder && (
+                <Portal>
+                    <Box
+                        position="fixed"
+                        top="0"
+                        left="0"
+                        right="0"
+                        bottom="0"
+                        bg="blackAlpha.600"
+                        zIndex={9999}
+                        data-testid="sf-place-order-loading-overlay"
+                    >
+                        <Center h="100%">
+                            <Spinner size="xl" color="white" thickness="4px" />
+                        </Center>
+                    </Box>
+                </Portal>
+            )}
         </Box>
     )
 }

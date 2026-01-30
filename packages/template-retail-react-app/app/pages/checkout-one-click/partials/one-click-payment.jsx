@@ -19,6 +19,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
@@ -54,7 +55,9 @@ const Payment = ({
     onSelectedPaymentMethodChange,
     onIsEditingChange,
     billingSameAsShipping,
-    setBillingSameAsShipping
+    setBillingSameAsShipping,
+    onOtpLoadingChange,
+    onBillingSubmit
 }) => {
     const {formatMessage} = useIntl()
     const {data: basketForTotal} = useCurrentBasket()
@@ -212,6 +215,7 @@ const Payment = ({
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
         const paymentInstrument = {
+            amount: basket?.orderTotal || 0,
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
@@ -241,17 +245,6 @@ const Payment = ({
             }
             setShowRegistrationNotice(true)
             setShouldSavePaymentMethod(true)
-            try {
-                const values = paymentMethodForm?.getValues?.()
-                const hasEnteredCard = values?.number && values?.holder && values?.expiry
-                const hasApplied = (currentBasketQuery?.data?.paymentInstruments?.length || 0) > 0
-                if (hasEnteredCard && !hasApplied && newBasketId) {
-                    await onPaymentSubmit(values, newBasketId)
-                    await currentBasketQuery.refetch()
-                }
-            } catch (_e) {
-                // non-blocking
-            }
             showToast({
                 variant: 'subtle',
                 title: formatMessage({
@@ -263,74 +256,60 @@ const Payment = ({
                 isClosable: true
             })
         },
-        [paymentMethodForm, currentBasketQuery, onPaymentSubmit, showToast, formatMessage]
+        [showToast, formatMessage]
     )
 
     // Auto-select a saved payment instrument for registered customers (run at most once)
-    const autoAppliedRef = useRef(false)
-    useEffect(() => {
-        const autoSelectSavedPayment = async () => {
-            if (step !== STEPS.PAYMENT || isCustomerLoading) return
-            if (autoAppliedRef.current) return
-            // Don't auto-apply when in edit mode - user is manually entering/selecting payment
-            if (currentIsEditing) return
-            const isRegistered = customer?.isRegistered
-            const hasSaved = customer?.paymentInstruments?.length > 0
-            const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
-            // If the shopper is currently typing a new card, skip auto-apply of saved
+    const {isLoading: isAutoSelectLoading} = useCheckoutAutoSelect({
+        currentStep: step,
+        targetStep: STEPS.PAYMENT,
+        isCustomerRegistered: customer?.isRegistered,
+        items: customer?.paymentInstruments,
+        getPreferredItem: (instruments) =>
+            instruments.find((pi) => pi.default === true) || instruments[0],
+        shouldSkip: () => {
             const entered = paymentMethodForm?.getValues?.()
             const hasEnteredCard = entered?.number && entered?.holder && entered?.expiry
-            if (!isRegistered || !hasSaved || alreadyApplied || hasEnteredCard) return
-            autoAppliedRef.current = true
-            const preferred =
-                customer.paymentInstruments.find((pi) => pi.default === true) ||
-                customer.paymentInstruments[0]
-            try {
-                setIsApplyingSavedPayment(true)
-                await addPaymentInstrumentToBasket({
-                    parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
-                    body: {
-                        paymentMethodId: 'CREDIT_CARD',
-                        customerPaymentInstrumentId: preferred.paymentInstrumentId
+            return currentIsEditing || !!hasEnteredCard
+        },
+        isAlreadyApplied: () => Boolean(appliedPayment),
+        applyItem: async (paymentInstrument) => {
+            await addPaymentInstrumentToBasket({
+                parameters: {
+                    basketId: activeBasketIdRef.current || basket?.basketId
+                },
+                body: {
+                    amount: basket?.orderTotal || 0,
+                    paymentMethodId: 'CREDIT_CARD',
+                    customerPaymentInstrumentId: paymentInstrument.paymentInstrumentId
+                }
+            })
+
+            if (isPickupOnly && paymentInstrument.billingAddress) {
+                const addr = {...paymentInstrument.billingAddress}
+                delete addr.addressId
+                delete addr.creationDate
+                delete addr.lastModified
+                delete addr.preferred
+
+                await updateBillingAddressForBasket({
+                    body: addr,
+                    parameters: {
+                        basketId: activeBasketIdRef.current || basket.basketId
                     }
                 })
-                if (isPickupOnly) {
-                    try {
-                        const saved = customer?.paymentInstruments?.find(
-                            (pi) => pi.paymentInstrumentId === preferred.paymentInstrumentId
-                        )
-                        const addr = saved?.billingAddress
-                        if (addr) {
-                            const cleaned = {...addr}
-                            delete cleaned.addressId
-                            delete cleaned.creationDate
-                            delete cleaned.lastModified
-                            delete cleaned.preferred
-                            await updateBillingAddressForBasket({
-                                body: cleaned,
-                                parameters: {basketId: activeBasketIdRef.current || basket.basketId}
-                            })
-                        }
-                    } catch {
-                        // ignore; user can enter billing manually
-                    }
-                } else if (selectedShippingAddress) {
-                    await onBillingSubmit()
-                    // Ensure basket is refreshed with payment & billing
-                    await currentBasketQuery.refetch()
-                    // Stay on Payment; place-order button is rendered on Payment step in this flow
-                }
-                // Ensure basket is refreshed with payment & billing
-                await currentBasketQuery.refetch()
-            } catch (_e) {
-                // Ignore and allow manual selection
-                console.error(_e)
-            } finally {
-                setIsApplyingSavedPayment(false)
+            } else if (selectedShippingAddress) {
+                await onBillingSubmit()
             }
-        }
-        autoSelectSavedPayment()
-    }, [step, isCustomerLoading])
+        },
+        onSuccess: async () => await currentBasketQuery.refetch(),
+        onError: (error) => {
+            console.error('Failed to auto-select payment:', error)
+        },
+        enabled: !isCustomerLoading
+    })
+
+    const effectiveIsApplyingSavedPayment = isAutoSelectLoading || isApplyingSavedPayment
 
     const onPaymentMethodChange = async (paymentInstrumentId) => {
         // Only try to remove payment if there's actually an applied payment
@@ -357,6 +336,7 @@ const Payment = ({
             await addPaymentInstrumentToBasket({
                 parameters: {basketId: activeBasketIdRef.current || basket?.basketId},
                 body: {
+                    amount: basket?.orderTotal || 0,
                     paymentMethodId: 'CREDIT_CARD',
                     customerPaymentInstrumentId: paymentInstrumentId
                 }
@@ -387,27 +367,6 @@ const Payment = ({
             setIsApplyingSavedPayment(false)
             onSelectedPaymentMethodChange?.(paymentInstrumentId)
         }
-    }
-
-    const onBillingSubmit = async () => {
-        // When billing is same as shipping, skip form validation and use shipping address directly
-        let billingAddress
-        if (billingSameAsShipping) {
-            billingAddress = selectedShippingAddress
-        } else {
-            const isFormValid = await billingAddressForm.trigger()
-            if (!isFormValid) {
-                return
-            }
-            billingAddress = billingAddressForm.getValues()
-        }
-        // Using destructuring to remove properties from the object...
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
-        return await updateBillingAddressForBasket({
-            body: address,
-            parameters: {basketId: activeBasketIdRef.current || basket.basketId}
-        })
     }
 
     const onPaymentRemoval = async () => {
@@ -476,7 +435,7 @@ const Payment = ({
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
                     billingAddressForm.formState.isSubmitting ||
-                    isApplyingSavedPayment ||
+                    effectiveIsApplyingSavedPayment ||
                     (isCustomerLoading && !isGuest)
                 }
                 disabled={appliedPayment == null}
@@ -487,7 +446,11 @@ const Payment = ({
                 })}
             >
                 <ToggleCardEdit>
-                    {!(customer?.isRegistered && isApplyingSavedPayment && !appliedPayment) ? (
+                    {!(
+                        customer?.isRegistered &&
+                        effectiveIsApplyingSavedPayment &&
+                        !appliedPayment
+                    ) ? (
                         <>
                             <Box mt={-2} mb={4}>
                                 <Stack direction="row" justify="space-between" align="center">
@@ -503,7 +466,7 @@ const Payment = ({
                             </Box>
 
                             <Stack spacing={6}>
-                                {isApplyingSavedPayment ? null : (
+                                {effectiveIsApplyingSavedPayment ? null : (
                                     <PaymentForm
                                         form={paymentMethodForm}
                                         onSubmit={onSubmit}
@@ -569,6 +532,7 @@ const Payment = ({
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
                                         setEnableUserRegistration={onUserRegistrationToggle}
+                                        onLoadingChange={onOtpLoadingChange}
                                         isGuestCheckout={registeredUserChoseGuest}
                                         isDisabled={
                                             !(
@@ -576,7 +540,9 @@ const Payment = ({
                                                 paymentMethodForm.formState.isValid ||
                                                 (isPickupOnly &&
                                                     billingAddressForm.formState.isValid)
-                                            )
+                                            ) ||
+                                            (!effectiveBillingSameAsShipping &&
+                                                !billingAddressForm.formState.isValid)
                                         }
                                         onSavePreferenceChange={onSavePreferenceChange}
                                         onRegistered={handleRegistrationSuccess}
@@ -632,8 +598,13 @@ const Payment = ({
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
+                                onLoadingChange={onOtpLoadingChange}
                                 isGuestCheckout={registeredUserChoseGuest}
-                                isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
+                                isDisabled={
+                                    (!appliedPayment && !paymentMethodForm.formState.isValid) ||
+                                    (!effectiveBillingSameAsShipping &&
+                                        !billingAddressForm.formState.isValid)
+                                }
                                 onSavePreferenceChange={onSavePreferenceChange}
                                 onRegistered={handleRegistrationSuccess}
                                 showNotice={showRegistrationNotice}
@@ -675,7 +646,11 @@ Payment.propTypes = {
     /** Whether billing address is same as shipping */
     billingSameAsShipping: PropTypes.bool.isRequired,
     /** Callback to set billing same as shipping state */
-    setBillingSameAsShipping: PropTypes.func.isRequired
+    setBillingSameAsShipping: PropTypes.func.isRequired,
+    /** Callback when OTP loading state changes */
+    onOtpLoadingChange: PropTypes.func,
+    /** Callback to submit billing address */
+    onBillingSubmit: PropTypes.func.isRequired
 }
 
 const PaymentCardSummary = ({payment}) => {

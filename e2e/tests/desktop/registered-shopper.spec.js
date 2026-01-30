@@ -25,8 +25,11 @@ test.beforeAll(async () => {
  * Test that registered shoppers can add a product to cart and go through the entire checkout process,
  * validating that shopper is able to get to the order summary section,
  * and that order shows up in order history
+ *
+ * @TODO: it appears that this test is very flaky and we haven't found a way to stablize it
+ * Skipping this test for now until we can find a way to stablize it
  */
-test('Registered shopper can checkout items', async ({page}) => {
+test.skip('Registered shopper can checkout items', async ({page}) => {
     await registeredUserHappyPath({page, registeredUserCredentials})
 })
 

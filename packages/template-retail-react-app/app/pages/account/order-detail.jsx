@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
@@ -18,11 +18,12 @@ import {
     Button,
     Divider,
     Grid,
+    Link as ChakraLink,
     SimpleGrid,
     Skeleton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useStores} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -31,6 +32,11 @@ import CartItemVariantImage from '@salesforce/retail-react-app/app/components/it
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
+import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -53,7 +59,8 @@ const OrderProducts = ({productItems, currency}) => {
             }
         }
     )
-    const variants = productItems?.map((item) => {
+    const consolidatedItems = consolidateDuplicateBonusProducts(productItems || [])
+    const variants = consolidatedItems?.map((item) => {
         const product = products?.[item.productId]
         return {
             ...(product ? product : {}),
@@ -109,21 +116,127 @@ const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
+    // expand: 'oms' returns order data from OMS if the order is successfully
+    // ingested to OMS, otherwise returns data from ECOM
+    // For regular non-oms orders, the order data is returned from ECOM
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
-            parameters: {orderNo: params.orderNo}
+            parameters: {
+                orderNo: params.orderNo,
+                expand: 'oms, oms_shipments'
+            }
         },
         {
             enabled: onClient && !!params.orderNo
         }
     )
     const isLoading = isOrderLoading || !order
-    const shipment = order?.shipments[0]
-    const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
-    const paymentCard = order?.paymentInstruments[0]?.paymentCard
+
+    // Check if order has OMS data
+    const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
+
+    // Check if order is multi-shipment order
+    const isMultiShipmentOrder = useMemo(
+        () => (order?.omsData?.shipments?.length ?? 0) > 1 || (order?.shipments?.length ?? 0) > 1,
+        [isOmsOrder, order?.omsData?.shipments?.length, order?.shipments?.length]
+    )
+
+    const {pickupShipments, deliveryShipments} = useMemo(() => {
+        return storeLocatorEnabled
+            ? groupShipmentsByDeliveryOption(order)
+            : {pickupShipments: [], deliveryShipments: order?.shipments || []}
+    }, [order?.shipments, storeLocatorEnabled])
+
+    const storeIds = useMemo(
+        () => pickupShipments.map((shipment) => shipment.c_fromStoreId).filter(Boolean),
+        [pickupShipments]
+    )
+
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeIds.join(',')
+            }
+        },
+        {
+            enabled: storeIds.length > 0 && onClient
+        }
+    )
+
+    const getStoreData = useCallback(
+        (storeId) => {
+            if (!storeData?.data) return null
+            return storeData.data.find((store) => store.id === storeId)
+        },
+        [storeData?.data]
+    )
+
+    const renderShippingMethod = (
+        shippingMethodName,
+        shippingStatus,
+        trackingNumber,
+        trackingUrl,
+        shipmentsLength,
+        index
+    ) => (
+        <Stack spacing={1}>
+            <Heading as="h2" fontSize="sm" pt={1}>
+                {shipmentsLength > 1 ? (
+                    <FormattedMessage
+                        defaultMessage="Shipping Method {number}"
+                        id="account_order_detail.heading.shipping_method_number"
+                        values={{number: index + 1}}
+                    />
+                ) : (
+                    <FormattedMessage
+                        defaultMessage="Shipping Method"
+                        id="account_order_detail.heading.shipping_method"
+                    />
+                )}
+            </Heading>
+            <Box>
+                <Text fontSize="sm" textTransform="titlecase">
+                    {{
+                        not_shipped: formatMessage({
+                            defaultMessage: 'Not shipped',
+                            id: 'account_order_detail.shipping_status.not_shipped'
+                        }),
+                        part_shipped: formatMessage({
+                            defaultMessage: 'Partially shipped',
+                            id: 'account_order_detail.shipping_status.part_shipped'
+                        }),
+                        shipped: formatMessage({
+                            defaultMessage: 'Shipped',
+                            id: 'account_order_detail.shipping_status.shipped'
+                        })
+                    }[shippingStatus] || shippingStatus}
+                </Text>
+                <Text fontSize="sm">{shippingMethodName}</Text>
+                {trackingNumber && (
+                    <Text fontSize="sm">
+                        <FormattedMessage
+                            defaultMessage="Tracking Number"
+                            id="account_order_detail.label.tracking_number"
+                        />
+                        :{' '}
+                        {trackingUrl ? (
+                            <ChakraLink href={trackingUrl} isExternal color="blue.600">
+                                {trackingNumber}
+                            </ChakraLink>
+                        ) : (
+                            trackingNumber
+                        )}
+                    </Text>
+                )}
+            </Box>
+        </Stack>
+    )
+
+    const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+    const itemCount = order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
 
     const headingRef = useRef()
     useEffect(() => {
@@ -197,7 +310,9 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                <Badge colorScheme="green">
+                                    {order.status || order.omsData?.status}
+                                </Badge>
                             </Stack>
                         </Stack>
                     ) : (
@@ -233,92 +348,161 @@ const AccountOrderDetail = () => {
                             </>
                         ) : (
                             <>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Method"
-                                            id="account_order_detail.heading.shipping_method"
-                                        />
-                                    </Heading>
-                                    <Box>
-                                        <Text fontSize="sm" textTransform="titlecase">
-                                            {
-                                                {
-                                                    not_shipped: formatMessage({
-                                                        defaultMessage: 'Not shipped',
-                                                        id: 'account_order_detail.shipping_status.not_shipped'
-                                                    }),
+                                {/* Pickup Shipments */}
+                                {pickupShipments.map((shipment, index) => {
+                                    const storeData = getStoreData(shipment.c_fromStoreId)
+                                    return (
+                                        <Stack
+                                            spacing={1}
+                                            key={`pickup-${index}`}
+                                            gridColumn={{sm: 'span 2'}}
+                                        >
+                                            <Heading as="h2" fontSize="sm" pt={1}>
+                                                {pickupShipments.length > 1 ? (
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Address {number}"
+                                                        id="account_order_detail.heading.pickup_address_number"
+                                                        values={{number: index + 1}}
+                                                    />
+                                                ) : (
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Address"
+                                                        id="account_order_detail.heading.pickup_address"
+                                                    />
+                                                )}
+                                            </Heading>
+                                            <Box>
+                                                {storeData ? (
+                                                    <StoreDisplay
+                                                        store={storeData}
+                                                        showDistance={false}
+                                                        showEmail={false}
+                                                        showPhone={true}
+                                                        showStoreHours={false}
+                                                    />
+                                                ) : (
+                                                    <Text fontSize="sm">
+                                                        <FormattedMessage
+                                                            defaultMessage="Pick up from Store {storeId}"
+                                                            id="account_order_detail.label.pickup_from_store"
+                                                            values={{
+                                                                storeId: shipment.c_fromStoreId
+                                                            }}
+                                                        />
+                                                    </Text>
+                                                )}
+                                            </Box>
+                                        </Stack>
+                                    )
+                                })}
+                                {/* Any type of Non-OMS or any type of single shipment order: show DeliveryMethods and Shipments info*/}
+                                {(!isOmsOrder || !isMultiShipmentOrder) &&
+                                    deliveryShipments.map((shipment, index) => {
+                                        const omsShipment = isOmsOrder
+                                            ? order.omsData.shipments?.[index]
+                                            : null
 
-                                                    part_shipped: formatMessage({
-                                                        defaultMessage: 'Partially shipped',
-                                                        id: 'account_order_detail.shipping_status.part_shipped'
-                                                    }),
-                                                    shipped: formatMessage({
-                                                        defaultMessage: 'Shipped',
-                                                        id: 'account_order_detail.shipping_status.shipped'
-                                                    })
-                                                }[shippingStatus]
-                                            }
-                                        </Text>
-                                        <Text fontSize="sm">{shippingMethod.name}</Text>
-                                        <Text fontSize="sm">
+                                        const shippingMethodName =
+                                            omsShipment?.provider || shipment.shippingMethod.name
+                                        const shippingStatus =
+                                            omsShipment?.status || shipment.shippingStatus
+                                        const trackingNumber =
+                                            omsShipment?.trackingNumber || shipment.trackingNumber
+                                        const trackingUrl = omsShipment?.trackingUrl
+
+                                        return (
+                                            <React.Fragment key={`delivery-${index}`}>
+                                                {renderShippingMethod(
+                                                    shippingMethodName,
+                                                    shippingStatus,
+                                                    trackingNumber,
+                                                    trackingUrl,
+                                                    deliveryShipments.length,
+                                                    index
+                                                )}
+                                                <Stack spacing={1}>
+                                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                                        {deliveryShipments.length > 1 ? (
+                                                            <FormattedMessage
+                                                                defaultMessage="Shipping Address {number}"
+                                                                id="account_order_detail.heading.shipping_address_number"
+                                                                values={{number: index + 1}}
+                                                            />
+                                                        ) : (
+                                                            <FormattedMessage
+                                                                defaultMessage="Shipping Address"
+                                                                id="account_order_detail.heading.shipping_address"
+                                                            />
+                                                        )}
+                                                    </Heading>
+                                                    <Box>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.firstName &&
+                                                            shipment.shippingAddress.lastName
+                                                                ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
+                                                                : shipment.shippingAddress.fullName}
+                                                        </Text>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.address1}
+                                                        </Text>
+                                                        <Text fontSize="sm">
+                                                            {shipment.shippingAddress.city},{' '}
+                                                            {shipment.shippingAddress.stateCode}{' '}
+                                                            {shipment.shippingAddress.postalCode}
+                                                        </Text>
+                                                    </Box>
+                                                </Stack>
+                                            </React.Fragment>
+                                        )
+                                    })}
+
+                                {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
+                                {isOmsOrder &&
+                                    isMultiShipmentOrder &&
+                                    order?.omsData?.shipments?.map((shipment, index) => (
+                                        <React.Fragment key={`oms-shipment-${index}`}>
+                                            {renderShippingMethod(
+                                                shipment.provider,
+                                                shipment.status,
+                                                shipment.trackingNumber,
+                                                shipment.trackingUrl,
+                                                order?.omsData?.shipments?.length ?? 0,
+                                                index
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+
+                                {/* Payment Method */}
+                                {paymentCard && (
+                                    <Stack spacing={1}>
+                                        <Heading as="h2" fontSize="sm" pt={1}>
                                             <FormattedMessage
-                                                defaultMessage="Tracking Number"
-                                                id="account_order_detail.label.tracking_number"
+                                                defaultMessage="Payment Method"
+                                                id="account_order_detail.heading.payment_method"
                                             />
-                                            :{' '}
-                                            {trackingNumber ||
-                                                formatMessage({
-                                                    defaultMessage: 'Pending',
-                                                    id: 'account_order_detail.label.pending_tracking_number'
-                                                })}
-                                        </Text>
-                                    </Box>
-                                </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Payment Method"
-                                            id="account_order_detail.heading.payment_method"
-                                        />
-                                    </Heading>
-                                    <Stack direction="row">
-                                        {CardIcon && (
-                                            <CardIcon layerStyle="ccIcon" aria-hidden="true" />
-                                        )}
-                                        <Box>
-                                            <Text fontSize="sm">{paymentCard?.cardType}</Text>
-                                            <Stack direction="row">
-                                                <Text fontSize="sm">
-                                                    &bull;&bull;&bull;&bull;{' '}
-                                                    {paymentCard?.numberLastDigits}
-                                                </Text>
-                                                <Text fontSize="sm">
-                                                    {paymentCard?.expirationMonth}/
-                                                    {paymentCard?.expirationYear}
-                                                </Text>
-                                            </Stack>
-                                        </Box>
+                                        </Heading>
+                                        <Stack direction="row">
+                                            {CardIcon && (
+                                                <CardIcon layerStyle="ccIcon" aria-hidden="true" />
+                                            )}
+                                            <Box>
+                                                <Text fontSize="sm">{paymentCard?.cardType}</Text>
+                                                <Stack direction="row">
+                                                    <Text fontSize="sm">
+                                                        &bull;&bull;&bull;&bull;{' '}
+                                                        {paymentCard?.numberLastDigits}
+                                                    </Text>
+                                                    <Text fontSize="sm">
+                                                        {paymentCard?.expirationMonth}/
+                                                        {paymentCard?.expirationYear}
+                                                    </Text>
+                                                </Stack>
+                                            </Box>
+                                        </Stack>
                                     </Stack>
-                                </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Address"
-                                            id="account_order_detail.heading.shipping_address"
-                                        />
-                                    </Heading>
-                                    <Box>
-                                        <Text fontSize="sm">
-                                            {shippingAddress.firstName} {shippingAddress.lastName}
-                                        </Text>
-                                        <Text fontSize="sm">{shippingAddress.address1}</Text>
-                                        <Text fontSize="sm">
-                                            {shippingAddress.city}, {shippingAddress.stateCode}{' '}
-                                            {shippingAddress.postalCode}
-                                        </Text>
-                                    </Box>
-                                </Stack>
+                                )}
+
+                                {/* Billing Address */}
                                 <Stack spacing={1}>
                                     <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage

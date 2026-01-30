@@ -60,6 +60,7 @@ import '@salesforce/retail-react-app/app/assets/svg/heart.svg'
 import '@salesforce/retail-react-app/app/assets/svg/heart-solid.svg'
 import '@salesforce/retail-react-app/app/assets/svg/close.svg'
 import '@salesforce/retail-react-app/app/assets/svg/credit-card.svg'
+import '@salesforce/retail-react-app/app/assets/svg/sparkle.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
@@ -201,6 +202,7 @@ export const SocialPinterestIcon = icon('social-pinterest', {
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
+export const SparkleIcon = icon('sparkle')
 export const StoreIcon = icon('store')
 export const SignoutIcon = icon('signout')
 export const UserIcon = icon('user')

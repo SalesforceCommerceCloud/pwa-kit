@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {IntlProvider} from 'react-intl'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -101,7 +101,8 @@ const setup = (overrides = {}) => {
         isGuestCheckout: overrides.isGuestCheckout ?? false,
         isDisabled: overrides.isDisabled ?? false,
         onSavePreferenceChange: overrides.onSavePref ?? jest.fn(),
-        onRegistered: overrides.onRegistered ?? jest.fn()
+        onRegistered: overrides.onRegistered ?? jest.fn(),
+        onLoadingChange: overrides.onLoadingChange ?? jest.fn()
     }
 
     const utils = render(
@@ -398,6 +399,151 @@ describe('UserRegistration', () => {
         })
         // onRegistered should not be called on error
         expect(props.onRegistered).not.toHaveBeenCalled()
+    })
+
+    test('shows loading overlay when guest user clicks registration checkbox', async () => {
+        const user = userEvent.setup()
+        const onLoadingChange = jest.fn()
+        setup({
+            onLoadingChange,
+            authorizeMutate: jest.fn().mockImplementation(() => {
+                // Simulate async delay
+                return new Promise((resolve) => setTimeout(() => resolve({}), 100))
+            })
+        })
+
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+        await user.click(checkbox)
+
+        // Verify loading overlay appears
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-otp-loading-overlay')).toBeInTheDocument()
+        })
+
+        // Verify onLoadingChange was called with true
+        expect(onLoadingChange).toHaveBeenCalledWith(true)
+
+        // Wait for OTP modal to open (which clears loading state)
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('otp-guest')).toBeInTheDocument()
+            },
+            {timeout: 2000}
+        )
+
+        // Verify loading overlay disappears when OTP modal opens
+        await waitFor(() => {
+            expect(screen.queryByTestId('sf-otp-loading-overlay')).not.toBeInTheDocument()
+        })
+
+        // Verify onLoadingChange was called with false when modal opens
+        expect(onLoadingChange).toHaveBeenCalledWith(false)
+    })
+
+    test('hides loading overlay when OTP authorization fails', async () => {
+        const user = userEvent.setup()
+        const onLoadingChange = jest.fn()
+        // Make the error happen after a small delay to ensure overlay appears first
+        const authorizeMutate = jest.fn().mockImplementation(() => {
+            return new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Authorization failed')), 50)
+            })
+        })
+        setup({
+            onLoadingChange,
+            authorizeMutate
+        })
+
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+        await user.click(checkbox)
+
+        // Verify loading overlay appears initially
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-otp-loading-overlay')).toBeInTheDocument()
+        })
+        expect(onLoadingChange).toHaveBeenCalledWith(true)
+
+        // Wait for error to be handled
+        await waitFor(
+            () => {
+                expect(screen.queryByTestId('sf-otp-loading-overlay')).not.toBeInTheDocument()
+            },
+            {timeout: 2000}
+        )
+
+        // Verify onLoadingChange was called with false on error
+        expect(onLoadingChange).toHaveBeenCalledWith(false)
+        // OTP modal should not open on error
+        expect(screen.queryByTestId('otp-guest')).not.toBeInTheDocument()
+    })
+
+    test('does not show loading overlay for registered users', async () => {
+        const user = userEvent.setup()
+        const onLoadingChange = jest.fn()
+        setup({isGuest: false, onLoadingChange})
+
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+        await user.click(checkbox)
+
+        // Loading overlay should not appear for registered users
+        expect(screen.queryByTestId('sf-otp-loading-overlay')).not.toBeInTheDocument()
+        expect(onLoadingChange).not.toHaveBeenCalled()
+    })
+
+    test('clears loading state when checkbox is unchecked', async () => {
+        const user = userEvent.setup()
+        const onLoadingChange = jest.fn()
+        const authorizeMutate = jest.fn().mockImplementation(() => {
+            return new Promise((resolve) => setTimeout(() => resolve({}), 200))
+        })
+
+        // Wrapper to control the enableUserRegistration prop
+        const TestWrapper = () => {
+            const [enabled, setEnabled] = useState(false)
+            return (
+                <IntlProvider locale="en-GB" messages={TEST_MESSAGES}>
+                    <UserRegistration
+                        enableUserRegistration={enabled}
+                        setEnableUserRegistration={setEnabled}
+                        onLoadingChange={onLoadingChange}
+                    />
+                </IntlProvider>
+            )
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: {
+                basketId: 'basket-123',
+                customerInfo: {email: 'test@example.com'},
+                productItems: [{productId: 'sku-1', quantity: 1}],
+                shipments: [
+                    {shippingAddress: {address1: '123 Main'}, shippingMethod: {id: 'Ground'}}
+                ]
+            }
+        })
+        useCustomerType.mockReturnValue({isGuest: true})
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync = authorizeMutate
+
+        render(<TestWrapper />)
+
+        const checkbox = screen.getByRole('checkbox', {name: /Create an account/i})
+
+        // Check the checkbox
+        await user.click(checkbox)
+
+        // Wait for loading to start
+        await waitFor(() => {
+            expect(onLoadingChange).toHaveBeenCalledWith(true)
+        })
+
+        // Uncheck the checkbox before OTP modal opens
+        await user.click(checkbox)
+
+        // Verify loading state is cleared
+        await waitFor(() => {
+            expect(onLoadingChange).toHaveBeenCalledWith(false)
+        })
+        expect(screen.queryByTestId('sf-otp-loading-overlay')).not.toBeInTheDocument()
     })
 
     test('displays explanatory text when registration is enabled', () => {

@@ -17,12 +17,6 @@
       "value": "Log Out"
     }
   ],
-  "account.payments.action.refresh": [
-    {
-      "type": 0,
-      "value": "Refresh"
-    }
-  ],
   "account.payments.action.retry": [
     {
       "type": 0,
@@ -105,6 +99,12 @@
     {
       "type": 0,
       "value": "Add a new payment method to check out faster."
+    }
+  ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "My Account"
     }
   ],
   "account_addresses.badge.default": [
@@ -207,16 +207,52 @@
       "value": "Payment Method"
     }
   ],
+  "account_order_detail.heading.pickup_address": [
+    {
+      "type": 0,
+      "value": "Pickup Address"
+    }
+  ],
+  "account_order_detail.heading.pickup_address_number": [
+    {
+      "type": 0,
+      "value": "Pickup Address "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,
       "value": "Shipping Address"
     }
   ],
+  "account_order_detail.heading.shipping_address_number": [
+    {
+      "type": 0,
+      "value": "Shipping Address "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_method": [
     {
       "type": 0,
       "value": "Shipping Method"
+    }
+  ],
+  "account_order_detail.heading.shipping_method_number": [
+    {
+      "type": 0,
+      "value": "Shipping Method "
+    },
+    {
+      "type": 1,
+      "value": "number"
     }
   ],
   "account_order_detail.label.order_number": [
@@ -239,10 +275,14 @@
       "value": "date"
     }
   ],
-  "account_order_detail.label.pending_tracking_number": [
+  "account_order_detail.label.pickup_from_store": [
     {
       "type": 0,
-      "value": "Pending"
+      "value": "Pick up from Store "
+    },
+    {
+      "type": 1,
+      "value": "storeId"
     }
   ],
   "account_order_detail.label.tracking_number": [
@@ -473,6 +513,12 @@
     {
       "type": 0,
       "value": "You Might Also Like"
+    }
+  ],
+  "addressSuggestionDropdown.suggested": [
+    {
+      "type": 0,
+      "value": "SUGGESTED"
     }
   ],
   "auth_modal.button.close.assistive_msg": [
@@ -811,6 +857,12 @@
       "value": "Recently Viewed"
     }
   ],
+  "cart.title.shopping_cart": [
+    {
+      "type": 0,
+      "value": "Shopping Cart"
+    }
+  ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
@@ -925,6 +977,12 @@
       "value": "Place Order"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "Please enter a billing address."
+    }
+  ],
   "checkout.error.cannot_save_address": [
     {
       "type": 0,
@@ -953,6 +1011,12 @@
     {
       "type": 0,
       "value": "Save this payment method for future use"
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "Checkout"
     }
   ],
   "checkout.title.user_registration": [
@@ -1083,22 +1147,10 @@
       "value": "Shipping"
     }
   ],
-  "checkout_confirmation.label.shipping.strikethrough.price": [
-    {
-      "type": 0,
-      "value": "Originally "
-    },
+  "checkout_confirmation.label.shipping.price": [
     {
       "type": 1,
-      "value": "originalPrice"
-    },
-    {
-      "type": 0,
-      "value": ", now "
-    },
-    {
-      "type": 1,
-      "value": "newPrice"
+      "value": "price"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -1487,6 +1539,12 @@
     {
       "type": 0,
       "value": "Checkout as Guest"
+    }
+  ],
+  "contact_info.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
     }
   ],
   "contact_info.button.continue_to_shipping_address": [
@@ -2039,6 +2097,18 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.error.too_many_login_attempts": [
+    {
+      "type": 0,
+      "value": "You reached the limit for login attempts. For your security, wait 10 minutes and try again."
+    }
+  ],
+  "global.error.too_many_password_reset_requests": [
+    {
+      "type": 0,
+      "value": "You reached the limit for password resets. For your security, wait 10 minutes and try again."
+    }
+  ],
   "global.info.added_to_wishlist": [
     {
       "type": 1,
@@ -2099,6 +2169,12 @@
     {
       "type": 0,
       "value": "View"
+    }
+  ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Ask Shopping Agent"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -2327,6 +2403,12 @@
     {
       "type": 0,
       "value": "Read docs"
+    }
+  ],
+  "home.title.home": [
+    {
+      "type": 0,
+      "value": "Home"
     }
   ],
   "home.title.react_starter_store": [
@@ -2749,6 +2831,12 @@
       "value": "Chinese (Taiwan)"
     }
   ],
+  "login.title.sign_in": [
+    {
+      "type": 0,
+      "value": "Sign In"
+    }
+  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -2770,7 +2858,7 @@
   "login_form.button.continue_securely": [
     {
       "type": 0,
-      "value": "Continue Securely"
+      "value": "Continue"
     }
   ],
   "login_form.button.google": [
@@ -3073,6 +3161,12 @@
       "value": "The page you're looking for can't be found."
     }
   ],
+  "page_not_found.title.page_not_found": [
+    {
+      "type": 0,
+      "value": "Page Not Found"
+    }
+  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -3311,6 +3405,12 @@
     {
       "type": 0,
       "value": "Recently Viewed"
+    }
+  ],
+  "product_detail.title.product_details": [
+    {
+      "type": 0,
+      "value": "Product Details"
     }
   ],
   "product_item.label.quantity": [
@@ -3797,6 +3897,18 @@
       "value": "Create an account and get first access to the very best products, inspiration and community."
     }
   ],
+  "registration.title.create_account": [
+    {
+      "type": 0,
+      "value": "Create Account"
+    }
+  ],
+  "reset_password.title.reset_password": [
+    {
+      "type": 0,
+      "value": "Reset Password"
+    }
+  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
@@ -3845,10 +3957,22 @@
       "value": "Did you mean"
     }
   ],
+  "search.suggestions.popular": [
+    {
+      "type": 0,
+      "value": "Popular Searches"
+    }
+  ],
   "search.suggestions.products": [
     {
       "type": 0,
       "value": "Products"
+    }
+  ],
+  "search.suggestions.recent": [
+    {
+      "type": 0,
+      "value": "Recent Searches"
     }
   ],
   "search.suggestions.viewAll": [
@@ -4153,12 +4277,6 @@
       "value": "Address saved successfully"
     }
   ],
-  "shipping_options.action.send_as_gift_wrapping": [
-    {
-      "type": 0,
-      "value": "Send as a gift (gift wrapping)"
-    }
-  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
@@ -4175,12 +4293,6 @@
     {
       "type": 0,
       "value": "Free"
-    }
-  ],
-  "shipping_options.help.notifications": [
-    {
-      "type": 0,
-      "value": "You can enable or disable notifications at any time."
     }
   ],
   "shipping_options.label.no_method_selected": [

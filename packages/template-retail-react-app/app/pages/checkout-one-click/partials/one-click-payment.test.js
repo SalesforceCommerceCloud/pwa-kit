@@ -143,10 +143,17 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration',
     () => {
-        const MockUserRegistration = function ({enableUserRegistration, onRegistered}) {
-            return enableUserRegistration ? (
-                <div data-testid="user-registration">
+        const MockUserRegistration = function ({enableUserRegistration, onRegistered, isDisabled}) {
+            return (
+                <div data-testid="user-registration" data-disabled={isDisabled}>
                     User Registration
+                    <input
+                        type="checkbox"
+                        data-testid="user-registration-checkbox"
+                        checked={enableUserRegistration}
+                        disabled={isDisabled}
+                        onChange={() => {}}
+                    />
                     <button
                         data-testid="trigger-registration"
                         onClick={async () => {
@@ -158,7 +165,7 @@ jest.mock(
                         Complete Registration
                     </button>
                 </div>
-            ) : null
+            )
         }
 
         return MockUserRegistration
@@ -658,6 +665,478 @@ describe('Payment Component', () => {
             expect(checkboxAfter).toBeInTheDocument()
             expect(checkboxAfter).toBeChecked()
         })
+
+        test('does not add payment again during registration when payment already exists on basket', async () => {
+            const user = userEvent.setup()
+            const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            useShopperBasketsMutation.mockImplementation((mutationType) => {
+                switch (mutationType) {
+                    case 'addPaymentInstrumentToBasket':
+                        return {mutateAsync: mockAddPaymentInstrument}
+                    case 'updateBillingAddressForBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    case 'removePaymentInstrumentFromBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    default:
+                        return {mutateAsync: jest.fn()}
+                }
+            })
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={true}
+                    paymentMethodForm={{
+                        handleSubmit: jest.fn((callback) => (e) => {
+                            e?.preventDefault?.()
+                            callback({})
+                        }),
+                        watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                        getValues: jest.fn(() => ({
+                            number: '4111111111111111',
+                            holder: 'John Doe',
+                            expiry: '12/25'
+                        })),
+                        formState: {isSubmitting: false, isValid: true}
+                    }}
+                />
+            )
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify payment was NOT added again (payment already exists on basket)
+            // Payment should be transferred during basket merge, not added again
+            expect(mockAddPaymentInstrument).not.toHaveBeenCalled()
+        })
+
+        test('does not add payment during registration even when payment form has values', async () => {
+            const user = userEvent.setup()
+            const mockAddPaymentInstrument = jest.fn().mockResolvedValue({})
+
+            // Basket without payment initially, but payment will be on basket before registration
+            // (since registration checkbox is disabled until payment is filled)
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            useShopperBasketsMutation.mockImplementation((mutationType) => {
+                switch (mutationType) {
+                    case 'addPaymentInstrumentToBasket':
+                        return {mutateAsync: mockAddPaymentInstrument}
+                    case 'updateBillingAddressForBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    case 'removePaymentInstrumentFromBasket':
+                        return {mutateAsync: jest.fn().mockResolvedValue({})}
+                    default:
+                        return {mutateAsync: jest.fn()}
+                }
+            })
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                getValues: jest.fn(() => ({
+                    number: '4111111111111111',
+                    holder: 'John Doe',
+                    expiry: '12/25',
+                    cardType: 'Visa'
+                })),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={true}
+                    paymentMethodForm={mockPaymentMethodForm}
+                />
+            )
+
+            // Find and trigger user registration
+            const registrationComponent = screen.getByTestId('user-registration')
+            const triggerRegistrationButton =
+                within(registrationComponent).getByTestId('trigger-registration')
+
+            // Trigger registration
+            await user.click(triggerRegistrationButton)
+
+            // Wait for registration to complete
+            await waitFor(() => {
+                expect(screen.getByTestId('user-registration')).toBeInTheDocument()
+            })
+
+            // Verify payment was NOT added again
+            // Payment is already on basket (registration requires payment to be filled first)
+            // Basket transfer/merge will preserve the payment, no need to add it again
+            expect(mockAddPaymentInstrument).not.toHaveBeenCalled()
+        })
+
+        test('disables user registration checkbox when payment is not filled in', () => {
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    enableUserRegistration={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).toBeDisabled()
+        })
+
+        test('disables user registration checkbox when same as shipping is unchecked and billing address is not filled in', () => {
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    enableUserRegistration={false}
+                    billingSameAsShipping={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).toBeDisabled()
+        })
+
+        test('enables user registration checkbox when same as shipping is checked even if billing address form is invalid', () => {
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    enableUserRegistration={false}
+                    billingSameAsShipping={true}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).not.toBeDisabled()
+        })
+
+        test('enables user registration checkbox when same as shipping is unchecked but billing address is filled in', () => {
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Billing St',
+                    city: 'Oakland',
+                    stateCode: 'CA',
+                    postalCode: '94601',
+                    countryCode: 'US'
+                })),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            render(
+                <TestWrapper
+                    enableUserRegistration={false}
+                    billingSameAsShipping={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).not.toBeDisabled()
+        })
+
+        test('disables user registration checkbox when payment is filled in but same as shipping is unchecked and billing address is invalid', () => {
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={false}
+                    billingSameAsShipping={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).toBeDisabled()
+        })
+
+        test('enables user registration checkbox when payment is filled in and billing address is valid', () => {
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Billing St',
+                    city: 'Oakland',
+                    stateCode: 'CA',
+                    postalCode: '94601',
+                    countryCode: 'US'
+                })),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={false}
+                    billingSameAsShipping={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).not.toBeDisabled()
+        })
+
+        test('disables user registration checkbox when unchecking same as shipping with invalid billing address', async () => {
+            const user = userEvent.setup()
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: true}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    enableUserRegistration={false}
+                    billingSameAsShipping={true}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            // Initially enabled when same as shipping is checked
+            let registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).not.toBeDisabled()
+
+            // Uncheck "same as shipping"
+            const sameAsShippingCheckbox = screen.getByRole('checkbox', {
+                name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+            })
+            await user.click(sameAsShippingCheckbox)
+
+            // Now should be disabled because billing address is not filled in
+            await waitFor(() => {
+                registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+                expect(registrationCheckbox).toBeDisabled()
+            })
+        })
+
+        test('disables user registration checkbox in summary view when same as shipping is unchecked and billing address is invalid', () => {
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={false}
+                    billingSameAsShipping={false}
+                    initialStep={5}
+                    isEditing={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            // In summary view, should be disabled when same as shipping is unchecked and billing is invalid
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).toBeDisabled()
+        })
+
+        test('enables user registration checkbox in summary view when payment is applied', () => {
+            const basketWithPayment = {
+                ...mockBasket,
+                paymentInstruments: [mockPaymentInstruments[0]]
+            }
+
+            const mockPaymentMethodForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                watch: jest.fn(() => ({unsubscribe: jest.fn()})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            const mockBillingAddressForm = {
+                handleSubmit: jest.fn((callback) => (e) => {
+                    e?.preventDefault?.()
+                    callback({})
+                }),
+                trigger: jest.fn().mockResolvedValue(true),
+                getValues: jest.fn(() => ({})),
+                formState: {isSubmitting: false, isValid: false}
+            }
+
+            render(
+                <TestWrapper
+                    basketData={basketWithPayment}
+                    enableUserRegistration={false}
+                    billingSameAsShipping={true}
+                    initialStep={5}
+                    isEditing={false}
+                    paymentMethodForm={mockPaymentMethodForm}
+                    billingAddressForm={mockBillingAddressForm}
+                />
+            )
+
+            // In summary view with payment applied, should be enabled
+            const registrationCheckbox = screen.getByTestId('user-registration-checkbox')
+            expect(registrationCheckbox).not.toBeDisabled()
+        })
     })
 
     describe('Save Payment Method', () => {
@@ -869,8 +1348,14 @@ describe('Payment Component', () => {
                     }
                 ]
             }
-            render(<TestWrapper isRegistered={true} customerData={customerWithSaved} />)
-            // Wait for form to appear (auto-apply may temporarily hide it)
+            // Use isEditing so auto-apply is skipped and the form stays visible (avoids CI race)
+            render(
+                <TestWrapper
+                    isRegistered={true}
+                    customerData={customerWithSaved}
+                    isEditing={true}
+                />
+            )
             await screen.findByTestId('payment-form')
             await user.click(screen.getByText('Select Saved'))
             // If no error thrown, the path executed successfully
@@ -904,11 +1389,13 @@ describe('Payment Component', () => {
                     }
                 ]
             }
+            // Use isEditing so auto-apply is skipped and the form stays visible (avoids CI race)
             render(
                 <TestWrapper
                     basketData={pickupBasket}
                     isRegistered={true}
                     customerData={customerWithSaved}
+                    isEditing={true}
                 />
             )
             await screen.findByTestId('payment-form')

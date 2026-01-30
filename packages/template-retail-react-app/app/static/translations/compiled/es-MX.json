@@ -17,6 +17,12 @@
       "value": "Cerrar sesión"
     }
   ],
+  "account.title.my_account": [
+    {
+      "type": 0,
+      "value": "Mi cuenta"
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -493,6 +499,12 @@
       "value": "Vistos recientemente"
     }
   ],
+  "cart.title.shopping_cart": [
+    {
+      "type": 0,
+      "value": "Carrito de compras"
+    }
+  ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
@@ -611,6 +623,12 @@
     {
       "type": 0,
       "value": "Se produjo un error inesperado durante el pago."
+    }
+  ],
+  "checkout.title.checkout": [
+    {
+      "type": 0,
+      "value": "Pagar"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -1889,6 +1907,12 @@
       "value": "Leer documentos"
     }
   ],
+  "home.title.home": [
+    {
+      "type": 0,
+      "value": "Inicio"
+    }
+  ],
   "home.title.react_starter_store": [
     {
       "type": 0,
@@ -2293,6 +2317,12 @@
       "value": "Chino (Taiwán)"
     }
   ],
+  "login.title.sign_in": [
+    {
+      "type": 0,
+      "value": "Iniciar sesión"
+    }
+  ],
   "login_form.action.create_account": [
     {
       "type": 0,
@@ -2505,6 +2535,12 @@
       "value": "No podemos encontrar la página que busca."
     }
   ],
+  "page_not_found.title.page_not_found": [
+    {
+      "type": 0,
+      "value": "Página no encontrada"
+    }
+  ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
@@ -2669,6 +2705,12 @@
     {
       "type": 0,
       "value": "Vistos recientemente"
+    }
+  ],
+  "product_detail.title.product_details": [
+    {
+      "type": 0,
+      "value": "Detalles del producto"
     }
   ],
   "product_item.label.quantity": [
@@ -3089,6 +3131,18 @@
     {
       "type": 0,
       "value": "Cree una cuenta y obtenga un primer acceso a los mejores productos, inspiración y comunidad."
+    }
+  ],
+  "registration.title.create_account": [
+    {
+      "type": 0,
+      "value": "Crear cuenta"
+    }
+  ],
+  "reset_password.title.reset_password": [
+    {
+      "type": 0,
+      "value": "Restablecer contraseña"
     }
   ],
   "reset_password_form.action.sign_in": [

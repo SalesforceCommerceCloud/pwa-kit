@@ -73,7 +73,7 @@ test('Shopper can use the consent tracking form', async ({page}) => {
     await checkDntCookie(page, '1')
 
     // Logging out clears the preference
-    await page.getByRole('heading', {name: /My Account/i}).click()
+    await page.getByRole('button', {name: /My Account chevron-down/i}).click()
     const buttons = await page.getByText(/Log Out/i).elementHandles()
     for (const button of buttons) {
         if (await button.isVisible()) {

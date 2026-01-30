@@ -70,7 +70,7 @@ const ShippingAddressEditForm = ({
                         form={form}
                         formTitleAriaLabel={formTitleAriaLabel}
                         isBillingAddress={isBillingAddress}
-                        hidePhone={hidePhone}
+                        hidePhone={hidePhone || !isBillingAddress}
                         hidePreferred={true}
                     />
 
@@ -165,10 +165,13 @@ const ShippingAddressSelection = ({
 
     useEffect(() => {
         if (isBillingAddress) {
-            form.reset({...selectedAddress})
-            return
+            // Choose selected address (if any)
+            if (selectedAddress?.address1) {
+                form.reset({...selectedAddress})
+                return
+            }
         }
-        // Automatically select the customer's default/preferred shipping address
+        // Automatically select the customer's default/preferred address as shipping/billing address
         if (customer.addresses) {
             const address = customer.addresses.find((addr) => addr.preferred === true)
             if (address) {
@@ -357,7 +360,7 @@ const ShippingAddressSelection = ({
                                                             toggleAddressEdit={toggleAddressEdit}
                                                             hideSubmitButton={hideSubmitButton}
                                                             form={form}
-                                                            hidePhone={!isBillingAddress}
+                                                            hidePhone={isBillingAddress}
                                                             submitButtonLabel={submitButtonLabel}
                                                             formTitleAriaLabel={formTitleAriaLabel}
                                                         />
@@ -416,8 +419,7 @@ const ShippingAddressSelection = ({
                         hideSubmitButton={hideSubmitButton}
                         form={form}
                         isBillingAddress={isBillingAddress}
-                        hidePhone={!isBillingAddress}
-                        hidePreferred={true}
+                        hidePhone={isBillingAddress}
                         submitButtonLabel={submitButtonLabel}
                         formTitleAriaLabel={formTitleAriaLabel}
                     />

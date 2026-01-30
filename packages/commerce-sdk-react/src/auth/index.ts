@@ -94,7 +94,7 @@ type AuthorizeIDPParams = {
 type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
-    mode?: string
+    mode?: 'email' | 'callback'
     locale?: string
     /** When true, SLAS will register the customer as part of the passwordless flow */
     register_customer?: boolean | string
@@ -134,6 +134,8 @@ type AuthDataKeys =
     | typeof DWSID_COOKIE_NAME
     | 'code_verifier'
     | 'uido'
+    | 'idp_refresh_token'
+    | 'dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -182,6 +184,14 @@ const DATA_MAP: AuthDataMap = {
     idp_access_token: {
         storageType: 'local',
         key: 'idp_access_token'
+    },
+    idp_refresh_token: {
+        storageType: 'local',
+        key: 'idp_refresh_token'
+    },
+    dnt: {
+        storageType: 'local',
+        key: 'dnt'
     },
     token_type: {
         storageType: 'local',
@@ -367,8 +377,7 @@ class Auth {
 
         this.isPrivate = !!this.clientSecret
 
-        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
@@ -1271,33 +1280,33 @@ class Auth {
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const slasClient = this.client
         const usid = this.get('usid')
+        // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
+        // do not pass the mode parameter. Newer versions should explicitly pass the mode.
+        const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
         const options = {
             headers: {
                 Authorization: ''
             },
             parameters: {
-                ...(parameters.register_customer !== undefined && {
-                    register_customer:
-                        typeof parameters.register_customer === 'boolean'
-                            ? String(parameters.register_customer)
-                            : parameters.register_customer
-                })
-            },
-            body: {
-                user_id: parameters.userid,
-                mode: finalMode,
-                locale: parameters.locale,
-                // Include usid and site as required by SLAS
+                ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
-                channel_id: slasClient.clientConfig.parameters.siteId,
-                ...(finalMode === 'callback' && callbackURI && {callback_uri: callbackURI}),
-                ...(parameters.last_name && {last_name: parameters.last_name}),
+                ...(parameters.locale && {locale: parameters.locale}),
+                userid: parameters.userid,
+                mode,
+                ...(parameters.register_customer !== undefined && {
+                    registerCustomer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? parameters.register_customer
+                            : parameters.register_customer === 'true'
+                            ? true
+                            : false
+                }),
+                ...(parameters.last_name && {lastName: parameters.last_name}),
                 ...(parameters.email && {email: parameters.email}),
-                ...(parameters.first_name && {first_name: parameters.first_name}),
-                ...(parameters.phone_number && {phone_number: parameters.phone_number})
+                ...(parameters.first_name && {firstName: parameters.first_name}),
+                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
         } as {
             headers?: {[key: string]: string}
@@ -1369,10 +1378,10 @@ class Auth {
                 mode: parameters.mode || 'callback',
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                callback_uri: parameters.callback_uri,
+                ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
                 hint: parameters.hint || 'cross_device',
-                locale: parameters.locale,
-                idp_name: parameters.idp_name,
+                ...(parameters.locale && {locale: parameters.locale}),
+                ...(parameters.idp_name && {idp_name: parameters.idp_name}),
                 ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }
         }
@@ -1384,7 +1393,12 @@ class Auth {
             )}`
         }
 
-        const res = await slasClient.getPasswordResetToken(options)
+        // Set rawResponse to true to access the response body message for error handling
+        const res = await slasClient.getPasswordResetToken(options, true)
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
         return res
     }
 
@@ -1399,12 +1413,18 @@ class Auth {
                 Authorization: ''
             },
             body: {
+                // TODO: remove the eslint disabled after updating OAS
+                // user_id is a valid param for resetPassword
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                hint: parameters.hint,
-                code_verifier: parameters.code_verifier
+                hint: parameters.hint || 'cross_device',
+                // hint='cross_device' and a defined user_id is required for code_verifier to be optional for this call
+                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier})
             }
         }
 
@@ -1414,9 +1434,6 @@ class Auth {
                 `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
             )}`
         }
-        // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const res = await this.client.resetPassword(options)
         return res
     }

@@ -134,16 +134,18 @@ describe('Bonus Product Utilities - Integration Tests', () => {
                 'prod-123',
                 mockProductsWithPromotions
             )
+            // Only BonusProductOnOrderOfAmountAbove250 should be returned because it's in bonusDiscountLineItems
             expect(promotionIds).toContain('BonusProductOnOrderOfAmountAbove250')
-            expect(promotionIds).toContain('FreeShippingPromotion')
+            expect(promotionIds).toHaveLength(1) // FreeShippingPromotion is not a bonus promotion
 
-            // Get callout text for each promotion
+            // Get callout text for the bonus promotion
             const bonusCallout = bonusProductUtils.getPromotionCalloutText(
                 mockProductsWithPromotions['prod-123'],
                 'BonusProductOnOrderOfAmountAbove250'
             )
             expect(bonusCallout).toBe('Buy $250+ and get free bonus products!')
 
+            // FreeShippingPromotion callout text can still be retrieved (it's just not a bonus promotion)
             const shippingCallout = bonusProductUtils.getPromotionCalloutText(
                 mockProductsWithPromotions['prod-123'],
                 'FreeShippingPromotion'

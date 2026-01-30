@@ -47,13 +47,19 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {useLocation} from 'react-router-dom'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
+    const location = useLocation()
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -64,16 +70,30 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const transferBasket = useShopperBasketsMutation('transferBasket')
     const updateCustomer = useShopperCustomersMutation('updateCustomer')
+    const updateBillingAddressForBasket = useShopperBasketsMutation('updateBillingAddressForBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const callbackURL = passwordlessConfig?.callbackURI
+        ? absoluteUrl(passwordlessConfig.callbackURI)
+        : ''
+    const redirectPath = location.pathname + location.search
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
+
+    // Determine if this order has delivery shipments
+    const shipments = basket?.shipments || []
+    const productItems = basket?.productItems || []
+    const shipmentsWithItems = shipments.filter((s) =>
+        productItems.some((i) => i.shipmentId === s.shipmentId)
+    )
+    const hasDeliveryShipments = shipmentsWithItems.some((s) => !isPickupShipment(s))
 
     const form = useForm({
         defaultValues: {
             email: customer?.email || basket?.customerInfo?.email || '',
-            phone: customer?.phoneHome || '',
+            phone: customer?.phoneHome || basket?.billingAddress?.phone || '',
             password: '',
             otp: ''
         }
@@ -213,8 +233,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
-                    mode: 'email',
-                    locale: locale?.id
+                    mode: passwordlessConfig?.mode,
+                    locale: locale?.id,
+                    ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
@@ -223,6 +244,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
+                const message = formatMessage(getPasswordlessErrorMessage(error.message))
+                setError(message)
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {
                     setShowContinueButton(true)
@@ -252,11 +275,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const handleCheckoutAsGuest = async () => {
         try {
             const email = form.getValues('email')
+            const phone = form.getValues('phone')
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: {email: email}
             })
+
+            // Save phone number to basket billing address for guest shoppers
+            if (phone) {
+                await updateBillingAddressForBasket.mutateAsync({
+                    parameters: {basketId: basket.basketId},
+                    body: {
+                        ...basket?.billingAddress,
+                        phone: phone
+                    }
+                })
+            }
 
             // Set the flag that "Checkout as Guest" was clicked
             setRegisteredUserChoseGuest(true)
@@ -267,7 +302,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
-            setError(error.message)
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            setError(message)
         }
     }
 
@@ -312,7 +348,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
 
             // Persist phone number to the newly registered customer's profile
-            const phone = form.getValues('phone')
+            const phone = basket?.billingAddress?.phone || form.getValues('phone')
             if (phone && customer?.customerId) {
                 try {
                     await updateCustomer.mutateAsync({
@@ -461,6 +497,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         parameters: {basketId: basket.basketId},
                         body: {email: formData.email}
                     })
+
+                    // Save phone number to basket billing address for guest shoppers
+                    if (phone) {
+                        await updateBillingAddressForBasket.mutateAsync({
+                            parameters: {basketId: basket.basketId},
+                            body: {
+                                ...basket?.billingAddress,
+                                phone: phone
+                            }
+                        })
+                    }
 
                     // Update basket and immediately advance to next step for smooth UX
                     goToNextStep()
@@ -615,10 +662,17 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             isLoading={isSubmitting}
                                             disabled={isSubmitting}
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Continue to Shipping Address"
-                                                id="contact_info.button.continue_to_shipping_address"
-                                            />
+                                            {hasDeliveryShipments ? (
+                                                <FormattedMessage
+                                                    defaultMessage="Continue to Shipping Address"
+                                                    id="contact_info.button.continue_to_shipping_address"
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    defaultMessage="Continue to Payment"
+                                                    id="contact_info.button.continue_to_payment"
+                                                />
+                                            )}
                                         </Button>
                                     )}
                                 </Stack>
@@ -639,7 +693,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                 {(customer?.email || form.getValues('email')) && (
                     <ToggleCardSummary>
-                        <Text>{customer?.email || form.getValues('email')}</Text>
+                        <Stack spacing={1}>
+                            <Text>{customer?.email || form.getValues('email')}</Text>
+                            {(customer?.phoneHome || form.getValues('phone')) && (
+                                <Text fontSize="sm" color="gray.600">
+                                    {customer?.phoneHome || form.getValues('phone')}
+                                </Text>
+                            )}
+                        </Stack>
                     </ToggleCardSummary>
                 )}
             </ToggleCard>

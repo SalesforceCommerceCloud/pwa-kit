@@ -8,9 +8,6 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Log Out"
   },
-  "account.payments.action.refresh": {
-    "defaultMessage": "Refresh"
-  },
   "account.payments.action.retry": {
     "defaultMessage": "Retry"
   },
@@ -52,6 +49,9 @@
   },
   "account.payments.placeholder.text": {
     "defaultMessage": "Add a new payment method to check out faster."
+  },
+  "account.title.my_account": {
+    "defaultMessage": "My Account"
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
@@ -101,11 +101,23 @@
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
   },
+  "account_order_detail.heading.pickup_address": {
+    "defaultMessage": "Pickup Address"
+  },
+  "account_order_detail.heading.pickup_address_number": {
+    "defaultMessage": "Pickup Address {number}"
+  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
+  "account_order_detail.heading.shipping_address_number": {
+    "defaultMessage": "Shipping Address {number}"
+  },
   "account_order_detail.heading.shipping_method": {
     "defaultMessage": "Shipping Method"
+  },
+  "account_order_detail.heading.shipping_method_number": {
+    "defaultMessage": "Shipping Method {number}"
   },
   "account_order_detail.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -113,8 +125,8 @@
   "account_order_detail.label.ordered_date": {
     "defaultMessage": "Ordered: {date}"
   },
-  "account_order_detail.label.pending_tracking_number": {
-    "defaultMessage": "Pending"
+  "account_order_detail.label.pickup_from_store": {
+    "defaultMessage": "Pick up from Store {storeId}"
   },
   "account_order_detail.label.tracking_number": {
     "defaultMessage": "Tracking Number"
@@ -203,6 +215,9 @@
   },
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
+  },
+  "addressSuggestionDropdown.suggested": {
+    "defaultMessage": "SUGGESTED"
   },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Close login form"
@@ -297,6 +312,9 @@
   "cart.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
   },
+  "cart.title.shopping_cart": {
+    "defaultMessage": "Shopping Cart"
+  },
   "cart_cta.link.checkout": {
     "defaultMessage": "Proceed to Checkout"
   },
@@ -333,6 +351,9 @@
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "Please enter a billing address."
+  },
   "checkout.error.cannot_save_address": {
     "defaultMessage": "Could not save shipping address."
   },
@@ -347,6 +368,9 @@
   },
   "checkout.payment.save_payment_method": {
     "defaultMessage": "Save this payment method for future use"
+  },
+  "checkout.title.checkout": {
+    "defaultMessage": "Checkout"
   },
   "checkout.title.user_registration": {
     "defaultMessage": "Save Checkout Info for Future Use"
@@ -408,8 +432,8 @@
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
   },
-  "checkout_confirmation.label.shipping.strikethrough.price": {
-    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
+  "checkout_confirmation.label.shipping.price": {
+    "defaultMessage": "{price}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
@@ -573,6 +597,9 @@
   },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout as Guest"
+  },
+  "contact_info.button.continue_to_payment": {
+    "defaultMessage": "Continue to Payment"
   },
   "contact_info.button.continue_to_shipping_address": {
     "defaultMessage": "Continue to Shipping Address"
@@ -825,6 +852,12 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
+  "global.error.too_many_login_attempts": {
+    "defaultMessage": "You reached the limit for login attempts. For your security, wait 10 minutes and try again."
+  },
+  "global.error.too_many_password_reset_requests": {
+    "defaultMessage": "You reached the limit for password resets. For your security, wait 10 minutes and try again."
+  },
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
@@ -839,6 +872,9 @@
   },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
+  },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "Ask Shopping Agent"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -948,6 +984,9 @@
   },
   "home.link.read_docs": {
     "defaultMessage": "Read docs"
+  },
+  "home.title.home": {
+    "defaultMessage": "Home"
   },
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
@@ -1149,6 +1188,9 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
+  "login.title.sign_in": {
+    "defaultMessage": "Sign In"
+  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
@@ -1159,7 +1201,7 @@
     "defaultMessage": "Back to Sign In Options"
   },
   "login_form.button.continue_securely": {
-    "defaultMessage": "Continue Securely"
+    "defaultMessage": "Continue"
   },
   "login_form.button.google": {
     "defaultMessage": "Google"
@@ -1285,6 +1327,9 @@
   "page_not_found.title.page_cant_be_found": {
     "defaultMessage": "The page you're looking for can't be found."
   },
+  "page_not_found.title.page_not_found": {
+    "defaultMessage": "Page Not Found"
+  },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
   },
@@ -1404,6 +1449,9 @@
   },
   "product_detail.recommended_products.title.recently_viewed": {
     "defaultMessage": "Recently Viewed"
+  },
+  "product_detail.title.product_details": {
+    "defaultMessage": "Product Details"
   },
   "product_item.label.quantity": {
     "defaultMessage": "Quantity:"
@@ -1591,6 +1639,12 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
   },
+  "registration.title.create_account": {
+    "defaultMessage": "Create Account"
+  },
+  "reset_password.title.reset_password": {
+    "defaultMessage": "Reset Password"
+  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Sign in"
   },
@@ -1616,8 +1670,14 @@
   "search.suggestions.didYouMean": {
     "defaultMessage": "Did you mean"
   },
+  "search.suggestions.popular": {
+    "defaultMessage": "Popular Searches"
+  },
   "search.suggestions.products": {
     "defaultMessage": "Products"
+  },
+  "search.suggestions.recent": {
+    "defaultMessage": "Recent Searches"
   },
   "search.suggestions.viewAll": {
     "defaultMessage": "View All"
@@ -1754,9 +1814,6 @@
   "shipping_multi_address.success.address_saved": {
     "defaultMessage": "Address saved successfully"
   },
-  "shipping_options.action.send_as_gift_wrapping": {
-    "defaultMessage": "Send as a gift (gift wrapping)"
-  },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
   },
@@ -1765,9 +1822,6 @@
   },
   "shipping_options.free": {
     "defaultMessage": "Free"
-  },
-  "shipping_options.help.notifications": {
-    "defaultMessage": "You can enable or disable notifications at any time."
   },
   "shipping_options.label.no_method_selected": {
     "defaultMessage": "No shipping method selected"

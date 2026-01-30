@@ -20,6 +20,13 @@ import {
     mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {useMapsLibrary} from '@vis.gl/react-google-maps'
+
+// Mock Google Maps API
+jest.mock('@vis.gl/react-google-maps', () => ({
+    useMapsLibrary: jest.fn(),
+    APIProvider: ({children}) => children
+}))
 
 // This is a flaky test file!
 jest.retryTimes(5)
@@ -506,6 +513,205 @@ test('Can proceed through checkout as registered customer', async () => {
     const nextButton = allButtons.find((btn) => !/edit/i.test(btn.textContent))
     expect(nextButton).toBeDefined()
     await user.click(nextButton)
+
+    // Verify checkout container is present
+    expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+    document.cookie = ''
+})
+
+test('Uses google address autocomplete when a platform provided google API key is provided by the shopper configuration API', async () => {
+    // Mock Google Maps API and useAutocompleteSuggestions hook
+    const mockFetchAutocompleteSuggestions = jest.fn()
+    const mockAutocompleteSuggestion = {
+        fetchAutocompleteSuggestions: mockFetchAutocompleteSuggestions
+    }
+    const mockAutocompleteSessionToken = jest.fn()
+    const mockPlaces = {
+        AutocompleteSessionToken: mockAutocompleteSessionToken,
+        AutocompleteSuggestion: mockAutocompleteSuggestion
+    }
+
+    useMapsLibrary.mockReturnValue(mockPlaces)
+
+    // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
+    // update this object, which essentially mimics a saved basket on the backend.
+    let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+
+    // Set the default shipping method in the initial basket state
+    currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+
+    // Set up additional requests for intercepting/mocking for just this test.
+    global.server.use(
+        // mock adding guest email to basket
+        rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+            currentBasket.customerInfo.email = 'test@test.com'
+            return res(ctx.json(currentBasket))
+        }),
+
+        rest.get('*/configuration/shopper-configurations/*/configurations', (req, res, ctx) => {
+            const configurations = {
+                configurations: [
+                    {
+                        id: 'gcp',
+                        value: 'platform-provided-key'
+                    }
+                ]
+            }
+            return res(ctx.json(configurations))
+        }),
+
+        // mock add shipping and billing address to basket
+        rest.put('*/shipping-address', (req, res, ctx) => {
+            const shippingBillingAddress = {
+                address1: '123 Main St',
+                city: 'Tampa',
+                countryCode: 'US',
+                firstName: 'Tester',
+                fullName: 'Tester McTesting',
+                id: '047b18d4aaaf4138f693a4b931',
+                lastName: 'McTesting',
+                phone: '(727) 555-1234',
+                postalCode: '33610',
+                stateCode: 'FL'
+            }
+            currentBasket.shipments[0].shippingAddress = shippingBillingAddress
+            currentBasket.billingAddress = shippingBillingAddress
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add billing address to basket
+        rest.put('*/billing-address', (req, res, ctx) => {
+            const shippingBillingAddress = {
+                address1: '123 Main St',
+                city: 'Tampa',
+                countryCode: 'US',
+                firstName: 'Tester',
+                fullName: 'Tester McTesting',
+                id: '047b18d4aaaf4138f693a4b931',
+                lastName: 'McTesting',
+                phone: '(727) 555-1234',
+                postalCode: '33610',
+                stateCode: 'FL'
+            }
+            currentBasket.shipments[0].shippingAddress = shippingBillingAddress
+            currentBasket.billingAddress = shippingBillingAddress
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add shipping method
+        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add payment instrument
+        rest.post('*/baskets/:basketId/payment-instruments', (req, res, ctx) => {
+            currentBasket.paymentInstruments = [
+                {
+                    amount: 0,
+                    paymentCard: {
+                        cardType: 'Visa',
+                        creditCardExpired: false,
+                        expirationMonth: 1,
+                        expirationYear: 2040,
+                        holder: 'Testy McTester',
+                        maskedNumber: '************1111',
+                        numberLastDigits: '1111',
+                        validFromMonth: 1,
+                        validFromYear: 2020
+                    },
+                    paymentInstrumentId: '875cae2724408c9a3eb45715ba',
+                    paymentMethodId: 'CREDIT_CARD'
+                }
+            ]
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock place order
+        rest.post('*/orders', (req, res, ctx) => {
+            const response = {
+                ...currentBasket,
+                ...scapiOrderResponse,
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
+            }
+            return res(ctx.json(response))
+        }),
+
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [currentBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        })
+    )
+
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    // Wait for checkout to load and display first step
+    await screen.findByText(/checkout as guest/i)
+
+    // Verify cart products display
+    await user.click(screen.getByText(/2 items in cart/i))
+    expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
+
+    // Verify password field is reset if customer toggles login form
+    const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
+    await user.click(loginToggleButton)
+    // Provide customer email and submit
+    const passwordInput = document.querySelector('input[type="password"]')
+    await user.type(passwordInput, 'Password1!')
+
+    const checkoutAsGuestButton = screen.getByText(/Checkout as guest/i)
+    await user.click(checkoutAsGuestButton)
+
+    // Provide customer email and submit
+    const emailInput = screen.getByLabelText(/email/i)
+    const submitBtn = screen.getByText(/checkout as guest/i)
+    await user.type(emailInput, 'test@test.com')
+    await user.click(submitBtn)
+
+    // Wait for next step to render
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    })
+
+    // Email should be displayed in previous step summary
+    expect(screen.getByText('test@test.com')).toBeInTheDocument()
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+
+    // Fill out shipping address form and submit
+    await user.type(screen.getByLabelText(/first name/i), 'Tester')
+    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
+    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
+    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+    await user.type(screen.getByLabelText(/city/i), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText(/zip code/i), '33610')
+    await user.click(screen.getByText(/continue to shipping method/i))
+
+    // Wait for next step to render
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+        expect(mockFetchAutocompleteSuggestions).toHaveBeenCalled()
+    })
+
+    // Shipping address displayed in previous step summary
+    const step1Content = within(screen.getByTestId('sf-toggle-card-step-1-content'))
+    expect(step1Content.getByText('Tester McTesting')).toBeInTheDocument()
+    expect(step1Content.getByText('123 Main St')).toBeInTheDocument()
+    expect(step1Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
+    expect(step1Content.getByText('US')).toBeInTheDocument()
+
+    // Applied shipping method should be displayed in previous step summary
+    expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
 
     // Verify checkout container is present
     expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()

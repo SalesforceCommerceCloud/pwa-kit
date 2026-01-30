@@ -1,4 +1,5 @@
 name: publish_to_npm
+description: Publish packages to NPM registry
 inputs:
   NODE_AUTH_TOKEN:
     description: "Node auth token"

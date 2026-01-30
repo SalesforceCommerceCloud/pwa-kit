@@ -263,35 +263,6 @@ describe('AccountPayments', () => {
         expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
     })
 
-    test('displays refresh button', () => {
-        mockUseCurrentCustomer.mockReturnValue({
-            data: mockCustomer,
-            isLoading: false,
-            error: null
-        })
-
-        renderWithProviders(<AccountPayments />)
-
-        expect(screen.getByRole('button', {name: /refresh/i})).toBeInTheDocument()
-    })
-
-    test('calls refetch when refresh button is clicked', async () => {
-        const mockRefetch = jest.fn()
-        mockUseCurrentCustomer.mockReturnValue({
-            data: mockCustomer,
-            isLoading: false,
-            error: null,
-            refetch: mockRefetch
-        })
-
-        const {user} = renderWithProviders(<AccountPayments />)
-
-        const refreshButton = screen.getByRole('button', {name: /refresh/i})
-        await user.click(refreshButton)
-
-        expect(mockRefetch).toHaveBeenCalledTimes(1)
-    })
-
     test('calls refetch when retry button is clicked', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({

@@ -63,10 +63,8 @@ describe('CreateAppGuidelinesTool', () => {
     describe('Tool Structure', () => {
         it('should have correct structure', () => {
             expect(tool).toMatchObject({
-                name: 'create_storefront_app',
-                description: expect.stringContaining(
-                    'Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.'
-                ),
+                name: 'pwakit_create_storefront',
+                description: expect.any(String),
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
             })
@@ -232,7 +230,7 @@ describe('CreateAppGuidelinesTool', () => {
                 const gitignorePath = `${testDirectory}/.gitignore`
                 fs.existsSync.mockReturnValue(true)
 
-                tool.createBasicGitignore(testDirectory)
+                tool.createBasicGitignore(gitignorePath)
 
                 expect(fs.writeFileSync).not.toHaveBeenCalled()
             })

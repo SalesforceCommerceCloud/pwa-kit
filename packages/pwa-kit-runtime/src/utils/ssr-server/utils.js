@@ -118,3 +118,26 @@ export const parseCacheControl = (value) => {
     }
     return result
 }
+
+/**
+ * Type checking utility functions
+ */
+export const isString = (element) => typeof element === 'string'
+
+export const isArray = (element) => Array.isArray(element)
+
+export const isObject = (element) =>
+    element !== null && typeof element === 'object' && !Array.isArray(element)
+
+export const isIterable = (element) => isArray(element) || isObject(element)
+
+/**
+ * Iterate over an object or array, calling a function for each key-value pair
+ * @param {Object|Array} iterable - The object or array to iterate over
+ * @param {Function} functionRef - Function to call for each key-value pair (key, value)
+ */
+export const forEachIn = (iterable, functionRef) => {
+    Object.keys(iterable).forEach((key) => {
+        functionRef(key, iterable[key])
+    })
+}

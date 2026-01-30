@@ -6,9 +6,9 @@
  */
 
 import React, {useEffect} from 'react'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
@@ -19,11 +19,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useLocation} from 'react-router-dom'
 import {useRouteMatch} from 'react-router'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {
-    RESET_PASSWORD_LANDING_PATH,
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {getPasswordResetErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -33,16 +29,13 @@ const ResetPassword = () => {
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
-    const {getPasswordResetToken} = usePasswordReset()
+    const {getPasswordResetToken, resetPasswordLandingPath} = usePasswordReset()
 
     const submitForm = async ({email}) => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
-            const message =
-                e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getPasswordResetErrorMessage(e.message))
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -55,6 +48,12 @@ const ResetPassword = () => {
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage
+                    defaultMessage="Reset Password"
+                    id="reset_password.title.reset_password"
+                />
+            </Heading>
             <Seo title="Reset password" description="Reset customer password" />
             <Container
                 paddingTop={16}
@@ -65,7 +64,7 @@ const ResetPassword = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                {path === RESET_PASSWORD_LANDING_PATH ? (
+                {path.endsWith(resetPasswordLandingPath) ? (
                     <ResetPasswordLanding />
                 ) : (
                     <ResetPasswordForm

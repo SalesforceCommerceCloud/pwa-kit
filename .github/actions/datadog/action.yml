@@ -1,4 +1,5 @@
 name: datadog
+description: Send metrics to Datadog
 inputs:
   datadog_api_key:
     description: "Datadog API key"

@@ -18,7 +18,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     ToggleCard,
     ToggleCardEdit,
@@ -30,8 +29,12 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    isPickupShipment,
+    isPickupMethod
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import PropTypes from 'prop-types'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
@@ -45,8 +48,6 @@ export default function ShippingOptions() {
     const {data: customer} = useCurrentCustomer()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
-    const [hasAutoSelected, setHasAutoSelected] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     // Identify delivery shipments (exclude pickup and those without shipping addresses)
@@ -93,23 +94,74 @@ export default function ShippingOptions() {
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
+    // Filter out pickup methods for delivery shipment
+    const deliveryMethods =
+        (shippingMethods?.applicableShippingMethods || []).filter(
+            (method) => !isPickupMethod(method)
+        ) || []
+
+    const {isLoading: isAutoSelectLoading} = useCheckoutAutoSelect({
+        currentStep: step,
+        targetStep: STEPS.SHIPPING_OPTIONS,
+        isCustomerRegistered: customer?.isRegistered,
+        items: deliveryMethods,
+        getPreferredItem: (methods) => {
+            const defaultMethodId = shippingMethods?.defaultShippingMethodId
+            return methods.find((m) => m.id === defaultMethodId) || methods[0]
+        },
+        shouldSkip: () => {
+            if (selectedShippingMethod?.id && !isPickupMethod(selectedShippingMethod)) {
+                const stillValid = deliveryMethods.some((m) => m.id === selectedShippingMethod.id)
+                if (stillValid) {
+                    goToNextStep()
+                    return true
+                }
+            }
+            return false
+        },
+        isAlreadyApplied: () => false,
+        applyItem: async (method) => {
+            await updateShippingMethod.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: targetDeliveryShipment?.shipmentId || 'me'
+                },
+                body: {id: method.id}
+            })
+        },
+        onSuccess: () => goToNextStep(),
+        onError: (error) => {
+            console.error('Failed to auto-select shipping method:', error)
+        },
+        enabled: !hasMultipleDeliveryShipments
+    })
+
     // Calculate if we should show loading state immediately for auto-selection
     const shouldShowInitialLoading = useMemo(() => {
+        const filteredMethods =
+            shippingMethods?.applicableShippingMethods?.filter(
+                (method) => !isPickupMethod(method)
+            ) || []
+        const defaultMethodId = shippingMethods?.defaultShippingMethodId
+        const defaultMethod = defaultMethodId
+            ? shippingMethods.applicableShippingMethods?.find(
+                  (method) => method.id === defaultMethodId
+              )
+            : null
+
         return (
             step === STEPS.SHIPPING_OPTIONS &&
-            !hasAutoSelected &&
             customer?.isRegistered &&
             !selectedShippingMethod?.id &&
-            shippingMethods?.applicableShippingMethods?.length &&
-            shippingMethods.defaultShippingMethodId &&
-            shippingMethods.applicableShippingMethods.find(
-                (method) => method.id === shippingMethods.defaultShippingMethodId
-            )
+            filteredMethods.length > 0 &&
+            defaultMethodId &&
+            defaultMethod &&
+            !isPickupMethod(defaultMethod)
         )
-    }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
+    }, [step, customer, selectedShippingMethod, shippingMethods, STEPS.SHIPPING_OPTIONS])
 
-    // Use calculated loading state or manual loading state
-    const effectiveIsLoading = Boolean(isLoading) || Boolean(shouldShowInitialLoading)
+    // Use calculated loading state or auto-select loading state
+    const effectiveIsLoading = Boolean(isAutoSelectLoading) || Boolean(shouldShowInitialLoading)
 
     const form = useForm({
         shouldUnregister: false,
@@ -119,96 +171,39 @@ export default function ShippingOptions() {
     })
 
     useEffect(() => {
+        // Filter out pickup methods
+        const filteredMethods =
+            shippingMethods?.applicableShippingMethods?.filter(
+                (method) => !isPickupMethod(method)
+            ) || []
+
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
+        // Only use default if it's not a pickup method
+        const validDefaultMethodId =
+            defaultMethodId &&
+            !isPickupMethod(
+                shippingMethods.applicableShippingMethods?.find((m) => m.id === defaultMethodId)
+            )
+                ? defaultMethodId
+                : filteredMethods[0]?.id
+
         const methodId = form.getValues().shippingMethodId
-        if (!selectedShippingMethod && !methodId && defaultMethodId) {
-            form.reset({shippingMethodId: defaultMethodId})
+        if (!selectedShippingMethod && !methodId && validDefaultMethodId) {
+            form.reset({shippingMethodId: validDefaultMethodId})
         }
 
-        if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
+        if (
+            selectedShippingMethod &&
+            !isPickupMethod(selectedShippingMethod) &&
+            methodId !== selectedShippingMethod.id
+        ) {
             form.reset({shippingMethodId: selectedShippingMethod.id})
         }
         // If there are no applicable methods for the current address, clear the form selection
-        if (!shippingMethods?.applicableShippingMethods?.length && methodId) {
+        if (!filteredMethods.length && methodId) {
             form.reset({shippingMethodId: ''})
         }
     }, [selectedShippingMethod, shippingMethods])
-
-    // Validate existing shipping method for new address or auto-select default for authenticated users
-    useEffect(() => {
-        const handleShippingMethodForReturningShopper = async () => {
-            // Only auto-select when on this step and haven't already auto-selected
-            if (step !== STEPS.SHIPPING_OPTIONS || hasAutoSelected || isLoading) {
-                return
-            }
-
-            // Wait for shipping methods to load
-            if (!shippingMethods?.applicableShippingMethods?.length) {
-                return
-            }
-
-            const applicable = shippingMethods.applicableShippingMethods
-
-            // If we already have a shipping method on the basket, validate it against the new address' methods.
-            if (selectedShippingMethod?.id) {
-                const stillValid = applicable.some((m) => m.id === selectedShippingMethod.id)
-                setHasAutoSelected(true)
-                if (stillValid) {
-                    // Do not update the basket – keep existing method and proceed to payment
-                    goToNextStep()
-                    return
-                }
-                // If existing method is no longer valid, fall through to select/apply a default
-            }
-
-            // Only proceed with auto-apply for authenticated users when no valid method is present
-            if (!customer?.isRegistered) {
-                return
-            }
-
-            const defaultMethodId = shippingMethods.defaultShippingMethodId
-            const defaultMethod =
-                applicable.find((method) => method.id === defaultMethodId) || applicable[0]
-
-            if (defaultMethod) {
-                //Auto-selecting default shipping method
-                setHasAutoSelected(true)
-                setIsLoading(true) // Show loading state immediately
-
-                try {
-                    // Apply the default shipping method and continue to next step
-                    await updateShippingMethod.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: targetDeliveryShipment?.shipmentId || 'me'
-                        },
-                        body: {
-                            id: defaultMethodId
-                        }
-                    })
-                    //Default shipping method auto-applied successfully
-                    setIsLoading(false) // Clear loading state before navigation
-                    goToNextStep()
-                } catch (error) {
-                    // Reset on error so user can manually select
-                    setHasAutoSelected(false)
-                    setIsLoading(false) // Hide loading state on error
-                }
-            }
-        }
-
-        handleShippingMethodForReturningShopper()
-    }, [
-        step,
-        selectedShippingMethod,
-        customer,
-        shippingMethods,
-        hasAutoSelected,
-        basket?.basketId,
-        isLoading,
-        goToNextStep,
-        updateShippingMethod
-    ])
 
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({
@@ -230,40 +225,28 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    const hasApplicableMethods = Boolean(
-        shippingMethods?.applicableShippingMethods &&
-            shippingMethods.applicableShippingMethods.length > 0
-    )
-    const isSelectedMethodValid =
-        hasApplicableMethods &&
-        Boolean(
-            selectedShippingMethod?.id &&
-                shippingMethods.applicableShippingMethods?.some(
-                    (m) => m.id === selectedShippingMethod.id
-                )
-        )
+    // Filter out pickup methods for all shipments
+    const filteredShippingMethods =
+        shippingMethods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) ||
+        []
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
     })
 
-    let shippingPriceLabel = selectedMethodDisplayPrice
-    if (selectedMethodDisplayPrice !== shippingItem.price) {
-        const currentPrice =
-            selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
-
-        shippingPriceLabel = formatMessage(
-            {
-                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
-                id: 'checkout_confirmation.label.shipping.strikethrough.price'
-            },
-            {
-                originalPrice: shippingItem.price,
-                newPrice: currentPrice
-            }
-        )
-    }
+    const shippingPriceLabel =
+        selectedMethodDisplayPrice === 0
+            ? freeLabel
+            : formatMessage(
+                  {
+                      defaultMessage: '{price}',
+                      id: 'checkout_confirmation.label.shipping.price'
+                  },
+                  {
+                      price: selectedMethodDisplayPrice
+                  }
+              )
 
     return (
         <ToggleCard
@@ -313,7 +296,7 @@ export default function ShippingOptions() {
                         data-testid="sf-checkout-shipping-options-form"
                     >
                         <Stack spacing={6}>
-                            {shippingMethods?.applicableShippingMethods?.length > 0 && (
+                            {filteredShippingMethods.length > 0 && (
                                 <Controller
                                     name="shippingMethodId"
                                     control={form.control}
@@ -325,47 +308,43 @@ export default function ShippingOptions() {
                                             onChange={onChange}
                                         >
                                             <Stack spacing={5}>
-                                                {shippingMethods.applicableShippingMethods.map(
-                                                    (opt) => (
-                                                        <Radio value={opt.id} key={opt.id}>
-                                                            <Flex justify="space-between" w="full">
-                                                                <Box>
-                                                                    <Text>{opt.name}</Text>
-                                                                    <Text
-                                                                        fontSize="sm"
-                                                                        color="gray.600"
-                                                                    >
-                                                                        {opt.description}
-                                                                    </Text>
-                                                                </Box>
-                                                                <Text fontWeight="bold">
-                                                                    <FormattedNumber
-                                                                        value={opt.price}
-                                                                        style="currency"
-                                                                        currency={currency}
-                                                                    />
+                                                {filteredShippingMethods.map((opt) => (
+                                                    <Radio value={opt.id} key={opt.id}>
+                                                        <Flex justify="space-between" w="full">
+                                                            <Box>
+                                                                <Text>{opt.name}</Text>
+                                                                <Text
+                                                                    fontSize="sm"
+                                                                    color="gray.600"
+                                                                >
+                                                                    {opt.description}
                                                                 </Text>
-                                                            </Flex>
-                                                            {opt.shippingPromotions?.map(
-                                                                (promo) => (
-                                                                    <Text
-                                                                        key={promo.promotionId}
-                                                                        fontSize="sm"
-                                                                        color="green.600"
-                                                                    >
-                                                                        {promo.calloutMsg}
-                                                                    </Text>
-                                                                )
-                                                            )}
-                                                        </Radio>
-                                                    )
-                                                )}
+                                                            </Box>
+                                                            <Text fontWeight="bold">
+                                                                <FormattedNumber
+                                                                    value={opt.price}
+                                                                    style="currency"
+                                                                    currency={currency}
+                                                                />
+                                                            </Text>
+                                                        </Flex>
+                                                        {opt.shippingPromotions?.map((promo) => (
+                                                            <Text
+                                                                key={promo.promotionId}
+                                                                fontSize="sm"
+                                                                color="green.600"
+                                                            >
+                                                                {promo.calloutMsg}
+                                                            </Text>
+                                                        ))}
+                                                    </Radio>
+                                                ))}
                                             </Stack>
                                         </RadioGroup>
                                     )}
                                 />
                             )}
-                            {shippingMethods?.applicableShippingMethods?.length > 0 && (
+                            {filteredShippingMethods.length > 0 && (
                                 <Box>
                                     <Container variant="form">
                                         <Button w="full" type="submit">
@@ -393,12 +372,11 @@ export default function ShippingOptions() {
 
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
-                isSelectedMethodValid &&
+                selectedShippingMethod &&
                 selectedShippingAddress && (
                     <SingleShipmentSummary
                         selectedShippingMethod={selectedShippingMethod}
                         selectedMethodDisplayPrice={selectedMethodDisplayPrice}
-                        shippingItem={shippingItem}
                         shippingPriceLabel={shippingPriceLabel}
                         currency={currency}
                         freeLabel={freeLabel}
@@ -497,7 +475,6 @@ MultiShipmentSummary.propTypes = {
 const SingleShipmentSummary = ({
     selectedShippingMethod,
     selectedMethodDisplayPrice,
-    shippingItem,
     shippingPriceLabel,
     currency,
     freeLabel
@@ -506,46 +483,21 @@ const SingleShipmentSummary = ({
         <ToggleCardSummary>
             <Flex justify="space-between" w="full">
                 <Text>{selectedShippingMethod.name}</Text>
-                <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                    <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                        {selectedMethodDisplayPrice === 0 ? (
-                            freeLabel
-                        ) : (
-                            <FormattedNumber
-                                value={selectedMethodDisplayPrice}
-                                style="currency"
-                                currency={currency}
-                            />
-                        )}
-                    </Text>
-                    {selectedMethodDisplayPrice !== shippingItem.price && (
-                        <Text
-                            fontWeight="normal"
-                            textDecoration="line-through"
-                            color="gray.600"
-                            marginLeft={1}
-                            aria-hidden="true"
-                            role="presentation"
-                        >
-                            <FormattedNumber
-                                style="currency"
-                                currency={currency}
-                                value={shippingItem.price}
-                            />
-                        </Text>
+                <Text fontWeight="bold" aria-label={shippingPriceLabel}>
+                    {selectedMethodDisplayPrice === 0 ? (
+                        freeLabel
+                    ) : (
+                        <FormattedNumber
+                            value={selectedMethodDisplayPrice}
+                            style="currency"
+                            currency={currency}
+                        />
                     )}
-                </Flex>
+                </Text>
             </Flex>
             <Text fontSize="sm" color="gray.700">
                 {selectedShippingMethod.description}
             </Text>
-            {shippingItem?.priceAdjustments?.map((adjustment) => {
-                return (
-                    <Text key={adjustment.priceAdjustmentId} fontSize="sm" color="green.600">
-                        {adjustment.itemText}
-                    </Text>
-                )
-            })}
         </ToggleCardSummary>
     )
 }
@@ -556,15 +508,6 @@ SingleShipmentSummary.propTypes = {
         description: PropTypes.string
     }).isRequired,
     selectedMethodDisplayPrice: PropTypes.number.isRequired,
-    shippingItem: PropTypes.shape({
-        price: PropTypes.number,
-        priceAdjustments: PropTypes.arrayOf(
-            PropTypes.shape({
-                priceAdjustmentId: PropTypes.string,
-                itemText: PropTypes.string
-            })
-        )
-    }),
     shippingPriceLabel: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     freeLabel: PropTypes.string.isRequired
@@ -588,23 +531,32 @@ const ShipmentMethods = ({shipment, index, currency}) => {
 
     useEffect(() => {
         // Only attempt auto-select when there are applicable methods available and we haven't already auto-selected
-        const applicableMethods = methods?.applicableShippingMethods || []
+        // Filter out pickup methods for multi-shipments
+        const applicableMethods =
+            methods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) || []
         const applicableIds = applicableMethods.map((m) => m.id)
         if (!applicableIds.length || hasAutoSelected) {
             return
         }
 
         // Determine the method to select:
-        // 1. Use existing shipment method if still valid
-        // 2. Use default shipping method if available
+        // 1. Use existing shipment method if still valid (and not pickup)
+        // 2. Use default shipping method if available (and not pickup)
         // 3. Fall back to first available method
         const existingMethodId =
-            shipment?.shippingMethod?.id && applicableIds.includes(shipment.shippingMethod.id)
+            shipment?.shippingMethod?.id &&
+            !isPickupMethod(shipment.shippingMethod) &&
+            applicableIds.includes(shipment.shippingMethod.id)
                 ? shipment.shippingMethod.id
                 : undefined
         const defaultMethodId =
             methods?.defaultShippingMethodId &&
-            applicableIds.includes(methods.defaultShippingMethodId)
+            applicableIds.includes(methods.defaultShippingMethodId) &&
+            !isPickupMethod(
+                methods.applicableShippingMethods.find(
+                    (m) => m.id === methods.defaultShippingMethodId
+                )
+            )
                 ? methods.defaultShippingMethodId
                 : undefined
         const firstMethodId = applicableMethods[0]?.id
@@ -658,68 +610,64 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                 </Text>
             )}
 
-            {methods?.applicableShippingMethods?.length > 0 && (
-                <RadioGroup
-                    name={`shipping-options-${shipment.shipmentId}`}
-                    value={selected}
-                    onChange={async (val) => {
-                        setSelected(val)
-                        try {
-                            await updateShippingMethod.mutateAsync({
-                                parameters: {
-                                    basketId: basket.basketId,
-                                    shipmentId: shipment.shipmentId
-                                },
-                                body: {id: val}
-                            })
-                        } catch {
-                            // Ignore; allow user to retry selection
-                        }
-                    }}
-                >
-                    <Stack spacing={5}>
-                        {methods.applicableShippingMethods.map((opt) => (
-                            <Radio value={opt.id} key={opt.id}>
-                                <Flex justify="space-between" w="full">
-                                    <Box>
-                                        <Text>{opt.name}</Text>
-                                        <Text fontSize="sm" color="gray.600">
-                                            {opt.description}
+            {(() => {
+                // Filter out pickup methods for multi-shipments
+                const filteredMethods =
+                    methods?.applicableShippingMethods?.filter(
+                        (method) => !isPickupMethod(method)
+                    ) || []
+                return filteredMethods.length > 0 ? (
+                    <RadioGroup
+                        name={`shipping-options-${shipment.shipmentId}`}
+                        value={selected}
+                        onChange={async (val) => {
+                            setSelected(val)
+                            try {
+                                await updateShippingMethod.mutateAsync({
+                                    parameters: {
+                                        basketId: basket.basketId,
+                                        shipmentId: shipment.shipmentId
+                                    },
+                                    body: {id: val}
+                                })
+                            } catch {
+                                // Ignore; allow user to retry selection
+                            }
+                        }}
+                    >
+                        <Stack spacing={5}>
+                            {filteredMethods.map((opt) => (
+                                <Radio value={opt.id} key={opt.id}>
+                                    <Flex justify="space-between" w="full">
+                                        <Box>
+                                            <Text>{opt.name}</Text>
+                                            <Text fontSize="sm" color="gray.600">
+                                                {opt.description}
+                                            </Text>
+                                        </Box>
+                                        <Text fontWeight="bold">
+                                            <FormattedNumber
+                                                value={opt.price}
+                                                style="currency"
+                                                currency={currency}
+                                            />
                                         </Text>
-                                    </Box>
-                                    <Text fontWeight="bold">
-                                        <FormattedNumber
-                                            value={opt.price}
-                                            style="currency"
-                                            currency={currency}
-                                        />
-                                    </Text>
-                                </Flex>
-                                {opt.shippingPromotions?.map((promo) => (
-                                    <Text key={promo.promotionId} fontSize="sm" color="green.600">
-                                        {promo.calloutMsg}
-                                    </Text>
-                                ))}
-                            </Radio>
-                        ))}
-                    </Stack>
-                </RadioGroup>
-            )}
-
-            <Box mt={4}>
-                <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                    <FormattedMessage
-                        defaultMessage="Send as a gift (gift wrapping)"
-                        id="shipping_options.action.send_as_gift_wrapping"
-                    />
-                </Button>
-                <Text fontSize="sm" color="gray.500">
-                    <FormattedMessage
-                        defaultMessage="You can enable or disable notifications at any time."
-                        id="shipping_options.help.notifications"
-                    />
-                </Text>
-            </Box>
+                                    </Flex>
+                                    {opt.shippingPromotions?.map((promo) => (
+                                        <Text
+                                            key={promo.promotionId}
+                                            fontSize="sm"
+                                            color="green.600"
+                                        >
+                                            {promo.calloutMsg}
+                                        </Text>
+                                    ))}
+                                </Radio>
+                            ))}
+                        </Stack>
+                    </RadioGroup>
+                ) : null
+            })()}
         </Box>
     )
 }
