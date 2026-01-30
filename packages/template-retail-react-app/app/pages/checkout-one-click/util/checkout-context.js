@@ -80,14 +80,18 @@ export const CheckoutProvider = ({children}) => {
     // Run this once when checkout begins
     useEffect(() => {
         if (basket?.productItems) {
-            einstein.sendBeginCheckout(basket)
+            einstein.sendBeginCheckout(basket, {
+                checkoutType: 'one-click'
+            })
         }
     }, [])
 
     // Run this every time checkout steps change
     useEffect(() => {
         if (step != undefined) {
-            einstein.sendCheckoutStep(getCheckoutStepName(step), step, basket)
+            einstein.sendCheckoutStep(getCheckoutStepName(step), step, basket, {
+                checkoutType: 'one-click'
+            })
         }
     }, [step])
 
