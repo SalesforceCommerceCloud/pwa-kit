@@ -102,7 +102,7 @@ describe('OtpAuth', () => {
 
     describe('Component Rendering', () => {
         test('renders OTP form with all elements', () => {
-            renderWithProviders(<WrapperComponent />)
+            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
 
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
             expect(
@@ -127,7 +127,7 @@ describe('OtpAuth', () => {
         })
 
         test('renders buttons with correct styling', () => {
-            renderWithProviders(<WrapperComponent />)
+            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
 
             const guestButton = screen.getByRole('button', {name: /Checkout as a Guest/i})
             const resendButton = screen.getByRole('button', {name: /Resend Code/i})
@@ -623,7 +623,7 @@ describe('OtpAuth', () => {
         })
 
         test('buttons have accessible text', () => {
-            renderWithProviders(<WrapperComponent />)
+            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
 
             expect(screen.getByRole('button', {name: /Checkout as a Guest/i})).toBeInTheDocument()
             expect(screen.getByRole('button', {name: /Resend Code/i})).toBeInTheDocument()
