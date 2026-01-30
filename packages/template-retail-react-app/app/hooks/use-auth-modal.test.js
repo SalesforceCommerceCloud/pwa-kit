@@ -15,7 +15,11 @@ import {
     registerUserToken,
     clearAllCookies
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {
+    AuthModal,
+    useAuthModal,
+    EMAIL_VIEW
+} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
@@ -350,6 +354,27 @@ describe('Passwordless enabled', () => {
             expect(
                 screen.getByText(/To log in to your account, enter the code/i)
             ).toBeInTheDocument()
+        })
+    })
+
+    test('shows check your email view when initial view is set to email', async () => {
+        const {user} = renderWithProviders(
+            <MockedComponent isPasswordlessEnabled={true} initialView={EMAIL_VIEW} />
+        )
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+        })
+
+        await user.click(screen.getByText(/Resend Link/i))
+
+        // check that the Check Your Email view is still open
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
     })
 

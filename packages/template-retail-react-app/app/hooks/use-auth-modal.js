@@ -29,6 +29,7 @@ import {
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
+import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
@@ -110,14 +111,11 @@ export const AuthModal = ({
                 locale: locale.id,
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
-            // Close AuthModal first, then open OtpAuth modal after a brief delay
-            onClose()
-            setTimeout(() => {
-                setIsOtpAuthOpen(true)
-            }, 150) // Small delay to allow AuthModal to close first
+            return {success: true}
         } catch (error) {
             const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
+            return {success: false}
         }
     }
 
@@ -160,7 +158,15 @@ export const AuthModal = ({
             login: async (data) => {
                 if (isPasswordless) {
                     const email = data.email
-                    await handlePasswordlessLogin(email)
+                    const {success} = await handlePasswordlessLogin(email)
+                    // Only close AuthModal and open OtpAuth modal if passwordless login succeeded
+                    if (success) {
+                        // Close AuthModal first, then open OtpAuth modal after a brief delay
+                        onClose()
+                        setTimeout(() => {
+                            setIsOtpAuthOpen(true)
+                        }, 150) // Small delay to allow AuthModal to close first
+                    }
                     return
                 }
 
@@ -204,6 +210,10 @@ export const AuthModal = ({
                     const message = formatMessage(getPasswordResetErrorMessage(e.message))
                     form.setError('global', {type: 'manual', message})
                 }
+            },
+            email: async () => {
+                const email = form.getValues().email || initialEmail
+                await handlePasswordlessLogin(email)
             }
         }[currentView](data)
     }
@@ -344,6 +354,13 @@ export const AuthModal = ({
                                 form={form}
                                 submitForm={submitForm}
                                 clickSignIn={onBackToSignInClick}
+                            />
+                        )}
+                        {currentView === EMAIL_VIEW && (
+                            <PasswordlessEmailConfirmation
+                                form={form}
+                                submitForm={submitForm}
+                                email={form.getValues().email || initialEmail}
                             />
                         )}
                     </ModalBody>
