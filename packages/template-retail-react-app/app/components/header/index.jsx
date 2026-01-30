@@ -42,7 +42,8 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon,
-    StoreIcon
+    StoreIcon,
+    SparkleIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
@@ -52,6 +53,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -97,6 +99,7 @@ const SearchBar = (props) => {
  * @param   {object} props.searchInputRef reference of the search input
  * @param   {func} props.onMyAccountClick click event handler for my account button
  * @param   {func} props.onMyCartClick click event handler for my cart button
+ * @param   {func} props.onAgentClick click event handler for agent button
  * @return  {React.ReactElement} - Header component
  */
 const Header = ({
@@ -107,6 +110,7 @@ const Header = ({
     onMyCartClick = noop,
     onWishlistClick = noop,
     onStoreLocatorClick = noop,
+    onAgentClick = noop,
     ...props
 }) => {
     const intl = useIntl()
@@ -119,6 +123,8 @@ const Header = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const commerceAgentConfig = getCommerceAgentConfig()
+    const showLaunchAgentButton = commerceAgentConfig?.enableAgentFromHeader === 'true'
     const {
         getButtonProps: getAccountMenuButtonProps,
         getDisclosureProps: getAccountMenuDisclosureProps,
@@ -191,6 +197,18 @@ const Header = ({
                     <HideOnMobile>
                         <SearchBar />
                     </HideOnMobile>
+                    {showLaunchAgentButton && (
+                        <IconButton
+                            icon={<SparkleIcon />}
+                            aria-label={intl.formatMessage({
+                                id: 'header.button.assistive_msg.ask_shopping_agent',
+                                defaultMessage: 'Ask Shopping Agent'
+                            })}
+                            variant="unstyled"
+                            {...styles.icons}
+                            onClick={onAgentClick}
+                        />
+                    )}
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
@@ -362,6 +380,7 @@ Header.propTypes = {
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
     onStoreLocatorClick: PropTypes.func,
+    onAgentClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})

@@ -765,6 +765,9 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
   },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "Ask Shopping Agent"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
