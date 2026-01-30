@@ -7,10 +7,9 @@
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the reset password flow.
@@ -18,14 +17,10 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 export const usePasswordReset = () => {
     const showToast = useToast()
     const {formatMessage} = useIntl()
-    const appOrigin = useAppOrigin()
-    const config = getConfig()
-    const resetPasswordCallback =
-        config.app.login?.resetPassword?.callbackURI || '/reset-password-callback'
-    const callbackURI = isAbsoluteURL(resetPasswordCallback)
-        ? resetPasswordCallback
-        : `${appOrigin}${getEnvBasePath()}${resetPasswordCallback}`
-    const resetPasswordLandingPath = config.app.login?.resetPassword?.landingPath
+    const {locale} = useMultiSite()
+    const config = getConfig().app.login?.resetPassword
+    const callbackURI = absoluteUrl(config?.callbackURI)
+    const resetPasswordLandingPath = config?.landingPath
 
     const getPasswordResetTokenMutation = useAuthHelper(AuthHelpers.GetPasswordResetToken)
     const resetPasswordMutation = useAuthHelper(AuthHelpers.ResetPassword)
@@ -33,7 +28,9 @@ export const usePasswordReset = () => {
     const getPasswordResetToken = async (email) => {
         await getPasswordResetTokenMutation.mutateAsync({
             user_id: email,
-            callback_uri: callbackURI
+            mode: config.mode,
+            locale: locale.id,
+            ...(callbackURI && {callback_uri: callbackURI})
         })
     }
 

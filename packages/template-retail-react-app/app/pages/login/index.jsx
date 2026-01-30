@@ -29,13 +29,14 @@ import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/comp
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
@@ -55,12 +56,16 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {isRegistered, customerType} = useCustomerType()
+    const {locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const passwordlessMode = passwordless?.mode
     const passwordlessLoginLandingPath = passwordless?.landingPath
+    const passwordlessConfigCallback = absoluteUrl(passwordless?.callbackURI)
+
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 
@@ -105,13 +110,16 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            await authorizePasswordlessLogin.mutateAsync({userid: email})
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                mode: passwordlessMode,
+                locale: locale.id,
+                ...(passwordlessConfigCallback && {callbackURI: passwordlessConfigCallback})
+            })
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }

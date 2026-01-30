@@ -13,18 +13,27 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
  *
- * @param {string} path - The relative URL path to be appended to the origin.
+ * @param {string} path - The relative URL path or absolute URL to be resolved.
  * @param {string} [appOrigin] - The optional application origin (e.g., "https://example.com").
  *                                If not provided, the function will call `getAppOrigin()`.
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {
+    // If path is not provided or already an absolute URL, return it as-is
+    if (!path || isAbsoluteURL(path)) {
+        return path
+    }
+
+    // Construct the full path with envBasePath between origin and path
+    const fullPath = `${getEnvBasePath()}${path}`
     // absoluteUrl is not a react hook so we cannot use the useAppOrigin hook here
-    return new URL(path, appOrigin || getAppOrigin()).toString()
+    return new URL(fullPath, appOrigin || getAppOrigin()).toString()
 }
 
 /**

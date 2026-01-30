@@ -94,7 +94,7 @@ type AuthorizeIDPParams = {
 type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
-    mode?: string
+    mode?: 'email' | 'callback'
     locale?: string
     /** When true, SLAS will register the customer as part of the passwordless flow */
     register_customer?: boolean | string
@@ -377,8 +377,7 @@ class Auth {
 
         this.isPrivate = !!this.clientSecret
 
-        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+        this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
@@ -1279,55 +1278,41 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
-        const slasClient = this.client
         const usid = this.get('usid')
+        // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
+        // do not pass the mode parameter. Newer versions should explicitly pass the mode.
+        const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = parameters.mode || (callbackURI ? 'callback' : 'sms')
 
-        const options = {
-            headers: {
-                Authorization: ''
+        const res = await helpers.authorizePasswordless({
+            slasClient: this.client,
+            credentials: {
+                clientSecret: this.clientSecret
             },
             parameters: {
-                ...(parameters.register_customer !== undefined && {
-                    register_customer:
-                        typeof parameters.register_customer === 'boolean'
-                            ? String(parameters.register_customer)
-                            : parameters.register_customer
-                })
-            },
-            body: {
-                user_id: parameters.userid,
-                mode: finalMode,
-                locale: parameters.locale,
-                // Include usid and site as required by SLAS
+                ...(callbackURI && {callbackURI}),
                 ...(usid && {usid}),
-                channel_id: slasClient.clientConfig.parameters.siteId,
-                ...(finalMode === 'callback' && callbackURI && {callback_uri: callbackURI}),
-                ...(parameters.last_name && {last_name: parameters.last_name}),
+                ...(parameters.locale && {locale: parameters.locale}),
+                userid: parameters.userid,
+                mode,
+                ...(parameters.register_customer !== undefined && {
+                    registerCustomer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? parameters.register_customer
+                            : parameters.register_customer === 'true'
+                            ? true
+                            : false
+                }),
+                ...(parameters.last_name && {lastName: parameters.last_name}),
                 ...(parameters.email && {email: parameters.email}),
-                ...(parameters.first_name && {first_name: parameters.first_name}),
-                ...(parameters.phone_number && {phone_number: parameters.phone_number})
+                ...(parameters.first_name && {firstName: parameters.first_name}),
+                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
-        } as {
-            headers?: {[key: string]: string}
-            parameters?: Record<string, string>
-            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType &
-                helpers.CustomRequestBody
+        })
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
         }
-
-        // Use Basic auth header when using private client
-        if (this.clientSecret) {
-            options.headers = options.headers || {}
-            options.headers.Authorization = `Basic ${stringToBase64(
-                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
-            )}`
-        } else {
-            // If not using private client, avoid sending Authorization header
-            delete options.headers
-        }
-
-        const res = await slasClient.authorizePasswordlessCustomer(options)
         return res
     }
 
@@ -1379,10 +1364,10 @@ class Auth {
                 mode: parameters.mode || 'callback',
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                callback_uri: parameters.callback_uri,
+                ...(parameters.callback_uri && {callback_uri: parameters.callback_uri}),
                 hint: parameters.hint || 'cross_device',
-                locale: parameters.locale,
-                idp_name: parameters.idp_name,
+                ...(parameters.locale && {locale: parameters.locale}),
+                ...(parameters.idp_name && {idp_name: parameters.idp_name}),
                 ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }
         }
@@ -1394,7 +1379,12 @@ class Auth {
             )}`
         }
 
-        const res = await slasClient.getPasswordResetToken(options)
+        // Set rawResponse to true to access the response body message for error handling
+        const res = await slasClient.getPasswordResetToken(options, true)
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
         return res
     }
 

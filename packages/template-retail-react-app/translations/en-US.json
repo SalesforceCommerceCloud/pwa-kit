@@ -852,6 +852,12 @@
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
+  "global.error.too_many_login_attempts": {
+    "defaultMessage": "You reached the limit for login attempts. For your security, wait 10 minutes and try again."
+  },
+  "global.error.too_many_password_reset_requests": {
+    "defaultMessage": "You reached the limit for password resets. For your security, wait 10 minutes and try again."
+  },
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
@@ -866,6 +872,9 @@
   },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
+  },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "Ask Shopping Agent"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -1192,7 +1201,7 @@
     "defaultMessage": "Back to Sign In Options"
   },
   "login_form.button.continue_securely": {
-    "defaultMessage": "Continue Securely"
+    "defaultMessage": "Continue"
   },
   "login_form.button.google": {
     "defaultMessage": "Google"
