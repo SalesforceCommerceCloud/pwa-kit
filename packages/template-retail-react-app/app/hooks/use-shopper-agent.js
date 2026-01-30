@@ -8,15 +8,13 @@ import {useCallback} from 'react'
 import {launchChat} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 /**
- * React hook that returns a stable callback to open the shopper agent chat window.
- * Uses the embedded service bootstrap API to launch the chat.
- *
- * @returns {Function} openShopperAgent - Stable callback to open the shopper agent chat
+ * React hook that returns shopper agent actions.
+ * Uses the embedded service bootstrap API. Structured for future extension (e.g. close, sendMessage).
  */
-export function useOpenShopperAgent() {
-    const openShopperAgent = useCallback(() => {
+export function useShopperAgent() {
+    const open = useCallback(() => {
         launchChat()
     }, [])
 
-    return openShopperAgent
+    return {actions: {open}}
 }
