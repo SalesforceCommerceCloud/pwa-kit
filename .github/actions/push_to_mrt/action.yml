@@ -1,4 +1,5 @@
 name: push_to_mrt
+description: Push bundle to MRT (Managed Runtime)
 inputs:
     CWD:
         description: Project directory

@@ -20,14 +20,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
 
-// Constants
-import {
-    PASSWORDLESS_LOGIN_LANDING_PATH,
-    RESET_PASSWORD_LANDING_PATH
-} from '@salesforce/retail-react-app/app/constants'
-
 const fallback = <Skeleton height="75vh" width="100%" />
-const socialRedirectURI = getConfig()?.app?.login?.social?.redirectURI
 
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
@@ -78,16 +71,6 @@ export const routes = [
         exact: true
     },
     {
-        path: RESET_PASSWORD_LANDING_PATH,
-        component: ResetPassword,
-        exact: true
-    },
-    {
-        path: PASSWORDLESS_LOGIN_LANDING_PATH,
-        component: Login,
-        exact: true
-    },
-    {
         path: '/account',
         component: Account
     },
@@ -103,11 +86,6 @@ export const routes = [
     {
         path: '/callback',
         component: LoginRedirect,
-        exact: true
-    },
-    {
-        path: socialRedirectURI || '/social-callback',
-        component: SocialLoginRedirect,
         exact: true
     },
     {
@@ -134,17 +112,44 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
-    },
-    {
-        path: '*',
-        component: PageNotFound
     }
 ]
 
 export default () => {
     const config = getConfig()
-    return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*'],
+    const loginConfig = config?.app?.login
+    const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
+    const socialLoginEnabled = loginConfig?.social?.enabled
+    const socialRedirectURI = loginConfig?.social?.redirectURI
+    const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
+    const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+
+    // Add dynamic routes conditionally (only if features are enabled and paths are defined)
+    const dynamicRoutes = [
+        resetPasswordLandingPath && {
+            path: resetPasswordLandingPath,
+            component: ResetPassword,
+            exact: true
+        },
+        passwordlessLoginEnabled &&
+            passwordlessLoginLandingPath && {
+                path: passwordlessLoginLandingPath,
+                component: Login,
+                exact: true
+            },
+        socialLoginEnabled &&
+            socialRedirectURI && {
+                path: socialRedirectURI,
+                component: SocialLoginRedirect,
+                exact: true
+            }
+    ].filter(Boolean)
+
+    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
+        ignoredRoutes: ['/callback'],
         fuzzyPathMatching: true
     })
+
+    // Add catch-all route at the end so it doesn't match before dynamic routes
+    return [...allRoutes, {path: '*', component: PageNotFound}]
 }
