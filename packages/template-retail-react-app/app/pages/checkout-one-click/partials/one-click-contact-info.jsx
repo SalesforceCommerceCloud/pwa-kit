@@ -244,6 +244,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
+                const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
+                setError(message)
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {
                     setShowContinueButton(true)
@@ -300,8 +302,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
-            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
-            setError(message)
+            setError(error.message)
         }
     }
 
