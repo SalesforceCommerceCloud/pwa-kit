@@ -1188,6 +1188,9 @@
   "locale_text.message.zh-TW": {
     "defaultMessage": "Chinese (Taiwan)"
   },
+  "login.title.sign_in": {
+    "defaultMessage": "Sign In"
+  },
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },

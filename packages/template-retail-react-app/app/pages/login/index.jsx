@@ -7,8 +7,8 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, defineMessage} from 'react-intl'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
+import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -186,6 +186,9 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     return (
         <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>
+            <Heading as="h1" srOnly>
+                <FormattedMessage defaultMessage="Sign In" id="login.title.sign_in" />
+            </Heading>
             <Seo title="Sign in" description="Customer sign in" />
             <Container
                 paddingTop={16}
@@ -200,8 +203,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     form={form}
                     submitForm={submitForm}
                     clickCreateAccount={() => navigate('/registration')}
-                    // We let submitForm handle passwordless login to ensure when the form submission
-                    // is triggered in other ways like pressing Enter it is handled correctly
                     handlePasswordlessLoginClick={noop}
                     handleForgotPasswordClick={() => navigate('/reset-password')}
                     isPasswordlessEnabled={isPasswordlessEnabled}

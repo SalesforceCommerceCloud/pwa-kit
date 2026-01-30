@@ -5983,6 +5983,20 @@
       "value": "]"
     }
   ],
+  "login.title.sign_in": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şīɠƞ Īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.action.create_account": [
     {
       "type": 0,
