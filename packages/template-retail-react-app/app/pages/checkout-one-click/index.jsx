@@ -99,6 +99,7 @@ const CheckoutOneClick = () => {
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
+    const [isShipmentCleanupComplete, setIsShipmentCleanupComplete] = useState(false)
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
         deliveryShipments.length > 0 ? deliveryShipments[0]?.shippingAddress : null
@@ -135,8 +136,23 @@ const CheckoutOneClick = () => {
     // Remove any empty shipments whenever navigating to the checkout page
     // Using basketId ensures that the basket is in a valid state before removing empty shipments
     useEffect(() => {
-        if (basket?.shipments?.length > 1) {
-            removeEmptyShipments(basket)
+        if (!basket?.basketId) {
+            return
+        }
+        if (basket?.shipments?.length <= 1) {
+            setIsShipmentCleanupComplete(true)
+            return
+        }
+
+        let cancelled = false
+        setIsShipmentCleanupComplete(false)
+        removeEmptyShipments(basket).then(() => {
+            if (!cancelled) {
+                setIsShipmentCleanupComplete(true)
+            }
+        })
+        return () => {
+            cancelled = true
         }
     }, [basket?.basketId])
 
@@ -587,7 +603,10 @@ const CheckoutOneClick = () => {
                             />
                             {hasPickupShipments && <PickupAddress />}
                             {hasDeliveryShipments && (
-                                <ShippingAddress enableUserRegistration={enableUserRegistration} />
+                                <ShippingAddress
+                                    enableUserRegistration={enableUserRegistration}
+                                    isShipmentCleanupComplete={isShipmentCleanupComplete}
+                                />
                             )}
                             {hasDeliveryShipments && <ShippingOptions />}
                             <Payment
@@ -615,7 +634,11 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
-                                            disabled={isOtpLoading || isPlacingOrder}
+                                            disabled={
+                                                isOtpLoading ||
+                                                isPlacingOrder ||
+                                                !isShipmentCleanupComplete
+                                            }
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
