@@ -47,14 +47,19 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {useLocation} from 'react-router-dom'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
+    const location = useLocation()
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -69,6 +74,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const callbackURL = passwordlessConfig?.callbackURI
+        ? absoluteUrl(passwordlessConfig.callbackURI)
+        : ''
+    const redirectPath = location.pathname + location.search
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
 
@@ -223,8 +233,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
-                    mode: 'email', //need to change this
-                    locale: locale?.id
+                    mode: passwordlessConfig?.mode,
+                    locale: locale?.id,
+                    ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
@@ -289,7 +300,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
-            setError(error.message)
+            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            setError(message)
         }
     }
 

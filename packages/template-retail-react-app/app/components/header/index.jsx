@@ -53,7 +53,6 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
