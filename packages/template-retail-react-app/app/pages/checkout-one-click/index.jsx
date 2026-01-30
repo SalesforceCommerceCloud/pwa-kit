@@ -143,6 +143,7 @@ const CheckoutOneClick = () => {
             setIsShipmentCleanupComplete(true)
             return
         }
+
         let cancelled = false
         setIsShipmentCleanupComplete(false)
         removeEmptyShipments(basket).then(() => {
