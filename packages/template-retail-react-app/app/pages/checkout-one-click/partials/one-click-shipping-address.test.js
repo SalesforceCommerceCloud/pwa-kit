@@ -317,6 +317,26 @@ describe('ShippingAddress Component', () => {
         ).toBeInTheDocument()
     })
 
+    test('does not run auto-select when isShipmentCleanupComplete is false', async () => {
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        renderWithProviders(<ShippingAddress isShipmentCleanupComplete={false} />)
+        // Allow time for useCheckoutAutoSelect effect to run (it should skip due to enabled: false)
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 50))
+        })
+        // Auto-select must not have called updateShippingAddressForShipment
+        expect(mockUpdateShippingAddress.mutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('runs auto-select when isShipmentCleanupComplete is true', async () => {
+        mockUpdateShippingAddress.mutateAsync.mockResolvedValue({})
+        renderWithProviders(<ShippingAddress isShipmentCleanupComplete={true} />)
+        await waitFor(() => {
+            expect(mockUpdateShippingAddress.mutateAsync).toHaveBeenCalled()
+        })
+        await waitForNotLoading()
+    })
+
     test('handles submission errors gracefully', async () => {
         mockUpdateShippingAddress.mutateAsync.mockRejectedValue(new Error('API Error'))
 
