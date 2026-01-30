@@ -3175,20 +3175,6 @@
       "value": "Resend Code"
     }
   ],
-  "otp.button.resend_timer": [
-    {
-      "type": 0,
-      "value": "Resend code in "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " seconds..."
-    }
-  ],
   "otp.error.invalid_code": [
     {
       "type": 0,
@@ -3213,6 +3199,20 @@
     {
       "type": 0,
       "value": "To log in to your account, enter the code sent to your email."
+    }
+  ],
+  "otp.message.resend_cooldown": [
+    {
+      "type": 0,
+      "value": "You can request a new code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " seconds."
     }
   ],
   "otp.message.verifying": [
