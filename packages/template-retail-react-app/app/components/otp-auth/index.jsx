@@ -114,7 +114,7 @@ const OtpAuth = ({
     }, [isOpen, resendCooldownDuration])
 
     const handleVerify = async (code = otpInputs.values.join('')) => {
-        if (code.length !== OTP_LENGTH) return
+        if (isVerifying || code.length !== OTP_LENGTH) return
 
         setIsVerifying(true)
         setError('')
@@ -150,8 +150,8 @@ const OtpAuth = ({
     }
 
     const handleResend = async () => {
-        // Only send OTP when cooldown is complete; button is always visible/enabled
-        if (resendTimer > 0) return
+        // No action while verifying or during cooldown; button stays visible/enabled
+        if (isVerifying || resendTimer > 0) return
 
         setResendTimer(resendCooldownDuration)
         try {
@@ -173,6 +173,8 @@ const OtpAuth = ({
     }
 
     const handleCheckoutAsGuest = async () => {
+        if (isVerifying) return
+
         // Track checkout as guest selection
         await track('/checkout-as-guest', {
             activity: 'checkout_as_guest_selected',
