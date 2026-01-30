@@ -249,7 +249,11 @@ export const AuthModal = ({
     }, [form.control?.fieldsRef?.current])
 
     useEffect(() => {
-        form.reset()
+        // we don't want to reset the form on email view
+        // because we want to pass the email to PasswordlessEmailConfirmation
+        if (currentView !== EMAIL_VIEW) {
+            form.reset()
+        }
     }, [currentView])
 
     useEffect(() => {
