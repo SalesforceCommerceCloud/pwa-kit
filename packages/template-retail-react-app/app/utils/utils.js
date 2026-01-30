@@ -6,6 +6,7 @@
  */
 
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {encode as base64Encode} from 'base64-arraybuffer'
 
 /**
  * Call requestIdleCallback in supported browsers.
@@ -221,4 +222,17 @@ export const buildRedirectURI = (appOrigin = '', redirectPath = '') => {
     } else {
         return ''
     }
+}
+
+/**
+ * Converts an ArrayBuffer or Uint8Array to a base64url-encoded string.
+ * Base64url encoding is URL-safe (uses '-' and '_' instead of '+' and '/', and omits padding).
+ *
+ * @param {ArrayBuffer|Uint8Array} input - The buffer to encode
+ * @returns {string} Base64url-encoded string
+ */
+export const arrayBufferToBase64Url = (input) => {
+    const uint8array = new Uint8Array(input)
+    const base64 = base64Encode(uint8array.buffer)
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }

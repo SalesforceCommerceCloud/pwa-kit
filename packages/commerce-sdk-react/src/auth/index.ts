@@ -1542,12 +1542,14 @@ class Auth {
                 // Required params
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                user_id: parameters.user_id,
                 // Optional params
+                ...(parameters.user_id && {user_id: parameters.user_id}),
                 ...(parameters.tenant_id && {tenant_id: parameters.tenant_id})
             }
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore TODO: user_id is optional, but commerce-sdk-isomorphic expects it to be required. Remove this comment after commerce-sdk-isomorphic is updated.
         return await slasClient.startWebauthnAuthentication(options)
     }
 

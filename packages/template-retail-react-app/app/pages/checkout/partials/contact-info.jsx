@@ -43,9 +43,11 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
+import {
+    API_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -58,6 +60,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const {loginWithPasskey} = usePasskeyLogin()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -74,10 +77,11 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const passwordlessConfig = getConfig().app.login?.passwordless
-    const passwordlessConfigMode = passwordlessConfig?.mode
-    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
-    const callbackURL = absoluteUrl(passwordlessConfigCallback)
+    const config = getConfig()
+    const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
+    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
+        ? passwordlessConfigCallback
+        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -106,15 +110,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 })
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
-
-                const hasBasketItem = basket.productItems?.length > 0
-                if (hasBasketItem) {
-                    mergeBasket.mutate({
-                        parameters: {
-                            createDestinationBasket: true
-                        }
-                    })
-                }
+                handleMergeBasket()
             }
             goToNextStep()
         } catch (error) {
@@ -146,11 +142,37 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         authModal.onOpen()
     }
 
+    const handleMergeBasket = () => {
+        const hasBasketItem = basket.productItems?.length > 0
+        if (hasBasketItem) {
+            mergeBasket.mutate({
+                parameters: {
+                    createDestinationBasket: true
+                }
+            })
+        }
+    }
+
     useEffect(() => {
         if (!showPasswordField) {
             form.unregister('password')
         }
     }, [showPasswordField])
+
+    useEffect(() => {
+        const handlePasskeyLogin = async () => {
+            try {
+                await loginWithPasskey()
+                handleMergeBasket()
+            } catch (error) {
+                setError(formatMessage(API_ERROR_MESSAGE))
+            }
+        }
+
+        if (!customer.isRegistered) {
+            handlePasskeyLogin()
+        }
+    }, [customer.isRegistered])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')
