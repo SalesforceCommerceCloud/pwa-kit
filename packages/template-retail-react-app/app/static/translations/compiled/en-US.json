@@ -1881,6 +1881,18 @@
       "value": "Something went wrong. Try again!"
     }
   ],
+  "global.error.too_many_login_attempts": [
+    {
+      "type": 0,
+      "value": "You reached the limit for login attempts. For your security, wait 10 minutes and try again."
+    }
+  ],
+  "global.error.too_many_password_reset_requests": [
+    {
+      "type": 0,
+      "value": "You reached the limit for password resets. For your security, wait 10 minutes and try again."
+    }
+  ],
   "global.info.added_to_wishlist": [
     {
       "type": 1,
@@ -2624,7 +2636,7 @@
   "login_form.button.continue_securely": [
     {
       "type": 0,
-      "value": "Continue Securely"
+      "value": "Continue"
     }
   ],
   "login_form.button.google": [

@@ -1,0 +1,22 @@
+---
+description: Page Creation Rule - automatically apply when user asks to create new page, add page, make page, build page, generate page manually
+globs:
+alwaysApply: false
+---
+USE WHEN create a new page, add a new page, make a new page, build a new page, generate a new page, create page, add page, make page, build page, generate page
+
+**Mandatory**
+-Please ask the user to provide following information **one at a time**, in a natural and conversational way.
+- Do **not** ask all the questions at once.
+- DO ask user to clarify page name and page route before proceed
+- DO ask user to specify the components he wishes to include within the page
+- Incase the component is **not found**, please ask the user to confirm the location of the component.
+- Incase the component is **not present**, do not create any new component unless specifically requested
+- If the newly added component requires any additional input requirements, please ask the user for the same.
+- Do NOT include other project components or hooks unless specifically requested
+- Do NOT add extra styling, layout, or features unless explicitly asked
+
+## Implementation Steps
+1. Ask for page name 
+2. Create simple component in `app/pages/[page-name]/index.jsx`
+3. Add route to `app/routes.jsx`

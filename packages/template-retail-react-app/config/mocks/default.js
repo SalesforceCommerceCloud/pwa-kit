@@ -35,7 +35,7 @@ module.exports = {
         login: {
             passwordless: {
                 enabled: false,
-                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+                mode: 'email',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
@@ -43,6 +43,7 @@ module.exports = {
                 idps: ['google', 'apple']
             },
             resetPassword: {
+                mode: 'email',
                 landingPath: '/reset-password-landing'
             }
         },
