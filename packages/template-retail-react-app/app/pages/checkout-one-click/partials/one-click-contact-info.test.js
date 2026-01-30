@@ -631,10 +631,14 @@ describe('ContactInfo Component', () => {
         await waitFor(() => {
             expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalled()
         })
-        // Error alert should be rendered with API error message
+        // Error alert should be rendered; component maps errors via getPasswordlessErrorMessage to generic message
         await waitFor(() => {
             const alerts = screen.queryAllByRole('alert')
-            const hasError = alerts.some((n) => n.textContent?.includes('API Error'))
+            const hasError = alerts.some(
+                (n) =>
+                    n.textContent?.includes('Something went wrong') ||
+                    n.textContent?.includes('API Error')
+            )
             expect(hasError).toBe(true)
         })
     })
