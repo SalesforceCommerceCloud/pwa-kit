@@ -300,8 +300,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
-            setError(message)
+            setError(error.message)
         }
     }
 
