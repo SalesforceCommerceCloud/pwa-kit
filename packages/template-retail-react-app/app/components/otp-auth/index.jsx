@@ -44,7 +44,7 @@ const OtpAuth = ({
     const isValidOtpLength = parsedLength === 6 || parsedLength === 8
     const OTP_LENGTH = isValidOtpLength ? parsedLength : 8
 
-    if (tokenLength != null && !isValidOtpLength) {
+    if (!isValidOtpLength) {
         console.warn(
             `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to ${OTP_LENGTH}.`
         )
