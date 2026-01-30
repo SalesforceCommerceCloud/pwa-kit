@@ -9,7 +9,7 @@ import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl, getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useQuery} from '@tanstack/react-query'
 import {
@@ -340,12 +340,16 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
-                                        location: {
-                                            ...location,
-                                            search: ''
+                                    href={`${appOrigin}${getRouterBasePath()}${getPathWithLocale(
+                                        locale.id,
+                                        buildUrl,
+                                        {
+                                            location: {
+                                                ...location,
+                                                search: ''
+                                            }
                                         }
-                                    })}`}
+                                    )}`}
                                     key={locale.id}
                                 />
                             ))}
@@ -353,12 +357,16 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
-                                    location: {
-                                        ...location,
-                                        search: ''
+                                href={`${appOrigin}${getRouterBasePath()}${getPathWithLocale(
+                                    locale.id,
+                                    buildUrl,
+                                    {
+                                        location: {
+                                            ...location,
+                                            search: ''
+                                        }
                                     }
-                                })}`}
+                                )}`}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />

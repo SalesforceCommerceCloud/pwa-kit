@@ -325,23 +325,8 @@ describe('getParamsFromPath', function () {
     describe('getParamsFromPath with base path', () => {
         test('should remove base path from path when showBasePath is true', () => {
             const basePath = '/test-base'
-            // Re-require modules to get fresh imports with mocks
-            // This is because these modules are first imported at module load time before mocks were set
-            // and have references to the original functions.
-            /* eslint-disable @typescript-eslint/no-var-requires */
-            const {
-                getParamsFromPath: getParamsFromPathFresh
-            } = require('@salesforce/retail-react-app/app/utils/site-utils')
-            const {
-                getConfig: getConfigFresh
-            } = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
-            const {
-                getRouterBasePath: getRouterBasePathFresh
-            } = require('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
-            /* eslint-enable @typescript-eslint/no-var-requires */
-
-            getRouterBasePathFresh.mockReturnValue(basePath)
-            getConfigFresh.mockImplementation(() => ({
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
                 ...mockConfig,
                 app: {
                     ...mockConfig.app,
@@ -353,7 +338,7 @@ describe('getParamsFromPath', function () {
             }))
 
             const path = `${basePath}/us/en-US/category/womens`
-            const result = getParamsFromPathFresh(path)
+            const result = getParamsFromPath(path)
             expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
         })
     })

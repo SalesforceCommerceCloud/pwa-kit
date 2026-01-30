@@ -21,7 +21,6 @@ import {
 import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -32,13 +31,6 @@ jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
     return {
         ...original,
         getAppOrigin: jest.fn(() => 'https://www.example.com')
-    }
-})
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig)
     }
 })
 
@@ -198,31 +190,20 @@ describe('getPathWithLocale', () => {
         expect(relativeUrl).toBe(`/`)
     })
 
-    describe('getPathWithLocale with base path and showBasePath', () => {
-        test('should include base path when showBasePath is true', () => {
-            const basePath = '/test-base'
+    test('getPathWithLocale returns path without base path if base path is present', () => {
+        const basePath = '/test-base'
+        getRouterBasePath.mockReturnValue(basePath)
 
-            getRouterBasePath.mockReturnValue(basePath)
-            getConfig.mockReturnValue({
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    url: {
-                        ...mockConfig.app.url,
-                        showBasePath: true
-                    }
-                }
-            })
+        const location = new URL(
+            `http://localhost:3000${basePath}/uk/it-IT/category/newarrivals-womens`
+        )
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
 
-            // Location pathname should have a base path when showBasePath is true
-            const location = new URL(
-                `http://localhost:3000${basePath}/uk/it-IT/category/newarrivals-womens`
-            )
-            const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
-
-            const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
-            expect(relativeUrl).toBe(`${basePath}/uk/fr/category/newarrivals-womens`)
-        })
+        const path = getPathWithLocale('fr-FR', buildUrl, {location})
+        expect(path).toBe('/uk/fr/category/newarrivals-womens')
+        expect(path).not.toContain(basePath)
+        // Caller uses basePath + path for window.location or full href
+        expect(`${basePath}${path}`).toBe(`${basePath}/uk/fr/category/newarrivals-womens`)
     })
 })
 
