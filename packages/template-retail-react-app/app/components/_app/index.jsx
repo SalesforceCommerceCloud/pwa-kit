@@ -293,6 +293,11 @@ const App = (props) => {
         trackPage()
     }, [location])
 
+    const getHrefForLocale = (localeId) =>
+        `${appOrigin}${getRouterBasePath()}${getPathWithLocale(localeId, buildUrl, {
+            location: {...location, search: ''}
+        })}`
+
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
@@ -340,16 +345,7 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getRouterBasePath()}${getPathWithLocale(
-                                        locale.id,
-                                        buildUrl,
-                                        {
-                                            location: {
-                                                ...location,
-                                                search: ''
-                                            }
-                                        }
-                                    )}`}
+                                    href={getHrefForLocale(locale.id)}
                                     key={locale.id}
                                 />
                             ))}
@@ -357,16 +353,7 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getRouterBasePath()}${getPathWithLocale(
-                                    locale.id,
-                                    buildUrl,
-                                    {
-                                        location: {
-                                            ...location,
-                                            search: ''
-                                        }
-                                    }
-                                )}`}
+                                href={getHrefForLocale(locale.id)}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
