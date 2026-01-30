@@ -28,6 +28,20 @@ jest.setTimeout(40_000)
 
 mockConfig.app.oneClickCheckout.enabled = true
 
+const mockRemoveEmptyShipments = jest.fn().mockResolvedValue(undefined)
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-multiship')
+    return {
+        useMultiship: jest.fn((basket) => ({
+            ...actual.useMultiship(basket),
+            removeEmptyShipments: (...args) => {
+                mockRemoveEmptyShipments(...args)
+                return Promise.resolve()
+            }
+        }))
+    }
+})
+
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: jest.fn()
@@ -306,6 +320,46 @@ describe('Checkout One Click', () => {
         )
 
         getConfig.mockImplementation(() => mockConfig)
+        mockRemoveEmptyShipments.mockClear()
+    })
+
+    test('calls removeEmptyShipments when basket has multiple shipments', async () => {
+        const basketWithMultipleShipments = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        basketWithMultipleShipments.shipments = [
+            basketWithMultipleShipments.shipments[0],
+            {
+                shipmentId: 'shipment-2',
+                shippingAddress: null,
+                shippingMethod: null
+            }
+        ]
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        baskets: [basketWithMultipleShipments],
+                        total: 1
+                    })
+                )
+            })
+        )
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+        await waitFor(
+            () => {
+                expect(mockRemoveEmptyShipments).toHaveBeenCalled()
+                const [basket] = mockRemoveEmptyShipments.mock.calls[0]
+                expect(basket?.basketId).toBe(basketWithMultipleShipments.basketId)
+                expect(basket?.shipments?.length).toBeGreaterThan(1)
+            },
+            {timeout: 5000}
+        )
     })
 
     test('renders pickup and shipping sections for mixed baskets', async () => {

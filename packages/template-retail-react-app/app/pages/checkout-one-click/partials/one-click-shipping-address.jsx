@@ -45,7 +45,7 @@ const shippingAddressAriaLabel = defineMessage({
 })
 
 export default function ShippingAddress(props) {
-    const {enableUserRegistration = false} = props
+    const {enableUserRegistration = false, isShipmentCleanupComplete = true} = props
     const {formatMessage} = useIntl()
     const [isManualSubmitLoading, setIsManualSubmitLoading] = useState(false)
     const [isMultiShipping, setIsMultiShipping] = useState(false)
@@ -210,6 +210,7 @@ export default function ShippingAddress(props) {
         getPreferredItem: (addresses) =>
             addresses.find((addr) => addr.preferred === true) || addresses[0],
         shouldSkip: () => {
+            if (!isShipmentCleanupComplete) return true
             if (openedByUser) return true
             if (selectedShippingAddress?.address1) {
                 if (typeof goToNextStep === 'function') {
@@ -223,6 +224,7 @@ export default function ShippingAddress(props) {
         applyItem: async (address) => {
             await submitAndContinue(address)
         },
+        enabled: isShipmentCleanupComplete,
         // Navigation is already handled inside submitAndContinue (goToStep/goToNextStep)
         onSuccess: () => {},
         onError: (error) => {
@@ -230,7 +232,7 @@ export default function ShippingAddress(props) {
         }
     })
 
-    const isLoading = isAutoSelectLoading || isManualSubmitLoading
+    const isLoading = isAutoSelectLoading || isManualSubmitLoading || !isShipmentCleanupComplete
 
     const handleEdit = () => {
         setOpenedByUser(true)
@@ -311,5 +313,6 @@ export default function ShippingAddress(props) {
 }
 
 ShippingAddress.propTypes = {
-    enableUserRegistration: PropTypes.bool
+    enableUserRegistration: PropTypes.bool,
+    isShipmentCleanupComplete: PropTypes.bool
 }
