@@ -3212,13 +3212,35 @@
     },
     {
       "type": 0,
-      "value": " seconds."
-    }
-  ],
-  "otp.message.verifying": [
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "second"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "seconds"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
     {
       "type": 0,
-      "value": "Verifying code..."
+      "value": "."
     }
   ],
   "otp.title.confirm_its_you": [

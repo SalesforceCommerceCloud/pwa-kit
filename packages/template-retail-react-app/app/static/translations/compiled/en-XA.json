@@ -6800,21 +6800,35 @@
     },
     {
       "type": 0,
-      "value": " şḗḗƈǿǿƞḓş."
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "şḗḗƈǿǿƞḓ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "şḗḗƈǿǿƞḓş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
     },
     {
       "type": 0,
-      "value": "]"
-    }
-  ],
-  "otp.message.verifying": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ṽḗḗřīƒẏīƞɠ ƈǿǿḓḗḗ..."
+      "value": "."
     },
     {
       "type": 0,

@@ -102,7 +102,7 @@ describe('OtpAuth', () => {
 
     describe('Component Rendering', () => {
         test('renders OTP form with all elements', () => {
-            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
+            renderWithProviders(<WrapperComponent />)
 
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
             expect(
@@ -127,7 +127,7 @@ describe('OtpAuth', () => {
         })
 
         test('renders buttons with correct styling', () => {
-            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
+            renderWithProviders(<WrapperComponent />)
 
             const guestButton = screen.getByRole('button', {name: /Checkout as a Guest/i})
             const resendButton = screen.getByRole('button', {name: /Resend Code/i})
@@ -474,7 +474,7 @@ describe('OtpAuth', () => {
             expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com', true)
         })
 
-        test('resend button is disabled during initial cooldown when modal opens (default 30s)', () => {
+        test('countdown message is shown on initial open and both buttons are always visible', () => {
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}
@@ -485,14 +485,13 @@ describe('OtpAuth', () => {
                 />
             )
 
-            expect(
-                screen.getByText(/You can request a new code in 30 seconds/i)
-            ).toBeInTheDocument()
-            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
-            expect(resendButton).toBeDisabled()
+            // FormattedMessage may render "30 second(s)." (ICU plural)
+            expect(screen.getByText(/You can request a new code in 30 second/i)).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /Resend Code/i})).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /Checkout as a Guest/i})).toBeInTheDocument()
         })
 
-        test('resend cooldown uses custom prop when provided', () => {
+        test('countdown message uses custom cooldown duration when provided', () => {
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}
@@ -504,12 +503,12 @@ describe('OtpAuth', () => {
                 />
             )
 
-            expect(
-                screen.getByText(/You can request a new code in 15 seconds/i)
-            ).toBeInTheDocument()
+            // FormattedMessage may render "15 second(s)." (ICU plural)
+            expect(screen.getByText(/You can request a new code in 15 second/i)).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /Resend Code/i})).toBeInTheDocument()
         })
 
-        test('resend button is disabled during countdown after clicking Resend', async () => {
+        test('clicking Resend during cooldown does not send OTP', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -518,25 +517,69 @@ describe('OtpAuth', () => {
                     form={mockForm}
                     handleOtpVerification={mockHandleOtpVerification}
                     handleSendEmailOtp={mockHandleSendEmailOtp}
-                    resendCooldownDuration={5}
                 />
             )
 
-            // Wait for initial 5s cooldown to expire so Resend is clickable
+            // Resend button is always visible; during initial 30s cooldown it should not send
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
+            await user.click(resendButton)
+            await user.click(resendButton)
+
+            expect(mockHandleSendEmailOtp).not.toHaveBeenCalled()
+        })
+
+        test('clicking Resend when cooldown is complete sends OTP and shows countdown', async () => {
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                    resendCooldownDuration={0}
+                />
+            )
+
+            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
+            await user.click(resendButton)
+
+            expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com', true)
+        })
+
+        test('clicking Resend again during cooldown after first send does not send again', async () => {
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                    resendCooldownDuration={2}
+                />
+            )
+
+            // Wait for initial 2s cooldown to expire (text is "X second(s)." from FormattedMessage)
             await waitFor(
                 () => {
-                    expect(screen.getByRole('button', {name: /Resend Code/i})).not.toBeDisabled()
+                    expect(
+                        screen.queryByText(/You can request a new code in \d+ second/i)
+                    ).not.toBeInTheDocument()
                 },
-                {timeout: 6000}
+                {timeout: 3000}
             )
 
             await user.click(screen.getByRole('button', {name: /Resend Code/i}))
+            expect(mockHandleSendEmailOtp).toHaveBeenCalledTimes(1)
 
+            // Countdown is showing; click Resend again - should not send
             expect(
-                await screen.findByText(/You can request a new code in 5 seconds/i)
+                screen.getByText(/You can request a new code in \d+ second/i)
             ).toBeInTheDocument()
-            const resendButton = screen.getByRole('button', {name: /Resend Code/i})
-            expect(resendButton).toBeDisabled()
+            await user.click(screen.getByRole('button', {name: /Resend Code/i}))
+
+            expect(mockHandleSendEmailOtp).toHaveBeenCalledTimes(1)
         })
     })
 
@@ -580,7 +623,7 @@ describe('OtpAuth', () => {
         })
 
         test('buttons have accessible text', () => {
-            renderWithProviders(<WrapperComponent resendCooldownDuration={0} />)
+            renderWithProviders(<WrapperComponent />)
 
             expect(screen.getByRole('button', {name: /Checkout as a Guest/i})).toBeInTheDocument()
             expect(screen.getByRole('button', {name: /Resend Code/i})).toBeInTheDocument()

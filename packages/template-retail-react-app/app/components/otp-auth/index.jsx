@@ -150,6 +150,9 @@ const OtpAuth = ({
     }
 
     const handleResend = async () => {
+        // Only send OTP when cooldown is complete; button is always visible/enabled
+        if (resendTimer > 0) return
+
         setResendTimer(resendCooldownDuration)
         try {
             await track('/otp-resend', {
@@ -193,8 +196,6 @@ const OtpAuth = ({
             }
         }
     }
-
-    const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
@@ -252,29 +253,21 @@ const OtpAuth = ({
                                         width={12}
                                         height={14}
                                         borderRadius="md"
-                                        borderColor="gray.300"
+                                        borderColor={error ? 'red.500' : 'gray.300'}
                                         borderWidth={2}
                                         disabled={isVerifying}
                                         _focus={{
-                                            borderColor: 'blue.500',
-                                            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+                                            borderColor: error ? 'red.500' : 'blue.500',
+                                            boxShadow: error
+                                                ? '0 0 0 1px var(--chakra-colors-red-500)'
+                                                : '0 0 0 1px var(--chakra-colors-blue-500)'
                                         }}
                                         _hover={{
-                                            borderColor: 'gray.400'
+                                            borderColor: error ? 'red.500' : 'gray.400'
                                         }}
                                     />
                                 ))}
                             </SimpleGrid>
-
-                            {/* Loading indicator during verification */}
-                            {isVerifying && (
-                                <Text fontSize="sm" color="blue.500">
-                                    <FormattedMessage
-                                        defaultMessage="Verifying code..."
-                                        id="otp.message.verifying"
-                                    />
-                                </Text>
-                            )}
 
                             {/* Error message */}
                             {error && (
@@ -283,11 +276,11 @@ const OtpAuth = ({
                                 </Text>
                             )}
 
-                            {/* Resend cooldown message */}
+                            {/* Countdown message */}
                             {resendTimer > 0 && (
                                 <Text fontSize="sm" color="gray.600" textAlign="center">
                                     <FormattedMessage
-                                        defaultMessage="You can request a new code in {timer} seconds."
+                                        defaultMessage="You can request a new code in {timer} {timer, plural, one {second} other {seconds}}."
                                         id="otp.message.resend_cooldown"
                                         values={{timer: resendTimer}}
                                     />
@@ -332,13 +325,10 @@ const OtpAuth = ({
                                     onClick={handleResend}
                                     variant="solid"
                                     size="lg"
-                                    colorScheme={isResendDisabled ? 'gray' : 'blue'}
-                                    bg={isResendDisabled ? 'gray.300' : 'blue.500'}
+                                    colorScheme="blue"
+                                    bg="blue.500"
                                     minWidth={40}
-                                    isDisabled={isResendDisabled}
-                                    _hover={isResendDisabled ? {} : {bg: 'blue.600'}}
-                                    _disabled={{bg: 'gray.300', color: 'gray.600'}}
-                                    aria-disabled={isResendDisabled}
+                                    _hover={{bg: 'blue.600'}}
                                 >
                                     <FormattedMessage
                                         defaultMessage="Resend Code"
