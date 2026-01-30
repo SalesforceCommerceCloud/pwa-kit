@@ -57,18 +57,25 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
     }
 })
 
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
-    getConfig: jest.fn()
-}))
+const mockLoginWithPasskey = jest.fn().mockResolvedValue(undefined)
 
-beforeEach(() => {
-    getConfig.mockImplementation(() => mockConfig)
-    global.server.use(
-        rest.post('*/oauth2/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
+jest.mock('@salesforce/retail-react-app/app/hooks/use-passkey-login', () => {
+    return {
+        __esModule: true,
+        usePasskeyLogin: jest.fn(() => ({
+            loginWithPasskey: mockLoginWithPasskey
+        }))
+    }
 })
+
+const mockUseCurrentCustomer = jest.fn(() => ({
+    data: {
+        isRegistered: false
+    }
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
 
 afterEach(() => {
     jest.resetModules()

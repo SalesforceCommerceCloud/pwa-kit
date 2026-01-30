@@ -1400,6 +1400,7 @@ class Auth {
         if (authHeader) {
             options.headers.Authorization = authHeader
         }
+
         const res = await this.client.resetPassword(options)
         return res
     }
