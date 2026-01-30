@@ -178,6 +178,7 @@ export class EinsteinAPI {
                 namespace: 'useEinstein.einsteinFetch',
                 additionalProperties: {error: error}
             })
+            return {}
         }
 
         if (!response?.ok) {
@@ -342,7 +343,7 @@ export class EinsteinAPI {
     /**
      * Tells the Einstein engine when a user starts the checkout process.
      **/
-    async sendBeginCheckout(basket, args) {
+    async sendBeginCheckout(basket, args = {}) {
         const endpoint = `/activities/${this.siteId}/beginCheckout`
         const method = 'POST'
         const products = basket.productItems.map((item) => this._constructEinsteinItem(item))
@@ -350,7 +351,8 @@ export class EinsteinAPI {
         const body = {
             products: products,
             amount: subTotal,
-            ...args
+            checkoutType: 'traditional', // Default to traditional for backward compatibility
+            ...args // Allow override (e.g., checkoutType: 'one-click')
         }
 
         return this.einsteinFetch(endpoint, method, body)
@@ -360,14 +362,15 @@ export class EinsteinAPI {
      * Tells the Einstein engine when a user reaches the given step during checkout.
      * https://developer.salesforce.com/docs/commerce/einstein-api/references#einstein-recommendations:Summary
      **/
-    async sendCheckoutStep(stepName, stepNumber, basket, args) {
+    async sendCheckoutStep(stepName, stepNumber, basket, args = {}) {
         const endpoint = `/activities/${this.siteId}/checkoutStep`
         const method = 'POST'
         const body = {
             stepName,
             stepNumber,
             basketId: basket.basketId,
-            ...args
+            checkoutType: 'traditional', // Default to traditional for backward compatibility
+            ...args // Allow override (e.g., checkoutType: 'one-click')
         }
 
         return this.einsteinFetch(endpoint, method, body)
