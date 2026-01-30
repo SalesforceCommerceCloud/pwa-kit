@@ -159,3 +159,29 @@ describe('AccountDetail component', () => {
         expect(screen.queryByText(/forgot password/i)).not.toBeInTheDocument()
     })
 })
+
+test('Email field is readonly when editing profile', async () => {
+    sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByText(/Account Details/i)).toBeInTheDocument()
+    })
+
+    const profileCard = screen.getByTestId('sf-toggle-card-my-profile')
+    // Click edit to open the profile form
+    await user.click(within(profileCard).getByText(/edit/i))
+
+    // Profile Form must be present
+    expect(screen.getByLabelText('Profile Form')).toBeInTheDocument()
+
+    // Find the email input field
+    const emailInput = screen.getByLabelText('Email')
+    expect(emailInput).toBeInTheDocument()
+
+    // Verify the email field is readonly
+    expect(emailInput).toHaveAttribute('readonly')
+})

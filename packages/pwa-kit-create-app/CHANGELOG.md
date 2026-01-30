@@ -1,3 +1,5 @@
+## v3.16.0-dev (Dec 17, 2025)
+- Add new One-Click Checkout configuration [#3609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3609)
 
 ## v3.15.0-dev (Nov 05, 2025)
 - Support email mode by default for passwordless login and password reset in a generated app. [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)

@@ -134,6 +134,15 @@ const AccountOrderDetail = () => {
     )
     const isLoading = isOrderLoading || !order
 
+    // Check if order has OMS data
+    const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
+
+    // Check if order is multi-shipment order
+    const isMultiShipmentOrder = useMemo(
+        () => (order?.omsData?.shipments?.length ?? 0) > 1 || (order?.shipments?.length ?? 0) > 1,
+        [isOmsOrder, order?.omsData?.shipments?.length, order?.shipments?.length]
+    )
+
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
             ? groupShipmentsByDeliveryOption(order)
@@ -162,6 +171,67 @@ const AccountOrderDetail = () => {
             return storeData.data.find((store) => store.id === storeId)
         },
         [storeData?.data]
+    )
+
+    const renderShippingMethod = (
+        shippingMethodName,
+        shippingStatus,
+        trackingNumber,
+        trackingUrl,
+        shipmentsLength,
+        index
+    ) => (
+        <Stack spacing={1}>
+            <Heading as="h2" fontSize="sm" pt={1}>
+                {shipmentsLength > 1 ? (
+                    <FormattedMessage
+                        defaultMessage="Shipping Method {number}"
+                        id="account_order_detail.heading.shipping_method_number"
+                        values={{number: index + 1}}
+                    />
+                ) : (
+                    <FormattedMessage
+                        defaultMessage="Shipping Method"
+                        id="account_order_detail.heading.shipping_method"
+                    />
+                )}
+            </Heading>
+            <Box>
+                <Text fontSize="sm" textTransform="titlecase">
+                    {{
+                        not_shipped: formatMessage({
+                            defaultMessage: 'Not shipped',
+                            id: 'account_order_detail.shipping_status.not_shipped'
+                        }),
+                        part_shipped: formatMessage({
+                            defaultMessage: 'Partially shipped',
+                            id: 'account_order_detail.shipping_status.part_shipped'
+                        }),
+                        shipped: formatMessage({
+                            defaultMessage: 'Shipped',
+                            id: 'account_order_detail.shipping_status.shipped'
+                        })
+                    }[shippingStatus] || shippingStatus}
+                </Text>
+                <Text fontSize="sm">{shippingMethodName}</Text>
+                {trackingNumber && (
+                    <Text fontSize="sm">
+                        <FormattedMessage
+                            defaultMessage="Tracking Number"
+                            id="account_order_detail.label.tracking_number"
+                        />
+                        :{' '}
+                        {trackingUrl ? (
+                            <ChakraLink href={trackingUrl} isExternal color="blue.600">
+                                {trackingNumber}
+                            </ChakraLink>
+                        ) : (
+                            trackingNumber
+                        )}
+                    </Text>
+                )}
+            </Box>
+        </Stack>
     )
 
     const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
@@ -325,86 +395,31 @@ const AccountOrderDetail = () => {
                                         </Stack>
                                     )
                                 })}
+                                {/* Any type of Non-OMS or any type of single shipment order: show DeliveryMethods and Shipments info*/}
+                                {(!isOmsOrder || !isMultiShipmentOrder) &&
+                                    deliveryShipments.map((shipment, index) => {
+                                        const omsShipment = isOmsOrder
+                                            ? order.omsData.shipments?.[index]
+                                            : null
 
-                                {/* Delivery Shipments */}
-                                {deliveryShipments.map((shipment, index) => {
-                                    // Hide shipping address for OMS multi-shipment orders
-                                    // Can't reliably correlate OMS shipments to ECOM addresses by index
-                                    const isOmsOrder = !!order?.omsData
-                                    const omsShipment = isOmsOrder
-                                        ? order.omsData.shipments?.[index]
-                                        : null
-                                    const isOmsMultiShipment =
-                                        isOmsOrder &&
-                                        (order.omsData.shipments?.length > 1 ||
-                                            order.shipments?.length > 1)
+                                        const shippingMethodName =
+                                            omsShipment?.provider || shipment.shippingMethod.name
+                                        const shippingStatus =
+                                            omsShipment?.status || shipment.shippingStatus
+                                        const trackingNumber =
+                                            omsShipment?.trackingNumber || shipment.trackingNumber
+                                        const trackingUrl = omsShipment?.trackingUrl
 
-                                    const shippingMethodName =
-                                        omsShipment?.provider || shipment.shippingMethod.name
-                                    const shippingStatus =
-                                        omsShipment?.status || shipment.shippingStatus
-                                    const trackingNumber =
-                                        omsShipment?.trackingNumber || shipment.trackingNumber
-                                    const trackingUrl = omsShipment?.trackingUrl
-
-                                    return (
-                                        <React.Fragment key={`delivery-${index}`}>
-                                            <Stack spacing={1}>
-                                                <Heading as="h2" fontSize="sm" pt={1}>
-                                                    {deliveryShipments.length > 1 ? (
-                                                        <FormattedMessage
-                                                            defaultMessage="Shipping Method {number}"
-                                                            id="account_order_detail.heading.shipping_method_number"
-                                                            values={{number: index + 1}}
-                                                        />
-                                                    ) : (
-                                                        <FormattedMessage
-                                                            defaultMessage="Shipping Method"
-                                                            id="account_order_detail.heading.shipping_method"
-                                                        />
-                                                    )}
-                                                </Heading>
-                                                <Box>
-                                                    <Text fontSize="sm" textTransform="titlecase">
-                                                        {{
-                                                            not_shipped: formatMessage({
-                                                                defaultMessage: 'Not shipped',
-                                                                id: 'account_order_detail.shipping_status.not_shipped'
-                                                            }),
-                                                            part_shipped: formatMessage({
-                                                                defaultMessage: 'Partially shipped',
-                                                                id: 'account_order_detail.shipping_status.part_shipped'
-                                                            }),
-                                                            shipped: formatMessage({
-                                                                defaultMessage: 'Shipped',
-                                                                id: 'account_order_detail.shipping_status.shipped'
-                                                            })
-                                                        }[shippingStatus] || shippingStatus}
-                                                    </Text>
-                                                    <Text fontSize="sm">{shippingMethodName}</Text>
-                                                    {trackingNumber && (
-                                                        <Text fontSize="sm">
-                                                            <FormattedMessage
-                                                                defaultMessage="Tracking Number"
-                                                                id="account_order_detail.label.tracking_number"
-                                                            />
-                                                            :{' '}
-                                                            {trackingUrl ? (
-                                                                <ChakraLink
-                                                                    href={trackingUrl}
-                                                                    isExternal
-                                                                    color="blue.600"
-                                                                >
-                                                                    {trackingNumber}
-                                                                </ChakraLink>
-                                                            ) : (
-                                                                trackingNumber
-                                                            )}
-                                                        </Text>
-                                                    )}
-                                                </Box>
-                                            </Stack>
-                                            {!isOmsMultiShipment && (
+                                        return (
+                                            <React.Fragment key={`delivery-${index}`}>
+                                                {renderShippingMethod(
+                                                    shippingMethodName,
+                                                    shippingStatus,
+                                                    trackingNumber,
+                                                    trackingUrl,
+                                                    deliveryShipments.length,
+                                                    index
+                                                )}
                                                 <Stack spacing={1}>
                                                     <Heading as="h2" fontSize="sm" pt={1}>
                                                         {deliveryShipments.length > 1 ? (
@@ -437,10 +452,25 @@ const AccountOrderDetail = () => {
                                                         </Text>
                                                     </Box>
                                                 </Stack>
+                                            </React.Fragment>
+                                        )
+                                    })}
+
+                                {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
+                                {isOmsOrder &&
+                                    isMultiShipmentOrder &&
+                                    order?.omsData?.shipments?.map((shipment, index) => (
+                                        <React.Fragment key={`oms-shipment-${index}`}>
+                                            {renderShippingMethod(
+                                                shipment.provider,
+                                                shipment.status,
+                                                shipment.trackingNumber,
+                                                shipment.trackingUrl,
+                                                order?.omsData?.shipments?.length ?? 0,
+                                                index
                                             )}
                                         </React.Fragment>
-                                    )
-                                })}
+                                    ))}
 
                                 {/* Payment Method */}
                                 {paymentCard && (

@@ -18,6 +18,7 @@ describe('Shopper Customers hooks', () => {
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
             'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
+            'getPublicProductListItems', // TODO: Implement when the endpoint exits closed beta
             'registerExternalProfile' // TODO: Implement when the endpoint exits closed beta
         ])
     })

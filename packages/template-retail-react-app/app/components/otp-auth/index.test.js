@@ -112,6 +112,13 @@ describe('OtpAuth', () => {
             expect(screen.getByText(/Resend code/i)).toBeInTheDocument()
         })
 
+        test('renders 8 OTP input fields', () => {
+            renderWithProviders(<WrapperComponent />)
+
+            const otpInputs = screen.getAllByRole('textbox')
+            expect(otpInputs).toHaveLength(8)
+        })
+
         test('renders phone icon', () => {
             renderWithProviders(<WrapperComponent />)
 

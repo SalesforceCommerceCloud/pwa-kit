@@ -31,7 +31,6 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -53,6 +52,7 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Constants
 import {
@@ -84,6 +84,7 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
+    const {oneClickCheckout = {}} = getConfig().app || {}
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -248,7 +249,7 @@ const CheckoutConfirmation = () => {
                         </Stack>
                     </Box>
 
-                    {customer.isGuest && (
+                    {!oneClickCheckout.enabled && customer.isGuest && (
                         <Box
                             layerStyle="card"
                             rounded={[0, 0, 'base']}
