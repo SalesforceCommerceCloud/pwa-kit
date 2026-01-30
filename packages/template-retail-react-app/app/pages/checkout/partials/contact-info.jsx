@@ -46,9 +46,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    API_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
