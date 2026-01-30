@@ -223,7 +223,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
-                    mode: 'email',
+                    mode: 'email', //need to change this
                     locale: locale?.id
                 })
                 // Only open modal if API call succeeds
