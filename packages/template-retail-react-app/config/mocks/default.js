@@ -51,7 +51,6 @@ module.exports = {
                 mode: 'email',
                 landingPath: '/reset-password-landing'
             }
-            }
         },
         siteAliases: {
             'site-1': 'uk',
