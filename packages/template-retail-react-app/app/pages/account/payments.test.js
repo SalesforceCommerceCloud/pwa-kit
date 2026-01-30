@@ -262,6 +262,7 @@ describe('AccountPayments', () => {
 
         expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
     })
+
     test('calls refetch when retry button is clicked', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({

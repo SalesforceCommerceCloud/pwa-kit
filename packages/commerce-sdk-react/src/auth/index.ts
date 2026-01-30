@@ -1278,16 +1278,16 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const slasClient = this.client
         const usid = this.get('usid')
         // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
         // do not pass the mode parameter. Newer versions should explicitly pass the mode.
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
 
-        const res = await helpers.authorizePasswordless({
-            slasClient: this.client,
-            credentials: {
-                clientSecret: this.clientSecret
+        const options = {
+            headers: {
+                Authorization: ''
             },
             parameters: {
                 ...(callbackURI && {callbackURI}),
@@ -1308,11 +1308,25 @@ class Auth {
                 ...(parameters.first_name && {firstName: parameters.first_name}),
                 ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
-        })
-        if (res && res.status !== 200) {
-            const errorData = await res.json()
-            throw new Error(`${res.status} ${String(errorData.message)}`)
+        } as {
+            headers?: {[key: string]: string}
+            parameters?: Record<string, string>
+            body: ShopperLoginTypes.authorizePasswordlessCustomerBodyType &
+                helpers.CustomRequestBody
         }
+
+        // Use Basic auth header when using private client
+        if (this.clientSecret) {
+            options.headers = options.headers || {}
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        } else {
+            // If not using private client, avoid sending Authorization header
+            delete options.headers
+        }
+
+        const res = await slasClient.authorizePasswordlessCustomer(options)
         return res
     }
 

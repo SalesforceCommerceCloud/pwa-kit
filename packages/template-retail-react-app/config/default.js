@@ -72,7 +72,7 @@ module.exports = {
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
         oneClickCheckout: {
-            enabled: false
+            enabled: true
         },
         partialHydrationEnabled: false,
         pages: {
