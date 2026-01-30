@@ -47,7 +47,6 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -112,7 +111,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isBlurChecking, setIsBlurChecking] = useState(false)
-    const [, setRegisteredUserChoseGuest] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
     // Auto-focus the email field when the component mounts
@@ -272,38 +271,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     }
 
     // Handle checkout as guest from OTP modal
-    const handleCheckoutAsGuest = async () => {
-        try {
-            const email = form.getValues('email')
-            const phone = form.getValues('phone')
-            // Update basket with guest email
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: email}
-            })
-
-            // Save phone number to basket billing address for guest shoppers
-            if (phone) {
-                await updateBillingAddressForBasket.mutateAsync({
-                    parameters: {basketId: basket.basketId},
-                    body: {
-                        ...basket?.billingAddress,
-                        phone: phone
-                    }
-                })
-            }
-
-            // Set the flag that "Checkout as Guest" was clicked
-            setRegisteredUserChoseGuest(true)
-            if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(true)
-            }
-
-            // Proceed to next step (shipping address)
-            goToNextStep()
-        } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
-            setError(message)
+    const handleCheckoutAsGuest = () => {
+        setRegisteredUserChoseGuest(true)
+        if (onRegisteredUserChoseGuest) {
+            onRegisteredUserChoseGuest(true)
         }
     }
 
@@ -473,7 +444,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 return
             }
 
-            if (!result.isRegistered) {
+            if (!result.isRegistered || registeredUserChoseGuest) {
                 // Guest shoppers must provide phone number before proceeding
                 const phone = (formData.phone || '').trim()
                 if (!phone) {
