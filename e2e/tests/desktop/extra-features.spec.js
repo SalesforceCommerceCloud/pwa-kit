@@ -32,7 +32,7 @@ test('Verify passwordless login request', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
-    await page.getByRole('button', {name: 'Continue Securely'}).click()
+    await page.getByRole('button', {name: 'Continue'}).click()
 
     await page.waitForResponse(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login'
@@ -47,12 +47,11 @@ test('Verify passwordless login request', async ({page}) => {
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
-test('Verify password reset callback request', async ({page}) => {
+test('Verify password reset request', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -88,16 +87,13 @@ test('Verify password reset callback request', async ({page}) => {
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
 // Verify on the login UI that looks different when extra login features are not enabled
-test('Verify password reset callback request when extra login features are not enabled', async ({
-    page
-}) => {
+test('Verify password reset request when extra login features are not enabled', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -132,13 +128,12 @@ test('Verify password reset callback request when extra login features are not e
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request', async ({page}) => {
+test('Verify password reset action request', async ({page}) => {
     let interceptedRequest = null
     await page.route(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action',

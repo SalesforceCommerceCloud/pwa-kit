@@ -41,6 +41,13 @@ jest.mock('./site-utils', () => {
         getUrlConfig: jest.fn()
     }
 })
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
+    return {
+        ...original,
+        getEnvBasePath: jest.fn(() => '')
+    }
+})
 
 jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
@@ -406,6 +413,11 @@ describe('removeQueryParamsFromPath test', () => {
 })
 
 describe('absoluteUrl', function () {
+    test('return undefined when path is not provided', () => {
+        const url = absoluteUrl()
+        expect(url).toBeUndefined()
+    })
+
     test('return expected when path is a relative url', () => {
         const url = absoluteUrl('/uk/en/women/dresses')
         expect(url).toBe('https://www.example.com/uk/en/women/dresses')
@@ -413,6 +425,19 @@ describe('absoluteUrl', function () {
 
     test('return expected when path is an absolute url', () => {
         const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
+        expect(url).toBe('https://www.example.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is a relative url and appOrigin is provided', () => {
+        const url = absoluteUrl('uk/en/women/dresses', 'https://www.custom.com')
+        expect(url).toBe('https://www.custom.com/uk/en/women/dresses')
+    })
+
+    test('return expected when path is an absolute url and appOrigin is provided', () => {
+        const url = absoluteUrl(
+            'https://www.example.com/uk/en/women/dresses',
+            'https://www.should-be-ignored.com'
+        )
         expect(url).toBe('https://www.example.com/uk/en/women/dresses')
     })
 })

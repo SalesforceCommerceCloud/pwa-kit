@@ -19,10 +19,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useLocation} from 'react-router-dom'
 import {useRouteMatch} from 'react-router'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {getPasswordResetErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -38,10 +35,7 @@ const ResetPassword = () => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
-            const message =
-                e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getPasswordResetErrorMessage(e.message))
             form.setError('global', {type: 'manual', message})
         }
     }
