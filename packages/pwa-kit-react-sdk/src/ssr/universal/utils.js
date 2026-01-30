@@ -9,6 +9,7 @@
  */
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getEnvBasePath, bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
 
@@ -52,4 +53,22 @@ export const getProxyConfigs = () => {
 
     // Clone to avoid accidental mutation of important configuration variables.
     return configs.map((config) => ({...config}))
+}
+
+/**
+ * Returns the base path (defined in config.ssrParameters.envBasePath)
+ * for React Router routes when showBasePath is enabled in the app config.
+ *
+ * This function should be used when working with a React Router route
+ * (The route is defined in routes.jsx).
+ *
+ * Use getEnvBasePath (pwa-kit-runtime) if you are working with an express route\
+ * (The route is defined in ssr.js).
+ *
+ * @returns {string} - The base path if showBasePath is true, otherwise an empty string
+ */
+export const getRouterBasePath = () => {
+    const config = getConfig()
+    const showBasePath = config?.app?.url?.showBasePath === true
+    return showBasePath ? getEnvBasePath() : ''
 }

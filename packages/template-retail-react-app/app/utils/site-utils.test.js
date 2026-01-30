@@ -11,6 +11,7 @@ import {
     resolveSiteFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
@@ -25,8 +26,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getRouterBasePath: jest.fn(() => '')
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
+    // Reset the mock after resetModules
+    getRouterBasePath.mockReturnValue('')
 })
 
 afterEach(() => {
@@ -308,6 +319,27 @@ describe('getParamsFromPath', function () {
             //     return
             // })
             expect(getParamsFromPath(path)).toEqual(expectedRes)
+        })
+    })
+
+    describe('getParamsFromPath with base path', () => {
+        test('should remove base path from path when showBasePath is true', () => {
+            const basePath = '/test-base'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const path = `${basePath}/us/en-US/category/womens`
+            const result = getParamsFromPath(path)
+            expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
         })
     })
 })

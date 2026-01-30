@@ -13,6 +13,7 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Constructs an absolute URL from a given path and an optional application origin.
@@ -119,18 +120,24 @@ export const searchUrlBuilder = (searchTerm) => '/search?q=' + encodeURIComponen
 
 /**
  * Returns a relative URL for a locale short code.
- * Based on your app configuration, this function will replace your current locale shortCode with a new one
+ * Based on your app configuration, this function will replace your current locale shortCode with a new one.
  *
  * @param {String} shortCode - The locale short code.
  * @param {function(*, *, *, *=): string} - Generates a site URL from the provided path, site and locale.
  * @param {string[]} opts.disallowParams - URL parameters to remove
  * @param {Object} opts.location - location object to replace the default `window.location`
- * @returns {String} url - The relative URL for the specific locale.
+ * @returns {String} url - The relative URL for the specific locale (without base path).
  */
 export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
+
+    // sanitize the base path from current url if existing
+    const basePath = getRouterBasePath()
+    if (basePath && pathname.startsWith(basePath)) {
+        pathname = pathname.substring(basePath.length)
+    }
 
     // sanitize the site from current url if existing
     if (siteRef) {
@@ -167,6 +174,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         site.alias || site.id,
         locale?.alias || locale?.id
     )
+
     return newUrl
 }
 
@@ -224,6 +232,7 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
             queryLocale && locale && searchParams.append('locale', locale)
             queryString = `?${searchParams.toString()}`
         }
+
         return `${sitePath}${localePath}${path}${queryString}`
     }
 }
@@ -272,6 +281,11 @@ export const removeQueryParamsFromPath = (path, keys) => {
  */
 export const removeSiteLocaleFromPath = (pathName = '') => {
     let {siteRef, localeRef} = getParamsFromPath(pathName)
+
+    const basePath = getRouterBasePath()
+    if (basePath && pathName.startsWith(basePath)) {
+        pathName = pathName.substring(basePath.length)
+    }
 
     // remove the site alias from the current pathName
     if (siteRef) {

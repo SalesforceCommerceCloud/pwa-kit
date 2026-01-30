@@ -27,6 +27,7 @@ module.exports = {
             site: 'path',
             locale: 'path',
             showDefaults: true,
+            showBasePath: false,
             interpretPlusSignAsSpace: false
         },
         login: {

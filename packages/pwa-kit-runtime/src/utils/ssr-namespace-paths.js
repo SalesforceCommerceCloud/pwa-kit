@@ -23,7 +23,15 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 /*
  * Returns the base path. This is prepended to a /mobify path.
- * Returns an empty string if the base path is not set or is '/'.
+ * Returns an empty string if the base path is not set.
+ * Throws an error if the base path is not valid.
+ *
+ * Use this function if you are working with an express route
+ * (ie. The route is defined in ssr.js).
+ *
+ * Use getRouterBasePath (pwa-kit-react-sdk) if you are working
+ * with a React Router route
+ * (ie. The route is defined in routes.jsx).
  */
 export const getEnvBasePath = () => {
     let basePath = ''
