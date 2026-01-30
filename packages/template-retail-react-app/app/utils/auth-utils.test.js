@@ -70,7 +70,7 @@ describe('getLoginPasswordlessErrorMessage', () => {
     test.each([
         ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
-        [null, API_ERROR_MESSAGE],
+        [null, API_ERROR_MESSAGE]
     ])(
         'maps login passwordless error "%s" to the correct message descriptor',
         (errorMessage, expectedMessage) => {
