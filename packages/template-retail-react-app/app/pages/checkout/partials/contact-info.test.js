@@ -49,6 +49,19 @@ jest.mock('../util/checkout-context', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
+beforeEach(() => {
+    getConfig.mockImplementation(() => mockConfig)
+    global.server.use(
+        rest.post('*/oauth2/login', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        })
+    )
+})
+
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
     const defaultReturn = {data: {}, derivedData: {totalItems: 0}}
     return {

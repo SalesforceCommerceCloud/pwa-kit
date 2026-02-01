@@ -43,8 +43,10 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {
     API_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
@@ -77,11 +79,10 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const config = getConfig()
-    const passwordlessConfigCallback = config.app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const passwordlessConfigMode = passwordlessConfig?.mode
+    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
+    const callbackURL = absoluteUrl(passwordlessConfigCallback)
 
     const handlePasswordlessLogin = async (email) => {
         try {
