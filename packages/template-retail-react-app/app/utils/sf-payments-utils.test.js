@@ -16,7 +16,8 @@ import {
     createPaymentInstrumentBody,
     getClientSecret,
     getGatewayFromPaymentMethod,
-    getSetupFutureUsage
+    getSetupFutureUsage,
+    transformPaymentMethodReferences
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
 describe('sf-payments-utils', () => {
@@ -1181,15 +1182,22 @@ describe('sf-payments-utils', () => {
             expect(result.amount).toBe(0)
         })
 
-        test('includes shippingPreference when provided', () => {
+        test('includes shippingPreference when provided for PayPal', () => {
+            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Paypal', accountId: 'paypal_acct_123'}]
             const result = createPaymentInstrumentBody({
                 amount: 100.0,
                 paymentMethodType: 'paypal',
                 zoneId: 'us-west-1',
-                shippingPreference: 'GET_FROM_FILE'
+                shippingPreference: 'GET_FROM_FILE',
+                paymentMethods,
+                paymentMethodSetAccounts
             })
 
-            expect(result.paymentReferenceRequest.shippingPreference).toBe('GET_FROM_FILE')
+            expect(result.paymentReferenceRequest.gateway).toBe('paypal')
+            expect(result.paymentReferenceRequest.gatewayProperties.paypal).toEqual({
+                shippingPreference: 'GET_FROM_FILE'
+            })
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage when storePaymentMethod is true', () => {
@@ -1208,9 +1216,9 @@ describe('sf-payments-utils', () => {
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-                'on_session'
-            )
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({
+                setupFutureUsage: 'on_session'
+            })
         })
 
         test('includes gateway and gatewayProperties.stripe.setup_future_usage as off_session when futureUsageOffSession is true', () => {
@@ -1229,9 +1237,9 @@ describe('sf-payments-utils', () => {
 
             // Both gateway and gatewayProperties should be included (verified format with backend)
             expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-                'off_session'
-            )
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({
+                setupFutureUsage: 'off_session'
+            })
         })
 
         test('does not include gatewayProperties when storePaymentMethod is false and futureUsageOffSession is false', () => {
@@ -1263,41 +1271,6 @@ describe('sf-payments-utils', () => {
             expect(result.paymentReferenceRequest.shippingPreference).toBeUndefined()
         })
 
-        test('includes gateway for Adyen when storePaymentMethod is true', () => {
-            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
-            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
-            const result = createPaymentInstrumentBody({
-                amount: 100.0,
-                paymentMethodType: 'card',
-                zoneId: 'default',
-                shippingPreference: undefined,
-                storePaymentMethod: true,
-                futureUsageOffSession: false,
-                paymentMethods,
-                paymentMethodSetAccounts
-            })
-
-            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
-            expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
-        })
-
-        test('does not include gateway for Adyen when storePaymentMethod is false', () => {
-            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
-            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
-            const result = createPaymentInstrumentBody({
-                amount: 100.0,
-                paymentMethodType: 'card',
-                zoneId: 'default',
-                shippingPreference: undefined,
-                storePaymentMethod: false,
-                futureUsageOffSession: false,
-                paymentMethods,
-                paymentMethodSetAccounts
-            })
-
-            expect(result.paymentReferenceRequest.gateway).toBeUndefined()
-        })
-
         test('does not include setupFutureUsage in POST request even when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
@@ -1319,9 +1292,9 @@ describe('sf-payments-utils', () => {
     })
 
     describe('getGatewayFromPaymentMethod', () => {
-        test('returns null for PayPal payment method type', () => {
+        test('returns Paypal for PayPal gateway', () => {
             const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct'}]
-            const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'paypal_acct'}]
+            const paymentMethodSetAccounts = [{vendor: 'Paypal', accountId: 'paypal_acct'}]
 
             const result = getGatewayFromPaymentMethod(
                 'paypal',
@@ -1329,20 +1302,7 @@ describe('sf-payments-utils', () => {
                 paymentMethodSetAccounts
             )
 
-            expect(result).toBeNull()
-        })
-
-        test('returns null for Venmo payment method type', () => {
-            const paymentMethods = [{paymentMethodType: 'venmo', accountId: 'venmo_acct'}]
-            const paymentMethodSetAccounts = [{vendor: 'PayPal', accountId: 'venmo_acct'}]
-
-            const result = getGatewayFromPaymentMethod(
-                'venmo',
-                paymentMethods,
-                paymentMethodSetAccounts
-            )
-
-            expect(result).toBeNull()
+            expect(result).toBe('paypal')
         })
 
         test('returns Stripe for Stripe gateway', () => {
@@ -1490,6 +1450,303 @@ describe('sf-payments-utils', () => {
             expect(getClientSecret(undefined)).toBeUndefined()
             expect(getClientSecret({})).toBeUndefined()
             expect(getClientSecret({paymentReference: {}})).toBeUndefined()
+        })
+    })
+
+    describe('transformPaymentMethodReferences', () => {
+        test('returns empty array when customer is null', () => {
+            const result = transformPaymentMethodReferences(null, {})
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array when customer is undefined', () => {
+            const result = transformPaymentMethodReferences(undefined, {})
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array when customer has no paymentMethodReferences', () => {
+            const result = transformPaymentMethodReferences({}, {})
+            expect(result).toEqual([])
+        })
+
+        test('transforms payment method reference with brand and last4', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0]).toEqual({
+                accountId: 'stripe-account-1',
+                name: 'Visa •••• 4242',
+                status: 'Active',
+                isDefault: false,
+                type: 'card',
+                accountHolderName: null,
+                id: 'pm_123',
+                gatewayTokenId: 'pm_123',
+                usageType: 'OffSession',
+                gatewayId: 'stripe-account-1',
+                gatewayCustomerId: null,
+                last4: '4242',
+                network: 'visa',
+                issuer: null,
+                expiryMonth: null,
+                expiryYear: null,
+                bankName: null,
+                savedByMerchant: false
+            })
+        })
+
+        test('transforms payment method reference with type card and last4', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_456',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        last4: '1234'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('Card •••• 1234')
+        })
+
+        test('transforms payment method reference with sepa_debit type', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_789',
+                        accountId: 'stripe-account-1',
+                        type: 'sepa_debit',
+                        last4: '5678'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('Account ending in 5678')
+        })
+
+        test('uses default name when brand and last4 are missing', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_999',
+                        accountId: 'stripe-account-1',
+                        type: 'card'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('Saved Payment Method')
+        })
+
+        test('filters out payment methods without matching account', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    },
+                    {
+                        id: 'pm_456',
+                        accountId: 'non-existent-account',
+                        type: 'card',
+                        brand: 'mastercard',
+                        last4: '5555'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].id).toBe('pm_123')
+        })
+
+        test('filters out payment methods without accountId', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    },
+                    {
+                        id: 'pm_456',
+                        type: 'card',
+                        brand: 'mastercard',
+                        last4: '5555'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].id).toBe('pm_123')
+        })
+
+        test('filters out payment methods when paymentMethodSetAccounts is empty', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: []
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(0)
+        })
+
+        test('uses accountId for gatewayId', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].gatewayId).toBe('stripe-account-1')
+        })
+
+        test('transforms multiple payment method references', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {
+                        id: 'pm_123',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'visa',
+                        last4: '4242'
+                    },
+                    {
+                        id: 'pm_456',
+                        accountId: 'stripe-account-1',
+                        type: 'card',
+                        brand: 'mastercard',
+                        last4: '5555'
+                    }
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {
+                        accountId: 'stripe-account-1',
+                        gatewayId: 'stripe-account-1',
+                        vendor: 'Stripe'
+                    }
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toHaveLength(2)
+            expect(result[0].name).toBe('Visa •••• 4242')
+            expect(result[1].name).toBe('Mastercard •••• 5555')
         })
     })
 })

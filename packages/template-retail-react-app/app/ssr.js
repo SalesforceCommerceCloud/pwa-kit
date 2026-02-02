@@ -339,6 +339,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.c360a.salesforce.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
+                        // Payment gateways
+                        '*.adyen.com',
                         // TODO: Used to load metadata
                         '*.demandware.net',
                         '*.adyen.com',
@@ -351,7 +353,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com',
+                        '*.google.com',,
+                        '*.adyen.com'
                     ]
                 }
             }

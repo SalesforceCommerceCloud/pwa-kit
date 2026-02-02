@@ -48,9 +48,11 @@ import {
     buildTheme,
     getSFPaymentsInstrument,
     createPaymentInstrumentBody,
-    getClientSecret
+    transformPaymentMethodReferences,
+    getGatewayFromPaymentMethod
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
     const {onRequiresPayButtonChange, onCreateOrder, onError} = props
@@ -60,7 +62,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer} = useCurrentCustomer(['paymentmethodreferences'])
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -127,13 +129,27 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const paymentMethodType = useRef(null)
     const currentBasket = useRef(null)
     const savePaymentMethodRef = useRef(false)
+    const updatedOrder = useRef(null)
+    const gateway = useRef(null)
 
     const handlePaymentMethodSelected = (evt) => {
+        // Track selected payment method
         paymentMethodType.current = evt.detail.selectedPaymentMethod
+
+        // Determine gateway for selected payment method
+        gateway.current = getGatewayFromPaymentMethod(
+            paymentMethodType.current,
+            paymentConfig?.paymentMethods,
+            paymentConfig?.paymentMethodSetAccounts
+        )
+
         if (evt.detail.savePaymentMethodForFutureUse !== undefined) {
+            // Track if payment method should be saved for future use
             savePaymentMethodRef.current = evt.detail.savePaymentMethodForFutureUse === true
         }
+
         if (evt.detail.requiresPayButton !== undefined && onRequiresPayButtonChange) {
+            // Notify listener whether pay button is required
             onRequiresPayButtonChange(evt.detail.requiresPayButton)
         }
     }
@@ -145,12 +161,12 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             if (event?.detail?.savePaymentMethodForFutureUse !== undefined) {
                 savePaymentMethodRef.current = event.detail.savePaymentMethodForFutureUse === true
             }
-            const updatedOrder = await createAndUpdateOrder(
+            updatedOrder.current = await createAndUpdateOrder(
                 savePaymentMethodRef.current && customer?.isRegistered
             )
             // Clear the ref after successful order creation
             currentBasket.current = null
-            navigate(`/checkout/confirmation/${updatedOrder.orderNo}`)
+            navigate(`/checkout/confirmation/${updatedOrder.current.orderNo}`)
         } catch (error) {
             const message = formatMessage({
                 id: 'checkout.message.generic_error',
@@ -210,44 +226,120 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         })
     }
 
-    const createPaymentInstrument = async () => {
-        let updatedBasket = await onBillingSubmit()
+    const createBasketPaymentInstrument = async () => {
+        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
+        // submit, `undefined` is returned.
+        const updatedBasket = await onBillingSubmit()
+
+        if (!updatedBasket) {
+            throw new Error('Billing form errors')
+        }
+
+        // Store the updated basket for potential cleanup on cancel
+        currentBasket.current = updatedBasket
 
         // Remove any existing Salesforce Payments instruments first
         await removeSFPaymentsInstruments(updatedBasket)
 
-        updatedBasket = await addPaymentInstrumentToBasket({
+        // Create SF Payments basket payment instrument
+        return await addPaymentInstrumentToBasket({
             parameters: {basketId: updatedBasket.basketId},
             body: createPaymentInstrumentBody({
                 amount: updatedBasket.orderTotal,
                 paymentMethodType: paymentMethodType.current,
                 zoneId,
                 shippingPreference: 'SET_PROVIDED_ADDRESS',
+                paymentData: null,
                 storePaymentMethod: false,
                 futureUsageOffSession,
                 paymentMethods: paymentConfig?.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
-                isPostRequest: true // never include setupFutureUsage in POST
+                isPostRequest: true
             })
         })
-
-        // Store the updated basket for potential cleanup on cancel
-        currentBasket.current = updatedBasket
-
-        // Find SF Payments payment instrument
-        const updatedBasketPaymentInstrument = getSFPaymentsInstrument(updatedBasket)
-
-        return {
-            id: updatedBasketPaymentInstrument.paymentReference?.paymentReferenceId
-        }
     }
 
-    const createAndUpdateOrder = async (shouldSavePaymentMethod = false) => {
+    const createIntent = async (paymentData) => {
+        if (gateway.current === PAYMENT_GATEWAYS.PAYPAL) {
+            // Create SF Payments basket payment instrument referencing PayPal order
+            const updatedBasket = await createBasketPaymentInstrument()
+
+            // Find payment instrument in updated basket
+            const basketPaymentInstrument = getSFPaymentsInstrument(updatedBasket)
+
+            // Return PayPal order information
+            return {
+                id: basketPaymentInstrument.paymentReference.paymentReferenceId
+            }
+        }
+
+        // For Stripe and Adyen, update order payment instrument to create payment
+        const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+        updatedOrder.current = await createAndUpdateOrder(shouldSavePaymentMethod, paymentData)
+
+        // Find updated SF Payments payment instrument in updated order
+        const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder.current)
+
+        let paymentIntent
+        if (gateway.current === PAYMENT_GATEWAYS.STRIPE) {
+            // Track created payment intent
+            paymentIntent = {
+                id: orderPaymentInstrument.paymentReference.paymentReferenceId,
+                client_secret:
+                    orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
+                        ?.clientSecret
+            }
+
+            // Read setup_future_usage from backend response, fallback to manual calculation if not available
+            // TODO: The fallback is temporary that's to be removed in next iteration.
+            const setupFutureUsage =
+                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
+                    ?.setup_future_usage
+            if (setupFutureUsage) {
+                paymentIntent.setup_future_usage = setupFutureUsage
+            } else if (futureUsageOffSession) {
+                paymentIntent.setup_future_usage = 'off_session'
+            } else if (shouldSavePaymentMethod) {
+                paymentIntent.setup_future_usage = 'on_session'
+            }
+
+            // Update the redirect return URL to include the related order no
+            config.current.options.returnUrl +=
+                '?orderNo=' + encodeURIComponent(updatedOrder.current.orderNo)
+        } else if (gateway.current === PAYMENT_GATEWAYS.ADYEN) {
+            // Track created Adyen payment
+            paymentIntent = {
+                pspReference:
+                    orderPaymentInstrument.paymentReference.gatewayProperties.adyen
+                        .adyenPaymentIntent.id,
+                resultCode:
+                    orderPaymentInstrument.paymentReference.gatewayProperties.adyen
+                        .adyenPaymentIntent.resultCode,
+                action: orderPaymentInstrument.paymentReference.gatewayProperties.adyen
+                    .adyenPaymentIntent.adyenPaymentIntentAction
+            }
+        }
+
+        return paymentIntent
+    }
+
+    const createAndUpdateOrder = async (shouldSavePaymentMethod = false, paymentData = null) => {
         // Create order from the basket
-        const order = await onCreateOrder()
+        let order = await onCreateOrder()
 
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
+
+        if (gateway.current === PAYMENT_GATEWAYS.ADYEN) {
+            // Append necessary data to Adyen redirect return URL
+            paymentData.returnUrl +=
+                '&orderNo=' +
+                encodeURIComponent(order.orderNo) +
+                '&zoneId=' +
+                encodeURIComponent(paymentConfig?.zoneId) +
+                '&type=' +
+                encodeURIComponent(paymentMethodType.current)
+        }
 
         try {
             // Update order payment instrument to create payment
@@ -256,13 +348,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 paymentMethodType: paymentMethodType.current,
                 zoneId,
                 shippingPreference: null,
+                paymentData,
                 storePaymentMethod: shouldSavePaymentMethod,
                 futureUsageOffSession,
                 paymentMethods: paymentConfig?.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts
             })
 
-            const updatedOrder = await updatePaymentInstrumentForOrder({
+            order = await updatePaymentInstrumentForOrder({
                 parameters: {
                     orderNo: order.orderNo,
                     paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
@@ -270,7 +363,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 body: paymentInstrumentBody
             })
 
-            return updatedOrder
+            return order
         } catch (error) {
             const statusCode = error?.response?.status || error?.status
             const errorMessage = error?.message || error?.response?.data?.message || 'Unknown error'
@@ -318,109 +411,49 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     }
 
     const confirmPayment = async () => {
-        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
-        // submit, `undefined` is returned.
-        const updatedBasket = await onBillingSubmit()
+        // Create SF Payments basket payment instrument before creating order
+        const updatedBasket = await createBasketPaymentInstrument()
 
-        if (!updatedBasket) {
-            throw new Error('Billing form errors')
+        // Create payment billing details from basket
+        const billingDetails = {}
+
+        if (updatedBasket.customerInfo) {
+            billingDetails.email = updatedBasket.customerInfo.email
+        }
+
+        if (updatedBasket.billingAddress) {
+            billingDetails.phone = updatedBasket.billingAddress.phone
+            billingDetails.name = updatedBasket.billingAddress.fullName
+            billingDetails.address = {
+                line1: updatedBasket.billingAddress.address1,
+                line2: updatedBasket.billingAddress.address2,
+                city: updatedBasket.billingAddress.city,
+                state: updatedBasket.billingAddress.stateCode,
+                postalCode: updatedBasket.billingAddress.postalCode,
+                country: updatedBasket.billingAddress.countryCode
+            }
+        }
+
+        // Create payment shipping details from basket
+        const shippingDetails = {}
+        if (updatedBasket.shipments?.[0].shippingAddress) {
+            shippingDetails.name = updatedBasket.shipments[0].shippingAddress.fullName
+            shippingDetails.address = {
+                line1: updatedBasket.shipments[0].shippingAddress.address1,
+                line2: updatedBasket.shipments[0].shippingAddress.address2,
+                city: updatedBasket.shipments[0].shippingAddress.city,
+                state: updatedBasket.shipments[0].shippingAddress.stateCode,
+                postalCode: updatedBasket.shipments[0].shippingAddress.postalCode,
+                country: updatedBasket.shipments[0].shippingAddress.countryCode
+            }
         }
 
         startConfirming(updatedBasket)
 
-        // Remove any existing Salesforce Payments instruments first
-        await removeSFPaymentsInstruments(updatedBasket)
-
-        // Create SF Payments basket payment instrument before creating order
-        await addPaymentInstrumentToBasket({
-            parameters: {basketId: updatedBasket.basketId},
-            body: createPaymentInstrumentBody({
-                amount: updatedBasket.orderTotal,
-                paymentMethodType: paymentMethodType.current,
-                zoneId,
-                shippingPreference: null,
-                storePaymentMethod: false,
-                futureUsageOffSession,
-                paymentMethods: paymentConfig?.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts,
-                isPostRequest: true
-            })
-        })
-
-        let updatedOrder = null
         try {
-            // Update order payment instrument to create payment
-            const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
-            updatedOrder = await createAndUpdateOrder(shouldSavePaymentMethod)
-
-            // Find updated SF Payments payment instrument in updated order
-            const orderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
-
-            // Track created payment intent
-            const paymentIntent = {
-                client_secret: getClientSecret(orderPaymentInstrument),
-                id: orderPaymentInstrument.paymentReference.paymentReferenceId
-            }
-
-            if (futureUsageOffSession) {
-                paymentIntent.setup_future_usage = 'off_session'
-            } else if (shouldSavePaymentMethod) {
-                paymentIntent.setup_future_usage = 'on_session'
-            }
-
-            // Create payment billing details from basket
-            const billingDetails = {}
-
-            if (updatedOrder.customerInfo) {
-                billingDetails.email = updatedOrder.customerInfo.email
-            }
-
-            if (updatedOrder.billingAddress) {
-                billingDetails.phone = updatedOrder.billingAddress.phone
-                billingDetails.name = updatedOrder.billingAddress.fullName
-                billingDetails.address = {
-                    line1: updatedOrder.billingAddress.address1,
-                    line2: updatedOrder.billingAddress.address2,
-                    city: updatedOrder.billingAddress.city,
-                    state: updatedOrder.billingAddress.stateCode,
-                    postalCode: updatedOrder.billingAddress.postalCode,
-                    country: updatedOrder.billingAddress.countryCode
-                }
-            }
-
-            // Create payment shipping details from basket
-            const shippingDetails = {}
-            if (updatedOrder.shipments?.[0].shippingAddress) {
-                shippingDetails.name = updatedOrder.shipments[0].shippingAddress.fullName
-                shippingDetails.address = {
-                    line1: updatedOrder.shipments[0].shippingAddress.address1,
-                    line2: updatedOrder.shipments[0].shippingAddress.address2,
-                    city: updatedOrder.shipments[0].shippingAddress.city,
-                    state: updatedOrder.shipments[0].shippingAddress.stateCode,
-                    postalCode: updatedOrder.shipments[0].shippingAddress.postalCode,
-                    country: updatedOrder.shipments[0].shippingAddress.countryCode
-                }
-            }
-
-            // Update the redirect return URL to include the related order no
-            config.current.options.returnUrl += '?orderNo=' + updatedOrder.orderNo
-
-            // Update Elements to match Payment Intent's setup_future_usage before SDK confirms
-            const paymentIntentFunction = async () => {
-                const selectedPaymentMethod = checkoutComponent.current?.selectedPaymentMethod
-                if (selectedPaymentMethod?.asSavedPaymentMethodComponent) {
-                    const spmComponent = selectedPaymentMethod.asSavedPaymentMethodComponent()
-                    if (spmComponent) {
-                        spmComponent.setSavePaymentMethodFuture(futureUsageOffSession)
-                    }
-                }
-
-                return paymentIntent
-            }
-
             // Confirm the payment
             const result = await checkoutComponent.current.confirm(
-                paymentIntentFunction,
+                null,
                 billingDetails,
                 shippingDetails
             )
@@ -432,15 +465,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // TODO: only invalidate order queries
             queryClient.invalidateQueries()
             // Finally return the created order
-            return updatedOrder
+            return updatedOrder.current
         } catch (error) {
             // Only fail order if createAndUpdateOrder succeeded but perhaps confirm fails
-            if (updatedOrder && !error.orderNo) {
+            if (updatedOrder.current && !error.orderNo) {
                 // createAndUpdateOrder succeeded but confirm failed - need to fail the order
                 try {
                     await failOrder({
                         parameters: {
-                            orderNo: updatedOrder.orderNo,
+                            orderNo: updatedOrder.current.orderNo,
                             reopenBasket: true
                         },
                         body: {
@@ -449,7 +482,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     })
                     logger.info('Order failed successfully after confirm failure', {
                         namespace: 'SFPaymentsSheet.confirmPayment',
-                        additionalProperties: {orderNo: updatedOrder.orderNo}
+                        additionalProperties: {orderNo: updatedOrder.current.orderNo}
                     })
 
                     // Show error message to user - order was failed and basket reopened
@@ -464,7 +497,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     logger.error('Failed to fail order after confirm failure', {
                         namespace: 'SFPaymentsSheet.confirmPayment',
                         additionalProperties: {
-                            orderNo: updatedOrder.orderNo,
+                            orderNo: updatedOrder.current.orderNo,
                             failOrderError
                         }
                     })
@@ -486,17 +519,29 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         confirmPayment
     }))
 
+    const savedPaymentMethods = useMemo(
+        () => transformPaymentMethodReferences(customer, paymentConfig),
+        [customer, paymentConfig]
+    )
+
     useEffect(() => {
         if (sfp && metadata && containerElementRef.current && paymentConfig) {
+            const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
+                (account) => ({
+                    ...account,
+                    gatewayId: account.accountId
+                })
+            )
+
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+                paymentMethodSetAccounts: paymentMethodSetAccounts
             }
 
             config.current = {
                 theme: buildTheme(),
                 actions: {
-                    createIntent: createPaymentInstrument,
+                    createIntent: createIntent,
                     onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
                 },
                 options: {
@@ -506,7 +551,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         customer?.isRegistered && customer?.customerId
                     ),
                     // Suppress "Make payment method default" checkbox since we don't support default SPM yet
-                    showSaveAsDefaultCheckbox: false
+                    showSaveAsDefaultCheckbox: false,
+                    savedPaymentMethods: savedPaymentMethods
                 }
             }
 
@@ -549,7 +595,9 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic,
-        customer?.isRegistered
+        customer?.isRegistered,
+        customer?.customerId,
+        savedPaymentMethods
     ])
 
     useEffect(() => {

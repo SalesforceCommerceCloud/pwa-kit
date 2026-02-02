@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
@@ -14,9 +14,27 @@ import {FormattedMessage} from 'react-intl'
 import {Heading, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
+import {useOrder, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPayments, STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {getSFPaymentsInstrument} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
+
+// const ADYEN_SUCCESS_RESULT_CODES = [
+//     'Authorised',
+//     'PartiallyAuthorised',
+//     'Received',
+//     'Pending',
+//     'PresentToShopper'
+// ]
+const ADYEN_SUCCESS_RESULT_CODES = [
+    'AUTHORISED',
+    'PARTIALLYAUTHORISED',
+    'RECEIVED',
+    'PENDING',
+    'PRESENTTOSHOPPER'
+]
 
 const PaymentProcessing = () => {
     const intl = useIntl()
@@ -25,38 +43,146 @@ const PaymentProcessing = () => {
     const {sfp} = useSFPayments()
     const toast = useToast()
 
+    const {mutateAsync: updatePaymentInstrumentForOrder} = useShopperOrdersMutation(
+        'updatePaymentInstrumentForOrder'
+    )
+    const {mutateAsync: failOrder} = useShopperOrdersMutation('failOrder')
+
     const params = new URLSearchParams(location.search)
-    const isError = !params.has('orderNo')
+    const vendor = params.get('vendor')
     const orderNo = params.get('orderNo')
+    const {data: order} = useOrder(
+        {
+            parameters: {orderNo}
+        },
+        {
+            enabled: !!orderNo
+        }
+    )
+
+    function isValidReturnUrl() {
+        switch (vendor) {
+            case 'Stripe':
+                // Stripe requires orderNo
+                return !!orderNo
+            case 'Adyen':
+                // Adyen requires orderNo, type, redirectResult, and zoneId
+                return (
+                    !!orderNo &&
+                    params.has('type') &&
+                    params.has('zoneId') &&
+                    params.has('redirectResult')
+                )
+            default:
+                // Unsupported payment gateway
+                return false
+        }
+    }
+
+    const isError = !isValidReturnUrl()
+    const isHandled = useRef(false)
+
+    async function handleAdyenRedirect() {
+        // Find SF Payments payment instrument in order
+        const orderPaymentInstrument = getSFPaymentsInstrument(order)
+
+        // Submit redirect result
+        const updatedOrder = await updatePaymentInstrumentForOrder({
+            parameters: {
+                orderNo: order.orderNo,
+                paymentInstrumentId: orderPaymentInstrument.paymentInstrumentId
+            },
+            body: {
+                paymentMethodId: 'Salesforce Payments',
+                paymentReferenceRequest: {
+                    paymentMethodType: params.get('type'),
+                    zoneId: params.get('zoneId'),
+                    gateway: PAYMENT_GATEWAYS.ADYEN,
+                    gatewayProperties: {
+                        adyen: {
+                            redirectResult: params.get('redirectResult')
+                        }
+                    }
+                }
+            }
+        })
+
+        // Find updated SF Payments payment instrument in updated order
+        const updatedOrderPaymentInstrument = getSFPaymentsInstrument(updatedOrder)
+
+        // Check if Adyen result code indicates redirect payment was successful
+        return ADYEN_SUCCESS_RESULT_CODES.includes(
+            updatedOrderPaymentInstrument?.paymentReference?.gatewayProperties?.adyen
+                ?.adyenPaymentIntent?.resultCode
+        )
+    }
+
+    async function failOrderForPayment() {
+        await failOrder({
+            parameters: {
+                orderNo,
+                reopenBasket: true
+            },
+            body: {
+                reasonCode: 'payment_confirm_failure'
+            }
+        })
+    }
+
+    function showOrderConfirmation() {
+        navigate(`/checkout/confirmation/${orderNo}`)
+    }
 
     useEffect(() => {
-        if (!isError && sfp) {
+        if (isError && order && !isHandled.current) {
+            // Ensure we don't handle the redirect twice
+            isHandled.current = true
+
+            // Order exists but payment can't be processed for return URL
+            failOrderForPayment()
+        } else if (!isError && sfp && order) {
             ;(async () => {
-                // If the URL has the necessary parameters, attempt to handle the redirect
-                const result = await sfp.handleRedirect()
-                if (result.responseCode === STATUS_SUCCESS) {
-                    // Payment was successful so navigate to order confirmation
-                    navigate(`/checkout/confirmation/${orderNo}`)
-                } else {
-                    // Show an error message that the payment was unsuccessful
-                    toast({
-                        title: intl.formatMessage({
-                            defaultMessage:
-                                'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
-                            id: 'payment_processing.error.unsuccessful'
-                        }),
-                        status: 'error',
-                        duration: 30000
-                    })
-
-                    // TODO: need to fail the order if not failed automatically by webhook
-
-                    // Navigate back to the checkout page to try again
-                    navigate('/checkout')
+                if (isHandled.current) {
+                    // Redirect already handled
+                    return
                 }
+
+                // Ensure we don't handle the redirect twice
+                isHandled.current = true
+
+                if (vendor === 'Stripe') {
+                    // Use sfp.js to attempt to handle the redirect
+                    const stripeResult = await sfp.handleRedirect()
+                    if (stripeResult.responseCode === STATUS_SUCCESS) {
+                        return showOrderConfirmation()
+                    }
+                } else if (vendor === 'Adyen') {
+                    const adyenResult = await handleAdyenRedirect()
+                    if (adyenResult) {
+                        // Redirect result submitted successfully, and we can proceed to the order confirmation
+                        return showOrderConfirmation()
+                    }
+                }
+
+                // Show an error message that the payment was unsuccessful
+                toast({
+                    title: intl.formatMessage({
+                        defaultMessage:
+                            'Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order.',
+                        id: 'payment_processing.error.unsuccessful'
+                    }),
+                    status: 'error',
+                    duration: 30000
+                })
+
+                // Attempt to fail the order
+                await failOrderForPayment()
+
+                // Navigate back to the checkout page to try again
+                navigate('/checkout')
             })()
         }
-    }, [sfp])
+    }, [sfp, order])
 
     return (
         <Stack spacing={6} height="100%" alignContent="center" justifyContent="center">

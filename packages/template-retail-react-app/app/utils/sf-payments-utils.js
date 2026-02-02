@@ -181,10 +181,6 @@ export const getGatewayFromPaymentMethod = (
     paymentMethods,
     paymentMethodSetAccounts
 ) => {
-    if (isPayPalPaymentMethodType(paymentMethodType)) {
-        return null
-    }
-
     const account = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, paymentMethodType)
     if (!account) {
         return null
@@ -195,6 +191,8 @@ export const getGatewayFromPaymentMethod = (
         return PAYMENT_GATEWAYS.STRIPE
     } else if (vendor === PAYMENT_GATEWAYS.ADYEN) {
         return PAYMENT_GATEWAYS.ADYEN
+    } else if (vendor === PAYMENT_GATEWAYS.PAYPAL) {
+        return PAYMENT_GATEWAYS.PAYPAL
     }
 
     return null
@@ -222,6 +220,7 @@ export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) =
  * @param {string} params.paymentMethodType - Type of payment method (e.g., 'card', 'paypal', 'venmo')
  * @param {string} params.zoneId - Zone ID for payment processing
  * @param {string} [params.shippingPreference] - Optional shipping preference for PayPal payment processing
+ * @param {string} [params.paymentData] - Optional Adyen client payment data object
  * @param {boolean} [params.storePaymentMethod=false] - Optional flag to save payment method for future use
  * @param {boolean} [params.futureUsageOffSession=false] - Optional flag indicating if off-session future usage is enabled (from payment config)
  * @param {Array} [params.paymentMethods] - Optional array of payment methods to determine gateway
@@ -234,6 +233,7 @@ export const createPaymentInstrumentBody = ({
     paymentMethodType,
     zoneId,
     shippingPreference,
+    paymentData = null,
     storePaymentMethod = false,
     futureUsageOffSession = false,
     paymentMethods = null,
@@ -245,15 +245,24 @@ export const createPaymentInstrumentBody = ({
         zoneId: zoneId ?? 'default'
     }
 
-    if (shippingPreference !== undefined && shippingPreference !== null) {
-        paymentReferenceRequest.shippingPreference = shippingPreference
-    }
-
     const gateway = getGatewayFromPaymentMethod(
         paymentMethodType,
         paymentMethods,
         paymentMethodSetAccounts
     )
+
+    if (
+        gateway === PAYMENT_GATEWAYS.PAYPAL &&
+        shippingPreference !== undefined &&
+        shippingPreference !== null
+    ) {
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.PAYPAL
+        paymentReferenceRequest.gatewayProperties = {
+            paypal: {
+                shippingPreference
+            }
+        }
+    }
 
     if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
         const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
@@ -261,14 +270,29 @@ export const createPaymentInstrumentBody = ({
             paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
             paymentReferenceRequest.gatewayProperties = {
                 stripe: {
-                    setupFutureUsage: setupFutureUsage
+                    setupFutureUsage
                 }
             }
         }
     }
 
-    if (gateway === PAYMENT_GATEWAYS.ADYEN && storePaymentMethod) {
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.ADYEN) {
+        // Create Adyen payment reference request
         paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
+        paymentReferenceRequest.gatewayProperties = {
+            adyen: {
+                ...(paymentData && {
+                    paymentMethod: paymentData.paymentMethod,
+                    returnUrl: paymentData.returnUrl,
+                    origin: paymentData.origin,
+                    lineItems: paymentData.lineItems,
+                    billingDetails: paymentData.billingDetails
+                }),
+                ...(storePaymentMethod === true && {
+                    storePaymentMethod: true
+                })
+            }
+        }
     }
 
     return {
@@ -276,6 +300,78 @@ export const createPaymentInstrumentBody = ({
         amount: amount,
         paymentReferenceRequest: paymentReferenceRequest
     }
+}
+
+/**
+ * Transforms payment method references from API format to SF Payments SDK format.
+ * @param {Object} customer - Customer object with paymentMethodReferences property
+ * @param {Object} paymentConfig - Payment configuration object with paymentMethodSetAccounts property
+ * @returns {Array} Transformed payment method references for SF Payments SDK
+ */
+export const transformPaymentMethodReferences = (customer, paymentConfig) => {
+    const paymentMethodReferences = customer?.paymentMethodReferences
+    const paymentMethodSetAccounts = paymentConfig?.paymentMethodSetAccounts || []
+
+    if (!Array.isArray(paymentMethodReferences) || !Array.isArray(paymentMethodSetAccounts)) {
+        return []
+    }
+
+    return paymentMethodReferences
+        .map((pmr) => {
+            const generateDisplayName = () => {
+                if (pmr.brand && pmr.last4) {
+                    const brandName = pmr.brand.charAt(0).toUpperCase() + pmr.brand.slice(1)
+                    return `${brandName} •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'card' && pmr.last4) {
+                    return `Card •••• ${pmr.last4}`
+                }
+                if (pmr.type === 'sepa_debit' && pmr.last4) {
+                    return `Account ending in ${pmr.last4}`
+                }
+                return 'Saved Payment Method'
+            }
+
+            // Determine gatewayId for SDK matching
+            if (!pmr.accountId) {
+                return null
+            }
+
+            const matchingAccount = paymentMethodSetAccounts.find(
+                (account) => account.accountId === pmr.accountId
+            )
+            if (!matchingAccount) {
+                return null
+            }
+
+            const gatewayId = matchingAccount.accountId
+
+            if (!gatewayId || typeof gatewayId !== 'string') {
+                return null
+            }
+
+            return {
+                accountId: pmr.accountId || null,
+                name: generateDisplayName(),
+                status: 'Active',
+                isDefault: false,
+                type: pmr.type || null,
+                accountHolderName: null,
+                id: pmr.id || null,
+                gatewayTokenId: pmr.id || null,
+                usageType: 'OffSession',
+                gatewayId: gatewayId,
+                gatewayCustomerId: null,
+                last4: pmr.last4 || null,
+                network: pmr.brand || null,
+                issuer: null,
+                expiryMonth: null,
+                expiryYear: null,
+                bankName: null,
+                savedByMerchant: false
+            }
+        })
+        .filter((spm) => spm !== null)
 }
 
 /**
