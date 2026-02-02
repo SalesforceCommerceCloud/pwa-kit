@@ -6,10 +6,13 @@
  */
 
 import {defineMessage} from 'react-intl'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 export const TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     defaultMessage:
@@ -39,6 +42,24 @@ const PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS = [
 const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
+
+/**
+ * Returns the absolute URL for the passwordless login callback.
+ * If the callback URI is already absolute, it is returned as-is; otherwise it is
+ * resolved against the app origin and env base path.
+ *
+ * @param {string} [callbackURI] - The callback URI from config (relative or absolute)
+ * @returns {string|undefined} - The full callback URL, or undefined if callbackURI is falsy
+ */
+export const getPasswordlessCallbackUrl = (callbackURI) => {
+    if (!callbackURI) {
+        return undefined
+    }
+    if (isAbsoluteURL(callbackURI)) {
+        return callbackURI
+    }
+    return `${getAppOrigin()}${getEnvBasePath()}${callbackURI}`
+}
 
 /**
  * Maps an error message to the appropriate user-friendly error message descriptor
