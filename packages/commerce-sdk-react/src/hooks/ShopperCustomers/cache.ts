@@ -67,6 +67,36 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
+    updateCustomerPaymentInstrument(customerId, {parameters}, response) {
+        const newParams = {...parameters}
+        return {
+            update: [
+                {
+                    queryKey: getCustomerPaymentInstrument.queryKey(newParams)
+                },
+                {
+                    queryKey: getCustomer.queryKey(newParams),
+                    updater: createUpdateFunction((customer: Customer) => {
+                        if (!customer.paymentInstruments) return customer
+                        const idx = customer.paymentInstruments.findIndex(
+                            ({paymentInstrumentId}) =>
+                                paymentInstrumentId === parameters.paymentInstrumentId
+                        )
+                        if (idx >= 0) {
+                            customer.paymentInstruments[idx] = response as any
+                            // If this instrument is now default, unset others
+                            if ((response as any)?.default) {
+                                customer.paymentInstruments = customer.paymentInstruments.map(
+                                    (pi, i) => (i === idx ? pi : {...pi, default: false})
+                                ) as any
+                            }
+                        }
+                        return customer
+                    })
+                }
+            ]
+        }
+    },
     createCustomerPaymentInstrument(customerId, {parameters}, response) {
         const newParams = {...parameters, paymentInstrumentId: response.paymentInstrumentId}
         return {
