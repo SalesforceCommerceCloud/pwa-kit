@@ -53,54 +53,6 @@
   "account.title.my_account": {
     "defaultMessage": "My Account"
   },
-  "account.payments.action.refresh": {
-    "defaultMessage": "Refresh"
-  },
-  "account.payments.action.retry": {
-    "defaultMessage": "Retry"
-  },
-  "account.payments.badge.default": {
-    "defaultMessage": "Default"
-  },
-  "account.payments.checkbox.make_default": {
-    "defaultMessage": "Make default"
-  },
-  "account.payments.error.payment_method_remove_failed": {
-    "defaultMessage": "We couldn't remove the payment method. Try again."
-  },
-  "account.payments.error.payment_method_save_failed": {
-    "defaultMessage": "We couldn't save the payment method. Try again."
-  },
-  "account.payments.error.set_default_failed": {
-    "defaultMessage": "We couldnt make the payment method as default. Try again."
-  },
-  "account.payments.heading.payment_methods": {
-    "defaultMessage": "Payment Methods"
-  },
-  "account.payments.info.default_payment_updated": {
-    "defaultMessage": "Payment method was made as default."
-  },
-  "account.payments.info.payment_method_removed": {
-    "defaultMessage": "Payment method was removed."
-  },
-  "account.payments.info.payment_method_saved": {
-    "defaultMessage": "New payment method was saved."
-  },
-  "account.payments.message.error": {
-    "defaultMessage": "We couldn't load the payment methods. Try again."
-  },
-  "account.payments.message.loading": {
-    "defaultMessage": "Loading payment methods..."
-  },
-  "account.payments.placeholder.heading": {
-    "defaultMessage": "No Saved Payment Methods"
-  },
-  "account.payments.placeholder.text": {
-    "defaultMessage": "Add a new payment method to check out faster."
-  },
-  "account.title.my_account": {
-    "defaultMessage": "My Account"
-  },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"
   },
