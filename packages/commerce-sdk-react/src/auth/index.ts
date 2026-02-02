@@ -1548,8 +1548,6 @@ class Auth {
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore TODO: user_id is optional, but commerce-sdk-isomorphic expects it to be required. Remove this comment after commerce-sdk-isomorphic is updated.
         return await slasClient.startWebauthnAuthentication(options)
     }
 
