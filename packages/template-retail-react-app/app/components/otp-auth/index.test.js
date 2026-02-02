@@ -82,7 +82,10 @@ describe('OtpAuth', () => {
         mockGetUsidWhenReady.mockResolvedValue('mock-usid-12345')
         mockGetEncUserIdWhenReady.mockResolvedValue('mock-enc-user-id')
         mockUseCurrentCustomer.mockReturnValue({
-            data: null // Default to guest user
+            data: {
+                customerId: 'mock-customer-id',
+                customerType: 'guest'
+            }
         })
 
         jest.clearAllMocks()
@@ -505,7 +508,12 @@ describe('OtpAuth', () => {
 
     describe('Einstein Tracking - Privacy-Compliant User Identification', () => {
         test('uses USID for guest users when DNT is disabled', async () => {
-            mockUseCurrentCustomer.mockReturnValue({data: null})
+            mockUseCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-customer-id',
+                    customerType: 'guest'
+                }
+            })
 
             renderWithProviders(
                 <OtpAuth

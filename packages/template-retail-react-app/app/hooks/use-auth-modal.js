@@ -42,6 +42,7 @@ import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-passw
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
@@ -72,7 +73,7 @@ export const AuthModal = ({
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
     const prevAuthType = usePrevious(customerType)
-
+    const {loginWithPasskey} = usePasskeyLogin()
     const customer = useCustomer(
         {parameters: {customerId}},
         {enabled: !!customerId && isRegistered}
@@ -207,6 +208,10 @@ export const AuthModal = ({
         if (isOpen) {
             setCurrentView(initialView)
             form.reset()
+            // Prompt user to login without username (discoverable credentials)
+            loginWithPasskey().catch((error) => {
+                // TODO W-21056536: Add error message handling
+            })
         }
     }, [isOpen])
 
@@ -381,7 +386,7 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const {passwordless = {}, social = {}, passkey = {}} = getConfig().app.login || {}
 
     return {
         initialView,

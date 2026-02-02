@@ -6,10 +6,13 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {rest} from 'msw'
+
+// Unmock the component so we can test it
+jest.unmock('@salesforce/retail-react-app/app/components/passkey-registration-modal')
+import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal/index'
 
 // Mock Commerce SDK hooks
 const mockMutateAsync = jest.fn()
@@ -78,12 +81,33 @@ describe('PasskeyRegistrationModal', () => {
             create: jest.fn()
         }
 
+        // Mock PublicKeyCredential API
+        global.PublicKeyCredential = {
+            parseCreationOptionsFromJSON: jest.fn((options) => ({
+                challenge: new Uint8Array([1, 2, 3]),
+                rp: {name: 'Test RP', id: 'example.com'},
+                user: {
+                    id: new Uint8Array([4, 5, 6]),
+                    name: 'test@example.com',
+                    displayName: 'Test User'
+                },
+                pubKeyCredParams: [{type: 'public-key', alg: -7}],
+                ...options
+            })),
+            isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true),
+            isConditionalMediationAvailable: jest.fn().mockResolvedValue(true)
+        }
+
         // Mock product API calls that may be triggered by components in the provider tree
         global.server.use(
             rest.get('*/products*', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.status(200), ctx.json({data: []}))
             })
         )
+    })
+
+    afterEach(() => {
+        delete global.PublicKeyCredential
     })
 
     describe('Rendering', () => {

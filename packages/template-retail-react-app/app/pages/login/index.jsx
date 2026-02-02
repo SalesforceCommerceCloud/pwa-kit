@@ -27,6 +27,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
@@ -82,6 +83,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
     const [redirectPath, setRedirectPath] = useState('')
     const {showToast} = usePasskeyRegistration()
+    const {loginWithPasskey} = usePasskeyLogin()
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -214,6 +216,14 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         // Navigate immediately if passkey is not enabled or not available
         navigate(redirectTo)
     }, [isRegistered, redirectPath])
+
+    useEffect(() => {
+        try {
+            loginWithPasskey()
+        } catch (error) {
+            // TODO W-21056536: Add error message handling
+        }
+    }, [])
 
     /**************** Einstein ****************/
     useEffect(() => {

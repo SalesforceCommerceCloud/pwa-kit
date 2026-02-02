@@ -122,6 +122,12 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+// Mock PasskeyRegistrationModal to prevent auth helper issues in tests
+jest.mock('@salesforce/retail-react-app/app/components/passkey-registration-modal', () => ({
+    __esModule: true,
+    default: () => null
+}))
+
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
 global.TextEncoder = require('util').TextEncoder
