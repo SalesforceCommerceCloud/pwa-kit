@@ -1278,16 +1278,16 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
-        const slasClient = this.client
         const usid = this.get('usid')
         // Default to 'callback' mode for backward compatibility as older versions of the template-retail-react-app
         // do not pass the mode parameter. Newer versions should explicitly pass the mode.
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
 
-        const options = {
-            headers: {
-                Authorization: ''
+        const res = await helpers.authorizePasswordless({
+            slasClient: this.client,
+            credentials: {
+                clientSecret: this.clientSecret
             },
             parameters: {
                 ...(callbackURI && {callbackURI}),
