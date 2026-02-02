@@ -54,9 +54,15 @@ module.exports = {
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
+            /*parameters: {
+                clientId: '0bb3af38-b52c-4f4b-966e-fe7087ca47e2',
+                organizationId: 'f_ecom_zyoe_006',
+                shortCode: 'sandbox-001',
+                siteId: 'RefArch'
+            }*/
             parameters: {
-                clientId: 'da84f620-2f8f-410b-a860-e1d9a07cf7b4',
-                organizationId: 'f_ecom_zyoe_005',
+                clientId: 'cc62dfa8-777f-486a-8af2-bdc048a4ba52',
+                organizationId: 'f_ecom_zyoe_009',
                 shortCode: 'sandbox-001',
                 siteId: 'RefArch'
             }
@@ -82,9 +88,9 @@ module.exports = {
         multishipEnabled: true,
         sfPayments: {
             enabled: true,
-            sdkUrl: 'https://zyoe-005.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            sdkUrl: 'https://zyoe-009.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             metadataUrl:
-                'https://zyoe-005.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+                'https://zyoe-009.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             // sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             // metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-RefArch-Site/-/default/v0/sfp/sfp.js',
@@ -111,7 +117,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zyoe-005.dx.commercecloud.salesforce.com',
+                host: 'zyoe-009.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]

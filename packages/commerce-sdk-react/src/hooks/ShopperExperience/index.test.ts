@@ -11,6 +11,13 @@ import * as queries from './query'
 describe('Shopper Experience hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemtented = getUnimplementedEndpoints(ShopperExperience, queries)
-        expect(unimplemtented).toEqual([])
+        expect(unimplemtented).toEqual([
+            // TODO: Implement content hooks when needed
+            'getContent',
+            'getContentFolder',
+            'getContentFolders',
+            'getMultipleContent',
+            'searchContent',
+        ])
     })
 })

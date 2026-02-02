@@ -327,6 +327,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Payment gateways
                         '*.stripe.com',
                         '*.paypal.com',
+                        '*.adyen.com',
+                        '*.google.com',
                         // TODO: Used to load a valid sfp.js
                         '*.demandware.net'
                     ],
@@ -338,14 +340,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // TODO: Used to load metadata
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        '*.adyen.com',
+                        '*.google.com',
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
                         // Payment gateways
                         '*.stripe.com',
-                        '*.paypal.com'
+                        '*.paypal.com',
+                        '*.adyen.com',
+                        '*.google.com',
                     ]
                 }
             }
@@ -416,7 +422,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             // Parse the URL to extract hostname and path
             const url = new URL(config.app.sfPayments.metadataUrl)
-
+console.log('url', url)
+console.log('config.app.sfPayments.metadataUrl', config.app.sfPayments.metadataUrl)
             // Use Node's https module instead of fetch
             const data = await new Promise((resolve, reject) => {
                 const options = {

@@ -57,12 +57,17 @@ const SFPaymentsExpressButtons = ({
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency: paymentCurrency,
-            countryCode: paymentCountryCode || fallbackCountryCode || 'US' // TODO: remove US when parameter made optional
+            countryCode: paymentCountryCode || fallbackCountryCode || 'US', // TODO: remove US when parameter made optional
+            //amount: 99.99  // <-- add the transaction amount
         }
     })
 
     const cardCaptureAutomatic = useAutomaticCapture()
-    const zoneId = useShopperConfiguration('zoneId')
+    //const zoneId = useShopperConfiguration('zoneId')
+    // Get zoneId from payment configuration if available, otherwise fall back to shopper configuration
+    const zoneIdFromConfig = useShopperConfiguration('zoneId')
+    console.log('paymentConfig:', JSON.stringify(paymentConfig, null, 2))
+    const zoneId = paymentConfig?.zoneId || zoneIdFromConfig
 
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
         'updateBillingAddressForBasket'
@@ -202,9 +207,11 @@ const SFPaymentsExpressButtons = ({
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody(
-                order.orderTotal,
-                paymentType,
-                zoneIdValue
+                {
+                    amount: order.orderTotal,
+                    paymentMethodType: paymentType,
+                    zoneId: zoneIdValue
+                }
             )
 
             // Update order payment instrument to create payment
@@ -565,9 +572,11 @@ const SFPaymentsExpressButtons = ({
                             expressBasket.current = await addPaymentInstrumentToBasket({
                                 parameters: {basketId: updatedBasket.basketId},
                                 body: createPaymentInstrumentBody(
-                                    updatedBasket.orderTotal || updatedBasket.productSubTotal, // Use updatedBasket instead of expressBasket.current
-                                    paymentMethodType,
-                                    zoneId
+                                    {
+                                        amount: updatedBasket.orderTotal || updatedBasket.productSubTotal,
+                                        paymentMethodType: paymentMethodType,
+                                        zoneId: zoneId
+                                    }
                                 )
                             })
                         } catch (error) {
@@ -599,6 +608,71 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
+
+ /**
+     * Ensures a Salesforce Payments payment instrument exists in the basket.
+     * If one doesn't exist, removes any existing one and adds a new one.
+     * @param {Object} basket - The basket object
+     * @param {string} paymentMethodType - Type of payment method
+     * @param {string} zoneId - Zone ID for payment processing
+     * @returns {Promise<Object>} Updated basket with payment instrument
+     */
+ const ensurePaymentInstrumentInBasket = async (basket, paymentMethodType, zoneId) => {
+    // Check if payment instrument already exists
+    let sfPaymentsInstrument = getSFPaymentsInstrument(basket)
+    
+    if (sfPaymentsInstrument) {
+        // Payment instrument already exists, return basket as-is
+        return basket
+    }
+    
+    // Remove any existing Salesforce Payments payment instrument first
+    sfPaymentsInstrument = getSFPaymentsInstrument(basket)
+    if (sfPaymentsInstrument) {
+        basket = await removePaymentInstrumentFromBasket({
+            parameters: {
+                basketId: basket.basketId,
+                paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
+            }
+        })
+    }
+    
+    // Add Salesforce Payments payment instrument to basket
+    try {
+        basket = await addPaymentInstrumentToBasket({
+            parameters: {basketId: basket.basketId},
+            body: createPaymentInstrumentBody({
+                amount: basket.orderTotal || basket.productSubTotal,
+                paymentMethodType: paymentMethodType,
+                zoneId: zoneId
+            })
+        })
+    } catch (error) {
+        const statusCode = error?.response?.status || error?.status
+        const errorMessage =
+            error?.message || error?.response?.data?.message || 'Unknown error'
+        const errorDetails = error?.response?.data || error?.body || {}
+
+        logger.error('Failed to add payment instrument to basket', {
+            namespace: 'SFPaymentsExpressButtons.ensurePaymentInstrumentInBasket',
+            additionalProperties: {
+                statusCode,
+                errorMessage,
+                errorDetails,
+                basketId: basket?.basketId,
+                paymentMethodType,
+                orderTotal: basket?.orderTotal,
+                productSubTotal: basket?.productSubTotal,
+                error: error
+            }
+        })
+        showErrorMessage(ERROR_MESSAGE_KEYS.PROCESS_PAYMENT)
+        throw error
+    }
+    
+    return basket
+}
+            
             const createIntentFunction = async () => {
                 // For PayPal/Venmo, prepare basket here since createIntentFunction is called after button click
                 if (isPayPalPaymentMethodType(paymentMethodType)) {
@@ -631,11 +705,12 @@ const SFPaymentsExpressButtons = ({
                         expressBasket.current = await addPaymentInstrumentToBasket({
                             parameters: {basketId: expressBasket.current.basketId},
                             body: createPaymentInstrumentBody(
-                                expressBasket.current.orderTotal ||
+                            {
+                                amount: expressBasket.current.orderTotal ||
                                     expressBasket.current.productSubTotal,
-                                paymentMethodType,
-                                zoneId
-                            )
+                                paymentMethodType: paymentMethodType,
+                                zoneId: zoneId
+                            })
                         })
                     } catch (error) {
                         const statusCode = error?.response?.status || error?.status
@@ -662,6 +737,18 @@ const SFPaymentsExpressButtons = ({
                     }
                     updatedPaymentInstrument = getSFPaymentsInstrument(expressBasket.current)
                 } else {
+
+                    ///TEST COODE
+                    console.log('paymentMethodType', paymentMethodType)
+                    console.log('ensurePaymentInstrumentInBasket', zoneId)
+                    // For non-PayPal methods, ensure payment instrument exists in basket
+                    // (e.g., Stripe adds it in onPayerApprove, but Adyen may not call onPayerApprove before createIntentFunction)
+                    expressBasket.current = await ensurePaymentInstrumentInBasket(
+                        expressBasket.current,
+                        paymentMethodType,
+                        zoneId
+                    )
+
                     // Create order and update payment instrument
                     try {
                         const order = await createOrderAndUpdatePayment(
@@ -739,9 +826,20 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
-            const paymentMethodSet = {
+            const paymentMethodSetOld = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
+            }
+            const paymentMethodSet = {
+                paymentMethods: paymentConfig.paymentMethods,
+                //test code to inject country code
+                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts?.map((account) => ({
+                    ...account,
+                    config: {
+                        ...account.config,
+                        country: paymentCountryCode || fallbackCountryCode || 'US'  // Inject country here
+                    }
+                })) || []
             }
 
             const config = {
