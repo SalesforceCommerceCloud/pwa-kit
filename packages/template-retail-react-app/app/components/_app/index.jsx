@@ -90,6 +90,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -288,6 +289,8 @@ const App = (props) => {
         history.push(path)
     }
 
+    const {actions: shopperAgentActions} = useShopperAgent()
+
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
     }
@@ -342,7 +345,7 @@ const App = (props) => {
                                 <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
                                 {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                                For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
                                 {site.l10n?.supportedLocales.map((locale) => (
                                     <link
                                         rel="alternate"
@@ -404,6 +407,7 @@ const App = (props) => {
                                                     onMyAccountClick={onAccountClick}
                                                     onWishlistClick={onWishlistClick}
                                                     onStoreLocatorClick={onOpenStoreLocator}
+                                                    onAgentClick={shopperAgentActions.open}
                                                 >
                                                     <HideOnDesktop>
                                                         <DrawerMenu

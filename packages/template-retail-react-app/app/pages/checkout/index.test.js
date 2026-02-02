@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import Checkout from '@salesforce/retail-react-app/app/pages/checkout/index'
+import CheckoutContainer from '@salesforce/retail-react-app/app/pages/checkout/index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
@@ -53,7 +53,7 @@ const WrappedCheckout = () => {
     return (
         <Switch>
             <Route exact path={createPathWithDefaults('/checkout')}>
-                <Checkout />
+                <CheckoutContainer />
             </Route>
             <Route
                 exact
@@ -211,7 +211,7 @@ afterEach(() => {
 })
 
 test('Renders skeleton until customer and basket are loaded', () => {
-    const {getByTestId, queryByTestId} = renderWithProviders(<Checkout />)
+    const {getByTestId, queryByTestId} = renderWithProviders(<CheckoutContainer />)
 
     expect(getByTestId('sf-checkout-skeleton')).toBeInTheDocument()
     expect(queryByTestId('sf-checkout-container')).not.toBeInTheDocument()

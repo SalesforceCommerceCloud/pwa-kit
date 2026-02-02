@@ -31,7 +31,7 @@ export const isPickupMethod = (shippingMethod) => {
  * @returns {boolean} true if the shipment is configured for pickup-in-store.
  */
 export const isPickupShipment = (shipment) => {
-    return isPickupMethod(shipment?.shippingMethod)
+    return isPickupMethod(shipment?.shippingMethod) || !!shipment?.c_fromStoreId
 }
 
 /**

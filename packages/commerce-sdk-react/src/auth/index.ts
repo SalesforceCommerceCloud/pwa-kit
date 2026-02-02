@@ -96,10 +96,19 @@ type AuthorizePasswordlessParams = {
     userid: string
     mode?: 'email' | 'callback'
     locale?: string
+    /** When true, SLAS will register the customer as part of the passwordless flow */
+    register_customer?: boolean | string
+    /** Optional registration details forwarded to SLAS when register_customer=true */
+    first_name?: string
+    last_name?: string
+    email?: string
+    phone_number?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
+    /** When true, SLAS will register the customer if not already registered */
+    register_customer?: boolean | string
 }
 
 /**
@@ -125,6 +134,8 @@ type AuthDataKeys =
     | typeof DWSID_COOKIE_NAME
     | 'code_verifier'
     | 'uido'
+    | 'idp_refresh_token'
+    | 'dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -1283,7 +1294,19 @@ class Auth {
                 ...(usid && {usid}),
                 ...(parameters.locale && {locale: parameters.locale}),
                 userid: parameters.userid,
-                mode
+                mode,
+                ...(parameters.register_customer !== undefined && {
+                    registerCustomer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? parameters.register_customer
+                            : parameters.register_customer === 'true'
+                            ? true
+                            : false
+                }),
+                ...(parameters.last_name && {lastName: parameters.last_name}),
+                ...(parameters.email && {email: parameters.email}),
+                ...(parameters.first_name && {firstName: parameters.first_name}),
+                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
             }
         })
         if (res && res.status !== 200) {
@@ -1299,6 +1322,7 @@ class Auth {
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
+        const usid = this.get('usid')
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
             credentials: {
@@ -1306,7 +1330,14 @@ class Auth {
             },
             parameters: {
                 pwdlessLoginToken,
-                dnt: dntPref !== undefined ? String(dntPref) : undefined
+                dnt: dntPref !== undefined ? String(dntPref) : undefined,
+                ...(usid && {usid}),
+                ...(parameters.register_customer !== undefined && {
+                    register_customer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? String(parameters.register_customer)
+                            : parameters.register_customer
+                })
             }
         })
         const isGuest = false

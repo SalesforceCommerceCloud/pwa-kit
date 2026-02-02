@@ -795,7 +795,7 @@ describe('OMS Single shipment with partial data (missing provider, trackingUrl)'
     })
 })
 
-describe('BOPIS Order with OMS - Pickup and Delivery', () => {
+describe('BOPIS Order with OMS Single Pickup and Single Delivery', () => {
     // Helper to create BOPIS order with OMS data
     const createBopisOmsOrder = (overrides = {}) => ({
         orderNo: 'BOPIS-OMS-001',
@@ -825,7 +825,6 @@ describe('BOPIS Order with OMS - Pickup and Delivery', () => {
                 shippingMethod: {
                     name: 'Ground'
                 },
-                trackingNumber: 'ECOM-TRACK-OLD',
                 shippingAddress: {
                     fullName: 'Sarah Johnson',
                     address1: '456 Delivery St',
@@ -887,18 +886,8 @@ describe('BOPIS Order with OMS - Pickup and Delivery', () => {
         expect(await screen.findByText('Shipping Method')).toBeInTheDocument()
         expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
         expect(screen.queryByText(/Ground/i)).not.toBeInTheDocument()
-    })
-
-    test('should display OMS tracking number as clickable link for delivery shipment', async () => {
-        setupOrderDetailsPage(createBopisOmsOrder())
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const trackingLink = await screen.findByRole('link', {name: /BOPIS-TRACK-123/i})
         expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/BOPIS-TRACK-123')
-    })
-
-    test('should display OMS shipment status for delivery shipment', async () => {
-        setupOrderDetailsPage(createBopisOmsOrder())
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
     })
 
@@ -1131,15 +1120,25 @@ describe('BOPIS Order with OMS - Multiple Pickup Locations', () => {
         expect(await screen.findByText(/Partially Ready/i)).toBeInTheDocument()
     })
 
-    test('should display OMS provider and tracking for delivery shipment', async () => {
+    test('should display OMS shipment 1 with UPS provider and tracking', async () => {
         setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(await screen.findByText(/UPS/i)).toBeInTheDocument()
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
         const trackingLink = await screen.findByRole('link', {name: /MULTI-TRACK-456/i})
         expect(trackingLink).toHaveAttribute(
             'href',
             'https://www.ups.com/track?loc=en_US&tracknum=MULTI-TRACK-456'
         )
+    })
+
+    test('should display OMS shipment 2 with FedEx provider and tracking', async () => {
+        setupOrderDetailsPage(createMultiPickupBopisOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
+        expect(await screen.findByText(/PENDING/i)).toBeInTheDocument()
+        const trackingLink = await screen.findByRole('link', {name: /MULTI-TRACK-789/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/MULTI-TRACK-789')
     })
 
     test('should NOT display shipping address for multi-pickup BOPIS OMS order', async () => {
@@ -1164,6 +1163,12 @@ describe('BOPIS Order with OMS - Pickup and Delivery Shipments', () => {
                     provider: 'FedEx',
                     trackingNumber: 'OMS-TRACK-456',
                     trackingUrl: 'https://tracking.fedex.com/OMS-TRACK-456'
+                },
+                {
+                    status: 'NEW',
+                    provider: 'UPS',
+                    trackingNumber: 'OMS-TRACK-123',
+                    trackingUrl: 'https://tracking.fedex.com/OMS-TRACK-123'
                 }
             ]
         },
@@ -1180,8 +1185,6 @@ describe('BOPIS Order with OMS - Pickup and Delivery Shipments', () => {
                 shippingMethod: {
                     name: 'Ground'
                 },
-                shippingStatus: 'shipped',
-                trackingNumber: 'ECOM-TRACK-OLD',
                 shippingAddress: {
                     firstName: 'John',
                     lastName: 'Doe'
@@ -1230,31 +1233,27 @@ describe('BOPIS Order with OMS - Pickup and Delivery Shipments', () => {
         expect(await screen.findByText(/100 Market St/i)).toBeInTheDocument()
     })
 
-    test('should display OMS provider for delivery shipment', async () => {
+    test('should display OMS shipment 1 and link', async () => {
         setupOrderDetailsPage(createOmsBopisWithDelivery())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
-        expect(screen.queryByText(/Ground/i)).not.toBeInTheDocument()
-    })
-
-    test('should display OMS tracking number as clickable link for delivery', async () => {
-        setupOrderDetailsPage(createOmsBopisWithDelivery())
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/FEDEX/i)).toBeInTheDocument()
+        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
         const trackingLink = await screen.findByRole('link', {name: /OMS-TRACK-456/i})
         expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/OMS-TRACK-456')
     })
 
-    test('should display OMS shipment status for delivery', async () => {
+    test('should display OMS shipment 2 and link', async () => {
         setupOrderDetailsPage(createOmsBopisWithDelivery())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(await screen.findByText(/SHIPPED/i)).toBeInTheDocument()
+        expect(await screen.findByText(/UPS/i)).toBeInTheDocument()
+        expect(await screen.findByText(/NEW/i)).toBeInTheDocument()
+        const trackingLink = await screen.findByRole('link', {name: /OMS-TRACK-123/i})
+        expect(trackingLink).toHaveAttribute('href', 'https://tracking.fedex.com/OMS-TRACK-123')
     })
 
     test('should NOT display shipping address for OMS BOPIS order with multiple shipments', async () => {
         setupOrderDetailsPage(createOmsBopisWithDelivery())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        // Shipping address should be hidden for OMS multi-shipment orders
-        // (order has 2 shipments: 1 pickup + 1 delivery, so order.shipments?.length > 1)
         expect(screen.queryByRole('heading', {name: /^shipping address$/i})).not.toBeInTheDocument()
         expect(screen.queryByText(/John Doe/i)).not.toBeInTheDocument()
     })

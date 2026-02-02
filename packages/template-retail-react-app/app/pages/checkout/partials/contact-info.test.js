@@ -25,6 +25,7 @@ const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
 const password = 'abc123'
 
+//jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context', () => {
 jest.mock('../util/checkout-context', () => {
     const mockGoToStep = jest.fn()
     const mockGoToNextStep = jest.fn()
