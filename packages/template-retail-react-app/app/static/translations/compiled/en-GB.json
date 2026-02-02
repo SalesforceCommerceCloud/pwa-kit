@@ -17,6 +17,90 @@
       "value": "Log Out"
     }
   ],
+  "account.payments.action.retry": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "account.payments.badge.default": [
+    {
+      "type": 0,
+      "value": "Default"
+    }
+  ],
+  "account.payments.checkbox.make_default": [
+    {
+      "type": 0,
+      "value": "Make default"
+    }
+  ],
+  "account.payments.error.payment_method_remove_failed": [
+    {
+      "type": 0,
+      "value": "We couldn't remove the payment method. Try again."
+    }
+  ],
+  "account.payments.error.payment_method_save_failed": [
+    {
+      "type": 0,
+      "value": "We couldn't save the payment method. Try again."
+    }
+  ],
+  "account.payments.error.set_default_failed": [
+    {
+      "type": 0,
+      "value": "We couldnt make the payment method as default. Try again."
+    }
+  ],
+  "account.payments.heading.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "account.payments.info.default_payment_updated": [
+    {
+      "type": 0,
+      "value": "Payment method was made as default."
+    }
+  ],
+  "account.payments.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "Payment method was removed."
+    }
+  ],
+  "account.payments.info.payment_method_saved": [
+    {
+      "type": 0,
+      "value": "New payment method was saved."
+    }
+  ],
+  "account.payments.message.error": [
+    {
+      "type": 0,
+      "value": "We couldn't load the payment methods. Try again."
+    }
+  ],
+  "account.payments.message.loading": [
+    {
+      "type": 0,
+      "value": "Loading payment methods..."
+    }
+  ],
+  "account.payments.placeholder.heading": [
+    {
+      "type": 0,
+      "value": "No Saved Payment Methods"
+    }
+  ],
+  "account.payments.placeholder.text": [
+    {
+      "type": 0,
+      "value": "Add a new payment method to check out faster."
+    }
+  ],
   "account.title.my_account": [
     {
       "type": 0,
@@ -75,6 +159,24 @@
     {
       "type": 0,
       "value": "Addresses"
+    }
+  ],
+  "account_creation_notification.body": [
+    {
+      "type": 0,
+      "value": "We’ve created and verified your account using the information from your order. Next time you check out, just enter the code we send to log in — no password needed."
+    }
+  ],
+  "account_creation_notification.title": [
+    {
+      "type": 0,
+      "value": "Account Created"
+    }
+  ],
+  "account_creation_notification.verified": [
+    {
+      "type": 0,
+      "value": "Verified"
     }
   ],
   "account_detail.title.account_details": [
@@ -289,6 +391,12 @@
       "value": "Order History"
     }
   ],
+  "account_payments.button.add_payment": [
+    {
+      "type": 0,
+      "value": "Add Payment Method"
+    }
+  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
@@ -457,6 +565,12 @@
     {
       "type": 0,
       "value": "You're now signed in."
+    }
+  ],
+  "auth_modal.description.now_signed_in_simple": [
+    {
+      "type": 0,
+      "value": "You are now signed in."
     }
   ],
   "auth_modal.error.incorrect_email_or_password": [
@@ -863,16 +977,52 @@
       "value": "Place Order"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "Please enter a billing address."
+    }
+  ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "Could not save shipping address."
+    }
+  ],
+  "checkout.label.user_registration": [
+    {
+      "type": 0,
+      "value": "Create an account to check out faster"
+    }
+  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "An unexpected error occurred during checkout."
     }
   ],
+  "checkout.message.user_registration": [
+    {
+      "type": 0,
+      "value": "Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
+    }
+  ],
+  "checkout.payment.save_payment_method": [
+    {
+      "type": 0,
+      "value": "Save this payment method for future use"
+    }
+  ],
   "checkout.title.checkout": [
     {
       "type": 0,
       "value": "Checkout"
+    }
+  ],
+  "checkout.title.user_registration": [
+    {
+      "type": 0,
+      "value": "Save Checkout Info for Future Use"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -997,6 +1147,12 @@
       "value": "Shipping"
     }
   ],
+  "checkout_confirmation.label.shipping.price": [
+    {
+      "type": 1,
+      "value": "price"
+    }
+  ],
   "checkout_confirmation.label.subtotal": [
     {
       "type": 0,
@@ -1093,6 +1249,24 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
+  "checkout_contact_info.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "checkout_contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Sign Out"
+    }
+  ],
+  "checkout_contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "Contact Info"
+    }
+  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -1151,10 +1325,28 @@
       "value": "Remove"
     }
   ],
+  "checkout_payment.button.place_order": [
+    {
+      "type": 0,
+      "value": "Place Order"
+    }
+  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
       "value": "Review Order"
+    }
+  ],
+  "checkout_payment.error.cannot_remove_applied_payment": [
+    {
+      "type": 0,
+      "value": "Could not remove the applied payment. Please try again or use the current payment to place your order."
+    }
+  ],
+  "checkout_payment.error.cannot_save_payment": [
+    {
+      "type": 0,
+      "value": "Could not save payment method. Please try again."
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -1349,6 +1541,18 @@
       "value": "Checkout as Guest"
     }
   ],
+  "contact_info.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Continue to Payment"
+    }
+  ],
+  "contact_info.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Address"
+    }
+  ],
   "contact_info.button.login": [
     {
       "type": 0,
@@ -1529,6 +1733,12 @@
     {
       "type": 0,
       "value": "Order History"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
     }
   ],
   "drawer_menu.header.assistive_msg.title": [
@@ -1855,6 +2065,12 @@
     {
       "type": 0,
       "value": "Order History"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
     }
   ],
   "global.account.link.wishlist": [
@@ -2845,6 +3061,82 @@
       "value": "Tax"
     }
   ],
+  "otp.button.cancel_guest_registration": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "otp.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Checkout as a Guest"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "Resend Code"
+    }
+  ],
+  "otp.button.resend_timer": [
+    {
+      "type": 0,
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " seconds..."
+    }
+  ],
+  "otp.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "The code is invalid or expired. Click Resend Code and try again."
+    }
+  ],
+  "otp.message.enter_code_for_account_guest": [
+    {
+      "type": 0,
+      "value": "We sent a one-time password (OTP) to your email. To create your account and proceed to checkout, enter the "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-digit code below."
+    }
+  ],
+  "otp.message.enter_code_for_account_returning": [
+    {
+      "type": 0,
+      "value": "To log in to your account, enter the code sent to your email."
+    }
+  ],
+  "otp.message.verifying": [
+    {
+      "type": 0,
+      "value": "Verifying code..."
+    }
+  ],
+  "otp.title.confirm_its_you": [
+    {
+      "type": 0,
+      "value": "Confirm it's you"
+    }
+  ],
+  "otp.title.create_account": [
+    {
+      "type": 0,
+      "value": "Create an account"
+    }
+  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2969,6 +3261,20 @@
       "value": "Password Reset Success"
     }
   ],
+  "payment_selection.button.view_all": [
+    {
+      "type": 0,
+      "value": "View All ("
+    },
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " more)"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -3009,6 +3315,12 @@
     {
       "type": 0,
       "value": "Show Products"
+    }
+  ],
+  "pickup_address.message.loading_store_info": [
+    {
+      "type": 0,
+      "value": "Loading store information…"
     }
   ],
   "pickup_address.title.pickup_address": [
@@ -3690,7 +4002,7 @@
   "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
-      "value": "Ship to Multiple Addresses"
+      "value": "Ship to multiple addresses"
     }
   ],
   "shipping_address.action.ship_to_single_address": [
@@ -3761,6 +4073,12 @@
       "value": "Your items will be shipped to multiple addresses."
     }
   ],
+  "shipping_address.summary.multiple_locations": [
+    {
+      "type": 0,
+      "value": "You are shipping to multiple locations."
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -3813,6 +4131,12 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
+    }
+  ],
+  "shipping_multi_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "Ship items to one address"
     }
   ],
   "shipping_multi_address.add_new_address.aria_label": [
@@ -3887,6 +4211,12 @@
       "value": "productName"
     }
   ],
+  "shipping_multi_address.label.note": [
+    {
+      "type": 0,
+      "value": "Note"
+    }
+  ],
   "shipping_multi_address.loading.message": [
     {
       "type": 0,
@@ -3897,6 +4227,18 @@
     {
       "type": 0,
       "value": "Loading addresses..."
+    }
+  ],
+  "shipping_multi_address.message.no_delivery_items": [
+    {
+      "type": 0,
+      "value": "There are no items to deliver. All items are pickup."
+    }
+  ],
+  "shipping_multi_address.message.pickup_items": [
+    {
+      "type": 0,
+      "value": "Some items are set for pickup and are not shown here. Only delivery items can be assigned to addresses."
     }
   ],
   "shipping_multi_address.no_addresses_available": [
@@ -3941,6 +4283,12 @@
       "value": "Continue to Payment"
     }
   ],
+  "shipping_options.error.no_shipping_methods": [
+    {
+      "type": 0,
+      "value": "No shipping methods are available for this address. Please enter a different address."
+    }
+  ],
   "shipping_options.free": [
     {
       "type": 0,
@@ -3951,6 +4299,20 @@
     {
       "type": 0,
       "value": "No shipping method selected"
+    }
+  ],
+  "shipping_options.label.shipment_number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "index"
+    },
+    {
+      "type": 0,
+      "value": ":"
     }
   ],
   "shipping_options.label.shipping_to": [
@@ -3973,6 +4335,12 @@
     {
       "type": 0,
       "value": "Shipping & Gift Options"
+    }
+  ],
+  "shipping_options.title.shipping_method": [
+    {
+      "type": 0,
+      "value": "Shipping Options"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -4283,6 +4651,12 @@
     {
       "type": 0,
       "value": ":"
+    }
+  ],
+  "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "Change"
     }
   ],
   "toggle_card.action.edit": [

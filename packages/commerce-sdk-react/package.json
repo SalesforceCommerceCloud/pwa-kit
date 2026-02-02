@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/commerce-sdk-react",
-  "version": "4.4.0-dev",
+  "version": "5.0.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
   "bugs": {
@@ -40,7 +40,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "4.2.0",
+    "commerce-sdk-isomorphic": "5.0.0-preview.1",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },
