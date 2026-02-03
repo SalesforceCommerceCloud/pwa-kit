@@ -1,3 +1,6 @@
+## v8.5.0-dev (Jan 19, 2026)
+- [Feature] One Click Checkout [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+
 ## v8.4.0-dev (Dec 17, 2025)
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
@@ -10,6 +13,7 @@
   - BOPIS multishipment with OMS [#3613] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
 - [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
+- Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)

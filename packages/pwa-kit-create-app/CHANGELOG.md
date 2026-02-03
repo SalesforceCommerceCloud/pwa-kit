@@ -1,7 +1,9 @@
 ## v3.16.0-dev (Dec 17, 2025)
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
+- Add new One-Click Checkout configuration [#3609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3609)
 - Support email mode by default for passwordless login and password reset in a generated app. [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+- Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 
 ## v3.15.0 (Dec 17, 2025)
 - Add new Google Cloud API configuration and Bonus Product configuration [#3523](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3523)

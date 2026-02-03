@@ -59,6 +59,7 @@ import '@salesforce/retail-react-app/app/assets/svg/visibility-off.svg'
 import '@salesforce/retail-react-app/app/assets/svg/heart.svg'
 import '@salesforce/retail-react-app/app/assets/svg/heart-solid.svg'
 import '@salesforce/retail-react-app/app/assets/svg/close.svg'
+import '@salesforce/retail-react-app/app/assets/svg/credit-card.svg'
 import '@salesforce/retail-react-app/app/assets/svg/sparkle.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
@@ -149,6 +150,7 @@ export const BasketIcon = icon('basket')
 export const CheckIcon = icon('check')
 export const CheckCircleIcon = icon('check-circle')
 export const ChevronDownIcon = icon('chevron-down')
+export const CreditCardIcon = icon('credit-card')
 export const ChevronLeftIcon = icon('chevron-left')
 export const ChevronRightIcon = icon('chevron-right')
 export const ChevronUpIcon = icon('chevron-up')

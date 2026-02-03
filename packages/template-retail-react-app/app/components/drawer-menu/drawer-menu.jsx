@@ -115,6 +115,8 @@ const DrawerMenu = ({
 
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
+    const {oneClickCheckout = {}} = getConfig().app || {}
+    const isOneClickCheckoutEnabled = oneClickCheckout.enabled
 
     useEffect(() => {
         setAriaBusy('false')
@@ -257,7 +259,20 @@ const DrawerMenu = ({
                                                                 id: 'drawer_menu.button.addresses',
                                                                 defaultMessage: 'Addresses'
                                                             })
-                                                        }
+                                                        },
+                                                        ...(isOneClickCheckoutEnabled
+                                                            ? [
+                                                                  {
+                                                                      id: 'payments',
+                                                                      path: '/payments',
+                                                                      name: intl.formatMessage({
+                                                                          id: 'drawer_menu.button.payment_methods',
+                                                                          defaultMessage:
+                                                                              'Payment Methods'
+                                                                      })
+                                                                  }
+                                                              ]
+                                                            : [])
                                                     ]
                                                 }
                                             ]

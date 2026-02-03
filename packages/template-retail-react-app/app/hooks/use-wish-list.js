@@ -12,7 +12,7 @@ const onClient = typeof window !== 'undefined'
 // (mimic the logic in the other older hook 'use-wishlist.js')
 export const useWishList = ({listId = ''} = {}) => {
     const {data: customer} = useCurrentCustomer()
-    const {customerId} = customer
+    const {customerId} = customer || {}
     const createCustomerProductList = useShopperCustomersMutation('createCustomerProductList')
     const {data: productLists, ...restOfQuery} = useCustomerProductLists(
         {

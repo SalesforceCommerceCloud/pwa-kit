@@ -43,8 +43,10 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {
+    getPasswordlessCallbackUrl,
+    getPasswordlessErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
@@ -76,8 +78,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authModal = useAuthModal(authModalView)
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigMode = passwordlessConfig?.mode
-    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
-    const callbackURL = absoluteUrl(passwordlessConfigCallback)
+    const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
 
     const handlePasswordlessLogin = async (email) => {
         try {

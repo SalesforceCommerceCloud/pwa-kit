@@ -41,7 +41,7 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const LOGIN_VIEW = 'login'
@@ -88,9 +88,8 @@ export const AuthModal = ({
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const passwordlessConfig = getConfig().app.login?.passwordless
-    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
     const passwordlessMode = passwordlessConfig?.mode
-    const callbackURL = absoluteUrl(passwordlessConfigCallback)
+    const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
