@@ -1661,6 +1661,12 @@
       "value": "Visning"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Spør handleassistenten"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
