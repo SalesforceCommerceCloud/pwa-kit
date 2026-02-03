@@ -244,8 +244,15 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                const message = formatMessage(getPasswordlessErrorMessage(error.message))
-                setError(message)
+                const errMsg = error?.message || ''
+                const isUserNotFound =
+                    /user not found|email not found|unknown user|no account|no user|error getting user info/i.test(
+                        errMsg
+                    )
+                if (!isUserNotFound) {
+                    const message = formatMessage(getPasswordlessErrorMessage(errMsg))
+                    setError(message)
+                }
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {
                     setShowContinueButton(true)
