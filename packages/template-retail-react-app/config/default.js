@@ -30,6 +30,8 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
+            // The length of the token for OTP authentication. Used by passwordless login and reset password.
+            // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values include 6 or 8. Defaults to: 8
             tokenLength: process.env.OTP_TOKEN_LENGTH || 8,
             passwordless: {
                 enabled: false,
