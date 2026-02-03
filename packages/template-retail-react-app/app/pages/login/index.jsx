@@ -31,7 +31,7 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     getAuthorizePasswordlessErrorMessage,
-    getLoginPasswordlessErrorMessage
+    getLoginPasswordlessErrorMessage,
     getPasswordlessCallbackUrl
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'

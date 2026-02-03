@@ -64,7 +64,7 @@ export const getPasswordlessCallbackUrl = (callbackURI) => {
 }
 
 /**
- * Maps an error message to the appropriate user-friendly error message descriptor
+ * Maps error message from authorizePasswordless mutation to the appropriate user-friendly error message descriptor
  * for passwordless login feature errors.
  *
  * @param {string} errorMessage - The error message from the API
