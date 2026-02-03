@@ -33,10 +33,12 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {
+    getPasswordlessCallbackUrl,
+    getPasswordlessErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
@@ -64,7 +66,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const passwordlessMode = passwordless?.mode
     const passwordlessLoginLandingPath = passwordless?.landingPath
-    const passwordlessConfigCallback = absoluteUrl(passwordless?.callbackURI)
+
+    const passwordlessConfigCallback = getPasswordlessCallbackUrl(passwordless?.callbackURI)
 
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps

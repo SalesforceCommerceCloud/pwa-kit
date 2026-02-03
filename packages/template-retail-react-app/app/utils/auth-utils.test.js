@@ -9,11 +9,48 @@ import {
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import {
+    getPasswordlessCallbackUrl,
     getPasswordlessErrorMessage,
     getPasswordResetErrorMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
+
+jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/utils/url')
+    return {
+        ...original,
+        getAppOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
+    return {
+        ...original,
+        getEnvBasePath: jest.fn(() => '/test')
+    }
+})
+
+describe('getPasswordlessCallbackUrl', function () {
+    test.each([undefined, null, ''])('return undefined when callbackURI is %s', (callbackURI) => {
+        expect(getPasswordlessCallbackUrl(callbackURI)).toBeUndefined()
+    })
+
+    test('return callbackURI as-is when it is an absolute URL', () => {
+        const absoluteUrl = 'https://callback.example.com/passwordless'
+        expect(getPasswordlessCallbackUrl(absoluteUrl)).toBe(absoluteUrl)
+    })
+
+    test('return full URL with origin and base path when callbackURI is relative', () => {
+        expect(getPasswordlessCallbackUrl('/passwordless-login-callback')).toBe(
+            'https://www.example.com/test/passwordless-login-callback'
+        )
+    })
+})
 
 describe('getPasswordlessErrorMessage', () => {
     test.each([
