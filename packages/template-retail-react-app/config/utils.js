@@ -32,7 +32,9 @@ function validateOtpTokenLength(tokenLength) {
     // Check if it's one of the allowed values (includes() will return false for NaN or invalid numbers)
     if (!VALID_OTP_TOKEN_LENGTHS.includes(parsedLength)) {
         throw new Error(
-            `Invalid OTP token length: ${tokenLength}. Valid values are ${VALID_OTP_TOKEN_LENGTHS.join(' or ')}. `
+            `Invalid OTP token length: ${tokenLength}. Valid values are ${VALID_OTP_TOKEN_LENGTHS.join(
+                ' or '
+            )}. `
         )
     }
 
