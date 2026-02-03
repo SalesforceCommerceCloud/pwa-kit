@@ -24,13 +24,6 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/utils/url')
-    return {
-        ...original,
-        getAppOrigin: jest.fn(() => 'https://www.example.com')
-    }
-})
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
