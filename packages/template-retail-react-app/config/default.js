@@ -6,7 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
-const {parseSettings} = require('./utils.js')
+const {parseSettings, validateOtpTokenLength} = require('./utils.js')
 
 module.exports = {
     app: {
@@ -31,10 +31,10 @@ module.exports = {
         },
         login: {
             // The length of the token for OTP authentication. Used by passwordless login and reset password.
-            // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values include 6 or 8. Defaults to: 8
-            tokenLength: process.env.OTP_TOKEN_LENGTH || 8,
+            // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
+            tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
-                enabled: false,
+                enabled: true,
                 mode: 'email',
                 landingPath: '/passwordless-login-landing'
             },
@@ -57,7 +57,8 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: '03b8dbb9-7cab-45eb-bb8b-9c97a272fed7',
+                // secret: t87nRRL7RMGBcc6HI_qKafuakfb4gw6XLB8WcblqkCA
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
