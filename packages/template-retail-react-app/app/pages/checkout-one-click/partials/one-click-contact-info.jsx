@@ -53,8 +53,8 @@ import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-ut
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {useLocation} from 'react-router-dom'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -75,9 +75,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
     const passwordlessConfig = getConfig().app.login?.passwordless
-    const callbackURL = passwordlessConfig?.callbackURI
-        ? absoluteUrl(passwordlessConfig.callbackURI)
-        : ''
+    const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
