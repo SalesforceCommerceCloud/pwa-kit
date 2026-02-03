@@ -161,6 +161,32 @@ describe('OtpAuth', () => {
                 expect(otpInputs).toHaveLength(expectedLength)
             }
         )
+
+        test.each([7, 'abc', null, undefined])(
+            'defaults to 8 OTP input fields when tokenLength is invalid (%s)',
+            (tokenLength) => {
+                const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+                getConfig.mockImplementation(() => ({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        login: {
+                            ...mockConfig.app.login,
+                            tokenLength
+                        }
+                    }
+                }))
+                renderWithProviders(<WrapperComponent />)
+                const otpInputs = screen.getAllByRole('textbox')
+                expect(otpInputs).toHaveLength(8)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining(
+                        `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to 8.`
+                    )
+                )
+                consoleWarnSpy.mockRestore()
+            }
+        )
     })
 
     describe('OTP Input Functionality', () => {

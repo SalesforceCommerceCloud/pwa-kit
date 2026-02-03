@@ -34,7 +34,7 @@ module.exports = {
             // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
             tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
-                enabled: true,
+                enabled: false,
                 mode: 'email',
                 landingPath: '/passwordless-login-landing'
             },
@@ -57,8 +57,7 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '03b8dbb9-7cab-45eb-bb8b-9c97a272fed7',
-                // secret: t87nRRL7RMGBcc6HI_qKafuakfb4gw6XLB8WcblqkCA
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
