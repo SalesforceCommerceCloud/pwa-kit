@@ -1,5 +1,5 @@
 ## v3.16.0-dev (Dec 17, 2025)
-Add disableHttpOnlySessionCookies into ssrParameters
+Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
 
 ## v3.15.0 (Dec 17, 2025)
 
