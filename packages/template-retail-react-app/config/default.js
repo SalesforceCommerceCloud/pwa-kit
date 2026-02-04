@@ -103,7 +103,7 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
-        disableHttpOnlySessionCookies: true,
+        disableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',
