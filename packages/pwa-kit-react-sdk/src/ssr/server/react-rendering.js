@@ -365,6 +365,7 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
+        __MRT_DISABLE_HTTPONLY_SESSION_COOKIES__: process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
