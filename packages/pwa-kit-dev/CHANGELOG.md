@@ -1,4 +1,6 @@
 ## v3.16.0-dev (Dec 17, 2025)
+Add disableHttpOnlySessionCookies into ssrParameters
+
 ## v3.15.0 (Dec 17, 2025)
 
 ## v3.14.0 (Nov 04, 2025)
