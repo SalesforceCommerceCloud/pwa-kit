@@ -10,6 +10,8 @@ import userEvent from '@testing-library/user-event'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // Mock the Einstein hook
 const mockSendViewPage = jest.fn()
@@ -42,6 +44,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
 }))
 
 const WrapperComponent = ({...props}) => {
@@ -91,6 +97,7 @@ describe('OtpAuth', () => {
         mockHandleOtpVerification.mockResolvedValue({
             success: true
         })
+        getConfig.mockImplementation(() => mockConfig)
     })
 
     describe('Component Rendering', () => {
@@ -128,6 +135,58 @@ describe('OtpAuth', () => {
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
         })
+    })
+
+    describe('OTP token length configuration', () => {
+        test.each([
+            [6, 6],
+            [8, 8],
+            ['6', 6],
+            ['8', 8]
+        ])(
+            'renders %s OTP input fields when tokenLength is set to %s',
+            (tokenLength, expectedLength) => {
+                getConfig.mockImplementation(() => ({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        login: {
+                            ...mockConfig.app.login,
+                            tokenLength
+                        }
+                    }
+                }))
+                renderWithProviders(<WrapperComponent />)
+                const otpInputs = screen.getAllByRole('textbox')
+                expect(otpInputs).toHaveLength(expectedLength)
+            }
+        )
+
+        test.each([7, 'abc', null, undefined])(
+            'defaults to 8 OTP input fields when tokenLength is invalid (%s)',
+            (tokenLength) => {
+                const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation()
+                getConfig.mockImplementation(() => ({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        login: {
+                            ...mockConfig.app.login,
+                            tokenLength
+                        }
+                    }
+                }))
+                renderWithProviders(<WrapperComponent />)
+                const otpInputs = screen.getAllByRole('textbox')
+                expect(otpInputs).toHaveLength(8)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining(
+                        `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to 8.`
+                    )
+                )
+                consoleWarnSpy.mockRestore()
+            }
+        )
     })
 
     describe('OTP Input Functionality', () => {

@@ -13,7 +13,6 @@ import {
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const mockUseRouteMatch = jest.fn(() => ({path: '/'}))
 
