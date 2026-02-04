@@ -47,7 +47,7 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getAuthorizePasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -242,7 +242,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                const message = formatMessage(getPasswordlessErrorMessage(error.message))
+                const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
                 setError(message)
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {

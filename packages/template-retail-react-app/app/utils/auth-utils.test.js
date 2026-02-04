@@ -6,12 +6,14 @@
  */
 import {
     API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import {
     getPasswordlessCallbackUrl,
-    getPasswordlessErrorMessage,
+    getAuthorizePasswordlessErrorMessage,
     getPasswordResetErrorMessage,
+    getLoginPasswordlessErrorMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
@@ -52,7 +54,7 @@ describe('getPasswordlessCallbackUrl', function () {
     })
 })
 
-describe('getPasswordlessErrorMessage', () => {
+describe('getAuthorizePasswordlessErrorMessage', () => {
     test.each([
         ['no callback_uri is registered for client', FEATURE_UNAVAILABLE_ERROR_MESSAGE],
         ["callback_uri doesn't match the registered callbacks", FEATURE_UNAVAILABLE_ERROR_MESSAGE],
@@ -74,7 +76,7 @@ describe('getPasswordlessErrorMessage', () => {
     ])(
         'maps passwordless error "%s" to the correct message descriptor',
         (errorMessage, expectedMessage) => {
-            expect(getPasswordlessErrorMessage(errorMessage)).toBe(expectedMessage)
+            expect(getAuthorizePasswordlessErrorMessage(errorMessage)).toBe(expectedMessage)
         }
     )
 })
@@ -97,6 +99,19 @@ describe('getPasswordResetErrorMessage', () => {
         'maps password reset error "%s" to the correct message descriptor',
         (errorMessage, expectedMessage) => {
             expect(getPasswordResetErrorMessage(errorMessage)).toBe(expectedMessage)
+        }
+    )
+})
+
+describe('getLoginPasswordlessErrorMessage', () => {
+    test.each([
+        ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
+        ['unexpected error message', API_ERROR_MESSAGE],
+        [null, API_ERROR_MESSAGE]
+    ])(
+        'maps login passwordless error "%s" to the correct message descriptor',
+        (errorMessage, expectedMessage) => {
+            expect(getLoginPasswordlessErrorMessage(errorMessage)).toBe(expectedMessage)
         }
     )
 })
