@@ -1661,6 +1661,12 @@
       "value": "Visa"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Fråga shoppingassistenten"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,

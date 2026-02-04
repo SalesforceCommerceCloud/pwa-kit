@@ -27,6 +27,7 @@ import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useOtpInputs} from '@salesforce/retail-react-app/app/hooks/use-otp-inputs'
 import {useCountdown} from '@salesforce/retail-react-app/app/hooks/use-countdown'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const OtpAuth = ({
     isOpen,
@@ -39,7 +40,17 @@ const OtpAuth = ({
     isPasskeyRegistration = false,
     hideCheckoutAsGuestButton = false
 }) => {
-    const OTP_LENGTH = 8
+    const {tokenLength} = getConfig().app.login
+    const parsedLength = Number(tokenLength)
+    const isValidOtpLength = parsedLength === 6 || parsedLength === 8
+    const OTP_LENGTH = isValidOtpLength ? parsedLength : 8
+
+    if (!isValidOtpLength) {
+        console.warn(
+            `Invalid OTP token length: ${tokenLength}. Expected 6 or 8. Defaulting to ${OTP_LENGTH}.`
+        )
+    }
+
     const [isVerifying, setIsVerifying] = useState(false)
     const [error, setError] = useState('')
     const [resendTimer, setResendTimer] = useCountdown(0)

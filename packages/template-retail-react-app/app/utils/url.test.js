@@ -13,7 +13,6 @@ import {
     getPathWithLocale,
     rebuildPathWithParams,
     removeQueryParamsFromPath,
-    absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath,
     serverSafeEncode
@@ -25,13 +24,6 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/utils/url')
-    return {
-        ...original,
-        getAppOrigin: jest.fn(() => 'https://www.example.com')
-    }
-})
 jest.mock('./utils', () => {
     const original = jest.requireActual('./utils')
     return {
@@ -391,36 +383,6 @@ describe('removeQueryParamsFromPath test', () => {
         const url = '/en/product/25501032M?color=black&size=M&something=123'
         const updatedUrl = removeQueryParamsFromPath(url, ['color', 'size'])
         expect(updatedUrl).toBe('/en/product/25501032M?something=123')
-    })
-})
-
-describe('absoluteUrl', function () {
-    test('return undefined when path is not provided', () => {
-        const url = absoluteUrl()
-        expect(url).toBeUndefined()
-    })
-
-    test('return expected when path is a relative url', () => {
-        const url = absoluteUrl('/uk/en/women/dresses')
-        expect(url).toBe('https://www.example.com/uk/en/women/dresses')
-    })
-
-    test('return expected when path is an absolute url', () => {
-        const url = absoluteUrl('https://www.example.com/uk/en/women/dresses')
-        expect(url).toBe('https://www.example.com/uk/en/women/dresses')
-    })
-
-    test('return expected when path is a relative url and appOrigin is provided', () => {
-        const url = absoluteUrl('uk/en/women/dresses', 'https://www.custom.com')
-        expect(url).toBe('https://www.custom.com/uk/en/women/dresses')
-    })
-
-    test('return expected when path is an absolute url and appOrigin is provided', () => {
-        const url = absoluteUrl(
-            'https://www.example.com/uk/en/women/dresses',
-            'https://www.should-be-ignored.com'
-        )
-        expect(url).toBe('https://www.example.com/uk/en/women/dresses')
     })
 })
 

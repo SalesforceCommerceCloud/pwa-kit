@@ -33,6 +33,7 @@ module.exports = {
             showDefaults: true
         },
         login: {
+            tokenLength: 8,
             passwordless: {
                 enabled: false,
                 mode: 'email',

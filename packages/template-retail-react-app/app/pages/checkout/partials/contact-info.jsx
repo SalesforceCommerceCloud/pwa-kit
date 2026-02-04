@@ -44,7 +44,10 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {
+    getPasswordlessCallbackUrl,
+    getAuthorizePasswordlessErrorMessage
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {
@@ -81,8 +84,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authModal = useAuthModal(authModalView)
     const passwordlessConfig = getConfig().app.login?.passwordless
     const passwordlessConfigMode = passwordlessConfig?.mode
-    const passwordlessConfigCallback = passwordlessConfig?.callbackURI
-    const callbackURL = absoluteUrl(passwordlessConfigCallback)
+    const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -96,7 +98,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = formatMessage(getPasswordlessErrorMessage(error.message))
+            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             setError(message)
         }
     }
