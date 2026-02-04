@@ -109,13 +109,13 @@ export default function ShippingOptions() {
             const defaultMethodId = shippingMethods?.defaultShippingMethodId
             return methods.find((m) => m.id === defaultMethodId) || methods[0]
         },
+        // Skip auto-apply when a valid method is already selected. Do NOT call goToNextStep here:
+        // when the user clicked "Change" to edit options, we must stay on the edit view instead of
+        // immediately advancing (which would cause a flicker and prevent editing).
         shouldSkip: () => {
             if (selectedShippingMethod?.id && !isPickupMethod(selectedShippingMethod)) {
                 const stillValid = deliveryMethods.some((m) => m.id === selectedShippingMethod.id)
-                if (stillValid) {
-                    goToNextStep()
-                    return true
-                }
+                if (stillValid) return true
             }
             return false
         },
@@ -160,8 +160,12 @@ export default function ShippingOptions() {
         )
     }, [step, customer, selectedShippingMethod, shippingMethods, STEPS.SHIPPING_OPTIONS])
 
-    // Use calculated loading state or auto-select loading state
-    const effectiveIsLoading = Boolean(isAutoSelectLoading) || Boolean(shouldShowInitialLoading)
+    // Use calculated loading state or auto-select loading state only for single-shipment.
+    // For multi-shipment, each ShipmentMethods fetches its own methods; the parent's loading
+    // would otherwise stay true (e.g. due to cached data from a disabled query) and the edit view would show a spinner indefinitely.
+    const effectiveIsLoading = hasMultipleDeliveryShipments
+        ? false
+        : Boolean(isAutoSelectLoading) || Boolean(shouldShowInitialLoading)
 
     const form = useForm({
         shouldUnregister: false,
