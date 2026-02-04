@@ -126,20 +126,6 @@ const Payment = ({
         }
     }, [shouldSavePaymentMethod, onSavePreferenceChange])
 
-    // When a newly registered shopper leaves checkout and returns, they have no saved payments yet.
-    // Auto-check "Save for future use" so the next card they enter gets saved to their profile.
-    const hasAutoCheckedSaveForNewlyRegisteredRef = useRef(false)
-    useEffect(() => {
-        if (hasAutoCheckedSaveForNewlyRegisteredRef.current) return
-        if (!customer?.isRegistered) return
-        const hasNoSavedPayments =
-            !customer?.paymentInstruments || customer.paymentInstruments.length === 0
-        if (hasNoSavedPayments) {
-            hasAutoCheckedSaveForNewlyRegisteredRef.current = true
-            setShouldSavePaymentMethod(true)
-        }
-    }, [customer?.isRegistered, customer?.paymentInstruments])
-
     // Handles user registration checkbox toggle (OTP handled by UserRegistration)
     const onUserRegistrationToggle = async (checked) => {
         setEnableUserRegistration(checked)
