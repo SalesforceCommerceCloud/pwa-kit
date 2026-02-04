@@ -528,27 +528,28 @@ const Payment = ({
                                         isBillingAddress
                                     />
                                 )}
-                                {(isGuest || showRegistrationNotice) && (
-                                    <UserRegistration
-                                        enableUserRegistration={enableUserRegistration}
-                                        setEnableUserRegistration={onUserRegistrationToggle}
-                                        onLoadingChange={onOtpLoadingChange}
-                                        isGuestCheckout={registeredUserChoseGuest}
-                                        isDisabled={
-                                            !(
-                                                appliedPayment ||
-                                                paymentMethodForm.formState.isValid ||
-                                                (isPickupOnly &&
-                                                    billingAddressForm.formState.isValid)
-                                            ) ||
-                                            (!effectiveBillingSameAsShipping &&
-                                                !billingAddressForm.formState.isValid)
-                                        }
-                                        onSavePreferenceChange={onSavePreferenceChange}
-                                        onRegistered={handleRegistrationSuccess}
-                                        showNotice={showRegistrationNotice}
-                                    />
-                                )}
+                                {(isGuest || showRegistrationNotice) &&
+                                    !registeredUserChoseGuest && (
+                                        <UserRegistration
+                                            enableUserRegistration={enableUserRegistration}
+                                            setEnableUserRegistration={onUserRegistrationToggle}
+                                            onLoadingChange={onOtpLoadingChange}
+                                            isGuestCheckout={registeredUserChoseGuest}
+                                            isDisabled={
+                                                !(
+                                                    appliedPayment ||
+                                                    paymentMethodForm.formState.isValid ||
+                                                    (isPickupOnly &&
+                                                        billingAddressForm.formState.isValid)
+                                                ) ||
+                                                (!effectiveBillingSameAsShipping &&
+                                                    !billingAddressForm.formState.isValid)
+                                            }
+                                            onSavePreferenceChange={onSavePreferenceChange}
+                                            onRegistered={handleRegistrationSuccess}
+                                            showNotice={showRegistrationNotice}
+                                        />
+                                    )}
                             </Stack>
                         </>
                     ) : null}
@@ -594,7 +595,7 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        {(isGuest || showRegistrationNotice) && (
+                        {(isGuest || showRegistrationNotice) && !registeredUserChoseGuest && (
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}

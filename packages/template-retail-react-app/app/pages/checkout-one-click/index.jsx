@@ -31,7 +31,9 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     useCheckout,
-    CheckoutProvider
+    CheckoutProvider,
+    getCheckoutGuestChoiceFromStorage,
+    setCheckoutGuestChoiceInStorage
 } from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-pickup-address'
@@ -64,7 +66,9 @@ const CheckoutOneClick = () => {
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(
+        getCheckoutGuestChoiceFromStorage
+    )
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isOtpLoading, setIsOtpLoading] = useState(false)
     const [isPlacingOrder, setIsPlacingOrder] = useState(false)
@@ -463,6 +467,7 @@ const CheckoutOneClick = () => {
                 }
             }
 
+            setCheckoutGuestChoiceInStorage(false)
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({

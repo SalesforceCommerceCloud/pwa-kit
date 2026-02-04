@@ -26,7 +26,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
+import {
+    useCheckout,
+    setCheckoutGuestChoiceInStorage
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import {
     ToggleCard,
@@ -281,6 +284,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Handle checkout as guest from OTP modal
     const handleCheckoutAsGuest = () => {
         setRegisteredUserChoseGuest(true)
+        setCheckoutGuestChoiceInStorage(true)
         if (onRegisteredUserChoseGuest) {
             onRegisteredUserChoseGuest(true)
         }
@@ -341,6 +345,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
+            setCheckoutGuestChoiceInStorage(false)
             if (onRegisteredUserChoseGuest) {
                 onRegisteredUserChoseGuest(false)
             }

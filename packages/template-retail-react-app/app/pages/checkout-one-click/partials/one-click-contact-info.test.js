@@ -7,6 +7,7 @@
 import React from 'react'
 import {screen, waitFor, fireEvent, act} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
+import {setCheckoutGuestChoiceInStorage} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {AuthHelpers, useCustomerType} from '@salesforce/commerce-sdk-react'
@@ -79,6 +80,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 const mockSetContactPhone = jest.fn()
 const mockGoToNextStep = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context', () => {
+    const setCheckoutGuestChoiceInStorage = jest.fn()
     return {
         useCheckout: jest.fn().mockReturnValue({
             customer: null,
@@ -91,7 +93,8 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
             goToStep: null,
             goToNextStep: mockGoToNextStep,
             setContactPhone: mockSetContactPhone
-        })
+        }),
+        setCheckoutGuestChoiceInStorage
     }
 })
 
@@ -293,7 +296,8 @@ describe('ContactInfo Component', () => {
                         goToStep: jest.fn(),
                         goToNextStep: jest.fn(),
                         setContactPhone: jest.fn()
-                    })
+                    }),
+                    setCheckoutGuestChoiceInStorage: jest.fn()
                 }
             }
         )
@@ -789,6 +793,7 @@ describe('ContactInfo Component', () => {
         await user.click(screen.getByText(/Checkout as a guest/i))
 
         expect(onRegisteredUserChoseGuestSpy).toHaveBeenCalledWith(true)
+        expect(setCheckoutGuestChoiceInStorage).toHaveBeenCalledWith(true)
         expect(mockUpdateCustomerForBasket.mutateAsync).not.toHaveBeenCalled()
         expect(mockGoToNextStep).not.toHaveBeenCalled()
 
@@ -858,5 +863,8 @@ describe('ContactInfo Component', () => {
                 body: {phoneHome: billingPhone}
             })
         })
+
+        // Guest choice storage should be cleared when user signs in via OTP
+        expect(setCheckoutGuestChoiceInStorage).toHaveBeenCalledWith(false)
     })
 })
