@@ -22,8 +22,9 @@ import {
     getEnvBasePath,
     slasPrivateProxyPath
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {absoluteUrl, createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
+import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -62,8 +63,9 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
-
-    const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
+    const passwordlessCallbackURI = getPasswordlessCallbackUrl(
+        locals.appConfig.login?.passwordless?.callbackURI
+    )
 
     const storeLocatorConfig = {
         radius: STORE_LOCATOR_RADIUS,
@@ -79,7 +81,6 @@ const AppConfig = ({children, locals = {}}) => {
     const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
-    const passwordlessLoginCallbackURI = absoluteUrl(passwordlessCallback, appOrigin)
 
     return (
         <CommerceApiProvider
@@ -94,7 +95,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
-            passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
+            passwordlessLoginCallbackURI={passwordlessCallbackURI}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             {{#if answers.project.commerce.isSlasPrivate}}

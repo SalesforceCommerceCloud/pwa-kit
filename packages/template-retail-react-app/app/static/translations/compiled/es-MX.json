@@ -1679,6 +1679,12 @@
       "value": "Vista"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Preguntar al agente de compras"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
