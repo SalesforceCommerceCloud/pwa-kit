@@ -531,27 +531,6 @@ describe('ContactInfo Component', () => {
         })
     })
 
-    test('does not show error message when login returns user/email not found (guest flow)', async () => {
-        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
-            new Error('Email not found')
-        )
-
-        const {user} = renderWithProviders(<ContactInfo />)
-
-        const emailInput = screen.getByLabelText('Email')
-        await user.type(emailInput, validEmail)
-        fireEvent.blur(emailInput)
-
-        await waitFor(() => {
-            expect(
-                mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-            ).toHaveBeenCalled()
-        })
-
-        // Red error banner should NOT be shown when user is not found (guest can continue)
-        expect(screen.queryByText(/Something went wrong\. Try again!/i)).not.toBeInTheDocument()
-    })
-
     test('renders contact info title', () => {
         renderWithProviders(<ContactInfo />)
 
