@@ -31,9 +31,9 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 
 // Components
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -52,6 +52,7 @@ import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/par
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Constants
 import {
@@ -83,6 +84,7 @@ const CheckoutConfirmation = () => {
         {}
     )
     const form = useForm()
+    const {oneClickCheckout = {}} = getConfig().app || {}
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
 
@@ -247,7 +249,7 @@ const CheckoutConfirmation = () => {
                         </Stack>
                     </Box>
 
-                    {customer.isGuest && (
+                    {!oneClickCheckout.enabled && customer.isGuest && (
                         <Box
                             layerStyle="card"
                             rounded={[0, 0, 'base']}
@@ -332,52 +334,61 @@ const CheckoutConfirmation = () => {
                                                 width="full"
                                                 divider={<Divider />}
                                             >
-                                                {order.productItems?.map((product, idx) => {
-                                                    const productDetail =
-                                                        productItemsMap?.[product.productId] || {}
-                                                    const variant = {
-                                                        ...product,
-                                                        ...productDetail,
-                                                        price: product.price
-                                                    }
+                                                {(() => {
+                                                    const consolidatedItems =
+                                                        consolidateDuplicateBonusProducts(
+                                                            order.productItems || []
+                                                        )
+                                                    return consolidatedItems.map((product, idx) => {
+                                                        const productDetail =
+                                                            productItemsMap?.[product.productId] ||
+                                                            {}
+                                                        const variant = {
+                                                            ...product,
+                                                            ...productDetail,
+                                                            price: product.price
+                                                        }
 
-                                                    return (
-                                                        <ItemVariantProvider
-                                                            key={product.productId}
-                                                            index={idx}
-                                                            variant={variant}
-                                                        >
-                                                            <Flex
-                                                                width="full"
-                                                                alignItems="flex-start"
+                                                        return (
+                                                            <ItemVariantProvider
+                                                                key={`${product.productId}-${
+                                                                    product.itemId || idx
+                                                                }`}
+                                                                index={idx}
+                                                                variant={variant}
                                                             >
-                                                                <CartItemVariantImage
-                                                                    width="80px"
-                                                                    mr={2}
-                                                                />
-                                                                <Stack
-                                                                    spacing={1}
-                                                                    marginTop="-3px"
-                                                                    flex={1}
+                                                                <Flex
+                                                                    width="full"
+                                                                    alignItems="flex-start"
                                                                 >
-                                                                    <CartItemVariantName />
-                                                                    <Flex
-                                                                        width="full"
-                                                                        justifyContent="space-between"
-                                                                        alignItems="flex-end"
+                                                                    <CartItemVariantImage
+                                                                        width="80px"
+                                                                        mr={2}
+                                                                    />
+                                                                    <Stack
+                                                                        spacing={1}
+                                                                        marginTop="-3px"
+                                                                        flex={1}
                                                                     >
-                                                                        <CartItemVariantAttributes
-                                                                            includeQuantity
-                                                                        />
-                                                                        <CartItemVariantPrice
-                                                                            currency={currency}
-                                                                        />
-                                                                    </Flex>
-                                                                </Stack>
-                                                            </Flex>
-                                                        </ItemVariantProvider>
-                                                    )
-                                                })}
+                                                                        <CartItemVariantName />
+                                                                        <Flex
+                                                                            width="full"
+                                                                            justifyContent="space-between"
+                                                                            alignItems="flex-end"
+                                                                        >
+                                                                            <CartItemVariantAttributes
+                                                                                includeQuantity
+                                                                            />
+                                                                            <CartItemVariantPrice
+                                                                                currency={currency}
+                                                                            />
+                                                                        </Flex>
+                                                                    </Stack>
+                                                                </Flex>
+                                                            </ItemVariantProvider>
+                                                        )
+                                                    })
+                                                })()}
                                             </Stack>
                                         )}
 

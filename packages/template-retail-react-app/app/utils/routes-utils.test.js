@@ -288,4 +288,181 @@ describe('configureRoutes', function () {
             expect(paths).toEqual(expectedRes)
         })
     })
+
+    describe('fuzzyPathMatching', function () {
+        // Expected patterns based on sites mock:
+        // Sites: uk (alias) / site-1 (id), us (alias) / site-2 (id)
+        // Locales: en-GB, fr (alias), fr-FR, it-IT (site-1), en-US, en-CA (site-2)
+        const sitePattern = 'uk|site-1|us|site-2'
+        const localePattern = 'en-GB|fr|fr-FR|it-IT|en-US|en-CA'
+
+        const fuzzyCases = [
+            {
+                urlConfig: {
+                    site: 'path',
+                    locale: 'path',
+                    showDefaults: true
+                },
+                expectedRes: [
+                    `/:site(${sitePattern})/:locale(${localePattern})/`,
+                    '/',
+                    `/:site(${sitePattern})/:locale(${localePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'path',
+                    locale: 'path',
+                    showDefaults: false
+                },
+                expectedRes: [
+                    `/:site(${sitePattern})/:locale(${localePattern})/`,
+                    '/',
+                    `/:site(${sitePattern})/:locale(${localePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'query_param',
+                    locale: 'path',
+                    showDefaults: true
+                },
+                expectedRes: [
+                    `/:locale(${localePattern})/`,
+                    '/',
+                    `/:locale(${localePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'query_param',
+                    locale: 'path',
+                    showDefaults: false
+                },
+                expectedRes: [
+                    `/:locale(${localePattern})/`,
+                    '/',
+                    `/:locale(${localePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'path',
+                    locale: 'query_param',
+                    showDefaults: true
+                },
+                expectedRes: [
+                    `/:site(${sitePattern})/`,
+                    '/',
+                    `/:site(${sitePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'path',
+                    locale: 'query_param',
+                    showDefaults: false
+                },
+                expectedRes: [
+                    `/:site(${sitePattern})/`,
+                    '/',
+                    `/:site(${sitePattern})/category/:categoryId`,
+                    '/category/:categoryId'
+                ]
+            },
+            {
+                urlConfig: {
+                    site: 'query_param',
+                    locale: 'query_param',
+                    showDefaults: true
+                },
+                expectedRes: ['/', '/category/:categoryId']
+            },
+            {
+                urlConfig: {
+                    site: 'query_param',
+                    locale: 'query_param',
+                    showDefaults: false
+                },
+                expectedRes: ['/', '/category/:categoryId']
+            },
+            {
+                urlConfig: {
+                    site: 'path',
+                    locale: 'path',
+                    showDefaults: true
+                },
+                expectedRes: [
+                    `/:site(${sitePattern})/:locale(${localePattern})/`,
+                    '/',
+                    '/category/:categoryId'
+                ],
+                ignoredRoutes: ['/category/:categoryId']
+            }
+        ]
+
+        fuzzyCases.forEach(({urlConfig, expectedRes, ignoredRoutes = []}) => {
+            test(`Should return parameterized routes with fuzzyPathMatching based on ${JSON.stringify(
+                urlConfig
+            )} config${
+                ignoredRoutes.length ? ` and ignore routes ${ignoredRoutes.join(',')}` : ''
+            }`, () => {
+                const config = {
+                    app: {
+                        url: urlConfig
+                    }
+                }
+                const configuredRoutes = configureRoutes(routes, config, {
+                    ignoredRoutes,
+                    fuzzyPathMatching: true
+                })
+                const paths = configuredRoutes.map((route) => route.path)
+                expect(paths).toEqual(expectedRes)
+            })
+        })
+
+        test('Should generate significantly fewer routes with fuzzyPathMatching enabled', () => {
+            const config = {
+                app: {
+                    url: {
+                        site: 'path',
+                        locale: 'path',
+                        showDefaults: true
+                    }
+                }
+            }
+
+            const explicitRoutes = configureRoutes(routes, config, {fuzzyPathMatching: false})
+            const fuzzyRoutes = configureRoutes(routes, config, {fuzzyPathMatching: true})
+
+            // Fuzzy matching should produce significantly fewer routes
+            expect(fuzzyRoutes.length).toBeLessThan(explicitRoutes.length)
+            // With 2 input routes, fuzzy should produce 4 (2 parameterized + 2 fallback)
+            expect(fuzzyRoutes).toHaveLength(4)
+        })
+
+        test('Should preserve route properties when using fuzzyPathMatching', () => {
+            const config = {
+                app: {
+                    url: {
+                        site: 'path',
+                        locale: 'path',
+                        showDefaults: true
+                    }
+                }
+            }
+            const configuredRoutes = configureRoutes(routes, config, {fuzzyPathMatching: true})
+
+            // All routes should have the component and exact properties preserved
+            configuredRoutes.forEach((route) => {
+                expect(route.component).toBeDefined()
+                expect(route.exact).toBe(true)
+            })
+        })
+    })
 })

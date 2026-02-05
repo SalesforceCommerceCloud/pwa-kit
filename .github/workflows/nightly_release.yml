@@ -26,7 +26,6 @@ jobs:
           echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
           version_major=`echo "$version" | cut -d "." -f 1`
           echo "monorepo_version_major=$version_major" >> "$GITHUB_ENV"
-          echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" ?? "$GITHUB_ENV"
 
       - name: Get nightly version
         run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" >> "$GITHUB_ENV"
@@ -116,7 +115,7 @@ jobs:
         with:
           payload: |
             {
-              "message": "Successfully released PWA Kit v${{ env.nightly_version }}"
+              "message": "✅ Successfully released PWA Kit v${{ env.nightly_version }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -128,7 +127,37 @@ jobs:
         with:
           payload: |
             {
-              "message": "Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }} (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+              "message": "❌ Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }} (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Check NPM Token Expiry
+        if: always()
+        run: |
+          LAST_ROTATION="${{ secrets.NPM_TOKEN_LAST_ROTATION_DATE }}"
+          
+          if [ -z "$LAST_ROTATION" ]; then
+            echo "NPM_TOKEN_LAST_ROTATION_DATE secret not set, skipping expiry check"
+            exit 0
+          fi
+          
+          CURRENT_DATE=$(date +%s)
+          EXPIRY_DATE=$(( $LAST_ROTATION + 7776000 ))  # 90 days in seconds (90 * 24 * 60 * 60)
+          DAYS_LEFT=$(( ($EXPIRY_DATE - $CURRENT_DATE) / 86400 ))
+          
+          echo "NPM Token last rotated: $(date -d @$LAST_ROTATION +'%Y-%m-%d')"
+          echo "Days until expiry: $DAYS_LEFT"
+          echo "days_left=$DAYS_LEFT" >> "$GITHUB_ENV"
+          echo "should_notify=$( [ $DAYS_LEFT -le 10 ] && echo 'true' || echo 'false' )" >> "$GITHUB_ENV"
+
+      - name: Send Token Expiry Warning to Slack
+        if: always() && env.should_notify == 'true'
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "⚠️ NPM Token expiring soon! Only ${{ env.days_left }} days remaining. Please rotate the token using the instructions in this doc: ${{ secrets.PWA_KIT_RELEASE_DOC_LINK }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

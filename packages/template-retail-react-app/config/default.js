@@ -6,7 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
-const {parseSettings} = require('./utils.js')
+const {parseSettings, validateOtpTokenLength} = require('./utils.js')
 
 module.exports = {
     app: {
@@ -30,10 +30,12 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
+            // The length of the token for OTP authentication. Used by passwordless login and reset password.
+            // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
+            tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
                 enabled: false,
-                callbackURI:
-                    process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+                mode: 'email',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
@@ -42,7 +44,7 @@ module.exports = {
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
-                callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
+                mode: 'email',
                 landingPath: '/reset-password-landing'
             }
         },
@@ -72,6 +74,9 @@ module.exports = {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
+        oneClickCheckout: {
+            enabled: false
+        },
         partialHydrationEnabled: false,
         pages: {
             cart: {
@@ -79,7 +84,10 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
-        multishipEnabled: true
+        multishipEnabled: true,
+        googleCloudAPI: {
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
+        }
     },
     envBasePath: '/',
     externals: [],

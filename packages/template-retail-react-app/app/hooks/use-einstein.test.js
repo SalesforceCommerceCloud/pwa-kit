@@ -230,7 +230,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"products":[{"id":"682875719029M","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"682875719029M","price":29.99,"quantity":1}],"amount":29.99,"checkoutType":"traditional","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -249,7 +249,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"stepName":"CheckoutStep","stepNumber":0,"basketId":"f6bbeee30fb93c2f94213f60f8","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"stepName":"CheckoutStep","stepNumber":0,"basketId":"f6bbeee30fb93c2f94213f60f8","checkoutType":"traditional","cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })

@@ -1,5 +1,13 @@
+## v3.16.0-dev (Dec 17, 2025)
+- Add new One-Click Checkout configuration [#3609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3609)
+- Support email mode by default for passwordless login and password reset in a generated app. [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+- Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
+- Add `tokenLength` to login configuration [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 
-## v3.14.0-dev (Sep 26, 2025)
+## v3.15.0 (Dec 17, 2025)
+- Add new Google Cloud API configuration and Bonus Product configuration [#3523](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3523)
+
+## v3.14.0 (Nov 04, 2025)
 - Prompt text for Site ID should match actual validation: Site ID may contain uppercase or lowercase letters, numbers, hyphens, or underscores. - Updated Site ID validator regex to allow both uppercase and lowercase letters for improved compatibility, clarity. [#3410] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3410)
 - Added Hybrid Proxy support configuration for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
 

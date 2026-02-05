@@ -24,6 +24,7 @@ class AccessDenied extends ServiceException {
 }
 
 describe('server', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let originalEnv, app, server
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
@@ -58,9 +59,11 @@ describe('server', () => {
         ['/exception', 500, 'text/html; charset=utf-8'],
         ['/cache', 200, 'application/json; charset=utf-8'],
         ['/cookie', 200, 'application/json; charset=utf-8'],
+        ['/multi-cookies', 200, 'application/json; charset=utf-8'],
         ['/set-response-headers', 200, 'application/json; charset=utf-8'],
         ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8']
+        ['/memtest', 200, 'application/json; charset=utf-8'],
+        ['/streaming-large', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
@@ -76,6 +79,10 @@ describe('server', () => {
         return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
     })
 
+    test('All responses have Server header set to "mrt ref app"', () => {
+        return request(app).get('/').expect('Server', 'mrt ref app')
+    })
+
     test('Path "/headers" echoes request headers', async () => {
         const response = await request(app).get('/headers').set('Random-Header', 'random')
 
@@ -86,6 +93,21 @@ describe('server', () => {
         return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
+    })
+
+    test('Path "/multi-cookies" sets multiple cookies', async () => {
+        const response = await request(app).get('/multi-cookies')
+        const setCookieHeaders = response.headers['set-cookie']
+        expect(setCookieHeaders).toBeDefined()
+        expect(Array.isArray(setCookieHeaders)).toBe(true)
+        expect(setCookieHeaders.length).toBeGreaterThanOrEqual(3)
+        // Check that the first cookie is set using res.cookie (includes Path=/)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-cookie=test-value'))).toBe(
+            true
+        )
+        // Check that the appended cookies are present
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value2'))).toBe(true)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value3'))).toBe(true)
     })
 
     test('Path "/set-response-headers" sets response header', () => {
@@ -147,5 +169,18 @@ describe('server', () => {
         for (const header in response.body.headers) {
             expect(header).toBe(header.toLowerCase())
         }
+    })
+
+    test('Path "/ssr-shared" serves the example.json file', async () => {
+        const response = await request(app).get('/ssr-shared')
+        expect(response.body.message).toBe(
+            'This file is used in the E2E tests to verify that correct header values are set.'
+        )
+    })
+
+    test('Path "/streaming-large" returns streaming: false', async () => {
+        const response = await request(app).get('/streaming-large')
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({streaming: false})
     })
 })

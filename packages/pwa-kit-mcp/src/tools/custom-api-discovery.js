@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {loadConfig, getOAuthToken, callCustomApiDxEndpoint, logMCPMessage} from '../utils/utils.js'
+import {
+    loadConfig,
+    getOAuthToken,
+    callCustomApiDxEndpoint,
+    logMCPMessage,
+    loadCustomApiFromFallbackPath
+} from '../utils/utils.js'
 import {
     parseWebDAVDirectories,
     parseWebDAVResponse,
@@ -91,15 +97,28 @@ function fetchAndValidateConfigs() {
     const config = loadConfig()
     const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} = config
 
-    // Validate configuration fields
-    const nullConfigFields = Object.entries(config)
-        .filter(([, value]) => value === null || value === undefined)
-        .map(([key]) => key)
+    // Define which fields are critical for SFCC API connection
+    const criticalFields = ['clientId', 'clientSecret', 'organizationId', 'instanceId']
 
-    if (nullConfigFields.length > 0) {
-        throw new Error(`Required configuration fields are null: ${nullConfigFields.join(', ')}`)
+    // Check which critical fields are missing
+    const missingCriticalFields = criticalFields.filter(
+        (field) => !config[field] || config[field].trim() === ''
+    )
+
+    // If all critical fields are missing, use fallback mode (local file search)
+    if (missingCriticalFields.length === criticalFields.length) {
+        return {isFallback: true}
     }
 
+    // If some (but not all) critical fields are missing, throw an error with helpful message
+    if (missingCriticalFields.length > 0) {
+        throw new Error(
+            `Required SFCC API credentials are missing: ${missingCriticalFields.join(', ')}. ` +
+                `Either provide all credentials or use SFCC_CARTRIDGE_PATH environment variable for local fallback.`
+        )
+    }
+
+    // All critical fields present, return config
     return {clientId, clientSecret, organizationId, instanceId, shortCode, hostname}
 }
 
@@ -207,6 +226,37 @@ async function searchRecursivelyForApiName(
     return {searchResults}
 }
 
+/**
+ * Processes custom API data from local fallback path
+ * @returns {Array} Array of processed custom API entries
+ */
+function processFallbackCustomApi() {
+    const fallbackData = loadCustomApiFromFallbackPath()
+
+    if (!fallbackData) {
+        return []
+    }
+
+    const {apiJson, schemaYaml, source} = fallbackData
+
+    // Transform api.json structure to match expected output format
+    const processedEntry = {
+        apiName: apiJson.apiName || apiJson.name,
+        apiVersion: apiJson.apiVersion || apiJson.version,
+        cartridgeName: apiJson.cartridgeName || 'local-fallback',
+        endpointPath: apiJson.endpointPath || apiJson.path,
+        httpMethod: apiJson.httpMethod || apiJson.method,
+        status: 'active',
+        securityScheme: apiJson.securityScheme || 'unknown',
+        siteId: apiJson.siteId || null,
+        baseUrl: apiJson.baseUrl || 'local-fallback',
+        schema: schemaYaml,
+        source: source
+    }
+
+    return [processedEntry]
+}
+
 export default {
     name: 'scapi_custom_api_discovery',
     description:
@@ -215,8 +265,67 @@ export default {
     fn: async () => {
         let dxEndpointResponse = null
         let activeCodeVersion = null
-        const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} =
-            fetchAndValidateConfigs()
+
+        const config = fetchAndValidateConfigs()
+
+        // Handle fallback scenario
+        if (config.isFallback) {
+            try {
+                const fallbackApis = processFallbackCustomApi()
+
+                if (fallbackApis.length === 0) {
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: JSON.stringify(
+                                    {
+                                        metadata: {
+                                            fallback: true,
+                                            activeCodeVersion: null,
+                                            timestamp: new Date().toISOString(),
+                                            totalApis: 0,
+                                            message:
+                                                'No SFCC configuration found (dw.json or env vars) and no local fallback path available. Please configure SFCC_CARTRIDGE_PATH environment variable or PWA_STOREFRONT_APP_PATH, or provide SFCC credentials.'
+                                        },
+                                        customApis: []
+                                    },
+                                    null,
+                                    2
+                                )
+                            }
+                        ]
+                    }
+                }
+
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    metadata: {
+                                        fallback: true,
+                                        activeCodeVersion: 'local-filesystem',
+                                        timestamp: new Date().toISOString(),
+                                        totalApis: fallbackApis.length,
+                                        source: fallbackApis[0]?.source || 'local-fallback'
+                                    },
+                                    customApis: fallbackApis
+                                },
+                                null,
+                                2
+                            )
+                        }
+                    ]
+                }
+            } catch (error) {
+                return toErrorResponse(error, [])
+            }
+        }
+
+        // Continue with existing SFCC API logic
+        const {clientId, clientSecret, organizationId, instanceId, shortCode, hostname} = config
         const customApiHost = `${shortCode}.api.commercecloud.salesforce.com`
         const oauthScope = `SALESFORCE_COMMERCE_API:${instanceId} sfcc.custom-apis`
 

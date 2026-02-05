@@ -7,7 +7,7 @@
 import Auth from '../auth'
 import {CommerceApiProviderProps} from '../provider'
 import {Logger} from '../types'
-import {OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
+import {CustomEndpointArg, OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
 
 /**
  * A helper function for handling bad responses from SCAPI when an invalid access token is used.
@@ -37,7 +37,7 @@ export const generateCustomEndpointOptions = (
     config: Omit<CommerceApiProviderProps, 'children'>,
     access_token: string,
     args?: TMutationVariables
-) => {
+): CustomEndpointArg => {
     const globalHeaders = config.headers || {}
     const globalClientConfig = {
         parameters: {

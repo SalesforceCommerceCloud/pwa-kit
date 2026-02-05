@@ -17,4 +17,6 @@ export {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-deri
 export {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 export {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/use-rule-based-bonus-products'
 export {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
+export {useCountdown} from '@salesforce/retail-react-app/app/hooks/use-countdown'
+export {useOtpInputs} from '@salesforce/retail-react-app/app/hooks/use-otp-inputs'
 export {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'

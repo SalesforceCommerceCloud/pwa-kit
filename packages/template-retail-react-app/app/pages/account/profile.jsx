@@ -100,15 +100,8 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                     body: {
                         firstName: values.firstName,
                         lastName: values.lastName,
-                        phoneHome: values.phone,
-                        // NOTE/ISSUE
-                        // The sdk is allowing you to change your email to an already-existing email.
-                        // I would expect an error. We also want to keep the email and login the same
-                        // for the customer, but the sdk isn't changing the login when we submit an
-                        // updated email. This will lead to issues where you change your email but end
-                        // up not being able to login since 'login' will no longer match the email.
-                        email: values.email,
-                        login: values.email
+                        phoneHome: values.phone
+                        // Email field is now readonly and not included in the update
                     }
                 },
                 {
@@ -235,7 +228,7 @@ ProfileCard.propTypes = {
     allowPasswordChange: PropTypes.bool
 }
 
-const PasswordCard = () => {
+const PasswordCard = ({handleForgotPasswordClick}) => {
     const {formatMessage} = useIntl()
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
@@ -300,7 +293,10 @@ const PasswordCard = () => {
                                     </Text>
                                 </Alert>
                             )}
-                            <UpdatePasswordFields form={form} />
+                            <UpdatePasswordFields
+                                form={form}
+                                handleForgotPasswordClick={handleForgotPasswordClick}
+                            />
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
@@ -336,7 +332,11 @@ const PasswordCard = () => {
     )
 }
 
-const AccountDetail = () => {
+PasswordCard.propTypes = {
+    handleForgotPasswordClick: PropTypes.func
+}
+
+const AccountDetail = ({handleForgotPasswordClick}) => {
     const headingRef = useRef()
     useEffect(() => {
         // Focus the 'Account Details' header when the component mounts for accessibility
@@ -356,10 +356,16 @@ const AccountDetail = () => {
 
             <Stack spacing={4}>
                 <ProfileCard allowPasswordChange={!isExternal} />
-                {!isExternal && <PasswordCard />}
+                {!isExternal && (
+                    <PasswordCard handleForgotPasswordClick={handleForgotPasswordClick} />
+                )}
             </Stack>
         </Stack>
     )
+}
+
+AccountDetail.propTypes = {
+    handleForgotPasswordClick: PropTypes.func
 }
 
 AccountDetail.getTemplateName = () => 'account-detail'
