@@ -1468,7 +1468,7 @@ describe('SFPaymentsSheet', () => {
             ).toBeUndefined()
         })
 
-        test('confirmPayment excludes storePaymentMethod when paymentData is missing for Adyen', async () => {
+        test('confirmPayment excludes storePaymentMethod when paymentData is null for Adyen', async () => {
             const ref = React.createRef()
             const mockOrder = createMockOrder({
                 paymentInstruments: [
@@ -1562,10 +1562,10 @@ describe('SFPaymentsSheet', () => {
             const requestBody = updateCall[0].body
 
             expect(requestBody.paymentReferenceRequest.gateway).toBe('adyen')
-            // storePaymentMethod is sent when user requested save
+            // storePaymentMethod not sent when paymentData is null 
             expect(
                 requestBody.paymentReferenceRequest.gatewayProperties.adyen.storePaymentMethod
-            ).toBe(true)
+            ).toBeUndefined()
             // paymentMethod should not be included when paymentData is null
             expect(
                 requestBody.paymentReferenceRequest.gatewayProperties.adyen.paymentMethod
@@ -1926,7 +1926,6 @@ describe('SFPaymentsSheet', () => {
                 />
             )
 
-            // Wait for component to initialize
             await waitFor(() => {
                 expect(mockCheckout).toHaveBeenCalled()
             })
