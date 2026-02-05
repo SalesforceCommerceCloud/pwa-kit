@@ -175,10 +175,26 @@ const mockCustomer = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
 
-// Set default implementation
+// Set default implementation: customer loaded, not loading
 mockUseCustomer.mockImplementation(() => ({
-    data: mockCustomer
+    data: mockCustomer,
+    isLoading: false
 }))
+
+// Mock useCurrentCustomer hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
+    return {
+        useCurrentCustomer: (expand) => {
+            const query = mockUseCustomer()
+            const data = query.data
+                ? {...query.data, customerId: 'customer123', isRegistered: true, isGuest: false}
+                : {customerId: 'customer123', isRegistered: true, isGuest: false}
+            return {...query, data}
+        }
+    }
+})
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => {
     return jest.fn(() => ({
@@ -232,7 +248,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
             sfp: {
                 checkout: mockCheckout
             },
-            metadata: {key: 'value'},
+            metadata: {key: 'value', gateways: {}},
+            isMetadataLoading: false,
             startConfirming: mockStartConfirming,
             endConfirming: mockEndConfirming
         })
@@ -1230,13 +1247,361 @@ describe('SFPaymentsSheet', () => {
         })
     })
 
+    describe('Adyen SPM (Saved Payment Methods)', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            mockCustomer.paymentMethodReferences = []
+            mockUseCustomer.mockImplementation(() => ({
+                data: {...mockCustomer},
+                isLoading: false
+            }))
+        })
+
+        test('confirmPayment includes storePaymentMethod when savePaymentMethodForFutureUse is true for Adyen', async () => {
+            const ref = React.createRef()
+            const mockOrder = createMockOrder({
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123',
+                            gateway: 'adyen',
+                            gatewayProperties: {
+                                adyen: {
+                                    adyenPaymentIntent: {
+                                        id: 'PI123',
+                                        resultCode: 'AUTHORISED',
+                                        adyenPaymentAction: 'action'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent({
+                    paymentMethod: 'payment method',
+                    returnUrl: 'http://test.com?name=value',
+                    origin: 'http://mystore.com',
+                    lineItems: [],
+                    billingDetails: {}
+                })
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'klarna',
+                            savePaymentMethodForFutureUse: true
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            })
+
+            const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+            const requestBody = updateCall[0].body
+
+            expect(requestBody.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(
+                requestBody.paymentReferenceRequest.gatewayProperties.adyen.storePaymentMethod
+            ).toBe(true)
+            expect(requestBody.paymentReferenceRequest.gatewayProperties.adyen.paymentMethod).toBe(
+                'payment method'
+            )
+        })
+
+        test('confirmPayment excludes storePaymentMethod when savePaymentMethodForFutureUse is false for Adyen', async () => {
+            const ref = React.createRef()
+            const mockOrder = createMockOrder({
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123',
+                            gateway: 'adyen',
+                            gatewayProperties: {
+                                adyen: {
+                                    adyenPaymentIntent: {
+                                        id: 'PI123',
+                                        resultCode: 'AUTHORISED',
+                                        adyenPaymentAction: 'action'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                await config.actions.createIntent({
+                    paymentMethod: 'payment method',
+                    returnUrl: 'http://test.com?name=value',
+                    origin: 'http://mystore.com',
+                    lineItems: [],
+                    billingDetails: {}
+                })
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'klarna',
+                            savePaymentMethodForFutureUse: false
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            })
+
+            const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+            const requestBody = updateCall[0].body
+
+            expect(requestBody.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(
+                requestBody.paymentReferenceRequest.gatewayProperties.adyen.storePaymentMethod
+            ).toBeUndefined()
+        })
+
+        test('confirmPayment excludes storePaymentMethod when paymentData is missing for Adyen', async () => {
+            const ref = React.createRef()
+            const mockOrder = createMockOrder({
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123',
+                            gateway: 'adyen',
+                            gatewayProperties: {
+                                adyen: {
+                                    adyenPaymentIntent: {
+                                        id: 'PI123',
+                                        resultCode: 'AUTHORISED',
+                                        adyenPaymentAction: 'action'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            })
+
+            mockUpdateBillingAddress.mockResolvedValue({
+                ...mockBasket,
+                billingAddress: mockBasket.shipments[0].shippingAddress,
+                paymentInstruments: []
+            })
+
+            mockAddPaymentInstrument.mockResolvedValue({
+                ...mockBasket,
+                paymentInstruments: [
+                    {
+                        paymentInstrumentId: 'PI123',
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {
+                            paymentReferenceId: 'ref123'
+                        }
+                    }
+                ]
+            })
+
+            mockOnCreateOrder.mockResolvedValue(mockOrder)
+            mockUpdatePaymentInstrument.mockResolvedValue(mockOrder)
+
+            mockCheckoutConfirm.mockImplementation(async () => {
+                const config = mockCheckout.mock.calls[0][2]
+                // Call createIntent without paymentData (null)
+                await config.actions.createIntent(null)
+
+                return {
+                    responseCode: STATUS_SUCCESS,
+                    data: {}
+                }
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={ref}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await waitFor(() => {
+                expect(ref.current).toBeDefined()
+            })
+
+            const paymentElement = mockCheckout.mock.calls[0][4]
+
+            await act(async () => {
+                paymentElement.dispatchEvent(
+                    new CustomEvent('sfp:paymentmethodselected', {
+                        bubbles: true,
+                        composed: true,
+                        detail: {
+                            selectedPaymentMethod: 'klarna',
+                            savePaymentMethodForFutureUse: true
+                        }
+                    })
+                )
+            })
+
+            await ref.current.confirmPayment()
+
+            await waitFor(() => {
+                expect(mockUpdatePaymentInstrument).toHaveBeenCalled()
+            })
+
+            const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
+            const requestBody = updateCall[0].body
+
+            expect(requestBody.paymentReferenceRequest.gateway).toBe('adyen')
+            // storePaymentMethod is sent when user requested save
+            expect(
+                requestBody.paymentReferenceRequest.gatewayProperties.adyen.storePaymentMethod
+            ).toBe(true)
+            // paymentMethod should not be included when paymentData is null
+            expect(
+                requestBody.paymentReferenceRequest.gatewayProperties.adyen.paymentMethod
+            ).toBeUndefined()
+        })
+    })
+
     describe('SPM (Saved Payment Methods) Display', () => {
         beforeEach(() => {
             jest.clearAllMocks()
             mockCustomer.paymentMethodReferences = []
             mockUseCustomer.mockImplementation(() => ({
-                data: {...mockCustomer}
+                data: {...mockCustomer},
+                isLoading: false
             }))
+        })
+
+        test('does not initialize checkout while customer is loading (registered user)', async () => {
+            mockUseCustomer.mockImplementation(() => ({
+                data: undefined,
+                isLoading: true
+            }))
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50))
+            })
+
+            expect(mockCheckout).not.toHaveBeenCalled()
         })
 
         test('passes empty savedPaymentMethods to SDK when customer has no payment method references', async () => {
@@ -1347,13 +1712,39 @@ describe('SFPaymentsSheet', () => {
             const config = checkoutCall[2]
 
             expect(config.options.savedPaymentMethods).toEqual([])
-=======
->>>>>>> f09e9e5fd (W-20508465: Add support for Adyen payments)
+        })
+
+        test('does not initialize checkout while metadata is loading', async () => {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const useSFPaymentsModule = require('@salesforce/retail-react-app/app/hooks/use-sf-payments')
+            jest.spyOn(useSFPaymentsModule, 'useSFPayments').mockReturnValue({
+                sfp: {
+                    checkout: mockCheckout
+                },
+                metadata: undefined,
+                isMetadataLoading: true,
+                startConfirming: mockStartConfirming,
+                endConfirming: mockEndConfirming
+            })
+
+            renderWithCheckoutContext(
+                <SFPaymentsSheet
+                    ref={React.createRef()}
+                    onCreateOrder={mockOnCreateOrder}
+                    onError={mockOnError}
+                />
+            )
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50))
+            })
+
+            expect(mockCheckout).not.toHaveBeenCalled()
         })
     })
 
     describe('lifecycle', () => {
-        test('cleans up checkout component on unmount', () => {
+        test('cleans up checkout component on unmount', async () => {
             const {unmount} = renderWithCheckoutContext(
                 <SFPaymentsSheet
                     ref={mockRef}
@@ -1361,6 +1752,11 @@ describe('SFPaymentsSheet', () => {
                     onError={mockOnError}
                 />
             )
+
+            // Wait for component to initialize
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
 
             unmount()
 
@@ -1418,6 +1814,11 @@ describe('SFPaymentsSheet', () => {
 
             await waitFor(() => {
                 expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
+            })
+
+            // Wait for component to initialize
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
             })
 
             await waitFor(
@@ -1524,6 +1925,11 @@ describe('SFPaymentsSheet', () => {
                     onError={mockOnError}
                 />
             )
+
+            // Wait for component to initialize
+            await waitFor(() => {
+                expect(mockCheckout).toHaveBeenCalled()
+            })
 
             await waitFor(
                 () => {
