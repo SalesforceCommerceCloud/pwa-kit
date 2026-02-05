@@ -279,19 +279,19 @@ export const createPaymentInstrumentBody = ({
     if (!isPostRequest && gateway === PAYMENT_GATEWAYS.ADYEN) {
         // Create Adyen payment reference request
         paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
+        const adyenProperties = {
+            ...(paymentData && {
+                paymentMethod: paymentData.paymentMethod,
+                returnUrl: paymentData.returnUrl,
+                origin: paymentData.origin,
+                lineItems: paymentData.lineItems,
+                billingDetails: paymentData.billingDetails
+            }),
+            ...(storePaymentMethod === true && {storePaymentMethod: true})
+        }
+
         paymentReferenceRequest.gatewayProperties = {
-            adyen: {
-                ...(paymentData && {
-                    paymentMethod: paymentData.paymentMethod,
-                    returnUrl: paymentData.returnUrl,
-                    origin: paymentData.origin,
-                    lineItems: paymentData.lineItems,
-                    billingDetails: paymentData.billingDetails
-                }),
-                ...(storePaymentMethod === true && {
-                    storePaymentMethod: true
-                })
-            }
+            adyen: adyenProperties
         }
     }
 
@@ -318,11 +318,8 @@ export const transformPaymentMethodReferences = (customer, paymentConfig) => {
 
     return paymentMethodReferences
         .map((pmr) => {
+            // Display title is derived by the SDK from network + labels; name is for reference/logging only.
             const generateDisplayName = () => {
-                if (pmr.brand && pmr.last4) {
-                    const brandName = pmr.brand.charAt(0).toUpperCase() + pmr.brand.slice(1)
-                    return `${brandName} •••• ${pmr.last4}`
-                }
                 if (pmr.type === 'card' && pmr.last4) {
                     return `Card •••• ${pmr.last4}`
                 }
