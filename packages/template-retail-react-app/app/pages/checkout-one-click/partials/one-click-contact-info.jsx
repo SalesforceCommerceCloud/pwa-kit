@@ -50,14 +50,14 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getAuthorizePasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 import {useLocation} from 'react-router-dom'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -78,9 +78,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
     const passwordlessConfig = getConfig().app.login?.passwordless
-    const callbackURL = passwordlessConfig?.callbackURI
-        ? absoluteUrl(passwordlessConfig.callbackURI)
-        : ''
+    const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
@@ -247,15 +245,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                const errMsg = error?.message || ''
-                const isUserNotFound =
-                    /user not found|email not found|unknown user|no account|no user|error getting user info/i.test(
-                        errMsg
-                    )
-                if (!isUserNotFound) {
-                    const message = formatMessage(getPasswordlessErrorMessage(errMsg))
-                    setError(message)
-                }
+                const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
+                setError(message)
                 // Keep continue button visible if email is valid (for unregistered users)
                 if (isValidEmail(email)) {
                     setShowContinueButton(true)

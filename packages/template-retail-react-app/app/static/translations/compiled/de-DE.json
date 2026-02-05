@@ -1665,6 +1665,12 @@
       "value": "Anzeigen"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Einkaufsassistent fragen"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,

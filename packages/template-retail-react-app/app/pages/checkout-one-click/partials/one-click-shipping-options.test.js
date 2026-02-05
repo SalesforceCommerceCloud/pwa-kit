@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -341,7 +341,7 @@ describe('ShippingOptions Component', () => {
     })
 
     describe('for registered users with auto-selection', () => {
-        test('skips shipping method update when existing method is still valid', async () => {
+        test('skips shipping method update when existing method is still valid and stays on edit view', async () => {
             jest.resetModules()
 
             jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
@@ -376,10 +376,14 @@ describe('ShippingOptions Component', () => {
             localRenderWithProviders(<module.default />)
 
             await waitFor(() => {
-                expect(mockGoToNextStep).toHaveBeenCalled()
+                expect(mockUpdateShippingMethod.mutateAsync).not.toHaveBeenCalled()
             })
 
-            expect(mockUpdateShippingMethod.mutateAsync).not.toHaveBeenCalled()
+            // Does not auto-advance so user can change option or click Continue (fixes "Change" flicker)
+            expect(mockGoToNextStep).not.toHaveBeenCalled()
+            expect(
+                screen.getAllByRole('button', {name: /continue to payment/i}).length
+            ).toBeGreaterThan(0)
         })
 
         test('auto-selects default method when existing method is no longer valid', async () => {
@@ -796,6 +800,93 @@ describe('ShippingOptions Component', () => {
             )
 
             expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+        })
+
+        test('multi-shipment edit view shows shipping options for each shipment', async () => {
+            jest.resetModules()
+
+            jest.doMock(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+                () => ({
+                    useCheckout: jest.fn().mockReturnValue({
+                        step: 3,
+                        STEPS: {
+                            CONTACT_INFO: 0,
+                            PICKUP_ADDRESS: 1,
+                            SHIPPING_ADDRESS: 2,
+                            SHIPPING_OPTIONS: 3,
+                            PAYMENT: 4
+                        },
+                        goToStep: mockGoToStep,
+                        goToNextStep: mockGoToNextStep
+                    })
+                })
+            )
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+                useCurrentCustomer: () => ({
+                    data: {customerId: 'test-customer-id', isRegistered: true}
+                })
+            }))
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+                useCurrentBasket: () => ({
+                    data: {
+                        basketId: 'test-basket-id',
+                        shipments: [
+                            {
+                                shipmentId: 'ship1',
+                                shippingAddress: {
+                                    firstName: 'Oscar',
+                                    lastName: 'Robertson',
+                                    address1: '333 South St',
+                                    city: 'West Lafayette',
+                                    stateCode: 'IN',
+                                    postalCode: '98103'
+                                },
+                                shippingMethod: {id: 'std', name: 'Standard'}
+                            },
+                            {
+                                shipmentId: 'ship2',
+                                shippingAddress: {
+                                    firstName: 'Lee',
+                                    lastName: 'Robertson',
+                                    address1: '158 South St',
+                                    city: 'West Lafayette',
+                                    stateCode: 'IN',
+                                    postalCode: '98103'
+                                },
+                                shippingMethod: {id: 'std2', name: 'Standard 2'}
+                            }
+                        ],
+                        shippingItems: [
+                            {shipmentId: 'ship1', price: 0},
+                            {shipmentId: 'ship2', price: 0}
+                        ]
+                    },
+                    derivedData: {hasBasket: true, totalItems: 2, totalShippingCost: 0}
+                })
+            }))
+
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
+                if (parameters.shipmentId === 'ship1') return {data: multiShipMethods1}
+                if (parameters.shipmentId === 'ship2') return {data: multiShipMethods2}
+                return {data: multiShipMethods1}
+            })
+
+            const {renderWithProviders: localRenderWithProviders} = await import(
+                '@salesforce/retail-react-app/app/utils/test-utils'
+            )
+            const module = await import(
+                '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
+            )
+
+            localRenderWithProviders(<module.default />)
+
+            const cards = screen.getAllByTestId('sf-toggle-card-step-2')
+            expect(cards.length).toBeGreaterThan(0)
+            expect(within(cards[0]).queryByTestId('loading')).toBeNull()
+            expect(screen.getAllByText('Shipment 1:').length).toBeGreaterThan(0)
+            expect(screen.getAllByText('Shipment 2:').length).toBeGreaterThan(0)
         })
 
         test('auto-selects default method when no method is set on shipment', async () => {
