@@ -20,7 +20,7 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
@@ -63,7 +63,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
-    const {data: customer} = useCurrentCustomer(['paymentmethodreferences'])
+    const {isRegistered} = useCustomerType()
+    const {data: customer, isLoading: customerLoading} = useCurrentCustomer(
+        isRegistered ? ['paymentmethodreferences'] : undefined
+    )
+    const isDataLoading = isRegistered && customerLoading
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -329,7 +333,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        if (gateway.current === PAYMENT_GATEWAYS.ADYEN) {
+        if (gateway.current === PAYMENT_GATEWAYS.ADYEN && paymentData) {
             // Append necessary data to Adyen redirect return URL
             paymentData.returnUrl +=
                 '&orderNo=' +
@@ -535,6 +539,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     )
 
     useEffect(() => {
+        // Wait for SPM data to load before initializing for registered users
+        if (isDataLoading) {
+            return
+        }
+
+        if (checkoutComponent.current) {
+            return
+        }
+
         if (sfp && metadata && containerElementRef.current && paymentConfig) {
             const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
                 (account) => ({
@@ -600,14 +613,13 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current = null
         }
     }, [
+        isDataLoading,
         sfp,
         metadata,
         containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic,
-        customer?.isRegistered,
-        customer?.customerId,
-        savedPaymentMethods
+        customer?.isRegistered
     ])
 
     useEffect(() => {
