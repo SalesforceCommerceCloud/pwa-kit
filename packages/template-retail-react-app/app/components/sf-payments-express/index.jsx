@@ -23,14 +23,6 @@ const SFPaymentsExpress = ({
     // this flag ensures data remains available even if the refetch completes before the cache update.
     const {data: basket} = useCurrentBasket()
 
-    // Preserves the basketId in a ref so that the component stays mounted even after the basket is consumed.
-    // The ref persists across re-renders and doesn't cause the guard to fail when
-    // the basket becomes null
-    const basketIdRef = useRef(null)
-
-    if (basket?.basketId) {
-        basketIdRef.current = basket.basketId
-    }
     const prepareBasket = useCallback(async () => {
         return basket
     }, [basket?.basketId])
@@ -43,13 +35,7 @@ const SFPaymentsExpress = ({
         [basket?.basketId]
     )
 
-    // Use ref instead of live basket for the guard
-    /*
-    When the component first mounts and there's no basket yet (user hasn't added anything to cart), 
-    basketIdRef.current will be null (its initial value). 
-    In this case, you don't want to render payment buttons, so return null to avoid rendering.
-    */
-    if (!basketIdRef.current) {
+    if (!basket?.basketId) {
         return null
     }
 
