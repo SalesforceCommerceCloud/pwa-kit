@@ -205,12 +205,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     }
 
     // Handle sending OTP email
-    const handleSendEmailOtp = async (email) => {
+    const handleSendEmailOtp = async (email, isResend = false) => {
         // Normalize email for comparison (trim and lowercase)
         const normalizedEmail = email?.trim().toLowerCase() || ''
 
-        // Skip if email hasn't changed from the last one we sent
-        if (lastEmailSentRef.current === normalizedEmail) {
+        // Skip if email hasn't changed from the last one we sent (unless user requested)
+        if (!isResend && lastEmailSentRef.current === normalizedEmail) {
             // Return cached result if we have one
             if (otpSendPromiseRef.current) {
                 return otpSendPromiseRef.current
@@ -219,8 +219,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             return {isRegistered: false}
         }
 
-        // Reuse in-flight request (single-flight) across blur and submit
-        if (otpSendPromiseRef.current) {
+        // Reuse in-flight request (single-flight) across blur and submit (but not for explicit resend)
+        if (!isResend && otpSendPromiseRef.current) {
             return otpSendPromiseRef.current
         }
 

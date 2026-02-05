@@ -6511,28 +6511,6 @@
       "value": "]"
     }
   ],
-  "otp.button.resend_timer": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗşḗḗƞḓ ƈǿǿḓḗḗ īƞ "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " şḗḗƈǿǿƞḓş..."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "otp.error.invalid_code": [
     {
       "type": 0,
@@ -6583,14 +6561,50 @@
       "value": "]"
     }
   ],
-  "otp.message.verifying": [
+  "otp.message.resend_cooldown": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ṽḗḗřīƒẏīƞɠ ƈǿǿḓḗḗ..."
+      "value": "Ẏǿǿŭŭ ƈȧȧƞ řḗḗɋŭŭḗḗşŧ ȧȧ ƞḗḗẇ ƈǿǿḓḗḗ īƞ "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "şḗḗƈǿǿƞḓ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "şḗḗƈǿǿƞḓş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "."
     },
     {
       "type": 0,
