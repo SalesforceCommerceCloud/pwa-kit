@@ -175,7 +175,7 @@ const mockCustomer = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
 
-// Set default implementation: customer loaded, not loading
+// Set default implementation
 mockUseCustomer.mockImplementation(() => ({
     data: mockCustomer,
     isLoading: false
