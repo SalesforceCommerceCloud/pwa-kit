@@ -12,15 +12,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 /**
- * Helper function to read the client secret from the payment instrument
- * @param {Object} paymentInstrument - Payment instrument object
- * @returns {string|null} Client secret
- */
-export const getClientSecret = (paymentInstrument) => {
-    return paymentInstrument?.paymentReference?.gatewayProperties?.stripe?.clientSecret
-}
-
-/**
  * Returns the first Salesforce Payments instrument found in a basket or order.
  * @param {Object} basketOrOrder - A basket or order object containing paymentInstruments
  * @returns {Object|undefined} First Salesforce Payments payment instrument found, or undefined if none exist
@@ -288,7 +279,7 @@ export const createPaymentInstrumentBody = ({
                     lineItems: paymentData.lineItems,
                     billingDetails: paymentData.billingDetails
                 }),
-                ...(storePaymentMethod === true && paymentData && {storePaymentMethod: true})
+                ...(storePaymentMethod === true && {storePaymentMethod: true})
             }
         }
     }
@@ -316,7 +307,6 @@ export const transformPaymentMethodReferences = (customer, paymentConfig) => {
 
     return paymentMethodReferences
         .map((pmr) => {
-            // Display title is derived by the SDK from network + labels; name is for reference/logging only.
             const generateDisplayName = () => {
                 if (pmr.type === 'card' && pmr.last4) {
                     return `Card •••• ${pmr.last4}`
