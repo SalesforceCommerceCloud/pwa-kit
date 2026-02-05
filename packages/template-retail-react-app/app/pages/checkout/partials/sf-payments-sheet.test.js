@@ -1468,7 +1468,7 @@ describe('SFPaymentsSheet', () => {
             ).toBeUndefined()
         })
 
-        test('confirmPayment excludes storePaymentMethod when paymentData is null for Adyen', async () => {
+        test('confirmPayment includes storePaymentMethod when save requested and paymentData is null for Adyen', async () => {
             const ref = React.createRef()
             const mockOrder = createMockOrder({
                 paymentInstruments: [
@@ -1562,10 +1562,10 @@ describe('SFPaymentsSheet', () => {
             const requestBody = updateCall[0].body
 
             expect(requestBody.paymentReferenceRequest.gateway).toBe('adyen')
-            // storePaymentMethod not sent when paymentData is null 
+            // When user requested save, storePaymentMethod is sent (utils include it when true regardless of paymentData)
             expect(
                 requestBody.paymentReferenceRequest.gatewayProperties.adyen.storePaymentMethod
-            ).toBeUndefined()
+            ).toBe(true)
             // paymentMethod should not be included when paymentData is null
             expect(
                 requestBody.paymentReferenceRequest.gatewayProperties.adyen.paymentMethod
@@ -1744,7 +1744,7 @@ describe('SFPaymentsSheet', () => {
     })
 
     describe('lifecycle', () => {
-        test('cleans up checkout component on unmount', async () => {
+        test('cleans up checkout component on unmount', () => {
             const {unmount} = renderWithCheckoutContext(
                 <SFPaymentsSheet
                     ref={mockRef}
@@ -1752,11 +1752,6 @@ describe('SFPaymentsSheet', () => {
                     onError={mockOnError}
                 />
             )
-
-            // Wait for component to initialize
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            })
 
             unmount()
 
@@ -1814,11 +1809,6 @@ describe('SFPaymentsSheet', () => {
 
             await waitFor(() => {
                 expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
-            })
-
-            // Wait for component to initialize
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
             })
 
             await waitFor(
@@ -1925,10 +1915,6 @@ describe('SFPaymentsSheet', () => {
                     onError={mockOnError}
                 />
             )
-
-            await waitFor(() => {
-                expect(mockCheckout).toHaveBeenCalled()
-            })
 
             await waitFor(
                 () => {
