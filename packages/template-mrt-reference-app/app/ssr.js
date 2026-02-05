@@ -65,6 +65,7 @@ const ENVS_TO_EXPOSE = [
     'aws_lambda_log_stream_name',
     'aws_region',
     'bundle_id',
+    'mrt_env_base_path',
     // These "customer" defined environment variables are set by the Manager
     // and expected by the MRT smoke test suite
     'customer_*',
@@ -355,11 +356,12 @@ const loggingMiddleware = (req, res, next) => {
 
 const envBasePathMiddleware = (req, res, next) => {
     const basePath = process.env.MRT_ENV_BASE_PATH
-    if (basePath && req.path.startsWith(basePath)) {
-        req.originalPath = req.path
-        req.path = req.path.slice(basePath.length) || '/'
+    console.log(`Base path: ${basePath}`)
+    console.log(`Request path: ${req.url}`)
+    if (basePath && req.url.startsWith(basePath)) {
+        req.url = req.path.slice(basePath.length) || '/'
         console.log(
-            `Base path: Rewrote ${basePath} -> Request path: ${req.originalPath} -> New path: ${req.path}`
+            `Base path: Rewrote ${basePath} -> Request path: ${req.originalUrl} -> New path: ${req.url}`
         )
     }
     return next()
@@ -397,11 +399,10 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
         return next()
     })
 
-    // Add a middleware to consume the base path from the request path if one is set
-    app.use(envBasePathMiddleware)
     // Add middleware to log request and response headers
     app.use(loggingMiddleware)
-
+    // Add a middleware to consume the base path from the request path if one is set
+    app.use(envBasePathMiddleware)
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)

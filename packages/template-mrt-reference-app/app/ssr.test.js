@@ -17,6 +17,10 @@ const {
 const {mockClient} = require('aws-sdk-client-mock')
 const {ServiceException} = require('@smithy/smithy-client')
 
+const standardHeaders = {
+    'x-correlation-id': 'test-correlation-id',
+    'x-apigateway-event': 'test-apigateway-event'
+}
 class AccessDenied extends ServiceException {
     constructor(options) {
         super({...options, name: 'AccessDenied'})
@@ -28,6 +32,27 @@ describe('server', () => {
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
     const logsMock = mockClient(CloudWatchLogsClient)
+    const pathsToCheck = [
+        ['/', 200, 'application/json; charset=utf-8'],
+        ['/tls', 200, 'application/json; charset=utf-8'],
+        ['/exception', 500, 'text/html; charset=utf-8'],
+        ['/cache', 200, 'application/json; charset=utf-8'],
+        ['/cookie', 200, 'application/json; charset=utf-8'],
+        ['/set-response-headers', 200, 'application/json; charset=utf-8'],
+        ['/isolation', 200, 'application/json; charset=utf-8'],
+        ['/memtest', 200, 'application/json; charset=utf-8'],
+        ['/streaming-large', 200, 'application/json; charset=utf-8']
+    ]
+    const pathsToCheckWithBasePath = (basePath) => {
+        return pathsToCheck.map(
+            (pathStatusContentType) => [
+                basePath + pathStatusContentType[0],
+                pathStatusContentType[1],
+                pathStatusContentType[2]
+            ]
+        )
+    }
+
     beforeEach(() => {
         originalEnv = process.env
         process.env = Object.assign({}, process.env, {
@@ -53,37 +78,45 @@ describe('server', () => {
         server.close()
         jest.restoreAllMocks()
     })
-    test.each([
-        ['/', 200, 'application/json; charset=utf-8'],
-        ['/tls', 200, 'application/json; charset=utf-8'],
-        ['/exception', 500, 'text/html; charset=utf-8'],
-        ['/cache', 200, 'application/json; charset=utf-8'],
-        ['/cookie', 200, 'application/json; charset=utf-8'],
-        ['/set-response-headers', 200, 'application/json; charset=utf-8'],
-        ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8'],
-        ['/streaming-large', 200, 'application/json; charset=utf-8']
-    ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
+    test.each(pathsToCheck)('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
             .expect(expectedStatus)
             .expect('Content-Type', expectedContentType)
     })
 
+    test.each(pathsToCheckWithBasePath('/test-base-path'))('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
+        process.env.MRT_ENV_BASE_PATH = '/test-base-path'
+        return request(app)
+            .get(path)
+            .set(standardHeaders)
+            .expect(expectedStatus)
+            .expect('Content-Type', expectedContentType)
+    })
+
     test('Path "/cache" has Cache-Control set', () => {
-        return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
+        return request(app)
+            .get('/cache')
+            .set(standardHeaders)
+            .expect('Cache-Control', 's-maxage=60')
     })
 
     test('Path "/cache/:duration" has Cache-Control set correctly', () => {
-        return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
+        return request(app)
+            .get('/cache/123')
+            .set(standardHeaders)
+            .expect('Cache-Control', 's-maxage=123')
     })
 
     test('All responses have Server header set to "mrt ref app"', () => {
-        return request(app).get('/').expect('Server', 'mrt ref app')
+        return request(app).get('/').set(standardHeaders).expect('Server', 'mrt ref app')
     })
 
     test('Path "/headers" echoes request headers', async () => {
-        const response = await request(app).get('/headers').set('Random-Header', 'random')
+        const response = await request(app)
+            .get('/headers')
+            .set(standardHeaders)
+            .set('Random-Header', 'random')
 
         expect(response.body.headers['random-header']).toBe('random')
     })
@@ -91,12 +124,14 @@ describe('server', () => {
     test('Path "/cookie" sets cookie', () => {
         return request(app)
             .get('/cookie?name=test-cookie&value=test-value')
+            .set(standardHeaders)
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
 
     test('Path "/set-response-headers" sets response header', () => {
         return request(app)
             .get('/set-response-headers?header1=value1&header2=test-value')
+            .set(standardHeaders)
             .expect('header1', 'value1')
             .expect('header2', 'test-value')
     })
@@ -107,7 +142,7 @@ describe('server', () => {
         s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
         logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
         const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
-        const response = await request(app).get(`/isolation?${params}`)
+        const response = await request(app).get(`/isolation?${params}`).set(standardHeaders)
         expect(response.body.origin).toBe(true)
         expect(response.body.storage).toBe(true)
         expect(response.body.logs).toBe(true)
@@ -119,7 +154,7 @@ describe('server', () => {
         s3Mock.on(GetObjectCommand).resolves()
         logsMock.on(CreateLogStreamCommand).resolves()
         const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
-        const response = await request(app).get(`/isolation?${params}`)
+        const response = await request(app).get(`/isolation?${params}`).set(standardHeaders)
         expect(response.body.origin).toBe(false)
         expect(response.body.storage).toBe(false)
         expect(response.body.logs).toBe(false)
@@ -133,14 +168,14 @@ describe('server', () => {
     })
 
     test('Path "/ssr-shared" serves the example.json file', async () => {
-        const response = await request(app).get('/ssr-shared')
+        const response = await request(app).get('/ssr-shared').set(standardHeaders)
         expect(response.body.message).toBe(
             'This file is used in the E2E tests to verify that correct header values are set.'
         )
     })
 
     test('Path "/streaming-large" returns streaming: false', async () => {
-        const response = await request(app).get('/streaming-large')
+        const response = await request(app).get('/streaming-large').set(standardHeaders)
         expect(response.status).toBe(200)
         expect(response.body).toEqual({streaming: false})
     })
