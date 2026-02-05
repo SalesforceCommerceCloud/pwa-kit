@@ -411,7 +411,7 @@ const AccountOrderDetail = () => {
                                             : null
 
                                         const shippingMethodName =
-                                            omsShipment?.provider || shipment.shippingMethod.name
+                                            omsShipment?.provider || shipment.shippingMethod?.name
                                         const shippingStatus =
                                             omsShipment?.status || shipment.shippingStatus
                                         const trackingNumber =
