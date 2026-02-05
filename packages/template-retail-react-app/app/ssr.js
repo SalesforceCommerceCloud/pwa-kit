@@ -425,8 +425,6 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             // Parse the URL to extract hostname and path
             const url = new URL(config.app.sfPayments.metadataUrl)
-            console.log('url', url)
-            console.log('config.app.sfPayments.metadataUrl', config.app.sfPayments.metadataUrl)
             // Use Node's https module instead of fetch
             const data = await new Promise((resolve, reject) => {
                 const options = {

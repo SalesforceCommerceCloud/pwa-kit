@@ -284,7 +284,7 @@ const SFPaymentsExpressButtons = ({
                 zoneId: zoneIdValue,
                 paymentData: paymentData,
                 paymentMethods: paymentConfig?.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts // Add this
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts
             })
 
             // Update order payment instrument to create payment
