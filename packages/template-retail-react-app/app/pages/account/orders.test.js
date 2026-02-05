@@ -1429,8 +1429,12 @@ describe('OMS order with no OMS shipments - default to ECOM shipment display (mu
         // Default to ECOM delivery block (multi-shipment) when OMS has no shipments.
         expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
         expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping address 1/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping address 2/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 1/i})
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 2/i})
+        ).toBeInTheDocument()
         expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
         expect(await screen.findByText(/Bob Smith/i)).toBeInTheDocument()
         expect(await screen.findByText(/876 NE 8th st/i)).toBeInTheDocument()
