@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useCallback, useMemo, useRef} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import PropTypes from 'prop-types'
 
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'

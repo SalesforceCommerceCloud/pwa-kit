@@ -74,7 +74,7 @@ const SFPaymentsExpressButtons = ({
         parameters: {
             currency: paymentCurrency,
             countryCode: paymentCountryCode || fallbackCountryCode || 'US' // TODO: remove US when parameter made optional
-            //zoneId: "stripeUSTest" (if you need to test with a different zone)
+            //,zoneId: "stripeUSTest" //if you need to test with a different zone
         }
     })
 
@@ -261,12 +261,7 @@ const SFPaymentsExpressButtons = ({
     /**
      * Create order from basket and update payment instrument
      */
-    const createOrderAndUpdatePayment = async (
-        basketId,
-        paymentType,
-        zoneIdValue,
-        paymentData = {}
-    ) => {
+    const createOrderAndUpdatePayment = async (basketId, paymentType, paymentData = {}) => {
         // Create order from the basket
         let order = await createOrder({
             body: {basketId}
@@ -281,7 +276,7 @@ const SFPaymentsExpressButtons = ({
             const paymentInstrumentBody = createPaymentInstrumentBody({
                 amount: order.orderTotal,
                 paymentMethodType: paymentType,
-                zoneId: zoneIdValue,
+                zoneId: zoneId,
                 paymentData: paymentData,
                 paymentMethods: paymentConfig?.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts
@@ -685,10 +680,9 @@ const SFPaymentsExpressButtons = ({
              * If one doesn't exist, removes any existing one and adds a new one.
              * @param {Object} basket - The basket object
              * @param {string} paymentMethodType - Type of payment method
-             * @param {string} zoneId - Zone ID for payment processing
              * @returns {Promise<Object>} Updated basket with payment instrument
              */
-            const ensurePaymentInstrumentInBasket = async (basket, paymentMethodType, zoneId) => {
+            const ensurePaymentInstrumentInBasket = async (basket, paymentMethodType) => {
                 // Check if payment instrument already exists
                 let sfPaymentsInstrument = getSFPaymentsInstrument(basket)
 
@@ -818,6 +812,9 @@ const SFPaymentsExpressButtons = ({
                     // For Adyen: Update addresses from paymentData before creating order
                     // (Stripe uses onPayerApprove instead, PayPal is handled above)
                     if (isAdyen && paymentData?.shippingDetails) {
+                        // Set confirmingBasket to show loading spinner during address updates
+                        startConfirming(expressBasket.current)
+
                         const {billingAddress, shippingAddress} = transformAddressDetails(
                             paymentData.billingDetails,
                             paymentData.shippingDetails
@@ -851,7 +848,6 @@ const SFPaymentsExpressButtons = ({
                         const order = await createOrderAndUpdatePayment(
                             expressBasket.current.basketId,
                             paymentMethodType,
-                            zoneId,
                             paymentData
                         )
                         orderRef.current = order
@@ -890,8 +886,7 @@ const SFPaymentsExpressButtons = ({
                         // Create order and update payment instrument
                         order = await createOrderAndUpdatePayment(
                             expressBasket.current.basketId,
-                            paymentMethodType,
-                            zoneId
+                            paymentMethodType
                         )
                         orderRef.current = order
                     }
