@@ -353,6 +353,18 @@ const loggingMiddleware = (req, res, next) => {
     return next()
 }
 
+const envBasePathMiddleware = (req, res, next) => {
+    const basePath = process.env.MRT_ENV_BASE_PATH
+    if (basePath && req.path.startsWith(basePath)) {
+        req.originalPath = req.path
+        req.path = req.path.slice(basePath.length) || '/'
+        console.log(
+            `Base path: Rewrote ${basePath} -> Request path: ${req.originalPath} -> New path: ${req.path}`
+        )
+    }
+    return next()
+}
+
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -385,6 +397,8 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
         return next()
     })
 
+    // Add a middleware to consume the base path from the request path if one is set
+    app.use(envBasePathMiddleware)
     // Add middleware to log request and response headers
     app.use(loggingMiddleware)
 
