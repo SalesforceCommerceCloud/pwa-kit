@@ -344,7 +344,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // TODO: Used to load metadata
                         '*.demandware.net',
                         '*.adyen.com',
-                        '*.google.com',
+                        '*.google.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -353,7 +353,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com',,
+                        '*.google.com',
                         '*.adyen.com'
                     ]
                 }
@@ -425,8 +425,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             // Parse the URL to extract hostname and path
             const url = new URL(config.app.sfPayments.metadataUrl)
-console.log('url', url)
-console.log('config.app.sfPayments.metadataUrl', config.app.sfPayments.metadataUrl)
+            console.log('url', url)
+            console.log('config.app.sfPayments.metadataUrl', config.app.sfPayments.metadataUrl)
             // Use Node's https module instead of fetch
             const data = await new Promise((resolve, reject) => {
                 const options = {

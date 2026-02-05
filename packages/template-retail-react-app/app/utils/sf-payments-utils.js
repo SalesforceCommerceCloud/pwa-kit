@@ -375,6 +375,30 @@ export const transformPaymentMethodReferences = (customer, paymentConfig) => {
 }
 
 /**
+ * Maps payment method type for express buttons based on gateway.
+ * Stripe express requires 'card' for googlepay/applepay, while Adyen uses the original type.
+ *
+ * @param {string} type - The payment method type (e.g., 'googlepay', 'applepay', 'paypal')
+ * @param {string} gateway - The payment gateway (e.g., 'stripe', 'adyen')
+ * @returns {string} The mapped payment method type
+ */
+export const getExpressPaymentMethodType = (type, paymentMethods, paymentMethodSetAccounts) => {
+    const gateway = getGatewayFromPaymentMethod(type, paymentMethods, paymentMethodSetAccounts)
+    // Only Stripe express needs 'card' mapping for applepay/googlepay
+    if (gateway === PAYMENT_GATEWAYS.STRIPE) {
+        switch (type) {
+            case 'applepay':
+            case 'googlepay':
+                return 'card'
+            default:
+                return type
+        }
+    }
+    // Adyen and others use the type as-is
+    return type
+}
+
+/**
  * Returns a theme object containing CSS information for use with SF Payments components.
  * @param {*} options - theme override options
  * @returns SF Payments theme

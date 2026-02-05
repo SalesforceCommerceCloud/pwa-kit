@@ -18,7 +18,6 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
-import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 import {
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
@@ -34,8 +33,24 @@ import {
     getSelectedShippingMethodId,
     createPaymentInstrumentBody,
     isPayPalPaymentMethodType,
-    getClientSecret
+    getClientSecret,
+    getGatewayFromPaymentMethod,
+    getExpressPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
+import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
+
+/*
+  These imports are needed during the failOrder process.  The useAccessToken hook is not a commonly used hook
+  BUT it is needed to get the current order details and gaurd the failOrder process from failing
+  It's not a new pattern we are introducing: use-einstein.js uses it to get the access token
+  We are basically bypassing the React Query Wrapper and going directly to the Commerce API to get the order details
+  The React Query hooks are designed for declarative data fetching, so for imperative calls, you use the raw API client, which requires manual auth.
+  If we use the React Query hooks, we would need to wait for the query to complete before we can call the failOrder mutation
+
+  The useQueryClient is needed to clear the stale cache when the basket can't be recovered
+*/
+import {useCommerceApi, useAccessToken} from '@salesforce/commerce-sdk-react'
+import {useQueryClient} from '@tanstack/react-query'
 
 const SFPaymentsExpressButtons = ({
     usage,
@@ -51,23 +66,20 @@ const SFPaymentsExpressButtons = ({
     const intl = useIntl()
     const navigate = useNavigation()
     const toast = useToast()
+    const queryClient = useQueryClient()
     const {countryCode: fallbackCountryCode} = useSFPaymentsCountry()
     const {sfp, metadata, startConfirming, endConfirming} = useSFPayments()
 
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency: paymentCurrency,
-            countryCode: paymentCountryCode || fallbackCountryCode || 'US', // TODO: remove US when parameter made optional
-            //amount: 99.99  // <-- add the transaction amount
+            countryCode: paymentCountryCode || fallbackCountryCode || 'US' // TODO: remove US when parameter made optional
+            //zoneId: "stripeUSTest" (if you need to test with a different zone)
         }
     })
 
     const cardCaptureAutomatic = useAutomaticCapture()
-    //const zoneId = useShopperConfiguration('zoneId')
-    // Get zoneId from payment configuration if available, otherwise fall back to shopper configuration
-    const zoneIdFromConfig = useShopperConfiguration('zoneId')
-    console.log('paymentConfig:', JSON.stringify(paymentConfig, null, 2))
-    const zoneId = paymentConfig?.zoneId || zoneIdFromConfig
+    const zoneId = paymentConfig?.zoneId
 
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
         'updateBillingAddressForBasket'
@@ -96,6 +108,14 @@ const SFPaymentsExpressButtons = ({
     const expressComponent = useRef(null)
     const prepareBasketRef = useRef(prepareBasket)
     const failOrderCalledRef = useRef(false)
+    const orderRef = useRef(null)
+
+    // used to call failOrder
+    const api = useCommerceApi()
+    const {getTokenWhenReady} = useAccessToken()
+
+    // tracks if payment is in progress
+    const isPaymentInProgress = useRef(false)
 
     // Update the ref whenever prepareBasket changes, including when the variant changes on PDP
     // Using prepareBasketRef.current also ensures the function handlers always call the latest prepareBasket function
@@ -119,7 +139,8 @@ const SFPaymentsExpressButtons = ({
         DEFAULT: 'DEFAULT',
         FAIL_ORDER: 'FAIL_ORDER',
         PREPARE_BASKET: 'PREPARE_BASKET',
-        PROCESS_PAYMENT: 'PROCESS_PAYMENT'
+        PROCESS_PAYMENT: 'PROCESS_PAYMENT',
+        ORDER_RECOVERY_FAILED: 'ORDER_RECOVERY_FAILED'
     }
     const ERROR_MESSAGES = {
         DEFAULT: {
@@ -141,6 +162,11 @@ const SFPaymentsExpressButtons = ({
             defaultMessage:
                 'Unable to process payment. Please try again or select a different payment method.',
             id: 'sfp_payments_express.error.process_payment'
+        },
+        ORDER_RECOVERY_FAILED: {
+            defaultMessage:
+                'Order recovery failed. Please try again or select a different payment method.',
+            id: 'sfp_payments_express.error.order_recovery_failed'
         }
     }
 
@@ -192,9 +218,55 @@ const SFPaymentsExpressButtons = ({
     }
 
     /**
+     * Attempts to fail an order and reopen the basket.
+     * Only calls failOrder if the order status supports the transition.
+     * @param {string} orderNo - The order number to fail
+     * @returns {Promise<boolean>} - true if failOrder succeeded and basket was reopened
+     */
+    const attemptFailOrder = async (orderNo) => {
+        if (!orderNo || failOrderCalledRef.current) {
+            return false
+        }
+
+        try {
+            // Fetch current order status
+            const token = await getTokenWhenReady()
+            const currentOrder = await api.shopperOrders.getOrder({
+                parameters: {orderNo},
+                headers: {Authorization: `Bearer ${token}`}
+            })
+
+            // Only call failOrder if status allows the transition
+            if (currentOrder.status === 'created') {
+                await failOrder({
+                    parameters: {orderNo, reopenBasket: true},
+                    body: {reasonCode: 'payment_confirm_failure'}
+                })
+                failOrderCalledRef.current = true
+                return true // Basket was reopened
+            } else {
+                failOrderCalledRef.current = true
+                // Basket can't be recovered - clear stale cache
+                queryClient.invalidateQueries()
+                return false // Can't recover basket
+            }
+        } catch (error) {
+            failOrderCalledRef.current = true
+            // Basket can't be recovered - clear stale cache
+            queryClient.invalidateQueries()
+            return false
+        }
+    }
+
+    /**
      * Create order from basket and update payment instrument
      */
-    const createOrderAndUpdatePayment = async (basketId, paymentType, zoneIdValue) => {
+    const createOrderAndUpdatePayment = async (
+        basketId,
+        paymentType,
+        zoneIdValue,
+        paymentData = {}
+    ) => {
         // Create order from the basket
         let order = await createOrder({
             body: {basketId}
@@ -206,13 +278,14 @@ const SFPaymentsExpressButtons = ({
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
         try {
-            const paymentInstrumentBody = createPaymentInstrumentBody(
-                {
-                    amount: order.orderTotal,
-                    paymentMethodType: paymentType,
-                    zoneId: zoneIdValue
-                }
-            )
+            const paymentInstrumentBody = createPaymentInstrumentBody({
+                amount: order.orderTotal,
+                paymentMethodType: paymentType,
+                zoneId: zoneIdValue,
+                paymentData: paymentData,
+                paymentMethods: paymentConfig?.paymentMethods,
+                paymentMethodSetAccounts: paymentConfig?.paymentMethodSetAccounts // Add this
+            })
 
             // Update order payment instrument to create payment
             order = await updatePaymentInstrumentForOrder({
@@ -240,20 +313,15 @@ const SFPaymentsExpressButtons = ({
                     error: error
                 }
             })
-
-            // call failOrder to clean up the order (ex: amount is not valid, zone is not valid etc)
-            await failOrder({
-                parameters: {
-                    orderNo: createdOrderNo,
-                    reopenBasket: true
-                },
-                body: {
-                    reasonCode: 'payment_confirm_failure'
+            const basketRecovered = await attemptFailOrder(createdOrderNo)
+            if (basketRecovered) {
+                showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
+            } else {
+                showErrorMessage(ERROR_MESSAGE_KEYS.ORDER_RECOVERY_FAILED)
+                if (usage !== EXPRESS_BUY_NOW) {
+                    navigate('/cart')
                 }
-            })
-            failOrderCalledRef.current = true
-            showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
-
+            }
             // Attach orderNo to the error so caller knows order was created
             error.orderNo = createdOrderNo
             throw error
@@ -334,28 +402,32 @@ const SFPaymentsExpressButtons = ({
     }
 
     useEffect(() => {
+        // Remove containerElementRef.current from effect dependencies to prevent unnecessary re-renders
+        // instead use it in the if statement to check if the container element is attached to the DOM
         if (metadata && sfp && paymentConfig && containerElementRef.current) {
+            // Skip re-initialization if payment is in progress
+            if (isPaymentInProgress.current && expressComponent.current) {
+                return
+            }
             if (expressComponent.current) {
                 expressComponent.current.destroy()
                 expressComponent.current = null
             }
 
             let paymentMethodType = null
-            let orderNo = null
-
-            const mapPaymentMethodType = (type) => {
-                switch (type) {
-                    case 'applepay':
-                    case 'googlepay':
-                        return 'card'
-                    default:
-                        return type
-                }
-            }
+            orderRef.current = null
 
             const onClick = async (type) => {
-                paymentMethodType = mapPaymentMethodType(type)
+                // reset payment, order and failorder flags
+                isPaymentInProgress.current = true
+                failOrderCalledRef.current = false
+                orderRef.current = null
 
+                paymentMethodType = getExpressPaymentMethodType(
+                    type,
+                    paymentConfig?.paymentMethods,
+                    paymentConfig?.paymentMethodSetAccounts
+                )
                 // For non-PayPal payment methods, prepare basket immediately
                 if (!isPayPalPaymentMethodType(paymentMethodType)) {
                     prepareBasketPromise.current = prepareBasketRef.current()
@@ -382,7 +454,7 @@ const SFPaymentsExpressButtons = ({
             // Helper function to clean up express basket state
             const cleanupExpressBasket = async () => {
                 // If an order was already created, the basket was consumed - don't try to clean it up
-                if (orderNo) {
+                if (orderRef.current) {
                     expressBasket.current = null
                     return
                 }
@@ -423,6 +495,7 @@ const SFPaymentsExpressButtons = ({
             }
 
             const onCancel = async () => {
+                isPaymentInProgress.current = false
                 endConfirming()
                 await cleanupExpressBasket()
                 showErrorMessage(ERROR_MESSAGE_KEYS.DEFAULT)
@@ -535,7 +608,7 @@ const SFPaymentsExpressButtons = ({
 
                 // For non-PayPal methods, if order was already created in createIntentFunction,
                 // the basket is consumed and we shouldn't try to update addresses
-                if (!isPayPalPaymentMethodType(paymentMethodType) && orderNo) {
+                if (!isPayPalPaymentMethodType(paymentMethodType) && orderRef.current) {
                     logger.info('Order already created, skipping address updates', {
                         namespace: 'SFPaymentsExpressButtons.onPayerApprove'
                     })
@@ -571,13 +644,12 @@ const SFPaymentsExpressButtons = ({
                         try {
                             expressBasket.current = await addPaymentInstrumentToBasket({
                                 parameters: {basketId: updatedBasket.basketId},
-                                body: createPaymentInstrumentBody(
-                                    {
-                                        amount: updatedBasket.orderTotal || updatedBasket.productSubTotal,
-                                        paymentMethodType: paymentMethodType,
-                                        zoneId: zoneId
-                                    }
-                                )
+                                body: createPaymentInstrumentBody({
+                                    amount:
+                                        updatedBasket.orderTotal || updatedBasket.productSubTotal,
+                                    paymentMethodType: paymentMethodType,
+                                    zoneId: zoneId
+                                })
                             })
                         } catch (error) {
                             const statusCode = error?.response?.status || error?.status
@@ -608,72 +680,78 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
+            /**
+             * Ensures a Salesforce Payments payment instrument exists in the basket.
+             * If one doesn't exist, removes any existing one and adds a new one.
+             * @param {Object} basket - The basket object
+             * @param {string} paymentMethodType - Type of payment method
+             * @param {string} zoneId - Zone ID for payment processing
+             * @returns {Promise<Object>} Updated basket with payment instrument
+             */
+            const ensurePaymentInstrumentInBasket = async (basket, paymentMethodType, zoneId) => {
+                // Check if payment instrument already exists
+                let sfPaymentsInstrument = getSFPaymentsInstrument(basket)
 
- /**
-     * Ensures a Salesforce Payments payment instrument exists in the basket.
-     * If one doesn't exist, removes any existing one and adds a new one.
-     * @param {Object} basket - The basket object
-     * @param {string} paymentMethodType - Type of payment method
-     * @param {string} zoneId - Zone ID for payment processing
-     * @returns {Promise<Object>} Updated basket with payment instrument
-     */
- const ensurePaymentInstrumentInBasket = async (basket, paymentMethodType, zoneId) => {
-    // Check if payment instrument already exists
-    let sfPaymentsInstrument = getSFPaymentsInstrument(basket)
-    
-    if (sfPaymentsInstrument) {
-        // Payment instrument already exists, return basket as-is
-        return basket
-    }
-    
-    // Remove any existing Salesforce Payments payment instrument first
-    sfPaymentsInstrument = getSFPaymentsInstrument(basket)
-    if (sfPaymentsInstrument) {
-        basket = await removePaymentInstrumentFromBasket({
-            parameters: {
-                basketId: basket.basketId,
-                paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
-            }
-        })
-    }
-    
-    // Add Salesforce Payments payment instrument to basket
-    try {
-        basket = await addPaymentInstrumentToBasket({
-            parameters: {basketId: basket.basketId},
-            body: createPaymentInstrumentBody({
-                amount: basket.orderTotal || basket.productSubTotal,
-                paymentMethodType: paymentMethodType,
-                zoneId: zoneId
-            })
-        })
-    } catch (error) {
-        const statusCode = error?.response?.status || error?.status
-        const errorMessage =
-            error?.message || error?.response?.data?.message || 'Unknown error'
-        const errorDetails = error?.response?.data || error?.body || {}
+                if (sfPaymentsInstrument) {
+                    // Payment instrument already exists, return basket as-is
+                    return basket
+                }
 
-        logger.error('Failed to add payment instrument to basket', {
-            namespace: 'SFPaymentsExpressButtons.ensurePaymentInstrumentInBasket',
-            additionalProperties: {
-                statusCode,
-                errorMessage,
-                errorDetails,
-                basketId: basket?.basketId,
-                paymentMethodType,
-                orderTotal: basket?.orderTotal,
-                productSubTotal: basket?.productSubTotal,
-                error: error
+                // Remove any existing Salesforce Payments payment instrument first
+                sfPaymentsInstrument = getSFPaymentsInstrument(basket)
+                if (sfPaymentsInstrument) {
+                    basket = await removePaymentInstrumentFromBasket({
+                        parameters: {
+                            basketId: basket.basketId,
+                            paymentInstrumentId: sfPaymentsInstrument.paymentInstrumentId
+                        }
+                    })
+                }
+
+                // Add Salesforce Payments payment instrument to basket
+                try {
+                    basket = await addPaymentInstrumentToBasket({
+                        parameters: {basketId: basket.basketId},
+                        body: createPaymentInstrumentBody({
+                            amount: basket.orderTotal || basket.productSubTotal,
+                            paymentMethodType: paymentMethodType,
+                            zoneId: zoneId
+                        })
+                    })
+                } catch (error) {
+                    const statusCode = error?.response?.status || error?.status
+                    const errorMessage =
+                        error?.message || error?.response?.data?.message || 'Unknown error'
+                    const errorDetails = error?.response?.data || error?.body || {}
+
+                    logger.error('Failed to add payment instrument to basket', {
+                        namespace: 'SFPaymentsExpressButtons.ensurePaymentInstrumentInBasket',
+                        additionalProperties: {
+                            statusCode,
+                            errorMessage,
+                            errorDetails,
+                            basketId: basket?.basketId,
+                            paymentMethodType,
+                            orderTotal: basket?.orderTotal,
+                            productSubTotal: basket?.productSubTotal,
+                            error: error
+                        }
+                    })
+                    showErrorMessage(ERROR_MESSAGE_KEYS.PROCESS_PAYMENT)
+                    throw error
+                }
+
+                return basket
             }
-        })
-        showErrorMessage(ERROR_MESSAGE_KEYS.PROCESS_PAYMENT)
-        throw error
-    }
-    
-    return basket
-}
-            
-            const createIntentFunction = async () => {
+
+            const createIntentFunction = async (paymentData = {}) => {
+                const gateway = getGatewayFromPaymentMethod(
+                    paymentMethodType,
+                    paymentConfig?.paymentMethods,
+                    paymentConfig?.paymentMethodSetAccounts
+                )
+                const isAdyen = gateway === PAYMENT_GATEWAYS.ADYEN
+
                 // For PayPal/Venmo, prepare basket here since createIntentFunction is called after button click
                 if (isPayPalPaymentMethodType(paymentMethodType)) {
                     const currentBasket = await prepareBasketRef.current()
@@ -704,9 +782,9 @@ const SFPaymentsExpressButtons = ({
                     try {
                         expressBasket.current = await addPaymentInstrumentToBasket({
                             parameters: {basketId: expressBasket.current.basketId},
-                            body: createPaymentInstrumentBody(
-                            {
-                                amount: expressBasket.current.orderTotal ||
+                            body: createPaymentInstrumentBody({
+                                amount:
+                                    expressBasket.current.orderTotal ||
                                     expressBasket.current.productSubTotal,
                                 paymentMethodType: paymentMethodType,
                                 zoneId: zoneId
@@ -737,12 +815,31 @@ const SFPaymentsExpressButtons = ({
                     }
                     updatedPaymentInstrument = getSFPaymentsInstrument(expressBasket.current)
                 } else {
+                    // For Adyen: Update addresses from paymentData before creating order
+                    // (Stripe uses onPayerApprove instead, PayPal is handled above)
+                    if (isAdyen && paymentData?.shippingDetails) {
+                        const {billingAddress, shippingAddress} = transformAddressDetails(
+                            paymentData.billingDetails,
+                            paymentData.shippingDetails
+                        )
+                        // Update shipping address
+                        expressBasket.current = await updateShippingAddressForShipment.mutateAsync({
+                            parameters: {
+                                basketId: expressBasket.current.basketId,
+                                shipmentId: DEFAULT_SHIPMENT_ID,
+                                useAsBilling: false
+                            },
+                            body: shippingAddress
+                        })
 
-                    ///TEST COODE
-                    console.log('paymentMethodType', paymentMethodType)
-                    console.log('ensurePaymentInstrumentInBasket', zoneId)
+                        // Update billing address
+                        await updateBillingAddressForBasket({
+                            parameters: {basketId: expressBasket.current.basketId},
+                            body: billingAddress
+                        })
+                    }
                     // For non-PayPal methods, ensure payment instrument exists in basket
-                    // (e.g., Stripe adds it in onPayerApprove, but Adyen may not call onPayerApprove before createIntentFunction)
+                    // (e.g., Stripe adds it in onPayerApprove, but Adyen does not call onPayerApprove before createIntentFunction)
                     expressBasket.current = await ensurePaymentInstrumentInBasket(
                         expressBasket.current,
                         paymentMethodType,
@@ -754,22 +851,35 @@ const SFPaymentsExpressButtons = ({
                         const order = await createOrderAndUpdatePayment(
                             expressBasket.current.basketId,
                             paymentMethodType,
-                            zoneId
+                            zoneId,
+                            paymentData
                         )
-                        orderNo = order.orderNo
+                        orderRef.current = order
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
                         // orderNo will be attached to the error
                         if (error.orderNo) {
-                            orderNo = error.orderNo
+                            orderRef.current = {orderNo: error.orderNo}
                         }
                         throw error
                     }
                 }
-                return {
-                    client_secret: getClientSecret(updatedPaymentInstrument),
-                    id: updatedPaymentInstrument.paymentReference.paymentReferenceId
+                const paymentReference = updatedPaymentInstrument?.paymentReference
+                if (isAdyen) {
+                    const adyenIntent =
+                        paymentReference?.gatewayProperties?.adyen?.adyenPaymentIntent
+                    return {
+                        pspReference: adyenIntent?.id,
+                        guid: paymentReference?.paymentReferenceId,
+                        resultCode: adyenIntent?.resultCode,
+                        action: adyenIntent?.adyenPaymentIntentAction
+                    }
+                } else {
+                    return {
+                        client_secret: getClientSecret(updatedPaymentInstrument),
+                        id: paymentReference?.paymentReferenceId
+                    }
                 }
             }
 
@@ -783,7 +893,7 @@ const SFPaymentsExpressButtons = ({
                             paymentMethodType,
                             zoneId
                         )
-                        orderNo = order.orderNo
+                        orderRef.current = order
                     }
 
                     // Close modal if callback provided (for mini cart)
@@ -794,30 +904,34 @@ const SFPaymentsExpressButtons = ({
                     endConfirming()
 
                     // Navigate to confirmation page with the order number
-                    navigate(`/checkout/confirmation/${orderNo}`)
+                    navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
+                    isPaymentInProgress.current = false
                 } catch (error) {
                     endConfirming()
                 }
             }
 
-            // Async function to handle payment error event.  This is called when error event is handled by SF Payments SDK.
+            /**
+             * Handles payment error event.
+             * Attempts to fail an order and reopen the basket.
+             * Only calls failOrder if the order status supports the transition.
+             * @returns {Promise<void>}
+             */
             const paymentError = async () => {
+                isPaymentInProgress.current = false
+
+                const basketRecovered = await attemptFailOrder(orderRef.current?.orderNo)
+
                 endConfirming()
-                // if orderNo is present and failOrder has not been called, call failOrder
-                if (orderNo && !failOrderCalledRef.current) {
-                    await failOrder({
-                        parameters: {
-                            orderNo: orderNo,
-                            reopenBasket: true
-                        },
-                        body: {
-                            reasonCode: 'payment_confirm_failure'
-                        }
-                    })
-                    failOrderCalledRef.current = true
+                if (basketRecovered) {
+                    showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
+                } else {
+                    showErrorMessage(ERROR_MESSAGE_KEYS.ORDER_RECOVERY_FAILED)
+                    // Only navigate to cart if NOT on PDP
+                    if (usage !== EXPRESS_BUY_NOW) {
+                        navigate('/cart')
+                    }
                 }
-                orderNo = null
-                failOrderCalledRef.current = false // Reset for next attempt
             }
 
             const handlePaymentMethodsRendered = (details) => {
@@ -826,22 +940,18 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
-            const paymentMethodSetOld = {
-                paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts
-            }
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                //test code to inject country code
-                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts?.map((account) => ({
-                    ...account,
-                    config: {
-                        ...account.config,
-                        country: paymentCountryCode || fallbackCountryCode || 'US'  // Inject country here
-                    }
-                })) || []
+                // inject country code into payment method set accounts (Adyen seems to need it but Stripe works with/without it)
+                paymentMethodSetAccounts:
+                    paymentConfig.paymentMethodSetAccounts?.map((account) => ({
+                        ...account,
+                        config: {
+                            ...account.config,
+                            country: paymentCountryCode || fallbackCountryCode || 'US' // Inject country here
+                        }
+                    })) || []
             }
-
             const config = {
                 theme: buildTheme({
                     expressButtonLayout,
@@ -902,10 +1012,12 @@ const SFPaymentsExpressButtons = ({
 
         // Cleanup on unmount
         return () => {
-            expressComponent.current?.destroy()
-            expressComponent.current = null
+            if (!isPaymentInProgress.current) {
+                expressComponent.current?.destroy()
+                expressComponent.current = null
+            }
         }
-    }, [sfp, metadata, paymentConfig, cardCaptureAutomatic, containerElementRef.current])
+    }, [sfp, metadata, paymentConfig, cardCaptureAutomatic])
 
     return <Box ref={containerElementRef} data-testid={'sf-payments-express'} />
 }

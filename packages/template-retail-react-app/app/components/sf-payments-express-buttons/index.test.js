@@ -211,6 +211,19 @@ describe('SFPaymentsExpressButtons', () => {
 
         expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
     })
+    test('component renders and handles prop changes without errors', () => {
+        const {rerender} = renderWithProviders(
+            <SFPaymentsExpressButtons {...defaultProps} paymentCurrency="USD" />
+        )
+
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+
+        // Simulate prop change that would trigger useEffect
+        rerender(<SFPaymentsExpressButtons {...defaultProps} paymentCurrency="EUR" />)
+
+        // Should still render without errors
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
+    })
 })
 
 describe('prepareBasket prop updates', () => {
