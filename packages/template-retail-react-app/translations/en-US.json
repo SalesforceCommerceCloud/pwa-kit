@@ -1294,9 +1294,6 @@
   "otp.button.resend_code": {
     "defaultMessage": "Resend Code"
   },
-  "otp.button.resend_timer": {
-    "defaultMessage": "Resend code in {timer} seconds..."
-  },
   "otp.error.invalid_code": {
     "defaultMessage": "The code is invalid or expired. Click Resend Code and try again."
   },
@@ -1306,8 +1303,8 @@
   "otp.message.enter_code_for_account_returning": {
     "defaultMessage": "To log in to your account, enter the code sent to your email."
   },
-  "otp.message.verifying": {
-    "defaultMessage": "Verifying code..."
+  "otp.message.resend_cooldown": {
+    "defaultMessage": "You can request a new code in {timer} {timer, plural, one {second} other {seconds}}."
   },
   "otp.title.confirm_its_you": {
     "defaultMessage": "Confirm it's you"

@@ -3079,20 +3079,6 @@
       "value": "Resend Code"
     }
   ],
-  "otp.button.resend_timer": [
-    {
-      "type": 0,
-      "value": "Resend code in "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " seconds..."
-    }
-  ],
   "otp.error.invalid_code": [
     {
       "type": 0,
@@ -3119,10 +3105,46 @@
       "value": "To log in to your account, enter the code sent to your email."
     }
   ],
-  "otp.message.verifying": [
+  "otp.message.resend_cooldown": [
     {
       "type": 0,
-      "value": "Verifying code..."
+      "value": "You can request a new code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "second"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "seconds"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "otp.title.confirm_its_you": [
