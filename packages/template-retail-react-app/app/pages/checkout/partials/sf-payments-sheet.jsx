@@ -49,7 +49,6 @@ import {
     getSFPaymentsInstrument,
     createPaymentInstrumentBody,
     transformPaymentMethodReferences,
-    getClientSecret,
     getGatewayFromPaymentMethod
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -291,8 +290,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             paymentIntent = {
                 id: orderPaymentInstrument.paymentReference.paymentReferenceId,
                 client_secret:
-                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
-                    ?.clientSecret
+                    orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
+                        ?.clientSecret
             }
 
             // Read setup_future_usage from backend response, fallback to manual calculation if not available
@@ -454,7 +453,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
 
         startConfirming(updatedBasket)
-
 
         try {
             // Confirm the payment
