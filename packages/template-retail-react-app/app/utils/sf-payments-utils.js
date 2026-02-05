@@ -279,19 +279,17 @@ export const createPaymentInstrumentBody = ({
     if (!isPostRequest && gateway === PAYMENT_GATEWAYS.ADYEN) {
         // Create Adyen payment reference request
         paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.ADYEN
-        const adyenProperties = {
-            ...(paymentData && {
-                paymentMethod: paymentData.paymentMethod,
-                returnUrl: paymentData.returnUrl,
-                origin: paymentData.origin,
-                lineItems: paymentData.lineItems,
-                billingDetails: paymentData.billingDetails
-            }),
-            ...(storePaymentMethod === true && {storePaymentMethod: true})
-        }
-
         paymentReferenceRequest.gatewayProperties = {
-            adyen: adyenProperties
+            adyen: {
+                ...(paymentData && {
+                    paymentMethod: paymentData.paymentMethod,
+                    returnUrl: paymentData.returnUrl,
+                    origin: paymentData.origin,
+                    lineItems: paymentData.lineItems,
+                    billingDetails: paymentData.billingDetails
+                }),
+                ...(storePaymentMethod === true && paymentData && {storePaymentMethod: true})
+            }
         }
     }
 
