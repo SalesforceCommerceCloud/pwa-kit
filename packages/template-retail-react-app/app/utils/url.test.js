@@ -17,34 +17,20 @@ import {
     removeSiteLocaleFromPath,
     serverSafeEncode
 } from '@salesforce/retail-react-app/app/utils/url'
-import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 afterEach(() => {
     jest.clearAllMocks()
 })
 
-jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/utils/url')
-    return {
-        ...original,
-        getAppOrigin: jest.fn(() => 'https://www.example.com')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig)
-    }
-})
-
-jest.mock('./site-utils', () => {
-    const original = jest.requireActual('./site-utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
+beforeEach(() => {
+    getConfig.mockReturnValue(mockConfig)
 })
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
@@ -153,8 +139,6 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
-
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')

@@ -12,6 +12,7 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * Modifies a given url by adding/updating query parameters.
