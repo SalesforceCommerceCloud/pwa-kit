@@ -12,6 +12,7 @@
 - Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 - [BREAKING] Remove unused absoluteUrl util from retail react app [#3633](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3633)
 - Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
+- Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
 
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
