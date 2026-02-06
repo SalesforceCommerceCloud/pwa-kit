@@ -12,6 +12,7 @@ import {
     Button,
     Input,
     SimpleGrid,
+    Spinner,
     Stack,
     Text,
     HStack,
@@ -270,6 +271,17 @@ const OtpAuth = ({
                                     />
                                 ))}
                             </SimpleGrid>
+
+                            {/* Loading spinner during verification */}
+                            {isVerifying && (
+                                <Spinner
+                                    size="sm"
+                                    color="blue.500"
+                                    role="status"
+                                    aria-live="polite"
+                                    data-testid="otp-verifying-spinner"
+                                />
+                            )}
 
                             {/* Error message */}
                             {error && (
