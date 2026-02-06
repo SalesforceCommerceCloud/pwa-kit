@@ -254,13 +254,9 @@ export const addProductToCart = async ({page, isMobile = false}) => {
  *      - password
  * @param {Boolean} options.isMobile - flag to indicate if device type is mobile or not, defaulted to false
  */
-export const registerShopper = async ({
-    page,
-    userCredentials,
-    siteUrl = config.RETAIL_APP_HOME
-}) => {
+export const registerShopper = async ({page, userCredentials}) => {
     // Create Account and Sign In
-    await page.goto(siteUrl + '/registration')
+    await page.goto(config.RETAIL_APP_HOME + '/registration')
     await answerConsentTrackingForm(page)
 
     await page.waitForLoadState()
@@ -358,17 +354,12 @@ export const validateWishlist = async ({page, a11y = {}}) => {
  *
  * @return {Boolean} - denotes whether or not login was successful
  */
-export const loginShopper = async ({page, userCredentials, siteUrl = config.RETAIL_APP_HOME}) => {
+export const loginShopper = async ({page, userCredentials}) => {
     try {
-        await page.goto(siteUrl + '/login')
+        await page.goto(config.RETAIL_APP_HOME + '/login')
         await answerConsentTrackingForm(page)
 
         await page.locator('input#email').fill(userCredentials.email)
-
-        // If passwordless login is enabled, we need to click the password button to show the password input
-        if (page.locator('input#password').not.isVisible()) {
-            await page.getByRole('button', {name: 'Password'}).click()
-        }
         await page.locator('input#password').fill(userCredentials.password)
 
         const loginResponsePromise = page.waitForResponse(
