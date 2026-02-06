@@ -242,19 +242,17 @@ const SFPaymentsExpressButtons = ({
                     parameters: {orderNo, reopenBasket: true},
                     body: {reasonCode: 'payment_confirm_failure'}
                 })
-                failOrderCalledRef.current = true
                 return true // Basket was reopened
             } else {
-                failOrderCalledRef.current = true
-                // Basket can't be recovered - clear stale cache
-                queryClient.invalidateQueries()
                 return false // Can't recover basket
             }
         } catch (error) {
-            failOrderCalledRef.current = true
-            // Basket can't be recovered - clear stale cache
-            queryClient.invalidateQueries()
             return false
+        } finally {
+            // Mark as attempted to prevent retries
+            failOrderCalledRef.current = true
+            // Refresh cache to get updated basket state
+            queryClient.invalidateQueries()
         }
     }
 
@@ -815,36 +813,44 @@ const SFPaymentsExpressButtons = ({
                         // Set confirmingBasket to show loading spinner during address updates
                         startConfirming(expressBasket.current)
 
-                        const {billingAddress, shippingAddress} = transformAddressDetails(
-                            paymentData.billingDetails,
-                            paymentData.shippingDetails
-                        )
-                        // Update shipping address
-                        expressBasket.current = await updateShippingAddressForShipment.mutateAsync({
-                            parameters: {
-                                basketId: expressBasket.current.basketId,
-                                shipmentId: DEFAULT_SHIPMENT_ID,
-                                useAsBilling: false
-                            },
-                            body: shippingAddress
-                        })
+                        try {
+                            const {billingAddress, shippingAddress} = transformAddressDetails(
+                                paymentData.billingDetails,
+                                paymentData.shippingDetails
+                            )
+                            // Update shipping address
+                            expressBasket.current =
+                                await updateShippingAddressForShipment.mutateAsync({
+                                    parameters: {
+                                        basketId: expressBasket.current.basketId,
+                                        shipmentId: DEFAULT_SHIPMENT_ID,
+                                        useAsBilling: false
+                                    },
+                                    body: shippingAddress
+                                })
 
-                        // Update billing address
-                        await updateBillingAddressForBasket({
-                            parameters: {basketId: expressBasket.current.basketId},
-                            body: billingAddress
-                        })
+                            // Update billing address
+                            await updateBillingAddressForBasket({
+                                parameters: {basketId: expressBasket.current.basketId},
+                                body: billingAddress
+                            })
+                        } catch (error) {
+                            endConfirming()
+                            throw error
+                        }
                     }
-                    // For non-PayPal methods, ensure payment instrument exists in basket
-                    // (e.g., Stripe adds it in onPayerApprove, but Adyen does not call onPayerApprove before createIntentFunction)
-                    expressBasket.current = await ensurePaymentInstrumentInBasket(
-                        expressBasket.current,
-                        paymentMethodType,
-                        zoneId
-                    )
 
                     // Create order and update payment instrument
                     try {
+                        // For non-PayPal methods, ensure payment instrument exists in basket
+                        // (e.g., Stripe adds it in onPayerApprove, but Adyen does not call onPayerApprove before createIntentFunction)
+                        // keeping it for all as safety measure
+                        expressBasket.current = await ensurePaymentInstrumentInBasket(
+                            expressBasket.current,
+                            paymentMethodType,
+                            zoneId
+                        )
+
                         const order = await createOrderAndUpdatePayment(
                             expressBasket.current.basketId,
                             paymentMethodType,
@@ -858,6 +864,7 @@ const SFPaymentsExpressButtons = ({
                         if (error.orderNo) {
                             orderRef.current = {orderNo: error.orderNo}
                         }
+                        endConfirming()
                         throw error
                     }
                 }
