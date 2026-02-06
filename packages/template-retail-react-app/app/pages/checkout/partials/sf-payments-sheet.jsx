@@ -86,7 +86,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency,
-            countryCode: basket?.countryCode || countryCode || 'US' // TODO: remove US when parameter made optional
+            countryCode: countryCode || 'US'
         }
     })
 
@@ -528,6 +528,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         [customer, paymentConfig]
     )
 
+    const canSaveForFutureUsage = !!(customer?.isRegistered && customer?.customerId)
+
     useEffect(() => {
         // Wait for SPM data to load before initializing for registered users
         if (isDataLoading) {
@@ -560,9 +562,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 options: {
                     useManualCapture: !cardCaptureAutomatic,
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
-                    showSaveForFutureUsageCheckbox: !!(
-                        customer?.isRegistered && customer?.customerId
-                    ),
+                    showSaveForFutureUsageCheckbox: canSaveForFutureUsage,
                     // Suppress "Make payment method default" checkbox since we don't support default SPM yet
                     showSaveAsDefaultCheckbox: false,
                     savedPaymentMethods: savedPaymentMethods
@@ -572,7 +572,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentRequest = {
                 amount: basket.productTotal,
                 currency: basket.currency,
-                country: 'US', // TODO: see W-18812582
+                country: countryCode || 'US',
                 locale: intl.locale
             }
 
@@ -609,7 +609,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic,
-        customer?.isRegistered
+        canSaveForFutureUsage
     ])
 
     useEffect(() => {

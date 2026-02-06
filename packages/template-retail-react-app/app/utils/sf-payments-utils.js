@@ -279,7 +279,7 @@ export const createPaymentInstrumentBody = ({
                     lineItems: paymentData.lineItems,
                     billingDetails: paymentData.billingDetails
                 }),
-                ...(storePaymentMethod === true && {storePaymentMethod: true})
+                ...(storePaymentMethod && {storePaymentMethod: true})
             }
         }
     }
