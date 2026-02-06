@@ -39,7 +39,7 @@ const baseSubscriptionResponse: ShopperConsentsTypes.ConsentSubscriptionResponse
     data: [
         {
             subscriptionId: 'test-subscription',
-            channels: new Set(['email' as ShopperConsentsTypes.ChannelType]),
+            channels: ['email' as ShopperConsentsTypes.ChannelType],
             contactPointValue: 'test@example.com'
         }
     ]
@@ -124,7 +124,7 @@ describe('Cache update behavior', () => {
                 data: [
                     {
                         subscriptionId: 'test-subscription',
-                        channels: new Set(['email' as ShopperConsentsTypes.ChannelType]),
+                        channels: ['email' as ShopperConsentsTypes.ChannelType],
                         contactPointValue: 'test@example.com'
                     }
                 ]
@@ -209,12 +209,12 @@ describe('Cache update behavior', () => {
                 data: [
                     {
                         subscriptionId: 'test-subscription',
-                        channels: new Set(['email' as ShopperConsentsTypes.ChannelType]),
+                        channels: ['email' as ShopperConsentsTypes.ChannelType],
                         contactPointValue: 'test@example.com'
                     },
                     {
                         subscriptionId: 'test-subscription-2',
-                        channels: new Set(['sms' as ShopperConsentsTypes.ChannelType]),
+                        channels: ['sms' as ShopperConsentsTypes.ChannelType],
                         contactPointValue: '+15551234567'
                     }
                 ]
