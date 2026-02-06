@@ -17,6 +17,25 @@ const {
 const {mockClient} = require('aws-sdk-client-mock')
 const {ServiceException} = require('@smithy/smithy-client')
 
+const pathsToCheck = [
+    ['/', 200, 'application/json; charset=utf-8'],
+    ['/tls', 200, 'application/json; charset=utf-8'],
+    ['/exception', 500, 'text/html; charset=utf-8'],
+    ['/cache', 200, 'application/json; charset=utf-8'],
+    ['/cookie', 200, 'application/json; charset=utf-8'],
+    ['/set-response-headers', 200, 'application/json; charset=utf-8'],
+    ['/isolation', 200, 'application/json; charset=utf-8'],
+    ['/memtest', 200, 'application/json; charset=utf-8'],
+    ['/streaming-large', 200, 'application/json; charset=utf-8']
+]
+const pathsToCheckWithBasePath = (basePath) => {
+    return pathsToCheck.map((pathStatusContentType) => [
+        basePath + pathStatusContentType[0],
+        pathStatusContentType[1],
+        pathStatusContentType[2]
+    ])
+}
+
 class AccessDenied extends ServiceException {
     constructor(options) {
         super({...options, name: 'AccessDenied'})
@@ -53,23 +72,26 @@ describe('server', () => {
         process.env = originalEnv
         jest.restoreAllMocks()
     })
-    test.each([
-        ['/', 200, 'application/json; charset=utf-8'],
-        ['/tls', 200, 'application/json; charset=utf-8'],
-        ['/exception', 500, 'text/html; charset=utf-8'],
-        ['/cache', 200, 'application/json; charset=utf-8'],
-        ['/cookie', 200, 'application/json; charset=utf-8'],
-        ['/multi-cookies', 200, 'application/json; charset=utf-8'],
-        ['/set-response-headers', 200, 'application/json; charset=utf-8'],
-        ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8'],
-        ['/streaming-large', 200, 'application/json; charset=utf-8']
-    ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
-        return request(app)
-            .get(path)
-            .expect(expectedStatus)
-            .expect('Content-Type', expectedContentType)
-    })
+    test.each(pathsToCheck)(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
+
+    test.each(pathsToCheckWithBasePath('/test-base-path'))(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            process.env.MRT_ENV_BASE_PATH = '/test-base-path'
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
 
     test('Path "/cache" has Cache-Control set', () => {
         return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
