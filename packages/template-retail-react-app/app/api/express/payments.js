@@ -21,6 +21,7 @@
 import {extractAccessToken, extractSiteId, createAuthHeaders} from '../utils/auth.js'
 import {asyncHandler, handleUpstreamResponse, ErrorTypes, logProxyRequest} from '../utils/error-handler.js'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {paymentLimiter} from '../utils/rate-limit.js'
 
 /**
  * Submits a payment through the Adyen integration.
@@ -81,5 +82,5 @@ export const submitPayment = asyncHandler(async (req, res) => {
  * @param {Object} app - Express app instance
  */
 export const registerPaymentsRoutes = (app) => {
-    app.post('/api/express/payments', submitPayment)
+    app.post('/api/express/payments', paymentLimiter, submitPayment)
 }

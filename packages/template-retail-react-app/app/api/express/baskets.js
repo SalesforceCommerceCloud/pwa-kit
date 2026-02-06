@@ -24,6 +24,7 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {extractAccessToken, extractSiteId, createAuthHeaders} from '../utils/auth.js'
 import {asyncHandler, handleUpstreamResponse, ErrorTypes, logProxyRequest} from '../utils/error-handler.js'
+import {basketCreationLimiter, calculateLimiter, basketReadLimiter} from '../utils/rate-limit.js'
 
 /**
  * Creates a temporary basket for Express Payments (Buy Now) flows.
@@ -234,8 +235,8 @@ export const calculateBasket = asyncHandler(async (req, res) => {
  * @param {Object} app - Express app instance
  */
 export const registerBasketsRoutes = (app) => {
-    app.post('/api/express/baskets/temporary', createTemporaryBasket)
-    app.get('/api/express/baskets/:basketId', getBasket)
-    app.delete('/api/express/baskets/:basketId', deleteBasket)
-    app.post('/api/express/baskets/:basketId/calculate', calculateBasket)
+    app.post('/api/express/baskets/temporary', basketCreationLimiter, createTemporaryBasket)
+    app.get('/api/express/baskets/:basketId', basketReadLimiter, getBasket)
+    app.delete('/api/express/baskets/:basketId', basketReadLimiter, deleteBasket)
+    app.post('/api/express/baskets/:basketId/calculate', calculateLimiter, calculateBasket)
 }

@@ -18,6 +18,7 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {extractAccessToken, extractSiteId, createAuthHeaders} from '../utils/auth.js'
 import {asyncHandler, handleUpstreamResponse, ErrorTypes, logProxyRequest} from '../utils/error-handler.js'
+import {shippingLimiter} from '../utils/rate-limit.js'
 
 /**
  * Updates the shipping address for a basket.
@@ -109,5 +110,5 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
  * @param {Object} app - Express app instance
  */
 export const registerShippingAddressRoutes = (app) => {
-    app.put('/api/express/baskets/:basketId/shipping-address', updateShippingAddress)
+    app.put('/api/express/baskets/:basketId/shipping-address', shippingLimiter, updateShippingAddress)
 }

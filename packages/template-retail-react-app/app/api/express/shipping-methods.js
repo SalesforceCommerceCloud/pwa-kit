@@ -18,6 +18,7 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {extractAccessToken, extractSiteId, createAuthHeaders} from '../utils/auth.js'
 import {asyncHandler, handleUpstreamResponse, ErrorTypes, logProxyRequest} from '../utils/error-handler.js'
+import {shippingLimiter} from '../utils/rate-limit.js'
 
 /**
  * Gets available shipping methods for a basket.
@@ -137,6 +138,6 @@ export const updateShippingMethod = asyncHandler(async (req, res) => {
  * @param {Object} app - Express app instance
  */
 export const registerShippingMethodsRoutes = (app) => {
-    app.get('/api/express/baskets/:basketId/shipping-methods', getShippingMethods)
-    app.put('/api/express/baskets/:basketId/shipping-methods', updateShippingMethod)
+    app.get('/api/express/baskets/:basketId/shipping-methods', shippingLimiter, getShippingMethods)
+    app.put('/api/express/baskets/:basketId/shipping-methods', shippingLimiter, updateShippingMethod)
 }
