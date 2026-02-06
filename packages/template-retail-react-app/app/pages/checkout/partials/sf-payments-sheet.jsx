@@ -86,7 +86,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency,
-            countryCode: countryCode || 'US'
+            countryCode: basket?.countryCode || countryCode || 'US' // TODO: remove US when parameter made optional
         }
     })
 
