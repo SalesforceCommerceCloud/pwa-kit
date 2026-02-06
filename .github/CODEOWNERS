@@ -59,6 +59,8 @@ packages/template-retail-react-app/app/pages/cart/partials/bonus-products-title.
 # Standard Products feature files - PR #2697
 packages/template-retail-react-app/app/mocks/standard-product.js @SalesforceCommerceCloud/cc-sharks
 packages/template-retail-react-app/app/utils/add-to-cart-utils.js @SalesforceCommerceCloud/cc-sharks
-                                                        
+
+# One-Click Checkout feature files
+packages/template-retail-react-app/app/pages/checkout-one-click/ @SalesforceCommerceCloud/stretch-armstrong
 
 #ECCN:Open Source
