@@ -572,7 +572,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             const paymentRequest = {
                 amount: basket.productTotal,
                 currency: basket.currency,
-                country: countryCode || 'US',
+                country: 'US', // TODO: see W-18812582
                 locale: intl.locale
             }
 
