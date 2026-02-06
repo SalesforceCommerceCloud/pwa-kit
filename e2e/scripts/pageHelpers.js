@@ -7,6 +7,7 @@
 const {expect} = require('@playwright/test')
 const config = require('../config')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
+const crypto = require('crypto')
 /**
  * Note: As a best practice, we should await the network call and assert on the network response rather than waiting for pageLoadState()
  * to avoid race conditions from lock in pageLoadState being released before network call resolves.
@@ -253,9 +254,13 @@ export const addProductToCart = async ({page, isMobile = false}) => {
  *      - password
  * @param {Boolean} options.isMobile - flag to indicate if device type is mobile or not, defaulted to false
  */
-export const registerShopper = async ({page, userCredentials}) => {
+export const registerShopper = async ({
+    page,
+    userCredentials,
+    siteUrl = config.RETAIL_APP_HOME
+}) => {
     // Create Account and Sign In
-    await page.goto(config.RETAIL_APP_HOME + '/registration')
+    await page.goto(siteUrl + '/registration')
     await answerConsentTrackingForm(page)
 
     await page.waitForLoadState()
@@ -353,12 +358,17 @@ export const validateWishlist = async ({page, a11y = {}}) => {
  *
  * @return {Boolean} - denotes whether or not login was successful
  */
-export const loginShopper = async ({page, userCredentials}) => {
+export const loginShopper = async ({page, userCredentials, siteUrl = config.RETAIL_APP_HOME}) => {
     try {
-        await page.goto(config.RETAIL_APP_HOME + '/login')
+        await page.goto(siteUrl + '/login')
         await answerConsentTrackingForm(page)
 
         await page.locator('input#email').fill(userCredentials.email)
+
+        // If passwordless login is enabled, we need to click the password button to show the password input
+        if (page.locator('input#password').not.isVisible()) {
+            await page.getByRole('button', {name: 'Password'}).click()
+        }
         await page.locator('input#password').fill(userCredentials.password)
 
         const loginResponsePromise = page.waitForResponse(
@@ -790,4 +800,86 @@ export const selectStoreFromPLP = async ({page}) => {
         // Close the modal
         await page.getByRole('button', {name: 'Close'}).click()
     }
+}
+
+/**
+ * Validates that a passkey login request is made to the /webAuthn/authenticate/finish endpoint.
+ * We can't register an actual passkey in the E2E environment because registration requires a token verification.
+ * Instead,we add a mock credential to the virtual authenticator to bypass the registration flow and verify the
+ * request to the /webAuthn/authenticate/finish endpoint.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ */
+export const validatePasskeyLogin = async ({page}) => {
+    // Start a CDP session to interact with WebAuthn
+    const client = await page.context().newCDPSession(page)
+    await client.send('WebAuthn.enable')
+    // Create a virtual authenticator to simulate a hardware authenticator for testing
+    const {authenticatorId} = await client.send('WebAuthn.addVirtualAuthenticator', {
+        options: {
+            protocol: 'ctap2',
+            transport: 'internal',
+            hasResidentKey: true,
+            hasUserVerification: true,
+            isUserVerified: true,
+            // Enabling automaticPresenceSimulation automatically completes the device's passkey prompt without user interaction
+            automaticPresenceSimulation: true
+        }
+    })
+
+    // Preload mock credential into the virtual authenticator
+    const rpId = new URL(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME).hostname
+    // Generate a valid EC key pair for WebAuthn (ES256/P-256)
+    const {privateKey} = crypto.generateKeyPairSync('ec', {namedCurve: 'P-256'})
+    const privateKeyBase64 = privateKey.export({format: 'der', type: 'pkcs8'}).toString('base64')
+
+    console.log('privateKeyBase64', privateKeyBase64)
+    const credentialIdBuffer = Buffer.from('mock-credential-id-' + Date.now())
+    const credentialIdBase64 = credentialIdBuffer.toString('base64') // For mock credential
+    const credentialId = credentialIdBuffer.toString('base64url') // For verifying the request
+    await client.send('WebAuthn.addCredential', {
+        authenticatorId,
+        credential: {
+            credentialId: credentialIdBase64,
+            isResidentCredential: true,
+            rpId,
+            privateKey: privateKeyBase64,
+            userHandle: Buffer.from('test-user-handle').toString('base64'),
+            signCount: 0,
+            transports: ['internal']
+        }
+    })
+
+    let interceptedRequest = null
+
+    // Intercept the WebAuthn authenticate/finish endpoint to verify the request
+    await page.route(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/webauthn/authenticate/finish',
+        (route) => {
+            interceptedRequest = route.request()
+            route.continue()
+        }
+    )
+
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + '/login')
+
+    // Wait for the WebAuthn authenticate/finish request
+    await page.waitForResponse(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/webauthn/authenticate/finish'
+    )
+
+    // Verify the /webAuthn/authenticate/finish request
+    expect(interceptedRequest).toBeTruthy()
+    expect(interceptedRequest.method()).toBe('POST')
+    const postData = interceptedRequest.postData()
+    expect(postData).toBeTruthy()
+    const requestBody = JSON.parse(postData)
+    expect(requestBody).toBeTruthy()
+
+    // Verify the request body structure matches expected format
+    expect(requestBody.client_id).toBeTruthy()
+    expect(requestBody.channel_id).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
+    expect(requestBody.credential.id).toBe(credentialId)
+    expect(requestBody.credential.clientExtensionResults).toBeTruthy()
+    expect(requestBody.credential.response).toBeTruthy()
 }

@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const {test, expect} = require('@playwright/test')
+const {test, expect, describe} = require('@playwright/test')
 const config = require('../../config.js')
 const {generateUserCredentials} = require('../../scripts/utils.js')
-const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
+const {answerConsentTrackingForm, validatePasskeyLogin} = require('../../scripts/pageHelpers.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
@@ -205,5 +205,11 @@ describe('Password reset', () => {
         )
 
         expect(interceptedRequest).toBeTruthy()
+    })
+})
+
+describe('Passkey Login', () => {
+    test('Verify passkey login', async ({page}) => {
+        await validatePasskeyLogin({page})
     })
 })

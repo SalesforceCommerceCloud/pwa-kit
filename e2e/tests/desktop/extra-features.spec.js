@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const {test, expect} = require('@playwright/test')
+const {test, expect, describe} = require('@playwright/test')
 const config = require('../../config.js')
 const {generateUserCredentials} = require('../../scripts/utils.js')
-const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
+const {answerConsentTrackingForm, validatePasskeyLogin} = require('../../scripts/pageHelpers.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
@@ -199,5 +199,17 @@ describe('Password reset', () => {
         )
 
         expect(interceptedRequest).toBeTruthy()
+    })
+})
+
+describe('Passkey Login', () => {
+    /**
+     * Test that a user can login with a passkey.
+     * We can't register an actual passkey in the E2E environment because registration requires a token verification.
+     * Instead,we add a mock credential to the virtual authenticator to bypass the registration flow and verify the
+     * request to the /webAuthn/authenticate/finish endpoint.
+     */
+    test('Verify passkey login', async ({page}) => {
+        await validatePasskeyLogin({page})
     })
 })
