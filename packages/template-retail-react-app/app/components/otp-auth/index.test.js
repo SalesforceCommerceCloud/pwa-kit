@@ -246,6 +246,41 @@ describe('OtpAuth', () => {
             await user.type(otpInputs[7], '8')
             expect(otpInputs[7]).toHaveFocus()
         })
+
+        test('shows spinner while OTP is being verified', async () => {
+            const deferred = {}
+            const verifyingPromise = new Promise((resolve) => {
+                deferred.resolve = resolve
+            })
+            const mockVerify = jest.fn().mockReturnValue(verifyingPromise)
+
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockVerify}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            expect(screen.queryByTestId('otp-verifying-spinner')).not.toBeInTheDocument()
+
+            const otpInputs = screen.getAllByRole('textbox')
+            fireEvent.paste(otpInputs[0], {
+                clipboardData: {getData: () => '12345678'}
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTestId('otp-verifying-spinner')).toBeInTheDocument()
+            })
+
+            deferred.resolve({success: true})
+            await waitFor(() => {
+                expect(screen.queryByTestId('otp-verifying-spinner')).not.toBeInTheDocument()
+            })
+        })
     })
 
     describe('Keyboard Navigation', () => {
