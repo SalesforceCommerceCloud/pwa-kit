@@ -39,13 +39,11 @@ describe('server', () => {
         ['/streaming-large', 200, 'application/json; charset=utf-8']
     ]
     const pathsToCheckWithBasePath = (basePath) => {
-        return pathsToCheck.map(
-            (pathStatusContentType) => [
-                basePath + pathStatusContentType[0],
-                pathStatusContentType[1],
-                pathStatusContentType[2]
-            ]
-        )
+        return pathsToCheck.map((pathStatusContentType) => [
+            basePath + pathStatusContentType[0],
+            pathStatusContentType[1],
+            pathStatusContentType[2]
+        ])
     }
 
     beforeEach(() => {
@@ -73,31 +71,33 @@ describe('server', () => {
         server.close()
         jest.restoreAllMocks()
     })
-    test.each(pathsToCheck)('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
-        return request(app)
-            .get(path)
-            .expect(expectedStatus)
-            .expect('Content-Type', expectedContentType)
-    })
+    test.each(pathsToCheck)(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
 
-    test.each(pathsToCheckWithBasePath('/test-base-path'))('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
-        process.env.MRT_ENV_BASE_PATH = '/test-base-path'
-        return request(app)
-            .get(path)
-            .expect(expectedStatus)
-            .expect('Content-Type', expectedContentType)
-    })
+    test.each(pathsToCheckWithBasePath('/test-base-path'))(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            process.env.MRT_ENV_BASE_PATH = '/test-base-path'
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
 
     test('Path "/cache" has Cache-Control set', () => {
-        return request(app)
-            .get('/cache')
-            .expect('Cache-Control', 's-maxage=60')
+        return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
     })
 
     test('Path "/cache/:duration" has Cache-Control set correctly', () => {
-        return request(app)
-            .get('/cache/123')
-            .expect('Cache-Control', 's-maxage=123')
+        return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
     })
 
     test('All responses have Server header set to "mrt ref app"', () => {
@@ -105,9 +105,7 @@ describe('server', () => {
     })
 
     test('Path "/headers" echoes request headers', async () => {
-        const response = await request(app)
-            .get('/headers')
-            .set('Random-Header', 'random')
+        const response = await request(app).get('/headers').set('Random-Header', 'random')
 
         expect(response.body.headers['random-header']).toBe('random')
     })
