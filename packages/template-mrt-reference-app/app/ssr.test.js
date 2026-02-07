@@ -93,6 +93,17 @@ describe('server', () => {
         }
     )
 
+    test('Path /echo should work with base path', async () => {
+        const basePath = '/test-base-path'
+        process.env.MRT_ENV_BASE_PATH = basePath
+        const response = await request(app).get(`${basePath}/echo?x=foo&y=bar`)
+        expect(response.status).toBe(200)
+        expect(response.body.query.x).toBe('foo')
+        expect(response.body.query.y).toBe('bar')
+        expect(response.body.path).toBe('/echo')
+        expect(response.body.env.MRT_ENV_BASE_PATH).toBe(basePath)
+    })
+
     test('Path "/cache" has Cache-Control set', () => {
         return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
     })
