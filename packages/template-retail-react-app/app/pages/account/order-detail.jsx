@@ -137,11 +137,17 @@ const AccountOrderDetail = () => {
     // Check if order has OMS data
     const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
 
-    // Check if order is multi-shipment order
+    const omsShipmentCount = order?.omsData?.shipments?.length ?? 0
+    const ecomShipmentCount = order?.shipments?.length ?? 0
+
+    const hasOmsShipment = useMemo(() => omsShipmentCount > 0, [omsShipmentCount])
+
     const isMultiShipmentOrder = useMemo(
-        () => (order?.omsData?.shipments?.length ?? 0) > 1 || (order?.shipments?.length ?? 0) > 1,
-        [isOmsOrder, order?.omsData?.shipments?.length, order?.shipments?.length]
+        () => omsShipmentCount > 1 || ecomShipmentCount > 1,
+        [omsShipmentCount, ecomShipmentCount]
     )
+
+    const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -396,14 +402,14 @@ const AccountOrderDetail = () => {
                                     )
                                 })}
                                 {/* Any type of Non-OMS or any type of single shipment order: show DeliveryMethods and Shipments info*/}
-                                {(!isOmsOrder || !isMultiShipmentOrder) &&
+                                {!showMultiShipmentsFromOmsOnly &&
                                     deliveryShipments.map((shipment, index) => {
                                         const omsShipment = isOmsOrder
                                             ? order.omsData.shipments?.[index]
                                             : null
 
                                         const shippingMethodName =
-                                            omsShipment?.provider || shipment.shippingMethod.name
+                                            omsShipment?.provider || shipment.shippingMethod?.name
                                         const shippingStatus =
                                             omsShipment?.status || shipment.shippingStatus
                                         const trackingNumber =
@@ -457,8 +463,7 @@ const AccountOrderDetail = () => {
                                     })}
 
                                 {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
-                                {isOmsOrder &&
-                                    isMultiShipmentOrder &&
+                                {showMultiShipmentsFromOmsOnly &&
                                     order?.omsData?.shipments?.map((shipment, index) => (
                                         <React.Fragment key={`oms-shipment-${index}`}>
                                             {renderShippingMethod(
@@ -466,7 +471,7 @@ const AccountOrderDetail = () => {
                                                 shipment.status,
                                                 shipment.trackingNumber,
                                                 shipment.trackingUrl,
-                                                order?.omsData?.shipments?.length ?? 0,
+                                                omsShipmentCount,
                                                 index
                                             )}
                                         </React.Fragment>
