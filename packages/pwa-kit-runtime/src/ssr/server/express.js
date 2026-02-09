@@ -8,7 +8,6 @@
  * @module progressive-web-sdk/ssr/server/express
  */
 
-import URL from 'url'
 import {
     CachedResponse,
     getHashForString,
@@ -83,7 +82,9 @@ export const RESOLVED_PROMISE = Promise.resolve()
  * @private
  */
 export const generateCacheKey = (req, options = {}) => {
-    let {pathname, query} = URL.parse(req.url)
+    const parsedUrl = new URL(req.url, 'http://localhost')
+    let pathname = parsedUrl.pathname
+    const query = parsedUrl.search ? parsedUrl.search.slice(1) : null
 
     // remove the trailing slash
     if (pathname.charAt(pathname.length - 1) === '/') {
