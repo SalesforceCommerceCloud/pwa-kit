@@ -140,10 +140,19 @@ const Search = (props) => {
     const appOrigin = useAppOrigin()
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
 
-    const askAgentOnSearchEnabled = useMemo(() => {
-        const {enabled, askAgentOnSearch} = getCommerceAgentConfig()
-        return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
-    }, [config.app.commerceAgent])
+    const commerceAgentConfig = useMemo(
+        () => getCommerceAgentConfig(),
+        [config.app?.commerceAgent, config.app?.commerceAgentSettings]
+    )
+    const askAgentOnSearchEnabled = useMemo(
+        () =>
+            isAskAgentOnSearchEnabled(
+                commerceAgentConfig?.enabled,
+                commerceAgentConfig?.askAgentOnSearch
+            ),
+        [commerceAgentConfig]
+    )
+    const enableAgentFromSearchSuggestions = commerceAgentConfig?.enableAgentFromSearchSuggestions
 
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -331,6 +340,11 @@ const Search = (props) => {
         }
     }
 
+    const onAskAssistantClick = () => {
+        launchChat()
+        clearInput()
+    }
+
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
@@ -402,6 +416,8 @@ const Search = (props) => {
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}
                             searchSuggestions={searchSuggestions}
+                            enableAgentFromSearchSuggestions={enableAgentFromSearchSuggestions}
+                            onAskAssistantClick={onAskAssistantClick}
                         />
                     </PopoverContent>
                 </HideOnMobile>
@@ -430,6 +446,8 @@ const Search = (props) => {
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}
                             searchSuggestions={searchSuggestions}
+                            enableAgentFromSearchSuggestions={enableAgentFromSearchSuggestions}
+                            onAskAssistantClick={onAskAssistantClick}
                         />
                     )}
                 </Flex>
