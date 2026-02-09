@@ -229,3 +229,50 @@ describe('Type checking utility functions', () => {
         })
     })
 })
+
+describe('logMRTError', () => {
+    let consoleErrorSpy
+
+    beforeEach(() => {
+        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+        consoleErrorSpy.mockRestore()
+    })
+
+    const getLoggedJson = () => JSON.parse(consoleErrorSpy.mock.calls[0][0])
+
+    test('should log message and stack when an Error instance is provided', () => {
+        const err = new Error('something went wrong')
+        utils.logMRTError('data_store', err)
+
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+        const logged = getLoggedJson()
+        expect(logged).toHaveProperty('__MRT__data_store', 'error')
+        expect(logged).toHaveProperty('type', 'MRT_internal')
+        expect(logged).toHaveProperty('error', 'something went wrong')
+        expect(logged).toHaveProperty('stack', err.stack)
+    })
+
+    test('should normalize non-Errors to Errors', () => {
+        utils.logMRTError('middleware', 'plain string error')
+
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+        const logged = getLoggedJson()
+        expect(logged).toHaveProperty('__MRT__middleware', 'error')
+        expect(logged).toHaveProperty('type', 'MRT_internal')
+        expect(logged).toHaveProperty('error', 'plain string error')
+        expect(logged.stack).toBeTruthy()
+    })
+
+    test('should include context when provided', () => {
+        const err = new Error('something bad happened')
+        utils.logMRTError('data_store', err, {myContext: 'some helpful context'})
+
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+        const logged = getLoggedJson()
+        expect(logged).toHaveProperty('error', 'something bad happened')
+        expect(logged).toHaveProperty('myContext', 'some helpful context')
+    })
+})
