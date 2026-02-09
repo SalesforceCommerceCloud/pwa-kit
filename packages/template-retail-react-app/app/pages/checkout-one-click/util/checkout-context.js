@@ -10,6 +10,26 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    getSessionJSONItem,
+    setSessionJSONItem,
+    clearSessionJSONItem
+} from '@salesforce/retail-react-app/app/utils/utils'
+
+/** SessionStorage key for "checkout as guest" choice so it persists when shopper navigates away and returns */
+export const CHECKOUT_GUEST_CHOICE_STORAGE_KEY = 'sf_checkout_one_click_guest_choice'
+
+export const getCheckoutGuestChoiceFromStorage = () => {
+    return getSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY) === true
+}
+
+export const setCheckoutGuestChoiceInStorage = (value) => {
+    if (value) {
+        setSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY, true)
+    } else {
+        clearSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY)
+    }
+}
 
 const CheckoutContext = React.createContext()
 
