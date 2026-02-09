@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {DynamoDBClient} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocumentClient, GetCommand} from '@aws-sdk/lib-dynamodb'
-
 import {isRemote, logMRTError} from './utils'
 
 export class DataStoreNotFoundError extends Error {
@@ -69,6 +66,11 @@ export class DataStore {
         }
 
         if (!this._ddb) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const {DynamoDBClient} = require('@aws-sdk/client-dynamodb')
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const {DynamoDBDocumentClient} = require('@aws-sdk/lib-dynamodb')
+
             this._tableName = `DataAccessLayer-${process.env.AWS_REGION}`
             this._ddb = DynamoDBDocumentClient.from(
                 new DynamoDBClient({
@@ -123,6 +125,9 @@ export class DataStore {
         }
 
         const ddb = this._getClient()
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const {GetCommand} = require('@aws-sdk/lib-dynamodb')
+
         let response
         try {
             response = await ddb.send(
