@@ -22,9 +22,6 @@ export function launchChat() {
     try {
         const utilAPI = window.embeddedservice_bootstrap?.utilAPI
         if (!utilAPI) return
-
-        // When the floating button was hidden on load, show it first before launching
-        // so the chat window opens correctly (Salesforce Embedded Messaging requirement)
         const hideChatButtonOnLoad =
             window.embeddedservice_bootstrap?.settings?.hideChatButtonOnLoad === true
         if (hideChatButtonOnLoad && typeof utilAPI.showChatButton === 'function') {
