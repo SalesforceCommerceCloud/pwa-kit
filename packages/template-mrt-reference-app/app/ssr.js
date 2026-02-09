@@ -350,7 +350,7 @@ const headerTest = async (req, res) => {
 /**
  * Fetch an entry from the data store by key and return it as JSON.
  */
-export const dataStoreTest = async (req, res) => {
+const dataStoreTest = async (req, res) => {
     const store = DataStore.getDataStore()
 
     if (!store.isDataStoreAvailable()) {
