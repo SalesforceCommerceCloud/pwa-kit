@@ -27,10 +27,7 @@ export function launchChat() {
         // so the chat window opens correctly (Salesforce Embedded Messaging requirement)
         const hideChatButtonOnLoad =
             window.embeddedservice_bootstrap?.settings?.hideChatButtonOnLoad === true
-        if (
-            hideChatButtonOnLoad &&
-            typeof utilAPI.showChatButton === 'function'
-        ) {
+        if (hideChatButtonOnLoad && typeof utilAPI.showChatButton === 'function') {
             utilAPI.showChatButton()
         }
 
