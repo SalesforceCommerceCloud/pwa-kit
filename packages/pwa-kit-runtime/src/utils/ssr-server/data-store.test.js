@@ -13,7 +13,6 @@ import {
 } from './data-store'
 
 jest.mock('./utils', () => ({
-    isRemote: jest.fn(),
     logMRTError: jest.fn()
 }))
 
@@ -28,7 +27,7 @@ jest.mock('@aws-sdk/lib-dynamodb', () => ({
     GetCommand: jest.fn()
 }))
 
-import {isRemote, logMRTError} from './utils'
+import {logMRTError} from './utils'
 import {DynamoDBClient} from '@aws-sdk/client-dynamodb'
 import {DynamoDBDocumentClient, GetCommand} from '@aws-sdk/lib-dynamodb'
 
@@ -47,8 +46,7 @@ describe('DataStore', () => {
             send: mockSend
         })
 
-        // Default to remote environment
-        isRemote.mockReturnValue(false)
+        // Default to the data store being available
         process.env.AWS_REGION = 'ca-central-1'
         process.env.MOBIFY_PROPERTY_ID = 'my-project'
         process.env.DEPLOY_TARGET = 'my-target'
@@ -75,28 +73,14 @@ describe('DataStore', () => {
     })
 
     describe('isDataStoreAvailable', () => {
-        test('should return true when remote', () => {
-            delete process.env.AWS_REGION
-            delete process.env.MOBIFY_PROPERTY_ID
-            delete process.env.DEPLOY_TARGET
-
+        test('should return true when all required env vars are set', () => {
             const store = DataStore.getDataStore()
-
-            expect(store.isDataStoreAvailable()).toBe(true)
-        })
-
-        test('should return true when local and all required env vars are set', () => {
-            isRemote.mockReturnValue(true)
-
-            const store = DataStore.getDataStore()
-
             expect(store.isDataStoreAvailable()).toBe(true)
         })
 
         test.each(['AWS_REGION', 'MOBIFY_PROPERTY_ID', 'DEPLOY_TARGET'])(
-            'should return false when local and %s is missing',
+            'should return false when %s is missing',
             (environmentVariableName) => {
-                isRemote.mockReturnValue(true)
                 delete process.env[environmentVariableName]
 
                 const store = DataStore.getDataStore()
@@ -108,9 +92,8 @@ describe('DataStore', () => {
 
     describe('getEntry', () => {
         test.each(['AWS_REGION', 'MOBIFY_PROPERTY_ID', 'DEPLOY_TARGET'])(
-            'should throw DataStoreUnavailableError when local and %s is missing',
+            'should throw DataStoreUnavailableError when %s is missing',
             async (environmentVariableName) => {
-                isRemote.mockReturnValue(true)
                 delete process.env[environmentVariableName]
 
                 const store = DataStore.getDataStore()

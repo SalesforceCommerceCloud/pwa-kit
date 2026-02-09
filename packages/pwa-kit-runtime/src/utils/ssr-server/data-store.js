@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {isRemote, logMRTError} from './utils'
+import {logMRTError} from './utils'
 
 export class DataStoreNotFoundError extends Error {
     constructor(message) {
@@ -35,9 +35,6 @@ export class DataStoreUnavailableError extends Error {
  *
  * This class uses a singleton pattern.
  * Use DataStore.getDataStore() to get the singleton instance.
- *
- * When running locally, the data store is unavailable unless
- * required environment variables are set.
  */
 export class DataStore {
     _tableName = ''
@@ -100,13 +97,8 @@ export class DataStore {
      * @returns true if the data store is available, false otherwise
      */
     isDataStoreAvailable() {
-        return (
-            isRemote() ||
-            Boolean(
-                process.env.AWS_REGION &&
-                    process.env.MOBIFY_PROPERTY_ID &&
-                    process.env.DEPLOY_TARGET
-            )
+        return Boolean(
+            process.env.AWS_REGION && process.env.MOBIFY_PROPERTY_ID && process.env.DEPLOY_TARGET
         )
     }
 
