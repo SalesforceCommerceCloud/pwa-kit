@@ -997,9 +997,7 @@ describe('generateCacheKey', () => {
         })
 
         test('handles URLs with multiple query parameters', () => {
-            const key = generateCacheKey(
-                mockRequest({url: '/test?a=1&b=2&c=3&d=special%26char'})
-            )
+            const key = generateCacheKey(mockRequest({url: '/test?a=1&b=2&c=3&d=special%26char'}))
             expect(key).toBeDefined()
             expect(key.startsWith('/test/')).toBe(true)
         })

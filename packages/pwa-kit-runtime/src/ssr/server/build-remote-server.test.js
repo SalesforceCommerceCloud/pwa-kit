@@ -101,7 +101,11 @@ describe('WHATWG URL parsing for SSR request processing', () => {
     })
 
     test('reconstructs URL correctly with updated path and search', () => {
-        const parsedUrl = new URL('/original?q=1', 'http://localhost')
+        // Verify that new URL correctly parses, then string concatenation reconstructs
+        const parsed = new URL('/original?q=1', 'http://localhost')
+        expect(parsed.pathname).toBe('/original')
+        expect(parsed.search).toBe('?q=1')
+
         const updatedPath = '/new-path'
         const updatedSearch = '?q=2'
         const reconstructed = updatedPath + updatedSearch
