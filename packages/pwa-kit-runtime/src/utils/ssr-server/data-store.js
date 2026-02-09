@@ -7,7 +7,7 @@
 import {DynamoDBClient} from '@aws-sdk/client-dynamodb'
 import {DynamoDBDocumentClient, GetCommand} from '@aws-sdk/lib-dynamodb'
 
-import {isRemote, logMRTError} from './utils/utils'
+import {isRemote, logMRTError} from './utils'
 
 export class DataStoreNotFoundError extends Error {
     constructor(message) {

@@ -47,7 +47,7 @@ const {
     DataStoreNotFoundError,
     DataStoreServiceError,
     DataStoreUnavailableError
-} = require('@salesforce/pwa-kit-runtime/ssr/utils/ssr-server/data-store')
+} = require('@salesforce/pwa-kit-runtime/utils/ssr-server/data-store')
 
 const {isolationTests} = require('./isolation-actions')
 const pkg = require('../package.json')
