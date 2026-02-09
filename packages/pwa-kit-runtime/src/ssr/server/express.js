@@ -15,6 +15,7 @@ import {
     localDevLog,
     parseCacheControl,
     parseEndParameters,
+    parseRequestUrl,
     isRemote,
     wrapResponseWrite,
     detectDeviceType
@@ -82,9 +83,7 @@ export const RESOLVED_PROMISE = Promise.resolve()
  * @private
  */
 export const generateCacheKey = (req, options = {}) => {
-    const parsedUrl = new URL(req.url, 'http://localhost')
-    let pathname = parsedUrl.pathname
-    const query = parsedUrl.search ? parsedUrl.search.slice(1) : null
+    let {pathname, query} = parseRequestUrl(req)
 
     // remove the trailing slash
     if (pathname.charAt(pathname.length - 1) === '/') {

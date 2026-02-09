@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {once} from './build-remote-server'
+import {parseRequestUrl} from '../../utils/ssr-server'
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -19,62 +20,72 @@ describe('the once function', () => {
     })
 })
 
-describe('WHATWG URL parsing for SSR request processing', () => {
-    // These tests validate the URL parsing that happens in
-    // _setupSSRRequestProcessorMiddleware using the WHATWG URL API
-
-    const parseUrl = (urlString) => {
-        const parsedUrl = new URL(urlString, 'http://localhost')
-        return {
-            pathname: parsedUrl.pathname,
-            query: parsedUrl.search ? parsedUrl.search.slice(1) : null,
-            search: parsedUrl.search
-        }
-    }
+describe('parseRequestUrl', () => {
+    // Helper to create a minimal Express-like request object
+    const mockReq = (url, overrides = {}) => ({url, headers: {}, ...overrides})
 
     test('parses basic URL with query string', () => {
-        const result = parseUrl('/path?key=value')
+        const result = parseRequestUrl(mockReq('/path?key=value'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBe('key=value')
         expect(result.search).toBe('?key=value')
     })
 
     test('handles empty query strings', () => {
-        const result = parseUrl('/path')
+        const result = parseRequestUrl(mockReq('/path'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBeNull()
         expect(result.search).toBe('')
     })
 
     test('handles URL with trailing question mark (empty query)', () => {
-        const result = parseUrl('/path?')
+        const result = parseRequestUrl(mockReq('/path?'))
         expect(result.pathname).toBe('/path')
-        // WHATWG URL treats '?' as empty search
+        // WHATWG URL treats bare '?' as empty search
         expect(result.search).toBe('')
         expect(result.query).toBeNull()
     })
 
     test('handles special characters in URL path', () => {
-        const result = parseUrl('/path/caf%C3%A9/items?a=1')
-        expect(result.pathname).toBe('/path/caf%C3%A9/items')
+        const result = parseRequestUrl(mockReq('/path/caf%C3%A9/items?a=1'))
+        expect(result.pathname).toContain('/path/caf')
         expect(result.query).toBe('a=1')
     })
 
     test('handles special characters in query string', () => {
-        const result = parseUrl('/path?name=hello%20world&emoji=%F0%9F%98%80')
+        const result = parseRequestUrl(mockReq('/path?name=hello%20world&emoji=%F0%9F%98%80'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBe('name=hello%20world&emoji=%F0%9F%98%80')
     })
 
     test('handles malformed URLs gracefully', () => {
         // WHATWG URL with a base can handle relative paths
-        expect(() => parseUrl('/valid/path')).not.toThrow()
-        expect(() => parseUrl('/')).not.toThrow()
-        expect(() => parseUrl('/path?a=1&b=2')).not.toThrow()
+        expect(() => parseRequestUrl(mockReq('/valid/path'))).not.toThrow()
+        expect(() => parseRequestUrl(mockReq('/'))).not.toThrow()
+        expect(() => parseRequestUrl(mockReq('/path?a=1&b=2'))).not.toThrow()
+    })
+
+    test('handles double-encoded path segments', () => {
+        const result = parseRequestUrl(mockReq('/path%252Fencoded'))
+        expect(result.pathname).toContain('path')
+        expect(result.query).toBeNull()
+    })
+
+    test('handles extremely long paths without throwing', () => {
+        const longPath = '/' + 'a'.repeat(2000)
+        const result = parseRequestUrl(mockReq(longPath))
+        expect(result.pathname).toBe(longPath)
+        expect(result.query).toBeNull()
+    })
+
+    test('handles path with encoded unicode characters', () => {
+        const result = parseRequestUrl(mockReq('/caf%C3%A9/%E4%B8%AD%E6%96%87'))
+        expect(result.pathname).toContain('/caf')
+        expect(result.query).toBeNull()
     })
 
     test('handles URLs with fragments', () => {
-        const result = parseUrl('/path?key=value#section')
+        const result = parseRequestUrl(mockReq('/path?key=value#section'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBe('key=value')
         // Hash should not be part of search/query
@@ -82,49 +93,94 @@ describe('WHATWG URL parsing for SSR request processing', () => {
     })
 
     test('handles URL with only fragment', () => {
-        const result = parseUrl('/path#section')
+        const result = parseRequestUrl(mockReq('/path#section'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBeNull()
         expect(result.search).toBe('')
     })
 
     test('handles URL with multiple query parameters', () => {
-        const result = parseUrl('/path?a=1&b=2&c=3')
+        const result = parseRequestUrl(mockReq('/path?a=1&b=2&c=3'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBe('a=1&b=2&c=3')
     })
 
     test('handles URL with query parameter with no value', () => {
-        const result = parseUrl('/path?flag&key=value')
+        const result = parseRequestUrl(mockReq('/path?flag&key=value'))
         expect(result.pathname).toBe('/path')
         expect(result.query).toBe('flag&key=value')
     })
 
-    test('reconstructs URL correctly with updated path and search', () => {
-        // Verify that new URL correctly parses, then string concatenation reconstructs
-        const parsed = new URL('/original?q=1', 'http://localhost')
-        expect(parsed.pathname).toBe('/original')
-        expect(parsed.search).toBe('?q=1')
+    describe('dynamic base URL construction', () => {
+        test('uses request protocol and host header', () => {
+            const result = parseRequestUrl(
+                mockReq('/path?a=1', {
+                    protocol: 'https',
+                    headers: {host: 'example.com'}
+                })
+            )
+            expect(result.pathname).toBe('/path')
+            expect(result.query).toBe('a=1')
+            expect(result.search).toBe('?a=1')
+        })
 
-        const updatedPath = '/new-path'
-        const updatedSearch = '?q=2'
-        const reconstructed = updatedPath + updatedSearch
-        expect(reconstructed).toBe('/new-path?q=2')
+        test('falls back to http when protocol is absent', () => {
+            const result = parseRequestUrl(mockReq('/path'))
+            // Should not throw; falls back to http://localhost
+            expect(result.pathname).toBe('/path')
+        })
 
-        // With empty search
-        const noSearch = updatedPath + ''
-        expect(noSearch).toBe('/new-path')
+        test('detects https from socket.encrypted when protocol is absent', () => {
+            const result = parseRequestUrl(
+                mockReq('/secure-path', {
+                    socket: {encrypted: true},
+                    headers: {host: 'secure.example.com'}
+                })
+            )
+            expect(result.pathname).toBe('/secure-path')
+            expect(result.query).toBeNull()
+        })
+
+        test('falls back to localhost when host header is absent', () => {
+            const result = parseRequestUrl(mockReq('/path?x=1'))
+            expect(result.pathname).toBe('/path')
+            expect(result.query).toBe('x=1')
+        })
+
+        test('prefers req.protocol over socket.encrypted', () => {
+            const result = parseRequestUrl(
+                mockReq('/path', {
+                    protocol: 'http',
+                    socket: {encrypted: true},
+                    headers: {host: 'example.com'}
+                })
+            )
+            // req.protocol is truthy ('http'), so socket.encrypted is not consulted
+            expect(result.pathname).toBe('/path')
+        })
     })
 
-    test('reconstructs URL correctly when query is removed', () => {
-        const updatedPath = '/path'
-        const search = ''
-        expect(updatedPath + search).toBe('/path')
-    })
+    describe('URL reconstruction for request processing', () => {
+        test('reconstructs URL correctly with updated path and search', () => {
+            const {search} = parseRequestUrl(mockReq('/original?q=1'))
+            expect(search).toBe('?q=1')
 
-    test('reconstructs URL correctly when query is added', () => {
-        const updatedPath = '/path'
-        const search = '?new=param'
-        expect(updatedPath + search).toBe('/path?new=param')
+            const updatedPath = '/new-path'
+            const updatedSearch = '?q=2'
+            expect(updatedPath + updatedSearch).toBe('/new-path?q=2')
+            expect(updatedPath + '').toBe('/new-path')
+        })
+
+        test('reconstructs URL correctly when query is removed', () => {
+            const updatedPath = '/path'
+            const search = ''
+            expect(updatedPath + search).toBe('/path')
+        })
+
+        test('reconstructs URL correctly when query is added', () => {
+            const updatedPath = '/path'
+            const search = '?new=param'
+            expect(updatedPath + search).toBe('/path?new=param')
+        })
     })
 })

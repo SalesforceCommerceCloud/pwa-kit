@@ -1007,6 +1007,44 @@ describe('generateCacheKey', () => {
             expect(key).toBeDefined()
             expect(key.startsWith('/test/')).toBe(true)
         })
+
+        test('handles double-encoded path segments', () => {
+            const key = generateCacheKey(mockRequest({url: '/path%252Fencoded?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('handles extremely long paths without throwing', () => {
+            const longPath = '/' + 'a'.repeat(2000)
+            const key = generateCacheKey(mockRequest({url: longPath}))
+            expect(key).toBeDefined()
+        })
+    })
+
+    describe('dynamic base URL construction', () => {
+        test('produces consistent keys with protocol and host header', () => {
+            const keyDefault = generateCacheKey(mockRequest({url: '/test?a=1'}))
+            const keyWithHost = generateCacheKey(
+                mockRequest({
+                    url: '/test?a=1',
+                    protocol: 'https',
+                    headers: {host: 'example.com'}
+                })
+            )
+            // pathname and query are the same, so the cache key should match
+            expect(keyDefault).toEqual(keyWithHost)
+        })
+
+        test('works with socket.encrypted and no protocol', () => {
+            const key = generateCacheKey(
+                mockRequest({
+                    url: '/test?a=1',
+                    socket: {encrypted: true},
+                    headers: {host: 'secure.example.com'}
+                })
+            )
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/')).toBe(true)
+        })
     })
 })
 

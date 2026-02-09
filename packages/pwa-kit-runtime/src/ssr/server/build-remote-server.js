@@ -19,6 +19,7 @@ import {
     isRemote,
     MetricsSender,
     outgoingRequestHook,
+    parseRequestUrl,
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
@@ -410,8 +411,7 @@ export const RemoteServerFactory = {
 
             // Apply the request processor
             const requestProcessor = that._getRequestProcessor(req)
-            const parsedUrl = new URL(req.url, 'http://localhost')
-            const originalQuerystring = parsedUrl.search ? parsedUrl.search.slice(1) : null
+            let {search, query: originalQuerystring} = parseRequestUrl(req)
             let updatedQuerystring = originalQuerystring
             let updatedPath = req.path
 
@@ -467,7 +467,6 @@ export const RemoteServerFactory = {
             }
 
             // Update the request.
-            let search = parsedUrl.search
             if (updatedQuerystring !== originalQuerystring) {
                 search = updatedQuerystring ? `?${updatedQuerystring}` : ''
 
