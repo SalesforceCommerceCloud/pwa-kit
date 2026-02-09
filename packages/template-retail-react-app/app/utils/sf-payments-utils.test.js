@@ -17,8 +17,11 @@ import {
     getClientSecret,
     getGatewayFromPaymentMethod,
     getSetupFutureUsage,
-    transformPaymentMethodReferences
+    transformPaymentMethodReferences,
+    getExpressPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
+
+import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
 describe('sf-payments-utils', () => {
     describe('getSFPaymentsInstrument', () => {
@@ -1747,6 +1750,28 @@ describe('sf-payments-utils', () => {
             expect(result).toHaveLength(2)
             expect(result[0].name).toBe('Visa •••• 4242')
             expect(result[1].name).toBe('Mastercard •••• 5555')
+        })
+    })
+
+    describe('getExpressPaymentMethodType', () => {
+        test('returns card for googlepay with Stripe gateway', () => {
+            const result = getExpressPaymentMethodType('googlepay', PAYMENT_GATEWAYS.STRIPE)
+            expect(result).toBe('card')
+        })
+
+        test('returns googlepay for googlepay with Adyen gateway', () => {
+            const result = getExpressPaymentMethodType('googlepay', PAYMENT_GATEWAYS.ADYEN)
+            expect(result).toBe('googlepay')
+        })
+
+        test('returns card for applepay with Stripe gateway', () => {
+            const result = getExpressPaymentMethodType('applepay', PAYMENT_GATEWAYS.STRIPE)
+            expect(result).toBe('card')
+        })
+
+        test('returns type unchanged for non-mapped types', () => {
+            const result = getExpressPaymentMethodType('paypal', PAYMENT_GATEWAYS.STRIPE)
+            expect(result).toBe('paypal')
         })
     })
 })

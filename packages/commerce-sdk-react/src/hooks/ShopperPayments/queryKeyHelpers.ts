@@ -6,7 +6,7 @@
  */
 import {ShopperPayments} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {pickValidParams, omitNullable} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperPayments<{shortCode: string}>
@@ -41,7 +41,10 @@ export const getPaymentConfiguration: QueryKeyHelper<'getPaymentConfiguration'> 
     queryKey: (params: Params<'getPaymentConfiguration'>) => {
         return [
             ...getPaymentConfiguration.path(params),
-            pickValidParams(params || {}, ShopperPayments.paramKeys.getPaymentConfiguration)
+            // pickValidParams returns the filtered parameters, TypeScript sees that zoneId 
+            // could be string | null, and complains because null isn't allowed in the query key.
+            // omitNullable removes null values from the parameters (zoneId is optional but NOT nullable)
+            omitNullable(pickValidParams(params || {}, ShopperPayments.paramKeys.getPaymentConfiguration))
         ]
     }
 }

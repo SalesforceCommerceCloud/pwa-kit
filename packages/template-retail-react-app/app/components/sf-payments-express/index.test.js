@@ -252,3 +252,29 @@ describe('SFPaymentsExpress', () => {
         expect(useCurrentBasket).toHaveBeenCalled()
     })
 })
+
+describe('basketIdRef preservation', () => {
+    test('stays mounted when basket becomes null after initial render', () => {
+        // First render with basket
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithSuit))
+        const {rerender} = renderWithProviders(<SFPaymentsExpress />)
+
+        expect(screen.getByTestId('sf-payments-express-buttons')).toBeInTheDocument()
+
+        // Basket becomes null (consumed after order creation)
+        useCurrentBasket.mockReturnValue(createMockBasket(null))
+        rerender(<SFPaymentsExpress />)
+
+        // Should still render because basketIdRef preserved the value
+        expect(screen.getByTestId('sf-payments-express-buttons')).toBeInTheDocument()
+    })
+
+    test('renders null on initial mount when basket is null', () => {
+        // First render without basket
+        useCurrentBasket.mockReturnValue(createMockBasket(null))
+        renderWithProviders(<SFPaymentsExpress />)
+
+        // Should not render because basketIdRef was never set
+        expect(screen.queryByTestId('sf-payments-express-buttons')).not.toBeInTheDocument()
+    })
+})
