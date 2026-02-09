@@ -365,7 +365,7 @@ const envBasePathMiddleware = (req, res, next) => {
     const basePath = process.env.MRT_ENV_BASE_PATH
     console.log(`Base path: ${basePath}`)
     console.log(`Request path: ${req.url}`)
-    if (basePath && req.path.startsWith(`${basePath}/` || req.path === basePath)) {
+    if (basePath && (req.path.startsWith(`${basePath}/`) || req.path === basePath)) {
         req.url = req.url.slice(basePath.length) || '/'
         console.log(
             `Base path: Rewrote ${basePath} -> Original url: ${req.originalUrl} -> New url: ${req.url}`

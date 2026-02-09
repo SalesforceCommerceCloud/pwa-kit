@@ -98,9 +98,12 @@ describe('server', () => {
         process.env.MRT_ENV_BASE_PATH = basePath
         const response = await request(app).get(`${basePath}/echo?x=foo&y=bar`)
         expect(response.status).toBe(200)
+        // preserves query parameters
         expect(response.body.query.x).toBe('foo')
         expect(response.body.query.y).toBe('bar')
+        // path is the path after the base path
         expect(response.body.path).toBe('/echo')
+        // base path env var present in response body
         expect(response.body.env.MRT_ENV_BASE_PATH).toBe(basePath)
     })
 
