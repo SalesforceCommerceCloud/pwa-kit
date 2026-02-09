@@ -31,7 +31,9 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     useCheckout,
-    CheckoutProvider
+    CheckoutProvider,
+    getCheckoutGuestChoiceFromStorage,
+    setCheckoutGuestChoiceInStorage
 } from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-pickup-address'
@@ -55,16 +57,17 @@ import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {nanoid} from 'nanoid'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, STEPS, contactPhone} = useCheckout()
+    const {step, STEPS} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(
+        getCheckoutGuestChoiceFromStorage
+    )
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isOtpLoading, setIsOtpLoading] = useState(false)
     const [isPlacingOrder, setIsPlacingOrder] = useState(false)
@@ -119,8 +122,6 @@ const CheckoutOneClick = () => {
         ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
     const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
-    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
-    const updateCustomer = useShopperCustomersMutation('updateCustomer')
 
     const handleSavePreferenceChange = (shouldSave) => {
         setShouldSavePaymentMethod(shouldSave)
@@ -382,87 +383,9 @@ const CheckoutOneClick = () => {
                         fullCardDetails
                     )
                 }
-
-                // For newly registered guests only, persist shipping address when billing same as shipping
-                // Skip saving pickup/store addresses - only save delivery addresses
-                // For multi-shipment orders, save all delivery addresses with the first one as default
-                if (
-                    enableUserRegistration &&
-                    currentCustomer?.isRegistered &&
-                    !registeredUserChoseGuest
-                ) {
-                    try {
-                        const customerId = order.customerInfo?.customerId
-                        if (!customerId) return
-
-                        // Get all delivery shipments (not pickup) from the order
-                        // This handles both single delivery and multi-shipment orders
-                        // For BOPIS orders, pickup shipments are filtered out
-                        const deliveryShipments =
-                            order?.shipments?.filter(
-                                (shipment) =>
-                                    !isPickupShipment(shipment) && shipment.shippingAddress
-                            ) || []
-
-                        if (deliveryShipments.length > 0) {
-                            // Save all delivery addresses, with the first one as preferred
-                            for (let i = 0; i < deliveryShipments.length; i++) {
-                                const shipment = deliveryShipments[i]
-                                const shipping = shipment.shippingAddress
-                                if (!shipping) continue
-
-                                // Whitelist fields and strip non-customer fields (e.g., id, _type)
-                                const {
-                                    address1,
-                                    address2,
-                                    city,
-                                    countryCode,
-                                    firstName,
-                                    lastName,
-                                    phone,
-                                    postalCode,
-                                    stateCode
-                                } = shipping || {}
-
-                                await createCustomerAddress.mutateAsync({
-                                    parameters: {customerId},
-                                    body: {
-                                        addressId: nanoid(),
-                                        preferred: i === 0, // First address is preferred
-                                        address1,
-                                        address2,
-                                        city,
-                                        countryCode,
-                                        firstName,
-                                        lastName,
-                                        phone,
-                                        postalCode,
-                                        stateCode
-                                    }
-                                })
-                            }
-                        }
-
-                        // Persist phone number as phoneHome for newly registered guest shoppers
-                        const phoneHome = basket?.billingAddress?.phone || contactPhone
-                        if (phoneHome) {
-                            await updateCustomer.mutateAsync({
-                                parameters: {customerId},
-                                body: {phoneHome}
-                            })
-                        }
-                    } catch (_e) {
-                        // Only surface error if shopper opted to register/save details; otherwise fail silently
-                        showError(
-                            formatMessage({
-                                id: 'checkout.error.cannot_save_address',
-                                defaultMessage: 'Could not save shipping address.'
-                            })
-                        )
-                    }
-                }
             }
 
+            setCheckoutGuestChoiceInStorage(false)
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
