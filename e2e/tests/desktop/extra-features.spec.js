@@ -13,11 +13,9 @@ const {answerConsentTrackingForm, validatePasskeyLogin} = require('../../scripts
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
 describe('Passkey Login', () => {
-    test('Verify passkey login', async ({page}, testInfo) => {
-        if (testInfo.retry) {
-            // authenticate/start has a 60s cooldown; wait 1 min on retry so the next attempt can call it again
-            await page.waitForTimeout(60000)
-        }
+    test('Verify passkey login', async ({page}) => {
+        // webauthn/authenticate/start has a 60s cooldown; wait 1 min to ensure it can be called again
+        await page.waitForTimeout(60000)
         await validatePasskeyLogin({page})
     })
 })
