@@ -21,6 +21,7 @@ import {
     isRemote,
     MetricsSender,
     outgoingRequestHook,
+    parseRequestUrl,
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
@@ -31,7 +32,6 @@ import dns from 'dns'
 import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
-import URL from 'url'
 import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
@@ -596,9 +596,8 @@ export const RemoteServerFactory = {
             // Fast path: /mobify routes always get the base path removed
             if (req.path.startsWith(`${basePath}/mobify`)) {
                 const cleanPath = removeBasePathFromPath(req.path)
-                const parsed = URL.parse(req.url)
-                parsed.pathname = cleanPath
-                req.url = URL.format(parsed)
+                const {search} = parseRequestUrl(req)
+                req.url = cleanPath + search
                 return next()
             }
 
@@ -640,9 +639,8 @@ export const RemoteServerFactory = {
             // Only update URL if our clean path matches an Express route
             // This leaves React Router paths (like /en-US/category) unchanged
             if (matchesExpressRoute) {
-                const parsed = URL.parse(req.url)
-                parsed.pathname = cleanPath
-                req.url = URL.format(parsed)
+                const {search} = parseRequestUrl(req)
+                req.url = cleanPath + search
             }
             next()
         }
@@ -682,8 +680,7 @@ export const RemoteServerFactory = {
             // Apply the request processor
             // `this` is bound to the calling context, usually RemoteServerFactory
             const requestProcessor = this._getRequestProcessor(req)
-            const parsed = URL.parse(req.url)
-            const originalQuerystring = parsed.query
+            let {search, query: originalQuerystring} = parseRequestUrl(req)
             let updatedQuerystring = originalQuerystring
             let updatedPath = req.path
 
@@ -740,8 +737,8 @@ export const RemoteServerFactory = {
 
             // Update the request.
             if (updatedQuerystring !== originalQuerystring) {
-                // Update the string in the parsed URL
-                parsed.search = updatedQuerystring ? `?${updatedQuerystring}` : ''
+                // Update the search string to reflect the new querystring
+                search = updatedQuerystring ? `?${updatedQuerystring}` : ''
 
                 // Let Express re-parse the parameters
                 if (updatedQuerystring) {
@@ -752,11 +749,9 @@ export const RemoteServerFactory = {
                 }
             }
 
-            parsed.pathname = updatedPath
-
             // This will update the request's URL with the new path
             // and querystring.
-            req.url = URL.format(parsed)
+            req.url = updatedPath + search
 
             // Get the request class and store it for general use. We
             // must do this AFTER the request-processor, because that's
