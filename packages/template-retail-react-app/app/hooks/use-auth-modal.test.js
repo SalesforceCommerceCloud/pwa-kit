@@ -11,9 +11,15 @@ import userEvent from '@testing-library/user-event'
 import {
     renderWithProviders,
     createPathWithDefaults,
-    guestToken
+    guestToken,
+    registerUserToken,
+    clearAllCookies
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {
+    AuthModal,
+    useAuthModal,
+    EMAIL_VIEW
+} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
@@ -109,6 +115,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
+    clearAllCookies()
     jest.resetModules()
     jest.restoreAllMocks()
 })
@@ -199,6 +206,20 @@ describe('Passwordless enabled', () => {
         global.server.use(
             rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            }),
+            rest.post('*/oauth2/passwordless/token', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        customer_id: 'registeredCustomerId',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken',
+                        usid: 'testusid',
+                        enc_user_id: 'testEncUserId',
+                        id_token: 'testIdToken'
+                    })
+                )
             })
         )
     })
@@ -216,11 +237,11 @@ describe('Passwordless enabled', () => {
     })
 
     test('Allows passwordless login', async () => {
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/',
-            origin: 'https://example.com'
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
         })
-        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
         // open the modal
@@ -238,30 +259,38 @@ describe('Passwordless enabled', () => {
         const passwordlessLoginButton = screen.getByText(/Continue/i)
         await user.click(passwordlessLoginButton)
 
-        // check that check email modal is open
-        await waitFor(
-            () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that OTP auth modal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
+        })
 
         // resend the email
-        await user.click(screen.getByText(/Resend Link/i))
+        await user.click(screen.getByText(/Resend Code/i))
 
-        // check that check email modal is still open
+        // enter the code manually
+        const code = '12345678'
+        const otpInputs = screen.getAllByRole('textbox')
+        for (let i = 0; i < 8; i++) {
+            await user.type(otpInputs[i], code[i])
+        }
+
         await waitFor(() => {
-            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+            expect(
+                screen.queryByText(/To log in to your account, enter the code/i)
+            ).not.toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
         })
     })
 
     test('allows passwordless login via Enter key', async () => {
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/',
-            origin: 'https://example.com'
-        })
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
@@ -279,15 +308,15 @@ describe('Passwordless enabled', () => {
         // simulate Enter key press in email field
         await user.keyboard('{Enter}')
 
-        // check that check email modal is open
-        await waitFor(
-            () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that the OtpAuthModal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
+        })
     })
 
     test('sends callbackURI when passwordless callback is configured', async () => {
@@ -304,11 +333,6 @@ describe('Passwordless enabled', () => {
             }
         })
 
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/',
-            origin: 'https://example.com'
-        })
-
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
@@ -322,6 +346,33 @@ describe('Passwordless enabled', () => {
         await user.type(screen.getByLabelText('Email'), validEmail)
         await user.click(screen.getByText(/Continue/i))
 
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that the OtpAuthModal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
+        })
+    })
+
+    test('shows check your email view when initial view is set to email', async () => {
+        const {user} = renderWithProviders(
+            <MockedComponent isPasswordlessEnabled={true} initialView={EMAIL_VIEW} />
+        )
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+        })
+
+        await user.click(screen.getByText(/Resend Link/i))
+
+        // check that the Check Your Email view is still open
         await waitFor(() => {
             expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
         })

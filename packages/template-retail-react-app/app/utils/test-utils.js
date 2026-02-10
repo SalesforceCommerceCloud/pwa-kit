@@ -40,6 +40,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import jwt from 'jsonwebtoken'
 import userEvent from '@testing-library/user-event'
+import Cookies from 'js-cookie'
 // This JWT's payload is special
 // it includes 3 fields that commerce-sdk-react cares:
 // exp, isb and sub
@@ -286,4 +287,17 @@ export const withPageProvider = (Component, options) => {
     WrappedComponent.displayName = `withRouter(${wrappedComponentName})`
 
     return WrappedComponent
+}
+
+/**
+ * Clears all cookies. Useful for test cleanup to ensure clean auth state.
+ * @returns {void}
+ */
+export const clearAllCookies = () => {
+    document.cookie.split(';').forEach((cookie) => {
+        const name = cookie.split('=')[0].trim()
+        if (name) {
+            Cookies.remove(name, {path: '/'})
+        }
+    })
 }

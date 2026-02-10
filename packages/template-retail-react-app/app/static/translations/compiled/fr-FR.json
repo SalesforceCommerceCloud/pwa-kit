@@ -1679,6 +1679,12 @@
       "value": "Afficher"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Demander à l'agent d'achat"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,

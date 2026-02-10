@@ -681,6 +681,9 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "表示"
   },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "ショッピングエージェントに質問"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "ロゴ"
   },
