@@ -1,5 +1,5 @@
 ## v5.0.0-dev (Jan 28, 2026)
-- Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3647)
+- Add Node 24 support. Drop Node 16 support. [#3647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3647)
 - Upgrade to commerce-sdk-isomorphic v5.0.0 and introduce Payment Instrument SCAPI integration [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
 
 ## v4.4.0-dev (Dec 17, 2025)
