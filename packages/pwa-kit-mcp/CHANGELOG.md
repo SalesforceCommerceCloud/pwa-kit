@@ -1,5 +1,5 @@
 ## 0.5.0-dev (Dec 17, 2025)
-
+- Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3647)
 - Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
 - Added the fallback path for the custom Api tool [#3458] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3458)
 
