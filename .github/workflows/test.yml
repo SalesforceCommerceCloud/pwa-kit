@@ -54,7 +54,7 @@ jobs:
       matrix:
         node: [18, 20, 22, 24]
         npm: [9, 10, 11]
-        exclude:
+        exclude: # node 18 with npm 11 are not compatible
           - node: 18
             npm: 11
     runs-on: ubuntu-latest
@@ -159,7 +159,7 @@ jobs:
       matrix:
         node: [18, 20, 22, 24]
         npm: [9, 10, 11]
-        exclude:
+        exclude: # node 18 with npm 11 is not compatible
           - node: 18
             npm: 11
     runs-on: windows-latest
