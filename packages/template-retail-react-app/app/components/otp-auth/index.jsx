@@ -302,7 +302,7 @@ const OtpAuth = ({
                             )}
 
                             {/* Buttons */}
-                            <HStack spacing={4} width="100%" justifyContent="flex-end">
+                            <HStack spacing={4} width="100%" justifyContent="center">
                                 {!hideCheckoutAsGuestButton && (
                                     <Button
                                         onClick={handleCheckoutAsGuest}
