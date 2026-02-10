@@ -12,6 +12,16 @@ const {answerConsentTrackingForm, validatePasskeyLogin} = require('../../scripts
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
+describe('Passkey Login', () => {
+    test('Verify passkey login', async ({page}, testInfo) => {
+        if (testInfo.retry) {
+            // authenticate/start has a 60s cooldown; wait 1 min on retry so the next attempt can call it again
+            await page.waitForTimeout(60000)
+        }
+        await validatePasskeyLogin({page})
+    })
+})
+
 describe('Passwordless login', () => {
     /**
      * Test that a user can login with passwordless login. There is no programmatic way to check the email,
@@ -199,17 +209,5 @@ describe('Password reset', () => {
         )
 
         expect(interceptedRequest).toBeTruthy()
-    })
-})
-
-describe('Passkey Login', () => {
-    /**
-     * Test that a user can login with a passkey.
-     * We can't register an actual passkey in the E2E environment because registration requires a token verification.
-     * Instead,we add a mock credential to the virtual authenticator to bypass the registration flow and verify the
-     * request to the /webAuthn/authenticate/finish endpoint.
-     */
-    test('Verify passkey login', async ({page}) => {
-        await validatePasskeyLogin({page})
     })
 })
