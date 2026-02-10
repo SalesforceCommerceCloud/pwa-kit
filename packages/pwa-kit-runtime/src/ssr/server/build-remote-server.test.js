@@ -624,9 +624,7 @@ describe('parseRequestUrl', () => {
         })
 
         test('detects https from socket.encrypted', () => {
-            const result = parseRequestUrl(
-                mockReq({url: '/test', socket: {encrypted: true}})
-            )
+            const result = parseRequestUrl(mockReq({url: '/test', socket: {encrypted: true}}))
             expect(result.pathname).toBe('/test')
         })
 

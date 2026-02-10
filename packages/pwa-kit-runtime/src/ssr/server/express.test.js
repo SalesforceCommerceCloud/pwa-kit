@@ -1041,9 +1041,7 @@ describe('generateCacheKey', () => {
         })
 
         test('detects https from socket.encrypted', () => {
-            const key = generateCacheKey(
-                mockRequest({url: '/test?a=1', socket: {encrypted: true}})
-            )
+            const key = generateCacheKey(mockRequest({url: '/test?a=1', socket: {encrypted: true}}))
             expect(key).toBeDefined()
         })
 
