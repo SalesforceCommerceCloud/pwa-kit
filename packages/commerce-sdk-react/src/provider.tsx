@@ -30,6 +30,12 @@ import {
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
 
+export interface PageDesignerParams {
+    mode?: string
+    pdToken?: string
+    pageId?: string
+}
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -51,6 +57,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    pageDesignerParams?: PageDesignerParams
 }
 
 /**
@@ -148,7 +155,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         disableAuthInit = false,
-        hybridAuthEnabled = false
+        hybridAuthEnabled = false,
+        pageDesignerParams = {}
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -317,7 +325,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 defaultDnt,
                 passwordlessLoginCallbackURI,
                 refreshTokenRegisteredCookieTTL,
-                refreshTokenGuestCookieTTL
+                refreshTokenGuestCookieTTL,
+                pageDesignerParams
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

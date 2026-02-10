@@ -391,7 +391,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'pay.google.com',
                         'payments.google.com',
                         'google.com',
-                        'www.google.com'
+                        'www.google.com',
+                        // Connect to SFCC/ODS instances
+                        '*.demandware.net'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -402,6 +404,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.adyen.com',
                         'payments.google.com',
                         'pay.google.com'
+                    ],
+                    'frame-ancestors': [
+                        // Allow Page Designer to embed the storefront in an iframe
+                        '*.demandware.net'
                     ]
                 }
             }
