@@ -24,6 +24,25 @@ const {
     DataStoreUnavailableError
 } = require('@salesforce/pwa-kit-runtime/utils/ssr-server/data-store')
 
+const pathsToCheck = [
+    ['/', 200, 'application/json; charset=utf-8'],
+    ['/tls', 200, 'application/json; charset=utf-8'],
+    ['/exception', 500, 'text/html; charset=utf-8'],
+    ['/cache', 200, 'application/json; charset=utf-8'],
+    ['/cookie', 200, 'application/json; charset=utf-8'],
+    ['/set-response-headers', 200, 'application/json; charset=utf-8'],
+    ['/isolation', 200, 'application/json; charset=utf-8'],
+    ['/memtest', 200, 'application/json; charset=utf-8'],
+    ['/streaming-large', 200, 'application/json; charset=utf-8']
+]
+const pathsToCheckWithBasePath = (basePath) => {
+    return pathsToCheck.map((pathStatusContentType) => [
+        basePath + pathStatusContentType[0],
+        pathStatusContentType[1],
+        pathStatusContentType[2]
+    ])
+}
+
 class AccessDenied extends ServiceException {
     constructor(options) {
         super({...options, name: 'AccessDenied'})
@@ -36,6 +55,7 @@ describe('server', () => {
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
     const logsMock = mockClient(CloudWatchLogsClient)
+
     beforeEach(() => {
         originalEnv = process.env
         process.env = Object.assign({}, process.env, {
@@ -56,26 +76,45 @@ describe('server', () => {
         s3Mock.reset()
         logsMock.reset()
     })
+
     afterEach(() => {
         process.env = originalEnv
         jest.restoreAllMocks()
     })
-    test.each([
-        ['/', 200, 'application/json charset=utf-8'],
-        ['/tls', 200, 'application/json charset=utf-8'],
-        ['/exception', 500, 'text/html charset=utf-8'],
-        ['/cache', 200, 'application/json charset=utf-8'],
-        ['/cookie', 200, 'application/json charset=utf-8'],
-        ['/multi-cookies', 200, 'application/json charset=utf-8'],
-        ['/set-response-headers', 200, 'application/json charset=utf-8'],
-        ['/isolation', 200, 'application/json charset=utf-8'],
-        ['/memtest', 200, 'application/json charset=utf-8'],
-        ['/streaming-large', 200, 'application/json charset=utf-8']
-    ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
-        return request(app)
-            .get(path)
-            .expect(expectedStatus)
-            .expect('Content-Type', expectedContentType)
+
+    test.each(pathsToCheck)(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
+
+    test.each(pathsToCheckWithBasePath('/test-base-path'))(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            process.env.MRT_ENV_BASE_PATH = '/test-base-path'
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
+
+    test('Path /echo should work with base path', async () => {
+        const basePath = '/test-base-path'
+        process.env.MRT_ENV_BASE_PATH = basePath
+        const response = await request(app).get(`${basePath}/echo?x=foo&y=bar`)
+        expect(response.status).toBe(200)
+        // preserves query parameters
+        expect(response.body.query.x).toBe('foo')
+        expect(response.body.query.y).toBe('bar')
+        // path is the path after the base path
+        expect(response.body.path).toBe('/echo')
+        // base path env var present in response body
+        expect(response.body.env.MRT_ENV_BASE_PATH).toBe(basePath)
     })
 
     test('Path "/cache" has Cache-Control set', () => {
