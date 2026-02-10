@@ -80,6 +80,54 @@ describe('shopper-agent-utils', () => {
             expect(() => launchChat()).not.toThrow()
         })
 
+        test('should call showChatButton before launchChat when hideChatButtonOnLoad is true', () => {
+            const mockShowChatButton = jest.fn()
+            const mockLaunchChat = jest.fn()
+
+            global.window = {
+                embeddedservice_bootstrap: {
+                    settings: {
+                        hideChatButtonOnLoad: true
+                    },
+                    utilAPI: {
+                        showChatButton: mockShowChatButton,
+                        launchChat: mockLaunchChat
+                    }
+                }
+            }
+
+            launchChat()
+
+            expect(mockShowChatButton).toHaveBeenCalledTimes(1)
+            expect(mockLaunchChat).toHaveBeenCalledTimes(1)
+            // showChatButton must be called before launchChat
+            expect(mockShowChatButton.mock.invocationCallOrder[0]).toBeLessThan(
+                mockLaunchChat.mock.invocationCallOrder[0]
+            )
+        })
+
+        test('should not call showChatButton when hideChatButtonOnLoad is false', () => {
+            const mockShowChatButton = jest.fn()
+            const mockLaunchChat = jest.fn()
+
+            global.window = {
+                embeddedservice_bootstrap: {
+                    settings: {
+                        hideChatButtonOnLoad: false
+                    },
+                    utilAPI: {
+                        showChatButton: mockShowChatButton,
+                        launchChat: mockLaunchChat
+                    }
+                }
+            }
+
+            launchChat()
+
+            expect(mockShowChatButton).not.toHaveBeenCalled()
+            expect(mockLaunchChat).toHaveBeenCalledTimes(1)
+        })
+
         test('should handle errors and log error', () => {
             const mockLaunchChat = jest.fn(() => {
                 throw new Error('Launch error')
