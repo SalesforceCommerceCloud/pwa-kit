@@ -20,7 +20,8 @@ export const getCommerceAgentConfig = () => {
         siteId: '',
         enableConversationContext: 'false',
         conversationContext: [],
-        enableAgentFromHeader: 'false'
+        enableAgentFromHeader: 'false',
+        enableAgentFromFloatingButton: 'false'
     }
     return getConfig().app.commerceAgent ?? defaults
 }
