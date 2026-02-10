@@ -138,7 +138,7 @@ describe('server', () => {
     test('Path "/cookie" sets cookie', async () => {
         return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
-            .expect('set-cookie', 'test-cookie=test-value Path=/')
+            .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
 
     test('Path "/multi-cookies" sets multiple cookies', async () => {
