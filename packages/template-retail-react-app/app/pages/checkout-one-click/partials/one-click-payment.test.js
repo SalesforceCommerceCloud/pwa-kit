@@ -1310,7 +1310,7 @@ describe('Payment Component', () => {
             // Click Edit Payment Info to enter edit mode
             const summary = screen.getAllByTestId('toggle-card-summary').pop()
             const editButton = within(summary).getByRole('button', {
-                name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
+                name: /toggle_card.action.changePaymentInfo|Change/i
             })
             await user.click(editButton)
 
