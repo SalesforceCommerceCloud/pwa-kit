@@ -31,14 +31,17 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [18, 20]
-        npm: [9, 10]
+        node: [18, 20, 22, 24]
+        npm: [9, 10, 11]
+        exclude: # node 18 with npm 11 are not compatible
+          - node: 18
+            npm: 11
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 18 && matrix.npm == 9 || matrix.node == 20 && matrix.npm == 10 }}
-      IS_LATEST_NPM: ${{ matrix.node == 20 && matrix.npm == 10 }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
+      IS_LATEST_NPM: ${{ matrix.node == 24 && matrix.npm == 11 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -113,12 +116,15 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [18, 20]
-        npm: [9, 10]        
+        node: [18, 20, 22, 24]
+        npm: [9, 10, 11]
+        exclude: # node 18 with npm 11 are not compatible
+          - node: 18
+            npm: 11
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 18 && matrix.npm == 9 || matrix.node == 20 && matrix.npm == 10 }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
     runs-on: windows-latest
     steps:
       - name: Checkout

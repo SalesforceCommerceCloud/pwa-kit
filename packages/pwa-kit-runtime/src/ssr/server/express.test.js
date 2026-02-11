@@ -955,6 +955,97 @@ describe('generateCacheKey', () => {
         const result1 = generateCacheKey(mockRequest())
         expect(generateCacheKey(mockRequest(), {extras: ['123']})).not.toEqual(result1)
     })
+
+    describe('URL parsing edge cases (WHATWG URL)', () => {
+        test('handles empty query strings', () => {
+            const key = generateCacheKey(mockRequest({url: '/test'}))
+            expect(key.startsWith('/test/')).toBe(true)
+        })
+
+        test('handles URL with empty query string (trailing ?)', () => {
+            const keyNoQuery = generateCacheKey(mockRequest({url: '/test'}))
+            const keyEmptyQuery = generateCacheKey(mockRequest({url: '/test?'}))
+            // Both should produce the same key since there are no query params
+            expect(keyNoQuery).toEqual(keyEmptyQuery)
+        })
+
+        test('handles special characters in URLs', () => {
+            const key = generateCacheKey(
+                mockRequest({url: '/test/caf%C3%A9?name=hello%20world&emoji=%F0%9F%98%80'})
+            )
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/caf%c3%a9/')).toBe(true)
+        })
+
+        test('handles URLs with encoded special characters in path', () => {
+            const key1 = generateCacheKey(mockRequest({url: '/path%20with%20spaces?a=1'}))
+            const key2 = generateCacheKey(mockRequest({url: '/path%20with%20spaces?a=2'}))
+            expect(key1).not.toEqual(key2)
+        })
+
+        test('handles URLs with fragments gracefully', () => {
+            // Fragments (#hash) should not affect the cache key since they
+            // are not sent to the server, but the URL parser should handle them
+            const key = generateCacheKey(mockRequest({url: '/test?a=1#section'}))
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/')).toBe(true)
+        })
+
+        test('handles URLs with only a path', () => {
+            const key = generateCacheKey(mockRequest({url: '/'}))
+            expect(key).toBeDefined()
+        })
+
+        test('handles URLs with multiple query parameters', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1&b=2&c=3&d=special%26char'}))
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/')).toBe(true)
+        })
+
+        test('handles URLs with query parameter with no value', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?flag&a=1'}))
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/')).toBe(true)
+        })
+
+        test('handles double-encoded path segments', () => {
+            const key = generateCacheKey(mockRequest({url: '/path%252Fencoded?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('handles extremely long paths without throwing', () => {
+            const longPath = '/' + 'a'.repeat(2000)
+            const key = generateCacheKey(mockRequest({url: longPath}))
+            expect(key).toBeDefined()
+        })
+    })
+
+    describe('dynamic base URL construction', () => {
+        test('produces consistent keys with protocol and host header', () => {
+            const keyDefault = generateCacheKey(mockRequest({url: '/test?a=1'}))
+            const keyWithHost = generateCacheKey(
+                mockRequest({
+                    url: '/test?a=1',
+                    protocol: 'https',
+                    headers: {host: 'example.com'}
+                })
+            )
+            // pathname and query are the same, so the cache key should match
+            expect(keyDefault).toEqual(keyWithHost)
+        })
+
+        test('works with socket.encrypted and no protocol', () => {
+            const key = generateCacheKey(
+                mockRequest({
+                    url: '/test?a=1',
+                    socket: {encrypted: true},
+                    headers: {host: 'secure.example.com'}
+                })
+            )
+            expect(key).toBeDefined()
+            expect(key.startsWith('/test/')).toBe(true)
+        })
+    })
 })
 
 describe('getRuntime', () => {

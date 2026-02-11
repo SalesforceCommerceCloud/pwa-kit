@@ -95,6 +95,26 @@ export const getFullRequestURL = (url) => {
     )
 }
 
+/**
+ * Parse a request URL using the WHATWG URL constructor.
+ * Builds a base from the request's protocol and host header,
+ * falling back to 'http://localhost' when those are absent.
+ *
+ * @param {Object} req - Express-like request object
+ * @returns {{pathname: string, search: string, query: string|null}}
+ * @private
+ */
+export const parseRequestUrl = (req) => {
+    const proto = req.protocol || (req.socket?.encrypted ? 'https' : 'http')
+    const base = `${proto}://${req.headers?.host || 'localhost'}`
+    const {pathname, search} = new URL(req.url, base)
+    return {
+        pathname,
+        search,
+        query: search ? search.slice(1) : null
+    }
+}
+
 const CC_AGE_RE = /(s-maxage|max-age)\s*=\s*(\d+)/gi
 
 /**
