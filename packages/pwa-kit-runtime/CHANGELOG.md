@@ -1,4 +1,6 @@
 ## v2.10.0 (Jul 29, 2025)
+- Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL`
+
 ## v2.9.1 (Mar 18, 2025)
 - Disable CloudWatch metrics sender retries [#2321](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2321)
 - Remove forced garbage collection on each invocation. Set `FORCE_GC=true` for the old behavior. [#2321](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2321)

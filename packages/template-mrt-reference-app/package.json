@@ -29,7 +29,7 @@
   "mobify": {
     "ssrEnabled": true,
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "20.x",
+      "ssrFunctionNodeVersion": "24.x",
       "proxyConfigs": [
         {
           "host": "httpbin.org",

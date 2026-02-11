@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 /**
  * This is a small wrapper around the generator script that we intend to use during
@@ -12,7 +13,7 @@
  * script but does setup/teardown of a local NPM repository that lets us test some
  * important edge-cases. Those are:
  *
- * 1. Testing `npx pwa-kit-create-app` without publishing to the public NPM repo.
+ * 1. Testing `npx @salesforce/pwa-kit-create-app` without publishing to the public NPM repo.
  * 2. Realistically testing generated projects as though they were installed from
  *    the public NPM repo.
  *
@@ -21,7 +22,7 @@
  *
  * ## Detailed Explanations
  *
- * ### Testing `npx pwa-kit-create-app`
+ * ### Testing `npx @salesforce/pwa-kit-create-app`
  *
  * It is simply not possible to test the behaviour of the `npx` command without
  * first publishing the package under test. We don't want to publish to the public
@@ -132,10 +133,12 @@ const runGenerator = () => {
     sh.rm('-rf', pathToNpxCache)
 
     console.log('Running the generator')
-
-    cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
-        stdio: 'inherit'
-    })
+    cp.execSync(
+        `npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`,
+        {
+            stdio: 'inherit'
+        }
+    )
 }
 
 const main = () => {
