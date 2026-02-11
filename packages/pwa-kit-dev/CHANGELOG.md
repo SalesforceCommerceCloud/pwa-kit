@@ -1,5 +1,4 @@
 ## v2.11.0-alpha.0 (Feb 11, 2026)
-## v2.10.0 (Jul 29, 2025)
 - Add Node 24 support. Drop Node 16 support
 
 ## v2.9.1 (Mar 18, 2025)
