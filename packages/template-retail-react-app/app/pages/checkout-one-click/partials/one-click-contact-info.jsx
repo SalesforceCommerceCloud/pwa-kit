@@ -666,16 +666,18 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     </Container>
                 </ToggleCardEdit>
 
-                {(customer?.email || form.getValues('email')) && (
-                    <ToggleCardSummary>
-                        <Stack spacing={1}>
-                            <Text>{customer?.email || form.getValues('email')}</Text>
-                            {(customer?.phoneHome || form.getValues('phone')) && (
-                                <Text>{customer?.phoneHome || form.getValues('phone')}</Text>
-                            )}
-                        </Stack>
-                    </ToggleCardSummary>
-                )}
+                {(() => {
+                    const summaryEmail = customer?.email || form.getValues('email')
+                    const summaryPhone = customer?.phoneHome || form.getValues('phone')
+                    return summaryEmail ? (
+                        <ToggleCardSummary>
+                            <Stack spacing={1}>
+                                <Text>{summaryEmail}</Text>
+                                {summaryPhone && <Text>{summaryPhone}</Text>}
+                            </Stack>
+                        </ToggleCardSummary>
+                    ) : null
+                })()}
             </ToggleCard>
 
             {/* Sign Out Confirmation Dialog */}
