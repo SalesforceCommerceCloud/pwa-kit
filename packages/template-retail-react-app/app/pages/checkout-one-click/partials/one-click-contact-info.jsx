@@ -512,6 +512,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
+    const customerEmail = customer?.email || form.getValues('email')
+    const customerPhone = customer?.phoneHome || form.getValues('phone')
+
     return (
         <>
             <ToggleCard
@@ -666,18 +669,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     </Container>
                 </ToggleCardEdit>
 
-                {(() => {
-                    const summaryEmail = customer?.email || form.getValues('email')
-                    const summaryPhone = customer?.phoneHome || form.getValues('phone')
-                    return summaryEmail ? (
-                        <ToggleCardSummary>
-                            <Stack spacing={1}>
-                                <Text>{summaryEmail}</Text>
-                                {summaryPhone && <Text>{summaryPhone}</Text>}
-                            </Stack>
-                        </ToggleCardSummary>
-                    ) : null
-                })()}
+                {customerEmail ? (
+                    <ToggleCardSummary>
+                        <Stack spacing={1}>
+                            <Text>{customerEmail}</Text>
+                            {customerPhone && <Text>{customerPhone}</Text>}
+                        </Stack>
+                    </ToggleCardSummary>
+                ) : null}
             </ToggleCard>
 
             {/* Sign Out Confirmation Dialog */}
