@@ -535,8 +535,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                               id: 'checkout_contact_info.action.sign_out'
                           })
                         : formatMessage({
-                              defaultMessage: 'Edit',
-                              id: 'checkout_contact_info.action.edit'
+                              defaultMessage: 'Change',
+                              id: 'checkout_contact_info.action.change'
                           })
                 }
             >
@@ -671,9 +671,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         <Stack spacing={1}>
                             <Text>{customer?.email || form.getValues('email')}</Text>
                             {(customer?.phoneHome || form.getValues('phone')) && (
-                                <Text fontSize="sm" color="gray.600">
-                                    {customer?.phoneHome || form.getValues('phone')}
-                                </Text>
+                                <Text>{customer?.phoneHome || form.getValues('phone')}</Text>
                             )}
                         </Stack>
                     </ToggleCardSummary>
