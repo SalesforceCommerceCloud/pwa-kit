@@ -46,6 +46,7 @@ const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
 const semver = require('semver')
+const generatorPkg = require('../package.json')
 
 sh.set('-e')
 
@@ -134,7 +135,7 @@ const runGenerator = () => {
 
     console.log('Running the generator')
     cp.execSync(
-        `npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`,
+        `npx ${flags} @salesforce/pwa-kit-create-app@${generatorPkg.version} ${process.argv.slice(2).join(' ')}`,
         {
             stdio: 'inherit'
         }
