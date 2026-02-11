@@ -1,4 +1,6 @@
 ## v3.16.0-dev (Dec 17, 2025)
+- Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
 ## v3.15.0 (Dec 17, 2025)
 
 ## v3.14.0 (Nov 04, 2025)
