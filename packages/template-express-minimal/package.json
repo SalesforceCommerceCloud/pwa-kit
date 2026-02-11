@@ -23,7 +23,7 @@
   "mobify": {
     "ssrEnabled": true,
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "22.x"
+      "ssrFunctionNodeVersion": "24.x"
     },
     "ssrOnly": [
       "ssr.js",
