@@ -531,13 +531,20 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const canSaveForFutureUsage = !!(customer?.isRegistered && customer?.customerId)
 
     useEffect(() => {
+        const isCustomerDataReady = !isCustomerDataLoading
+        const hasNoCheckoutInstance = !checkoutComponent.current
+        const hasSfp = !!sfp
+        const hasMetadata = !!metadata
+        const hasContainer = !!containerElementRef.current
+        const hasPaymentConfig = !!paymentConfig
+
         const readyToMountSFP =
-            !isCustomerDataLoading &&
-            !checkoutComponent.current &&
-            !!sfp &&
-            !!metadata &&
-            !!containerElementRef.current &&
-            !!paymentConfig
+            isCustomerDataReady &&
+            hasNoCheckoutInstance &&
+            hasSfp &&
+            hasMetadata &&
+            hasContainer &&
+            hasPaymentConfig
 
         if (!readyToMountSFP) {
             return
