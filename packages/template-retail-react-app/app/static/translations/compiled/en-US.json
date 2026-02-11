@@ -1249,10 +1249,10 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
-  "checkout_contact_info.action.edit": [
+  "checkout_contact_info.action.change": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Change"
     }
   ],
   "checkout_contact_info.action.sign_out": [
@@ -4676,6 +4676,18 @@
     }
   ],
   "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "Change"
+    }
+  ],
+  "toggle_card.action.changePaymentInfo": [
+    {
+      "type": 0,
+      "value": "Change"
+    }
+  ],
+  "toggle_card.action.changeShippingOptions": [
     {
       "type": 0,
       "value": "Change"
