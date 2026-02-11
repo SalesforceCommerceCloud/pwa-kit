@@ -14,6 +14,8 @@ const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
 describe('Passkey Login', () => {
     test('Verify passkey login', async ({page}) => {
+        // Override the global test timeout to 70s to ensure the test can complete
+        test.setTimeout(70000)
         // webauthn/authenticate/start has a 60s cooldown; wait 1 min to ensure it can be called again
         await page.waitForTimeout(60000)
         await validatePasskeyLogin({page})
