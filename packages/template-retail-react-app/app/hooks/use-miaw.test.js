@@ -141,6 +141,7 @@ describe('useMiaw hook', () => {
         expect(
             window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot
         ).toBe(false)
+        expect(window.embeddedservice_bootstrap.settings.hideChatButtonOnLoad).toBe(false)
         expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledWith(
             'test-org-id',
             'test-deployment',
@@ -165,6 +166,18 @@ describe('useMiaw hook', () => {
         renderHook(() => useMiaw(scriptWithError, ...Object.values(mockParams)))
 
         expect(window.embeddedservice_bootstrap.init).not.toHaveBeenCalled()
+    })
+
+    test('should hide floating chat button when enableAgentFromFloatingButton is false', () => {
+        renderHook(() =>
+            useMiaw(
+                mockScriptLoadStatus,
+                ...Object.values(mockParams),
+                'false' // enableAgentFromFloatingButton
+            )
+        )
+
+        expect(window.embeddedservice_bootstrap.settings.hideChatButtonOnLoad).toBe(true)
     })
 
     test('should handle different locale mappings', () => {
