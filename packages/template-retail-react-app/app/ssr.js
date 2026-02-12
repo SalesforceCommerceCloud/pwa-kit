@@ -60,7 +60,6 @@ const options = {
     // applySLASPrivateClientToEndpoints:
     //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
-
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
