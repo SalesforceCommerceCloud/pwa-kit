@@ -1,4 +1,8 @@
 ## v3.16.0-dev (Dec 17, 2025)
+- Update jest from ^26.6.3 to ^29.7.0 and all related test dependencies (babel-jest, jest-cli, jest-environment-jsdom, jest-environment-jsdom-global, jest-fetch-mock)
+- Migrate jest config: replace deprecated `testURL` with `testEnvironmentOptions.url`
+- Update archiver from 1.3.0 to ^6.0.2 and remove legacy type workarounds
+- Replace rimraf with Node.js built-in `fs.rm`/`fs.rmSync` (Node 18+)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
 ## v3.15.0 (Dec 17, 2025)
