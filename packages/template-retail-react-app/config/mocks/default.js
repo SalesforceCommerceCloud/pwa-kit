@@ -145,7 +145,7 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: 'localhost:8888',

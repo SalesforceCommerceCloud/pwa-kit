@@ -1,4 +1,5 @@
 ## v9.0.0-dev (Jan 19, 2026)
+- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - [Feature] One Click Checkout [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
 - [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
 - [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)

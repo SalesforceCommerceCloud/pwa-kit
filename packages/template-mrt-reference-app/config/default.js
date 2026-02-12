@@ -17,7 +17,7 @@ module.exports = {
         'config/default.js'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: 'httpbin.org',

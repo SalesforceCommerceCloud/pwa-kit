@@ -1,5 +1,5 @@
 ## 0.5.0-dev (Dec 17, 2025)
-
+- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
 - Added the fallback path for the custom Api tool [#3458] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3458)
 
