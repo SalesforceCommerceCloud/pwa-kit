@@ -112,26 +112,6 @@ type GetPasswordLessAccessTokenParams = {
 }
 
 /**
- * Throws an Error with status and message when response is not OK.
- * Uses res.text() to avoid SyntaxError on empty or non-JSON body (e.g. 404 from SLAS).
- */
-async function throwIfResponseNotOk(
-    res: {status: number; statusText?: string; text(): Promise<string>}
-): Promise<never> {
-    let message = res.statusText || `${res.status}`
-    try {
-        const text = await res.text()
-        if (text && text.trim()) {
-            const errorData = JSON.parse(text)
-            message = errorData?.message ?? message
-        }
-    } catch (_) {
-        // Empty or non-JSON body (e.g. 404 from SLAS for user not found)
-    }
-    throw new Error(`${res.status} ${message}`)
-}
-
-/**
  * The extended field is not from api response, we manually store the auth type,
  * so we don't need to make another API call when we already have the data.
  * Plus, the getCustomer endpoint only works for registered user, it returns a 404 for a guest user,
@@ -1330,7 +1310,8 @@ class Auth {
             }
         })
         if (res && res.status !== 200) {
-            await throwIfResponseNotOk(res)
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
         }
         return res
     }
@@ -1401,7 +1382,8 @@ class Auth {
         // Set rawResponse to true to access the response body message for error handling
         const res = await slasClient.getPasswordResetToken(options, true)
         if (res && res.status !== 200) {
-            await throwIfResponseNotOk(res)
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
         }
         return res
     }

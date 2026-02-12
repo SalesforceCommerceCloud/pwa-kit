@@ -989,8 +989,7 @@ describe('Auth', () => {
 
         const mockErrorResponse = {
             status: 400,
-            statusText: 'Bad Request',
-            text: jest.fn().mockResolvedValue(JSON.stringify({message: 'Invalid request'}))
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
         }
         ;(helpers.authorizePasswordless as jest.Mock).mockResolvedValueOnce(mockErrorResponse)
 
@@ -1098,8 +1097,7 @@ describe('Auth', () => {
 
         const mockErrorResponse = {
             status: 400,
-            statusText: 'Bad Request',
-            text: jest.fn().mockResolvedValue(JSON.stringify({message: 'Invalid request'}))
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
         }
         // @ts-expect-error private property
         const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
