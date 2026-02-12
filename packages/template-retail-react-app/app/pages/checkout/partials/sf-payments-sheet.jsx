@@ -166,7 +166,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 savePaymentMethodRef.current = event.detail.savePaymentMethodForFutureUse === true
             }
             updatedOrder.current = await createAndUpdateOrder(
-                savePaymentMethodRef.current && customer?.isRegistered
+                savePaymentMethodRef.current && isRegistered
             )
             // Clear the ref after successful order creation
             currentBasket.current = null
@@ -278,7 +278,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
 
         // For Stripe and Adyen, update order payment instrument to create payment
-        const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+        const shouldSavePaymentMethod = savePaymentMethodRef.current && isRegistered
         updatedOrder.current = await createAndUpdateOrder(shouldSavePaymentMethod, paymentData)
 
         // Find updated SF Payments payment instrument in updated order
@@ -528,7 +528,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         [customer, paymentConfig]
     )
 
-    const canSaveForFutureUsage = !!(customer?.isRegistered && customer?.customerId)
+    const canSaveForFutureUsage = isRegistered && !!customer?.customerId
 
     useEffect(() => {
         const isCustomerDataReady = !isCustomerDataLoading
