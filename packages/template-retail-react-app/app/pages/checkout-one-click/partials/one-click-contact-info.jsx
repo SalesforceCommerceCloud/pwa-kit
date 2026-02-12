@@ -245,11 +245,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
-                setError(message)
-                // Keep continue button visible if email is valid (for unregistered users)
-                if (isValidEmail(email)) {
+                // 404 = email not registered (guest); treat as guest and continue
+                const isGuestNotFound = String(error?.message || '').includes('404')
+                if (isGuestNotFound && isValidEmail(email)) {
+                    setError('')
                     setShowContinueButton(true)
+                } else {
+                    const message = formatMessage(
+                        getAuthorizePasswordlessErrorMessage(error.message)
+                    )
+                    setError(message)
+                    if (isValidEmail(email)) {
+                        setShowContinueButton(true)
+                    }
                 }
                 // Update the last email sent ref even on error to prevent retrying immediately
                 lastEmailSentRef.current = normalizedEmail

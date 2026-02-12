@@ -254,7 +254,6 @@ describe('OtpAuth', () => {
             })
             const mockVerify = jest.fn().mockReturnValue(verifyingPromise)
 
-            const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}

@@ -57,9 +57,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '0a8b812d-544f-4b21-b776-4fad19a15ab5',
+                organizationId: 'f_ecom_bldp_dev',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -76,7 +76,7 @@ module.exports = {
         },
         // Note: this feature is in Developer Preview at this time. To use One Click Checkout, enable the oneClickCheckout flag and configure private SLAS client.
         oneClickCheckout: {
-            enabled: false
+            enabled: true
         },
         partialHydrationEnabled: false,
         pages: {
@@ -106,11 +106,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'bldp_dev.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
