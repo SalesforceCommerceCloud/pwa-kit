@@ -2,7 +2,7 @@
 - [Bugfix] 1CC Bug Fixes [#3638](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3638)
 
 ## v9.0.0-preview.0 (Feb 06, 2026)
-- [Feature] One Click Checkout (Alpha release) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+- [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
 - [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
 - [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)
 - [Feature] PWA Integration with OMS

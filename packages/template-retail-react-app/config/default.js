@@ -74,7 +74,7 @@ module.exports = {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
-        // Note: this feature is in Alpha at this time.
+        // Note: this feature is in Developer Preview at this time. To use One Click Checkout, enable the oneClickCheckout flag and configure private SLAS client.
         oneClickCheckout: {
             enabled: false
         },
