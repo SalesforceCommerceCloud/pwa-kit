@@ -1,4 +1,5 @@
 ## v3.16.0-preview.1 (Feb 09, 2026)
+- Updated the SLAS private client proxy to enable customizing the proxy response body [#3662] https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3662/
 
 ## v3.16.0-preview.0 (Feb 06, 2026)
 - Migrate AWS SDK from v2 to v3 [#3566](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3566)
