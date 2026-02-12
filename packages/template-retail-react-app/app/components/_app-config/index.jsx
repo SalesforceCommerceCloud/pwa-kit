@@ -13,9 +13,6 @@
  * - assets/bootstrap/js/overrides/app/components/_app-config
  * - assets/templates/@salesforce/retail-react-app/app/components/_app-config
  */
-// Must run before commerce-sdk-react loads so passwordless requests from checkout-one-click send the bypass header
-import '@salesforce/retail-react-app/app/utils/patch-passwordless-fetch'
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -110,7 +107,7 @@ const AppConfig = ({children, locals = {}}) => {
             defaultDnt={DEFAULT_DNT_STATE}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={false}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
