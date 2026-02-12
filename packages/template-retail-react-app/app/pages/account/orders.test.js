@@ -1388,3 +1388,58 @@ describe('BOPIS Order - ECOM Only (No OMS)', () => {
         expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
     })
 })
+
+describe('OMS order with no OMS shipments - default to ECOM shipment display (multi-ship)', () => {
+    // Multi-shipment scenario: OMS order has omsData but no OMS shipments.
+    const omsOrderMultiShipNoOmsShipments = createMockOmsOrder({
+        omsData: {
+            status: 'Created'
+        },
+        shipments: [
+            {
+                shipmentId: 'ship1',
+                shippingMethod: {name: 'Ground'},
+                shippingAddress: {
+                    fullName: 'Alex Johnson',
+                    address1: '876 NE 8th st',
+                    city: 'Seattle',
+                    stateCode: 'WA',
+                    postalCode: '98121',
+                    countryCode: 'US'
+                }
+            },
+            {
+                shipmentId: 'ship2',
+                shippingMethod: {name: 'Express'},
+                shippingAddress: {
+                    fullName: 'Bob Smith',
+                    address1: '456 Second St',
+                    city: 'Portland',
+                    stateCode: 'OR',
+                    postalCode: '97201',
+                    countryCode: 'US'
+                }
+            }
+        ]
+    })
+
+    test('should display multi-shipment Shipping Method and Shipping Address from ECOM when OMS has no shipments', async () => {
+        setupOrderDetailsPage(omsOrderMultiShipNoOmsShipments)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // Default to ECOM delivery block (multi-shipment) when OMS has no shipments.
+        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 1/i})
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByRole('heading', {name: /shipping address 2/i})
+        ).toBeInTheDocument()
+        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Bob Smith/i)).toBeInTheDocument()
+        expect(await screen.findByText(/876 NE 8th st/i)).toBeInTheDocument()
+        expect(await screen.findByText(/456 Second St/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Ground/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Express/i)).toBeInTheDocument()
+    })
+})

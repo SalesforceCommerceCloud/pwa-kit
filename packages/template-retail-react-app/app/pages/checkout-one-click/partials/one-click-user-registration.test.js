@@ -15,6 +15,13 @@ import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
+    () => ({
+        useCheckout: () => ({contactPhone: ''})
+    })
+)
+
 const {AuthHelpers} = jest.requireActual('@salesforce/commerce-sdk-react')
 
 const TEST_MESSAGES = {
@@ -29,12 +36,23 @@ const mockAuthHelperFunctions = {
     [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
 }
 
+const mockCreateCustomerAddress = {mutateAsync: jest.fn().mockResolvedValue({})}
+const mockUpdateCustomer = {mutateAsync: jest.fn().mockResolvedValue({})}
+const mockCreateCustomerPaymentInstrument = {mutateAsync: jest.fn().mockResolvedValue({})}
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const original = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...original,
         useCustomerType: jest.fn(),
-        useAuthHelper: jest.fn((helper) => mockAuthHelperFunctions[helper])
+        useAuthHelper: jest.fn((helper) => mockAuthHelperFunctions[helper]),
+        useShopperCustomersMutation: jest.fn((mutationType) => {
+            if (mutationType === 'createCustomerAddress') return mockCreateCustomerAddress
+            if (mutationType === 'updateCustomer') return mockUpdateCustomer
+            if (mutationType === 'createCustomerPaymentInstrument')
+                return mockCreateCustomerPaymentInstrument
+            return {mutateAsync: jest.fn()}
+        })
     }
 })
 jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext', () =>

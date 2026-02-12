@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useRef, useState, useEffect} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -23,7 +23,12 @@ import {
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {nanoid} from 'nanoid'
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -36,14 +41,27 @@ export default function UserRegistration({
     onLoadingChange
 }) {
     const {data: basket} = useCurrentBasket()
+    const {contactPhone} = useCheckout()
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
+    const {formatMessage} = useIntl()
+    const showToast = useToast()
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const updateCustomer = useShopperCustomersMutation('updateCustomer')
+
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
     const [registrationSucceeded, setRegistrationSucceeded] = useState(false)
     const [isLoadingOtp, setIsLoadingOtp] = useState(false)
+
+    const showError = (message) => {
+        showToast({
+            title: message,
+            status: 'error'
+        })
+    }
 
     const handleOtpClose = () => {
         otpSentRef.current = false
@@ -92,12 +110,78 @@ export default function UserRegistration({
         }
     }, [isOtpOpen, isLoadingOtp, onLoadingChange])
 
+    const saveAddressesAndPhoneToProfile = async (customerId) => {
+        if (!basket || !customerId) return
+        const deliveryShipments =
+            basket.shipments?.filter(
+                (shipment) => !isPickupShipment(shipment) && shipment.shippingAddress
+            ) || []
+        try {
+            if (deliveryShipments.length > 0) {
+                for (let i = 0; i < deliveryShipments.length; i++) {
+                    const shipment = deliveryShipments[i]
+                    const shipping = shipment.shippingAddress
+                    if (!shipping) continue
+
+                    const {
+                        address1,
+                        address2,
+                        city,
+                        countryCode,
+                        firstName,
+                        lastName,
+                        phone,
+                        postalCode,
+                        stateCode
+                    } = shipping || {}
+
+                    await createCustomerAddress.mutateAsync({
+                        parameters: {customerId},
+                        body: {
+                            addressId: nanoid(),
+                            preferred: i === 0,
+                            address1,
+                            address2,
+                            city,
+                            countryCode,
+                            firstName,
+                            lastName,
+                            phone,
+                            postalCode,
+                            stateCode
+                        }
+                    })
+                }
+            }
+
+            const phoneHome = basket.billingAddress?.phone || contactPhone
+            if (phoneHome) {
+                await updateCustomer.mutateAsync({
+                    parameters: {customerId},
+                    body: {phoneHome}
+                })
+            }
+        } catch (_e) {
+            showError(
+                formatMessage({
+                    id: 'checkout.error.cannot_save_address',
+                    defaultMessage: 'Could not save shipping address.'
+                })
+            )
+        }
+    }
+
     const handleOtpVerification = async (otpCode) => {
         try {
-            await loginPasswordless.mutateAsync({
+            const token = await loginPasswordless.mutateAsync({
                 pwdlessLoginToken: otpCode,
                 register_customer: true
             })
+
+            const customerId = token?.customer_id || token?.customerId
+            if (customerId && basket) {
+                await saveAddressesAndPhoneToProfile(customerId)
+            }
 
             if (onRegistered) {
                 await onRegistered(basket?.basketId)

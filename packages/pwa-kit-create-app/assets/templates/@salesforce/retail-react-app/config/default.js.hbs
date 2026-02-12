@@ -34,7 +34,9 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            enableAgentFromHeader: 'false',
+            enableAgentFromFloatingButton: 'false'
         },
         // Customize settings for your url
         url: {
@@ -187,7 +189,7 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
