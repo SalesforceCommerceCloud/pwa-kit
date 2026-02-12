@@ -1,4 +1,4 @@
-## v2.11.0-alpha.0 (Feb 11, 2026)
+## v2.11.0-preview.0 (Feb 12, 2026)
 - Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL`
 
 ## v2.9.1 (Mar 18, 2025)
