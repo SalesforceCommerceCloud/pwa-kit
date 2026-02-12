@@ -8,7 +8,7 @@ import {isBinary, once, RemoteServerFactory} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
 import logger from '../../utils/logger-instance'
-import {catchAndLog} from '../../utils/ssr-server'
+import {catchAndLog, parseRequestUrl} from '../../utils/ssr-server'
 
 jest.mock('../../utils/ssr-config', () => {
     return {
@@ -537,5 +537,147 @@ describe('_setupHybridProxy', () => {
 
             expect(mockApp.use).not.toHaveBeenCalled()
         })
+    })
+})
+
+describe('parseRequestUrl', () => {
+    const mockReq = (overrides = {}) => ({
+        url: '/test?a=1',
+        headers: {},
+        ...overrides
+    })
+
+    test('parses a basic URL with query string', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?key=value'}))
+        expect(result.pathname).toBe('/path')
+        expect(result.search).toBe('?key=value')
+        expect(result.query).toBe('key=value')
+    })
+
+    test('handles URL with empty query string (trailing ?)', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?'}))
+        expect(result.pathname).toBe('/path')
+        expect(result.search).toBe('')
+        expect(result.query).toBeNull()
+    })
+
+    test('handles URL without any query string', () => {
+        const result = parseRequestUrl(mockReq({url: '/path'}))
+        expect(result.pathname).toBe('/path')
+        expect(result.search).toBe('')
+        expect(result.query).toBeNull()
+    })
+
+    test('handles URL with special characters in query', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?q=hello+world&lang=en%20US'}))
+        expect(result.pathname).toBe('/path')
+        expect(result.query).toContain('hello')
+    })
+
+    test('handles URL with fragment', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?a=1#section'}))
+        expect(result.pathname).toBe('/path')
+        expect(result.search).toBe('?a=1')
+        expect(result.query).toBe('a=1')
+    })
+
+    test('handles URL with encoded path', () => {
+        const result = parseRequestUrl(mockReq({url: '/caf%C3%A9?a=1'}))
+        expect(result.pathname).toBe('/caf%C3%A9')
+        expect(result.query).toBe('a=1')
+    })
+
+    test('handles URL with unicode characters', () => {
+        expect(() => parseRequestUrl(mockReq({url: '/path/日本語?a=1'}))).not.toThrow()
+    })
+
+    test('handles URL with long path', () => {
+        const longPath = '/a'.repeat(500)
+        const result = parseRequestUrl(mockReq({url: `${longPath}?x=1`}))
+        expect(result.pathname).toBe(longPath)
+        expect(result.query).toBe('x=1')
+    })
+
+    test('handles URL with multiple query parameters', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?a=1&b=2&c=3'}))
+        expect(result.query).toBe('a=1&b=2&c=3')
+    })
+
+    test('handles URL with valueless parameter', () => {
+        const result = parseRequestUrl(mockReq({url: '/path?flag'}))
+        expect(result.query).toBe('flag')
+    })
+
+    test('handles malformed URL gracefully by using localhost fallback', () => {
+        expect(() => parseRequestUrl(mockReq({url: '/path?a=1'}))).not.toThrow()
+    })
+
+    describe('dynamic base URL construction', () => {
+        test('uses request protocol when available', () => {
+            const result = parseRequestUrl(mockReq({url: '/test', protocol: 'https'}))
+            expect(result.pathname).toBe('/test')
+        })
+
+        test('falls back to http when no protocol info exists', () => {
+            const result = parseRequestUrl(mockReq({url: '/test'}))
+            expect(result.pathname).toBe('/test')
+        })
+
+        test('detects https from socket.encrypted', () => {
+            const result = parseRequestUrl(mockReq({url: '/test', socket: {encrypted: true}}))
+            expect(result.pathname).toBe('/test')
+        })
+
+        test('uses host header when available', () => {
+            const result = parseRequestUrl(
+                mockReq({url: '/test?a=1', headers: {host: 'example.com'}})
+            )
+            expect(result.pathname).toBe('/test')
+            expect(result.query).toBe('a=1')
+        })
+
+        test('falls back to localhost when no host header', () => {
+            const result = parseRequestUrl(mockReq({url: '/test?a=1'}))
+            expect(result.pathname).toBe('/test')
+            expect(result.query).toBe('a=1')
+        })
+
+        test('prefers req.protocol over socket.encrypted', () => {
+            const result = parseRequestUrl(
+                mockReq({url: '/test', protocol: 'https', socket: {encrypted: false}})
+            )
+            expect(result.pathname).toBe('/test')
+        })
+    })
+})
+
+describe('URL reconstruction for request processing', () => {
+    test('reconstructs URL with modified path', () => {
+        const req = {url: '/original/path?a=1', headers: {}}
+        const {search} = parseRequestUrl(req)
+        const newUrl = '/new/path' + search
+        expect(newUrl).toBe('/new/path?a=1')
+    })
+
+    test('reconstructs URL with modified querystring', () => {
+        const updatedPath = '/path'
+        const search = '?b=2'
+        const newUrl = updatedPath + search
+        expect(newUrl).toBe('/path?b=2')
+    })
+
+    test('reconstructs URL with empty querystring', () => {
+        const updatedPath = '/path'
+        const search = ''
+        const newUrl = updatedPath + search
+        expect(newUrl).toBe('/path')
+    })
+
+    test('reconstructs URL preserving query when only path changes', () => {
+        const req = {url: '/base/mobify/bundle?v=1&t=2', headers: {}}
+        const {search} = parseRequestUrl(req)
+        const cleanPath = '/mobify/bundle'
+        const newUrl = cleanPath + search
+        expect(newUrl).toBe('/mobify/bundle?v=1&t=2')
     })
 })

@@ -11,14 +11,14 @@ jobs:
       fail-fast: false
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22]
+        node: [20, 22, 24]
         npm: [10, 11]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,14 +63,14 @@ jobs:
       max-parallel: 1
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22]
+        node: [20, 22, 24]
         npm: [10, 11]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
 
     steps:
       - name: Checkout
@@ -175,14 +175,14 @@ jobs:
       max-parallel: 1
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22]
+        node: [20, 22, 24]
         npm: [10, 11]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -283,17 +283,17 @@ jobs:
       max-parallel: 1
       matrix:
           # Run all matrix env at once because we will not deploy demo app to MRT.
-          node: [20, 22]
+          node: [20, 22, 24]
           npm: [10, 11]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 11 }}
+      IS_MRT_NODE: ${{ matrix.node == 24 && matrix.npm == 11 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -365,7 +365,7 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e
 
-      - name: Run a11y test for Node 22 with npm 11
+      - name: Run a11y test for Node 24 with npm 11
         if: env.IS_MRT_NODE == 'true'
         run: npm run test:e2e:a11y
   notify-slack-pwa-private-client:
@@ -405,7 +405,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - name: Install Monorepo Dependencies
         run: node ./scripts/gtime.js monorepo_install npm ci

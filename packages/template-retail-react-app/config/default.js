@@ -102,7 +102,7 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         // Store the session cookies as HttpOnly for enhanced security.
         disableHttpOnlySessionCookies: false,
         proxyConfigs: [

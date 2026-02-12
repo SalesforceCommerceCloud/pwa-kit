@@ -34,7 +34,9 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            enableAgentFromHeader: 'false',
+            enableAgentFromFloatingButton: 'false'
         },
         // Customize how your 'site' and 'locale' are displayed in the url.
         url: {
@@ -181,9 +183,9 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
-        // Store the session cookies as HttpOnly for enhanced security.
-        disableHttpOnlySessionCookies: false,
+        ssrFunctionNodeVersion: '24.x',
+// Store the session cookies as HttpOnly for enhanced security.
+disableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
