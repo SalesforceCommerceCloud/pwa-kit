@@ -428,7 +428,7 @@ export const createBundle = async ({
                         archive.on('error', reject)
                         output.on('finish', resolve)
 
-                        archive.finalize()
+                        void archive.finalize()
                     })
             )
             .then(async () => {

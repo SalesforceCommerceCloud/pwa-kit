@@ -20,13 +20,12 @@ if (typeof global.setImmediate === 'undefined') {
 // jsdom v20 does not implement the User Timing API (performance.mark/measure)
 // Use the Node.js built-in performance API as a fallback
 if (typeof global.performance !== 'undefined' && typeof global.performance.mark !== 'function') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const {performance: nodePerformance} = require('perf_hooks')
     global.performance.mark = nodePerformance.mark.bind(nodePerformance)
     global.performance.measure = nodePerformance.measure.bind(nodePerformance)
-    global.performance.getEntriesByName =
-        nodePerformance.getEntriesByName.bind(nodePerformance)
-    global.performance.getEntriesByType =
-        nodePerformance.getEntriesByType.bind(nodePerformance)
+    global.performance.getEntriesByName = nodePerformance.getEntriesByName.bind(nodePerformance)
+    global.performance.getEntriesByType = nodePerformance.getEntriesByType.bind(nodePerformance)
     global.performance.clearMarks = nodePerformance.clearMarks.bind(nodePerformance)
     global.performance.clearMeasures = nodePerformance.clearMeasures.bind(nodePerformance)
 }
