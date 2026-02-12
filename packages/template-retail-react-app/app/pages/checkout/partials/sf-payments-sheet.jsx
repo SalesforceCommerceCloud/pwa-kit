@@ -528,29 +528,18 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         [customer, paymentConfig]
     )
 
-    const canSaveForFutureUsage = isRegistered && !!customer?.customerId
-
     useEffect(() => {
-        const isCustomerDataReady = !isCustomerDataLoading
-        const hasNoCheckoutInstance = !checkoutComponent.current
-        const hasSfp = !!sfp
-        const hasMetadata = !!metadata
-        const hasContainer = !!containerElementRef.current
-        const hasPaymentConfig = !!paymentConfig
+        // Mount SFP only when all required data and DOM are ready; otherwise skip or wait for a later run.
 
-        const readyToMountSFP =
-            isCustomerDataReady &&
-            hasNoCheckoutInstance &&
-            hasSfp &&
-            hasMetadata &&
-            hasContainer &&
-            hasPaymentConfig
+        if (isCustomerDataLoading) return // Wait for savedPaymentMethods data to load for registered users
+        if (checkoutComponent.current) return // Skip if Componenet Already mounted
+        if (!sfp) return // Skip if SFP SDK not loaded yet
+        if (!metadata) return // Skip if SFP metadata not available yet
+        if (!containerElementRef.current) return // Skip if Payment container ref not attached to DOM yet
+        if (!paymentConfig) return // Skip if Payment config not loaded yet
 
-        if (!readyToMountSFP) {
-            return
-        }
 
-        const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
+        const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map( 
             (account) => ({
                 ...account,
                 gatewayId: account.accountId
@@ -571,7 +560,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             options: {
                 useManualCapture: !cardCaptureAutomatic,
                 returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
-                showSaveForFutureUsageCheckbox: canSaveForFutureUsage,
+                showSaveForFutureUsageCheckbox: isRegistered,
                 // Suppress "Make payment method default" checkbox since we don't support default SPM yet
                 showSaveAsDefaultCheckbox: false,
                 savedPaymentMethods: savedPaymentMethods
@@ -612,8 +601,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         metadata,
         containerElementRef.current,
         paymentConfig,
-        cardCaptureAutomatic,
-        canSaveForFutureUsage
+        cardCaptureAutomatic
     ])
 
     useEffect(() => {
