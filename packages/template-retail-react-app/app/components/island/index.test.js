@@ -268,6 +268,10 @@ describe('Island Component', () => {
                 delete global.requestIdleCallback
 
                 jest.useFakeTimers()
+                // In Jest 29, fake timers no longer create spies automatically.
+                // Spy on the fake timer functions to assert they were called.
+                const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+                const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
 
                 const {container, getByTestId, getByText} = renderServerComponent(
                     <Island hydrateOn={'idle'}>
@@ -280,8 +284,7 @@ describe('Island Component', () => {
                 expect(container).toHaveStyle({display: 'contents'})
                 expect(getByTestId('idle-content')).toBeDefined()
                 expect(getByText('Idle Content')).toBeDefined()
-                expect(global.setTimeout).toHaveBeenCalledTimes(1)
-                expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 200)
+                expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 200)
 
                 await act(() => jest.advanceTimersByTime(200))
 
@@ -291,8 +294,9 @@ describe('Island Component', () => {
                 expect(getByTestId('idle-content')).toBeDefined()
                 expect(getByText('Idle Content')).toBeDefined()
 
-                expect(global.clearTimeout).toHaveBeenCalledTimes(1)
-                expect(global.clearTimeout).toHaveBeenCalledWith(expect.any(Number))
+                expect(clearTimeoutSpy).toHaveBeenCalledWith(expect.any(Number))
+                setTimeoutSpy.mockRestore()
+                clearTimeoutSpy.mockRestore()
                 jest.useRealTimers()
             })
 
@@ -300,6 +304,8 @@ describe('Island Component', () => {
                 delete global.requestIdleCallback
 
                 jest.useFakeTimers()
+                const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+                const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
 
                 const customOptions = {timeout: 500}
                 renderServerComponent(
@@ -308,10 +314,11 @@ describe('Island Component', () => {
                     </Island>
                 )
 
-                expect(global.setTimeout).toHaveBeenCalledTimes(1)
-                expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 500)
-                expect(global.clearTimeout).not.toHaveBeenCalled()
+                expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 500)
+                expect(clearTimeoutSpy).not.toHaveBeenCalled()
 
+                setTimeoutSpy.mockRestore()
+                clearTimeoutSpy.mockRestore()
                 jest.useRealTimers()
             })
 

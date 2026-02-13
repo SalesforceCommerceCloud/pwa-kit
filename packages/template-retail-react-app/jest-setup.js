@@ -6,6 +6,39 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
+
+// Prevent @testing-library/react from auto-registering afterEach cleanup hooks.
+// In Jest 27+, hooks cannot be defined inside test() blocks. Some tests use
+// jest.resetModules() + dynamic import() inside test() which re-evaluates
+// @testing-library/react and @testing-library/user-event, triggering hook
+// nesting errors. We register cleanup manually below at the correct scope level.
+process.env.RTL_SKIP_AUTO_CLEANUP = 'true'
+
+// Wrap hook registration functions to suppress automatic hook registration
+// from testing libraries (e.g. @testing-library/user-event, @testing-library/react)
+// when they are dynamically imported inside test() blocks via jest.resetModules() +
+// await import(). In Jest 27+, hooks cannot be defined inside test() blocks, and
+// jest-circus records these as errors without throwing. We detect library-originated
+// hook registrations via stack trace inspection and suppress them, since cleanup is
+// handled manually in our afterEach below.
+;['afterEach', 'afterAll', 'beforeAll', 'beforeEach'].forEach((hookName) => {
+    const original = global[hookName]
+    if (typeof original === 'function') {
+        global[hookName] = function (...args) {
+            const stack = new Error().stack || ''
+            if (
+                stack.includes('@testing-library/user-event') ||
+                stack.includes('@testing-library/react/dist')
+            ) {
+                // Skip: testing library trying to register hooks, possibly
+                // inside a test block. Cleanup is handled manually.
+                return
+            }
+            return original.apply(this, args)
+        }
+    }
+})
+
 // fetch polyfill can be removed when node 16 is no longer supported
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
@@ -108,8 +141,19 @@ beforeAll(() => {
         }
     })
 })
-afterEach(() => {
+// Save cleanup reference at module load time before any jest.resetModules() calls
+// can clear the module cache.
+const {cleanup: rtlCleanup} = require('@testing-library/react')
+
+afterEach(async () => {
     global.server.resetHandlers()
+    // Manual cleanup for @testing-library/react since we disabled auto-cleanup
+    // (RTL_SKIP_AUTO_CLEANUP) to prevent hook nesting errors with dynamic imports.
+    // rtlCleanup handles components rendered by the original RTL instance.
+    await rtlCleanup()
+    // Fallback: clear any remaining DOM content from tests that used
+    // jest.resetModules() + dynamic imports (separate RTL instances).
+    document.body.innerHTML = ''
 })
 afterAll(() => {
     global.server.close()

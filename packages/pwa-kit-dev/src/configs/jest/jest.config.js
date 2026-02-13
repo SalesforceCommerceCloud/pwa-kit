@@ -11,7 +11,11 @@ module.exports = {
     collectCoverage: true,
     testEnvironment: 'jest-environment-jsdom-global',
     testEnvironmentOptions: {
-        url: 'http://localhost/'
+        url: 'http://localhost/',
+        // Prevent jest-environment-jsdom from using 'browser' export conditions (Jest 29+).
+        // Without this, packages like uuid and nanoid resolve to ESM browser builds
+        // that Jest cannot parse in a CJS context.
+        customExportConditions: ['node', 'node-addons']
     },
     testPathIgnorePatterns: ['node_modules', 'build'],
     moduleNameMapper: {
