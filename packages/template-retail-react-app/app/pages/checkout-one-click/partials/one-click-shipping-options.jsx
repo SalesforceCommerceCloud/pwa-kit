@@ -266,8 +266,8 @@ export default function ShippingOptions() {
             }
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Options',
-                id: 'toggle_card.action.editShippingOptions'
+                defaultMessage: 'Change',
+                id: 'toggle_card.action.changeShippingOptions'
             })}
         >
             <ToggleCardEdit>
