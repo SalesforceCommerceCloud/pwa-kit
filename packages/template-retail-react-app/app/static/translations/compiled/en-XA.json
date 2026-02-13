@@ -2473,14 +2473,14 @@
       "value": "]"
     }
   ],
-  "checkout_contact_info.action.edit": [
+  "checkout_contact_info.action.change": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ḗḓīŧ"
+      "value": "Ƈħȧȧƞɠḗḗ"
     },
     {
       "type": 0,
@@ -9828,6 +9828,34 @@
     }
   ],
   "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "toggle_card.action.changePaymentInfo": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "toggle_card.action.changeShippingOptions": [
     {
       "type": 0,
       "value": "["
