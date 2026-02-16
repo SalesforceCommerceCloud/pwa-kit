@@ -270,6 +270,13 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
+        // Build the return URL (needed for updatePaymentInstrumentForOrder )      
+        const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+        paymentData.returnUrl = baseReturnUrl +
+            '?orderNo=' + encodeURIComponent(createdOrderNo) +
+            '&zoneId=' + encodeURIComponent(zoneId) +
+            '&type=' + encodeURIComponent(paymentType)
+
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({
                 amount: order.orderTotal,
@@ -944,15 +951,7 @@ const SFPaymentsExpressButtons = ({
 
             const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
-                // inject country code into payment method set accounts (Adyen seems to need it but Stripe works with/without it)
-                paymentMethodSetAccounts:
-                    paymentConfig.paymentMethodSetAccounts?.map((account) => ({
-                        ...account,
-                        config: {
-                            ...account.config,
-                            country: paymentCountryCode || fallbackCountryCode || 'US' // Inject country here
-                        }
-                    })) || []
+                paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts || []
             }
             const config = {
                 theme: buildTheme({
