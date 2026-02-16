@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,6 +13,7 @@ import SearchSuggestions from '@salesforce/retail-react-app/app/components/searc
 jest.mock(
     '@salesforce/retail-react-app/app/components/search/partials/search-suggestions-section',
     () => {
+        /* eslint-disable react/prop-types -- mock component; cannot reference PropTypes inside jest.mock factory */
         const MockSuggestionSection = (props) => (
             <div data-testid="suggestion-section">
                 {props.showAskAssistantBanner && props.onAskAssistantClick && (
@@ -26,6 +27,7 @@ jest.mock(
                 )}
             </div>
         )
+        /* eslint-enable react/prop-types */
         return MockSuggestionSection
     }
 )
