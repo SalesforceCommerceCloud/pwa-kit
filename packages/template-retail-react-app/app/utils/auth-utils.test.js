@@ -14,8 +14,10 @@ import {
     getAuthorizePasswordlessErrorMessage,
     getPasswordResetErrorMessage,
     getLoginPasswordlessErrorMessage,
+    getPasskeyErrorMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
-    TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
+    TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE,
+    TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 afterEach(() => {
@@ -114,4 +116,21 @@ describe('getLoginPasswordlessErrorMessage', () => {
             expect(getLoginPasswordlessErrorMessage(errorMessage)).toBe(expectedMessage)
         }
     )
+})
+
+describe('getPasskeyErrorMessage', () => {
+    test.each([
+        [
+            {message: 'Too many passkey registration requests were made.', response: {status: 400}},
+            TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
+        ],
+        [{response: {status: 400}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 401}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 403}}, API_ERROR_MESSAGE],
+        [{response: {status: 412}}, API_ERROR_MESSAGE],
+        [{response: {status: 500}}, API_ERROR_MESSAGE],
+        [new Error('Network Error'), API_ERROR_MESSAGE]
+    ])('maps passkey error to the correct message descriptor', (error, expectedMessage) => {
+        expect(getPasskeyErrorMessage(error)).toBe(expectedMessage)
+    })
 })
