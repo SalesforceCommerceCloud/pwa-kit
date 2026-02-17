@@ -1,3 +1,4 @@
+## v3.17.0-nightly-20260217081023 (Feb 17, 2026)
 ## v3.17.0-dev
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
