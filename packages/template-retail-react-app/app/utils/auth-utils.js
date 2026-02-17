@@ -110,3 +110,11 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
     }
     return API_ERROR_MESSAGE
 }
+
+export const getLoginWithPasskeyErrorMessage = (error) => {
+    // 400 Bad Request and 401 Unauthorized errors are related to incorrect configuration
+    if (error.response.status === 400 || error.response.status === 401) {
+        return FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
