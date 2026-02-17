@@ -25,7 +25,6 @@ import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
-import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -59,23 +58,6 @@ const mockRegisteredCustomer = {
     lastName: 'Testing',
     login: 'customer@test.com'
 }
-
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest.fn().mockImplementation((helperType) => {
-            // Return the specific mock if defined, otherwise return a default mock
-            return mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
-        })
-    }
-})
 
 let authModal = undefined
 const MockedComponent = (props) => {
@@ -272,7 +254,6 @@ describe('Passwordless enabled', () => {
                 }
             }
         })
-        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
         // open the modal
