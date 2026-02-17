@@ -441,8 +441,8 @@ const Payment = ({
                 disabled={appliedPayment == null}
                 onEdit={handleEditPayment}
                 editLabel={formatMessage({
-                    defaultMessage: 'Edit Payment Info',
-                    id: 'toggle_card.action.editPaymentInfo'
+                    defaultMessage: 'Change',
+                    id: 'toggle_card.action.changePaymentInfo'
                 })}
             >
                 <ToggleCardEdit>
@@ -580,8 +580,7 @@ const Payment = ({
 
                         <Divider borderColor="gray.100" />
 
-                        {(selectedBillingAddress ||
-                            (effectiveBillingSameAsShipping && selectedShippingAddress)) && (
+                        {selectedBillingAddress && !effectiveBillingSameAsShipping && (
                             <Stack spacing={2}>
                                 <Heading as="h3" fontSize="md">
                                     <FormattedMessage
@@ -589,9 +588,7 @@ const Payment = ({
                                         id="checkout_payment.heading.billing_address"
                                     />
                                 </Heading>
-                                <AddressDisplay
-                                    address={selectedBillingAddress || selectedShippingAddress}
-                                />
+                                <AddressDisplay address={selectedBillingAddress} />
                             </Stack>
                         )}
 

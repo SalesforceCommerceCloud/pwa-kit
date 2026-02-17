@@ -199,7 +199,6 @@ MetricsSender._override = !!process.env.SEND_CW_METRICS
 /**
  * Get the singleton MetricsSender
  *
- * @private
  * @returns {MetricsSender}
  */
 MetricsSender.getSender = () => {

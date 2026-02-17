@@ -166,3 +166,23 @@ export const forEachIn = (iterable, functionRef) => {
         functionRef(key, iterable[key])
     })
 }
+
+/**
+ * Log an internal MRT error.
+ *
+ * @param namespace Namespace for the error (e.g. data_store, redirect) to facilitate searching
+ * @param err Error to log
+ * @param context Optional context to include in the log
+ */
+export const logMRTError = (namespace, err, context) => {
+    const error = err instanceof Error ? err : new Error(String(err))
+    console.error(
+        JSON.stringify({
+            [`__MRT__${namespace}`]: 'error',
+            type: 'MRT_internal',
+            error: error.message,
+            stack: error.stack,
+            ...context
+        })
+    )
+}
