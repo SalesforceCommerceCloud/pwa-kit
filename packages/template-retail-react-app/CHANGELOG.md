@@ -1,3 +1,6 @@
+## v2.11.0-preview.0 (Feb 12, 2026)
+- Add Node 24 support. Drop Node 16 support
+
 ## v2.10.0 (Jul 29, 2025)
 - Integrate commerce-sdk-react with PWA Kit v2.x and implement Hybrid Auth support [#2510](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2510)
 

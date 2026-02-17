@@ -1,4 +1,6 @@
-## v2.10.0 (Jul 29, 2025)
+## v2.11.0-preview.0 (Feb 12, 2026)
+- Add Node 24 support. Drop Node 16 support
+
 ## v2.9.1 (Mar 18, 2025)
 - Update PWA-Kit SDKs to v2.9.1 [#2321](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2321)
 
