@@ -211,12 +211,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        try {
-            loginWithPasskey()
-        } catch (error) {
+        loginWithPasskey().catch((error) => {
             const message = formatMessage(getPasskeyErrorMessage(error))
             form.setError('global', {type: 'manual', message})
-        }
+        })
     }, [])
 
     /**************** Einstein ****************/

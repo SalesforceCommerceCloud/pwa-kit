@@ -624,6 +624,7 @@ describe('Passkey login', () => {
         // Clear all mocks
         jest.clearAllMocks()
 
+        // Override getConfig to return config with passkey enabled
         getConfig.mockReturnValue({
             ...mockConfig,
             app: {
@@ -648,6 +649,12 @@ describe('Passkey login', () => {
         global.navigator.credentials = {
             get: mockCredentialsGet
         }
+
+        // Mock parseRequestOptionsFromJSON to return mock options
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue({
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        })
 
         // Setup MSW handlers for WebAuthn API endpoints
         global.server.use(
@@ -688,13 +695,6 @@ describe('Passkey login', () => {
     })
 
     test('Triggers passkey login when modal opens with passkey enabled', async () => {
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
         // Mock credential that will be returned from navigator.credentials.get
         const mockCredential = {
             id: 'mock-credential-id',
@@ -745,14 +745,7 @@ describe('Passkey login', () => {
         )
     })
 
-    test('Falls back to other login methods when passkey login is cancelled', async () => {
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
+    test('User can login with other method when passkey login is cancelled', async () => {
         // Simulate user cancelling passkey selection (NotAllowedError)
         const notAllowedError = new Error('User cancelled')
         notAllowedError.name = 'NotAllowedError'
@@ -768,7 +761,7 @@ describe('Passkey login', () => {
         const trigger = screen.getByText(/open modal/i)
         await user.click(trigger)
 
-        // Should not show error for cancelled passkey
+        // Login form should be shown
         await waitFor(() => {
             expect(mockCredentialsGet).toHaveBeenCalled()
             expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
@@ -779,13 +772,6 @@ describe('Passkey login', () => {
     })
 
     test('Shows error when passkey authentication fails with error from the browser', async () => {
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
         // Simulate error in loginWithPasskey hook
         mockCredentialsGet.mockRejectedValue(new Error('Authentication failed'))
 
@@ -870,13 +856,6 @@ describe('Passkey login', () => {
     })
 
     test('Successfully logs in with passkey', async () => {
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
         const mockCredential = {
             id: 'mock-credential-id',
             rawId: new ArrayBuffer(32),
