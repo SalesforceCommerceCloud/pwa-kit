@@ -90,7 +90,6 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const {locale} = useMultiSite()
-    const config = getConfig()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -105,7 +104,7 @@ export const AuthModal = ({
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
-    const {showToast} = usePasskeyRegistration()
+    const {showRegisterPasskeyToast} = usePasskeyRegistration()
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -281,23 +280,8 @@ export const AuthModal = ({
         onClose()
         setIsOtpAuthOpen(false)
 
-        if (config?.app?.login?.passkey?.enabled) {
-            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
-            if (
-                window.PublicKeyCredential &&
-                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                window.PublicKeyCredential.isConditionalMediationAvailable
-            ) {
-                Promise.all([
-                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    window.PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {
-                    if (results.every((r) => r === true)) {
-                        showToast()
-                    }
-                })
-            }
-        }
+        // Show passkey registration prompt if supported
+        showRegisterPasskeyToast()
 
         // Show a toast only for those registed users returning to the site.
         // Only show toast when customer data is available (user is logged in and data is loaded)
@@ -431,7 +415,7 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {passwordless = {}, social = {}, passkey = {}} = getConfig().app.login || {}
+    const {passwordless = {}, social = {}} = getConfig().app.login || {}
 
     return {
         initialView,

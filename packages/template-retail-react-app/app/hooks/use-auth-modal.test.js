@@ -922,6 +922,74 @@ describe('Passkey login', () => {
             expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
         })
     })
+
+    describe('Passkey Registration', () => {
+        beforeEach(() => {
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {
+                        ...mockConfig.app.login,
+                        passkey: {enabled: true}
+                    }
+                }
+            })
+
+            // Mock WebAuthn API
+            global.PublicKeyCredential = {
+                isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true),
+                isConditionalMediationAvailable: jest.fn().mockResolvedValue(true)
+            }
+            global.window.PublicKeyCredential = global.PublicKeyCredential
+
+            global.server.use(
+                rest.post('*/oauth2/token', (req, res, ctx) =>
+                    res(
+                        ctx.delay(0),
+                        ctx.json({
+                            customer_id: 'registeredCustomerId',
+                            access_token: registerUserToken,
+                            refresh_token: 'testrefeshtoken',
+                            usid: 'testusid',
+                            enc_user_id: 'testEncUserId',
+                            id_token: 'testIdToken'
+                        })
+                    )
+                )
+            )
+        })
+
+        afterEach(() => {
+            delete global.PublicKeyCredential
+            delete global.window.PublicKeyCredential
+        })
+
+        test('shows passkey registration toast after login', async () => {
+            const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+            const validEmail = 'test@salesforce.com'
+            const validPassword = 'Password123!'
+
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            await waitFor(() => {
+                expect(screen.getByText(/Continue/i)).toBeInTheDocument()
+            })
+
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            await user.click(screen.getByText(/password/i))
+            await user.type(screen.getByLabelText('Password'), validPassword)
+            await user.keyboard('{Enter}')
+
+            // Create passkey toast is shown after login
+            await waitFor(() => {
+                // 2 matches are found for the toast
+                const toasts = screen.getAllByText(/Create Passkey/i)
+                expect(toasts.length).toBeGreaterThanOrEqual(1)
+            })
+        })
+    })
 })
 
 describe('Reset password', function () {
