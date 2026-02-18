@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
     Input,
@@ -225,7 +225,7 @@ const Search = (props) => {
     }
 
     const clearInput = () => {
-        searchInputRef.current.blur()
+        searchInputRef.current?.blur()
         setIsOpen(false)
     }
 
@@ -340,10 +340,10 @@ const Search = (props) => {
         }
     }
 
-    const onAskAssistantClick = () => {
+    const onAskAssistantClick = useCallback(() => {
         launchChat()
         clearInput()
-    }
+    }, [launchChat, clearInput])
 
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved

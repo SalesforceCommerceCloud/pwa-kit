@@ -28,6 +28,11 @@ const SuggestionSection = ({
     const hasPopularSearches = searchSuggestions?.popularSearchSuggestions?.length
     const hasRecentSearches = searchSuggestions?.recentSearchSuggestions?.length
 
+    const askAssistantBanner =
+        showAskAssistantBanner && onAskAssistantClick ? (
+            <AskAssistantBanner onClick={onAskAssistantClick} styles={styles} />
+        ) : null
+
     return (
         <Fragment>
             {/* Mobile - Vertical alignment */}
@@ -102,9 +107,7 @@ const SuggestionSection = ({
                         />
                     </Fragment>
                 )}
-                {showAskAssistantBanner && onAskAssistantClick && (
-                    <AskAssistantBanner onClick={onAskAssistantClick} styles={styles} />
-                )}
+                {askAssistantBanner}
             </HideOnDesktop>
             {/* Desktop - Vertical and Horizontal alignment */}
             <HideOnMobile>
@@ -199,9 +202,7 @@ const SuggestionSection = ({
                         )}
                     </Box>
                 </Box>
-                {showAskAssistantBanner && onAskAssistantClick && (
-                    <AskAssistantBanner onClick={onAskAssistantClick} styles={styles} />
-                )}
+                {askAssistantBanner}
             </HideOnMobile>
         </Fragment>
     )

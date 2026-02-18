@@ -45,7 +45,7 @@ const AskAssistantBanner = ({onClick, styles}) => {
 
 AskAssistantBanner.propTypes = {
     onClick: PropTypes.func.isRequired,
-    styles: PropTypes.object
+    styles: PropTypes.object.isRequired
 }
 
 export default AskAssistantBanner
