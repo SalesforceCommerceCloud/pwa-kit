@@ -9,17 +9,29 @@ import PropTypes from 'prop-types'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
 import HorizontalSuggestions from '@salesforce/retail-react-app/app/components/search/partials/horizontal-suggestions'
+import AskAssistantBanner from '@salesforce/retail-react-app/app/components/search/partials/ask-assistant-banner'
 import {FormattedMessage} from 'react-intl'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
-const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
+const SuggestionSection = ({
+    searchSuggestions,
+    closeAndNavigate,
+    styles,
+    showAskAssistantBanner,
+    onAskAssistantClick
+}) => {
     const hasCategories = searchSuggestions?.categorySuggestions?.length
     const hasProducts = searchSuggestions?.productSuggestions?.length
     const hasPhraseSuggestions = searchSuggestions?.phraseSuggestions?.length
     const hasPopularSearches = searchSuggestions?.popularSearchSuggestions?.length
     const hasRecentSearches = searchSuggestions?.recentSearchSuggestions?.length
+
+    const askAssistantBanner =
+        showAskAssistantBanner && onAskAssistantClick ? (
+            <AskAssistantBanner onClick={onAskAssistantClick} styles={styles} />
+        ) : null
 
     return (
         <Fragment>
@@ -95,6 +107,7 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                         />
                     </Fragment>
                 )}
+                {askAssistantBanner}
             </HideOnDesktop>
             {/* Desktop - Vertical and Horizontal alignment */}
             <HideOnMobile>
@@ -189,6 +202,7 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                         )}
                     </Box>
                 </Box>
+                {askAssistantBanner}
             </HideOnMobile>
         </Fragment>
     )
@@ -197,7 +211,9 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
 SuggestionSection.propTypes = {
     searchSuggestions: PropTypes.object.isRequired,
     closeAndNavigate: PropTypes.func.isRequired,
-    styles: PropTypes.object.isRequired
+    styles: PropTypes.object.isRequired,
+    showAskAssistantBanner: PropTypes.bool,
+    onAskAssistantClick: PropTypes.func
 }
 
 export default SuggestionSection

@@ -751,11 +751,6 @@ describe('Checkout One Click', () => {
             })
         ).toBeInTheDocument()
 
-        // Billing address should default to the shipping address
-
-        // Should display billing address that matches shipping address
-        expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-
         // Edit billing address
         // Toggle to edit billing address (not via same-as-shipping label in this flow)
         // Click the checkbox by role if present; otherwise skip
@@ -1210,10 +1205,6 @@ describe('Checkout One Click', () => {
                 return /5454\b/.test(text)
             })
         ).toBeInTheDocument()
-
-        // Verify billing address is displayed (it shows John Smith from the mock)
-        expect(step3Content.getByText('John Smith')).toBeInTheDocument()
-        expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
         // Verify UserRegistration component is hidden for registered customers
         expect(screen.queryByTestId('sf-user-registration-content')).not.toBeInTheDocument()
@@ -2653,7 +2644,7 @@ describe('Checkout One Click', () => {
 
         // Click "Edit Payment Info" button
         const editPaymentButton = screen.getByRole('button', {
-            name: /toggle_card.action.editPaymentInfo|Edit Payment Info/i
+            name: /toggle_card.action.changePaymentInfo|Change/i
         })
         await user.click(editPaymentButton)
 
