@@ -830,12 +830,7 @@ describe('Checkout One Click', () => {
         })
     })
 
-    // TODO: Fix timing issue — in Jest 29 (jsdom v20), the checkout auto-advances
-    // past the shipping address edit view before the test can interact with it.
-    // The "Add New Address" button is never visible because the registered customer's
-    // saved address is auto-selected and the step transitions to summary view.
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('Can add address during checkout as a registered customer', async () => {
+    test('Can add address during checkout as a registered customer', async () => {
         // Set the initial browser router path and render our component tree.
         window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
         const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
@@ -849,12 +844,15 @@ describe('Checkout One Click', () => {
             }
         })
 
-        await waitFor(() => {
-            expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
-        })
-
-        // Add address
-        await user.click(screen.getByText(/add new address/i))
+        // In one-click checkout for registered customers, the preferred address is
+        // auto-selected and the step may auto-advance to summary view. If it did,
+        // reopen the Shipping Address step to access the "Add New Address" button.
+        const reopenBtn = await screen
+            .findByRole('button', {name: /edit shipping address/i})
+            .catch(() => null)
+        if (reopenBtn) {
+            await user.click(reopenBtn)
+        }
 
         // Wait for the shipping address section to show a name (either address)
         await waitFor(() => {
