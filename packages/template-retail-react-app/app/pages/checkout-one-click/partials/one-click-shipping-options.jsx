@@ -33,7 +33,8 @@ import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {
     isPickupShipment,
-    isPickupMethod
+    isPickupMethod,
+    getDeliveryShippingMethods
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import PropTypes from 'prop-types'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -69,18 +70,18 @@ export default function ShippingOptions() {
                 step === STEPS.SHIPPING_OPTIONS &&
                 !hasMultipleDeliveryShipments,
             onSuccess: (data) => {
-                const noMethods =
-                    !data?.applicableShippingMethods || data.applicableShippingMethods.length === 0
+                const deliveryOnly = getDeliveryShippingMethods(data?.applicableShippingMethods)
+                const noDeliveryMethods = !deliveryOnly || deliveryOnly.length === 0
                 if (
                     step === STEPS.SHIPPING_OPTIONS &&
                     !hasMultipleDeliveryShipments &&
-                    noMethods &&
+                    noDeliveryMethods &&
                     !noMethodsToastShown
                 ) {
                     showToast({
                         title: formatMessage({
                             defaultMessage:
-                                'No shipping methods are available for this address. Please enter a different address.',
+                                'Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance.',
                             id: 'shipping_options.error.no_shipping_methods'
                         }),
                         status: 'error'
@@ -94,11 +95,15 @@ export default function ShippingOptions() {
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
+    // Reset error toast when state changes
+    useEffect(() => {
+        setNoMethodsToastShown(false)
+    }, [selectedShippingAddress?.stateCode])
+
     // Filter out pickup methods for delivery shipment
-    const deliveryMethods =
-        (shippingMethods?.applicableShippingMethods || []).filter(
-            (method) => !isPickupMethod(method)
-        ) || []
+    const deliveryMethods = getDeliveryShippingMethods(
+        shippingMethods?.applicableShippingMethods || []
+    )
 
     const {isLoading: isAutoSelectLoading} = useCheckoutAutoSelect({
         currentStep: step,
@@ -137,10 +142,9 @@ export default function ShippingOptions() {
 
     // Calculate if we should show loading state immediately for auto-selection
     const shouldShowInitialLoading = useMemo(() => {
-        const filteredMethods =
-            shippingMethods?.applicableShippingMethods?.filter(
-                (method) => !isPickupMethod(method)
-            ) || []
+        const filteredMethods = getDeliveryShippingMethods(
+            shippingMethods?.applicableShippingMethods
+        )
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
         const defaultMethod = defaultMethodId
             ? shippingMethods.applicableShippingMethods?.find(
@@ -173,11 +177,9 @@ export default function ShippingOptions() {
     })
 
     useEffect(() => {
-        // Filter out pickup methods
-        const filteredMethods =
-            shippingMethods?.applicableShippingMethods?.filter(
-                (method) => !isPickupMethod(method)
-            ) || []
+        const filteredMethods = getDeliveryShippingMethods(
+            shippingMethods?.applicableShippingMethods
+        )
 
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
         // Only use default if it's not a pickup method
@@ -227,10 +229,9 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    // Filter out pickup methods for all shipments
-    const filteredShippingMethods =
-        shippingMethods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) ||
-        []
+    const filteredShippingMethods = getDeliveryShippingMethods(
+        shippingMethods?.applicableShippingMethods
+    )
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
@@ -533,9 +534,7 @@ const ShipmentMethods = ({shipment, index, currency}) => {
 
     useEffect(() => {
         // Only attempt auto-select when there are applicable methods available and we haven't already auto-selected
-        // Filter out pickup methods for multi-shipments
-        const applicableMethods =
-            methods?.applicableShippingMethods?.filter((method) => !isPickupMethod(method)) || []
+        const applicableMethods = getDeliveryShippingMethods(methods?.applicableShippingMethods)
         const applicableIds = applicableMethods.map((m) => m.id)
         if (!applicableIds.length || hasAutoSelected) {
             return
@@ -613,11 +612,9 @@ const ShipmentMethods = ({shipment, index, currency}) => {
             )}
 
             {(() => {
-                // Filter out pickup methods for multi-shipments
-                const filteredMethods =
-                    methods?.applicableShippingMethods?.filter(
-                        (method) => !isPickupMethod(method)
-                    ) || []
+                const filteredMethods = getDeliveryShippingMethods(
+                    methods?.applicableShippingMethods
+                )
                 return filteredMethods.length > 0 ? (
                     <RadioGroup
                         name={`shipping-options-${shipment.shipmentId}`}
