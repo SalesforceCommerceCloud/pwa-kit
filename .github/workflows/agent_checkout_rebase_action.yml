@@ -28,7 +28,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # Or your project's specific Node.js version
+          node-version: '24' # Or your project's specific Node.js version
           cache: 'npm' # Caches npm dependencies for faster runs
 
       # Step 3: Configure Git with a user name and email.

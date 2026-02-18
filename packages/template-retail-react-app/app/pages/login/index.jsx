@@ -25,18 +25,17 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
-import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    PASSWORDLESS_LOGIN_LANDING_PATH,
-    PASSWORDLESS_ERROR_MESSAGES
-} from '@salesforce/retail-react-app/app/constants'
+import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {
+    getAuthorizePasswordlessErrorMessage,
+    getLoginPasswordlessErrorMessage,
+    getPasswordlessCallbackUrl
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
@@ -56,11 +55,17 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {isRegistered, customerType} = useCustomerType()
+    const {locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const passwordlessMode = passwordless?.mode
+    const passwordlessLoginLandingPath = passwordless?.landingPath
+
+    const passwordlessConfigCallback = getPasswordlessCallbackUrl(passwordless?.callbackURI)
+
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps
 
@@ -71,9 +76,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    const [currentView, setCurrentView] = useState(initialView)
-    const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
     const [redirectPath, setRedirectPath] = useState('')
+    const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -105,49 +109,55 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            await authorizePasswordlessLogin.mutateAsync({userid: email})
-            setPasswordlessLoginEmail(email)
-            setCurrentView(EMAIL_VIEW)
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                mode: passwordlessMode,
+                locale: locale.id,
+                ...(passwordlessConfigCallback && {callbackURI: passwordlessConfigCallback})
+            })
+            setIsOtpAuthOpen(true)
         } catch (error) {
-            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
             form.setError('global', {type: 'manual', message})
         }
     }
 
-    const submitForm = async (data, isPasswordless = false) => {
+    const handleOtpVerification = async (pwdlessLoginToken) => {
+        try {
+            await loginPasswordless.mutateAsync({pwdlessLoginToken})
+            return {success: true}
+        } catch (e) {
+            const errorData = await e.response?.json()
+            const message = formatMessage(getLoginPasswordlessErrorMessage(errorData.message))
+            return {success: false, error: message}
+        }
+    }
+
+    const submitForm = async (data) => {
         form.clearErrors()
 
-        return {
-            login: async (data) => {
-                if (isPasswordless) {
-                    const email = data.email
-                    await handlePasswordlessLogin(email)
-                    return
-                }
+        // If passwordless is enabled and the password is not provided, handle passwordless login
+        if (isPasswordlessEnabled && !data.password) {
+            const email = data.email
+            await handlePasswordlessLogin(email)
+            return
+        }
 
-                try {
-                    await login.mutateAsync({username: data.email, password: data.password})
-                } catch (error) {
-                    const message = /Unauthorized/i.test(error.message)
-                        ? formatMessage(LOGIN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                    form.setError('global', {type: 'manual', message})
-                }
-                handleMergeBasket()
-            },
-            email: async () => {
-                await handlePasswordlessLogin(passwordlessLoginEmail)
-            }
-        }[currentView](data)
+        try {
+            await login.mutateAsync({username: data.email, password: data.password})
+        } catch (error) {
+            const message = /Unauthorized/i.test(error.message)
+                ? formatMessage(LOGIN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
     }
 
     // Handles passwordless login by retrieving the 'token' from the query parameters and
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
+        if (path.endsWith(passwordlessLoginLandingPath) && isSuccessCustomerBaskets) {
             const token = decodeURIComponent(queryParams.get('token'))
             if (queryParams.get('redirect_url')) {
                 setRedirectPath(decodeURIComponent(queryParams.get('redirect_url')))
@@ -155,24 +165,14 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 setRedirectPath('')
             }
 
-            const passwordlessLogin = async () => {
-                try {
-                    await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
-                } catch (e) {
-                    const errorData = await e.response?.json()
-                    const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                        ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                    form.setError('global', {type: 'manual', message})
-                }
-            }
-            passwordlessLogin()
+            handleOtpVerification(token)
         }
     }, [path, isSuccessCustomerBaskets])
 
     // If customer is registered push to account page and merge the basket
     useEffect(() => {
         if (isRegistered) {
+            setIsOtpAuthOpen(false)
             handleMergeBasket()
             const redirectTo = redirectPath ? redirectPath : '/account'
             navigate(redirectTo)
@@ -200,28 +200,24 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                    <LoginForm
-                        form={form}
-                        submitForm={(data) => {
-                            const shouldUsePasswordless = isPasswordlessEnabled && !data.password
-                            return submitForm(data, shouldUsePasswordless)
-                        }}
-                        clickCreateAccount={() => navigate('/registration')}
-                        handlePasswordlessLoginClick={noop}
-                        handleForgotPasswordClick={() => navigate('/reset-password')}
-                        isPasswordlessEnabled={isPasswordlessEnabled}
-                        isSocialEnabled={isSocialEnabled}
-                        idps={idps}
-                    />
-                )}
-                {currentView === EMAIL_VIEW && (
-                    <PasswordlessEmailConfirmation
-                        form={form}
-                        submitForm={submitForm}
-                        email={passwordlessLoginEmail}
-                    />
-                )}
+                <LoginForm
+                    form={form}
+                    submitForm={submitForm}
+                    clickCreateAccount={() => navigate('/registration')}
+                    handlePasswordlessLoginClick={noop}
+                    handleForgotPasswordClick={() => navigate('/reset-password')}
+                    isPasswordlessEnabled={isPasswordlessEnabled}
+                    isSocialEnabled={isSocialEnabled}
+                    idps={idps}
+                />
+                <OtpAuth
+                    isOpen={isOtpAuthOpen}
+                    onClose={() => setIsOtpAuthOpen(false)}
+                    form={form}
+                    handleSendEmailOtp={handlePasswordlessLogin}
+                    handleOtpVerification={handleOtpVerification}
+                    hideCheckoutAsGuestButton={true}
+                />
             </Container>
         </Box>
     )

@@ -33,13 +33,19 @@ module.exports = {
             showDefaults: true
         },
         login: {
+            tokenLength: 8,
             passwordless: {
                 enabled: false,
-                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c'
+                mode: 'email',
+                landingPath: '/passwordless-login-landing'
             },
             social: {
                 enabled: false,
                 idps: ['google', 'apple']
+            },
+            resetPassword: {
+                mode: 'email',
+                landingPath: '/reset-password-landing'
             }
         },
         siteAliases: {
@@ -113,6 +119,9 @@ module.exports = {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
+        oneClickCheckout: {
+            enabled: false
+        },
         storeLocatorEnabled: true,
         multishipEnabled: true
     },
@@ -136,7 +145,7 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: 'localhost:8888',

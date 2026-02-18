@@ -1,10 +1,15 @@
-## v0.4.0-dev (Sep 26, 2025)
+## 0.5.0-dev
+- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
+- Added the fallback path for the custom Api tool [#3458] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3458)
+
+## 0.4.0 (Oct 24, 2025)
 - Unexposed the extra parameters on create_page tool. [#3359] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3359), [#3379] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3379)
 - Create page and component tools integrate their responses into agent IDE [#3377](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3377)
 - Added Hooks Recommendation tool [#3388](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3388)
 - Added Agent Guidelines. [#3366](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3366)
 - Added Explore SCAPI SHOP API Tool  [#3385](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3385)
-- Added Custom APIs Discovery. [##3387](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3387)
+- Added Custom APIs Discovery. [##3387](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3387), [#3413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3413), [#3423](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3423)
 
 ## v0.3.0 (Sep 25, 2025)
 - Added telemetry for MCP tools. [#3327](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3327)

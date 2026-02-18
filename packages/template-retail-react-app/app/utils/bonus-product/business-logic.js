@@ -26,6 +26,51 @@ import {
  */
 
 /**
+ * Detects if a bonus discount line item is rule-based.
+ * Rule-based promotions have empty bonusProducts arrays - products are
+ * determined by dynamic rules and must be fetched via SCAPI product search.
+ *
+ * Examples of rule-based promotions:
+ * - "Get choice of bonus where brand = 'Sony'"
+ * - "Get choice of bonus where price < $50"
+ * - "Get choice of bonus from 'Electronics' category"
+ *
+ * @param {Object} bonusDiscountLineItem - A single bonus discount line item from basket
+ * @returns {boolean} True if rule-based (empty bonusProducts array), false if list-based
+ *
+ * @example
+ * // Rule-based promotion (dynamic rules)
+ * const ruleBasedItem = {
+ *   promotionId: 'promo-123',
+ *   bonusProducts: []  // Empty array indicates rule-based
+ * }
+ * isRuleBasedPromotion(ruleBasedItem) // true
+ *
+ * @example
+ * // List-based promotion (static product list)
+ * const listBasedItem = {
+ *   promotionId: 'promo-456',
+ *   bonusProducts: [
+ *     { productId: 'p1', productName: 'Product 1' },
+ *     { productId: 'p2', productName: 'Product 2' }
+ *   ]
+ * }
+ * isRuleBasedPromotion(listBasedItem) // false
+ */
+export const isRuleBasedPromotion = (bonusDiscountLineItem) => {
+    if (!bonusDiscountLineItem) {
+        return false
+    }
+
+    // Rule-based indicator: has a valid promotionId AND bonusProducts array is empty or doesn't exist
+    const hasPromotionId = Boolean(bonusDiscountLineItem.promotionId)
+    const bonusProducts = bonusDiscountLineItem.bonusProducts || []
+    const hasEmptyBonusProducts = bonusProducts.length === 0
+
+    return hasPromotionId && hasEmptyBonusProducts
+}
+
+/**
  * Determines if a product's promotions are automatic (no choice) or manual (choice of bonus products).
  * Automatic promotions add bonus products directly to cart without user selection.
  * Choice promotions allow users to select which bonus products they want.
@@ -33,15 +78,26 @@ import {
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to check
  * @param {Object} productsWithPromotions - Object mapping productId to product data with promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {boolean} True if product has automatic promotions only
  */
-export const isAutomaticPromotion = (basket, productId, productsWithPromotions) => {
+export const isAutomaticPromotion = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     if (!basket || !productId || !productsWithPromotions) {
         return false
     }
 
     // Get promotion IDs for this product
-    const promotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const promotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (promotionIds.length === 0) {
         return false
@@ -65,9 +121,15 @@ export const isAutomaticPromotion = (basket, productId, productsWithPromotions) 
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to check
  * @param {Object} productsWithPromotions - Object mapping productId to product data with promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {boolean} Whether the product should show bonus product selection
  */
-export const shouldShowBonusProductSelection = (basket, productId, productsWithPromotions) => {
+export const shouldShowBonusProductSelection = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedQualifyingProductsMap = {}
+) => {
     // First check if the product is eligible for bonus products
     const isEligible = isProductEligibleForBonusProducts(productId, productsWithPromotions)
     if (!isEligible) {
@@ -83,7 +145,12 @@ export const shouldShowBonusProductSelection = (basket, productId, productsWithP
 
     // Finally check if this is an automatic promotion
     // Automatic promotions don't need selection UI since products are added automatically
-    const isAutomatic = isAutomaticPromotion(basket, productId, productsWithPromotions)
+    const isAutomatic = isAutomaticPromotion(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
     if (isAutomatic) {
         return false
     }

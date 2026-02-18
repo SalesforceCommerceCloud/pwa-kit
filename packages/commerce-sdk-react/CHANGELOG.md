@@ -1,10 +1,26 @@
-## v4.2.0-dev (Sep 26, 2025)
+## v5.1.0-dev
+- Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
+## v5.0.0 (Feb 12, 2026)
+- Upgrade to commerce-sdk-isomorphic v5.0.0 and introduce Payment Instrument SCAPI integration [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+- [Bugfix] Ensure code_verifier can be optional in resetPassword call [#3567](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3567)
+- [Improvement] Strengthening typescript types on custom endpoint options and fetchOptions types [#3589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3589)
+- [Feature] Update `authorizePasswordless`, `getPasswordResetToken`, and `resetPassword` to support use of `email` mode [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+
+## v4.3.0 (Dec 17, 2025)
+
+- Upgrade to commerce-sdk-isomorphic v4.2.0 and introduce Shopper Configurations SCAPI integration [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
+
+## v4.2.0 (Nov 04, 2025)
+
+- Upgrade to commerce-sdk-isomorphic v4.0.1 [#3449](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3449)
+- Prevent headers from being overriden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
 
 ## v4.1.0 (Sep 25, 2025)
 
 ## v4.0.0 (Sep 04, 2025)
 
-- [Breaking] Upgrade to commerce-sdk-isomorphic v4.0.0 [2879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2879)
+- [Breaking] Upgrade to commerce-sdk-isomorphic v4.0.0 [#2879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2879)
 - [Breaking] Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Update USID expiry to match SLAS refresh token expiry [#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)

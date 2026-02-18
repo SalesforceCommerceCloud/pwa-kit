@@ -7,12 +7,7 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {
-    helpers,
-    ShopperCustomersTypes,
-    ShopperCustomers,
-    ShopperLogin
-} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -20,7 +15,7 @@ import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
-import {ApiClientConfigParams, RequireKeys} from '../hooks/types'
+import {RequireKeys} from '../hooks/types'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -70,7 +65,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
-            }
+            },
+            getPasswordResetToken: jest.fn().mockResolvedValue({}),
+            resetPassword: jest.fn().mockResolvedValue({})
         }))
     }
 })
@@ -123,16 +120,6 @@ const JWTExpired = jwt.sign(
     },
     'secret'
 )
-
-const configPasswordlessSms = {
-    clientId: 'clientId',
-    organizationId: 'organizationId',
-    shortCode: 'shortCode',
-    siteId: 'siteId',
-    proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    logger: console
-}
 
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
 
@@ -921,32 +908,94 @@ describe('Auth', () => {
         expect(result).toHaveProperty('codeVerifier')
     })
 
-    test('authorizePasswordless calls isomorphic authorizePasswordless', async () => {
-        const auth = new Auth(config)
-        await auth.authorizePasswordless({
-            callbackURI: 'callbackURI',
-            userid: 'userid',
-            mode: 'callback'
-        })
+    test.each([
+        [
+            'with all parameters specified',
+            {callbackURI: 'callbackURI', userid: 'userid', mode: 'callback', locale: 'en-US'},
+            {
+                callbackURI: 'callbackURI',
+                userid: 'userid',
+                mode: 'callback',
+                locale: 'en-US'
+            }
+        ],
+        [
+            'defaults mode to callback when not specified',
+            {userid: 'userid'},
+            {userid: 'userid', mode: 'callback'}
+        ],
+        [
+            'defaults callbackURI to passwordlessLoginCallbackURI when not specified',
+            {userid: 'userid'},
+            {
+                userid: 'userid',
+                mode: 'callback',
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
+        ],
+        ['with mode email', {userid: 'userid', mode: 'email'}, {userid: 'userid', mode: 'email'}]
+    ])('authorizePasswordless %s', async (_, input: any, expectedParams: any) => {
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private method
+        auth.set('usid', 'test-usid-value')
+
+        await auth.authorizePasswordless(input)
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
+            credentials: {
+                clientSecret: SLAS_SECRET_PLACEHOLDER
+            },
             parameters: {
-                callbackURI: 'callbackURI',
-                userid: 'userid',
-                mode: 'callback'
+                ...expectedParams,
+                usid: 'test-usid-value'
             }
         })
     })
 
-    test('authorizePasswordless sets mode to sms as configured', async () => {
-        const auth = new Auth(configPasswordlessSms)
+    test('authorizePasswordless without usid', async () => {
+        const auth = new Auth(configSLASPrivate)
+
         await auth.authorizePasswordless({userid: 'userid'})
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {userid: 'userid', mode: 'sms'}
+            parameters: {
+                userid: 'userid',
+                mode: 'callback',
+                callbackURI: configSLASPrivate.passwordlessLoginCallbackURI
+            }
         })
+        // Verify usid is not in parameters when not set
+        expect(functionArg.parameters.usid).toBeUndefined()
+    })
+
+    test('authorizePasswordless without passwordlessLoginCallbackURI in config', async () => {
+        const configWithoutCallback = {
+            ...configSLASPrivate,
+            passwordlessLoginCallbackURI: undefined
+        }
+        const auth = new Auth(configWithoutCallback)
+
+        await auth.authorizePasswordless({userid: 'userid'})
+        expect(helpers.authorizePasswordless).toHaveBeenCalled()
+        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][0]
+        // callbackURI should not be in parameters when not configured
+        expect(functionArg.parameters.callbackURI).toBeUndefined()
+    })
+
+    test('authorizePasswordless throws error on non-200 response', async () => {
+        const auth = new Auth(configSLASPrivate)
+
+        const mockErrorResponse = {
+            status: 400,
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+        }
+        ;(helpers.authorizePasswordless as jest.Mock).mockResolvedValueOnce(mockErrorResponse)
+
+        await expect(auth.authorizePasswordless({userid: 'userid'})).rejects.toThrow(
+            '400 Invalid request'
+        )
     })
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
@@ -957,6 +1006,179 @@ describe('Auth', () => {
         expect(functionArg).toMatchObject({
             parameters: {pwdlessLoginToken: '12345678'}
         })
+    })
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                user_id: 'user@example.com',
+                mode: 'email',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                callback_uri: 'https://example.com/callback',
+                hint: 'custom_hint',
+                locale: 'en-GB',
+                idp_name: 'customIdp',
+                code_challenge: 'test-code-challenge'
+            },
+            {
+                user_id: 'user@example.com',
+                mode: 'email',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                callback_uri: 'https://example.com/callback',
+                hint: 'custom_hint',
+                locale: 'en-GB',
+                idp_name: 'customIdp',
+                code_challenge: 'test-code-challenge'
+            }
+        ],
+        [
+            'defaults all parameters when only required parameters are specified',
+            {user_id: 'user@example.com'},
+            {
+                user_id: 'user@example.com',
+                mode: 'callback',
+                channel_id: config.siteId,
+                client_id: config.clientId,
+                hint: 'cross_device'
+            }
+        ]
+    ])('getPasswordResetToken %s', async (_, input: any, expectedBody: any) => {
+        const auth = new Auth(config)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
+        )
+
+        await auth.getPasswordResetToken(input)
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining(expectedBody)
+            }),
+            // rawResponse is set to true
+            true
+        )
+    })
+
+    test('getPasswordResetToken with private client sets Authorization header', async () => {
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve({
+                status: 200,
+                json: jest.fn().mockResolvedValue({})
+            } as unknown as Response)
+        )
+
+        await auth.getPasswordResetToken({
+            user_id: 'user@example.com',
+            mode: 'email',
+            channel_id: 'channel_id'
+        })
+
+        expect(getPasswordResetTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            }),
+            // rawResponse is set to true
+            true
+        )
+    })
+
+    test('getPasswordResetToken throws error on non-200 response', async () => {
+        const auth = new Auth(configSLASPrivate)
+
+        const mockErrorResponse = {
+            status: 400,
+            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+        }
+        // @ts-expect-error private property
+        const getPasswordResetTokenSpy = jest.spyOn(auth.client, 'getPasswordResetToken')
+        getPasswordResetTokenSpy.mockReturnValueOnce(
+            Promise.resolve(mockErrorResponse as unknown as Response)
+        )
+
+        await expect(
+            auth.getPasswordResetToken({user_id: 'userid', mode: 'email', channel_id: 'channel_id'})
+        ).rejects.toThrow('400 Invalid request')
+    })
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                hint: 'custom_hint',
+                code_verifier: 'test-code-verifier'
+            },
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: 'customChannelId',
+                client_id: 'customClientId',
+                hint: 'custom_hint',
+                code_verifier: 'test-code-verifier'
+            }
+        ],
+        [
+            'defaults all parameters when only required parameters are specified',
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123'
+            },
+            {
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123',
+                channel_id: config.siteId,
+                client_id: config.clientId,
+                hint: 'cross_device'
+            }
+        ]
+    ])(
+        'resetPassword %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.resetPasswordBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.resetPasswordBodyType>
+        ) => {
+            const auth = new Auth(config)
+            // @ts-expect-error private property
+            const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+            await auth.resetPassword(input as ShopperLoginTypes.resetPasswordBodyType)
+
+            expect(resetPasswordSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: expect.objectContaining(expectedBody)
+                })
+            )
+        }
+    )
+
+    test('resetPassword with private client sets Authorization header', async () => {
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+
+        await auth.resetPassword({
+            pwd_action_token: '12345678',
+            new_password: 'newPassword123'
+        } as ShopperLoginTypes.resetPasswordBodyType)
+
+        expect(resetPasswordSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
+            })
+        )
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
