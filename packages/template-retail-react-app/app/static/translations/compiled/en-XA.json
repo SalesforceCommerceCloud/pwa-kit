@@ -8359,6 +8359,34 @@
       "value": "]"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓīşƈǿǿṽḗḗř, ƈǿǿḿƥȧȧřḗḗ, ȧȧƞḓ şħǿǿƥ şḿȧȧřŧḗḗř ẇīŧħ ẏǿǿŭŭř ƥḗḗřşǿǿƞȧȧŀ Şħǿǿƥƥīƞɠ Ȧɠḗḗƞŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧşķ Şħǿǿƥƥīƞɠ Ȧɠḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "search.suggestions.categories": [
     {
       "type": 0,

@@ -1661,6 +1661,12 @@
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Discover, compare, and shop smarter with your personal Shopping Agent."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Ask Shopping Agent"
+  },
   "search.suggestions.categories": {
     "defaultMessage": "Categories"
   },
