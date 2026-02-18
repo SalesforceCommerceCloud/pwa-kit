@@ -207,17 +207,44 @@ export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) =>
     }
 
     /**
-     * Update multiple consent subscriptions in bulk
+     * Update multiple consent subscriptions in bulk.
+     * The bulk endpoint may return HTTP 207 Multi-Status where individual items can fail
+     * even though the HTTP request itself succeeds. This function inspects the response
+     * and throws if any item has success === false, so callers get standard error semantics.
+     *
      * @param {Array<Object>} subscriptionsData - Array of subscription data objects
      * @returns {Promise} Promise resolving to the mutation result
+     * @throws {Error} If any item in the bulk response has success === false.
+     *   The error includes `response` (full API response) and `failures` (failed items).
      */
     const updateSubscriptions = async (subscriptionsData) => {
-        return updateSubscriptionsMutation.mutateAsync({
+        const response = await updateSubscriptionsMutation.mutateAsync({
             parameters: {},
             body: {
                 subscriptions: subscriptionsData
             }
         })
+
+        const results = response?.results || []
+        const failures = results.filter((r) => r.success === false)
+
+        if (failures.length > 0) {
+            failures.forEach((failure) => {
+                console.error(
+                    '[useMarketingConsent] Bulk update item failed:',
+                    failure.error || failure
+                )
+            })
+
+            const error = new Error(
+                `${failures.length} of ${results.length} subscription update(s) failed.`
+            )
+            error.response = response
+            error.failures = failures
+            throw error
+        }
+
+        return response
     }
 
     return {

@@ -132,7 +132,7 @@ export const useEmailSubscription = ({tag} = {}) => {
                 subscriptionUpdates.map((s) => s.subscriptionId)
             )
 
-            // Submit the consent using bulk API (ShopperConsents API v1.1.3)
+            // Submit the consent using Shopper Consents Bulk API
             await updateSubscriptions(subscriptionUpdates)
 
             setMessage(messages.success_confirmation)

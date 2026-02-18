@@ -667,6 +667,194 @@ describe('useMarketingConsent', () => {
             expect(response).toEqual(mockResponse)
         })
 
+        test('throws when bulk response contains failed items (207 Multi-Status)', async () => {
+            const mock207Response = {
+                results: [
+                    {
+                        channel: 'email',
+                        contactPointValue: 'customer@example.com',
+                        error: {
+                            code: 'UPDATE_FAILED',
+                            message: 'Failed to update consent subscription'
+                        },
+                        status: 'opt_in',
+                        subscriptionId: 'marketing-email',
+                        success: false
+                    }
+                ]
+            }
+            const mockMutateAsync = jest.fn().mockResolvedValue(mock207Response)
+            useShopperConsentsMutation.mockImplementation((mutationType) => {
+                if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {
+                    return {
+                        ...mockUseMutationResult,
+                        mutateAsync: mockMutateAsync
+                    }
+                }
+                return mockUseMutationResult
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            await expect(
+                result.current.updateSubscriptions([
+                    {
+                        subscriptionId: 'marketing-email',
+                        channel: 'email',
+                        status: 'opt_in',
+                        contactPointValue: 'customer@example.com'
+                    }
+                ])
+            ).rejects.toThrow('1 of 1 subscription update(s) failed.')
+        })
+
+        test('attaches response and failures to error thrown on 207', async () => {
+            const mock207Response = {
+                results: [
+                    {
+                        subscriptionId: 'marketing-email',
+                        success: false,
+                        error: {code: 'UPDATE_FAILED', message: 'Failed'}
+                    },
+                    {
+                        subscriptionId: 'marketing-sms',
+                        success: true
+                    }
+                ]
+            }
+            const mockMutateAsync = jest.fn().mockResolvedValue(mock207Response)
+            useShopperConsentsMutation.mockImplementation((mutationType) => {
+                if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {
+                    return {
+                        ...mockUseMutationResult,
+                        mutateAsync: mockMutateAsync
+                    }
+                }
+                return mockUseMutationResult
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            const promise = result.current.updateSubscriptions([
+                {
+                    subscriptionId: 'marketing-email',
+                    channel: 'email',
+                    status: 'opt_in',
+                    contactPointValue: 'customer@example.com'
+                }
+            ])
+
+            await expect(promise).rejects.toThrow('1 of 2 subscription update(s) failed.')
+
+            const err = await promise.catch((e) => e)
+            expect(err.response).toEqual(mock207Response)
+            expect(err.failures).toHaveLength(1)
+            expect(err.failures[0].subscriptionId).toBe('marketing-email')
+        })
+
+        test('resolves successfully when all results have success: true', async () => {
+            const allSuccessResponse = {
+                results: [
+                    {subscriptionId: 'marketing-email', success: true},
+                    {subscriptionId: 'marketing-sms', success: true}
+                ]
+            }
+            const mockMutateAsync = jest.fn().mockResolvedValue(allSuccessResponse)
+            useShopperConsentsMutation.mockImplementation((mutationType) => {
+                if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {
+                    return {
+                        ...mockUseMutationResult,
+                        mutateAsync: mockMutateAsync
+                    }
+                }
+                return mockUseMutationResult
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            const response = await result.current.updateSubscriptions([
+                {
+                    subscriptionId: 'marketing-email',
+                    channel: 'email',
+                    status: 'opt_in',
+                    contactPointValue: 'customer@example.com'
+                }
+            ])
+
+            expect(response).toEqual(allSuccessResponse)
+        })
+
+        test('resolves successfully when response has no results array', async () => {
+            const noResultsResponse = {success: true}
+            const mockMutateAsync = jest.fn().mockResolvedValue(noResultsResponse)
+            useShopperConsentsMutation.mockImplementation((mutationType) => {
+                if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {
+                    return {
+                        ...mockUseMutationResult,
+                        mutateAsync: mockMutateAsync
+                    }
+                }
+                return mockUseMutationResult
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            const response = await result.current.updateSubscriptions([
+                {
+                    subscriptionId: 'marketing-email',
+                    channel: 'email',
+                    status: 'opt_in',
+                    contactPointValue: 'customer@example.com'
+                }
+            ])
+
+            expect(response).toEqual(noResultsResponse)
+        })
+
+        test('logs each failed item error to console on 207', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+            const mock207Response = {
+                results: [
+                    {
+                        subscriptionId: 'marketing-email',
+                        success: false,
+                        error: {code: 'UPDATE_FAILED', message: 'Failed'}
+                    }
+                ]
+            }
+            const mockMutateAsync = jest.fn().mockResolvedValue(mock207Response)
+            useShopperConsentsMutation.mockImplementation((mutationType) => {
+                if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {
+                    return {
+                        ...mockUseMutationResult,
+                        mutateAsync: mockMutateAsync
+                    }
+                }
+                return mockUseMutationResult
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            try {
+                await result.current.updateSubscriptions([
+                    {
+                        subscriptionId: 'marketing-email',
+                        channel: 'email',
+                        status: 'opt_in',
+                        contactPointValue: 'customer@example.com'
+                    }
+                ])
+            } catch {
+                // expected
+            }
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                '[useMarketingConsent] Bulk update item failed:',
+                {code: 'UPDATE_FAILED', message: 'Failed'}
+            )
+            consoleSpy.mockRestore()
+        })
+
         test('reflects loading state during mutation', () => {
             useShopperConsentsMutation.mockImplementation((mutationType) => {
                 if (mutationType === ShopperConsentsMutations.UpdateSubscriptions) {

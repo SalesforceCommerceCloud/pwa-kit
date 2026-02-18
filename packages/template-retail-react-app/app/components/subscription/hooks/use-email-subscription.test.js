@@ -501,6 +501,81 @@ describe('useEmailSubscription', () => {
         })
     })
 
+    describe('submit action - 207 Multi-Status (error thrown by useMarketingConsent)', () => {
+        test('shows error when bulk update rejects due to per-item failures', async () => {
+            const bulkError = new Error('1 of 1 subscription update(s) failed.')
+            bulkError.failures = [
+                {
+                    subscriptionId: 'weekly-newsletter',
+                    success: false,
+                    error: {code: 'UPDATE_FAILED', message: 'Failed'}
+                }
+            ]
+            mockUpdateSubscriptions.mockRejectedValue(bulkError)
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.actions.setEmail('test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            await waitFor(() => {
+                expect(result.current.state.feedback.type).toBe('error')
+                expect(result.current.state.feedback.message).toBe(
+                    "We couldn't process the subscription. Try again."
+                )
+            })
+        })
+
+        test('does not clear email field on 207 failure', async () => {
+            const bulkError = new Error('1 of 1 subscription update(s) failed.')
+            mockUpdateSubscriptions.mockRejectedValue(bulkError)
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.actions.setEmail('test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            await waitFor(() => {
+                expect(result.current.state.email).toBe('test@example.com')
+            })
+        })
+
+        test('logs the thrown error to console', async () => {
+            const bulkError = new Error('1 of 2 subscription update(s) failed.')
+            mockUpdateSubscriptions.mockRejectedValue(bulkError)
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.actions.setEmail('test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            await waitFor(() => {
+                expect(console.error).toHaveBeenCalledWith(
+                    '[useEmailSubscription] Subscription error:',
+                    bulkError
+                )
+            })
+        })
+    })
+
     describe('Loading states', () => {
         test('reflects isUpdating state from useMarketingConsent', () => {
             useMarketingConsent.mockReturnValue({
