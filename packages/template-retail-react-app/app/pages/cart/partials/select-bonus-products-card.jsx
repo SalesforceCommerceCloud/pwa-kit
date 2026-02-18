@@ -137,8 +137,12 @@ const SelectBonusProductsCard = ({
                     // Then open the bonus selection modal after a brief delay
                     setTimeout(() => {
                         // Build the payload for the bonus selection modal
+                        // If bonusDiscountLineItem is provided, find ALL bonusDiscountLineItems with the same promotionId
+                        // This ensures the modal shows the correct total capacity
                         const modalBonusItems = bonusDiscountLineItem
-                            ? [bonusDiscountLineItem]
+                            ? (basket?.bonusDiscountLineItems || []).filter(
+                                  (bli) => bli.promotionId === bonusDiscountLineItem.promotionId
+                              )
                             : (basket?.bonusDiscountLineItems || []).filter((bli) =>
                                   promotionId ? bli.promotionId === promotionId : true
                               )

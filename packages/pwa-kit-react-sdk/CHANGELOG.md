@@ -1,4 +1,11 @@
-## v3.14.0-dev (Sep 26, 2025)
+## v3.17.0-dev
+- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
+## v3.16.0 (Feb 12, 2026)
+
+## v3.15.0 (Dec 17, 2025)
+
+## v3.14.0 (Nov 04, 2025)
 
 ## v3.13.0 (Sep 25, 2025)
 - Opentelemetry integration for SSR tracing [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)

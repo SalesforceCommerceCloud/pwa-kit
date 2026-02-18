@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Use latest LTS version for bundle size check
+          node-version: 24 # Use latest LTS version for bundle size check
           cache: npm
 
       - name: Setup Ubuntu Machine

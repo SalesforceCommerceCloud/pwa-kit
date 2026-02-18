@@ -1695,6 +1695,12 @@
       "value": "查看"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "咨询购物助手"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,

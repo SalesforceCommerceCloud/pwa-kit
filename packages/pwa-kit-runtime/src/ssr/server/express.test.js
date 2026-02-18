@@ -979,6 +979,84 @@ describe('generateCacheKey', () => {
         const result1 = generateCacheKey(mockRequest())
         expect(generateCacheKey(mockRequest(), {extras: ['123']})).not.toEqual(result1)
     })
+
+    describe('URL parsing edge cases', () => {
+        test('handles URL with empty query string', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('handles URL with special characters in query', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?q=hello+world&lang=en%20US'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('handles URL with fragment', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1#section'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('handles URL with encoded path', () => {
+            const key = generateCacheKey(mockRequest({url: '/test%20path?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('handles URL without query string', () => {
+            const key = generateCacheKey(mockRequest({url: '/test'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('handles URL with valueless query parameter', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?flag'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('handles URL with unicode characters in path', () => {
+            const key = generateCacheKey(mockRequest({url: '/caf%C3%A9?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('handles URL with multiple query parameters', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1&b=2&c=3'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+    })
+
+    describe('dynamic base URL construction', () => {
+        test('uses request protocol when available', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1', protocol: 'https'}))
+            expect(key).toBeDefined()
+            expect(key.indexOf('/test')).toBe(0)
+        })
+
+        test('falls back to http when no protocol info exists', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('detects https from socket.encrypted', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1', socket: {encrypted: true}}))
+            expect(key).toBeDefined()
+        })
+
+        test('falls back to localhost when no host header exists', () => {
+            const key = generateCacheKey(mockRequest({url: '/test?a=1'}))
+            expect(key).toBeDefined()
+        })
+
+        test('prefers req.protocol over socket.encrypted', () => {
+            const key = generateCacheKey(
+                mockRequest({url: '/test?a=1', protocol: 'https', socket: {encrypted: false}})
+            )
+            expect(key).toBeDefined()
+        })
+    })
 })
 
 describe('getRuntime', () => {

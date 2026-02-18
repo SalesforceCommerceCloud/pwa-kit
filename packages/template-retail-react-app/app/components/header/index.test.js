@@ -20,6 +20,7 @@ import {
     mockedRegisteredCustomer
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {useMediaQuery} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -30,6 +31,10 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
         useMediaQuery: jest.fn().mockReturnValue([true])
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/utils/config-utils', () => ({
+    getCommerceAgentConfig: jest.fn()
+}))
 const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         history.push(createPathWithDefaults('/account'))
@@ -55,6 +60,10 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
+    // Default mock for getCommerceAgentConfig
+    getCommerceAgentConfig.mockReturnValue({
+        enableAgentFromHeader: 'false'
+    })
 })
 afterEach(() => {
     localStorage.clear()
@@ -325,4 +334,103 @@ test('handles search functionality', async () => {
     // Test search input functionality
     fireEvent.change(searchInput, {target: {value: 'test search'}})
     expect(searchInput.value).toBe('test search')
+})
+
+describe('Agent button (SparkleIcon)', () => {
+    test('renders agent button when enableAgentFromHeader is true', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'true'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            expect(agentButton).toBeInTheDocument()
+        })
+    })
+
+    test('does not render agent button when enableAgentFromHeader is false', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'false'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            expect(agentButton).not.toBeInTheDocument()
+        })
+    })
+
+    test('does not render agent button when enableAgentFromHeader is undefined', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: undefined
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            expect(agentButton).not.toBeInTheDocument()
+        })
+    })
+
+    test('does not render agent button when enableAgentFromHeader is not "true"', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'someOtherValue'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            expect(agentButton).not.toBeInTheDocument()
+        })
+    })
+
+    test('calls onAgentClick when agent button is clicked', async () => {
+        const onAgentClick = jest.fn()
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'true'
+        })
+
+        renderWithProviders(<Header onAgentClick={onAgentClick} />)
+
+        await waitFor(() => {
+            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            expect(agentButton).toBeInTheDocument()
+        })
+
+        const agentButton = screen.getByLabelText('Ask Shopping Agent')
+        fireEvent.click(agentButton)
+
+        expect(onAgentClick).toHaveBeenCalledTimes(1)
+    })
+
+    test('agent button has correct aria-label', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'true'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            expect(agentButton).toBeInTheDocument()
+            expect(agentButton).toHaveAttribute('aria-label', 'Ask Shopping Agent')
+        })
+    })
+
+    test('calls getCommerceAgentConfig to check configuration', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'true'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            expect(getCommerceAgentConfig).toHaveBeenCalled()
+        })
+    })
 })

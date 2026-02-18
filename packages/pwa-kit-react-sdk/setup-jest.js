@@ -25,7 +25,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
                 '**/*.json'
             ],
             ssrParameters: {
-                ssrFunctionNodeVersion: '22.x',
+                ssrFunctionNodeVersion: '24.x',
                 proxyConfigs: [
                     {
                         host: 'kv7kzm78.api.commercecloud.salesforce.com',

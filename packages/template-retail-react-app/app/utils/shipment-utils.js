@@ -31,7 +31,7 @@ export const isPickupMethod = (shippingMethod) => {
  * @returns {boolean} true if the shipment is configured for pickup-in-store.
  */
 export const isPickupShipment = (shipment) => {
-    return isPickupMethod(shipment?.shippingMethod)
+    return isPickupMethod(shipment?.shippingMethod) || !!shipment?.c_fromStoreId
 }
 
 /**
@@ -192,4 +192,25 @@ export const isDefaultShipmentEmpty = (basket) => {
     if (!defaultShipment) return true
 
     return !basket.productItems?.some((item) => item.shipmentId === DEFAULT_SHIPMENT_ID)
+}
+
+/**
+ * Groups shipments into pickup and delivery arrays
+ * @param {Object} order - The order or basket object containing shipments
+ * @returns {Object} Object with pickup and delivery arrays of shipments
+ */
+export const groupShipmentsByDeliveryOption = (order) => {
+    const pickupShipments = []
+    const deliveryShipments = []
+
+    order?.shipments?.forEach((shipment) => {
+        const isPickup = isPickupShipment(shipment)
+        if (isPickup) {
+            pickupShipments.push(shipment)
+        } else {
+            deliveryShipments.push(shipment)
+        }
+    })
+
+    return {pickupShipments, deliveryShipments}
 }
