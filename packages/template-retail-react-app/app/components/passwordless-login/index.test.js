@@ -25,7 +25,7 @@ describe('PasswordlessLogin component', () => {
 
         expect(screen.getByLabelText('Email')).toBeInTheDocument()
         expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'Continue Securely'})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: 'Continue'})).toBeInTheDocument()
         expect(screen.getByText(/Or Login With/)).toBeInTheDocument()
         expect(screen.getByRole('button', {name: 'Password'})).toBeInTheDocument()
     })

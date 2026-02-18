@@ -32,27 +32,58 @@ test('Verify passwordless login request', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
-    await page.getByRole('button', {name: 'Continue Securely'}).click()
+    await page.getByRole('button', {name: 'Continue'}).click()
 
     await page.waitForResponse(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login'
     )
 
+    // Verify the passwordless login request
     expect(interceptedRequest).toBeTruthy()
     expect(interceptedRequest.method()).toBe('POST')
 
-    const postData = interceptedRequest.postData()
+    let postData = interceptedRequest.postData()
     expect(postData).toBeTruthy()
 
-    const params = new URLSearchParams(postData)
+    let params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
+
+    await page.route(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/token',
+        (route) => {
+            interceptedRequest = route.request()
+            route.continue()
+        }
+    )
+
+    // Wait for OTP input fields to appear and fill the 8-digit code
+    const otpCode = '12345678' // Replace with actual OTP code
+    const otpInputs = page.locator('input[inputmode="numeric"][maxlength="1"]')
+    await otpInputs.first().waitFor()
+
+    // Fill each input field with one digit
+    for (let i = 0; i < 8; i++) {
+        await otpInputs.nth(i).fill(otpCode[i])
+    }
+
+    await page.waitForResponse(
+        '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/token'
+    )
+
+    // Verify the passwordless login token request
+    expect(interceptedRequest).toBeTruthy()
+    expect(interceptedRequest.method()).toBe('POST')
+    postData = interceptedRequest.postData()
+    expect(postData).toBeTruthy()
+    params = new URLSearchParams(postData)
+    expect(params.get('pwdless_login_token')).toBe(otpCode)
+    expect(params.get('hint')).toBe('pwdless_login')
 })
 
-test('Verify password reset callback request', async ({page}) => {
+test('Verify password reset request', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -88,16 +119,13 @@ test('Verify password reset callback request', async ({page}) => {
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
 // Verify on the login UI that looks different when extra login features are not enabled
-test('Verify password reset callback request when extra login features are not enabled', async ({
-    page
-}) => {
+test('Verify password reset request when extra login features are not enabled', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -132,13 +160,12 @@ test('Verify password reset callback request when extra login features are not e
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('callback')
+    expect(params.get('mode')).toBe('email')
     expect(params.get('channel_id')).toBe(config.RETAIL_APP_HOME_SITE)
-    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request', async ({page}) => {
+test('Verify password reset action request', async ({page}) => {
     let interceptedRequest = null
     await page.route(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action',

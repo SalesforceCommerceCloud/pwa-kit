@@ -43,6 +43,22 @@ const BonusProductItem = ({
     const productName = product?.productName || product?.title
 
     const imageGroup = useMemo(() => {
+        // Check if this is productSearch data (has `image` property)
+        if (productData?.image) {
+            // Convert productSearch image format to imageGroup format
+            return {
+                images: [
+                    {
+                        link: productData.image.link,
+                        disBaseLink: productData.image.disBaseLink,
+                        alt: productData.image.alt || productName,
+                        title: productData.image.title || productName
+                    }
+                ]
+            }
+        }
+
+        // Otherwise, use imageGroups format (from products API)
         if (!productData?.imageGroups) {
             return null
         }

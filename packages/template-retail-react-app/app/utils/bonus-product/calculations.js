@@ -43,6 +43,7 @@ export const getBonusProductCountsForPromotion = (basket, promotionId) => {
 
     // Count selected items for this promotion (all bonus items with this promotion's bonusDiscountLineItemIds)
     const promotionBonusLineItemIds = promotionBonusItems.map((item) => item.id).filter(Boolean)
+
     const selectedBonusItems = (basket.productItems || [])
         .filter(
             (item) =>
