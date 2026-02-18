@@ -28,10 +28,15 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     id: 'global.error.too_many_password_reset_requests'
 })
 
-export const TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE = defineMessage({
+// Constants for Passkey authentication and registration
+export const PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
+    id: 'global.error.passkey_feature_unavailable',
+    defaultMessage: 'The passkey feature is currently unavailable'
+})
+export const PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE = defineMessage({
+    id: 'global.error.passkey_api_error',
     defaultMessage:
-        'You reached the limit for passkey registration attempts. For your security, wait 10 minutes and try again.',
-    id: 'global.error.too_many_passkey_registration_attempts'
+        'Something went wrong while authenticating your passkey. Try again or use a different login method.'
 })
 
 // Shared error patterns for token-based auth features (passwordless login, password reset)
@@ -130,9 +135,9 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
  */
 export const getPasskeyAuthenticateErrorMessage = (error) => {
     if (error.response?.status === 400 || error.response?.status === 401) {
-        return FEATURE_UNAVAILABLE_ERROR_MESSAGE
+        return PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
-    return API_ERROR_MESSAGE
+    return PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE
 }
 
 /**
@@ -148,12 +153,8 @@ export const getPasskeyAuthenticateErrorMessage = (error) => {
  * @returns {Object} - The message descriptor (from defineMessage) for formatMessage
  */
 export const getPasskeyRegistrationErrorMessage = (error) => {
-    // Too many requests error is only returned by AuthorizeWebauthnRegistration
-    if (TOO_MANY_REQUESTS_ERROR.test(error.message)) {
-        return TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
-    }
     if (error.response?.status === 400 || error.response?.status === 401) {
-        return FEATURE_UNAVAILABLE_ERROR_MESSAGE
+        return PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
 }

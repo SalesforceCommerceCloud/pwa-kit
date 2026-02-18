@@ -18,7 +18,8 @@ import {
     getPasskeyRegistrationErrorMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE,
-    TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
+    PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 afterEach(() => {
@@ -121,23 +122,19 @@ describe('getLoginPasswordlessErrorMessage', () => {
 
 describe('getPasskeyAuthenticateErrorMessage', () => {
     test.each([
-        [{response: {status: 400}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
-        [{response: {status: 401}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
-        [{response: {status: 403}}, API_ERROR_MESSAGE],
-        [{response: {status: 412}}, API_ERROR_MESSAGE],
-        [{response: {status: 500}}, API_ERROR_MESSAGE],
-        [new Error('Network Error'), API_ERROR_MESSAGE]
+        [{response: {status: 400}}, PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 401}}, PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 403}}, PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE],
+        [{response: {status: 412}}, PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE],
+        [{response: {status: 500}}, PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE],
+        [new Error('Network Error'), PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE]
     ])('maps passkey error to the correct message descriptor', (error, expectedMessage) => {
         expect(getPasskeyAuthenticateErrorMessage(error)).toBe(expectedMessage)
     })
 
     test.each([
-        [
-            {message: 'Too many passkey registration requests were made.', response: {status: 400}},
-            TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
-        ],
-        [{response: {status: 400}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
-        [{response: {status: 401}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 400}}, PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 401}}, PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE],
         [{response: {status: 403}}, API_ERROR_MESSAGE],
         [{response: {status: 412}}, API_ERROR_MESSAGE],
         [{response: {status: 500}}, API_ERROR_MESSAGE],
