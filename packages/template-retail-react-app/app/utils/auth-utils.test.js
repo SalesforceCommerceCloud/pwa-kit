@@ -14,7 +14,8 @@ import {
     getAuthorizePasswordlessErrorMessage,
     getPasswordResetErrorMessage,
     getLoginPasswordlessErrorMessage,
-    getPasskeyErrorMessage,
+    getPasskeyAuthenticateErrorMessage,
+    getPasskeyRegistrationErrorMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
@@ -118,7 +119,18 @@ describe('getLoginPasswordlessErrorMessage', () => {
     )
 })
 
-describe('getPasskeyErrorMessage', () => {
+describe('getPasskeyAuthenticateErrorMessage', () => {
+    test.each([
+        [{response: {status: 400}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 401}}, FEATURE_UNAVAILABLE_ERROR_MESSAGE],
+        [{response: {status: 403}}, API_ERROR_MESSAGE],
+        [{response: {status: 412}}, API_ERROR_MESSAGE],
+        [{response: {status: 500}}, API_ERROR_MESSAGE],
+        [new Error('Network Error'), API_ERROR_MESSAGE]
+    ])('maps passkey error to the correct message descriptor', (error, expectedMessage) => {
+        expect(getPasskeyAuthenticateErrorMessage(error)).toBe(expectedMessage)
+    })
+
     test.each([
         [
             {message: 'Too many passkey registration requests were made.', response: {status: 400}},
@@ -131,6 +143,6 @@ describe('getPasskeyErrorMessage', () => {
         [{response: {status: 500}}, API_ERROR_MESSAGE],
         [new Error('Network Error'), API_ERROR_MESSAGE]
     ])('maps passkey error to the correct message descriptor', (error, expectedMessage) => {
-        expect(getPasskeyErrorMessage(error)).toBe(expectedMessage)
+        expect(getPasskeyRegistrationErrorMessage(error)).toBe(expectedMessage)
     })
 })

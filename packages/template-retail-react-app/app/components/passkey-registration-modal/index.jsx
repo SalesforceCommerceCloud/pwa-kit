@@ -33,6 +33,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 // Utils
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/utils'
+import {getPasskeyRegistrationErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 // SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
@@ -73,13 +74,10 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             onClose()
             setIsOtpAuthOpen(true)
         } catch (err) {
-            setError(
-                err.message ||
-                    formatMessage({
-                        id: 'passkey_registration.modal.error.authorize_failed',
-                        defaultMessage: 'Failed to authorize passkey registration'
-                    })
-            )
+            // Set error message for the passkey registration modal
+            setError(formatMessage(getPasskeyRegistrationErrorMessage(err)))
+            // Re-throw the error to be handled by the OTP auth modal
+            throw err
         } finally {
             setIsLoading(false)
         }
@@ -105,7 +103,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 throw new Error('WebAuthn API not available in this browser')
             }
 
-            // navigator.credentials.create() will show a browser/system prompt
+            // Step 4: navigator.credentials.create() will show a browser/system prompt
             // This may appear to hang if the user doesn't interact with the prompt
             let credential
             try {
@@ -124,7 +122,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 throw new Error('Failed to create credential: user cancelled or operation failed')
             }
 
-            // Step 4: Convert credential to JSON format before sending to SLAS
+            // Step 5: Convert credential to JSON format before sending to SLAS
             // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
             let credentialJson
             try {
@@ -147,30 +145,24 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 }
             }
 
-            // Step 5: Finish WebAuthn registration
+            // Step 6: Finish WebAuthn registration
             await finishWebauthnUserRegistration.mutateAsync({
                 username: customer.email,
                 credential: credentialJson,
                 pwd_action_token: code
             })
 
-            // Step 6: Close OTP modal and main modal on success
+            // Step 7: Close OTP modal and main modal on success
             setIsOtpAuthOpen(false)
             onClose()
 
             return {success: true}
         } catch (err) {
-            const errorMessage =
-                err.message ||
-                formatMessage({
-                    id: 'passkey_registration.modal.error.registration_failed',
-                    defaultMessage: 'Failed to register passkey'
-                })
-
+            console.error('Error registering passkey:', err)
             // Return error result for OTP component to display
             return {
                 success: false,
-                error: errorMessage
+                error: formatMessage(getPasskeyRegistrationErrorMessage(err))
             }
         } finally {
             setIsLoading(false)

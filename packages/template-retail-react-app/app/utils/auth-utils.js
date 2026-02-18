@@ -119,11 +119,25 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
 
 /**
  * Maps errors from SLAS WebAuthn APIs to user-friendly message descriptors.
- * Used for both passkey login and registration auth helpers.
+ * Used for passkey login auth helpers.
  *
  * Passkey Login:
  * - StartWebauthnAuthentication
  * - FinishWebauthnAuthentication
+ *
+ * @param {Error} error - The error from the API
+ * @returns {Object} - The message descriptor (from defineMessage) for formatMessage
+ */
+export const getPasskeyAuthenticateErrorMessage = (error) => {
+    if (error.response?.status === 400 || error.response?.status === 401) {
+        return FEATURE_UNAVAILABLE_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps errors from SLAS WebAuthn APIs to user-friendly message descriptors.
+ * Used for passkey registration auth helpers.
  *
  * Passkey Registration:
  * - AuthorizeWebauthnRegistration
@@ -133,7 +147,7 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
  * @param {Error} error - The error from the API
  * @returns {Object} - The message descriptor (from defineMessage) for formatMessage
  */
-export const getPasskeyErrorMessage = (error) => {
+export const getPasskeyRegistrationErrorMessage = (error) => {
     // Too many requests error is only returned by AuthorizeWebauthnRegistration
     if (TOO_MANY_REQUESTS_ERROR.test(error.message)) {
         return TOO_MANY_PASSKEY_REGISTRATION_ATTEMPTS_ERROR_MESSAGE
