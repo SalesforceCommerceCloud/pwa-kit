@@ -9,13 +9,25 @@ import PropTypes from 'prop-types'
 import {Stack, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 import RecentSearches from '@salesforce/retail-react-app/app/components/search/partials/recent-searches'
 import SuggestionSection from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions-section'
+import AskAssistantBanner from '@salesforce/retail-react-app/app/components/search/partials/ask-assistant-banner'
 
-const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
+const SearchSuggestions = ({
+    recentSearches,
+    searchSuggestions,
+    closeAndNavigate,
+    enableAgentFromSearchSuggestions,
+    onAskAssistantClick
+}) => {
     const styles = useMultiStyleConfig('SearchSuggestions')
     const hasCategories = searchSuggestions?.categorySuggestions?.length
     const hasProducts = searchSuggestions?.productSuggestions?.length
     const hasBrands = searchSuggestions?.brandSuggestions?.length
-    const hasSuggestions = hasCategories || hasProducts || hasBrands
+    const hasPopularSearches = searchSuggestions?.popularSearchSuggestions?.length
+    const hasRecentSearches = searchSuggestions?.recentSearchSuggestions?.length
+    const hasSuggestions =
+        hasCategories || hasProducts || hasBrands || hasPopularSearches || hasRecentSearches
+    const showAskAssistantBanner =
+        enableAgentFromSearchSuggestions === 'true' || enableAgentFromSearchSuggestions === true
 
     return (
         <Stack {...styles.container}>
@@ -24,12 +36,19 @@ const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}
                     searchSuggestions={searchSuggestions}
                     closeAndNavigate={closeAndNavigate}
                     styles={styles}
+                    showAskAssistantBanner={showAskAssistantBanner}
+                    onAskAssistantClick={onAskAssistantClick}
                 />
             ) : (
-                <RecentSearches
-                    recentSearches={recentSearches}
-                    closeAndNavigate={closeAndNavigate}
-                />
+                <>
+                    <RecentSearches
+                        recentSearches={recentSearches}
+                        closeAndNavigate={closeAndNavigate}
+                    />
+                    {showAskAssistantBanner && onAskAssistantClick && (
+                        <AskAssistantBanner onClick={onAskAssistantClick} styles={styles} />
+                    )}
+                </>
             )}
         </Stack>
     )
@@ -38,7 +57,9 @@ const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}
 SearchSuggestions.propTypes = {
     recentSearches: PropTypes.array,
     searchSuggestions: PropTypes.object,
-    closeAndNavigate: PropTypes.func
+    closeAndNavigate: PropTypes.func,
+    enableAgentFromSearchSuggestions: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    onAskAssistantClick: PropTypes.func
 }
 
 export default SearchSuggestions

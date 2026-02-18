@@ -7,7 +7,6 @@
 
 // Re-export all tools from their respective files
 export {default as CreateAppGuidelinesTool} from './create-app-guideline.js'
-export {default as CreateNewComponentTool} from './create-new-component.js'
 export {default as DeveloperGuidelinesTool} from './developer-guideline.js'
 export {TestWithPlaywrightTool} from './site-test.js'
 export {default as CreateNewPageTool} from './create-new-page-tool.js'

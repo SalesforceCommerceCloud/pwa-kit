@@ -20,7 +20,7 @@ describe('Shopper Customers hooks', () => {
             'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
             'getPublicProductListItems', // TODO: Implement when the endpoint exits closed beta
             'registerExternalProfile', // TODO: Implement when the endpoint exits closed beta
-            'updateCustomerPaymentInstrument', // TODO: Implement when needed
+            'updateCustomerPaymentInstrument' // TODO: Implement when needed
         ])
     })
     test('all mutations have cache update logic', () => {

@@ -5,12 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
+import {useState, useCallback, useEffect} from 'react'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import {
     stateOptions,
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
+import {
+    processAddressSuggestion,
+    setAddressFieldValues
+} from '@salesforce/retail-react-app/app/utils/address-suggestions'
+import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
@@ -42,13 +48,127 @@ export default function useAddressFields({
     form: {
         watch,
         control,
+        setValue,
         formState: {errors}
     },
     prefix = ''
 }) {
     const {formatMessage} = useIntl()
 
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [isDismissed, setIsDismissed] = useState(false)
+    const [currentInput, setCurrentInput] = useState('')
+    const [isAutocompleted, setIsAutocompleted] = useState(false)
+    const [previousCountry, setPreviousCountry] = useState(undefined)
+
     const countryCode = watch('countryCode')
+
+    const {suggestions, isLoading, resetSession} = useAutocompleteSuggestions(
+        currentInput,
+        countryCode
+    )
+
+    const clearAddressFields = useCallback(() => {
+        setValue(`${prefix}address1`, '')
+        setValue(`${prefix}city`, '')
+        setValue(`${prefix}stateCode`, '')
+        setValue(`${prefix}postalCode`, '')
+        setCurrentInput('')
+        setShowDropdown(false)
+        setIsDismissed(false)
+        resetSession()
+    }, [prefix, setValue, resetSession])
+
+    useEffect(() => {
+        if (isAutocompleted) {
+            return
+        }
+
+        // Only clear fields if the country actually changed from a previous value (not initial load)
+        if (countryCode && previousCountry !== undefined && countryCode !== previousCountry) {
+            clearAddressFields()
+        }
+
+        setPreviousCountry(countryCode)
+    }, [countryCode, clearAddressFields, isAutocompleted, previousCountry])
+
+    const handleAddressInputChange = useCallback((value) => {
+        setCurrentInput(value)
+
+        if (!value || value.length < 3) {
+            setShowDropdown(false)
+        } else {
+            setShowDropdown(true)
+            setIsDismissed(false)
+        }
+    }, [])
+
+    const handleAddressFocus = useCallback(() => {
+        setIsDismissed(false) // Reset dismissal on new focus
+    }, [])
+
+    const handleAddressCut = useCallback(
+        (e) => {
+            const newValue = e.target.value
+            handleAddressInputChange(newValue)
+        },
+        [handleAddressInputChange]
+    )
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            const addressInput = document.querySelector(`input[name="${prefix}address1"]`)
+            const dropdown = document.querySelector('[data-testid="address-suggestion-dropdown"]')
+
+            if (
+                addressInput &&
+                dropdown &&
+                !addressInput.contains(event.target) &&
+                !dropdown.contains(event.target)
+            ) {
+                setShowDropdown(false)
+                setIsDismissed(true)
+                resetSession()
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [prefix, setShowDropdown, setIsDismissed, resetSession])
+
+    const handleDropdownClose = useCallback(() => {
+        setShowDropdown(false)
+        setIsDismissed(true)
+        resetSession()
+    }, [setShowDropdown, setIsDismissed, resetSession])
+
+    const handleSuggestionSelect = useCallback(
+        async (suggestion) => {
+            try {
+                setIsAutocompleted(true)
+
+                const addressFields = await processAddressSuggestion(suggestion)
+
+                setAddressFieldValues(setValue, prefix, addressFields)
+
+                resetSession()
+                setShowDropdown(false)
+                setIsDismissed(true)
+                setCurrentInput('')
+
+                setTimeout(() => {
+                    setIsAutocompleted(false)
+                }, 100)
+            } catch (error) {
+                console.error('Error parsing address suggestion:', error)
+                setIsAutocompleted(false)
+            }
+        },
+        [prefix, setValue, resetSession, setIsAutocompleted]
+    )
 
     const fields = {
         firstName: {
@@ -130,7 +250,25 @@ export default function useAddressFields({
                 })
             },
             error: errors[`${prefix}address1`],
-            control
+            control,
+            inputProps: ({onChange}) => ({
+                onChange(evt) {
+                    onChange(evt.target.value)
+                    handleAddressInputChange(evt.target.value)
+                },
+                onFocus: handleAddressFocus,
+                onCut: handleAddressCut
+            }),
+            autocomplete: {
+                suggestions,
+                showDropdown,
+                isLoading,
+                isDismissed,
+                onInputChange: handleAddressInputChange,
+                onFocus: handleAddressFocus,
+                onClose: handleDropdownClose,
+                onSelectSuggestion: handleSuggestionSelect
+            }
         },
         city: {
             name: `${prefix}city`,

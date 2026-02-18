@@ -34,7 +34,7 @@ import {
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -73,7 +73,9 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = useAppOrigin()
 
-    const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
+    const passwordlessCallbackURI = getPasswordlessCallbackUrl(
+        locals.appConfig.login?.passwordless?.callbackURI
+    )
 
     const storeLocatorConfig = {
         radius: STORE_LOCATOR_RADIUS,
@@ -89,9 +91,6 @@ const AppConfig = ({children, locals = {}}) => {
     const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
-    const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)
-        ? passwordlessCallback
-        : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
     return (
         <CommerceApiProvider
@@ -102,7 +101,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={redirectURI}
-            passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
+            passwordlessLoginCallbackURI={passwordlessCallbackURI}
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}

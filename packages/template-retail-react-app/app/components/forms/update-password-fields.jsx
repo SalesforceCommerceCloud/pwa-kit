@@ -17,7 +17,7 @@ import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components
 import Field from '@salesforce/retail-react-app/app/components/field'
 import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
 
-const UpdatePasswordFields = ({form, prefix = ''}) => {
+const UpdatePasswordFields = ({form, prefix = '', handleForgotPasswordClick}) => {
     const fields = useUpdatePasswordFields({form, prefix})
     const password = form.watch('password')
 
@@ -25,14 +25,16 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
         <Stack spacing={5} divider={<StackDivider borderColor="gray.100" />}>
             <Stack>
                 <Field {...fields.currentPassword} />
-                <Box>
-                    <Button variant="link" size="sm" onClick={() => null}>
-                        <FormattedMessage
-                            defaultMessage="Forgot Password?"
-                            id="update_password_fields.button.forgot_password"
-                        />
-                    </Button>
-                </Box>
+                {handleForgotPasswordClick && (
+                    <Box>
+                        <Button variant="link" size="sm" onClick={handleForgotPasswordClick}>
+                            <FormattedMessage
+                                defaultMessage="Forgot Password?"
+                                id="update_password_fields.button.forgot_password"
+                            />
+                        </Button>
+                    </Box>
+                )}
             </Stack>
 
             <Stack spacing={3} pb={2}>
@@ -45,6 +47,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
 }
 
 UpdatePasswordFields.propTypes = {
+    handleForgotPasswordClick: PropTypes.func,
     /** Object returned from `useForm` */
     form: PropTypes.object.isRequired,
 

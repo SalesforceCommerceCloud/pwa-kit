@@ -23,14 +23,14 @@ describe('LoginForm', () => {
             expect(screen.getByText(/Welcome Back/)).toBeInTheDocument()
             expect(screen.getByLabelText('Email')).toBeInTheDocument()
             expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
-            expect(screen.getByRole('button', {name: 'Continue Securely'})).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: 'Continue'})).toBeInTheDocument()
             expect(screen.getByText(/Or Login With/)).toBeInTheDocument()
             expect(screen.getByRole('button', {name: 'Password'})).toBeInTheDocument()
             expect(screen.getByText(/Don't have an account/)).toBeInTheDocument()
             expect(screen.getByRole('button', {name: 'Create account'})).toBeInTheDocument()
         })
 
-        test('renders form errors when "Continue Securely" button is clicked', async () => {
+        test('renders form errors when "Continue" button is clicked', async () => {
             const mockPasswordlessLoginClick = jest.fn()
             const {user} = renderWithProviders(
                 <WrapperComponent
@@ -39,7 +39,7 @@ describe('LoginForm', () => {
                 />
             )
 
-            await user.click(screen.getByRole('button', {name: 'Continue Securely'}))
+            await user.click(screen.getByRole('button', {name: 'Continue'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
         })
 

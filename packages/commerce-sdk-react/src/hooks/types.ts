@@ -6,8 +6,8 @@
  */
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
-    ShopperBasketsV2,
-    ShopperContexts,
+    ShopperBaskets,
+    ShopperConfigurations,
     ShopperCustomers,
     ShopperExperience,
     ShopperGiftCertificates,
@@ -86,7 +86,7 @@ export type ApiClientConfigParams = {
  * A map of commerce-sdk-isomorphic API client instances.
  */
 export interface ApiClients {
-    shopperBaskets?: ShopperBasketsV2<ApiClientConfigParams>
+    shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>
@@ -218,7 +218,7 @@ export type CacheUpdateMatrix<Client extends ApiClient> = {
         : never
 }
 
-type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
+export type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
 type CustomEndpointArgClientConfig = CustomEndpointArg['clientConfig']
 // The commerce-sdk-isomorphic custom endpoint helper REQUIRES clientConfig as mandatory argument
 // But we inject the configs for users from the provider, so this custom type is created

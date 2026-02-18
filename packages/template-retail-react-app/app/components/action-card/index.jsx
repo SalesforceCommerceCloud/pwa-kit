@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Box, Button, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
@@ -23,6 +23,7 @@ const ActionCard = ({
     editBtnRef,
     editBtnLabel,
     removeBtnLabel,
+    footerLeft,
     ...props
 }) => {
     const [showLoading, setShowLoading] = useState(false)
@@ -49,34 +50,40 @@ const ActionCard = ({
             {showLoading && <LoadingSpinner />}
             <Stack spacing={3}>
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
-                    {onEdit && (
-                        <Button
-                            onClick={onEdit}
-                            variant="link"
-                            size="sm"
-                            ref={editBtnRef}
-                            aria-label={editBtnLabel}
-                        >
-                            <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
-                        </Button>
-                    )}
-                    {onRemove && (
-                        <Button
-                            variant="link"
-                            size="sm"
-                            colorScheme="red"
-                            onClick={handleRemove}
-                            color="red.600"
-                            aria-label={removeBtnLabel}
-                        >
-                            <FormattedMessage
-                                defaultMessage="Remove"
-                                id="action_card.action.remove"
-                            />
-                        </Button>
-                    )}
-                </Stack>
+                <Flex align="center" justify="space-between">
+                    <Box>{footerLeft}</Box>
+                    <Stack direction="row" spacing={4} align="center">
+                        {onEdit && (
+                            <Button
+                                onClick={onEdit}
+                                variant="link"
+                                size="sm"
+                                ref={editBtnRef}
+                                aria-label={editBtnLabel}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Edit"
+                                    id="action_card.action.edit"
+                                />
+                            </Button>
+                        )}
+                        {onRemove && (
+                            <Button
+                                variant="link"
+                                size="sm"
+                                colorScheme="red"
+                                onClick={handleRemove}
+                                color="red.600"
+                                aria-label={removeBtnLabel}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Remove"
+                                    id="action_card.action.remove"
+                                />
+                            </Button>
+                        )}
+                    </Stack>
+                </Flex>
             </Stack>
         </Box>
     )
@@ -99,7 +106,10 @@ ActionCard.propTypes = {
     editBtnLabel: PropTypes.string,
 
     /** Accessibility label for remove button */
-    removeBtnLabel: PropTypes.string
+    removeBtnLabel: PropTypes.string,
+
+    /** Optional left-side footer content (e.g., Make default checkbox) */
+    footerLeft: PropTypes.node
 }
 
 export default ActionCard

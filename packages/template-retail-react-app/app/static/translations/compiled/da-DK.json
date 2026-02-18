@@ -1657,6 +1657,12 @@
       "value": "Vis"
     }
   ],
+  "header.button.assistive_msg.ask_shopping_agent": [
+    {
+      "type": 0,
+      "value": "Spørg shoppingassistenten"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
