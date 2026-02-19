@@ -132,6 +132,13 @@ const runGenerator = () => {
     console.log(`Clearing npx cache at ${pathToNpxCache}`)
     sh.rm('-rf', pathToNpxCache)
 
+    // Clean the npm cache to avoid ECOMPROMISED errors on Windows.
+    // The earlier `npm ci` step populates the cache with integrity hashes from the
+    // public npm registry. When Verdaccio serves locally-built packages with different
+    // integrity hashes, npm (especially v11+) throws ECOMPROMISED on Windows.
+    console.log('Cleaning npm cache to avoid integrity conflicts with local registry')
+    sh.exec('npm cache clean --force', {silent: true})
+
     console.log('Running the generator')
     cp.execSync(
         `npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`,

@@ -460,8 +460,8 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
-  "checkout_contact_info.action.edit": {
-    "defaultMessage": "Edit"
+  "checkout_contact_info.action.change": {
+    "defaultMessage": "Change"
   },
   "checkout_contact_info.action.sign_out": {
     "defaultMessage": "Sign Out"
@@ -1676,6 +1676,12 @@
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Discover, compare, and shop smarter with your personal Shopping Agent."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Ask Shopping Agent"
+  },
   "search.suggestions.categories": {
     "defaultMessage": "Categories"
   },
@@ -1962,6 +1968,12 @@
     "defaultMessage": "{label}:"
   },
   "toggle_card.action.change": {
+    "defaultMessage": "Change"
+  },
+  "toggle_card.action.changePaymentInfo": {
+    "defaultMessage": "Change"
+  },
+  "toggle_card.action.changeShippingOptions": {
     "defaultMessage": "Change"
   },
   "toggle_card.action.edit": {

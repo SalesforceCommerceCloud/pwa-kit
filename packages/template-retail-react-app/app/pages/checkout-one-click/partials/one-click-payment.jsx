@@ -441,8 +441,8 @@ const Payment = ({
                 disabled={appliedPayment == null}
                 onEdit={handleEditPayment}
                 editLabel={formatMessage({
-                    defaultMessage: 'Edit Payment Info',
-                    id: 'toggle_card.action.editPaymentInfo'
+                    defaultMessage: 'Change',
+                    id: 'toggle_card.action.changePaymentInfo'
                 })}
             >
                 <ToggleCardEdit>
@@ -528,27 +528,28 @@ const Payment = ({
                                         isBillingAddress
                                     />
                                 )}
-                                {(isGuest || showRegistrationNotice) && (
-                                    <UserRegistration
-                                        enableUserRegistration={enableUserRegistration}
-                                        setEnableUserRegistration={onUserRegistrationToggle}
-                                        onLoadingChange={onOtpLoadingChange}
-                                        isGuestCheckout={registeredUserChoseGuest}
-                                        isDisabled={
-                                            !(
-                                                appliedPayment ||
-                                                paymentMethodForm.formState.isValid ||
-                                                (isPickupOnly &&
-                                                    billingAddressForm.formState.isValid)
-                                            ) ||
-                                            (!effectiveBillingSameAsShipping &&
-                                                !billingAddressForm.formState.isValid)
-                                        }
-                                        onSavePreferenceChange={onSavePreferenceChange}
-                                        onRegistered={handleRegistrationSuccess}
-                                        showNotice={showRegistrationNotice}
-                                    />
-                                )}
+                                {(isGuest || showRegistrationNotice) &&
+                                    !registeredUserChoseGuest && (
+                                        <UserRegistration
+                                            enableUserRegistration={enableUserRegistration}
+                                            setEnableUserRegistration={onUserRegistrationToggle}
+                                            onLoadingChange={onOtpLoadingChange}
+                                            isGuestCheckout={registeredUserChoseGuest}
+                                            isDisabled={
+                                                !(
+                                                    appliedPayment ||
+                                                    paymentMethodForm.formState.isValid ||
+                                                    (isPickupOnly &&
+                                                        billingAddressForm.formState.isValid)
+                                                ) ||
+                                                (!effectiveBillingSameAsShipping &&
+                                                    !billingAddressForm.formState.isValid)
+                                            }
+                                            onSavePreferenceChange={onSavePreferenceChange}
+                                            onRegistered={handleRegistrationSuccess}
+                                            showNotice={showRegistrationNotice}
+                                        />
+                                    )}
                             </Stack>
                         </>
                     ) : null}
@@ -579,8 +580,7 @@ const Payment = ({
 
                         <Divider borderColor="gray.100" />
 
-                        {(selectedBillingAddress ||
-                            (effectiveBillingSameAsShipping && selectedShippingAddress)) && (
+                        {selectedBillingAddress && !effectiveBillingSameAsShipping && (
                             <Stack spacing={2}>
                                 <Heading as="h3" fontSize="md">
                                     <FormattedMessage
@@ -588,13 +588,11 @@ const Payment = ({
                                         id="checkout_payment.heading.billing_address"
                                     />
                                 </Heading>
-                                <AddressDisplay
-                                    address={selectedBillingAddress || selectedShippingAddress}
-                                />
+                                <AddressDisplay address={selectedBillingAddress} />
                             </Stack>
                         )}
 
-                        {(isGuest || showRegistrationNotice) && (
+                        {(isGuest || showRegistrationNotice) && !registeredUserChoseGuest && (
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}

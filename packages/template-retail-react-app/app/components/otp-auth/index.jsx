@@ -12,6 +12,7 @@ import {
     Button,
     Input,
     SimpleGrid,
+    Spinner,
     Stack,
     Text,
     HStack,
@@ -271,6 +272,17 @@ const OtpAuth = ({
                                 ))}
                             </SimpleGrid>
 
+                            {/* Loading spinner during verification */}
+                            {isVerifying && (
+                                <Spinner
+                                    size="sm"
+                                    color="blue.500"
+                                    role="status"
+                                    aria-live="polite"
+                                    data-testid="otp-verifying-spinner"
+                                />
+                            )}
+
                             {/* Error message */}
                             {error && (
                                 <Text fontSize="sm" color="red.500" textAlign="center">
@@ -290,7 +302,7 @@ const OtpAuth = ({
                             )}
 
                             {/* Buttons */}
-                            <HStack spacing={4} width="100%" justifyContent="flex-end">
+                            <HStack spacing={4} width="100%" justifyContent="center">
                                 {!hideCheckoutAsGuestButton && (
                                     <Button
                                         onClick={handleCheckoutAsGuest}

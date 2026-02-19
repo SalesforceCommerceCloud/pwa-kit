@@ -120,6 +120,31 @@ export const parseCacheControl = (value) => {
 }
 
 /**
+ * Parse a request URL using the WHATWG URL constructor, constructing a
+ * base URL from the request's protocol and host header when available.
+ * Falls back to 'http://localhost' as the base when host information is
+ * not present — in that case, do not rely on `origin` or `href` from
+ * the returned URL since they will contain the placeholder base.
+ *
+ * @param {Object} req - Express-like request object with `url`, `protocol`,
+ *   `headers.host`, and optionally `socket.encrypted` properties.
+ * @returns {{pathname: string, search: string, query: string|null}}
+ *   `pathname` – the URL path, `search` – the full query string including
+ *   leading `?` (or empty string), `query` – the query string without `?`
+ *   (or null if there is none).
+ */
+export const parseRequestUrl = (req) => {
+    const proto = req.protocol || (req.socket?.encrypted ? 'https' : 'http')
+    const base = `${proto}://${req.headers?.host || 'localhost'}`
+    const {pathname, search} = new URL(req.url, base)
+    return {
+        pathname,
+        search,
+        query: search ? search.slice(1) : null
+    }
+}
+
+/**
  * Type checking utility functions
  */
 export const isString = (element) => typeof element === 'string'
@@ -140,4 +165,24 @@ export const forEachIn = (iterable, functionRef) => {
     Object.keys(iterable).forEach((key) => {
         functionRef(key, iterable[key])
     })
+}
+
+/**
+ * Log an internal MRT error.
+ *
+ * @param namespace Namespace for the error (e.g. data_store, redirect) to facilitate searching
+ * @param err Error to log
+ * @param context Optional context to include in the log
+ */
+export const logMRTError = (namespace, err, context) => {
+    const error = err instanceof Error ? err : new Error(String(err))
+    console.error(
+        JSON.stringify({
+            [`__MRT__${namespace}`]: 'error',
+            type: 'MRT_internal',
+            error: error.message,
+            stack: error.stack,
+            ...context
+        })
+    )
 }

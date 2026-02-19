@@ -6,7 +6,7 @@ Welcome to the PWA Kit!
 
 ### Requirements
 
--   Node 18 or later
+-   Node 18, 20, 22, or 24
 -   npm 9 or later
 
 ### Run the Project Locally
