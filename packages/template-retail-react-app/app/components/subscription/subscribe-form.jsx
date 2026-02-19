@@ -8,11 +8,10 @@ import React, {useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
+    Flex,
     Text,
     Heading,
     Input,
-    InputGroup,
-    InputRightElement,
     Button,
     Alert,
     AlertIcon,
@@ -36,7 +35,7 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
         subscribeHeading: subscribeFormStyles.heading,
         subscribeMessage: subscribeFormStyles.message,
         subscribeField: subscribeFormStyles.field,
-        subscribeButtonContainer: subscribeFormStyles.buttonContainer,
+        subscribeButton: subscribeFormStyles.button,
         socialIcons: subscribeFormStyles.socialIcons,
         subscribeDisclaimer: subscribeFormStyles.disclaimer
     }
@@ -102,7 +101,7 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
             )}
 
             <Box>
-                <InputGroup>
+                <Flex>
                     <Input
                         ref={emailInputRef}
                         type="email"
@@ -119,17 +118,16 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
                         id="subscribe-email"
                         {...styles.subscribeField}
                     />
-                    <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button
-                            variant="footer"
-                            onClick={actions?.submit}
-                            isLoading={state?.isLoading}
-                            loadingText={messages.buttonSignUp}
-                        >
-                            {messages.buttonSignUp}
-                        </Button>
-                    </InputRightElement>
-                </InputGroup>
+                    <Button
+                        variant="footer"
+                        onClick={actions?.submit}
+                        isLoading={state?.isLoading}
+                        loadingText={messages.buttonSignUp}
+                        {...styles.subscribeButton}
+                    >
+                        {messages.buttonSignUp}
+                    </Button>
+                </Flex>
 
                 <Text {...styles.subscribeDisclaimer}>
                     <FormattedMessage

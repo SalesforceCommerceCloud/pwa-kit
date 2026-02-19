@@ -10,7 +10,7 @@ export default {
         'heading',
         'message',
         'field',
-        'buttonContainer',
+        'button',
         'socialIcons',
         'link',
         'disclaimer'
@@ -30,10 +30,14 @@ export default {
         },
         field: {
             background: 'white',
-            color: 'gray.900'
+            color: 'gray.900',
+            borderRightRadius: 0
         },
-        buttonContainer: {
-            width: 'auto'
+        button: {
+            borderLeftRadius: 0,
+            height: 'auto',
+            paddingLeft: 4,
+            paddingRight: 4
         },
         socialIcons: {
             marginTop: 4
