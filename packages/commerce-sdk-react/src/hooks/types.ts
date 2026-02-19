@@ -8,6 +8,8 @@ import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@t
 import {
     ShopperBaskets,
     ShopperConfigurations,
+    ShopperBasketsV2,
+    ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
     ShopperGiftCertificates,
