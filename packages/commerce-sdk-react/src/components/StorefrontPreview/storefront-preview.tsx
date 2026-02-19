@@ -18,8 +18,18 @@ type ContextChangeHandler = () => void | Promise<void>
 type OptionalWhenDisabled<T> = ({enabled?: true} & T) | ({enabled: false} & Partial<T>)
 
 /**
+ * Remove the base path from a path string.
+ * Only strips when path equals basePath or path starts with basePath + '/'.
+ */
+function removeBasePathFromPath(path: string, basePath: string): string {
+    const matches =
+        path.startsWith(basePath + '/') || path === basePath
+    return matches ? path.slice(basePath.length) || '/' : path
+}
+
+/**
  * Strip the base path from a path
- * 
+ *
  * React Router history re-adds the base path to the path, so we
  * remove it here to avoid base path duplication.
  */
@@ -29,15 +39,13 @@ function removeBasePathFromLocation<T>(
 ): LocationDescriptor<T> {
     if (!basePath) return pathOrLocation
     if (typeof pathOrLocation === 'string') {
-        return pathOrLocation.startsWith(basePath)
-            ? pathOrLocation.slice(basePath.length) || '/'
-            : pathOrLocation
+        return removeBasePathFromPath(pathOrLocation, basePath) as LocationDescriptor<T>
     }
     const pathname = pathOrLocation.pathname ?? '/'
-    const strippedPathname = pathname.startsWith(basePath)
-        ? pathname.slice(basePath.length) || '/'
-        : pathname
-    return {...pathOrLocation, pathname: strippedPathname}
+    return {
+        ...pathOrLocation,
+        pathname: removeBasePathFromPath(pathname, basePath)
+    }
 }
 
 /**

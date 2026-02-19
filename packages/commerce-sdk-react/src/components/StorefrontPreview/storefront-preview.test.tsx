@@ -165,6 +165,54 @@ describe('Storefront Preview Component', function () {
         expect(mockPush).toHaveBeenCalledWith('/other/product/123')
     })
 
+    test('experimentalUnsafeNavigate does not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/shop'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/shopping/cart', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/shopping/cart')
+    })
+
+    test('experimentalUnsafeNavigate strips to / when path exactly equals basePath', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/mybase', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/')
+    })
+
+    test('experimentalUnsafeNavigate removes base path from location object when getBasePath is provided', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            {pathname: '/mybase/product/123', search: '?q=1'},
+            'push'
+        )
+        expect(mockPush).toHaveBeenCalledWith({pathname: '/product/123', search: '?q=1'})
+    })
+
     test('cache breaker is added to the parameters of SCAPI requests, only if in storefront preview', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
         mockQueryEndpoint('baskets/123', {})
