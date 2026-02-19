@@ -9,7 +9,8 @@ import {
     getLocaleByReference,
     getParamsFromPath,
     getDefaultSite,
-    getSiteByReference
+    getSiteByReference,
+    removeBasePathFromPath
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -121,9 +122,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
 
     // sanitize the base path from current url if existing
     const basePath = getRouterBasePath()
-    if (basePath && pathname.startsWith(basePath)) {
-        pathname = pathname.substring(basePath.length)
-    }
+    pathname = removeBasePathFromPath(pathname, basePath)
 
     // sanitize the site from current url if existing
     if (siteRef) {
@@ -269,9 +268,7 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
     let {siteRef, localeRef} = getParamsFromPath(pathName)
 
     const basePath = getRouterBasePath()
-    if (basePath && pathName.startsWith(basePath)) {
-        pathName = pathName.substring(basePath.length)
-    }
+    pathName = removeBasePathFromPath(pathName, basePath)
 
     // remove the site alias from the current pathName
     if (siteRef) {

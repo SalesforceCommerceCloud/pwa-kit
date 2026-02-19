@@ -1,6 +1,7 @@
 ## v3.16.0-dev (Dec 17, 2025)
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
+- Update storefront preview to support base paths [#3666](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3666)
 
 ## v3.15.0 (Dec 17, 2025)
 - Fix multiple set-cookie headers [#3508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3508)
