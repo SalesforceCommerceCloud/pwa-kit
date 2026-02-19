@@ -36,14 +36,21 @@
  * A test bundle file is available at `/mobify/bundle/<BUNDLE_NUMBER>/assets/mobify.png`
  * where BUNDLE_NUMBER is the most recently published bundle number.
  */
-
-const path = require('path')
-const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const pkg = require('../package.json')
-const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
-const {isolationTests} = require('./isolation-actions')
+const basicAuth = require('express-basic-auth')
 const fs = require('fs').promises
+const path = require('path')
+
+const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
+const {
+    DataStore,
+    DataStoreNotFoundError,
+    DataStoreServiceError,
+    DataStoreUnavailableError
+} = require('@salesforce/pwa-kit-runtime/utils/ssr-server/data-store')
+
+const {isolationTests} = require('./isolation-actions')
+const pkg = require('../package.json')
 
 /**
  * Custom error class
@@ -342,6 +349,33 @@ const headerTest = async (req, res) => {
 }
 
 /**
+ * Fetch an entry from the data store by key and return it as JSON.
+ */
+const dataStoreTest = async (req, res) => {
+    const store = DataStore.getDataStore()
+
+    if (!store.isDataStoreAvailable()) {
+        return res.json({dataStore: false})
+    }
+
+    let result
+    try {
+        result = await store.getEntry(req.params.key)
+    } catch (err) {
+        if (err instanceof DataStoreUnavailableError) {
+            return res.status(400).json({error: err.message})
+        } else if (err instanceof DataStoreNotFoundError) {
+            return res.status(404).json({error: err.message})
+        } else if (err instanceof DataStoreServiceError) {
+            return res.status(500).json({error: err.message})
+        }
+        throw err
+    }
+
+    return res.json(result)
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -423,6 +457,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/set-response-headers', responseHeadersTest)
     app.get('/ssr-shared', ssrShared)
     app.get('/streaming-large', streamingLarge)
+    app.get('/data-store/:key', dataStoreTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

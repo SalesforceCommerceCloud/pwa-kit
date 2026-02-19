@@ -1,8 +1,10 @@
-## v3.16.0-dev (Dec 17, 2025)
+## v3.17.0-dev
 - Clear verdaccio npm cache during project generation [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
+## v3.16.0 (Feb 12, 2026)
 - Add new One-Click Checkout configuration [#3609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3609)
-- Support email mode by default for passwordless login and password reset in a generated app. [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+- Support email mode by default for passwordless login and password reset in a generated app [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 - Add `tokenLength` to login configuration [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 
