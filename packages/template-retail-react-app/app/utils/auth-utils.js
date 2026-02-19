@@ -33,11 +33,6 @@ export const PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     id: 'global.error.passkey_feature_unavailable',
     defaultMessage: 'The passkey feature is currently unavailable'
 })
-export const PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE = defineMessage({
-    id: 'global.error.passkey_api_error',
-    defaultMessage:
-        'Something went wrong while authenticating your passkey. Try again or use a different login method.'
-})
 
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
@@ -137,7 +132,7 @@ export const getPasskeyAuthenticateErrorMessage = (error) => {
     if (error.response?.status === 400 || error.response?.status === 401) {
         return PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
-    return PASSKEY_AUTHENTICATION_API_ERROR_MESSAGE
+    return API_ERROR_MESSAGE
 }
 
 /**

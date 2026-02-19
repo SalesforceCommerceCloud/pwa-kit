@@ -4347,6 +4347,20 @@
       "value": "]"
     }
   ],
+  "global.error.passkey_feature_unavailable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħḗḗ ƥȧȧşşķḗḗẏ ƒḗḗȧȧŧŭŭřḗḗ īş ƈŭŭřřḗḗƞŧŀẏ ŭŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
@@ -6841,34 +6855,6 @@
     {
       "type": 0,
       "value": "Řḗḗɠīşŧḗḗř Ƥȧȧşşķḗḗẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "passkey_registration.modal.error.authorize_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ȧȧŭŭŧħǿǿřīẑḗḗ ƥȧȧşşķḗḗẏ řḗḗɠīşŧřȧȧŧīǿǿƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "passkey_registration.modal.error.registration_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ řḗḗɠīşŧḗḗř ƥȧȧşşķḗḗẏ"
     },
     {
       "type": 0,

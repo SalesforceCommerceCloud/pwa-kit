@@ -2091,6 +2091,12 @@
       "value": "Invalid token, please try again."
     }
   ],
+  "global.error.passkey_feature_unavailable": [
+    {
+      "type": 0,
+      "value": "The passkey feature is currently unavailable"
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
@@ -3253,18 +3259,6 @@
     {
       "type": 0,
       "value": "Register Passkey"
-    }
-  ],
-  "passkey_registration.modal.error.authorize_failed": [
-    {
-      "type": 0,
-      "value": "Failed to authorize passkey registration"
-    }
-  ],
-  "passkey_registration.modal.error.registration_failed": [
-    {
-      "type": 0,
-      "value": "Failed to register passkey"
     }
   ],
   "passkey_registration.modal.label.nickname": [

@@ -242,6 +242,7 @@ export const AuthModal = ({
             loginWithPasskey().catch((error) => {
                 const message = formatMessage(getPasskeyAuthenticateErrorMessage(error))
                 form.setError('global', {type: 'manual', message})
+                console.error('Error authenticating passkey:', error)
             })
         }
     }, [isOpen])

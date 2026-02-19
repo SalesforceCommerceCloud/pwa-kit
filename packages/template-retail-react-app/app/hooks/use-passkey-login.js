@@ -39,9 +39,17 @@ export const usePasskeyLogin = () => {
             return
         }
 
-        const startWebauthnAuthenticationResponse = await startWebauthnAuthentication.mutateAsync(
-            {}
-        )
+        let startWebauthnAuthenticationResponse
+        try {
+            startWebauthnAuthenticationResponse = await startWebauthnAuthentication.mutateAsync({})
+        } catch (error) {
+            // 412 is returned when user attempts to authenticate within 1 minute of a previous attempt
+            // We return early in this case to avoid showing an error to the user
+            if (error.response?.status === 412) {
+                return
+            }
+            throw error
+        }
 
         // Transform response for WebAuthn API to send to navigator.credentials.get()
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static

@@ -193,9 +193,9 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     useEffect(() => {
         loginWithPasskey().catch((error) => {
-            console.error('Error authenticating passkey:', error)
             const message = formatMessage(getPasskeyAuthenticateErrorMessage(error))
             form.setError('global', {type: 'manual', message})
+            console.error('Error authenticating passkey:', error)
         })
     }, [])
 
