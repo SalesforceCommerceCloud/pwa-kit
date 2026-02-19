@@ -76,6 +76,13 @@ export const StorefrontPreview = ({
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
+            if (process.env.NODE_ENV !== 'production' && !getBasePath) {
+                console.warn(
+                    '[StorefrontPreview] No getBasePath prop provided. ' +
+                        'If your app uses a base path for router routes (showBasePath is true in url config), ' +
+                        'pass getBasePath to avoid base path duplication during navigation.'
+                )
+            }
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
