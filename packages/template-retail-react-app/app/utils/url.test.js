@@ -201,6 +201,18 @@ describe('getPathWithLocale', () => {
         // Caller uses basePath + path for window.location or full href
         expect(`${basePath}${path}`).toBe(`${basePath}/uk/fr/category/newarrivals-womens`)
     })
+
+    test('getPathWithLocale does not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+        const basePath = '/shop'
+        getRouterBasePath.mockReturnValue(basePath)
+
+        const location = new URL('http://localhost:3000/shopping/cart')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'en-GB')
+
+        const path = getPathWithLocale('en-GB', buildUrl, {location})
+        expect(path).toContain('/shopping')
+        expect(path).not.toBe('/cart')
+    })
 })
 
 describe('createUrlTemplate tests', () => {

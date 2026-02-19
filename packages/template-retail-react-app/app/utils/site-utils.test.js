@@ -16,7 +16,8 @@ import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/uti
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
     getParamsFromPath,
-    resolveLocaleFromUrl
+    resolveLocaleFromUrl,
+    removeBasePathFromPath
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
@@ -341,6 +342,43 @@ describe('getParamsFromPath', function () {
             const result = getParamsFromPath(path)
             expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
         })
+
+        test('should not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+            const basePath = '/shop'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const result = getParamsFromPath('/shopping/cart')
+            expect(result).toBeDefined()
+        })
+    })
+})
+
+describe('removeBasePathFromPath', () => {
+    test('removes when path starts with basePath + "/"', () => {
+        expect(removeBasePathFromPath('/shop/cart', '/shop')).toBe('/cart')
+        expect(removeBasePathFromPath('/test-base/uk/en-GB/foo', '/test-base')).toBe(
+            '/uk/en-GB/foo'
+        )
+    })
+    test('removes to "/" when path exactly equals basePath', () => {
+        expect(removeBasePathFromPath('/shop', '/shop')).toBe('/')
+    })
+    test('does not remove when basePath is only a substring (e.g. /shop vs /shopping/cart)', () => {
+        expect(removeBasePathFromPath('/shopping/cart', '/shop')).toBe('/shopping/cart')
+        expect(removeBasePathFromPath('/shopping', '/shop')).toBe('/shopping')
+    })
+    test('returns path unchanged when basePath is empty', () => {
+        expect(removeBasePathFromPath('/any/path', '')).toBe('/any/path')
     })
 })
 

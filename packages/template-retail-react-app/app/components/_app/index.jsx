@@ -303,7 +303,7 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview getToken={getTokenWhenReady}>
+            <StorefrontPreview getToken={getTokenWhenReady} getBasePath={getRouterBasePath}>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
