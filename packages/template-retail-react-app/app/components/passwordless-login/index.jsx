@@ -20,7 +20,7 @@ const PasswordlessLogin = ({
     handlePasswordlessLoginClick,
     isSocialEnabled = false,
     idps = [],
-    setLoginType = noop
+    setLoginType: _setLoginType = noop
 }) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
