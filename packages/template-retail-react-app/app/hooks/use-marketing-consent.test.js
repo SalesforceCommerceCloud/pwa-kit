@@ -1038,9 +1038,7 @@ describe('useMarketingConsent', () => {
         test('isFeatureEnabled is false when value is string "true" (must be boolean)', () => {
             useConfigurations.mockReturnValue({
                 data: {
-                    configurations: [
-                        {id: 'EnableConsentWithMarketingCloud', value: 'true'}
-                    ]
+                    configurations: [{id: 'EnableConsentWithMarketingCloud', value: 'true'}]
                 }
             })
 

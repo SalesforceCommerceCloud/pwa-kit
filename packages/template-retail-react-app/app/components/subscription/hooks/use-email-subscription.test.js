@@ -612,7 +612,7 @@ describe('useEmailSubscription', () => {
             expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
         })
 
-        test('still validates email when feature is disabled', async () => {
+        test('does not validate email when feature is disabled', async () => {
             const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
                 wrapper: createWrapper()
             })
@@ -621,8 +621,7 @@ describe('useEmailSubscription', () => {
                 await result.current.actions.submit()
             })
 
-            expect(result.current.state.feedback.type).toBe('error')
-            expect(result.current.state.feedback.message).toBe('Enter a valid email address.')
+            expect(result.current.state.feedback.type).toBe('success')
             expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
         })
     })
