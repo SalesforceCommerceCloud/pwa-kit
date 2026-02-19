@@ -7,7 +7,6 @@
 import {
     applyProxyRequestHeaders,
     applyProxyRequestAuthHeader,
-    ALLOWED_CACHING_PROXY_REQUEST_METHODS,
     configureProxy
 } from './configure-proxy'
 import * as ssrProxying from '../ssr-proxying'
@@ -122,7 +121,10 @@ describe('applyProxyRequestAuthHeader', () => {
             slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
         })
 
-        expect(proxyRequest.setHeader).toHaveBeenCalledWith('authorization', 'Bearer test-access-token')
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer test-access-token'
+        )
     })
 
     it('applies Bearer token for SLAS logout endpoint', () => {
@@ -146,7 +148,10 @@ describe('applyProxyRequestAuthHeader', () => {
             slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
         })
 
-        expect(proxyRequest.setHeader).toHaveBeenCalledWith('authorization', 'Bearer test-access-token')
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer test-access-token'
+        )
     })
 
     it('does not apply Bearer token for SLAS token endpoint', () => {

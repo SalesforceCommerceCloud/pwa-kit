@@ -157,7 +157,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
     // Override 'omit' or unset to 'same-origin'; keep 'same-origin' or 'include' as-is.
     const effectiveFetchOptions =
-        useHttpOnlySessionCookies && (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
+        useHttpOnlySessionCookies &&
+        (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
             ? {...fetchOptions, credentials: 'same-origin' as RequestCredentials}
             : fetchOptions
 
