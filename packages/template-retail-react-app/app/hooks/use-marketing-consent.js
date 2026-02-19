@@ -7,10 +7,12 @@
 
 import {
     useSubscriptions,
+    useConfigurations,
     useShopperConsentsMutation,
     ShopperConsentsMutations
 } from '@salesforce/commerce-sdk-react'
 import {useEffect} from 'react'
+import {ENABLE_CONSENT_WITH_MARKETING_CLOUD} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 
 /**
  * A hook for managing customer marketing consent subscriptions.
@@ -75,6 +77,13 @@ import {useEffect} from 'react'
  * const hasEmailChannel = hasChannel('marketing-email', 'email')
  */
 export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) => {
+    // Check if the feature is enabled via Shopper Configurations
+    const {data: configurations} = useConfigurations()
+    const isFeatureEnabled =
+        configurations?.configurations?.find(
+            (config) => config.id === ENABLE_CONSENT_WITH_MARKETING_CLOUD
+        )?.value === true
+
     // Query hook to get current subscriptions
     const subscriptionsQuery = useSubscriptions(
         {
@@ -248,6 +257,9 @@ export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) =>
     }
 
     return {
+        // Feature flag from Shopper Configurations
+        isFeatureEnabled,
+
         // Query data and status
         data: subscriptionsQuery.data,
         isLoading: subscriptionsQuery.isLoading,

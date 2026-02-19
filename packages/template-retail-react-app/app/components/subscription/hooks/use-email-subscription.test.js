@@ -82,6 +82,7 @@ describe('useEmailSubscription', () => {
         useMarketingConsent.mockReturnValue({
             data: {data: mockMatchingSubscriptions},
             isLoading: false,
+            isFeatureEnabled: true,
             refetch: jest.fn().mockResolvedValue({data: {data: mockMatchingSubscriptions}}),
             updateSubscriptions: mockUpdateSubscriptions,
             isUpdating: false,
@@ -252,6 +253,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: []},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -281,6 +283,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: []},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -407,6 +410,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: [mockMatchingSubscriptions[0]]},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -576,6 +580,53 @@ describe('useEmailSubscription', () => {
         })
     })
 
+    describe('submit action - feature disabled (no-op)', () => {
+        beforeEach(() => {
+            useMarketingConsent.mockReturnValue({
+                data: {data: mockMatchingSubscriptions},
+                isLoading: false,
+                isFeatureEnabled: false,
+                refetch: jest.fn().mockResolvedValue({data: {data: mockMatchingSubscriptions}}),
+                updateSubscriptions: mockUpdateSubscriptions,
+                isUpdating: false,
+                getSubscriptionsByTagAndChannel: mockGetSubscriptionsByTagAndChannel
+            })
+        })
+
+        test('does nothing when feature is disabled', async () => {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.actions.setEmail('test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            expect(result.current.state.feedback.message).toBeNull()
+            expect(result.current.state.feedback.type).toBe('success')
+            expect(result.current.state.email).toBe('test@example.com')
+            expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
+        })
+
+        test('still validates email when feature is disabled', async () => {
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            await act(async () => {
+                await result.current.actions.submit()
+            })
+
+            expect(result.current.state.feedback.type).toBe('error')
+            expect(result.current.state.feedback.message).toBe('Enter a valid email address.')
+            expect(mockUpdateSubscriptions).not.toHaveBeenCalled()
+        })
+    })
+
     describe('Loading states', () => {
         test('reflects isUpdating state from useMarketingConsent', () => {
             useMarketingConsent.mockReturnValue({
@@ -619,6 +670,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: mockCheckoutSubscriptions},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -682,6 +734,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: mockApiFormatSubscriptions},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -736,6 +789,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: mockMultipleTagsSubscriptions},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -794,6 +848,7 @@ describe('useEmailSubscription', () => {
 
             useMarketingConsent.mockReturnValue({
                 data: {data: mockMixedChannelSubscriptions},
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false
@@ -849,6 +904,7 @@ describe('useEmailSubscription', () => {
             useMarketingConsent.mockReturnValue({
                 data: undefined,
                 isLoading: false,
+                isFeatureEnabled: true,
                 refetch: mockRefetch,
                 updateSubscriptions: mockUpdateSubscriptions,
                 isUpdating: false,

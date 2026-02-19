@@ -51,7 +51,8 @@ export const useEmailSubscription = ({tag} = {}) => {
     const {
         refetch: fetchSubscriptions,
         updateSubscriptions,
-        isUpdating
+        isUpdating,
+        isFeatureEnabled
     } = useMarketingConsent({
         tags,
         enabled: false
@@ -91,6 +92,10 @@ export const useEmailSubscription = ({tag} = {}) => {
         if (!validation.valid) {
             setMessage(messages.error.enter_valid_email)
             setMessageType('error')
+            return
+        }
+
+        if (!isFeatureEnabled) {
             return
         }
 
@@ -143,7 +148,7 @@ export const useEmailSubscription = ({tag} = {}) => {
             setMessage(messages.error.generic_error)
             setMessageType('error')
         }
-    }, [email, tags, fetchSubscriptions, updateSubscriptions, messages])
+    }, [email, tags, isFeatureEnabled, fetchSubscriptions, updateSubscriptions, messages])
 
     return {
         state: {

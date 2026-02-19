@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// Shopper Configurations feature flag for marketing consent
+export const ENABLE_CONSENT_WITH_MARKETING_CLOUD = 'EnableConsentWithMarketingCloud'
+
 // Marketing consent status constants
 export const CONSENT_STATUS = {
     OPT_IN: 'opt_in',

@@ -9,6 +9,7 @@ import {renderHook} from '@testing-library/react'
 import {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
 import {
     useSubscriptions,
+    useConfigurations,
     useShopperConsentsMutation,
     ShopperConsentsMutations
 } from '@salesforce/commerce-sdk-react'
@@ -19,6 +20,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     return {
         ...originalModule,
         useSubscriptions: jest.fn(),
+        useConfigurations: jest.fn(),
         useShopperConsentsMutation: jest.fn()
     }
 })
@@ -115,6 +117,26 @@ const mockUseMutationResult = {
     error: null
 }
 
+const mockConfigurationsEnabled = {
+    configurations: [
+        {
+            configurationType: 'globalConfiguration',
+            id: 'EnableConsentWithMarketingCloud',
+            value: true
+        }
+    ]
+}
+
+const mockConfigurationsDisabled = {
+    configurations: [
+        {
+            configurationType: 'globalConfiguration',
+            id: 'EnableConsentWithMarketingCloud',
+            value: false
+        }
+    ]
+}
+
 describe('useMarketingConsent', () => {
     beforeEach(() => {
         jest.clearAllMocks()
@@ -122,6 +144,9 @@ describe('useMarketingConsent', () => {
         useSubscriptions.mockReturnValue({
             ...mockUseQueryResult,
             data: mockSubscriptionsData
+        })
+        useConfigurations.mockReturnValue({
+            data: mockConfigurationsEnabled
         })
         useShopperConsentsMutation.mockImplementation(() => {
             return mockUseMutationResult
@@ -972,6 +997,56 @@ describe('useMarketingConsent', () => {
             const {result} = renderHook(() => useMarketingConsent())
 
             expect(result.current.isUpdateSuccess).toBe(true)
+        })
+    })
+
+    describe('Feature flag (EnableConsentWithMarketingCloud)', () => {
+        test('isFeatureEnabled is true when configuration value is true', () => {
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.isFeatureEnabled).toBe(true)
+        })
+
+        test('isFeatureEnabled is false when configuration value is false', () => {
+            useConfigurations.mockReturnValue({
+                data: mockConfigurationsDisabled
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.isFeatureEnabled).toBe(false)
+        })
+
+        test('isFeatureEnabled is false when configuration is missing', () => {
+            useConfigurations.mockReturnValue({
+                data: {configurations: []}
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.isFeatureEnabled).toBe(false)
+        })
+
+        test('isFeatureEnabled is false when configurations data is undefined', () => {
+            useConfigurations.mockReturnValue({data: undefined})
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.isFeatureEnabled).toBe(false)
+        })
+
+        test('isFeatureEnabled is false when value is string "true" (must be boolean)', () => {
+            useConfigurations.mockReturnValue({
+                data: {
+                    configurations: [
+                        {id: 'EnableConsentWithMarketingCloud', value: 'true'}
+                    ]
+                }
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.isFeatureEnabled).toBe(false)
         })
     })
 })
