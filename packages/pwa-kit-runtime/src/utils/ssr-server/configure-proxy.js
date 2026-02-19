@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {createProxyMiddleware} from 'http-proxy-middleware'
+import cookie from 'cookie'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-proxying'
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
-import {isRemote, localDevLog, verboseProxyLogging} from './utils'
+import {isRemote, localDevLog, verboseProxyLogging, isScapiDomain} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
 
@@ -23,6 +24,69 @@ export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
  * @type {RegExp}
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
+
+/**
+ * Apply the Authorization header with the shopper's access token (Bearer token) to a proxy request.
+ *
+ * This function is intended to be called from within a proxy's onProxyReq method.
+ * It reads the access token from HttpOnly cookies and sets it as the Authorization header
+ * for applicable SCAPI endpoints.
+ *
+ * Logic for determining if Bearer token should be applied:
+ * 1. Caching proxies never use auth (skip)
+ * 2. siteId must be provided (skip if not)
+ * 3. Target must be SCAPI domain (skip if not)
+ * 4. For SLAS auth endpoints (/shopper/auth/*): Only apply if they match the regex
+ *    - Most use Basic Auth (client credentials), but some like /oauth2/logout need Bearer token
+ * 5. For non-SLAS auth endpoints (e.g., /shopper/products, /shopper/baskets): Always apply Bearer token
+ *
+ * @private
+ * @function
+ * @param proxyRequest {http.ClientRequest} the request that will be sent to the target host
+ * @param incomingRequest {http.IncomingMessage} the request made to this Express app
+ * @param caching {Boolean} true for a caching proxy, false for a standard proxy
+ * @param siteId {String} the site ID for the current request
+ * @param targetHost {String} the target hostname (host+port)
+ * @param slasEndpointsRequiringAccessToken {RegExp} regex for SLAS auth endpoints that need Bearer token
+ */
+export const applyProxyRequestAuthHeader = ({
+    proxyRequest,
+    incomingRequest,
+    caching,
+    siteId,
+    targetHost,
+    slasEndpointsRequiringAccessToken
+}) => {
+    const url = incomingRequest.url
+
+    // Skip if: caching proxy, no siteId, not SCAPI domain, or no URL
+    if (caching || !siteId || !isScapiDomain(targetHost) || !url) {
+        return
+    }
+    if (url.startsWith('/shopper/auth/')) {
+        // For SLAS auth endpoints, only apply if they match the configured regex
+        // Most SLAS endpoints use Basic Auth, only specific ones like /oauth2/logout need Bearer token
+        if (!slasEndpointsRequiringAccessToken || !url.match(slasEndpointsRequiringAccessToken)) {
+            return
+        }
+    }
+    // If we reach here, either:
+    // 1. It's a SLAS auth endpoint that matched the regex, OR
+    // 2. It's a non-SLAS auth endpoint (which always requires Bearer token)
+
+    // Get access token from HttpOnly cookie
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const tokenKey = `access_token_${siteId.trim()}`
+    const accessToken = cookies[tokenKey]
+
+    if (accessToken) {
+        // Always override - cookie-based auth takes precedence
+        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+    }
+}
 
 /**
  * Apply proxy headers to a request that is being proxied.
@@ -119,6 +183,8 @@ export const applyProxyRequestHeaders = ({
  * the origin ('http' or 'https', defaults to 'https')
  * @param caching {Boolean} true for a caching proxy, false for a
  * standard proxy.
+ * @param siteId {String} the site ID for the current request
+ * @param slasEndpointsRequiringAccessToken {RegExp} regex for SLAS auth endpoints that require Bearer token
  * @returns {middleware} function to pass to expressApp.use()
  */
 export const configureProxy = ({
@@ -127,7 +193,9 @@ export const configureProxy = ({
     targetProtocol,
     targetHost,
     appProtocol = /* istanbul ignore next */ 'https',
-    caching
+    caching,
+    siteId = null,
+    slasEndpointsRequiringAccessToken = /\/oauth2\/logout/
 }) => {
     // This configuration must match the behaviour of the proxying
     // in CloudFront.
@@ -194,6 +262,7 @@ export const configureProxy = ({
          * this Express app that prompted the proxying
          */
         onProxyReq: (proxyRequest, incomingRequest) => {
+            // First, apply standard proxy headers (Host, Origin, etc.)
             applyProxyRequestHeaders({
                 proxyRequest,
                 incomingRequest,
@@ -201,6 +270,16 @@ export const configureProxy = ({
                 proxyPath,
                 targetHost,
                 targetProtocol
+            })
+
+            // Apply Authorization header with shopper's access token from HttpOnly cookie
+            applyProxyRequestAuthHeader({
+                proxyRequest,
+                incomingRequest,
+                caching,
+                siteId,
+                targetHost,
+                slasEndpointsRequiringAccessToken
             })
         },
 
@@ -293,9 +372,16 @@ export const configureProxy = ({
  * to which requests are sent to the Express app)
  * @param {String} appProtocol {String} the protocol to use to make requests to
  * the origin ('http' or 'https', defaults to 'https')
+ * @param {String} siteId - the site ID for the current request
+ * @param {RegExp} slasEndpointsRequiringAccessToken - regex for SLAS auth endpoints that require Bearer token
  * @private
  */
-export const configureProxyConfigs = (appHostname, appProtocol) => {
+export const configureProxyConfigs = (
+    appHostname,
+    appProtocol,
+    siteId = null,
+    slasEndpointsRequiringAccessToken = /\/oauth2\/logout/
+) => {
     localDevLog('')
     proxyConfigs.forEach((config) => {
         localDevLog(
@@ -307,7 +393,9 @@ export const configureProxyConfigs = (appHostname, appProtocol) => {
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: false
+            caching: false,
+            siteId,
+            slasEndpointsRequiringAccessToken
         })
         config.cachingProxy = configureProxy({
             proxyPath: config.cachingPath,
@@ -315,7 +403,8 @@ export const configureProxyConfigs = (appHostname, appProtocol) => {
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: true
+            caching: true,
+            siteId: null // No auth for caching proxy
         })
     })
     localDevLog('')

@@ -257,12 +257,12 @@ const main = async () => {
             // This mimics how MRT sets the system environment variable
             const config = getConfig() || {}
             const disableHttpOnlySessionCookies =
-                config.ssrParameters?.disableHttpOnlySessionCookies || true
+                config.ssrParameters?.disableHttpOnlySessionCookies ?? true
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {}),
-                    MRT_DISABLE_HTTPONLY_SESSION_COOKIES: disableHttpOnlySessionCookies
+                    MRT_DISABLE_HTTPONLY_SESSION_COOKIES: String(disableHttpOnlySessionCookies)
                 }
             })
         })

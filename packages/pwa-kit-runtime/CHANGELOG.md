@@ -1,5 +1,6 @@
 ## v3.17.0-dev
 - Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- Add HttpOnly session cookies for SLAS private client proxy: when `MRT_DISABLE_HTTPONLY_SESSION_COOKIES` is not `'true'`, token responses are intercepted and session tokens are set as HttpOnly cookies; token fields (access_token, idp_access_token, refresh_token) are stripped from the response body. The client continues to get expires_in and refresh_token_expires_in from the response body. This runs before `onSLASPrivateProxyRes`; custom callbacks receive the sanitized response and should read from response headers (e.g. Set-Cookie) rather than the body when using HttpOnly session cookies. An error is thrown if `siteId` is missing in commerce API parameters.
 
 ## v3.16.0 (Feb 12, 2026)
 - Migrate AWS SDK from v2 to v3 [#3566](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3566)
