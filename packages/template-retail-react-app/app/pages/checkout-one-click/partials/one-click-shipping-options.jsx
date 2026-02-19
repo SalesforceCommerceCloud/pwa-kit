@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState, useMemo} from 'react'
+import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -51,6 +51,7 @@ export default function ShippingOptions() {
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
+    const [shipmentIdsWithNoMethods, setShipmentIdsWithNoMethods] = useState(() => new Set())
     // Identify delivery shipments (exclude pickup and those without shipping addresses)
     const deliveryShipments =
         basket?.shipments?.filter((s) => s.shippingAddress && !isPickupShipment(s)) || []
@@ -68,42 +69,79 @@ export default function ShippingOptions() {
             enabled:
                 Boolean(basket?.basketId) &&
                 step === STEPS.SHIPPING_OPTIONS &&
-                !hasMultipleDeliveryShipments,
-            onSuccess: (data) => {
-                const deliveryOnly = getDeliveryShippingMethods(data?.applicableShippingMethods)
-                const noDeliveryMethods = !deliveryOnly || deliveryOnly.length === 0
-                if (
-                    step === STEPS.SHIPPING_OPTIONS &&
-                    !hasMultipleDeliveryShipments &&
-                    noDeliveryMethods &&
-                    !noMethodsToastShown
-                ) {
-                    showToast({
-                        title: formatMessage({
-                            defaultMessage:
-                                'Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance.',
-                            id: 'shipping_options.error.no_shipping_methods'
-                        }),
-                        status: 'error'
-                    })
-                    setNoMethodsToastShown(true)
-                }
-            }
+                !hasMultipleDeliveryShipments
+            // Single-shipment "no methods" toast is handled in useEffect when data is available
         }
     )
 
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
-    // Reset error toast when state changes
+    // Reset error toast when address state changes (affecting applicable shipping methods)
+    const deliveryAddressStateKey = hasMultipleDeliveryShipments
+        ? deliveryShipments.map((s) => s.shippingAddress?.stateCode ?? '').join(',')
+        : selectedShippingAddress?.stateCode
     useEffect(() => {
         setNoMethodsToastShown(false)
-    }, [selectedShippingAddress?.stateCode])
+    }, [deliveryAddressStateKey])
 
     // Filter out pickup methods for delivery shipment
     const deliveryMethods = getDeliveryShippingMethods(
         shippingMethods?.applicableShippingMethods || []
     )
+    const noShippingMethodsToast = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage:
+                    'Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance.',
+                id: 'shipping_options.error.no_shipping_methods'
+            }),
+            status: 'error'
+        }),
+        [formatMessage]
+    )
+
+    // For multi-shipment, report whether this shipment has no applicable delivery methods
+    const handleShipmentMethodsResolved = useCallback(
+        (shipmentId, hasNoApplicableMethods) => {
+            setShipmentIdsWithNoMethods((prev) => {
+                const next = new Set(prev)
+                if (hasNoApplicableMethods) next.add(shipmentId)
+                else next.delete(shipmentId)
+                return next
+            })
+            if (
+                hasNoApplicableMethods &&
+                step === STEPS.SHIPPING_OPTIONS &&
+                hasMultipleDeliveryShipments
+            ) {
+                setNoMethodsToastShown((prev) => {
+                    if (!prev) showToast(noShippingMethodsToast)
+                    return true
+                })
+            }
+        },
+        [
+            step,
+            STEPS.SHIPPING_OPTIONS,
+            hasMultipleDeliveryShipments,
+            showToast,
+            noShippingMethodsToast
+        ]
+    )
+    const hasAnyShipmentWithNoMethods = shipmentIdsWithNoMethods.size > 0
+
+    // Single shipment: show toast when methods data is available and has no delivery methods
+    const singleShipmentNoMethods =
+        !hasMultipleDeliveryShipments &&
+        step === STEPS.SHIPPING_OPTIONS &&
+        shippingMethods != null &&
+        deliveryMethods.length === 0
+    useEffect(() => {
+        if (!singleShipmentNoMethods || noMethodsToastShown) return
+        showToast(noShippingMethodsToast)
+        setNoMethodsToastShown(true)
+    }, [singleShipmentNoMethods, noMethodsToastShown, showToast, noShippingMethodsToast])
 
     const {isLoading: isAutoSelectLoading} = useCheckoutAutoSelect({
         currentStep: step,
@@ -229,10 +267,6 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    const filteredShippingMethods = getDeliveryShippingMethods(
-        shippingMethods?.applicableShippingMethods
-    )
-
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
@@ -280,18 +314,21 @@ export default function ShippingOptions() {
                                 index={idx + 1}
                                 shipment={shipment}
                                 currency={currency}
+                                onShipmentMethodsResolved={handleShipmentMethodsResolved}
                             />
                         ))}
-                        <Box>
-                            <Container variant="form">
-                                <Button w="full" onClick={() => goToNextStep()}>
-                                    <FormattedMessage
-                                        defaultMessage="Continue to Payment"
-                                        id="shipping_options.button.continue_to_payment"
-                                    />
-                                </Button>
-                            </Container>
-                        </Box>
+                        {!hasAnyShipmentWithNoMethods && (
+                            <Box>
+                                <Container variant="form">
+                                    <Button w="full" onClick={() => goToNextStep()}>
+                                        <FormattedMessage
+                                            defaultMessage="Continue to Payment"
+                                            id="shipping_options.button.continue_to_payment"
+                                        />
+                                    </Button>
+                                </Container>
+                            </Box>
+                        )}
                     </Stack>
                 ) : (
                     <form
@@ -299,7 +336,7 @@ export default function ShippingOptions() {
                         data-testid="sf-checkout-shipping-options-form"
                     >
                         <Stack spacing={6}>
-                            {filteredShippingMethods.length > 0 && (
+                            {deliveryMethods.length > 0 && (
                                 <Controller
                                     name="shippingMethodId"
                                     control={form.control}
@@ -311,7 +348,7 @@ export default function ShippingOptions() {
                                             onChange={onChange}
                                         >
                                             <Stack spacing={5}>
-                                                {filteredShippingMethods.map((opt) => (
+                                                {deliveryMethods.map((opt) => (
                                                     <Radio value={opt.id} key={opt.id}>
                                                         <Flex justify="space-between" w="full">
                                                             <Box>
@@ -347,7 +384,7 @@ export default function ShippingOptions() {
                                     )}
                                 />
                             )}
-                            {filteredShippingMethods.length > 0 && (
+                            {deliveryMethods.length > 0 && (
                                 <Box>
                                     <Container variant="form">
                                         <Button w="full" type="submit">
@@ -370,13 +407,15 @@ export default function ShippingOptions() {
                     totalShippingCost={totalShippingCost}
                     currency={currency}
                     freeLabel={freeLabel}
+                    shipmentIdsWithNoMethods={shipmentIdsWithNoMethods}
                 />
             )}
 
             {!hasMultipleDeliveryShipments &&
                 !effectiveIsLoading &&
                 selectedShippingMethod &&
-                selectedShippingAddress && (
+                selectedShippingAddress &&
+                deliveryMethods.length > 0 && (
                     <SingleShipmentSummary
                         selectedShippingMethod={selectedShippingMethod}
                         selectedMethodDisplayPrice={selectedMethodDisplayPrice}
@@ -390,7 +429,13 @@ export default function ShippingOptions() {
 }
 
 // Child component for multi-shipment summary
-const MultiShipmentSummary = ({deliveryShipments, totalShippingCost, currency, freeLabel}) => {
+const MultiShipmentSummary = ({
+    deliveryShipments,
+    totalShippingCost,
+    currency,
+    freeLabel,
+    shipmentIdsWithNoMethods = new Set()
+}) => {
     const {formatMessage} = useIntl()
 
     return (
@@ -399,11 +444,12 @@ const MultiShipmentSummary = ({deliveryShipments, totalShippingCost, currency, f
                 {deliveryShipments.map((shipment) => {
                     // Use shipment.shippingTotal to include all costs (base + promotions + surcharges + other fees)
                     const itemCost = shipment.shippingTotal || 0
+                    const hasNoApplicableMethods = shipmentIdsWithNoMethods.has(shipment.shipmentId)
                     return (
                         <Box key={shipment.shipmentId}>
                             <Flex justify="space-between" w="full">
                                 <Box flex="1">
-                                    {shipment.shippingMethod ? (
+                                    {shipment.shippingMethod && !hasNoApplicableMethods ? (
                                         <>
                                             <Text mt={2}>{shipment.shippingMethod.name}</Text>
                                             <Text fontSize="sm" color="gray.700">
@@ -471,7 +517,8 @@ MultiShipmentSummary.propTypes = {
     ).isRequired,
     totalShippingCost: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
-    freeLabel: PropTypes.string.isRequired
+    freeLabel: PropTypes.string.isRequired,
+    shipmentIdsWithNoMethods: PropTypes.instanceOf(Set)
 }
 
 // Child component for single-shipment summary
@@ -516,7 +563,7 @@ SingleShipmentSummary.propTypes = {
     freeLabel: PropTypes.string.isRequired
 }
 
-const ShipmentMethods = ({shipment, index, currency}) => {
+const ShipmentMethods = ({shipment, index, currency, onShipmentMethodsResolved}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
@@ -527,10 +574,25 @@ const ShipmentMethods = ({shipment, index, currency}) => {
                 shipmentId: shipment.shipmentId
             }
         },
-        {enabled: Boolean(basket?.basketId && shipment?.shipmentId)}
+        {
+            enabled: Boolean(basket?.basketId && shipment?.shipmentId),
+            onSuccess: (data) => {
+                if (!onShipmentMethodsResolved) return
+                const deliveryOnly = getDeliveryShippingMethods(data?.applicableShippingMethods)
+                const noDeliveryMethods = !deliveryOnly || deliveryOnly.length === 0
+                onShipmentMethodsResolved(shipment.shipmentId, noDeliveryMethods)
+            }
+        }
     )
     const [selected, setSelected] = useState(shipment?.shippingMethod?.id || undefined)
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
+
+    // Sync to parent when methods are already available (from cache)
+    useEffect(() => {
+        if (!onShipmentMethodsResolved || methods === undefined) return
+        const deliveryMethods = getDeliveryShippingMethods(methods?.applicableShippingMethods)
+        onShipmentMethodsResolved(shipment.shipmentId, deliveryMethods.length === 0)
+    }, [methods, shipment.shipmentId, onShipmentMethodsResolved])
 
     useEffect(() => {
         // Only attempt auto-select when there are applicable methods available and we haven't already auto-selected
@@ -674,5 +736,6 @@ const ShipmentMethods = ({shipment, index, currency}) => {
 ShipmentMethods.propTypes = {
     shipment: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired
+    currency: PropTypes.string.isRequired,
+    onShipmentMethodsResolved: PropTypes.func
 }

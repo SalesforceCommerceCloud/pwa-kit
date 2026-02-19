@@ -6,6 +6,8 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
+import * as commerceSdk from '@salesforce/commerce-sdk-react'
+import * as checkoutContext from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -53,39 +55,39 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+let mockCustomerData = {customerId: 'test-customer-id', isRegistered: true}
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: () => ({
-        data: {
-            customerId: 'test-customer-id',
-            isRegistered: true
-        }
+        data: mockCustomerData
     })
 }))
 
+const defaultBasketData = {
+    basketId: 'test-basket-id',
+    shipments: [
+        {
+            shippingAddress: {
+                address1: '123 Main St',
+                city: 'Test City'
+            },
+            shippingMethod: null
+        }
+    ],
+    shippingItems: [
+        {
+            price: 5.99,
+            priceAdjustments: []
+        }
+    ]
+}
+const defaultBasketDerivedData = {hasBasket: true, totalItems: 1}
+let mockBasketData = defaultBasketData
+let mockBasketDerivedData = defaultBasketDerivedData
+
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: () => ({
-        data: {
-            basketId: 'test-basket-id',
-            shipments: [
-                {
-                    shippingAddress: {
-                        address1: '123 Main St',
-                        city: 'Test City'
-                    },
-                    shippingMethod: null
-                }
-            ],
-            shippingItems: [
-                {
-                    price: 5.99,
-                    priceAdjustments: []
-                }
-            ]
-        },
-        derivedData: {
-            hasBasket: true,
-            totalItems: 1
-        }
+        data: mockBasketData,
+        derivedData: mockBasketDerivedData
     })
 }))
 
@@ -119,11 +121,31 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: () => mockShowToast
 }))
 
+const STEPS = {
+    CONTACT_INFO: 0,
+    PICKUP_ADDRESS: 1,
+    SHIPPING_ADDRESS: 2,
+    SHIPPING_OPTIONS: 3,
+    PAYMENT: 4
+}
+
 beforeEach(() => {
     jest.clearAllMocks()
-    // Default mutation to resolve to avoid leakage from tests that override it
+    mockBasketData = defaultBasketData
+    mockBasketDerivedData = defaultBasketDerivedData
+    mockCustomerData = {customerId: 'test-customer-id', isRegistered: true}
     mockUpdateShippingMethod.mutateAsync.mockResolvedValue({})
     mockShowToast.mockReset()
+    commerceSdk.useShippingMethodsForShipment.mockReturnValue({
+        data: mockShippingMethods
+    })
+    // Re-apply checkout mock return value (cleared by clearAllMocks) so goToNextStep is always a function
+    checkoutContext.useCheckout.mockReturnValue({
+        step: 3,
+        STEPS,
+        goToStep: mockGoToStep,
+        goToNextStep: mockGoToNextStep
+    })
 })
 
 afterEach(() => {
@@ -199,18 +221,26 @@ describe('ShippingOptions Component', () => {
         })
 
         test('shows error toast and hides controls when no shipping methods are available', async () => {
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockImplementation((_params, opts) => {
-                const payload = {applicableShippingMethods: [], defaultShippingMethodId: 'std'}
-                if (opts && typeof opts.onSuccess === 'function') {
-                    opts.onSuccess(payload)
-                }
-                return {data: payload}
-            })
+            const emptyMethodsPayload = {
+                data: {applicableShippingMethods: [], defaultShippingMethodId: 'std'}
+            }
+            commerceSdk.useShippingMethodsForShipment.mockImplementation(() => emptyMethodsPayload)
             mockUpdateShippingMethod.mutateAsync.mockResolvedValue({})
 
             renderWithProviders(<ShippingOptions />)
 
+            await waitFor(
+                () => {
+                    expect(mockShowToast).toHaveBeenCalled()
+                    expect(mockShowToast).toHaveBeenCalledWith(
+                        expect.objectContaining({
+                            status: 'error',
+                            title: expect.stringContaining('unable to ship to this address')
+                        })
+                    )
+                },
+                {timeout: 2000}
+            )
             expect(
                 screen.queryByRole('button', {name: /continue to payment/i})
             ).not.toBeInTheDocument()
@@ -646,8 +676,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: freeShippingMethods})
+            commerceSdk.useShippingMethodsForShipment.mockReturnValue({data: freeShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
@@ -698,6 +727,81 @@ describe('ShippingOptions Component', () => {
                 }
             ]
         }
+
+        test('when one shipment has no applicable methods, shows error toast once and hides Continue to Payment', async () => {
+            mockCustomerData = {customerId: null, isRegistered: false}
+            mockBasketData = {
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'ship1',
+                        shippingAddress: {
+                            firstName: 'Oscar',
+                            lastName: 'Robertson',
+                            address1: '333 South Street Station',
+                            city: 'West Lafayette',
+                            stateCode: 'IN',
+                            postalCode: '98103'
+                        },
+                        shippingMethod: null
+                    },
+                    {
+                        shipmentId: 'ship2',
+                        shippingAddress: {
+                            firstName: 'Lee',
+                            lastName: 'Robertson',
+                            address1: '158 South Street Station',
+                            city: 'West Lafayette',
+                            stateCode: 'IN',
+                            postalCode: '98103'
+                        },
+                        shippingMethod: null
+                    }
+                ],
+                shippingItems: [
+                    {shipmentId: 'ship1', price: 0},
+                    {shipmentId: 'ship2', price: 0}
+                ]
+            }
+            mockBasketDerivedData = {hasBasket: true, totalItems: 2, totalShippingCost: 0}
+
+            const noMethodsPayload = {applicableShippingMethods: [], defaultShippingMethodId: null}
+            commerceSdk.useShippingMethodsForShipment.mockImplementation((firstArg, secondArg) => {
+                const params = firstArg?.parameters || firstArg
+                const shipmentId = params?.shipmentId
+                const data = shipmentId === 'ship1' ? noMethodsPayload : multiShipMethods2
+                const opts = secondArg || firstArg
+                const onSuccess = opts?.onSuccess || firstArg?.onSuccess
+                if (typeof onSuccess === 'function') {
+                    queueMicrotask(() => onSuccess(data))
+                }
+                return {data}
+            })
+
+            renderWithProviders(<ShippingOptions />)
+
+            await waitFor(
+                () => {
+                    expect(mockShowToast).toHaveBeenCalled()
+                    expect(mockShowToast).toHaveBeenCalledWith(
+                        expect.objectContaining({
+                            status: 'error',
+                            title: expect.stringContaining('unable to ship to this address')
+                        })
+                    )
+                },
+                {timeout: 5000}
+            )
+
+            // Continue to Payment is hidden when any shipment has no methods
+            expect(
+                screen.queryByRole('button', {name: /continue to payment/i})
+            ).not.toBeInTheDocument()
+
+            // Edit view shows both shipments (summary with "No shipping method selected" is only visible when not editing)
+            expect(screen.getByText('Shipment 1:')).toBeInTheDocument()
+            expect(screen.getByText('Shipment 2:')).toBeInTheDocument()
+        })
 
         test('renders per-shipment methods and allows updating by shipment', async () => {
             jest.resetModules()
@@ -759,16 +863,9 @@ describe('ShippingOptions Component', () => {
                             {shipmentId: 'ship2', price: 0}
                         ]
                     },
-                    derivedData: {hasBasket: true, totalItems: 2}
+                    derivedData: {hasBasket: true, totalItems: 2, totalShippingCost: 0}
                 })
             }))
-
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
-                if (parameters.shipmentId === 'ship1') return {data: multiShipMethods1}
-                if (parameters.shipmentId === 'ship2') return {data: multiShipMethods2}
-                return {data: multiShipMethods1}
-            })
 
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
@@ -776,6 +873,12 @@ describe('ShippingOptions Component', () => {
             const module = await import(
                 '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
             )
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
+                if (parameters.shipmentId === 'ship1') return {data: multiShipMethods1}
+                if (parameters.shipmentId === 'ship2') return {data: multiShipMethods2}
+                return {data: multiShipMethods1}
+            })
 
             const {user} = localRenderWithProviders(<module.default />)
 
@@ -866,8 +969,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
+            commerceSdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
                 if (parameters.shipmentId === 'ship1') return {data: multiShipMethods1}
                 if (parameters.shipmentId === 'ship2') return {data: multiShipMethods2}
                 return {data: multiShipMethods1}
@@ -968,13 +1070,6 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
-                if (parameters.shipmentId === 'ship1') return {data: methods1}
-                if (parameters.shipmentId === 'ship2') return {data: methods2}
-                return {data: methods1}
-            })
-
             mockUpdateShippingMethod.mutateAsync.mockResolvedValue({})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -983,6 +1078,12 @@ describe('ShippingOptions Component', () => {
             const module = await import(
                 '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
             )
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockImplementation(({parameters}) => {
+                if (parameters.shipmentId === 'ship1') return {data: methods1}
+                if (parameters.shipmentId === 'ship2') return {data: methods2}
+                return {data: methods1}
+            })
 
             localRenderWithProviders(<module.default />)
 
@@ -1072,15 +1173,14 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
-
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
             )
             const module = await import(
                 '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
             )
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
 
             const {user} = localRenderWithProviders(<module.default />)
 
@@ -1161,8 +1261,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
+            commerceSdk.useShippingMethodsForShipment.mockReturnValue({data: methods1})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
@@ -1255,15 +1354,14 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: methodsWithPromos})
-
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
             )
             const module = await import(
                 '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
             )
+            const sdk = await import('@salesforce/commerce-sdk-react')
+            sdk.useShippingMethodsForShipment.mockReturnValue({data: methodsWithPromos})
 
             localRenderWithProviders(<module.default />)
 
@@ -1347,8 +1445,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
+            commerceSdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
@@ -1434,8 +1531,7 @@ describe('ShippingOptions Component', () => {
                 })
             }))
 
-            const sdk = await import('@salesforce/commerce-sdk-react')
-            sdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
+            commerceSdk.useShippingMethodsForShipment.mockReturnValue({data: mockShippingMethods})
 
             const {renderWithProviders: localRenderWithProviders} = await import(
                 '@salesforce/retail-react-app/app/utils/test-utils'
