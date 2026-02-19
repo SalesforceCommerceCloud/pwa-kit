@@ -54,6 +54,8 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
+    /** When true, token response may be sanitized (tokens in HttpOnly cookies); only set non-token fields and use access_token_expires_at for expiry. */
+    useHttpOnlySessionCookies?: boolean
 }
 
 interface JWTHeaders {
@@ -136,6 +138,7 @@ type AuthDataKeys =
     | 'uido'
     | 'idp_refresh_token'
     | 'dnt'
+    | 'access_token_expires_at'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -250,6 +253,10 @@ const DATA_MAP: AuthDataMap = {
     uido: {
         storageType: 'local',
         key: 'uido'
+    },
+    access_token_expires_at: {
+        storageType: 'local',
+        key: 'access_token_expires_at'
     }
 }
 
@@ -284,6 +291,7 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
+    private useHttpOnlySessionCookies: boolean
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -380,6 +388,7 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
+        this.useHttpOnlySessionCookies = config.useHttpOnlySessionCookies ?? false
     }
 
     get(name: AuthDataKeys) {
@@ -515,6 +524,23 @@ class Auth {
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
         return validTimeSeconds <= tokenAgeSeconds
+    }
+
+    /**
+     * Returns whether the access token is expired. When useHttpOnlySessionCookies is true,
+     * uses access_token_expires_at from store; otherwise decodes the JWT from getAccessToken().
+     */
+    private isAccessTokenExpired(): boolean {
+        if (this.useHttpOnlySessionCookies) {
+            const expiresAt = this.get('access_token_expires_at')
+            if (expiresAt == null || expiresAt === '') return true
+            const expiresAtSec = Number(expiresAt)
+            if (Number.isNaN(expiresAtSec)) return true
+            const bufferSeconds = 60
+            return Date.now() / 1000 >= expiresAtSec - bufferSeconds
+        }
+        const token = this.getAccessToken()
+        return !token || this.isTokenExpired(token)
     }
 
     /**
@@ -680,33 +706,43 @@ class Auth {
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
-        this.set('access_token', res.access_token)
+
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
         this.set('id_token', res.id_token)
-        this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
-        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
             isGuest
         )
-        if (res.access_token) {
-            const {uido} = this.parseSlasJWT(res.access_token)
-            this.set('uido', uido)
-        }
-        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        this.set(refreshTokenKey, res.refresh_token, {
-            expires: expiresDate
-        })
+        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+        this.set('usid', res.usid ?? '', {expires: expiresDate})
 
-        this.set('usid', res.usid, {
-            expires: expiresDate
-        })
+        if (this.useHttpOnlySessionCookies) {
+            const uidoFromCookie = this.stores['cookie'].get('uido')
+            if (uidoFromCookie) this.set('uido', uidoFromCookie)
+        } else {
+            this.set('access_token', res.access_token)
+            this.set('idp_access_token', res.idp_access_token)
+            if (res.access_token) {
+                const {uido} = this.parseSlasJWT(res.access_token)
+                this.set('uido', uido)
+            }
+            const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+            this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
+        }
+        if (
+            res &&
+            typeof res === 'object' &&
+            'access_token_expires_at' in res &&
+            res.access_token_expires_at != null
+        ) {
+            this.set('access_token_expires_at', String(res.access_token_expires_at))
+        }
     }
 
     async refreshAccessToken() {
@@ -747,7 +783,7 @@ class Auth {
 
         // refresh flow for TAOB
         const accessToken = this.getAccessToken()
-        if (accessToken && this.isTokenExpired(accessToken)) {
+        if (this.isAccessTokenExpired()) {
             try {
                 const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
                 if (isAgent) {
@@ -888,8 +924,7 @@ class Auth {
             return await this.pendingToken
         }
 
-        const accessToken = this.getAccessToken()
-        if (accessToken && !this.isTokenExpired(accessToken)) {
+        if (!this.isAccessTokenExpired()) {
             return this.data
         }
 

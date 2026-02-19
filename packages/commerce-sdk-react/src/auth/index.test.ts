@@ -1502,3 +1502,68 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
     })
 })
+
+describe('HttpOnly Session Cookies', () => {
+    const expiresAtFuture = Math.floor(Date.now() / 1000) + 3600
+
+    const httpOnlyTokenResponse: ShopperLoginTypes.TokenResponse = {
+        ...TOKEN_RESPONSE,
+        // When HttpOnly cookies are enabled, the proxy strips tokens from the body
+        // and adds access_token_expires_at for client-side expiry checks
+        access_token_expires_at: expiresAtFuture
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('loginGuestUser stores access_token_expires_at but not tokens', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        await auth.loginGuestUser()
+
+        // access_token_expires_at should be stored for client-side expiry checks
+        expect(auth.get('access_token_expires_at')).toBe(String(expiresAtFuture))
+        // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
+        expect(auth.get('access_token')).toBeFalsy()
+        expect(auth.get('refresh_token_guest')).toBeFalsy()
+        // Common fields should still be stored
+        expect(auth.get('customer_id')).toBe(TOKEN_RESPONSE.customer_id)
+        expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
+    })
+
+    test('ready re-uses data when access_token_expires_at is still valid', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // First call: triggers loginGuestUser
+        await auth.ready()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Second call: access_token_expires_at is in the future, so it should re-use data
+        await auth.ready()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1) // Not called again
+    })
+
+    test('ready triggers refresh when access_token_expires_at is expired', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+
+        // Simulate a previous login that left behind stored data with an expired token
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('access_token_expires_at', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // Set a valid JWT so parseSlasJWT works during the refresh flow
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+    })
+})
