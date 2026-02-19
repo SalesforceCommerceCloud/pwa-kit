@@ -103,7 +103,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 throw new Error('WebAuthn API not available in this browser')
             }
 
-            // Step 4: navigator.credentials.create() will show a browser/system prompt
+            // navigator.credentials.create() will show a browser/system prompt
             // This may appear to hang if the user doesn't interact with the prompt
             const credential = await navigator.credentials.create({publicKey})
 
@@ -111,7 +111,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 throw new Error('Failed to create credential: user cancelled or operation failed')
             }
 
-            // Step 5: Convert credential to JSON format before sending to SLAS
+            // Step 4: Convert credential to JSON format before sending to SLAS
             // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON
             let credentialJson
             try {
@@ -134,14 +134,14 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 }
             }
 
-            // Step 6: Finish WebAuthn registration
+            // Step 5: Finish WebAuthn registration
             await finishWebauthnUserRegistration.mutateAsync({
                 username: customer.email,
                 credential: credentialJson,
                 pwd_action_token: code
             })
 
-            // Step 7: Close OTP modal and main modal on success
+            // Step 6: Close OTP modal and main modal on success
             setIsOtpAuthOpen(false)
             onClose()
 
@@ -151,6 +151,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             const message = /Unauthorized/i.test(err.message) 
                 ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
+
             // Return error result for OTP component to display
             return {
                 success: false,
