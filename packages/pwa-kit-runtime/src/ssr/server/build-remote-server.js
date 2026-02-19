@@ -603,8 +603,7 @@ export const RemoteServerFactory = {
             }
 
             // For other routes, only proceed if path equals basePath or path starts with basePath + '/'
-            const pathMatchesBasePath =
-                req.path === basePath || req.path.startsWith(basePath + '/')
+            const pathMatchesBasePath = req.path === basePath || req.path.startsWith(basePath + '/')
             if (!pathMatchesBasePath) {
                 return next()
             }
