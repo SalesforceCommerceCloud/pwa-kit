@@ -86,6 +86,15 @@ export const useEmailSubscription = ({tag} = {}) => {
     )
 
     const handleSignUp = useCallback(async () => {
+        // return immediately if feature is not enabled.
+        if (!isFeatureEnabled) {
+            console.error('[useEmailSubscription] Feature not enabled. Subscribe action ignored.')
+            return
+        }
+
+        // Clear any prior validation messages
+        setMessage(null)
+
         // Validate email using the utility validator
         const validation = validateEmail(email)
 
@@ -95,13 +104,7 @@ export const useEmailSubscription = ({tag} = {}) => {
             return
         }
 
-        if (!isFeatureEnabled) {
-            return
-        }
-
         try {
-            setMessage(null)
-
             // Fetch subscriptions on-demand when submitting
             const {data: freshSubscriptionsData} = await fetchSubscriptions()
             const allSubscriptions = freshSubscriptionsData?.data || []
