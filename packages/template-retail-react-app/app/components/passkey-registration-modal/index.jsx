@@ -33,10 +33,12 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 // Utils
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/utils'
-import {getPasskeyRegistrationErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 // SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
+
+// Constants
+import {API_ERROR_MESSAGE, INVALID_TOKEN_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Modal for registering a new passkey with a nickname
@@ -75,9 +77,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             setIsOtpAuthOpen(true)
         } catch (err) {
             // Set error message for the passkey registration modal
-            setError(formatMessage(getPasskeyRegistrationErrorMessage(err)))
-            // Re-throw the error to be handled by the OTP auth modal
-            throw err
+            setError(formatMessage(API_ERROR_MESSAGE))
         } finally {
             setIsLoading(false)
         }
@@ -105,18 +105,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
 
             // Step 4: navigator.credentials.create() will show a browser/system prompt
             // This may appear to hang if the user doesn't interact with the prompt
-            let credential
-            try {
-                credential = await navigator.credentials.create({
-                    publicKey
-                })
-            } catch (createError) {
-                // Handle user cancellation or other errors from the WebAuthn API
-                if (createError.name === 'NotAllowedError' || createError.name === 'AbortError') {
-                    throw new Error('Passkey registration was cancelled or timed out')
-                }
-                throw createError
-            }
+            const credential = await navigator.credentials.create({publicKey})
 
             if (!credential) {
                 throw new Error('Failed to create credential: user cancelled or operation failed')
@@ -159,10 +148,13 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             return {success: true}
         } catch (err) {
             console.error('Error registering passkey:', err)
+            const message = /Unauthorized/i.test(err.message) 
+                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
             // Return error result for OTP component to display
             return {
                 success: false,
-                error: formatMessage(getPasskeyRegistrationErrorMessage(err))
+                error: message
             }
         } finally {
             setIsLoading(false)

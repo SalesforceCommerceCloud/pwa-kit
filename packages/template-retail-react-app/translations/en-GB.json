@@ -849,9 +849,6 @@
   "global.error.invalid_token": {
     "defaultMessage": "Invalid token, please try again."
   },
-  "global.error.passkey_feature_unavailable": {
-    "defaultMessage": "The passkey feature is currently unavailable"
-  },
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },

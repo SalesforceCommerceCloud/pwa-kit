@@ -28,12 +28,6 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     id: 'global.error.too_many_password_reset_requests'
 })
 
-// Constants for Passkey authentication and registration
-export const PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
-    id: 'global.error.passkey_feature_unavailable',
-    defaultMessage: 'The passkey feature is currently unavailable'
-})
-
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
@@ -113,43 +107,6 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
 export const getLoginPasswordlessErrorMessage = (errorMessage) => {
     if (INVALID_TOKEN_ERROR.test(errorMessage)) {
         return INVALID_TOKEN_ERROR_MESSAGE
-    }
-    return API_ERROR_MESSAGE
-}
-
-/**
- * Maps errors from SLAS WebAuthn APIs to user-friendly message descriptors.
- * Used for passkey login auth helpers.
- *
- * Passkey Login:
- * - StartWebauthnAuthentication
- * - FinishWebauthnAuthentication
- *
- * @param {Error} error - The error from the API
- * @returns {Object} - The message descriptor (from defineMessage) for formatMessage
- */
-export const getPasskeyAuthenticateErrorMessage = (error) => {
-    if (error.response?.status === 400 || error.response?.status === 401) {
-        return PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE
-    }
-    return API_ERROR_MESSAGE
-}
-
-/**
- * Maps errors from SLAS WebAuthn APIs to user-friendly message descriptors.
- * Used for passkey registration auth helpers.
- *
- * Passkey Registration:
- * - AuthorizeWebauthnRegistration
- * - StartWebauthnUserRegistration
- * - FinishWebauthnUserRegistration
- *
- * @param {Error} error - The error from the API
- * @returns {Object} - The message descriptor (from defineMessage) for formatMessage
- */
-export const getPasskeyRegistrationErrorMessage = (error) => {
-    if (error.response?.status === 400 || error.response?.status === 401) {
-        return PASSKEY_FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
 }

@@ -34,8 +34,7 @@ import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     getAuthorizePasswordlessErrorMessage,
     getLoginPasswordlessErrorMessage,
-    getPasswordlessCallbackUrl,
-    getPasskeyAuthenticateErrorMessage
+    getPasswordlessCallbackUrl
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -192,10 +191,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        loginWithPasskey().catch((error) => {
-            const message = formatMessage(getPasskeyAuthenticateErrorMessage(error))
-            form.setError('global', {type: 'manual', message})
-            console.error('Error authenticating passkey:', error)
+        loginWithPasskey().catch(() => {
+            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
         })
     }, [])
 

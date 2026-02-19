@@ -629,7 +629,7 @@ describe('Passkey login', () => {
         // Should show error - 401 error from WebAuthn API should be caught and converted to user-friendly message
         await waitFor(() => {
             expect(
-                screen.getByText(/This feature is not currently available./i)
+                screen.getByText(/Something went wrong. Try again!/i)
             ).toBeInTheDocument()
         })
     })

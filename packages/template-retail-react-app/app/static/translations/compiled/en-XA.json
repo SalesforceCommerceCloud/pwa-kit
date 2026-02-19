@@ -4347,20 +4347,6 @@
       "value": "]"
     }
   ],
-  "global.error.passkey_feature_unavailable": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħḗḗ ƥȧȧşşķḗḗẏ ƒḗḗȧȧŧŭŭřḗḗ īş ƈŭŭřřḗḗƞŧŀẏ ŭŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,

@@ -239,10 +239,8 @@ export const AuthModal = ({
             setCurrentView(initialView)
             form.reset()
             // Prompt user to login without username (discoverable credentials)
-            loginWithPasskey().catch((error) => {
-                const message = formatMessage(getPasskeyAuthenticateErrorMessage(error))
-                form.setError('global', {type: 'manual', message})
-                console.error('Error authenticating passkey:', error)
+            loginWithPasskey().catch(() => {
+                form.setError('global', {type: 'manual', message:formatMessage(API_ERROR_MESSAGE)})
             })
         }
     }, [isOpen])

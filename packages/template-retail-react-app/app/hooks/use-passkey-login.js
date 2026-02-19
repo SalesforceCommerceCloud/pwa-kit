@@ -71,6 +71,7 @@ export const usePasskeyLogin = () => {
             if (error.name == 'NotAllowedError') {
                 return
             }
+            console.error('Error getting passkey credential from browser:', error)
             throw error
         }
 

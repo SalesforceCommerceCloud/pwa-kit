@@ -2091,12 +2091,6 @@
       "value": "Invalid token, please try again."
     }
   ],
-  "global.error.passkey_feature_unavailable": [
-    {
-      "type": 0,
-      "value": "The passkey feature is currently unavailable"
-    }
-  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
