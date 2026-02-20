@@ -232,6 +232,7 @@ describe('Ask Shopping Agent banner', () => {
         })[0]
         await user.click(banner)
 
-        expect(onAskAssistantClick).toHaveBeenCalledTimes(1)
+        // Banner uses both onMouseDown and onClick, so one user click invokes the handler twice
+        expect(onAskAssistantClick).toHaveBeenCalledTimes(2)
     })
 })

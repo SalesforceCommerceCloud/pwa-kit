@@ -28,11 +28,7 @@ test('renders Ask Shopping Agent banner with title and description', () => {
             name: /Ask Shopping Agent.*discover, compare and shop smarter/i
         })
     ).toBeInTheDocument()
-    expect(
-        screen.getByText(
-            (content) => content === 'Ask Shopping Agent'
-        )
-    ).toBeInTheDocument()
+    expect(screen.getByText((content) => content === 'Ask Shopping Agent')).toBeInTheDocument()
     expect(
         screen.getByText(/Discover, compare, and shop smarter with your personal Shopping Agent/i)
     ).toBeInTheDocument()
