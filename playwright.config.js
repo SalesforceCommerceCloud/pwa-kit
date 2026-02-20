@@ -36,43 +36,26 @@ module.exports = defineConfig({
         trace: 'on-first-retry'
     },
     snapshotPathTemplate: '{testDir}/{testFileDir}/__snapshots__/{arg}{ext}',
-    /* Configure projects for major browsers */
     projects: [
         {
             name: 'chromium',
             use: {...devices['Desktop Chrome']},
             testIgnore: ['**/a11y/**', '**/mobile/**', '**/extra-features.spec.js']
         },
-
-        /* Test against mobile viewports. */
         {
             name: 'mobile-chrome',
             use: {...devices['Pixel 5']},
             testIgnore: ['**/a11y/**', '**/desktop/**', '**/extra-features.spec.js']
         },
         {
-            name: 'a11y-mobile-slas-public-client',
+            name: 'a11y-mobile',
             use: {...devices['Pixel 5']},
             testDir: './e2e/tests/a11y/mobile',
-            snapshotPathTemplate: './e2e/tests/a11y/mobile/slas-public-client/__snapshots__/{arg}{ext}'
         },
         {
-            name: 'a11y-desktop-slas-public-client',
+            name: 'a11y-desktop',
             use: {...devices['Desktop Chrome']},
             testDir: './e2e/tests/a11y/desktop',
-            snapshotPathTemplate: './e2e/tests/a11y/desktop/slas-public-client/__snapshots__/{arg}{ext}'
-        },
-        {
-            name: 'a11y-mobile-slas-private-client',
-            use: {...devices['Pixel 5']},
-            testDir: './e2e/tests/a11y/mobile',
-            snapshotPathTemplate: './e2e/tests/a11y/mobile/slas-private-client/__snapshots__/{arg}{ext}'
-        },
-        {
-            name: 'a11y-desktop-slas-private-client',
-            use: {...devices['Desktop Chrome']},
-            testDir: './e2e/tests/a11y/desktop',
-            snapshotPathTemplate: './e2e/tests/a11y/desktop/slas-private-client/__snapshots__/{arg}{ext}'
         },
         {
             name: 'extra-features-desktop',

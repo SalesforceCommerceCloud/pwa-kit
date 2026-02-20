@@ -11,15 +11,22 @@ import userEvent from '@testing-library/user-event'
 import {
     renderWithProviders,
     createPathWithDefaults,
-    guestToken
+    guestToken,
+    registerUserToken,
+    clearAllCookies
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {
+    AuthModal,
+    useAuthModal,
+    EMAIL_VIEW
+} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '@salesforce/retail-react-app/app/pages/account'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
-import {AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -48,21 +55,9 @@ const mockRegisteredCustomer = {
     login: 'customer@test.com'
 }
 
-const mockAuthHelperFunctions = {
-    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
-}
-
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: jest
-            .fn()
-            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
-    }
-})
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 
 let authModal = undefined
 const MockedComponent = (props) => {
@@ -89,6 +84,7 @@ MockedComponent.propTypes = {
 // Set up and clean up
 beforeEach(() => {
     authModal = undefined
+    getConfig.mockImplementation(() => mockConfig)
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -119,6 +115,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     localStorage.clear()
+    clearAllCookies()
     jest.resetModules()
     jest.restoreAllMocks()
 })
@@ -185,7 +182,7 @@ test('allows regular login via Enter key in password mode', async () => {
     await user.click(trigger)
 
     await waitFor(() => {
-        expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        expect(screen.getByText(/Continue/i)).toBeInTheDocument()
     })
 
     // enter email and switch to password mode
@@ -198,16 +195,35 @@ test('allows regular login via Enter key in password mode', async () => {
     // simulate Enter key press in password field
     await user.keyboard('{Enter}')
 
-    // should trigger regular login
-    expect(
-        mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-    ).toHaveBeenCalledWith({
-        username: validEmail,
-        password: validPassword
+    // login successfully and close the modal
+    await waitFor(() => {
+        expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
     })
 })
 
 describe('Passwordless enabled', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            }),
+            rest.post('*/oauth2/passwordless/token', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json({
+                        customer_id: 'registeredCustomerId',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken',
+                        usid: 'testusid',
+                        enc_user_id: 'testEncUserId',
+                        id_token: 'testIdToken'
+                    })
+                )
+            })
+        )
+    })
+
     test('Renders passwordless login when enabled', async () => {
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
 
@@ -216,16 +232,16 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
     })
 
     test('Allows passwordless login', async () => {
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/',
-            origin: 'https://example.com'
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
         })
-        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
         // open the modal
@@ -233,47 +249,48 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
 
         // enter a valid email address
         await user.type(screen.getByLabelText('Email'), validEmail)
 
         // initiate passwordless login
-        const passwordlessLoginButton = screen.getByText(/continue securely/i)
+        const passwordlessLoginButton = screen.getByText(/Continue/i)
         await user.click(passwordlessLoginButton)
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that OTP auth modal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
         })
 
-        // check that check email modal is open
-        await waitFor(
-            () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
-
         // resend the email
-        await user.click(screen.getByText(/Resend Link/i))
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+        await user.click(screen.getByText(/Resend Code/i))
+
+        // enter the code manually
+        const code = '12345678'
+        const otpInputs = screen.getAllByRole('textbox')
+        for (let i = 0; i < 8; i++) {
+            await user.type(otpInputs[i], code[i])
+        }
+
+        await waitFor(() => {
+            expect(
+                screen.queryByText(/To log in to your account, enter the code/i)
+            ).not.toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
         })
     })
 
     test('allows passwordless login via Enter key', async () => {
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/',
-            origin: 'https://example.com'
-        })
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
         const validEmail = 'test@salesforce.com'
 
@@ -282,7 +299,7 @@ describe('Passwordless enabled', () => {
         await user.click(trigger)
 
         await waitFor(() => {
-            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
         })
 
         // enter a valid email address
@@ -291,24 +308,113 @@ describe('Passwordless enabled', () => {
         // simulate Enter key press in email field
         await user.keyboard('{Enter}')
 
-        // should trigger passwordless login
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
-        ).toHaveBeenCalledWith({
-            userid: validEmail,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that the OtpAuthModal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
+        })
+    })
+
+    test('sends callbackURI when passwordless callback is configured', async () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                login: {
+                    passwordless: {
+                        mode: 'callback',
+                        callbackURI: 'https://callback.com/passwordless'
+                    }
+                }
+            }
         })
 
-        // check that check email modal is open
-        await waitFor(
-            () => {
-                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+        const validEmail = 'test@salesforce.com'
+
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/Continue/i)).toBeInTheDocument()
+        })
+
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.click(screen.getByText(/Continue/i))
+
+        // check that the auth modal is closed
+        expect(authModal.isOpen).toBe(false)
+
+        // check that the OtpAuthModal is open
+        await waitFor(() => {
+            expect(
+                screen.getByText(/To log in to your account, enter the code/i)
+            ).toBeInTheDocument()
+        })
     })
+
+    test('shows check your email view when initial view is set to email', async () => {
+        const {user} = renderWithProviders(
+            <MockedComponent isPasswordlessEnabled={true} initialView={EMAIL_VIEW} />
+        )
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+        })
+
+        await user.click(screen.getByText(/Resend Link/i))
+
+        // check that the Check Your Email view is still open
+        await waitFor(() => {
+            expect(screen.getByText(/Check Your Email/i)).toBeInTheDocument()
+        })
+    })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many login requests were made. Please try again later.',
+            'You reached the limit for login attempts. For your security, wait 10 minutes and try again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when passwordless login fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/passwordless/login', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+
+            const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+            const validEmail = 'test@salesforce.com'
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            await waitFor(() => {
+                expect(screen.getByText(/Continue/i)).toBeInTheDocument()
+            })
+
+            // enter email and submit
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            await user.click(screen.getByText(/Continue/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })
 
 // TODO: Fix flaky/broken test
@@ -487,7 +593,10 @@ describe('Reset password', function () {
         global.server.use(
             rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) =>
                 res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
-            )
+            ),
+            rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+            })
         )
     })
 
@@ -544,4 +653,46 @@ describe('Reset password', function () {
         // check that the modal is closed
         expect(authModal.isOpen).toBe(false)
     })
+
+    test.each([
+        ['no callback_uri is registered for client', 'This feature is not currently available.'],
+        [
+            'Too many password reset requests were made. Please try again later.',
+            'You reached the limit for password resets. For your security, wait 10 minutes and try again.'
+        ],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'displays correct error message when password reset fails with "%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            global.server.use(
+                rest.post('*/oauth2/password/reset', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(400), ctx.json({message: apiErrorMessage}))
+                })
+            )
+
+            const {user} = renderWithProviders(<MockedComponent initialView="password" />, {
+                wrapperProps: {
+                    bypassAuth: false
+                }
+            })
+
+            // open the modal
+            const trigger = screen.getByText(/open modal/i)
+            await user.click(trigger)
+
+            // Wait for password reset form
+            let resetPwForm = await screen.findByTestId('sf-auth-modal-form')
+            expect(resetPwForm).toBeInTheDocument()
+            const withinForm = within(resetPwForm)
+
+            // Enter email and submit
+            await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+            await user.click(withinForm.getByText(/reset password/i))
+
+            // Verify error message is displayed
+            await waitFor(() => {
+                expect(withinForm.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })

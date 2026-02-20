@@ -14,7 +14,7 @@ It allows AI agents to query context-aware services like this server to help dev
 
 ## What is PWA-Kit-MCP?
 
-PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new components and pages, and support site validation through performance and accessibility testing.
+PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new pages, and support site validation through performance and accessibility testing.
 
 _NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
@@ -28,9 +28,6 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 
 * **`pwakit_create_storefront`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
-
-* **`pwakit_create_component`**:
-  Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
 * **`pwakit_create_page`**:
   Interactive tool to generate a new PWA storefront page with custom routing and components.
@@ -54,8 +51,12 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   *Example: `How do I get a product?`*
   
 * **`scapi_custom_api_discovery`**:
-  Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the  🔧 Configuration Options section.  
+  Discovers custom SCAPI APIs registered on BM, and fetches the schema of those APIs. Requires credential configuration described in the 🔧 Configuration Options section.  
   *Note: Ensure your API Client has access to your instance and has 'sfcc.custom-apis' as allowed scope*
+  
+  **Fallback Mode**: If SFCC credentials are not available, the tool will search for `api.json` and `schema.yaml` files locally in the following order:
+  1. `SFCC_CARTRIDGE_PATH` environment variable (if set) - searches recursively up to 10 levels deep
+  2. `PWA_STOREFRONT_APP_PATH` - searches current directory and parent directories (up to filesystem root or home directory, max 10 levels), then recursively down 10 levels in each
   
   *Custom API DX Endpoint Documentation*: [https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints](https://developer.salesforce.com/docs/commerce/commerce-api/references/custom-apis?meta=getEndpoints)
 
@@ -95,7 +96,7 @@ The MCP server supports two ways to configure your Salesforce Commerce Cloud cre
 
 #### Option 1: dw.json Configuration File (Recommended)
 
-Create a `dw.json` file under your project root directory with your SFCC credentials:
+Create a `dw.json` file under your PWA Kit project directory with your SFCC credentials:
 
 ```json
 {
@@ -108,7 +109,7 @@ Create a `dw.json` file under your project root directory with your SFCC credent
 }
 ```
 
-If `dw.json` doesn't live directly under your project root directory, then update your `mcp.json` to point to the `dw.json` file path:
+If `dw.json` doesn't live under your PWA Kit project directory, then update your `mcp.json` to point to the `dw.json` file path:
 
 ```json
 {
@@ -123,6 +124,11 @@ If `dw.json` doesn't live directly under your project root directory, then updat
   }
 }
 ```
+This is the priority when fetching dw.json locally:
+  1. dw.json path supplied from mcp settings args (if set)
+  2. PWA_STOREFRONT_APP_PATH/dw.json 
+  3. PWA_STOREFRONT_APP_PATH/../dw.json 
+  4. PWA_STOREFRONT_APP_PATH/../../dw.json
 
 #### Option 2: Environment Variables
 
@@ -137,7 +143,55 @@ SFCC_CLIENT_ID=your-client-id
 SFCC_CLIENT_SECRET=your-client-secret
 ```
 
-**Note:** Environment variables take precedence over`dw.json` values if both are provided.
+**Note:** Environment variables take precedence over `dw.json` values if both are provided.
+
+#### Option 3: Local Custom API Files (Fallback for Custom API Discovery)
+
+For the `scapi_custom_api_discovery` tool, if SFCC credentials are not available, you can provide local custom API files:
+
+**Method 1: Direct Path** - Set the `SFCC_CARTRIDGE_PATH` environment variable to point to your custom API cartridge directory:
+
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}",
+        "SFCC_CARTRIDGE_PATH": "/path/to/your/cartridge"
+      }
+    }
+  }
+}
+```
+
+**Method 2: Auto-discovery** - If `SFCC_CARTRIDGE_PATH` is not set, the tool will automatically search for `api.json` and `schema.yaml` files starting from `PWA_STOREFRONT_APP_PATH` and traversing up through parent directories until it reaches the filesystem root or home directory (max 10 levels). At each directory level, it searches recursively down through subdirectories (up to 10 levels deep).
+
+**File Structure Expected:**
+```
+your-custom-api-directory/
+├── api.json          # Custom API metadata
+└── schema.yaml       # OpenAPI schema (optional)
+```
+
+**Example `api.json`:**
+```json
+{
+  "apiName": "reviews",
+  "apiVersion": "v1",
+  "cartridgeName": "plugin_custom_api_intro",
+  "endpointPath": "reviews",
+  "httpMethod": "GET",
+  "securityScheme": "bearer",
+  "baseUrl": "https://your-shortcode.api.commercecloud.salesforce.com/custom/reviews/v1"
+}
+```
+
+**Search Priority:**
+1. SFCC credentials (dw.json or environment variables)
+2. `SFCC_CARTRIDGE_PATH` environment variable - searches recursively up to 10 levels deep in subdirectories
+3. `PWA_STOREFRONT_APP_PATH` and up to 5 parent directories - searches recursively up to 10 levels deep in subdirectories at each level
 
 ## 📊 Telemetry
 
@@ -184,7 +238,7 @@ Then send JSON-RPC requests like:
 
 ```json
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
-{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_sample_component", "arguments": {}}}
+{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "pwakit_get_dev_guidelines", "arguments": {}}}
 ```
 
 ---

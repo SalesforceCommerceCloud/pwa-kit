@@ -36,13 +36,21 @@
  * A test bundle file is available at `/mobify/bundle/<BUNDLE_NUMBER>/assets/mobify.png`
  * where BUNDLE_NUMBER is the most recently published bundle number.
  */
-
-const path = require('path')
-const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const pkg = require('../package.json')
-const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
+const basicAuth = require('express-basic-auth')
+const fs = require('fs').promises
+const path = require('path')
+
+const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
+const {
+    DataStore,
+    DataStoreNotFoundError,
+    DataStoreServiceError,
+    DataStoreUnavailableError
+} = require('@salesforce/pwa-kit-runtime/utils/ssr-server/data-store')
+
 const {isolationTests} = require('./isolation-actions')
+const pkg = require('../package.json')
 
 /**
  * Custom error class
@@ -64,6 +72,7 @@ const ENVS_TO_EXPOSE = [
     'aws_lambda_log_stream_name',
     'aws_region',
     'bundle_id',
+    'mrt_env_base_path',
     // These "customer" defined environment variables are set by the Manager
     // and expected by the MRT smoke test suite
     'customer_*',
@@ -194,6 +203,13 @@ const cookieTest = async (req, res) => {
     res.json(jsonFromRequest(req))
 }
 
+const multiCookies = async (req, res) => {
+    res.cookie('test-cookie', 'test-value')
+    res.append('Set-Cookie', 'test-value2')
+    res.append('Set-Cookie', 'test-value3')
+    res.json(jsonFromRequest(req))
+}
+
 /**
  * Express handler that sets single and multi-value response headers
  * and returns a JSON response with diagnostic values.
@@ -206,6 +222,30 @@ const responseHeadersTest = async (req, res) => {
         res.set(key, value)
     }
     res.json(jsonFromRequest(req))
+}
+
+/**
+ * Serve the example.json file from the static directory to verify that the file is served correctly.
+ */
+const ssrShared = async (req, res) => {
+    const fileName = `${__dirname}/static/example.json`
+    try {
+        const data = await fs.readFile(fileName, {encoding: 'utf8'})
+        const jsonData = JSON.parse(data)
+        res.json(jsonData)
+    } catch (error) {
+        res.json({
+            error: error
+        })
+    }
+}
+
+/**
+ * Express handler that returns a non-streaming response.
+ */
+const streamingLarge = (req, res) => {
+    res.status(200)
+    res.json({streaming: false})
 }
 
 /**
@@ -309,6 +349,33 @@ const headerTest = async (req, res) => {
 }
 
 /**
+ * Fetch an entry from the data store by key and return it as JSON.
+ */
+const dataStoreTest = async (req, res) => {
+    const store = DataStore.getDataStore()
+
+    if (!store.isDataStoreAvailable()) {
+        return res.json({dataStore: false})
+    }
+
+    let result
+    try {
+        result = await store.getEntry(req.params.key)
+    } catch (err) {
+        if (err instanceof DataStoreUnavailableError) {
+            return res.status(400).json({error: err.message})
+        } else if (err instanceof DataStoreNotFoundError) {
+            return res.status(404).json({error: err.message})
+        } else if (err instanceof DataStoreServiceError) {
+            return res.status(500).json({error: err.message})
+        }
+        throw err
+    }
+
+    return res.json(result)
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -325,6 +392,19 @@ const loggingMiddleware = (req, res, next) => {
         }
     })
 
+    return next()
+}
+
+const envBasePathMiddleware = (req, res, next) => {
+    const basePath = process.env.MRT_ENV_BASE_PATH
+    console.debug(`Base path: Base path: ${basePath}`)
+    console.debug(`Request path: Request path: ${req.url}`)
+    if (basePath && (req.path.startsWith(`${basePath}/`) || req.path === basePath)) {
+        req.url = req.url.slice(basePath.length) || '/'
+        console.debug(
+            `Base path: Rewrote ${basePath} -> Original url: ${req.originalUrl} -> New url: ${req.url}`
+        )
+    }
     return next()
 }
 
@@ -356,12 +436,14 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // before we invoke the handlers)
     app.use((req, res, next) => {
         res.set('Cache-Control', 'no-cache')
+        res.set('Server', 'mrt ref app')
         return next()
     })
 
     // Add middleware to log request and response headers
     app.use(loggingMiddleware)
-
+    // Add a middleware to consume the base path from the request path if one is set
+    app.use(envBasePathMiddleware)
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
@@ -369,9 +451,13 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/cache/:duration(\\d+)', cacheTest)
     app.get('/memtest', memoryTest)
     app.get('/cookie', cookieTest)
+    app.get('/multi-cookies', multiCookies)
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
+    app.get('/ssr-shared', ssrShared)
+    app.get('/streaming-large', streamingLarge)
+    app.get('/data-store/:key', dataStoreTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

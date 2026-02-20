@@ -6,7 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
-const {parseSettings} = require('./utils.js')
+const {parseSettings, validateOtpTokenLength} = require('./utils.js')
 
 module.exports = {
     app: {
@@ -34,7 +34,10 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            enableAgentFromHeader: 'false',
+            enableAgentFromFloatingButton: 'false',
+            enableAgentFromSearchSuggestions: 'false'
         },
         // Customize how your 'site' and 'locale' are displayed in the url.
         url: {
@@ -57,6 +60,9 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
+            // The length of the token for OTP authentication. Used by passwordless login and reset password.
+            // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
+            tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
                 // Enables or disables passwordless login for the site. Defaults to: false
                 {{#if answers.project.demo.enableDemoSettings}}
@@ -64,11 +70,12 @@ module.exports = {
                 {{else}}
                 enabled: false,
                 {{/if}}
+                // The mode for passwordless login. Valid values include 'email|callback'. Defaults to: 'callback'
+                mode: 'email',
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
-                // Required in 'callback' mode; if missing, passwordless login defaults to 'sms' mode, which requires Marketing Cloud configuration.
-                // If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
-                callbackURI:
-                    process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+                // Required when mode is set to 'callback'. If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
+                // callbackURI:
+                //     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 // The landing path for passwordless login
                 landingPath: '/passwordless-login-landing'
             },
@@ -88,9 +95,11 @@ module.exports = {
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
+                // The mode for reset password. Valid values include 'email|callback'. Defaults to: 'callback'
+                mode: 'email',
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
-                // If the env var `RESET_PASSWORD_CALLBACK_URI` is set, it will override the config value.
-                callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
+                // Required when mode is set to 'callback'. If the env var `RESET_PASSWORD_CALLBACK_URI` is set, it will override the config value.
+                // callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
                 // The landing path for reset password
                 landingPath: '/reset-password-landing'
             }
@@ -135,6 +144,22 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: '{{answers.project.dataCloud.appSourceId}}',
             tenantId: '{{answers.project.dataCloud.tenantId}}'
+        },
+        // Note: this feature is in Developer Preview at this time. To use One Click Checkout,
+        // enable the oneClickCheckout flag and configure private SLAS client. For more details, please
+        // check https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.16.0
+        oneClickCheckout: {
+            enabled: false
+        },
+        // Bonus product config
+        pages: {
+            cart: {
+                groupBonusProductsWithQualifyingProduct: true
+            }
+        },
+        // Google Cloud api config
+        googleCloudAPI: {
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
     // Experimental: The base path for the app. This is the path that will be prepended to all /mobify routes,
@@ -161,7 +186,7 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',

@@ -270,12 +270,16 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        // Build the return URL (needed for updatePaymentInstrumentForOrder )      
+        // Build the return URL (needed for updatePaymentInstrumentForOrder )
         const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
-        paymentData.returnUrl = baseReturnUrl +
-            '?orderNo=' + encodeURIComponent(createdOrderNo) +
-            '&zoneId=' + encodeURIComponent(zoneId) +
-            '&type=' + encodeURIComponent(paymentType)
+        paymentData.returnUrl =
+            baseReturnUrl +
+            '?orderNo=' +
+            encodeURIComponent(createdOrderNo) +
+            '&zoneId=' +
+            encodeURIComponent(zoneId) +
+            '&type=' +
+            encodeURIComponent(paymentType)
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({

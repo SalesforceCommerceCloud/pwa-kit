@@ -14,15 +14,24 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
  * will be returned.
  *
  * @param {Object} product
+ * @param {boolean} isProductPartOfSet
+ * @param {boolean} isProductPartOfBundle
+ * @param {Object} controlledVariationValues - Optional controlled variation values (skips URL reading)
  * @returns {Object} the currently selected `Variant` object.
  */
 export const useVariant = (
     product = {},
     isProductPartOfSet = false,
-    isProductPartOfBundle = false
+    isProductPartOfBundle = false,
+    controlledVariationValues = null
 ) => {
     const {variants = []} = product
-    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
+    const variationParams = useVariationParams(
+        product,
+        isProductPartOfSet,
+        isProductPartOfBundle,
+        controlledVariationValues
+    )
 
     // Get a filtered array of variants. The resulting array will only have variants
     // which have all the current variation params values set.

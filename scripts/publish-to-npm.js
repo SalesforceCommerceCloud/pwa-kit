@@ -70,7 +70,26 @@ const publishPackages = (packages = [], isNightly = false) => {
         })
 
         sh.exec('git add .', {silent: true})
-        sh.exec('git commit -m "temporary commit to have clean working tree"', {silent: true})
+        const commitResult = sh.exec(
+            'git commit -m "temporary commit to have clean working tree"',
+            {silent: true}
+        )
+
+        if (commitResult.code !== 0) {
+            console.error(
+                'Failed to create temporary commit. Git user.name and user.email might not be configured.'
+            )
+            console.error('Commit error:', commitResult.stderr)
+
+            // Clean up the package.json changes before exiting
+            packagesToIgnore.forEach((pkg) => {
+                sh.exec('npm pkg delete private', {cwd: pkg.location})
+            })
+            // Unstage the files that were staged with 'git add .' above
+            sh.exec('git reset HEAD', {silent: true})
+
+            process.exit(1)
+        }
     }
 
     // Why do we still want `lerna publish`? It turns out that we do need it. Sometimes we wanted some behaviour that's unique to Lerna.

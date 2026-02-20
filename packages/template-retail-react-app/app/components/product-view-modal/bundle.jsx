@@ -39,7 +39,7 @@ const BundleProductViewModal = ({
     ...props
 }) => {
     const productViewModalData = useProductViewModal(bundle)
-    const {variationParams} = useDerivedProduct(bundle)
+    const {variationParams} = useDerivedProduct(bundle, false, false, false)
     const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])

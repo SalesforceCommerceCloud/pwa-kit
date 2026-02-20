@@ -31,6 +31,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -72,32 +73,39 @@ const CartItems = ({basket}) => {
                 </AccordionButton>
                 <AccordionPanel px={0} py={4}>
                     <Stack spacing={5} align="flex-start" divider={<Divider />}>
-                        {basket.productItems?.map((product, idx) => {
-                            const variant = {
-                                ...product,
-                                ...(products && products[product.productId]),
-                                price: product.price
-                            }
-                            return (
-                                <ItemVariantProvider
-                                    key={`order-summary-item-${product.productId}-${product.itemId}`}
-                                    index={idx}
-                                    variant={variant}
-                                >
-                                    <Flex width="full" alignItems="flex-start">
-                                        <CartItemVariantImage width="80px" mr={2} />
-                                        <Stack width="full" spacing={1} marginTop="-3px">
-                                            <CartItemVariantName />
-                                            <CartItemVariantAttributes includeQuantity />
-                                            <CartItemVariantPrice
-                                                baseDirection="row"
-                                                currency={basket?.currency}
-                                            />
-                                        </Stack>
-                                    </Flex>
-                                </ItemVariantProvider>
+                        {(() => {
+                            const consolidatedItems = consolidateDuplicateBonusProducts(
+                                basket.productItems || []
                             )
-                        })}
+                            return consolidatedItems.map((product, idx) => {
+                                const variant = {
+                                    ...product,
+                                    ...(products && products[product.productId]),
+                                    price: product.price
+                                }
+                                return (
+                                    <ItemVariantProvider
+                                        key={`order-summary-item-${product.productId}-${
+                                            product.itemId || idx
+                                        }`}
+                                        index={idx}
+                                        variant={variant}
+                                    >
+                                        <Flex width="full" alignItems="flex-start">
+                                            <CartItemVariantImage width="80px" mr={2} />
+                                            <Stack width="full" spacing={1} marginTop="-3px">
+                                                <CartItemVariantName />
+                                                <CartItemVariantAttributes includeQuantity />
+                                                <CartItemVariantPrice
+                                                    baseDirection="row"
+                                                    currency={basket?.currency}
+                                                />
+                                            </Stack>
+                                        </Flex>
+                                    </ItemVariantProvider>
+                                )
+                            })
+                        })()}
 
                         <Button as={Link} to="/cart" variant="link" width="full" color="blue.700">
                             <FormattedMessage
