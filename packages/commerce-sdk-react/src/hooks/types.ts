@@ -20,8 +20,7 @@ import {
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
-    ShopperStores,
-    ShopperConfigurations
+    ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {CommerceApiProviderProps} from '../provider'

@@ -977,12 +977,6 @@
       "value": "Place Order"
     }
   ],
-  "checkout.heading.express_checkout": [
-    {
-      "type": 0,
-      "value": "Express Checkout"
-    }
-  ],
   "checkout.error.billing_address_required": [
     {
       "type": 0,
@@ -993,6 +987,12 @@
     {
       "type": 0,
       "value": "Could not save shipping address."
+    }
+  ],
+  "checkout.heading.express_checkout": [
+    {
+      "type": 0,
+      "value": "Express Checkout"
     }
   ],
   "checkout.label.user_registration": [
@@ -4187,12 +4187,6 @@
     {
       "type": 0,
       "value": "Visa"
-    }
-  ],
-  "sfp_payments_express.error.default": [
-    {
-      "type": 0,
-      "value": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order."
     }
   ],
   "shipping_address.action.ship_to_multiple_addresses": [
