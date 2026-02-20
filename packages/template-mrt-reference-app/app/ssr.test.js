@@ -17,6 +17,32 @@ const {
 const {mockClient} = require('aws-sdk-client-mock')
 const {ServiceException} = require('@smithy/smithy-client')
 
+const {
+    DataStore,
+    DataStoreNotFoundError,
+    DataStoreServiceError,
+    DataStoreUnavailableError
+} = require('@salesforce/pwa-kit-runtime/utils/ssr-server/data-store')
+
+const pathsToCheck = [
+    ['/', 200, 'application/json; charset=utf-8'],
+    ['/tls', 200, 'application/json; charset=utf-8'],
+    ['/exception', 500, 'text/html; charset=utf-8'],
+    ['/cache', 200, 'application/json; charset=utf-8'],
+    ['/cookie', 200, 'application/json; charset=utf-8'],
+    ['/set-response-headers', 200, 'application/json; charset=utf-8'],
+    ['/isolation', 200, 'application/json; charset=utf-8'],
+    ['/memtest', 200, 'application/json; charset=utf-8'],
+    ['/streaming-large', 200, 'application/json; charset=utf-8']
+]
+const pathsToCheckWithBasePath = (basePath) => {
+    return pathsToCheck.map((pathStatusContentType) => [
+        basePath + pathStatusContentType[0],
+        pathStatusContentType[1],
+        pathStatusContentType[2]
+    ])
+}
+
 class AccessDenied extends ServiceException {
     constructor(options) {
         super({...options, name: 'AccessDenied'})
@@ -24,10 +50,12 @@ class AccessDenied extends ServiceException {
 }
 
 describe('server', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let originalEnv, app, server
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
     const logsMock = mockClient(CloudWatchLogsClient)
+
     beforeEach(() => {
         originalEnv = process.env
         process.env = Object.assign({}, process.env, {
@@ -48,24 +76,45 @@ describe('server', () => {
         s3Mock.reset()
         logsMock.reset()
     })
+
     afterEach(() => {
         process.env = originalEnv
         jest.restoreAllMocks()
     })
-    test.each([
-        ['/', 200, 'application/json; charset=utf-8'],
-        ['/tls', 200, 'application/json; charset=utf-8'],
-        ['/exception', 500, 'text/html; charset=utf-8'],
-        ['/cache', 200, 'application/json; charset=utf-8'],
-        ['/cookie', 200, 'application/json; charset=utf-8'],
-        ['/set-response-headers', 200, 'application/json; charset=utf-8'],
-        ['/isolation', 200, 'application/json; charset=utf-8'],
-        ['/memtest', 200, 'application/json; charset=utf-8']
-    ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
-        return request(app)
-            .get(path)
-            .expect(expectedStatus)
-            .expect('Content-Type', expectedContentType)
+
+    test.each(pathsToCheck)(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
+
+    test.each(pathsToCheckWithBasePath('/test-base-path'))(
+        'Path %p should render correctly',
+        (path, expectedStatus, expectedContentType) => {
+            process.env.MRT_ENV_BASE_PATH = '/test-base-path'
+            return request(app)
+                .get(path)
+                .expect(expectedStatus)
+                .expect('Content-Type', expectedContentType)
+        }
+    )
+
+    test('Path /echo should work with base path', async () => {
+        const basePath = '/test-base-path'
+        process.env.MRT_ENV_BASE_PATH = basePath
+        const response = await request(app).get(`${basePath}/echo?x=foo&y=bar`)
+        expect(response.status).toBe(200)
+        // preserves query parameters
+        expect(response.body.query.x).toBe('foo')
+        expect(response.body.query.y).toBe('bar')
+        // path is the path after the base path
+        expect(response.body.path).toBe('/echo')
+        // base path env var present in response body
+        expect(response.body.env.MRT_ENV_BASE_PATH).toBe(basePath)
     })
 
     test('Path "/cache" has Cache-Control set', () => {
@@ -74,6 +123,10 @@ describe('server', () => {
 
     test('Path "/cache/:duration" has Cache-Control set correctly', () => {
         return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
+    })
+
+    test('All responses have Server header set to "mrt ref app"', () => {
+        return request(app).get('/').expect('Server', 'mrt ref app')
     })
 
     test('Path "/headers" echoes request headers', async () => {
@@ -86,6 +139,21 @@ describe('server', () => {
         return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
+    })
+
+    test('Path "/multi-cookies" sets multiple cookies', async () => {
+        const response = await request(app).get('/multi-cookies')
+        const setCookieHeaders = response.headers['set-cookie']
+        expect(setCookieHeaders).toBeDefined()
+        expect(Array.isArray(setCookieHeaders)).toBe(true)
+        expect(setCookieHeaders.length).toBeGreaterThanOrEqual(3)
+        // Check that the first cookie is set using res.cookie (includes Path=/)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-cookie=test-value'))).toBe(
+            true
+        )
+        // Check that the appended cookies are present
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value2'))).toBe(true)
+        expect(setCookieHeaders.some((cookie) => cookie.includes('test-value3'))).toBe(true)
     })
 
     test('Path "/set-response-headers" sets response header', () => {
@@ -147,5 +215,80 @@ describe('server', () => {
         for (const header in response.body.headers) {
             expect(header).toBe(header.toLowerCase())
         }
+    })
+
+    test('Path "/ssr-shared" serves the example.json file', async () => {
+        const response = await request(app).get('/ssr-shared')
+        expect(response.body.message).toBe(
+            'This file is used in the E2E tests to verify that correct header values are set.'
+        )
+    })
+
+    test('Path "/streaming-large" returns streaming: false', async () => {
+        const response = await request(app).get('/streaming-large')
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({streaming: false})
+    })
+
+    describe('dataStoreTest', () => {
+        let mockGetEntry
+        let mockIsDataStoreAvailable
+        let originalInstance
+
+        beforeEach(() => {
+            // Save the original instance
+            originalInstance = DataStore._instance
+
+            // Create a mock DataStore instance (available by default)
+            mockGetEntry = jest.fn()
+            mockIsDataStoreAvailable = jest.fn().mockReturnValue(true)
+            const mockDataStore = {
+                getEntry: mockGetEntry,
+                isDataStoreAvailable: mockIsDataStoreAvailable
+            }
+
+            // Replace the singleton instance
+            DataStore._instance = mockDataStore
+        })
+
+        afterEach(() => {
+            // Restore the original instance
+            DataStore._instance = originalInstance
+        })
+
+        it('should return 200 with { dataStore: false } when the data store is unavailable', async () => {
+            mockIsDataStoreAvailable.mockReturnValue(false)
+            const response = await request(app).get('/data-store/my-key').expect(200)
+            expect(response.body).toEqual({dataStore: false})
+        })
+
+        it('should return 200 with the entry when getEntry returns data', async () => {
+            const entry = {key: 'my-key', value: {foo: 'bar'}}
+            mockGetEntry.mockResolvedValue(entry)
+            const response = await request(app).get('/data-store/my-key').expect(200)
+            expect(response.body).toEqual(entry)
+        })
+
+        it('should return 400 when getEntry throws DataStoreUnavailableError', async () => {
+            mockGetEntry.mockRejectedValue(
+                new DataStoreUnavailableError('The data store is unavailable.')
+            )
+            const response = await request(app).get('/data-store/my-key').expect(400)
+            expect(response.body).toHaveProperty('error', 'The data store is unavailable.')
+        })
+
+        it('should return 404 when getEntry throws DataStoreNotFoundError', async () => {
+            mockGetEntry.mockRejectedValue(
+                new DataStoreNotFoundError("Data store entry 'my-key' not found.")
+            )
+            const response = await request(app).get('/data-store/my-key').expect(404)
+            expect(response.body).toHaveProperty('error', "Data store entry 'my-key' not found.")
+        })
+
+        it('should return 500 when getEntry throws DataStoreServiceError', async () => {
+            mockGetEntry.mockRejectedValue(new DataStoreServiceError('Data store request failed.'))
+            const response = await request(app).get('/data-store/my-key').expect(500)
+            expect(response.body).toHaveProperty('error', 'Data store request failed.')
+        })
     })
 })

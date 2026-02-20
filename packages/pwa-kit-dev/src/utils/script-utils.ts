@@ -8,7 +8,6 @@ import os from 'os'
 import path from 'path'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
-import {URL} from 'url'
 import {
     createWriteStream,
     existsSync,

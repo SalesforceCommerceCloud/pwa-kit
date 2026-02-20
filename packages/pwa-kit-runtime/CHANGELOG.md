@@ -1,5 +1,19 @@
-## v3.14.0-dev (Sep 26, 2025)
+## v3.17.0-dev
+- Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
+## v3.16.0 (Feb 12, 2026)
+- Migrate AWS SDK from v2 to v3 [#3566](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3566)
+- Updated the SLAS private client proxy to enable customizing the proxy response body [#3662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3662)
+
+## v3.15.0 (Dec 17, 2025)
+- Fix multiple set-cookie headers [#3508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3508)
+
+## v3.14.0 (Nov 04, 2025)
 - Replace aws-serverless-express with @h4ad/serverless-adapter [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+- Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
+- Add extensibility hooks for SLAS private client proxy with `onSLASPrivateProxyReq` and `onSLASPrivateProxyRes` callbacks [#3411](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3411)
+- Remove exception when transfer-encoding: chunked [#3439](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3439)
+- Fix chunked encoding option name [#3440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3440)
 
 ## v3.13.0 (Sep 25, 2025)
 

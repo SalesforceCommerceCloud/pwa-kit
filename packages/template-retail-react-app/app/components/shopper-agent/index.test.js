@@ -509,7 +509,31 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com', // embeddedServiceEndpoint
             'https://test.salesforce.com/scrt2.js', // scrt2Url
             'en-US', // locale.id
-            'test-refresh-token' // refreshToken
+            'test-refresh-token', // refreshToken
+            'true' // enableAgentFromFloatingButton (default)
+        )
+    })
+
+    test('should call useMiaw with enableAgentFromFloatingButton false when configured', () => {
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: {
+                ...commerceAgentSettings,
+                enableAgentFromFloatingButton: 'false'
+            }
+        }
+
+        render(<ShopperAgent {...props} />)
+
+        expect(mockedUseMiaw).toHaveBeenCalledWith(
+            {loaded: true, error: false},
+            'test-org-id',
+            'test-service',
+            'https://test.salesforce.com',
+            'https://test.salesforce.com/scrt2.js',
+            'en-US',
+            'test-refresh-token',
+            'false' // enableAgentFromFloatingButton
         )
     })
 

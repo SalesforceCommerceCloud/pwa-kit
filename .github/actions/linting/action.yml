@@ -1,4 +1,5 @@
 name: linting
+description: Run linting checks on the codebase
 inputs:
   cwd:
     required: false

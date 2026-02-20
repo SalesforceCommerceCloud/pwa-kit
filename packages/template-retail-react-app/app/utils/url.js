@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {
     getLocaleByReference,
     getParamsFromPath,
@@ -13,19 +12,6 @@ import {
     getSiteByReference
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
-
-/**
- * Constructs an absolute URL from a given path and an optional application origin.
- *
- * @param {string} path - The relative URL path to be appended to the origin.
- * @param {string} [appOrigin] - The optional application origin (e.g., "https://example.com").
- *                                If not provided, the function will call `getAppOrigin()`.
- * @returns {string} - The fully qualified URL as a string.
- */
-export const absoluteUrl = (path, appOrigin) => {
-    // absoluteUrl is not a react hook so we cannot use the useAppOrigin hook here
-    return new URL(path, appOrigin || getAppOrigin()).toString()
-}
 
 /**
  * Modifies a given url by adding/updating query parameters.

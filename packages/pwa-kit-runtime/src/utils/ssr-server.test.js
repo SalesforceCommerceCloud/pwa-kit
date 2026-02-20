@@ -472,13 +472,14 @@ describe('MetricsSender', () => {
         const calledParams = []
         let callCount = 0
         sender._CW = {
-            putMetricData: (params, callback) => {
+            putMetricData: (params) => {
                 callCount += 1
-                // This returns a fake error on the first call, and then
-                // accepts all subsequent calls.
-                const err = calledParams.length ? null : new Error('imaginary error')
                 params.MetricData.forEach((metric) => calledParams.push(metric))
-                callback(err, null)
+                // This returns a fake promise that resolves immediately
+                if (callCount === 1) {
+                    return Promise.reject(new Error('Some error'))
+                }
+                return Promise.resolve()
             }
         }
 
@@ -505,7 +506,7 @@ describe('MetricsSender', () => {
                 expect(actual).toBeDefined()
                 expect(actual.MetricName).toEqual(metric.name)
                 expect(actual.Value).toEqual(metric.value || 0)
-                expect(actual.Timestamp).toEqual(nowISO)
+                expect(actual.Timestamp.toISOString()).toEqual(nowISO)
 
                 if (metric.dimensions) {
                     expect(actual.Dimensions).toBeDefined()
@@ -539,10 +540,8 @@ describe('MetricsSender', () => {
         // Set up a fake CloudWatch client that will return a Throttling
         // error every time it's called.
         sender._CW = {
-            putMetricData: (params, callback) => {
-                const err = new Error('Throttled')
-                err.code = 'Throttling'
-                callback(err)
+            putMetricData: (params) => {
+                return Promise.reject(new Error('Throttled'))
             }
         }
 
@@ -620,6 +619,86 @@ describe('processLambdaResponse', () => {
             const res = processLambdaResponse(testCase.response, testCase.event)
             testCase.validate(res.headers)
         })
+    })
+
+    test('preserves single cookie in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        expect(result.multiValueHeaders).toBeDefined()
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+        expect(result.headers['set-cookie']).toBeUndefined()
+    })
+
+    test('preserves multiple cookies in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/', 'test-value2', 'test-value3']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        expect(result.multiValueHeaders).toBeDefined()
+        expect(result.multiValueHeaders['set-cookie']).toEqual([
+            'test-cookie=test-value; Path=/',
+            'test-value2',
+            'test-value3'
+        ])
+        expect(result.headers['set-cookie']).toBeUndefined()
+    })
+
+    test('removes set-cookie from headers when cookies are in multiValueHeaders', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/'],
+                'Accept-Language': ['en-US']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        // set-cookie should be removed from headers
+        expect(result.headers['set-cookie']).toBeUndefined()
+        // Other headers should still be present
+        expect(result.headers['accept-language']).toBe('en-US')
+        // Cookies should be in multiValueHeaders
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+    })
+
+    test('does not add multiValueHeaders when no cookies are present', () => {
+        const response = {
+            multiValueHeaders: {
+                'Accept-Language': ['en-US']
+            }
+        }
+        const event = {}
+        const result = processLambdaResponse(response, event)
+
+        // multiValueHeaders should be an empty object when no cookies are present
+        expect(result.multiValueHeaders).toEqual({})
+        expect(result.headers['accept-language']).toBe('en-US')
+    })
+
+    test('handles cookies with correlation ID', () => {
+        const response = {
+            multiValueHeaders: {
+                'set-cookie': ['test-cookie=test-value; Path=/']
+            }
+        }
+        const event = {
+            headers: {'x-correlation-id': 'e46cd109-39b7-4173-963e-2c5de78ba087'}
+        }
+        const result = processLambdaResponse(response, event)
+
+        expect(result.headers['x-correlation-id']).toBe('e46cd109-39b7-4173-963e-2c5de78ba087')
+        expect(result.multiValueHeaders['set-cookie']).toEqual(['test-cookie=test-value; Path=/'])
+        expect(result.headers['set-cookie']).toBeUndefined()
     })
 })
 

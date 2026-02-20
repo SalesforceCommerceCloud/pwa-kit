@@ -43,7 +43,8 @@ export {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/ap
 // Re-export business logic utilities
 export {
     shouldShowBonusProductSelection,
-    isAutomaticPromotion
+    isAutomaticPromotion,
+    isRuleBasedPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
 // Re-export React hooks

@@ -73,13 +73,15 @@ const normalizeLocaleToSalesforce = (locale) => {
  * @param {string} embeddedServiceDeploymentUrl - URL of the embedded service deployment
  * @param {string} scrt2Url - SCRT2 URL for the embedded messaging service
  * @param {string} locale - BCP-47 locale for the embedded messaging service
+ * @param {string} [enableAgentFromFloatingButton='true'] - When 'false', hides the floating chat button on load
  */
 const initEmbeddedMessaging = (
     salesforceOrgId,
     embeddedServiceDeploymentName,
     embeddedServiceDeploymentUrl,
     scrt2Url,
-    locale
+    locale,
+    enableAgentFromFloatingButton = 'true'
 ) => {
     try {
         if (
@@ -93,6 +95,9 @@ const initEmbeddedMessaging = (
             window.embeddedservice_bootstrap.settings.language = salesforceLanguage
             window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
             window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false
+            // Hide floating chat button when enableAgentFromFloatingButton is 'false'
+            window.embeddedservice_bootstrap.settings.hideChatButtonOnLoad =
+                enableAgentFromFloatingButton !== 'true'
             window.embeddedservice_bootstrap.init(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,
@@ -117,6 +122,7 @@ const initEmbeddedMessaging = (
  * @param {string} scrt2Url - SCRT2 URL for the embedded messaging service
  * @param {string} locale - BCP-47 locale for the embedded messaging service
  * @param {string} refreshToken - Refresh token for the embedded messaging service
+ * @param {string} [enableAgentFromFloatingButton='true'] - When 'false', hides the floating chat button on load
  */
 const useMiaw = (
     scriptLoadStatus,
@@ -125,7 +131,8 @@ const useMiaw = (
     embeddedServiceDeploymentUrl,
     scrt2Url,
     locale,
-    refreshToken
+    refreshToken,
+    enableAgentFromFloatingButton = 'true'
 ) => {
     useEffect(() => {
         if (scriptLoadStatus.loaded && !scriptLoadStatus.error) {
@@ -135,7 +142,7 @@ const useMiaw = (
                 embeddedServiceDeploymentUrl,
                 scrt2Url,
                 locale,
-                refreshToken
+                enableAgentFromFloatingButton
             )
         }
     }, [
@@ -145,7 +152,8 @@ const useMiaw = (
         embeddedServiceDeploymentUrl,
         scrt2Url,
         locale,
-        refreshToken
+        refreshToken,
+        enableAgentFromFloatingButton
     ])
 }
 

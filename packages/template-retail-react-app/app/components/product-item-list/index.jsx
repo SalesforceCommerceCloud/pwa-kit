@@ -33,7 +33,9 @@ const ProductItemList = ({
     removingItemIds = [],
     // Styling options
     hideBorder = false,
-    hideBottomBorder = false
+    hideBottomBorder = false,
+    // Pickup information
+    getShipmentInfoForProduct = null
 }) => {
     return (
         <Stack spacing={4}>
@@ -42,11 +44,18 @@ const ProductItemList = ({
                 // Check if this product item (regular or bonus) is being removed
                 const isBeingRemoved = removingItemIds.includes(productItem.itemId)
 
+                // Get pickup information for this product item
+                const shipmentInfo = getShipmentInfoForProduct
+                    ? getShipmentInfoForProduct(productItem)
+                    : null
+                const pickupInStore = shipmentInfo?.isPickupOrder || false
+
                 return (
                     <ProductItem
                         key={productItem.itemId}
                         isBonusProduct={isBonusProductItem}
                         isRemoving={isBeingRemoved}
+                        pickupInStore={pickupInStore}
                         containerStyles={{
                             borderX: 'none',
                             borderTop: 'none',
@@ -105,7 +114,8 @@ ProductItemList.propTypes = {
     selectedItem: PropTypes.object,
     removingItemIds: PropTypes.arrayOf(PropTypes.string),
     hideBorder: PropTypes.bool,
-    hideBottomBorder: PropTypes.bool
+    hideBottomBorder: PropTypes.bool,
+    getShipmentInfoForProduct: PropTypes.func
 }
 
 export default ProductItemList

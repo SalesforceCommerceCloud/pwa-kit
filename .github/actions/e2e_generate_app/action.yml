@@ -1,4 +1,5 @@
 name: e2e_generate_app
+description: Generate a new project for E2E testing
 inputs:
   PROJECT_KEY:
     description: Project key to specify project to generate ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")

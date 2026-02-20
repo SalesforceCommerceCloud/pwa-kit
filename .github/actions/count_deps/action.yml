@@ -1,4 +1,5 @@
 name: count_deps
+description: Count and validate project dependencies
 inputs:
   project_dir:
     description: 'Path to the project directory'

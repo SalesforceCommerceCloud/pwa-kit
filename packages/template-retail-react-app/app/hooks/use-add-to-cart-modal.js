@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -48,7 +48,8 @@ import {
     getRemainingAvailableBonusProductsForProduct,
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
-    shouldShowBonusProductSelection
+    shouldShowBonusProductSelection,
+    getPromotionIdsForProduct
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 /**
@@ -102,9 +103,23 @@ export const AddToCartModal = () => {
     }
 
     // Bonus product logic
-    const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
+    const {data: productsWithPromotions, ruleBasedQualifyingProductsMap} =
+        useBasketProductsWithPromotions(basket)
     // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
     const {bonusDiscountLineItems = []} = basket || {}
+
+    // Build a map of selected bonus products per bonusDiscountLineItem for efficient lookup
+    // This avoids repeated filtering through productItems for each bonusDiscountLineItem
+    const bonusSelectionMap = useMemo(() => {
+        const map = {}
+        basket?.productItems?.forEach((cartItem) => {
+            if (cartItem.bonusProductLineItem && cartItem.bonusDiscountLineItemId) {
+                const id = cartItem.bonusDiscountLineItemId
+                map[id] = (map[id] || 0) + (cartItem.quantity || 0)
+            }
+        })
+        return map
+    }, [basket?.productItems])
 
     if (!isOpen) {
         return null
@@ -354,7 +369,8 @@ export const AddToCartModal = () => {
                                         shouldShowBonusProductSelection(
                                             basket,
                                             product?.id,
-                                            productsWithPromotions
+                                            productsWithPromotions,
+                                            ruleBasedQualifyingProductsMap
                                         )
 
                                     if (!shouldShowBonusSelection) {
@@ -366,7 +382,9 @@ export const AddToCartModal = () => {
                                         getRemainingAvailableBonusProductsForProduct(
                                             basket,
                                             product?.id,
-                                            productsWithPromotions
+                                            productsWithPromotions,
+                                            {},
+                                            ruleBasedQualifyingProductsMap
                                         )
 
                                     // Only render if there is remaining capacity across the collection
@@ -379,9 +397,30 @@ export const AddToCartModal = () => {
                                         return null
                                     }
 
-                                    // Get the first remaining available bonus product which contains the complete bonus discount line item data
-                                    const firstRemainingBonusProduct =
-                                        remainingBonusProductsData.bonusItems[0]
+                                    // Get promotionIds for this product to find matching bonusDiscountLineItems
+                                    const promotionIds = getPromotionIdsForProduct(
+                                        basket,
+                                        product?.id,
+                                        productsWithPromotions,
+                                        ruleBasedQualifyingProductsMap
+                                    )
+
+                                    // Find a bonusDiscountLineItem that has remaining capacity
+                                    // This ensures we don't pass a fully-allocated bonusDiscountLineItem to SelectBonusProductsCard
+                                    const matchingBonusDiscountLineItem =
+                                        basket?.bonusDiscountLineItems?.find((bli) => {
+                                            return (
+                                                promotionIds.includes(bli.promotionId) &&
+                                                (bonusSelectionMap[bli.id] || 0) <
+                                                    (bli.maxBonusItems || 0)
+                                            )
+                                        })
+
+                                    // If no matching bonusDiscountLineItem found, don't render
+                                    if (!matchingBonusDiscountLineItem) {
+                                        return null
+                                    }
+
                                     return (
                                         <SelectBonusProductsCard
                                             qualifyingProduct={{productId: product?.id}}
@@ -394,14 +433,7 @@ export const AddToCartModal = () => {
                                                 // Close AddToCart modal first - the SelectBonusProductsCard will handle opening the bonus modal
                                                 if (onClose) onClose()
                                             }}
-                                            bonusDiscountLineItem={{
-                                                id: firstRemainingBonusProduct?.bonusDiscountLineItemId,
-                                                promotionId:
-                                                    firstRemainingBonusProduct?.promotionId,
-                                                maxBonusItems:
-                                                    remainingBonusProductsData.aggregatedMaxBonusItems,
-                                                bonusProducts: remainingBonusProductsData.bonusItems
-                                            }}
+                                            bonusDiscountLineItem={matchingBonusDiscountLineItem}
                                             hideSelectionCounter={true} // Hide "(0 of 2 selected)" from promotion text
                                         />
                                     )
@@ -421,11 +453,14 @@ export const AddToCartModal = () => {
                                                 'Cart Subtotal ({itemAccumulatedCount} item)',
                                             id: 'add_to_cart_modal.label.cart_subtotal'
                                         },
-                                        {itemAccumulatedCount: totalItems}
+                                        {
+                                            itemAccumulatedCount: totalItems
+                                        }
                                     )}
                                 </Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
                                     {productSubTotal &&
+                                        currency &&
                                         intl.formatNumber(productSubTotal, {
                                             style: 'currency',
                                             currency: currency
@@ -495,11 +530,14 @@ export const AddToCartModal = () => {
                                     defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
                                     id: 'add_to_cart_modal.label.cart_subtotal'
                                 },
-                                {itemAccumulatedCount: totalItems}
+                                {
+                                    itemAccumulatedCount: totalItems
+                                }
                             )}
                         </Text>
                         <Text alignSelf="flex-end" fontWeight="600">
                             {productSubTotal &&
+                                currency &&
                                 intl.formatNumber(productSubTotal, {
                                     style: 'currency',
                                     currency: currency
