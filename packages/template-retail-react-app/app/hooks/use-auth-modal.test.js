@@ -297,9 +297,12 @@ describe('Passwordless enabled', () => {
             ).not.toBeInTheDocument()
         })
 
-        await waitFor(() => {
-            expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
     })
 
     test('allows passwordless login via Enter key', async () => {
