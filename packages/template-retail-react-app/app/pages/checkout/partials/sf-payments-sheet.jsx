@@ -538,8 +538,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         if (!containerElementRef.current) return // Skip if Payment container ref not attached to DOM yet
         if (!paymentConfig) return // Skip if Payment config not loaded yet
 
-
-        const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map( 
+        const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
             (account) => ({
                 ...account,
                 gatewayId: account.accountId
