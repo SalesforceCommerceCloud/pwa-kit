@@ -74,6 +74,12 @@ describe('PWAKitLogger', () => {
         expect(console.info).toHaveBeenCalledWith('testNamespace INFO This is an info message')
     })
 
+    test('should handle log method (alias for info)', () => {
+        const logger = createLogger({packageName: 'test-package'})
+        logger.log('This is a log message')
+        expect(console.info).toHaveBeenCalledWith('test-package INFO This is a log message')
+    })
+
     describe('serializeError method', () => {
         let logger
 

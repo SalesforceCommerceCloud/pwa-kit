@@ -10,13 +10,14 @@ module.exports = {
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
+        'static/example.json',
         'static/example.txt',
         'static/favicon.ico',
         'static/robots.txt',
         'config/default.js'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: 'httpbin.org',

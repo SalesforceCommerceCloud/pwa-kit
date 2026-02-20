@@ -681,6 +681,9 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "보기"
   },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "쇼핑 에이전트에게 문의"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "로고"
   },

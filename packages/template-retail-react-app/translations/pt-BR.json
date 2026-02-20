@@ -681,6 +681,9 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "Ver"
   },
+  "header.button.assistive_msg.ask_shopping_agent": {
+    "defaultMessage": "Perguntar ao agente de compras"
+  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logotipo"
   },

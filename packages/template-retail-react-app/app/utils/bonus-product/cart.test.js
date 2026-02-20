@@ -12,7 +12,8 @@ describe('Bonus Product Cart Utilities', () => {
         bonusDiscountLineItems: [
             {
                 id: 'bonus-123',
-                promotionId: 'BonusProductOnOrderOfAmountAbove250'
+                promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                bonusProducts: [{productId: 'bonus-product-1'}] // List-based promotion
             }
         ],
         productItems: [
@@ -64,7 +65,8 @@ describe('Bonus Product Cart Utilities', () => {
                 {
                     id: 'bonus-123',
                     promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                    maxBonusItems: 4 // 4 total ties available
+                    maxBonusItems: 4, // 4 total ties available
+                    bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based promotion
                 }
             ],
             productItems: [
@@ -253,13 +255,79 @@ describe('Bonus Product Cart Utilities', () => {
             expect(result).toEqual([])
         })
 
+        describe('Different Product Variants Sharing Same Promotion', () => {
+            test('distributes bonus products without duplication when different variants qualify for same promotion', () => {
+                const basketWithDifferentVariants = {
+                    bonusDiscountLineItems: [
+                        {
+                            id: 'bonus-123',
+                            promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                            maxBonusItems: 4,
+                            bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}]
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'shirt-small-item',
+                            productId: 'shirt-small',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'shirt-large-item',
+                            productId: 'shirt-large',
+                            quantity: 1,
+                            priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                        },
+                        {
+                            itemId: 'tie-item-1',
+                            productId: 'red-tie',
+                            bonusProductLineItem: true,
+                            bonusDiscountLineItemId: 'bonus-123',
+                            quantity: 4
+                        }
+                    ]
+                }
+
+                const productsWithPromotions = {
+                    'shirt-small': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    },
+                    'shirt-large': {
+                        productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                    }
+                }
+
+                const firstVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[0],
+                    productsWithPromotions
+                )
+                const secondVariantResult = cartUtils.getBonusProductsForSpecificCartItem(
+                    basketWithDifferentVariants,
+                    basketWithDifferentVariants.productItems[1],
+                    productsWithPromotions
+                )
+
+                // Each variant should get 2 ties (no duplication)
+                expect(firstVariantResult[0].quantity).toBe(2)
+                expect(secondVariantResult[0].quantity).toBe(2)
+
+                // Total should equal actual bonus products in cart
+                const totalAllocated =
+                    firstVariantResult[0].quantity + secondVariantResult[0].quantity
+                expect(totalAllocated).toBe(4)
+            })
+        })
+
         describe('Composite Sorting: Store Pickup Priority', () => {
             const basketWithShipments = {
                 bonusDiscountLineItems: [
                     {
                         id: 'bonus-123',
                         promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 4
+                        maxBonusItems: 4,
+                        bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                     }
                 ],
                 shipments: [
@@ -528,7 +596,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         // No shipments array
@@ -583,7 +652,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -647,7 +717,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -709,7 +780,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -802,7 +874,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -849,7 +922,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [],
@@ -888,7 +962,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 4
+                                maxBonusItems: 4,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -928,7 +1003,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 0 // Zero max items
+                                maxBonusItems: 0, // Zero max items
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -980,7 +1056,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1054,7 +1131,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1128,7 +1206,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 6
+                                maxBonusItems: 6,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1234,7 +1313,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 10
+                                maxBonusItems: 10,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1373,7 +1453,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: 8
+                                maxBonusItems: 8,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: [
@@ -1512,7 +1593,8 @@ describe('Bonus Product Cart Utilities', () => {
                             {
                                 id: 'bonus-123',
                                 promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                                maxBonusItems: numItems * 2
+                                maxBonusItems: numItems * 2,
+                                bonusProducts: [{productId: 'red-tie'}, {productId: 'blue-tie'}] // List-based
                             }
                         ],
                         shipments: largeShipments,
@@ -1555,6 +1637,359 @@ describe('Bonus Product Cart Utilities', () => {
             )
             expect(result).toHaveLength(1)
             expect(result[0].productId).toBe('bonus-product-1')
+        })
+    })
+
+    describe('consolidateDuplicateBonusProducts', () => {
+        test('returns empty array for null input', () => {
+            const result = cartUtils.consolidateDuplicateBonusProducts(null)
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array for undefined input', () => {
+            const result = cartUtils.consolidateDuplicateBonusProducts(undefined)
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array for empty array input', () => {
+            const result = cartUtils.consolidateDuplicateBonusProducts([])
+            expect(result).toEqual([])
+        })
+
+        test('returns regular products as-is when no bonus products', () => {
+            const productItems = [
+                {
+                    productId: 'regular-product-1',
+                    itemId: 'item-1',
+                    quantity: 2
+                },
+                {
+                    productId: 'regular-product-2',
+                    itemId: 'item-2',
+                    quantity: 1
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(2)
+            expect(result[0].productId).toBe('regular-product-1')
+            expect(result[0].quantity).toBe(2)
+            expect(result[1].productId).toBe('regular-product-2')
+            expect(result[1].quantity).toBe(1)
+        })
+
+        test('consolidates duplicate bonus products by productId', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-3',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(4) // 1 + 2 + 1
+            expect(result[0].bonusProductLineItem).toBe(true)
+        })
+
+        test('keeps different bonus products separate', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-2',
+                    itemId: 'bonus-item-2',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(2)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(2)
+            expect(result[1].productId).toBe('bonus-product-2')
+            expect(result[1].quantity).toBe(1)
+        })
+
+        test('preserves order: regular products first, then bonus products', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'regular-product-1',
+                    itemId: 'regular-item-1',
+                    quantity: 2
+                },
+                {
+                    productId: 'bonus-product-2',
+                    itemId: 'bonus-item-2',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456'
+                },
+                {
+                    productId: 'regular-product-2',
+                    itemId: 'regular-item-2',
+                    quantity: 1
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(4)
+            // Regular products should come first
+            expect(result[0].productId).toBe('regular-product-1')
+            expect(result[0].bonusProductLineItem).toBeUndefined()
+            expect(result[1].productId).toBe('regular-product-2')
+            expect(result[1].bonusProductLineItem).toBeUndefined()
+            // Bonus products should come after
+            expect(result[2].productId).toBe('bonus-product-1')
+            expect(result[2].bonusProductLineItem).toBe(true)
+            expect(result[3].productId).toBe('bonus-product-2')
+            expect(result[3].bonusProductLineItem).toBe(true)
+        })
+
+        test('consolidates multiple duplicate bonus products and preserves other properties', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 3,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-2',
+                    itemId: 'bonus-item-3',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(2)
+            // First bonus product should be consolidated
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(4) // 1 + 3
+            expect(result[0].bonusProductLineItem).toBe(true)
+            expect(result[0].bonusDiscountLineItemId).toBe('bonus-123')
+            // Second bonus product should remain separate
+            expect(result[1].productId).toBe('bonus-product-2')
+            expect(result[1].quantity).toBe(2)
+        })
+
+        test('handles mixed regular and bonus products with duplicates', () => {
+            const productItems = [
+                {
+                    productId: 'regular-product-1',
+                    itemId: 'regular-item-1',
+                    quantity: 1
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'regular-product-2',
+                    itemId: 'regular-item-2',
+                    quantity: 2
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-2',
+                    itemId: 'bonus-item-3',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(4)
+            // Regular products first
+            expect(result[0].productId).toBe('regular-product-1')
+            expect(result[0].quantity).toBe(1)
+            expect(result[1].productId).toBe('regular-product-2')
+            expect(result[1].quantity).toBe(2)
+            // Consolidated bonus products
+            expect(result[2].productId).toBe('bonus-product-1')
+            expect(result[2].quantity).toBe(3) // 1 + 2
+            expect(result[3].productId).toBe('bonus-product-2')
+            expect(result[3].quantity).toBe(1)
+        })
+
+        test('handles bonus products with zero quantity', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 0,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(2) // 0 + 2
+        })
+
+        test('handles bonus products with missing quantity property', () => {
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(2) // undefined treated as 0, then + 2
+        })
+
+        test('consolidates same bonus product from different qualifying products', () => {
+            // Scenario: Same product (bonus-product-1) is a bonus for two different qualifying products
+            // This tests that consolidation happens by productId only, regardless of which
+            // qualifying product triggered the bonus or which bonusDiscountLineItemId it has
+            const productItems = [
+                {
+                    productId: 'regular-product-A',
+                    itemId: 'regular-item-A',
+                    quantity: 1
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-1',
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123' // From regular-product-A
+                },
+                {
+                    productId: 'regular-product-B',
+                    itemId: 'regular-item-B',
+                    quantity: 1
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'bonus-item-2',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-456' // From regular-product-B (different line item)
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(3)
+            // Regular products first
+            expect(result[0].productId).toBe('regular-product-A')
+            expect(result[1].productId).toBe('regular-product-B')
+            // Bonus products consolidated - same productId from different sources merged
+            expect(result[2].productId).toBe('bonus-product-1')
+            expect(result[2].quantity).toBe(3) // 2 + 1, consolidated from both qualifying products
+            expect(result[2].bonusProductLineItem).toBe(true)
+            // Note: The bonusDiscountLineItemId will be from the first item found (bonus-123)
+            // This is a side effect of using sampleItem - information about the second source is lost
+        })
+
+        test('itemId is not used in consolidation logic (only for display keys)', () => {
+            // itemId is unique per line item but consolidation only uses productId
+            const productItems = [
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'unique-item-id-1',
+                    quantity: 1,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                },
+                {
+                    productId: 'bonus-product-1',
+                    itemId: 'unique-item-id-2', // Different itemId
+                    quantity: 2,
+                    bonusProductLineItem: true,
+                    bonusDiscountLineItemId: 'bonus-123'
+                }
+            ]
+
+            const result = cartUtils.consolidateDuplicateBonusProducts(productItems)
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-product-1')
+            expect(result[0].quantity).toBe(3) // Consolidated despite different itemIds
+            // The itemId in result will be from the first item found (unique-item-id-1)
+            // This is preserved for React key generation but not used in consolidation logic
         })
     })
 })

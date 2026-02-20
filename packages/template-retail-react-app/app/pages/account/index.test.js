@@ -220,7 +220,6 @@ describe('updating password', function () {
         expect(el.getByText(/forgot password/i)).toBeInTheDocument()
     })
 
-    // TODO: Fix test
     test('Allows customer to update password', async () => {
         global.server.use(
             rest.put('*/password', (req, res, ctx) => res(ctx.status(204), ctx.json()))
@@ -233,10 +232,11 @@ describe('updating password', function () {
         await user.type(el.getByLabelText(/current password/i), 'Password!12345')
         await user.type(el.getByLabelText('New Password'), 'Password!98765')
         await user.type(el.getByLabelText('Confirm New Password'), 'Password!98765')
-        await user.click(el.getByText(/Forgot password/i))
         await user.click(el.getByText(/save/i))
-
-        expect(el.getByTestId('sf-toggle-card-password-content')).toBeInTheDocument()
+        // Wait for form submission to complete and edit mode to close
+        await waitFor(() => {
+            expect(el.getByTestId('sf-toggle-card-password-content')).toBeInTheDocument()
+        })
     })
 
     test('Warns customer when updating password with invalid current password', async () => {
@@ -256,5 +256,27 @@ describe('updating password', function () {
         await user.click(el.getByText(/save/i))
 
         expect(await screen.findByTestId('password-update-error')).toBeInTheDocument()
+    })
+
+    test('navigates to reset-password page when "Forgot Password?" is clicked', async () => {
+        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
+
+        const el = within(screen.getByTestId('sf-toggle-card-password'))
+        await user.click(el.getByText(/edit/i))
+
+        const forgotPasswordButton = el.getByText(/forgot password/i)
+        expect(forgotPasswordButton).toBeInTheDocument()
+
+        await user.click(forgotPasswordButton)
+
+        await waitFor(() => {
+            expect(window.location.pathname).toBe(`${expectedBasePath}/reset-password`)
+        })
     })
 })

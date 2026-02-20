@@ -8,7 +8,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Button,
+    Stack,
+    Text,
+    Alert,
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
@@ -40,6 +46,14 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                             id="auth_modal.check_email.title.check_your_email"
                         />
                     </Text>
+                    {form.formState.errors?.global && (
+                        <Alert status="error">
+                            <AlertIcon color="red.500" boxSize={4} />
+                            <Text fontSize="sm" ml={3}>
+                                {form.formState.errors.global.message}
+                            </Text>
+                        </Alert>
+                    )}
                     <Stack spacing={10}>
                         <Text align="center" fontSize="md" id="email-confirmation-desc">
                             <FormattedMessage

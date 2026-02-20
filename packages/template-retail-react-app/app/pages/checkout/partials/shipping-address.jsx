@@ -71,14 +71,18 @@ export default function ShippingAddress() {
     const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
-    // Check if there are multiple product items to show option to ship to multiple addresses
-    const productItemsCount = basket?.productItems?.length || 0
-    const hasMultipleProductItems = productItemsCount > 1
-
     // Check if there are multiple delivery shipments (multi-shipping was used)
     const deliveryShipments =
         basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
+    // Check if there are multiple delivery items to show option to ship to multiple addresses
+    // Only count items that are in delivery shipments (not pickup shipments)
+    const deliveryItems =
+        basket?.productItems?.filter((item) =>
+            deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
+        ) || []
+    const hasMultipleDeliveryItems = deliveryItems.length > 1
 
     // Initialize multi-shipping state based on existing basket shipments
     const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
@@ -163,10 +167,6 @@ export default function ShippingAddress() {
                 })
             }
             // Move all items to the single target delivery shipment.
-            const deliveryItems =
-                basket?.productItems?.filter((item) =>
-                    deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
-                ) || []
             const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
             if (itemsToMove.length > 0) {
                 basketAfterItemMoves = await updateItemsToDeliveryShipment(
@@ -220,14 +220,14 @@ export default function ShippingAddress() {
                           })
                 }
                 editAction={
-                    multishipEnabled && hasMultipleProductItems
+                    multishipEnabled && hasMultipleDeliveryItems
                         ? isMultiShipping
                             ? formatMessage(shipToOneAddressLabel)
                             : formatMessage(deliverToMultipleAddressesLabel)
                         : null
                 }
                 onEditActionClick={
-                    multishipEnabled && hasMultipleProductItems ? handleToggleShippingMode : null
+                    multishipEnabled && hasMultipleDeliveryItems ? handleToggleShippingMode : null
                 }
             >
                 <ToggleCardEdit>

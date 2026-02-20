@@ -20,3 +20,21 @@ test('renders PasswordlessEmailConfirmation component with passed email', () => 
     renderWithProviders(<WrapperComponent email={email} />)
     expect(screen.getByText(email)).toBeInTheDocument()
 })
+
+test('displays error message when form has global error', () => {
+    const WrapperWithError = () => {
+        const form = useForm()
+        const formWithError = {
+            ...form,
+            formState: {
+                ...form.formState,
+                errors: {
+                    global: {message: 'test error'}
+                }
+            }
+        }
+        return <PasswordlessEmailConfirmation form={formWithError} />
+    }
+    renderWithProviders(<WrapperWithError />)
+    expect(screen.getByText('test error')).toBeInTheDocument()
+})

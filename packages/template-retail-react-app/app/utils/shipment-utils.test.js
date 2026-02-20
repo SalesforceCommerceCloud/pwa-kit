@@ -16,7 +16,8 @@ import {
     findUnusedDeliveryShipment,
     findDeliveryShipmentWithSameAddress,
     findShipmentToConsolidate,
-    isDefaultShipmentEmpty
+    isDefaultShipmentEmpty,
+    groupShipmentsByDeliveryOption
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 // Mock the constants module
@@ -453,6 +454,113 @@ describe('shipment-utils', () => {
         test('should return false for null/undefined shipment', () => {
             expect(isPickupShipment(null)).toBe(false)
             expect(isPickupShipment(undefined)).toBe(false)
+        })
+    })
+
+    describe('groupShipmentsByDeliveryOption', () => {
+        test('should return empty pickupShipments array when all shipments are delivery', () => {
+            const deliveryOnlyOrder = {
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingMethod: {id: 'delivery-method', c_storePickupEnabled: false}
+                    },
+                    {
+                        shipmentId: 'shipment-3',
+                        shippingMethod: {id: 'delivery-method-2', c_storePickupEnabled: false}
+                    }
+                ]
+            }
+
+            const result = groupShipmentsByDeliveryOption(deliveryOnlyOrder)
+
+            expect(result.pickupShipments).toHaveLength(0)
+            expect(result.deliveryShipments).toHaveLength(2)
+        })
+
+        test('should return empty deliveryShipments array when all shipments are pickup', () => {
+            const pickupOnlyOrder = {
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true}
+                    },
+                    {
+                        shipmentId: 'shipment-2',
+                        shippingMethod: {id: 'pickup-method-2', c_storePickupEnabled: true}
+                    }
+                ]
+            }
+
+            const result = groupShipmentsByDeliveryOption(pickupOnlyOrder)
+
+            expect(result.pickupShipments).toHaveLength(2)
+            expect(result.deliveryShipments).toHaveLength(0)
+        })
+
+        test('should return empty arrays for null/undefined order', () => {
+            expect(groupShipmentsByDeliveryOption(null)).toEqual({
+                pickupShipments: [],
+                deliveryShipments: []
+            })
+            expect(groupShipmentsByDeliveryOption(undefined)).toEqual({
+                pickupShipments: [],
+                deliveryShipments: []
+            })
+        })
+
+        test('should correctly classify shipments with missing shipping method', () => {
+            const orderWithMissingMethod = {
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true}
+                    },
+                    {
+                        shipmentId: 'shipment-2'
+                        // No shippingMethod property
+                    }
+                ]
+            }
+
+            const result = groupShipmentsByDeliveryOption(orderWithMissingMethod)
+
+            expect(result.pickupShipments).toHaveLength(1)
+            expect(result.deliveryShipments).toHaveLength(1)
+            expect(result.pickupShipments[0].shipmentId).toBe('shipment-1')
+            expect(result.deliveryShipments[0].shipmentId).toBe('shipment-2')
+        })
+
+        test('should handle mixed pickupShipments and deliveryShipments shipments', () => {
+            const mixedOrder = {
+                shipments: [
+                    {
+                        shipmentId: 'delivery-1',
+                        shippingMethod: {id: 'standard', c_storePickupEnabled: false}
+                    },
+                    {
+                        shipmentId: 'pickup-1',
+                        shippingMethod: {id: 'pickupShipments', c_storePickupEnabled: true}
+                    },
+                    {
+                        shipmentId: 'delivery-2',
+                        shippingMethod: {id: 'express', c_storePickupEnabled: false}
+                    },
+                    {
+                        shipmentId: 'pickup-2',
+                        shippingMethod: {id: 'pickup', c_storePickupEnabled: true}
+                    }
+                ]
+            }
+
+            const result = groupShipmentsByDeliveryOption(mixedOrder)
+
+            expect(result.pickupShipments).toHaveLength(2)
+            expect(result.deliveryShipments).toHaveLength(2)
+            expect(result.pickupShipments[0].shipmentId).toBe('pickup-1')
+            expect(result.pickupShipments[1].shipmentId).toBe('pickup-2')
+            expect(result.deliveryShipments[0].shipmentId).toBe('delivery-1')
+            expect(result.deliveryShipments[1].shipmentId).toBe('delivery-2')
         })
     })
 })

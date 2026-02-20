@@ -1,4 +1,5 @@
 name: snyk
+description: Run Snyk security audit on the project
 inputs:
   snyk_token:
     description: "Snyk token"

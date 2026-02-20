@@ -67,6 +67,11 @@ export default function useProfileFields({
                 })
             },
             error: errors[`${prefix}email`],
+            inputProps: {
+                // For security reason, updating the email must be validated via OTP (One Time Password)
+                // If you are to change this to allow updating the email, you must validate the email via OTP otherwise you will have a security gap
+                readOnly: true
+            },
             control
         },
         phone: {

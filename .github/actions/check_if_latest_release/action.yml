@@ -1,4 +1,5 @@
 name: check_if_latest_release
+description: Check if the current release is the latest release
 inputs:
   token:
     description: "Github API token"

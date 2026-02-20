@@ -6,6 +6,7 @@
  */
 
 import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/common'
+import {isRuleBasedPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
 /**
  * Discovery utilities for finding available bonus products.
@@ -13,6 +14,10 @@ import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/
  * This module handles discovering and calculating what bonus products are available
  * for selection and addition to the cart. It focuses on finding NEW items that can
  * be added, calculating remaining capacity, and determining available discount line items.
+ *
+ * Supports both list-based and rule-based bonus promotions:
+ * - List-based: Products defined in bonusProducts array (static list)
+ * - Rule-based: Products fetched dynamically via ruleBasedProductsMap parameter
  *
  * Functions in this file:
  * - Discovery of available bonus items to add
@@ -24,20 +29,73 @@ import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/
  */
 
 /**
+ * Processes bonus products from a discount item based on promotion type.
+ * Handles both rule-based and list-based promotions.
+ *
+ * @param {Object} discountItem - The bonus discount line item
+ * @param {Object} ruleBasedProductsMap - Map of promotionId to products array for rule-based promotions
+ * @param {Object} additionalFields - Additional fields to merge into each product
+ * @returns {Array<Object>} Array of processed bonus products with metadata
+ */
+const processBonusProducts = (discountItem, ruleBasedProductsMap, additionalFields = {}) => {
+    const products = []
+
+    if (isRuleBasedPromotion(discountItem)) {
+        // Use products from ruleBasedProductsMap
+        const ruleProducts = ruleBasedProductsMap[discountItem.promotionId] || []
+        ruleProducts.forEach((product) => {
+            products.push({
+                ...product,
+                promotionId: discountItem.promotionId,
+                ...additionalFields
+            })
+        })
+    } else {
+        // List-based: use existing bonusProducts array
+        discountItem.bonusProducts?.forEach((bonusProduct) => {
+            products.push({
+                ...bonusProduct,
+                promotionId: discountItem.promotionId,
+                ...additionalFields
+            })
+        })
+    }
+
+    return products
+}
+
+/**
  * Gets all available bonus discount line items that are triggered by a specific product.
+ *
+ * Supports both list-based and rule-based promotions:
+ * - List-based: Uses bonusProducts array from bonusDiscountLineItems
+ * - Rule-based: Uses ruleBasedProductsMap to get dynamically fetched products
  *
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to find available bonus items for
  * @param {Object} productsWithPromotions - Products data with promotion info
+ * @param {Object} [ruleBasedProductsMap={}] - Map of promotionId to products array for rule-based promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Array<Object>} Array of available bonus discount line items
  */
-export const getAvailableBonusItemsForProduct = (basket, productId, productsWithPromotions) => {
+export const getAvailableBonusItemsForProduct = (
+    basket,
+    productId,
+    productsWithPromotions,
+    ruleBasedProductsMap = {},
+    ruleBasedQualifyingProductsMap = {}
+) => {
     if (!basket || !productId || !productsWithPromotions) {
         return []
     }
 
     // Get promotion IDs using enhanced product data
-    const productPromotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const productPromotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (productPromotionIds.length === 0) {
         return []
@@ -52,13 +110,10 @@ export const getAvailableBonusItemsForProduct = (basket, productId, productsWith
     // Flatten the bonus products from all matching discount line items
     const availableBonusItems = []
     matchingDiscountItems.forEach((discountItem) => {
-        discountItem.bonusProducts?.forEach((bonusProduct) => {
-            availableBonusItems.push({
-                ...bonusProduct,
-                promotionId: discountItem.promotionId,
-                discountLineItemId: discountItem.id
-            })
+        const products = processBonusProducts(discountItem, ruleBasedProductsMap, {
+            discountLineItemId: discountItem.id
         })
+        availableBonusItems.push(...products)
     })
 
     return availableBonusItems
@@ -69,6 +124,10 @@ export const getAvailableBonusItemsForProduct = (basket, productId, productsWith
  * and the maxBonusItems limits. Only returns bonus items with remainingBonusItemsCount > 0.
  * Also includes aggregated statistics for promotion tracking.
  *
+ * Supports both list-based and rule-based promotions:
+ * - List-based: Uses bonusProducts array from bonusDiscountLineItems
+ * - Rule-based: Uses ruleBasedProductsMap to get dynamically fetched products
+ *
  * Uses correct logic:
  * - Available items: aggregated maxBonusItems from bonusDiscountLineItems with same promotionId
  * - Selected items: sum of quantities of bonus products in cart matched by bonusDiscountLineItemId
@@ -76,12 +135,16 @@ export const getAvailableBonusItemsForProduct = (basket, productId, productsWith
  * @param {Object} basket - The current basket data
  * @param {string} productId - The product ID to find remaining bonus products for
  * @param {Object} productsWithPromotions - Products data with promotion info
+ * @param {Object} [ruleBasedProductsMap={}] - Map of promotionId to products array for rule-based promotions
+ * @param {Object} [ruleBasedQualifyingProductsMap={}] - Map of promotionId to Set of qualifying productIds for rule-based promotions
  * @returns {Object} Object containing bonusItems array and aggregated statistics
  */
 export const getRemainingAvailableBonusProductsForProduct = (
     basket,
     productId,
-    productsWithPromotions
+    productsWithPromotions,
+    ruleBasedProductsMap = {},
+    ruleBasedQualifyingProductsMap = {}
 ) => {
     if (!basket || !productId || !productsWithPromotions) {
         return {
@@ -93,7 +156,12 @@ export const getRemainingAvailableBonusProductsForProduct = (
     }
 
     // Get promotion IDs for this product
-    const productPromotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const productPromotionIds = getPromotionIdsForProduct(
+        basket,
+        productId,
+        productsWithPromotions,
+        ruleBasedQualifyingProductsMap
+    )
 
     if (productPromotionIds.length === 0) {
         return {
@@ -188,14 +256,11 @@ export const getRemainingAvailableBonusProductsForProduct = (
 
         // If there are remaining slots, add all bonus products from this discount item
         if (remainingBonusItemsCount > 0) {
-            discountItem.bonusProducts?.forEach((bonusProduct) => {
-                remainingBonusItems.push({
-                    ...bonusProduct,
-                    promotionId: discountItem.promotionId,
-                    bonusDiscountLineItemId: discountItem.id,
-                    remainingBonusItemsCount: remainingBonusItemsCount // All products share the same remaining count for this discount item
-                })
+            const products = processBonusProducts(discountItem, ruleBasedProductsMap, {
+                bonusDiscountLineItemId: discountItem.id,
+                remainingBonusItemsCount: remainingBonusItemsCount
             })
+            remainingBonusItems.push(...products)
         }
     })
 
