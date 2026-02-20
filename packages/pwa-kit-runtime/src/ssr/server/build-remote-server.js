@@ -1210,7 +1210,7 @@ export const RemoteServerFactory = {
                         if (typeof options.onSLASPrivateProxyRes === 'function') {
                             try {
                                 const customBuffer = options.onSLASPrivateProxyRes(
-                                    responseBuffer,
+                                    workingBuffer,
                                     proxyRes,
                                     req,
                                     res
