@@ -425,11 +425,12 @@ const Search = (props) => {
             <HideOnDesktop>
                 <Flex
                     display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
-                    postion="absolute"
+                    position="absolute"
                     background="white"
                     left={0}
                     right={0}
                     height="100vh"
+                    overflowX="hidden"
                 >
                     {searchSuggestion.isLoading ? (
                         <Spinner

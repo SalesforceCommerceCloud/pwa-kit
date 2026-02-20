@@ -11,13 +11,20 @@ import {FormattedMessage} from 'react-intl'
 import {SparkleIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const AskAssistantBanner = ({onClick, styles}) => {
+    const handleInteraction = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        onClick?.()
+    }
+
     return (
         <Box
             {...styles.askAssistantBanner}
             as="button"
             type="button"
             textAlign="left"
-            onClick={onClick}
+            onMouseDown={handleInteraction}
+            onClick={handleInteraction}
             aria-label="Ask Shopping Agent - Discover, compare and shop smarter with your personal shopping assistant"
         >
             <Box {...styles.askAssistantBannerIcon}>

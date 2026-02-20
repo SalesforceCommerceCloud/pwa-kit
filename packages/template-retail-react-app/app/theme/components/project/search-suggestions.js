@@ -79,13 +79,17 @@ export default {
             left: 2
         },
         askAssistantBanner: {
-            borderRadius: 0,
-            padding: '14px 30%',
+            // Mobile: rounded top corners, full-bleed into container padding, internal padding 24px (no 100vw = no horizontal scroll)
+            // Desktop: same full-bleed
+            borderRadius: {base: 'md', md: 0},
+            borderTopLeftRadius: {base: 'md', md: 0},
+            borderTopRightRadius: {base: 'md', md: 0},
+            padding: {base: '14px 24px', md: '14px 30%'},
             margin: 0,
-            marginBottom: -6,
-            // Extend into container padding (6 = 24px each side): wider than 100% and shift left
-            width: 'calc(100% + 48px)',
+            marginBottom: {base: 0, md: -6},
             marginLeft: -6,
+            width: 'calc(100% + 48px)',
+            boxSizing: 'border-box',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
