@@ -28,7 +28,13 @@ jest.mock('@salesforce/retail-react-app/app/components/dynamic-image', () => {
 const baseStyles = {
     textContainer: {},
     sectionHeader: {},
-    phraseContainer: {}
+    phraseContainer: {},
+    askAssistantBanner: {},
+    askAssistantBannerContent: {},
+    askAssistantBannerIcon: {},
+    askAssistantBannerTitle: {},
+    askAssistantBannerDescription: {},
+    askAssistantBannerArrow: {}
 }
 
 const makeSearchSuggestions = (overrides = {}) => ({
@@ -136,4 +142,95 @@ test('renders nothing when there are no categories, products, or phrase suggesti
     expect(screen.queryByText('Categories')).not.toBeInTheDocument()
     expect(screen.queryByText('Products')).not.toBeInTheDocument()
     expect(screen.queryByTestId('sf-horizontal-product-suggestions')).not.toBeInTheDocument()
+})
+
+describe('Ask Assistant banner', () => {
+    test('renders Ask Assistant banner when showAskAssistantBanner and onAskAssistantClick are provided', () => {
+        const searchSuggestions = makeSearchSuggestions({
+            categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
+        })
+
+        renderWithProviders(
+            <SuggestionSection
+                searchSuggestions={searchSuggestions}
+                closeAndNavigate={jest.fn()}
+                styles={baseStyles}
+                showAskAssistantBanner={true}
+                onAskAssistantClick={jest.fn()}
+            />
+        )
+
+        const banners = screen.getAllByRole('button', {
+            name: /ask assistant.*discover, compare and shop smarter/i
+        })
+        expect(banners.length).toBeGreaterThanOrEqual(1)
+    })
+
+    test('does not render Ask Assistant banner when showAskAssistantBanner is false', () => {
+        const searchSuggestions = makeSearchSuggestions({
+            categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
+        })
+
+        renderWithProviders(
+            <SuggestionSection
+                searchSuggestions={searchSuggestions}
+                closeAndNavigate={jest.fn()}
+                styles={baseStyles}
+                showAskAssistantBanner={false}
+                onAskAssistantClick={jest.fn()}
+            />
+        )
+
+        expect(
+            screen.queryByRole('button', {
+                name: /ask assistant.*discover, compare and shop smarter/i
+            })
+        ).not.toBeInTheDocument()
+    })
+
+    test('does not render Ask Assistant banner when onAskAssistantClick is not provided', () => {
+        const searchSuggestions = makeSearchSuggestions({
+            categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
+        })
+
+        renderWithProviders(
+            <SuggestionSection
+                searchSuggestions={searchSuggestions}
+                closeAndNavigate={jest.fn()}
+                styles={baseStyles}
+                showAskAssistantBanner={true}
+            />
+        )
+
+        expect(
+            screen.queryByRole('button', {
+                name: /ask assistant.*discover, compare and shop smarter/i
+            })
+        ).not.toBeInTheDocument()
+    })
+
+    test('clicking Ask Assistant banner calls onAskAssistantClick', async () => {
+        const user = userEvent.setup()
+        const onAskAssistantClick = jest.fn()
+        const searchSuggestions = makeSearchSuggestions({
+            recentSearchSuggestions: [{type: 'recent', name: 'shoes', link: '/search?q=shoes'}]
+        })
+
+        renderWithProviders(
+            <SuggestionSection
+                searchSuggestions={searchSuggestions}
+                closeAndNavigate={jest.fn()}
+                styles={baseStyles}
+                showAskAssistantBanner={true}
+                onAskAssistantClick={onAskAssistantClick}
+            />
+        )
+
+        const banner = screen.getAllByRole('button', {
+            name: /ask assistant.*discover, compare and shop smarter/i
+        })[0]
+        await user.click(banner)
+
+        expect(onAskAssistantClick).toHaveBeenCalledTimes(1)
+    })
 })

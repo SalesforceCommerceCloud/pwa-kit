@@ -23,6 +23,16 @@ export const getSFPaymentsInstrument = (basketOrOrder) => {
 }
 
 /**
+ * Returns the client secret from a payment instrument (e.g. Stripe PaymentIntent client_secret).
+ * Used by express payment flows to pass through to the payment SDK.
+ * @param {Object} paymentInstrument - Payment instrument with paymentReference.gatewayProperties
+ * @returns {string|undefined} Client secret for the payment gateway, or undefined if not present
+ */
+export const getClientSecret = (paymentInstrument) => {
+    return paymentInstrument?.paymentReference?.gatewayProperties?.stripe?.clientSecret
+}
+
+/**
  * Transform billing and shipping address details from payment provider format to basket format.
  * Determines the appropriate source for billing address (PayPal/Venmo may not provide complete billing details).
  * Handles name splitting and address field mapping.

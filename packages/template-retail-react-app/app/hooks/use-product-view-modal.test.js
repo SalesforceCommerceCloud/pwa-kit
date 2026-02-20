@@ -54,7 +54,6 @@ const MockComponent = ({product}) => {
             {isShown && (
                 <>
                     <div>{productViewModalData.product.id}</div>
-                    <div data-testid="variant">{JSON.stringify(productViewModalData.variant)}</div>
                     <div>{`isFetching: ${productViewModalData.isFetching}`}</div>
                 </>
             )}
@@ -75,7 +74,7 @@ beforeEach(() => {
 })
 
 describe('useProductViewModal hook', () => {
-    test('return proper data', async () => {
+    test('returns proper data with product and isFetching state', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
         renderWithProviders(<MockComponent product={mockProductDetail} />)
@@ -86,43 +85,10 @@ describe('useProductViewModal hook', () => {
         await waitFor(() => {
             expect(screen.getByText('750518699578M')).toBeInTheDocument()
             expect(screen.getByText(/isFetching: false/i)).toBeInTheDocument()
-            expect(screen.getByTestId('variant')).toHaveTextContent(
-                '{"orderable":true,"price":299.99,"productId":"750518699578M","variationValues":{"color":"BLACKFB","size":"038","width":"V"}}'
-            )
         })
     })
 
-    test("clean up product's related url param when unmounting product content", () => {
-        const history = createMemoryHistory()
-        history.push('/test/path')
-
-        renderWithProviders(
-            <Router history={history}>
-                <IntlProvider
-                    locale={DEFAULT_LOCALE}
-                    defaultLocale={DEFAULT_LOCALE}
-                    messages={messages}
-                >
-                    <MockComponent product={mockProductDetail} />
-                </IntlProvider>
-            </Router>
-        )
-        const toggleButton = screen.getByText(/Toggle the content/)
-        // show the content
-        fireEvent.click(toggleButton)
-        expect(history.location.pathname).toBe('/test/path')
-
-        // hide the content
-        fireEvent.click(toggleButton)
-        const searchParams = new URLSearchParams(history.location.search.toString())
-        waitFor(() => {
-            expect(searchParams.get('color')).toBeUndefined()
-            expect(searchParams.get('width')).toBeUndefined()
-            expect(searchParams.get('pid')).toBeUndefined()
-        })
-    })
-
-    test('load new variant on variant selection', async () => {
+    test('fetches and updates product data', async () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
@@ -136,13 +102,40 @@ describe('useProductViewModal hook', () => {
 
         const toggleButton = screen.getByText(/Toggle the content/)
         fireEvent.click(toggleButton)
-        expect(screen.getByText('750518699578M')).toBeInTheDocument()
 
-        history.push('/test/path?color=BLACKFB&size=050&width=V&pid=750518699660M')
         await waitFor(() => {
-            expect(screen.getByTestId('variant')).toHaveTextContent(
-                '{"orderable":true,"price":299.99,"productId":"750518699660M","variationValues":{"color":"BLACKFB","size":"050","width":"V"}}'
-            )
+            expect(screen.getByText('750518699578M')).toBeInTheDocument()
         })
+    })
+
+    test('does not manage URL parameters (modals use React state instead)', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path?color=red&size=M')
+
+        renderWithProviders(
+            <Router history={history}>
+                <IntlProvider
+                    locale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                >
+                    <MockComponent product={mockProductDetail} />
+                </IntlProvider>
+            </Router>
+        )
+
+        const toggleButton = screen.getByText(/Toggle the content/)
+
+        // Show the content
+        fireEvent.click(toggleButton)
+
+        // URL params should remain unchanged (no URL management)
+        expect(history.location.search).toBe('?color=red&size=M')
+
+        // Hide the content
+        fireEvent.click(toggleButton)
+
+        // URL params should still be unchanged
+        expect(history.location.search).toBe('?color=red&size=M')
     })
 })

@@ -77,6 +77,42 @@ export default {
             position: 'absolute',
             top: 2,
             left: 2
+        },
+        askAssistantBanner: {
+            borderRadius: 'md',
+            padding: 4,
+            marginTop: 3,
+            backgroundColor: 'blue.50',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 3,
+            _hover: {
+                backgroundColor: 'blue.100'
+            }
+        },
+        askAssistantBannerContent: {
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 3,
+            flex: 1,
+            minWidth: 0
+        },
+        askAssistantBannerTitle: {
+            fontWeight: 'bold',
+            fontSize: 'md'
+        },
+        askAssistantBannerDescription: {
+            fontSize: 'sm',
+            color: 'gray.600',
+            marginTop: 1
+        },
+        askAssistantBannerIcon: {
+            flexShrink: 0
+        },
+        askAssistantBannerArrow: {
+            flexShrink: 0
         }
     }
 }
