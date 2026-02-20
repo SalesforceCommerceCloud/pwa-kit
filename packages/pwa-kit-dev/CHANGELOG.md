@@ -1,7 +1,9 @@
-## v3.17.0-dev
-- Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+## [Unreleased]
 - Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
 - Fix issue to correctly set the environment variable `MRT_DISABLE_HTTPONLY_SESSION_COOKIES` [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
+
+## v3.17.0-dev
+- Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
 ## v3.16.0 (Feb 12, 2026)
 
