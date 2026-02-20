@@ -361,7 +361,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         // TODO: Used to load icons
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        '*.adyen.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
