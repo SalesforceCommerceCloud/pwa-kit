@@ -13,8 +13,8 @@ import {
     getSelectedShippingMethodId,
     isShippingMethodValid,
     isPayPalPaymentMethodType,
+    findPaymentAccount,
     createPaymentInstrumentBody,
-    getClientSecret,
     getGatewayFromPaymentMethod,
     getSetupFutureUsage,
     transformPaymentMethodReferences,
@@ -1095,6 +1095,62 @@ describe('sf-payments-utils', () => {
         })
     })
 
+    describe('findPaymentAccount', () => {
+        test('returns null when paymentMethodSetAccounts is null', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
+
+            const result = findPaymentAccount(paymentMethods, null, 'card')
+
+            expect(result).toBeNull()
+        })
+
+        test('returns null when paymentMethodSetAccounts is not an array', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
+
+            const result = findPaymentAccount(paymentMethods, {}, 'card')
+
+            expect(result).toBeNull()
+        })
+
+        test('returns null when payment method type not found in paymentMethods', () => {
+            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'paypal_acct'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
+
+            const result = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, 'card')
+
+            expect(result).toBeNull()
+        })
+
+        test('returns null when payment method has no accountId', () => {
+            const paymentMethods = [{paymentMethodType: 'card'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
+
+            const result = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, 'card')
+
+            expect(result).toBeNull()
+        })
+
+        test('returns null when paymentMethods is undefined', () => {
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
+
+            const result = findPaymentAccount(undefined, paymentMethodSetAccounts, 'card')
+
+            expect(result).toBeNull()
+        })
+
+        test('returns account when payment method and account match', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'stripe_acct_123'}]
+            const paymentMethodSetAccounts = [
+                {vendor: 'Stripe', accountId: 'stripe_acct_123'},
+                {vendor: 'Paypal', accountId: 'paypal_acct'}
+            ]
+
+            const result = findPaymentAccount(paymentMethods, paymentMethodSetAccounts, 'card')
+
+            expect(result).toEqual({vendor: 'Stripe', accountId: 'stripe_acct_123'})
+        })
+    })
+
     describe('createPaymentInstrumentBody', () => {
         test('creates payment instrument body with all parameters', () => {
             const result = createPaymentInstrumentBody({
@@ -1274,6 +1330,96 @@ describe('sf-payments-utils', () => {
             expect(result.paymentReferenceRequest.shippingPreference).toBeUndefined()
         })
 
+        test('includes gateway for Adyen when storePaymentMethod is true', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({
+                storePaymentMethod: true
+            })
+        })
+
+        test('includes gateway for Adyen when payment data provided', () => {
+            const paymentData = {
+                paymentMethod: 'payment method',
+                returnUrl: 'return URL',
+                origin: 'origin',
+                lineItems: 'line items',
+                billingDetails: 'billing details',
+                otherStuff: 'to be ignored'
+            }
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                paymentData,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({
+                paymentMethod: 'payment method',
+                returnUrl: 'return URL',
+                origin: 'origin',
+                lineItems: 'line items',
+                billingDetails: 'billing details'
+            })
+        })
+
+        test('includes empty gateway properties for Adyen', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: false,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBe('adyen')
+            expect(result.paymentReferenceRequest.gatewayProperties.adyen).toEqual({})
+        })
+
+        test('does not include gateway for Adyen POST request even when storePaymentMethod is true', () => {
+            const paymentMethods = [{paymentMethodType: 'card', accountId: 'adyen_acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct_123'}]
+            const result = createPaymentInstrumentBody({
+                amount: 100.0,
+                paymentMethodType: 'card',
+                zoneId: 'default',
+                shippingPreference: undefined,
+                storePaymentMethod: true,
+                futureUsageOffSession: false,
+                paymentMethods,
+                paymentMethodSetAccounts,
+                isPostRequest: true
+            })
+
+            expect(result.paymentReferenceRequest.gateway).toBeUndefined()
+            expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
+        })
+
         test('does not include setupFutureUsage in POST request even when storePaymentMethod is true', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
@@ -1429,33 +1575,6 @@ describe('sf-payments-utils', () => {
         })
     })
 
-    describe('getClientSecret', () => {
-        test('returns clientSecret from gatewayProperties.stripe structure', () => {
-            const paymentInstrument = {
-                paymentReference: {
-                    gatewayProperties: {
-                        stripe: {
-                            clientSecret:
-                                'pi_3Sfub6RArCOz1e7h0XCpAXOJ_secret_MV5Mk96oULHJLY7OLU6r74Hao'
-                        }
-                    },
-                    paymentReferenceId: 'pi_3Sfub6RArCOz1e7h0XCpAXOJ'
-                }
-            }
-
-            const result = getClientSecret(paymentInstrument)
-
-            expect(result).toBe('pi_3Sfub6RArCOz1e7h0XCpAXOJ_secret_MV5Mk96oULHJLY7OLU6r74Hao')
-        })
-
-        test('returns undefined when structure is missing or invalid', () => {
-            expect(getClientSecret(null)).toBeUndefined()
-            expect(getClientSecret(undefined)).toBeUndefined()
-            expect(getClientSecret({})).toBeUndefined()
-            expect(getClientSecret({paymentReference: {}})).toBeUndefined()
-        })
-    })
-
     describe('transformPaymentMethodReferences', () => {
         test('returns empty array when customer is null', () => {
             const result = transformPaymentMethodReferences(null, {})
@@ -1469,6 +1588,44 @@ describe('sf-payments-utils', () => {
 
         test('returns empty array when customer has no paymentMethodReferences', () => {
             const result = transformPaymentMethodReferences({}, {})
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array when paymentConfig is null', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {id: 'pm_123', accountId: 'stripe-account-1', type: 'card', last4: '4242'}
+                ]
+            }
+
+            const result = transformPaymentMethodReferences(customer, null)
+
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array when paymentMethodReferences is not an array', () => {
+            const customer = {paymentMethodReferences: null}
+            const paymentConfig = {
+                paymentMethodSetAccounts: [{accountId: 'stripe-account-1', vendor: 'Stripe'}]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
+            expect(result).toEqual([])
+        })
+
+        test('filters out when matching account has non-string accountId', () => {
+            const customer = {
+                paymentMethodReferences: [
+                    {id: 'pm_456', accountId: 999, type: 'card', last4: '1234'}
+                ]
+            }
+            const paymentConfig = {
+                paymentMethodSetAccounts: [{accountId: 999, vendor: 'Stripe'}]
+            }
+
+            const result = transformPaymentMethodReferences(customer, paymentConfig)
+
             expect(result).toEqual([])
         })
 
@@ -1499,7 +1656,7 @@ describe('sf-payments-utils', () => {
             expect(result).toHaveLength(1)
             expect(result[0]).toEqual({
                 accountId: 'stripe-account-1',
-                name: 'Visa •••• 4242',
+                name: 'Card •••• 4242',
                 status: 'Active',
                 isDefault: false,
                 type: 'card',
@@ -1517,6 +1674,48 @@ describe('sf-payments-utils', () => {
                 bankName: null,
                 savedByMerchant: false
             })
+        })
+
+        test('preserves brand variants in network field for SDK to derive display name', () => {
+            const paymentConfig = {
+                paymentMethodSetAccounts: [
+                    {accountId: 'adyen-1', gatewayId: 'adyen-1', vendor: 'Adyen'}
+                ]
+            }
+            const resultMc = transformPaymentMethodReferences(
+                {
+                    paymentMethodReferences: [
+                        {
+                            id: 'pm_mc',
+                            accountId: 'adyen-1',
+                            type: 'card',
+                            brand: 'mc',
+                            last4: '4444'
+                        }
+                    ]
+                },
+                paymentConfig
+            )
+            const resultMaster = transformPaymentMethodReferences(
+                {
+                    paymentMethodReferences: [
+                        {
+                            id: 'pm_master',
+                            accountId: 'adyen-1',
+                            type: 'card',
+                            brand: 'master',
+                            last4: '4444'
+                        }
+                    ]
+                },
+                paymentConfig
+            )
+            expect(resultMc).toHaveLength(1)
+            expect(resultMc[0].name).toBe('Card •••• 4444')
+            expect(resultMc[0].network).toBe('mc')
+            expect(resultMaster).toHaveLength(1)
+            expect(resultMaster[0].name).toBe('Card •••• 4444')
+            expect(resultMaster[0].network).toBe('master')
         })
 
         test('transforms payment method reference with type card and last4', () => {
@@ -1748,8 +1947,8 @@ describe('sf-payments-utils', () => {
             const result = transformPaymentMethodReferences(customer, paymentConfig)
 
             expect(result).toHaveLength(2)
-            expect(result[0].name).toBe('Visa •••• 4242')
-            expect(result[1].name).toBe('Mastercard •••• 5555')
+            expect(result[0].name).toBe('Card •••• 4242')
+            expect(result[1].name).toBe('Card •••• 5555')
         })
     })
 
