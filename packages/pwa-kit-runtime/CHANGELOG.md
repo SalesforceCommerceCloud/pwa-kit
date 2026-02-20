@@ -1,3 +1,4 @@
+## v3.17.0-nightly-20260220080926 (Feb 20, 2026)
 ## v3.17.0-dev
 - Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
