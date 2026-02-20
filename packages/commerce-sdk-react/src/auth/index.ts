@@ -54,7 +54,7 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
-    /** When true, token response may be sanitized (tokens in HttpOnly cookies); only set non-token fields and use access_token_expires_at for expiry. */
+    /** When true, session tokens are set as HttpOnly cookies */
     useHttpOnlySessionCookies?: boolean
 }
 

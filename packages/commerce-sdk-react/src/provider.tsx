@@ -155,7 +155,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const configLogger = logger || console
 
     // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
-    // Override 'omit' or unset to 'same-origin'; keep 'same-origin' or 'include' as-is.
     const effectiveFetchOptions =
         useHttpOnlySessionCookies &&
         (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
