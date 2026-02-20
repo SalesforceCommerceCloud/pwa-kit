@@ -122,8 +122,8 @@ function getRefreshTokenCookieTTL(refreshTokenExpiresInSLASValue, isGuest, optio
 }
 
 /**
- * When HttpOnly session cookies are enabled: set tokens as HttpOnly cookies, TTLs as non-HttpOnly,
- * strip token fields from body, and remove upstream Set-Cookie so we control all cookies.
+ * When HttpOnly session cookies are enabled: set tokens as HttpOnly cookies,
+ * strip token fields from body, and append our Set-Cookie headers (preserving upstream cookies).
  * @private
  */
 function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
