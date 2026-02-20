@@ -36,8 +36,7 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
     getAuthorizePasswordlessErrorMessage,
     getPasswordResetErrorMessage,
-    getLoginPasswordlessErrorMessage,
-    getPasskeyAuthenticateErrorMessage
+    getLoginPasswordlessErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -240,7 +239,7 @@ export const AuthModal = ({
             form.reset()
             // Prompt user to login without username (discoverable credentials)
             loginWithPasskey().catch(() => {
-                form.setError('global', {type: 'manual', message:formatMessage(API_ERROR_MESSAGE)})
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
             })
         }
     }, [isOpen])

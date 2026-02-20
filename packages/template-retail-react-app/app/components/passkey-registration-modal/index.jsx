@@ -38,7 +38,10 @@ import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/uti
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 
 // Constants
-import {API_ERROR_MESSAGE, INVALID_TOKEN_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Modal for registering a new passkey with a nickname
@@ -148,7 +151,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             return {success: true}
         } catch (err) {
             console.error('Error registering passkey:', err)
-            const message = /Unauthorized/i.test(err.message) 
+            const message = /Unauthorized/i.test(err.message)
                 ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
 

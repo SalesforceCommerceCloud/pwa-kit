@@ -27,7 +27,6 @@ import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/m
 import * as ReactHookForm from 'react-hook-form'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
@@ -815,9 +814,7 @@ describe('Passkey login', () => {
 
         // Should show error - 401 error from WebAuthn API should be caught and converted to user-friendly message
         await waitFor(() => {
-            expect(
-                screen.getByText(/Something went wrong. Try again!/i)
-            ).toBeInTheDocument()
+            expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
         })
     })
 

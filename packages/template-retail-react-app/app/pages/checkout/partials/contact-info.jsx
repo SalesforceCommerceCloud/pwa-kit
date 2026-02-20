@@ -49,10 +49,7 @@ import {
     getAuthorizePasswordlessErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {getPasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
-import {
-    API_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
