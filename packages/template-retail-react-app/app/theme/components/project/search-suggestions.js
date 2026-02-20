@@ -79,40 +79,67 @@ export default {
             left: 2
         },
         askAssistantBanner: {
-            borderRadius: 'md',
-            padding: 4,
-            marginTop: 3,
-            backgroundColor: 'blue.50',
+            borderRadius: 0,
+            padding: '14px 30%',
+            margin: 0,
+            marginBottom: -6,
+            // Extend into container padding (6 = 24px each side): wider than 100% and shift left
+            width: 'calc(100% + 48px)',
+            marginLeft: -6,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             gap: 3,
+            color: 'gray.800',
+            minHeight: '56px',
+            background:
+                'linear-gradient(to right, #E0EDFC 0%, #E8E5FC 40%, #F5E5ED 70%, #E8E5FC 100%)',
             _hover: {
-                backgroundColor: 'blue.100'
+                background:
+                    'linear-gradient(to right, #C7DCFC 0%, #DDD6FC 40%, #F0C9DE 70%, #DDD6FC 100%)'
             }
         },
         askAssistantBannerContent: {
             display: 'flex',
-            alignItems: 'flex-start',
-            gap: 3,
+            flexDirection: 'column',
             flex: 1,
-            minWidth: 0
+            minWidth: 0,
+            padding: 0,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            textAlign: 'left'
+        },
+        askAssistantBannerTitleRow: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            width: '100%'
         },
         askAssistantBannerTitle: {
-            fontWeight: 'bold',
-            fontSize: 'md'
+            fontSize: 'md',
+            lineHeight: 1.25,
+            color: 'gray.800',
+            textAlign: 'left'
         },
         askAssistantBannerDescription: {
             fontSize: 'sm',
             color: 'gray.600',
-            marginTop: 1
+            marginTop: '2px',
+            textAlign: 'left'
         },
         askAssistantBannerIcon: {
-            flexShrink: 0
+            flexShrink: 0,
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            transform: 'translateY(-50%)'
         },
         askAssistantBannerArrow: {
-            flexShrink: 0
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center'
         }
     }
 }
