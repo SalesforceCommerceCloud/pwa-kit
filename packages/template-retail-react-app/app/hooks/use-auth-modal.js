@@ -43,6 +43,8 @@ import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
@@ -73,7 +75,7 @@ export const AuthModal = ({
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
     const prevAuthType = usePrevious(customerType)
-
+    const {loginWithPasskey} = usePasskeyLogin()
     const customer = useCustomer(
         {parameters: {customerId}},
         {enabled: !!customerId && isRegistered}
@@ -100,6 +102,8 @@ export const AuthModal = ({
         {enabled: !!customerId && !isServer, keepPreviousData: true}
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+
+    const {showRegisterPasskeyToast} = usePasskeyRegistration()
 
     const handlePasswordlessLogin = async (email) => {
         try {
@@ -233,6 +237,10 @@ export const AuthModal = ({
         if (isOpen) {
             setCurrentView(initialView)
             form.reset()
+            // Prompt user to login without username (discoverable credentials)
+            loginWithPasskey().catch(() => {
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            })
         }
     }, [isOpen])
 
@@ -270,8 +278,12 @@ export const AuthModal = ({
         onClose()
         setIsOtpAuthOpen(false)
 
+        // Show passkey registration prompt if supported
+        showRegisterPasskeyToast()
+
         // Show a toast only for those registed users returning to the site.
-        if (loggingIn) {
+        // Only show toast when customer data is available (user is logged in and data is loaded)
+        if (loggingIn && customer.data) {
             toast({
                 variant: 'subtle',
                 title: `${formatMessage(
@@ -301,7 +313,7 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [isRegistered])
+    }, [isRegistered, customer.data])
 
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
