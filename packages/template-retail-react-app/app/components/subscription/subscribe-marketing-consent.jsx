@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -33,8 +33,8 @@ import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing
  * <SubscribeMarketingConsent tag={CONSENT_TAGS.REGISTRATION} />
  */
 const SubscribeMarketingConsent = ({tag = CONSENT_TAGS.EMAIL_CAPTURE, ...props}) => {
-    const {state, actions} = useEmailSubscription({tag})
-    return <SubscribeForm subscription={{state, actions}} {...props} />
+    const subscription = useEmailSubscription({tag})
+    return <SubscribeForm {...subscription} {...props} />
 }
 
 SubscribeMarketingConsent.propTypes = {

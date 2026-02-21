@@ -1,5 +1,6 @@
 ## v5.1.0-dev
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- Add Shopper Consents API support [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 
 ## v5.0.0 (Feb 12, 2026)
 - Upgrade to commerce-sdk-isomorphic v5.0.0 and introduce Payment Instrument SCAPI integration [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
@@ -14,7 +15,7 @@
 ## v4.2.0 (Nov 04, 2025)
 
 - Upgrade to commerce-sdk-isomorphic v4.0.1 [#3449](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3449)
-- Prevent headers from being overriden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
+- Prevent headers from being overridden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
 
 ## v4.1.0 (Sep 25, 2025)
 

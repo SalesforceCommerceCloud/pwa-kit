@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -21,47 +21,34 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl, FormattedMessage} from 'react-intl'
 import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 
-const SubscribeForm = ({subscription, ...otherProps}) => {
-    // Use SubscribeForm's own theme config instead of Footer's context
-    const subscribeFormStyles = useMultiStyleConfig('SubscribeForm')
+const SubscribeForm = ({
+    form,
+    onSubmit,
+    successMessage,
+    errors = {},
+    isSubmitting = false,
+    ...otherProps
+}) => {
+    const styles = useMultiStyleConfig('SubscribeForm')
 
-    // Ref to manage focus on the email input
-    const emailInputRef = useRef(null)
-
-    // Map SubscribeForm theme parts to Footer's expected structure
-    const styles = {
-        subscribe: subscribeFormStyles.container,
-        subscribeHeading: subscribeFormStyles.heading,
-        subscribeMessage: subscribeFormStyles.message,
-        subscribeField: subscribeFormStyles.field,
-        subscribeButton: subscribeFormStyles.button,
-        socialIcons: subscribeFormStyles.socialIcons,
-        subscribeDisclaimer: subscribeFormStyles.disclaimer
-    }
-
-    // Helper to create themed links for FormattedMessage
     const createLink = (chunks) => (
-        <Link href="/" {...subscribeFormStyles.link}>
+        <Link href="/" {...styles.link}>
             {chunks}
         </Link>
     )
 
     const intl = useIntl()
-    const {state, actions} = subscription
+    const {register} = form
 
-    // Restore focus to the email input after submission completes (success or error)
-    // Track previous loading state to detect when submission completes
-    const prevLoadingRef = useRef(false)
-
+    const prevSubmittingRef = useRef(false)
     useEffect(() => {
-        // Only restore focus when transitioning from loading to not loading
-        // This ensures we only focus after a submission completes, not on mount
-        if (prevLoadingRef.current && !state?.isLoading && emailInputRef.current) {
-            emailInputRef.current.focus()
+        if (prevSubmittingRef.current && !isSubmitting) {
+            form.setFocus('email')
         }
-        prevLoadingRef.current = state?.isLoading
-    }, [state?.isLoading])
+        prevSubmittingRef.current = isSubmitting
+    }, [isSubmitting, form])
 
     const messages = {
         heading: intl.formatMessage({
@@ -83,53 +70,57 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
         emailPlaceholder: intl.formatMessage({
             id: 'footer.subscribe.email.placeholder_text',
             defaultMessage: 'Enter your email address...'
+        }),
+        emailValidation: intl.formatMessage({
+            id: 'footer.error.enter_valid_email',
+            defaultMessage: 'Enter a valid email address.'
         })
     }
 
+    const errorMessage = errors?.email?.message
+    const feedbackMessage = errorMessage || successMessage
+    const feedbackType = errorMessage ? 'error' : 'success'
+
     return (
-        <Box {...styles.subscribe} {...otherProps}>
-            <Heading as="h2" {...styles.subscribeHeading}>
+        <Box {...styles.container} {...otherProps}>
+            <Heading as="h2" {...styles.heading}>
                 {messages.heading}
             </Heading>
-            <Text {...styles.subscribeMessage}>{messages.description}</Text>
+            <Text {...styles.message}>{messages.description}</Text>
 
-            {state?.feedback?.message && (
-                <Alert status={state.feedback.type === 'error' ? 'error' : 'success'} mb={4}>
+            {feedbackMessage && (
+                <Alert status={feedbackType} mb={4}>
                     <AlertIcon />
-                    <AlertDescription>{state.feedback.message}</AlertDescription>
+                    <AlertDescription>{feedbackMessage}</AlertDescription>
                 </Alert>
             )}
 
-            <Box>
+            <Box as="form" onSubmit={onSubmit} noValidate>
                 <Flex>
                     <Input
-                        ref={emailInputRef}
                         type="email"
                         placeholder={messages.emailPlaceholder}
                         aria-label={messages.emailAriaLabel}
-                        value={state?.email || ''}
-                        onChange={(e) => actions?.setEmail?.(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !state?.isLoading) {
-                                actions?.submit?.()
-                            }
-                        }}
-                        disabled={state?.isLoading}
+                        disabled={isSubmitting}
                         id="subscribe-email"
-                        {...styles.subscribeField}
+                        {...register('email', {
+                            required: messages.emailValidation,
+                            validate: (v) => isValidEmail(v) || messages.emailValidation
+                        })}
+                        {...styles.field}
                     />
                     <Button
+                        type="submit"
                         variant="footer"
-                        onClick={actions?.submit}
-                        isLoading={state?.isLoading}
+                        isLoading={isSubmitting}
                         loadingText={messages.buttonSignUp}
-                        {...styles.subscribeButton}
+                        {...styles.button}
                     >
                         {messages.buttonSignUp}
                     </Button>
                 </Flex>
 
-                <Text {...styles.subscribeDisclaimer}>
+                <Text {...styles.disclaimer}>
                     <FormattedMessage
                         id="footer.subscribe.disclaimer"
                         defaultMessage="By submitting this, I agree to the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>."
@@ -147,20 +138,11 @@ const SubscribeForm = ({subscription, ...otherProps}) => {
 }
 
 SubscribeForm.propTypes = {
-    subscription: PropTypes.shape({
-        state: PropTypes.shape({
-            email: PropTypes.string,
-            isLoading: PropTypes.bool,
-            feedback: PropTypes.shape({
-                message: PropTypes.string,
-                type: PropTypes.oneOf(['success', 'error'])
-            })
-        }),
-        actions: PropTypes.shape({
-            setEmail: PropTypes.func,
-            submit: PropTypes.func
-        })
-    }).isRequired
+    form: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    successMessage: PropTypes.string,
+    errors: PropTypes.object,
+    isSubmitting: PropTypes.bool
 }
 
 export default SubscribeForm
