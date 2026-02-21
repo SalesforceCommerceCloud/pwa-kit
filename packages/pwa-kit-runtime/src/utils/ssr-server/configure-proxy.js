@@ -49,7 +49,7 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param targetHost {String} the target hostname (host+port)
  * @param slasEndpointsRequiringAccessToken {RegExp} regex for SLAS auth endpoints that need Bearer token
  */
-export const applyProxyRequestAuthHeader = ({
+export const applyScapiAuthHeaders = ({
     proxyRequest,
     incomingRequest,
     caching,
@@ -79,7 +79,7 @@ export const applyProxyRequestAuthHeader = ({
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const tokenKey = `access_token_${siteId.trim()}`
+    const tokenKey = `cc-at_${siteId.trim()}`
     const accessToken = cookies[tokenKey]
 
     if (accessToken) {
@@ -273,7 +273,7 @@ export const configureProxy = ({
             })
 
             // Apply Authorization header with shopper's access token from HttpOnly cookie
-            applyProxyRequestAuthHeader({
+            applyScapiAuthHeaders({
                 proxyRequest,
                 incomingRequest,
                 caching,

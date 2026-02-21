@@ -6,7 +6,7 @@
  */
 import {
     applyProxyRequestHeaders,
-    applyProxyRequestAuthHeader,
+    applyScapiAuthHeaders,
     configureProxy
 } from './configure-proxy'
 import * as ssrProxying from '../ssr-proxying'
@@ -94,14 +94,14 @@ describe('configureProxy ALLOWED_CACHING_PROXY_REQUEST_METHODS', () => {
     })
 })
 
-describe('applyProxyRequestAuthHeader', () => {
+describe('applyScapiAuthHeaders', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     it('applies Bearer token for non-SLAS Shopper API endpoints', () => {
         utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({access_token_RefArch: 'test-access-token'})
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
         const proxyRequest = {
             setHeader: jest.fn(),
@@ -109,10 +109,10 @@ describe('applyProxyRequestAuthHeader', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'access_token_RefArch=test-access-token'}
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -129,17 +129,17 @@ describe('applyProxyRequestAuthHeader', () => {
 
     it('applies Bearer token for SLAS logout endpoint', () => {
         utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({access_token_RefArch: 'test-access-token'})
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
         const proxyRequest = {
             setHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/shopper/auth/v1/oauth2/logout',
-            headers: {cookie: 'access_token_RefArch=test-access-token'}
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -156,17 +156,17 @@ describe('applyProxyRequestAuthHeader', () => {
 
     it('does not apply Bearer token for SLAS token endpoint', () => {
         utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({access_token_RefArch: 'test-access-token'})
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
         const proxyRequest = {
             setHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/shopper/auth/v1/oauth2/token',
-            headers: {cookie: 'access_token_RefArch=test-access-token'}
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -181,17 +181,17 @@ describe('applyProxyRequestAuthHeader', () => {
 
     it('does not apply Bearer token when caching is true', () => {
         utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({access_token_RefArch: 'test-access-token'})
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
         const proxyRequest = {
             setHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'access_token_RefArch=test-access-token'}
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: true,
@@ -216,7 +216,7 @@ describe('applyProxyRequestAuthHeader', () => {
             headers: {}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -230,17 +230,17 @@ describe('applyProxyRequestAuthHeader', () => {
 
     it('does not apply Bearer token when target is not SCAPI domain', () => {
         utils.isScapiDomain.mockReturnValue(false)
-        cookie.parse.mockReturnValue({access_token_RefArch: 'test-access-token'})
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
         const proxyRequest = {
             setHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/api/products',
-            headers: {cookie: 'access_token_RefArch=test-access-token'}
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -264,7 +264,7 @@ describe('applyProxyRequestAuthHeader', () => {
             headers: {}
         }
 
-        applyProxyRequestAuthHeader({
+        applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
