@@ -13,7 +13,9 @@ import {
     CACHE_CONTROL,
     NO_CACHE,
     X_ENCODED_HEADERS,
-    CONTENT_SECURITY_POLICY
+    CONTENT_SECURITY_POLICY,
+    SLAS_TOKEN_RESPONSE_ENDPOINTS,
+    SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN
 } from './constants'
 import {
     catchAndLog,
@@ -32,12 +34,7 @@ import dns from 'dns'
 import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
-import {
-    Headers,
-    X_HEADERS_TO_REMOVE_ORIGIN,
-    X_MOBIFY_REQUEST_CLASS,
-    cookieAsString
-} from '../../utils/ssr-proxying'
+import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -65,8 +62,8 @@ import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
-import {jwtDecode} from 'jwt-decode'
 import {getConfig} from '../../utils/ssr-config'
+import {applyHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -94,151 +91,6 @@ export const isContentTypeBinary = (headers) => {
 
 export const isBinary = (headers) => {
     return isContentTypeBinary(headers)
-}
-
-// Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
-const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
-const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
-
-/**
- * Computes refresh token cookie TTL in seconds. Same logic as Auth.getRefreshTokenCookieTTLValue in commerce-sdk-react:
- * 1. Override value (if valid), 2. SLAS response value, 3. Default (guest or registered).
- * Used when setting HttpOnly refresh token cookies. Keep in sync with commerce-sdk-react auth.
- * @private
- */
-function getRefreshTokenCookieTTL(refreshTokenExpiresInSLASValue, isGuest, options = {}) {
-    const overrideValue = isGuest
-        ? options.refreshTokenGuestCookieTTL
-        : options.refreshTokenRegisteredCookieTTL
-    const defaultValue = isGuest
-        ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-        : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
-    const isOverrideValid =
-        typeof overrideValue === 'number' && overrideValue > 0 && overrideValue <= defaultValue
-    if (!isOverrideValid && overrideValue !== undefined) {
-        logger.warn('You are attempting to use an invalid refresh token TTL value.')
-    }
-    return isOverrideValid ? overrideValue : refreshTokenExpiresInSLASValue || defaultValue
-}
-
-/**
- * When HttpOnly session cookies are enabled: set tokens as HttpOnly cookies,
- * strip token fields from body, and append our Set-Cookie headers (preserving upstream cookies).
- * @private
- */
-function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
-    const siteId = options.mobify?.app?.commerceAPI?.parameters?.siteId
-    if (!siteId || typeof siteId !== 'string' || siteId.trim() === '') {
-        throw new Error(
-            'HttpOnly session cookies are enabled but siteId is missing. ' +
-                'Set mobify.app.commerceAPI.parameters.siteId in your app config.'
-        )
-    }
-
-    let parsed
-    try {
-        parsed = JSON.parse(responseBuffer.toString('utf8'))
-    } catch {
-        return responseBuffer
-    }
-
-    const cookieOptsBase = {
-        path: '/',
-        secure: true,
-        sameSite: 'lax',
-        httpOnly: true
-    }
-    const appendCookie = (cookieObj) => {
-        res.append(SET_COOKIE, cookieAsString(cookieObj))
-    }
-
-    // Add our cookies (append Set-Cookie); same names override, other upstream cookies are preserved
-    const siteIdTrimmed = siteId.trim()
-
-    // Access token
-    const accessToken = parsed.access_token
-    const expiresInSeconds = typeof parsed.expires_in === 'number' ? parsed.expires_in : 1800
-    if (accessToken) {
-        const accessExpires = new Date(Date.now() + expiresInSeconds * 1000)
-        appendCookie({
-            name: `access_token_${siteIdTrimmed}`,
-            value: accessToken,
-            ...cookieOptsBase,
-            expires: accessExpires
-        })
-    }
-
-    // Decode access token once for access_token_expires_at and guest/registered (same as commerce-sdk-react parseSlasJWT)
-    let accessTokenPayload = null
-    if (accessToken) {
-        try {
-            accessTokenPayload = jwtDecode(accessToken)
-        } catch (error) {
-            throw new Error(`Failed to decode access token JWT: ${error.message || error}. `)
-        }
-    }
-    // access_token_expires_at: Unix timestamp (seconds) when the access token expires; use JWT iat when available; added to response body so client can store in localStorage (no cookie expiry to manage)
-    let accessTokenExpiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds
-    if (accessTokenPayload && typeof accessTokenPayload.iat === 'number') {
-        accessTokenExpiresAt = accessTokenPayload.iat + expiresInSeconds
-    }
-
-    // IDP access token
-    const idpAccessToken = parsed.idp_access_token
-    if (idpAccessToken) {
-        const expiresInSeconds = typeof parsed.expires_in === 'number' ? parsed.expires_in : 1800
-        const idpExpires = new Date(Date.now() + expiresInSeconds * 1000)
-        appendCookie({
-            name: `idp_access_token_${siteIdTrimmed}`,
-            value: idpAccessToken,
-            ...cookieOptsBase,
-            expires: idpExpires
-        })
-    }
-
-    // Refresh token: set only the cookie for this user type (cc-nx-g = guest, cc-nx = registered); isGuest from JWT isb same as commerce-sdk-react parseSlasJWT
-    const refreshToken = parsed.refresh_token
-    let isGuest = true
-    let uido = null
-    if (accessTokenPayload && typeof accessTokenPayload.isb === 'string') {
-        const isbParts = accessTokenPayload.isb.split('::')
-        isGuest = isbParts[1] === 'upn:Guest'
-        const uidoPart = isbParts[0].split('uido:')[1]
-        if (uidoPart) uido = uidoPart
-    }
-    const refreshTTL = getRefreshTokenCookieTTL(parsed.refresh_token_expires_in, isGuest)
-    const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
-    if (refreshToken) {
-        const refreshCookieName = isGuest ? `cc-nx-g_${siteIdTrimmed}` : `cc-nx_${siteIdTrimmed}`
-        appendCookie({
-            name: refreshCookieName,
-            value: refreshToken,
-            ...cookieOptsBase,
-            expires: refreshExpires
-        })
-    }
-
-    // uido: IDP origin from JWT (e.g. "slas", "ecom"); non-HttpOnly so client can read it for useCustomerType/isExternal
-    if (uido) {
-        const accessExpires = new Date(Date.now() + expiresInSeconds * 1000)
-        appendCookie({
-            name: `uido_${siteIdTrimmed}`,
-            value: uido,
-            path: '/',
-            secure: true,
-            sameSite: 'lax',
-            httpOnly: false,
-            expires: accessExpires
-        })
-    }
-
-    // Strip from body only the fields set as HttpOnly cookies; add access_token_expires_at so client can store for expiry checks (uido is in non-HttpOnly cookie for client to read)
-    const stripped = {...parsed}
-    delete stripped.access_token
-    delete stripped.idp_access_token
-    delete stripped.refresh_token
-    stripped.access_token_expires_at = accessTokenExpiresAt
-    return Buffer.from(JSON.stringify(stripped), 'utf8')
 }
 
 /**
@@ -315,13 +167,13 @@ export const RemoteServerFactory = {
             // A regex for identifying which SLAS endpoints return tokens (access_token, refresh_token)
             // in the response body. Used to determine which responses should have HttpOnly session
             // cookies applied when that feature is enabled. Users can override this in ssr.js.
-            tokenResponseEndpoints: /\/oauth2\/(token|passwordless\/token)$/,
+            tokenResponseEndpoints: SLAS_TOKEN_RESPONSE_ENDPOINTS,
 
             // A regex for identifying which SLAS auth endpoints (/shopper/auth/) require the
             // shopper's access token in the Authorization header (Bearer token from HttpOnly cookie).
             // Most SLAS auth endpoints use Basic Auth with client credentials, but some like logout
             // require the shopper's Bearer token. Users can override this in ssr.js.
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/,
+            slasEndpointsRequiringAccessToken: SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN,
 
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
