@@ -238,11 +238,6 @@ describe('Passwordless enabled', () => {
     })
 
     test('Allows passwordless login', async () => {
-        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
-            wrapperProps: {
-                bypassAuth: false
-            }
-        })
         // Disable passkey to test passwordless in isolation
         getConfig.mockReturnValue({
             ...mockConfig,
@@ -254,6 +249,12 @@ describe('Passwordless enabled', () => {
                 }
             }
         })
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
+        })
+
         const validEmail = 'test@salesforce.com'
 
         // open the modal
