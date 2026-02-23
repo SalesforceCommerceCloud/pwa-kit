@@ -10,7 +10,7 @@ import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks
 import {
     useCustomerId,
     useCustomerBaskets,
-    useShopperBasketsMutation
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
@@ -47,7 +47,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         ...originalModule,
         useCustomerId: jest.fn(),
         useCustomerBaskets: jest.fn(),
-        useShopperBasketsMutation: jest.fn()
+        useShopperBasketsV2Mutation: jest.fn()
     }
 })
 

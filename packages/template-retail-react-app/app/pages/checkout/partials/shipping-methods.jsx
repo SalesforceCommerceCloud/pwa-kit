@@ -23,8 +23,8 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import {
-    useShippingMethodsForShipment,
-    useShopperBasketsMutation
+    useShippingMethodsForShipmentV2 as useShippingMethodsForShipment,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
