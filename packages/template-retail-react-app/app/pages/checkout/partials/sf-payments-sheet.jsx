@@ -62,7 +62,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     const navigate = useNavigation()
 
     const {data: basket} = useCurrentBasket()
-    const {data: customer} = useCurrentCustomer(['paymentmethodreferences'])
+    const {isRegistered} = useCustomerType()
+    const {data: customer, isLoading: customerLoading} = useCurrentCustomer(
+        isRegistered ? ['paymentmethodreferences'] : undefined
+    )
+    const isCustomerDataLoading = isRegistered && customerLoading
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -162,7 +166,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                 savePaymentMethodRef.current = event.detail.savePaymentMethodForFutureUse === true
             }
             updatedOrder.current = await createAndUpdateOrder(
-                savePaymentMethodRef.current && customer?.isRegistered
+                savePaymentMethodRef.current && isRegistered
             )
             // Clear the ref after successful order creation
             currentBasket.current = null
@@ -274,7 +278,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
 
         // For Stripe and Adyen, update order payment instrument to create payment
-        const shouldSavePaymentMethod = savePaymentMethodRef.current && customer?.isRegistered
+        const shouldSavePaymentMethod = savePaymentMethodRef.current && isRegistered
         updatedOrder.current = await createAndUpdateOrder(shouldSavePaymentMethod, paymentData)
 
         // Find updated SF Payments payment instrument in updated order
@@ -330,7 +334,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        if (gateway.current === PAYMENT_GATEWAYS.ADYEN) {
+        if (gateway.current === PAYMENT_GATEWAYS.ADYEN && paymentData) {
             // Append necessary data to Adyen redirect return URL
             paymentData.returnUrl +=
                 '&orderNo=' +
@@ -525,79 +529,78 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
     )
 
     useEffect(() => {
-        if (sfp && metadata && containerElementRef.current && paymentConfig) {
-            const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
-                (account) => ({
-                    ...account,
-                    gatewayId: account.accountId
-                })
-            )
+        // Mount SFP only when all required data and DOM are ready; otherwise skip or wait for a later run.
 
-            const paymentMethodSet = {
-                paymentMethods: paymentConfig.paymentMethods,
-                paymentMethodSetAccounts: paymentMethodSetAccounts
-            }
+        if (isCustomerDataLoading) return // Wait for savedPaymentMethods data to load for registered users
+        if (checkoutComponent.current) return // Skip if Componenet Already mounted
+        if (!sfp) return // Skip if SFP SDK not loaded yet
+        if (!metadata) return // Skip if SFP metadata not available yet
+        if (!containerElementRef.current) return // Skip if Payment container ref not attached to DOM yet
+        if (!paymentConfig) return // Skip if Payment config not loaded yet
 
-            config.current = {
-                theme: buildTheme(),
-                actions: {
-                    createIntent: createIntent,
-                    onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
-                },
-                options: {
-                    useManualCapture: !cardCaptureAutomatic,
-                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
-                    showSaveForFutureUsageCheckbox: !!(
-                        customer?.isRegistered && customer?.customerId
-                    ),
-                    // Suppress "Make payment method default" checkbox since we don't support default SPM yet
-                    showSaveAsDefaultCheckbox: false,
-                    savedPaymentMethods: savedPaymentMethods
-                }
-            }
+        const paymentMethodSetAccounts = (paymentConfig.paymentMethodSetAccounts || []).map(
+            (account) => ({
+                ...account,
+                gatewayId: account.accountId
+            })
+        )
 
-            const paymentRequest = {
-                amount: basket.productTotal,
-                currency: basket.currency,
-                country: 'US', // TODO: see W-18812582
-                locale: intl.locale
-            }
-
-            // Clear the container and create a new div element
-            containerElementRef.current.innerHTML = ''
-            const paymentElement = document.createElement('div')
-            containerElementRef.current.appendChild(paymentElement)
-
-            paymentElement.addEventListener(
-                'sfp:paymentmethodselected',
-                handlePaymentMethodSelected
-            )
-            paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
-            paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
-
-            checkoutComponent.current = sfp.checkout(
-                metadata,
-                paymentMethodSet,
-                config.current,
-                paymentRequest,
-                paymentElement
-            )
+        const paymentMethodSet = {
+            paymentMethods: paymentConfig.paymentMethods,
+            paymentMethodSetAccounts: paymentMethodSetAccounts
         }
 
-        // Cleanup on unmount
+        config.current = {
+            theme: buildTheme(),
+            actions: {
+                createIntent: createIntent,
+                onClick: () => {} // No-op: return empty function since its not applicable and SDK proceeds immediately
+            },
+            options: {
+                useManualCapture: !cardCaptureAutomatic,
+                returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`,
+                showSaveForFutureUsageCheckbox: isRegistered,
+                // Suppress "Make payment method default" checkbox since we don't support default SPM yet
+                showSaveAsDefaultCheckbox: false,
+                savedPaymentMethods: savedPaymentMethods
+            }
+        }
+
+        const paymentRequest = {
+            amount: basket.productTotal,
+            currency: basket.currency,
+            country: 'US', // TODO: see W-18812582
+            locale: intl.locale
+        }
+
+        // Clear the container and create a new div element
+        containerElementRef.current.innerHTML = ''
+        const paymentElement = document.createElement('div')
+        containerElementRef.current.appendChild(paymentElement)
+
+        paymentElement.addEventListener('sfp:paymentmethodselected', handlePaymentMethodSelected)
+        paymentElement.addEventListener('sfp:paymentapprove', handlePaymentButtonApprove)
+        paymentElement.addEventListener('sfp:paymentcancel', handlePaymentButtonCancel)
+
+        checkoutComponent.current = sfp.checkout(
+            metadata,
+            paymentMethodSet,
+            config.current,
+            paymentRequest,
+            paymentElement
+        )
+
         return () => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
     }, [
+        isCustomerDataLoading,
         sfp,
         metadata,
         containerElementRef.current,
         paymentConfig,
-        cardCaptureAutomatic,
-        customer?.isRegistered,
-        customer?.customerId,
-        savedPaymentMethods
+        cardCaptureAutomatic
     ])
 
     useEffect(() => {

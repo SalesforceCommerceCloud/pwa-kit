@@ -1,4 +1,5 @@
 name: bundlesize
+description: Check bundle size against maximum file size limits
 runs:
   using: composite
   steps:

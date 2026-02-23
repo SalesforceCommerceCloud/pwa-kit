@@ -10,13 +10,11 @@ Use these tools only when the user’s prompt clearly matches a tool’s purpose
 ## Tools
 - `pwakit_get_dev_guidelines`
 - `pwakit_create_storefront`
-- `pwakit_create_component`
 - `pwakit_create_page`
 - `pwakit_run_site_test`
 
 ## Mandatory usage (when applicable)
 - Storefront dev tasks (analyze, generate, refactor, modify, fix) → `pwakit_get_dev_guidelines` first, then:
-  - Components → `pwakit_create_component`
   - Pages → `pwakit_create_page`
 - Site or app performance or accessibility checks → `pwakit_run_site_test`.
 

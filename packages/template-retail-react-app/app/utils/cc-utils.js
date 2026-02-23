@@ -101,7 +101,7 @@ export const getMaskCreditCardNumber = (cardNumber) => {
 export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
     // Using destructuring to omit properties
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {expiry, paymentInstrumentId, ...selectedPayment} = paymentFormData
+    const {expiry, paymentInstrumentId, default: isDefault, ...selectedPayment} = paymentFormData
 
     // The form gives us the expiration date as `MM/YY` - so we need to split it into
     // month and year to submit them as individual fields.
@@ -109,6 +109,8 @@ export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
 
     return {
         paymentMethodId: 'CREDIT_CARD',
+        // When present, this flag sets the created payment instrument as the customer's default
+        ...(isDefault ? {default: true} : {}),
         paymentCard: {
             ...selectedPayment,
             number: selectedPayment.number.replace(/ /g, ''),

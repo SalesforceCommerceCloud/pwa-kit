@@ -7,7 +7,7 @@
 import Auth from '../auth'
 import {CommerceApiProviderProps} from '../provider'
 import {Logger} from '../types'
-import {OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
+import {CustomEndpointArg, OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
 
 /**
  * A helper function for handling bad responses from SCAPI when an invalid access token is used.
@@ -37,30 +37,7 @@ export const generateCustomEndpointOptions = (
     config: Omit<CommerceApiProviderProps, 'children'>,
     access_token: string,
     args?: TMutationVariables
-): {
-    options: {
-        method?: string
-        parameters?: {[key: string]: string | number | boolean | string[] | number[]}
-        customApiPathParameters?: {
-            apiName?: string
-            apiVersion?: string
-            endpointPath?: string
-            organizationId?: string
-            shortCode?: string
-        }
-        headers?: {[key: string]: string}
-        body?: unknown
-    }
-    clientConfig: {
-        parameters: {
-            shortCode: string
-            [key: string]: unknown
-        }
-        proxy?: string
-        throwOnBadResponse: boolean
-    }
-    rawResponse?: boolean
-} => {
+): CustomEndpointArg => {
     const globalHeaders = config.headers || {}
     const globalClientConfig = {
         parameters: {
@@ -76,6 +53,7 @@ export const generateCustomEndpointOptions = (
     return {
         ...options,
         options: {
+            ...options.options,
             method: options.options?.method || 'GET',
             headers: {
                 Authorization: `Bearer ${access_token}`,
@@ -84,8 +62,7 @@ export const generateCustomEndpointOptions = (
                 ...globalHeaders,
                 ...options.options?.headers,
                 ...(args?.headers ? args.headers : {})
-            },
-            ...options.options
+            }
         },
         clientConfig: {
             ...globalClientConfig,

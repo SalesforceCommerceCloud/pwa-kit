@@ -13,6 +13,7 @@ import {
     ShopperBaskets,
     ShopperBasketsV2,
     ShopperContexts,
+    ShopperConfigurations,
     ShopperCustomers,
     ShopperExperience,
     ShopperGiftCertificates,
@@ -24,7 +25,6 @@ import {
     ShopperSearch,
     ShopperSEO,
     ShopperStores,
-    ShopperConfigurations,
     FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
@@ -261,6 +261,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperBaskets: new ShopperBaskets(config),
             shopperBasketsV2: new ShopperBasketsV2(config),
             shopperContexts: new ShopperContexts(config),
+            shopperConfigurations: new ShopperConfigurations(config),
             shopperCustomers: new ShopperCustomers(config),
             shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
@@ -274,8 +275,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSEO(config),
-            shopperStores: new ShopperStores(config),
-            shopperConfigurations: new ShopperConfigurations(config)
+            shopperStores: new ShopperStores(config)
         }
     }, [
         clientId,

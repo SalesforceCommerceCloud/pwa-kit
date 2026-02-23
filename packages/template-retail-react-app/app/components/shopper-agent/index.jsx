@@ -175,7 +175,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         commerceOrgId,
         siteId,
         enableConversationContext = 'false',
-        conversationContext = []
+        conversationContext = [],
+        enableAgentFromFloatingButton = 'true'
     } = commerceAgentConfiguration
 
     // User session identifier hook
@@ -352,7 +353,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken
+        refreshToken,
+        enableAgentFromFloatingButton
     )
 
     // This component doesn't render visible UI, only manages the messaging service

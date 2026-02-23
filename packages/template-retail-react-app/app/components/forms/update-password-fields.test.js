@@ -58,4 +58,32 @@ describe('UpdatePasswordFields component', () => {
         expect(screen.getByText('Passwords do not match.')).toBeInTheDocument()
         expect(onSubmit).not.toHaveBeenCalled()
     })
+
+    test('does not render "Forgot Password?" button when handleForgotPasswordClick is not provided', () => {
+        renderWithProviders(<WrapperComponent />)
+
+        expect(screen.queryByText(/forgot password/i)).not.toBeInTheDocument()
+    })
+
+    test('renders "Forgot Password?" button when handleForgotPasswordClick is provided', () => {
+        const handleForgotPasswordClick = jest.fn()
+        renderWithProviders(
+            <WrapperComponent handleForgotPasswordClick={handleForgotPasswordClick} />
+        )
+
+        const forgotPasswordButton = screen.getByText(/forgot password/i)
+        expect(forgotPasswordButton).toBeInTheDocument()
+    })
+
+    test('calls handleForgotPasswordClick when "Forgot Password?" button is clicked', async () => {
+        const handleForgotPasswordClick = jest.fn()
+        const {user} = renderWithProviders(
+            <WrapperComponent handleForgotPasswordClick={handleForgotPasswordClick} />
+        )
+
+        const forgotPasswordButton = screen.getByText(/forgot password/i)
+        await user.click(forgotPasswordButton)
+
+        expect(handleForgotPasswordClick).toHaveBeenCalledTimes(1)
+    })
 })

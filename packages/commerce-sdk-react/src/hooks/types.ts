@@ -8,6 +8,7 @@ import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@t
 import {
     ShopperBaskets,
     ShopperBasketsV2,
+    ShopperConfigurations,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
@@ -19,8 +20,7 @@ import {
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
-    ShopperStores,
-    ShopperConfigurations
+    ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {CommerceApiProviderProps} from '../provider'
@@ -88,7 +88,7 @@ export type ApiClientConfigParams = {
  */
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
-    shopperBasketsV2?: ShopperBasketsV2<ApiClientConfigParams>
+    shopperBasketsV2?: ShopperBaskets<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>
@@ -220,7 +220,7 @@ export type CacheUpdateMatrix<Client extends ApiClient> = {
         : never
 }
 
-type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
+export type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
 type CustomEndpointArgClientConfig = CustomEndpointArg['clientConfig']
 // The commerce-sdk-isomorphic custom endpoint helper REQUIRES clientConfig as mandatory argument
 // But we inject the configs for users from the provider, so this custom type is created

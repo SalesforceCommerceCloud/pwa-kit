@@ -612,6 +612,64 @@ describe('ShippingAddress', () => {
             // Edit action button (Ship to Multiple Addresses) should not be rendered for single item
             expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
         })
+
+        it('should not show multi-shipping option when only one delivery item exists with pickup items', () => {
+            // Create a mixed basket with 1 delivery item and 1 pickup item
+            const mixedBasket = {
+                ...mockBasket,
+                productItems: [
+                    {
+                        productId: 'product-1',
+                        productName: 'Delivery Product',
+                        quantity: 1,
+                        itemId: 'item-1',
+                        shipmentId: 'delivery-shipment'
+                    },
+                    {
+                        productId: 'product-2',
+                        productName: 'Pickup Product',
+                        quantity: 1,
+                        itemId: 'item-2',
+                        shipmentId: 'pickup-shipment'
+                    }
+                ],
+                shipments: [
+                    {
+                        shipmentId: 'delivery-shipment',
+                        shippingMethod: {
+                            id: 'standard-shipping',
+                            c_storePickupEnabled: false
+                        }
+                    },
+                    {
+                        shipmentId: 'pickup-shipment',
+                        shippingMethod: {
+                            id: 'store-pickup',
+                            c_storePickupEnabled: true
+                        },
+                        c_fromStoreId: 'store-123'
+                    }
+                ]
+            }
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3 // SHIPPING_ADDRESS
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            // Mock useCurrentBasket to return the mixed basket
+            useCurrentBasket.mockReturnValue({
+                data: mixedBasket
+            })
+
+            renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+            // Should show shipping address selection
+            expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
+            // Edit action button (Ship to Multiple Addresses) should NOT be rendered
+            // because there's only 1 delivery item (pickup items don't count)
+            expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
+        })
     })
 
     describe('multishipEnabled behavior', () => {

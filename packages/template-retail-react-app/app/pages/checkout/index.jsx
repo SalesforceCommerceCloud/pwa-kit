@@ -50,6 +50,7 @@ import {
     useSFPaymentsEnabled,
     useSFPayments
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
 
 let persistedPaymentsError = null
 
@@ -340,8 +341,9 @@ const CheckoutContainer = () => {
     return (
         <CheckoutProvider>
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-
-            <Checkout />
+            <GoogleAPIProvider>
+                <Checkout />
+            </GoogleAPIProvider>
             <UnavailableProductConfirmationModal
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}

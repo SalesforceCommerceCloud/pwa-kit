@@ -31,6 +31,7 @@ export function useToast() {
 
     return ({
         title,
+        description,
         status,
         action,
         position = 'top-right',
@@ -40,6 +41,7 @@ export function useToast() {
     }) => {
         let toastConfig = {
             title,
+            description,
             status,
             isClosable,
             position,
