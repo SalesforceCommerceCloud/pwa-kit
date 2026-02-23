@@ -56,18 +56,18 @@ module.exports = {
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
-            /*parameters: {
+            parameters: {
                 clientId: '0bb3af38-b52c-4f4b-966e-fe7087ca47e2',
                 organizationId: 'f_ecom_zyoe_006',
                 shortCode: 'sandbox-001',
                 siteId: 'RefArch'
-            }*/
-            parameters: {
+            }
+            /*parameters: {
                 clientId: 'cc62dfa8-777f-486a-8af2-bdc048a4ba52',
                 organizationId: 'f_ecom_zyoe_009',
                 shortCode: 'sandbox-001',
                 siteId: 'RefArch'
-            }
+            }*/
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
@@ -96,9 +96,9 @@ module.exports = {
         multishipEnabled: true,
         sfPayments: {
             enabled: true,
-            sdkUrl: 'https://zyoe-009.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            sdkUrl: 'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             metadataUrl:
-                'https://zyoe-009.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+                'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             // sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             // metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
             //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-RefArch-Site/-/default/v0/sfp/sfp.js',
@@ -128,7 +128,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zyoe-009.dx.commercecloud.salesforce.com',
+                host: 'zyoe-006.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
