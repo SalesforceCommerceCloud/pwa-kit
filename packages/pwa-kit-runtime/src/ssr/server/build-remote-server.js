@@ -13,7 +13,9 @@ import {
     CACHE_CONTROL,
     NO_CACHE,
     X_ENCODED_HEADERS,
-    CONTENT_SECURITY_POLICY
+    CONTENT_SECURITY_POLICY,
+    SLAS_TOKEN_RESPONSE_ENDPOINTS,
+    SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN
 } from './constants'
 import {
     catchAndLog,
@@ -60,6 +62,8 @@ import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
+import {getConfig} from '../../utils/ssr-config'
+import {applyHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -160,6 +164,17 @@ export const RemoteServerFactory = {
             applySLASPrivateClientToEndpoints:
                 /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
+            // A regex for identifying which SLAS endpoints return tokens (access_token, refresh_token)
+            // in the response body. Used to determine which responses should have HttpOnly session
+            // cookies applied when that feature is enabled. Users can override this in ssr.js.
+            tokenResponseEndpoints: SLAS_TOKEN_RESPONSE_ENDPOINTS,
+
+            // A regex for identifying which SLAS auth endpoints (/shopper/auth/) require the
+            // shopper's access token in the Authorization header (Bearer token from HttpOnly cookie).
+            // Most SLAS auth endpoints use Basic Auth with client credentials, but some like logout
+            // require the shopper's Bearer token. Users can override this in ssr.js.
+            slasEndpointsRequiringAccessToken: SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN,
+
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
             // request modifications (e.g., custom headers).
@@ -167,8 +182,11 @@ export const RemoteServerFactory = {
             onSLASPrivateProxyReq: undefined,
 
             // Custom callback to modify the SLAS private client proxy response. This callback is invoked
-            // after the built-in proxy response handling. Users can modify or replace
-            // the response buffer.
+            // after the built-in proxy response handling (including HttpOnly session cookie handling when enabled).
+            // When HttpOnly session cookies are enabled (MRT_DISABLE_HTTPONLY_SESSION_COOKIES=false), the callback
+            // receives the response with tokens already moved to HttpOnly cookies and stripped from the body.
+            // Custom callbacks must not rely on token fields in the response body in that case; read from
+            // response headers (e.g. Set-Cookie) if needed.
             // Signature: (responseBuffer, proxyRes, req, res) => Buffer
             onSLASPrivateProxyRes: undefined
         }
@@ -210,6 +228,19 @@ export const RemoteServerFactory = {
         options.applySLASPrivateClientToEndpoints = new RegExp(
             `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
         )
+
+        // Note: HttpOnly session cookies are controlled by the MRT_DISABLE_HTTPONLY_SESSION_COOKIES
+        // env var (set by MRT in production, pwa-kit-dev locally). Read directly where needed.
+
+        // Extract siteId from app configuration for SCAPI auth
+        // This will be used to read the correct access token cookie
+        try {
+            const config = getConfig({buildDirectory: options.buildDir})
+            options.siteId = config?.app?.commerceAPI?.parameters?.siteId || null
+        } catch (e) {
+            // Config may not be available yet (e.g., during build), that's okay
+            options.siteId = null
+        }
 
         return options
     },
@@ -367,7 +398,14 @@ export const RemoteServerFactory = {
      * @private
      */
     _configureProxyConfigs(options) {
-        configureProxyConfigs(options.appHostname, options.protocol)
+        const siteId = options.siteId || null
+        const slasEndpointsRequiringAccessToken = options.slasEndpointsRequiringAccessToken
+        configureProxyConfigs(
+            options.appHostname,
+            options.protocol,
+            siteId,
+            slasEndpointsRequiringAccessToken
+        )
     },
 
     /**
@@ -963,6 +1001,47 @@ export const RemoteServerFactory = {
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
                     let workingBuffer = responseBuffer
                     try {
+                        // When HttpOnly session cookies are enabled and response is 200 from a token endpoint,
+                        // set tokens as HttpOnly cookies and strip from body.
+                        // Check against tokenResponseEndpoints regex (configurable in ssr.js)
+                        const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
+                        const httpOnlySessionCookiesEnabled =
+                            process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false'
+                        if (
+                            httpOnlySessionCookiesEnabled &&
+                            proxyRes.statusCode === 200 &&
+                            isTokenEndpoint
+                        ) {
+                            try {
+                                workingBuffer = applyHttpOnlySessionCookies(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options
+                                )
+                            } catch (error) {
+                                // HttpOnly configuration errors should fail the request (do not leak tokens)
+                                res.statusCode = 500
+                                res.statusMessage = 'Internal Server Error'
+                                logger.error('Error applying HttpOnly session cookies', {
+                                    namespace: '_setupSlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        error: error.message || error
+                                    }
+                                })
+                                return Buffer.from(
+                                    JSON.stringify({
+                                        error: 'Internal server error',
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
+                                    }),
+                                    'utf8'
+                                )
+                            }
+                        }
+
                         // If the passwordless login endpoint returns a 404, which corresponds to a user
                         // email not being found, we mask it with a 200 OK response so that it is not
                         // obvious that the user does not exist.
@@ -983,7 +1062,7 @@ export const RemoteServerFactory = {
                         if (typeof options.onSLASPrivateProxyRes === 'function') {
                             try {
                                 const customBuffer = options.onSLASPrivateProxyRes(
-                                    responseBuffer,
+                                    workingBuffer,
                                     proxyRes,
                                     req,
                                     res
@@ -1387,6 +1466,13 @@ export const RemoteServerFactory = {
      * proxy handler. Requires PWA_KIT_SLAS_CLIENT_SECRET environment variable.
      * @param {RegExp} [options.applySLASPrivateClientToEndpoints] - A regex pattern to match
      * SLAS endpoints where the Authorization header should be injected.
+     * @param {RegExp} [options.tokenResponseEndpoints] - A regex pattern to match SLAS endpoints
+     * that return tokens in the response body. Used to determine which responses should have HttpOnly
+     * session cookies applied. Defaults to /\/oauth2\/(token|passwordless\/token)$/.
+     * @param {RegExp} [options.slasEndpointsRequiringAccessToken] - A regex pattern to match SLAS auth
+     * endpoints (/shopper/auth/) that require the shopper's access token in the Authorization header (Bearer token).
+     * Most SLAS auth endpoints use Basic Auth with client credentials, but some like logout require the shopper's
+     * Bearer token. Defaults to /\/oauth2\/logout/.
      * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
      * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
      * Use this to add custom headers or modify the proxy request.

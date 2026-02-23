@@ -1,3 +1,6 @@
+## [Unreleased]
+- Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
+
 ## v5.1.0-dev
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 

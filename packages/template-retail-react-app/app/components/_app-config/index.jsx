@@ -111,6 +111,11 @@ const AppConfig = ({children, locals = {}}) => {
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
+            useHttpOnlySessionCookies={
+                typeof window !== 'undefined'
+                    ? window.__MRT_DISABLE_HTTPONLY_SESSION_COOKIES__ === 'false'
+                    : process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false'
+            }
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>

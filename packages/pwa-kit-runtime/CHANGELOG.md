@@ -1,3 +1,6 @@
+## [Unreleased]
+- Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
+
 ## v3.17.0-dev
 - Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 

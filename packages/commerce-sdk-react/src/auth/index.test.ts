@@ -1502,3 +1502,72 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
     })
 })
+
+describe('HttpOnly Session Cookies', () => {
+    const expiresAtFuture = Math.floor(Date.now() / 1000) + 3600
+
+    const httpOnlyTokenResponse: ShopperLoginTypes.TokenResponse = {
+        ...TOKEN_RESPONSE
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('loginGuestUser does not store tokens when HttpOnly cookies are enabled', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // Set cc-at-expires cookie (as server would via Set-Cookie header)
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiresAtFuture))
+
+        await auth.loginGuestUser()
+
+        // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
+        expect(auth.get('access_token')).toBeFalsy()
+        expect(auth.get('refresh_token_guest')).toBeFalsy()
+        // Common fields should still be stored
+        expect(auth.get('customer_id')).toBe(TOKEN_RESPONSE.customer_id)
+        expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
+    })
+
+    test('ready re-uses data when cc-at-expires cookie is still valid', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // First call: triggers loginGuestUser
+        await auth.ready()
+
+        // Set cc-at-expires cookie (as server would via Set-Cookie header)
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiresAtFuture))
+
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Second call: cc-at-expires is in the future, so it should re-use data
+        await auth.ready()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1) // Not called again
+    })
+
+    test('ready triggers refresh when cc-at-expires cookie is expired', async () => {
+        const auth = new Auth({...config, useHttpOnlySessionCookies: true})
+
+        // Simulate a previous login that left behind stored data with an expired token
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // Set a valid JWT so parseSlasJWT works during the refresh flow
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+    })
+})

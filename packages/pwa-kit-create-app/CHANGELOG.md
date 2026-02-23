@@ -1,3 +1,6 @@
+## [Unreleased]
+- Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
+
 ## v3.17.0-dev
 - Clear verdaccio npm cache during project generation [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)

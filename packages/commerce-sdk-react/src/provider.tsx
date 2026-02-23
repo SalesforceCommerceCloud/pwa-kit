@@ -48,6 +48,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    /** When true, proxy returns tokens in HttpOnly cookies. */
+    useHttpOnlySessionCookies?: boolean
 }
 
 /**
@@ -145,11 +147,20 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         disableAuthInit = false,
-        hybridAuthEnabled = false
+        hybridAuthEnabled = false,
+        useHttpOnlySessionCookies = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
     const configLogger = logger || console
+
+    // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
+    const effectiveFetchOptions = useMemo(() => {
+        return useHttpOnlySessionCookies &&
+            (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
+            ? {...fetchOptions, credentials: 'same-origin' as RequestCredentials}
+            : fetchOptions
+    }, [useHttpOnlySessionCookies, fetchOptions])
 
     const auth = useMemo(() => {
         return new Auth({
@@ -160,7 +171,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             proxy,
             redirectURI,
             headers,
-            fetchOptions,
+            fetchOptions: effectiveFetchOptions,
             fetchedToken,
             enablePWAKitPrivateClient,
             privateClientProxyEndpoint,
@@ -171,7 +182,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             passwordlessLoginCallbackURI,
             refreshTokenRegisteredCookieTTL,
             refreshTokenGuestCookieTTL,
-            hybridAuthEnabled
+            hybridAuthEnabled,
+            useHttpOnlySessionCookies
         })
     }, [
         clientId,
@@ -181,7 +193,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         proxy,
         redirectURI,
         headers,
-        fetchOptions,
+        effectiveFetchOptions,
         fetchedToken,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
@@ -193,7 +205,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
         apiClients,
-        hybridAuthEnabled
+        hybridAuthEnabled,
+        useHttpOnlySessionCookies
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -212,7 +225,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             throwOnBadResponse: true,
             fetchOptions: {
                 ...options.fetchOptions,
-                ...fetchOptions
+                ...effectiveFetchOptions
             }
         }
     }
@@ -252,7 +265,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency
             },
             throwOnBadResponse: true,
-            fetchOptions
+            fetchOptions: effectiveFetchOptions
         }
 
         return {
@@ -279,7 +292,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         siteId,
         proxy,
-        fetchOptions,
+        effectiveFetchOptions,
         locale,
         currency,
         headers?.['correlation-id'],

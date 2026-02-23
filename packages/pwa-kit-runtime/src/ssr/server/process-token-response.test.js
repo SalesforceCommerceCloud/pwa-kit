@@ -1,0 +1,317 @@
+/*
+ * Copyright (c) 2022, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {getRefreshTokenCookieTTL, applyHttpOnlySessionCookies} from './process-token-response'
+import {parse as parseSetCookie} from 'set-cookie-parser'
+
+jest.mock('../../utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn()
+    }
+}))
+
+import logger from '../../utils/logger-instance'
+
+function makeJWT(payload) {
+    const header = Buffer.from(JSON.stringify({alg: 'HS256', typ: 'JWT'})).toString('base64url')
+    const payloadPart = Buffer.from(JSON.stringify(payload)).toString('base64url')
+    return `${header}.${payloadPart}.sig`
+}
+
+function makeOptions(siteId = 'testsite') {
+    return {
+        mobify: {
+            app: {
+                commerceAPI: {
+                    parameters: {siteId}
+                }
+            }
+        }
+    }
+}
+
+function makeRes() {
+    const cookies = []
+    return {
+        cookies,
+        append: jest.fn((header, value) => {
+            cookies.push(value)
+        })
+    }
+}
+
+function makeResponseBuffer(body) {
+    return Buffer.from(JSON.stringify(body), 'utf8')
+}
+
+function parseCookie(cookieStr) {
+    return parseSetCookie(cookieStr)[0]
+}
+
+describe('getRefreshTokenCookieTTL', () => {
+    const GUEST_DEFAULT = 30 * 24 * 60 * 60
+    const REGISTERED_DEFAULT = 90 * 24 * 60 * 60
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns SLAS value for guest when no override', () => {
+        expect(getRefreshTokenCookieTTL(12345, true)).toBe(12345)
+    })
+
+    test('returns SLAS value for registered when no override', () => {
+        expect(getRefreshTokenCookieTTL(54321, false)).toBe(54321)
+    })
+
+    test('returns guest default when no SLAS value and no override', () => {
+        expect(getRefreshTokenCookieTTL(undefined, true)).toBe(GUEST_DEFAULT)
+    })
+
+    test('returns registered default when no SLAS value and no override', () => {
+        expect(getRefreshTokenCookieTTL(undefined, false)).toBe(REGISTERED_DEFAULT)
+    })
+
+    test('uses valid guest override', () => {
+        const ttl = 1000
+        expect(getRefreshTokenCookieTTL(12345, true, {refreshTokenGuestCookieTTL: ttl})).toBe(ttl)
+    })
+
+    test('uses valid registered override', () => {
+        const ttl = 1000
+        expect(getRefreshTokenCookieTTL(12345, false, {refreshTokenRegisteredCookieTTL: ttl})).toBe(
+            ttl
+        )
+    })
+
+    test('rejects override exceeding default and warns', () => {
+        const tooLarge = GUEST_DEFAULT + 1
+        const result = getRefreshTokenCookieTTL(12345, true, {
+            refreshTokenGuestCookieTTL: tooLarge
+        })
+        expect(result).toBe(12345)
+        expect(logger.warn).toHaveBeenCalledWith(
+            'You are attempting to use an invalid refresh token TTL value.'
+        )
+    })
+
+    test('rejects zero override and warns', () => {
+        const result = getRefreshTokenCookieTTL(12345, true, {refreshTokenGuestCookieTTL: 0})
+        expect(result).toBe(12345)
+        expect(logger.warn).toHaveBeenCalled()
+    })
+
+    test('rejects negative override and warns', () => {
+        const result = getRefreshTokenCookieTTL(12345, true, {refreshTokenGuestCookieTTL: -1})
+        expect(result).toBe(12345)
+        expect(logger.warn).toHaveBeenCalled()
+    })
+
+    test('rejects non-number override and warns', () => {
+        const result = getRefreshTokenCookieTTL(12345, true, {
+            refreshTokenGuestCookieTTL: 'invalid'
+        })
+        expect(result).toBe(12345)
+        expect(logger.warn).toHaveBeenCalled()
+    })
+})
+
+describe('applyHttpOnlySessionCookies', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('throws when siteId is missing', () => {
+        const res = makeRes()
+        const buf = makeResponseBuffer({access_token: 'x'})
+        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, {mobify: {}})).toThrow(
+            /siteId is missing/
+        )
+    })
+
+    test('throws when siteId is empty string', () => {
+        const res = makeRes()
+        const buf = makeResponseBuffer({access_token: 'x'})
+        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  '))).toThrow(
+            /siteId is missing/
+        )
+    })
+
+    test('returns buffer unchanged for non-JSON response', () => {
+        const res = makeRes()
+        const buf = Buffer.from('not json', 'utf8')
+        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        expect(result).toBe(buf)
+        expect(res.append).not.toHaveBeenCalled()
+    })
+
+    test('sets all cookies and strips tokens for a guest token response', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({
+            iat: 1000,
+            exp: 2800,
+            isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1',
+            dnt: '1'
+        })
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            idp_access_token: 'idp-token-value',
+            refresh_token: 'refresh-value',
+            expires_in: 1800,
+            customer_id: 'cust123'
+        })
+        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+
+        // cc-at: access token (HttpOnly)
+        const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
+        expect(atCookie.value).toBe(accessToken)
+        expect(atCookie.httpOnly).toBe(true)
+        expect(atCookie.secure).toBe(true)
+        expect(atCookie.path).toBe('/')
+
+        // cc-at-expires: expiry from JWT exp claim (non-HttpOnly)
+        const expCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
+        )
+        expect(expCookie.value).toBe(String(2800))
+        expect(expCookie.httpOnly).toBeUndefined()
+
+        // cc-at-dnt: do-not-track from JWT (non-HttpOnly)
+        const dntCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at-dnt_testsite=')))
+        expect(dntCookie.value).toBe('1')
+        expect(dntCookie.httpOnly).toBeUndefined()
+
+        // idp_access_token (HttpOnly)
+        const idpCookie = parseCookie(
+            res.cookies.find((c) => c.includes('idp_access_token_testsite='))
+        )
+        expect(idpCookie.value).toBe('idp-token-value')
+        expect(idpCookie.httpOnly).toBe(true)
+
+        // cc-nx-g: guest refresh token (HttpOnly)
+        const refreshCookie = parseCookie(res.cookies.find((c) => c.includes('cc-nx-g_testsite=')))
+        expect(refreshCookie.value).toBe('refresh-value')
+        expect(refreshCookie.httpOnly).toBe(true)
+
+        // uido (non-HttpOnly)
+        const uidoCookie = parseCookie(res.cookies.find((c) => c.includes('uido_testsite=')))
+        expect(uidoCookie.value).toBe('ecom')
+        expect(uidoCookie.httpOnly).toBeUndefined()
+
+        // Should NOT have registered refresh cookie
+        expect(res.cookies.find((c) => c.startsWith('cc-nx_testsite='))).toBeUndefined()
+
+        // Tokens stripped from body, other fields preserved
+        const body = JSON.parse(result.toString('utf8'))
+        expect(body).not.toHaveProperty('access_token')
+        expect(body).not.toHaveProperty('idp_access_token')
+        expect(body).not.toHaveProperty('refresh_token')
+        expect(body.expires_in).toBe(1800)
+        expect(body.customer_id).toBe('cust123')
+    })
+
+    test('sets all cookies for a registered token response', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({
+            iat: 2000,
+            exp: 3800,
+            isb: 'uido:ecom::upn:john@example.com::uidn:John'
+        })
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            refresh_token: 'refresh-value',
+            expires_in: 1800
+        })
+        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+
+        // cc-at (HttpOnly)
+        const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
+        expect(atCookie.httpOnly).toBe(true)
+
+        // cc-at-expires (non-HttpOnly)
+        const expCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
+        )
+        expect(expCookie.value).toBe(String(3800))
+
+        // cc-nx: registered refresh token (HttpOnly)
+        const refreshCookie = parseCookie(res.cookies.find((c) => c.includes('cc-nx_testsite=')))
+        expect(refreshCookie.value).toBe('refresh-value')
+        expect(refreshCookie.httpOnly).toBe(true)
+
+        // uido (non-HttpOnly)
+        const uidoCookie = parseCookie(res.cookies.find((c) => c.includes('uido_testsite=')))
+        expect(uidoCookie.value).toBe('ecom')
+
+        // Should NOT have guest refresh cookie
+        expect(res.cookies.find((c) => c.includes('cc-nx-g_testsite='))).toBeUndefined()
+
+        // No dnt cookie when dnt absent from JWT
+        expect(res.cookies.find((c) => c.includes('cc-at-dnt_testsite'))).toBeUndefined()
+
+        // Tokens stripped from body
+        const body = JSON.parse(result.toString('utf8'))
+        expect(body).not.toHaveProperty('access_token')
+        expect(body).not.toHaveProperty('refresh_token')
+    })
+
+    test('omits uido cookie when uido is absent from JWT', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: '::upn:Guest'})
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            refresh_token: 'refresh-value',
+            expires_in: 1800
+        })
+        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+
+        expect(res.cookies.find((c) => c.includes('uido_testsite'))).toBeUndefined()
+    })
+
+    test('throws when access token JWT is invalid', () => {
+        const res = makeRes()
+        const buf = makeResponseBuffer({access_token: 'not-a-jwt', expires_in: 1800})
+        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())).toThrow(
+            /Failed to decode access token JWT/
+        )
+    })
+
+    test('uses JWT exp for cookie expiry regardless of expires_in', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 5000, exp: 6800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken})
+        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+
+        const expCookie = res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
+        const parsed = parseCookie(expCookie)
+        expect(parsed.value).toBe(String(6800))
+    })
+
+    test('handles response with no tokens (no cookies set, body returned stripped)', () => {
+        const res = makeRes()
+        const buf = makeResponseBuffer({expires_in: 1800, other_field: 'value'})
+        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const body = JSON.parse(result.toString('utf8'))
+
+        expect(res.cookies).toHaveLength(0)
+        expect(body.other_field).toBe('value')
+    })
+
+    test('trims siteId and uses trimmed value in cookie names', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
+        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  mysite  '))
+
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_mysite='))
+        expect(atCookie).toBeDefined()
+        // No leading/trailing spaces in cookie name
+        expect(res.cookies.find((c) => c.includes('cc-at_  mysite'))).toBeUndefined()
+    })
+})
