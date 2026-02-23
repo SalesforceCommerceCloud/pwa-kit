@@ -81,7 +81,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
     const {showRegisterPasskeyToast} = usePasskeyRegistration()
-    const {loginWithPasskey} = usePasskeyLogin()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 
     const handleMergeBasket = () => {
@@ -194,6 +194,11 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         loginWithPasskey().catch(() => {
             form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
         })
+
+        // Cleanup: abort passkey login when navigating away from login page
+        return () => {
+            abortPasskeyLogin()
+        }
     }, [])
 
     /**************** Einstein ****************/
