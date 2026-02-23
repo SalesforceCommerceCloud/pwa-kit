@@ -53,6 +53,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
 
 const SFPaymentsSheet = forwardRef((props, ref) => {
     const {onRequiresPayButtonChange, onCreateOrder, onError} = props
