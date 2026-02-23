@@ -79,8 +79,6 @@ export default {
             left: 2
         },
         askAssistantBanner: {
-            // Mobile: rounded top corners, full-bleed into container padding, internal padding 24px (no 100vw = no horizontal scroll)
-            // Desktop: same full-bleed
             borderRadius: {base: 'md', md: 0},
             borderTopLeftRadius: {base: 'md', md: 0},
             borderTopRightRadius: {base: 'md', md: 0},
