@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    applyProxyRequestHeaders,
-    applyScapiAuthHeaders,
-    configureProxy
-} from './configure-proxy'
+import {applyProxyRequestHeaders, applyScapiAuthHeaders, configureProxy} from './configure-proxy'
 import * as ssrProxying from '../ssr-proxying'
 import * as utils from './utils'
 import cookie from 'cookie'

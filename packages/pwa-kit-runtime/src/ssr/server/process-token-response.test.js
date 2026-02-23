@@ -85,9 +85,9 @@ describe('getRefreshTokenCookieTTL', () => {
 
     test('uses valid registered override', () => {
         const ttl = 1000
-        expect(
-            getRefreshTokenCookieTTL(12345, false, {refreshTokenRegisteredCookieTTL: ttl})
-        ).toBe(ttl)
+        expect(getRefreshTokenCookieTTL(12345, false, {refreshTokenRegisteredCookieTTL: ttl})).toBe(
+            ttl
+        )
     })
 
     test('rejects override exceeding default and warns', () => {
@@ -183,9 +183,7 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(expCookie.httpOnly).toBeUndefined()
 
         // cc-at-dnt: do-not-track from JWT (non-HttpOnly)
-        const dntCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-at-dnt_testsite='))
-        )
+        const dntCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at-dnt_testsite=')))
         expect(dntCookie.value).toBe('1')
         expect(dntCookie.httpOnly).toBeUndefined()
 
@@ -197,9 +195,7 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(idpCookie.httpOnly).toBe(true)
 
         // cc-nx-g: guest refresh token (HttpOnly)
-        const refreshCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-nx-g_testsite='))
-        )
+        const refreshCookie = parseCookie(res.cookies.find((c) => c.includes('cc-nx-g_testsite=')))
         expect(refreshCookie.value).toBe('refresh-value')
         expect(refreshCookie.httpOnly).toBe(true)
 
@@ -245,9 +241,7 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(expCookie.value).toBe(String(3800))
 
         // cc-nx: registered refresh token (HttpOnly)
-        const refreshCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-nx_testsite='))
-        )
+        const refreshCookie = parseCookie(res.cookies.find((c) => c.includes('cc-nx_testsite=')))
         expect(refreshCookie.value).toBe('refresh-value')
         expect(refreshCookie.httpOnly).toBe(true)
 
