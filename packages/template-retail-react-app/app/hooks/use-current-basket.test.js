@@ -45,7 +45,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         ...originalModule,
         useCustomerId: jest.fn(() => 'abmuc2wupJxeoRxuo3wqYYmbhI'),
         useCustomerBaskets: jest.fn(),
-        useShopperBasketsMutation: () => ({
+        useShopperBasketsV2Mutation: () => ({
             mutateAsync: mockAsyncMutate
         })
     }

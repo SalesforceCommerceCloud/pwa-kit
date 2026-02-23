@@ -6,12 +6,12 @@
  */
 
 import {renderHook} from '@testing-library/react'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 
 // Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useShopperBasketsMutation: jest.fn()
+    useShopperBasketsV2Mutation: jest.fn()
 }))
 
 describe('useItemShipmentManagement', () => {
