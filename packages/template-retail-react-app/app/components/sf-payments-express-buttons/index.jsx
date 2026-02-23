@@ -12,9 +12,9 @@ import {useIntl} from 'react-intl'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
-import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
+import {useShippingMethodsForShipmentV2 as useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
@@ -270,12 +270,16 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        // Build the return URL (needed for updatePaymentInstrumentForOrder )      
+        // Build the return URL (needed for updatePaymentInstrumentForOrder )
         const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
-        paymentData.returnUrl = baseReturnUrl +
-            '?orderNo=' + encodeURIComponent(createdOrderNo) +
-            '&zoneId=' + encodeURIComponent(zoneId) +
-            '&type=' + encodeURIComponent(paymentType)
+        paymentData.returnUrl =
+            baseReturnUrl +
+            '?orderNo=' +
+            encodeURIComponent(createdOrderNo) +
+            '&zoneId=' +
+            encodeURIComponent(zoneId) +
+            '&type=' +
+            encodeURIComponent(paymentType)
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({

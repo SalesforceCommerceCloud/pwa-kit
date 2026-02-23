@@ -46,6 +46,7 @@ export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
 
 export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',
+    SHOPPER_BASKETS_V2: 'shopperBasketsV2',
     SHOPPER_CONFIGURATIONS: 'shopperConfigurations',
     SHOPPER_CONTEXTS: 'shopperContexts',
     SHOPPER_CUSTOMERS: 'shopperCustomers',

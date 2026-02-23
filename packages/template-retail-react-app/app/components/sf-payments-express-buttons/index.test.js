@@ -278,10 +278,10 @@ describe('failOrder error handling', () => {
                     paymentMethodSetAccounts: []
                 }
             }),
-            useShopperBasketsMutation: () => ({
+            useShopperBasketsV2Mutation: () => ({
                 mutateAsync: jest.fn()
             }),
-            useShippingMethodsForShipment: () => ({
+            useShippingMethodsForShipmentV2: () => ({
                 refetch: jest.fn()
             })
         }

@@ -6,6 +6,7 @@
  */
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
+    ShopperBaskets,
     ShopperBasketsV2,
     ShopperContexts,
     ShopperCustomers,
@@ -86,7 +87,8 @@ export type ApiClientConfigParams = {
  * A map of commerce-sdk-isomorphic API client instances.
  */
 export interface ApiClients {
-    shopperBaskets?: ShopperBasketsV2<ApiClientConfigParams>
+    shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperBasketsV2?: ShopperBasketsV2<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>

@@ -16,7 +16,7 @@ import {
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Controller} from 'react-hook-form'
-import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
+import {useShippingMethodsForShipmentV2 as useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'

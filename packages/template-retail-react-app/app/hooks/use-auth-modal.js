@@ -24,7 +24,7 @@ import {
     useCustomerId,
     useCustomerType,
     useCustomerBaskets,
-    useShopperBasketsMutation
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'

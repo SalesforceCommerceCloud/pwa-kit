@@ -43,7 +43,11 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    AuthHelpers,
+    useAuthHelper,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
