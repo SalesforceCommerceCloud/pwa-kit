@@ -72,12 +72,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
 })
 
 const mockLoginWithPasskey = jest.fn().mockResolvedValue(undefined)
+const mockAbortPasskeyLogin = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-passkey-login', () => {
     return {
         __esModule: true,
         usePasskeyLogin: jest.fn(() => ({
-            loginWithPasskey: mockLoginWithPasskey
+            loginWithPasskey: mockLoginWithPasskey,
+            abortPasskeyLogin: mockAbortPasskeyLogin
         }))
     }
 })
@@ -455,8 +457,8 @@ describe('passkey login', () => {
         })
     })
 
-    test('does not call loginWithPasskey when customer is registered', async () => {
-        // Mock registered customer
+    test('does not prompt for passkey when user is already logged in', async () => {
+        // When customer is registered, we must not trigger passkey (no prompt)
         mockUseCurrentCustomer.mockReturnValue({
             data: {
                 isRegistered: true,
@@ -466,9 +468,75 @@ describe('passkey login', () => {
 
         renderWithProviders(<ContactInfo />)
 
-        // Wait a bit to ensure useEffect has run
         await waitFor(() => {
             expect(mockLoginWithPasskey).not.toHaveBeenCalled()
         })
+    })
+
+    test('calls abortPasskeyLogin when component unmounts', async () => {
+        const {unmount} = renderWithProviders(<ContactInfo />)
+
+        // Wait for passkey login to be triggered
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).toHaveBeenCalled()
+        })
+
+        // Verify abort hasn't been called yet
+        expect(mockAbortPasskeyLogin).not.toHaveBeenCalled()
+
+        // Unmount the component (simulates navigating away)
+        unmount()
+
+        // Verify abort was called during cleanup
+        expect(mockAbortPasskeyLogin).toHaveBeenCalled()
+    })
+
+    test('Passkey prompt is aborted when user logs in with password', async () => {
+        // This test verifies that when the user logs in with password while the passkey
+        // flow is pending, the useEffect cleanup runs (customer becomes registered) and
+        // abortPasskeyLogin is called.
+        //
+        // The actual abort behavior is tested in use-passkey-login.test.js.
+
+        let customerRegistered = false
+        mockUseCurrentCustomer.mockImplementation(() => ({
+            data: {isRegistered: customerRegistered}
+        }))
+
+        // When login succeeds, mark customer as registered so the next render triggers
+        // the useEffect cleanup (abortPasskeyLogin)
+        global.server.use(
+            rest.post('*/oauth2/login', (req, res, ctx) => {
+                customerRegistered = true
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+            })
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        // Wait for passkey login to be triggered (passkey prompt is "pending")
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).toHaveBeenCalled()
+        })
+        expect(mockAbortPasskeyLogin).not.toHaveBeenCalled()
+
+        // User switches to login and logs in with password
+        const trigger = screen.getByText(/Already have an account\? Log in/i)
+        await user.click(trigger)
+
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.type(screen.getByLabelText('Password'), password)
+
+        const loginButton = screen.getByText('Log In')
+        await user.click(loginButton)
+
+        // Login succeeds; component re-renders with isRegistered: true; cleanup runs
+        await waitFor(
+            () => {
+                expect(mockAbortPasskeyLogin).toHaveBeenCalled()
+                expect(mockGoToNextStep).toHaveBeenCalled()
+            },
+            {timeout: 3000}
+        )
     })
 })
