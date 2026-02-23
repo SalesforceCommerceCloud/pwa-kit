@@ -283,10 +283,25 @@ describe('Error while logging in', function () {
 describe('Passkey login', () => {
     let mockCredentialsGet
     let mockPublicKeyCredential
+    let mockAppConfig
 
     beforeEach(() => {
         // Clear all mocks
         jest.clearAllMocks()
+
+        // Override getConfig to return config with passkey enabled
+        mockAppConfig = {
+            ...mockConfig.app,
+            login: {
+                ...mockConfig.app.login,
+                passkey: {enabled: true}
+            }
+        }
+
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: mockAppConfig
+        })
 
         // Mock WebAuthn API - default to never resolving (simulating no user action)
         mockCredentialsGet = jest.fn().mockImplementation(() => new Promise(() => {}))
@@ -301,6 +316,12 @@ describe('Passkey login', () => {
         global.navigator.credentials = {
             get: mockCredentialsGet
         }
+
+        // Mock parseRequestOptionsFromJSON to return mock options
+        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue({
+            challenge: 'mock-challenge',
+            allowCredentials: []
+        })
 
         // Clear localStorage
         localStorage.clear()
@@ -345,21 +366,6 @@ describe('Passkey login', () => {
     })
 
     test('Sets up conditional mediation on page load when passkey enabled', async () => {
-        const mockAppConfig = {
-            ...mockConfig.app,
-            login: {
-                ...mockConfig.app.login,
-                passkey: {enabled: true}
-            }
-        }
-
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
         // Mock that conditional mediation starts but user doesn't select
         mockCredentialsGet.mockImplementation(
             () =>
@@ -392,97 +398,6 @@ describe('Passkey login', () => {
                 )
             },
             {timeout: 2000}
-        )
-    })
-
-    test('Successfully logs in with passkey in passwordless mode on login page', async () => {
-        const mockAppConfig = {
-            ...mockConfig.app,
-            login: {
-                ...mockConfig.app.login,
-                passwordless: {enabled: true},
-                passkey: {enabled: true}
-            }
-        }
-
-        const mockPublicKeyOptions = {
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue(mockPublicKeyOptions)
-
-        const mockCredential = {
-            id: 'mock-credential-id',
-            rawId: new ArrayBuffer(32),
-            type: 'public-key',
-            response: {
-                authenticatorData: new ArrayBuffer(37),
-                clientDataJSON: new ArrayBuffer(128),
-                signature: new ArrayBuffer(64),
-                userHandle: new ArrayBuffer(16)
-            },
-            getClientExtensionResults: jest.fn().mockReturnValue({}),
-            toJSON: jest.fn().mockReturnValue({
-                id: 'mock-credential-id',
-                rawId: 'mock-raw-id',
-                type: 'public-key',
-                response: {
-                    authenticatorData: 'mock-auth-data',
-                    clientDataJSON: 'mock-client-data',
-                    signature: 'mock-signature',
-                    userHandle: 'mock-user-handle'
-                }
-            })
-        }
-
-        mockCredentialsGet.mockResolvedValue(mockCredential)
-
-        // Mock successful auth after passkey
-        global.server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) =>
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'customerid_1',
-                        access_token:
-                            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494',
-                        refresh_token: 'testrefeshtoken_1',
-                        usid: 'testusid_1',
-                        enc_user_id: 'testEncUserId_1',
-                        id_token: 'testIdToken_1'
-                    })
-                )
-            )
-        )
-
-        const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {
-                siteAlias: 'uk',
-                locale: {id: 'en-GB'},
-                appConfig: mockAppConfig,
-                bypassAuth: false
-            }
-        })
-
-        // Enter email (don't enter password for passwordless)
-        await user.type(screen.getByLabelText('Email'), 'test@salesforce.com')
-        await user.click(screen.getByRole('button', {name: /sign in/i}))
-
-        // Should trigger passkey authentication with credentials.get
-        await waitFor(
-            () => {
-                expect(mockCredentialsGet).toHaveBeenCalled()
-            },
-            {timeout: 5000}
-        )
-
-        // After successful passkey login, should redirect to account page
-        await waitFor(
-            () => {
-                expect(window.location.pathname).toBe('/uk/en-GB/account')
-            },
-            {timeout: 5000}
         )
     })
 
@@ -521,73 +436,34 @@ describe('Passkey login', () => {
         expect(mockCredentialsGet).not.toHaveBeenCalled()
     })
 
-    test('Handles passkey login cancellation gracefully', async () => {
-        const mockAppConfig = {
-            ...mockConfig.app,
-            login: {
-                ...mockConfig.app.login,
-                passwordless: {enabled: true},
-                passkey: {enabled: true}
-            }
+    test('Successfully logs in with passkey', async () => {
+        const mockCredential = {
+            id: 'mock-credential-id',
+            rawId: new ArrayBuffer(32),
+            type: 'public-key',
+            response: {
+                authenticatorData: new ArrayBuffer(37),
+                clientDataJSON: new ArrayBuffer(128),
+                signature: new ArrayBuffer(64),
+                userHandle: new ArrayBuffer(16)
+            },
+            getClientExtensionResults: jest.fn().mockReturnValue({}),
+            toJSON: jest.fn().mockReturnValue({
+                id: 'mock-credential-id',
+                rawId: 'mock-raw-id',
+                type: 'public-key',
+                response: {
+                    authenticatorData: 'mock-auth-data',
+                    clientDataJSON: 'mock-client-data',
+                    signature: 'mock-signature',
+                    userHandle: 'mock-user-handle'
+                }
+            })
         }
 
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue({
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        })
+        mockCredentialsGet.mockResolvedValue(mockCredential)
 
-        // User cancels passkey selection
-        const notAllowedError = new Error('User cancelled')
-        notAllowedError.name = 'NotAllowedError'
-        mockCredentialsGet.mockRejectedValue(notAllowedError)
-
-        const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {
-                siteAlias: 'uk',
-                locale: {id: 'en-GB'},
-                appConfig: mockAppConfig,
-                bypassAuth: false
-            }
-        })
-
-        // Enter email without password for passwordless
-        await user.type(screen.getByLabelText('Email'), 'test@salesforce.com')
-        await user.click(screen.getByRole('button', {name: /sign in/i}))
-
-        // Should not show error for cancelled passkey
-        // Page should remain on login page
-        await waitFor(() => {
-            expect(screen.getByTestId('login-page')).toBeInTheDocument()
-        })
-    })
-
-    test('Shows passkey registration prompt after successful login when passkey enabled and not registered', async () => {
-        const mockAppConfig = {
-            ...mockConfig.app,
-            login: {
-                ...mockConfig.app.login,
-                passkey: {enabled: true}
-            }
-        }
-
-        mockPublicKeyCredential.parseRequestOptionsFromJSON.mockReturnValue({
-            challenge: 'mock-challenge',
-            allowCredentials: []
-        })
-
-        const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {
-                siteAlias: 'uk',
-                locale: {id: 'en-GB'},
-                appConfig: mockAppConfig,
-                bypassAuth: false
-            }
-        })
-
-        // Login with regular credentials
-        await user.type(screen.getByLabelText('Email'), 'customer@test.com')
-        await user.type(screen.getByLabelText('Password'), 'Password!1')
-
+        // Mock customer as registered after passkey login
         global.server.use(
             rest.post('*/oauth2/token', (req, res, ctx) =>
                 res(
@@ -605,15 +481,155 @@ describe('Passkey login', () => {
             )
         )
 
-        await user.click(screen.getByRole('button', {name: /sign in/i}))
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
 
-        // After successful login, should navigate to account page
+        // Wait for passkey flow to be triggered when modal opens
         await waitFor(
             () => {
-                expect(window.location.pathname).toBe('/uk/en-GB/account')
+                expect(mockCredentialsGet).toHaveBeenCalled()
             },
             {timeout: 5000}
         )
+
+        // login successfully and navigate to account page
+        await waitFor(() => {
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
+            expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
+        })
+    })
+
+    test('User can select other login method when passkey login is cancelled', async () => {
+        // User cancels passkey selection
+        const notAllowedError = new Error('User cancelled')
+        notAllowedError.name = 'NotAllowedError'
+        mockCredentialsGet.mockRejectedValue(notAllowedError)
+
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Login form should be shown
+        await waitFor(() => {
+            expect(mockCredentialsGet).toHaveBeenCalled()
+            expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
+            expect(screen.getByLabelText('Email')).toBeInTheDocument()
+            expect(screen.getByLabelText('Password')).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /sign in/i})).toBeInTheDocument()
+            expect(screen.getByTestId('login-page')).toBeInTheDocument()
+        })
+    })
+
+    describe('Passkey Registration', () => {
+        test('Displays Create passkey toast after successful login when passkey is enabled', async () => {
+            // Successful email/password login
+            global.server.use(
+                rest.post('*/oauth2/token', (req, res, ctx) =>
+                    res(
+                        ctx.delay(0),
+                        ctx.json({
+                            customer_id: 'customerid_1',
+                            access_token:
+                                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494',
+                            refresh_token: 'testrefeshtoken_1',
+                            usid: 'testusid_1',
+                            enc_user_id: 'testEncUserId_1',
+                            id_token: 'testIdToken_1'
+                        })
+                    )
+                ),
+                rest.post('*/baskets/actions/merge', (req, res, ctx) =>
+                    res(ctx.delay(0), ctx.json(mockMergedBasket))
+                )
+            )
+
+            const {user} = renderWithProviders(<MockedComponent />, {
+                wrapperProps: {
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockAppConfig,
+                    bypassAuth: false
+                }
+            })
+
+            // Wait for login form after passkey is cancelled
+            await waitFor(() => {
+                expect(screen.getByLabelText('Email')).toBeInTheDocument()
+                expect(screen.getByLabelText('Password')).toBeInTheDocument()
+            })
+
+            await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+            await user.type(screen.getByLabelText('Password'), 'Password!1')
+            await user.click(screen.getByRole('button', {name: /sign in/i}))
+
+            // Create passkey toast is shown after successful login when passkey is enabled and WebAuthn is supported
+            await waitFor(
+                () => {
+                    expect(
+                        screen.getByRole('button', {name: /Create Passkey/i})
+                    ).toBeInTheDocument()
+                },
+                {timeout: 3000}
+            )
+        })
+    })
+
+    test('Shows error when passkey authentication fails with error from the browser', async () => {
+        // Simulate error in navigator.credentials.get hook
+        mockCredentialsGet.mockRejectedValue(new Error('Authentication failed'))
+
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Should show error - passkey error should be caught and handled
+        await waitFor(() => {
+            expect(mockCredentialsGet).toHaveBeenCalled()
+            expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
+        })
+    })
+
+    test('Shows error when passkey authentication fails with error from the WebAuthn API', async () => {
+        // Simulate error in WebAuthn API
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(401),
+                    ctx.json({message: 'Authentication failed'})
+                )
+            })
+        )
+
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockAppConfig,
+                bypassAuth: false
+            }
+        })
+
+        // Should show error - 401 error from WebAuthn API should be caught and converted to user-friendly message
+        await waitFor(() => {
+            expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
+        })
     })
 })
 

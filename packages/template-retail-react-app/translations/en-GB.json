@@ -1354,12 +1354,6 @@
   "passkey_registration.modal.button.register": {
     "defaultMessage": "Register Passkey"
   },
-  "passkey_registration.modal.error.authorize_failed": {
-    "defaultMessage": "Failed to authorize passkey registration"
-  },
-  "passkey_registration.modal.error.registration_failed": {
-    "defaultMessage": "Failed to register passkey"
-  },
   "passkey_registration.modal.label.nickname": {
     "defaultMessage": "Passkey Nickname (optional)"
   },

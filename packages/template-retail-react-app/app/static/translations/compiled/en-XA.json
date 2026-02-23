@@ -6847,34 +6847,6 @@
       "value": "]"
     }
   ],
-  "passkey_registration.modal.error.authorize_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ȧȧŭŭŧħǿǿřīẑḗḗ ƥȧȧşşķḗḗẏ řḗḗɠīşŧřȧȧŧīǿǿƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "passkey_registration.modal.error.registration_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ řḗḗɠīşŧḗḗř ƥȧȧşşķḗḗẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "passkey_registration.modal.label.nickname": [
     {
       "type": 0,

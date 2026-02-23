@@ -62,7 +62,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const config = getConfig()
-    const {passwordless = {}, social = {}, passkey = {}} = config.app.login || {}
+    const {passwordless = {}, social = {}} = config.app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
     const passwordlessMode = passwordless?.mode
     const passwordlessLoginLandingPath = passwordless?.landingPath
@@ -80,7 +80,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
-    const {showToast} = usePasskeyRegistration()
+    const {showRegisterPasskeyToast} = usePasskeyRegistration()
     const {loginWithPasskey} = usePasskeyLogin()
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 
@@ -184,37 +184,16 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         handleMergeBasket()
         const redirectTo = redirectPath ? redirectPath : '/account'
 
-        if (passkey?.enabled) {
-            // Show passkey registration modal only if Webauthn feature flag is enabled and compatible with the browser
-            if (
-                window.PublicKeyCredential &&
-                window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
-                window.PublicKeyCredential.isConditionalMediationAvailable
-            ) {
-                Promise.all([
-                    window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-                    window.PublicKeyCredential.isConditionalMediationAvailable()
-                ]).then((results) => {
-                    if (results.every((r) => r === true)) {
-                        showToast()
-                    }
-                    // Navigate after passkey check completes (whether toast is shown or not)
-                    navigate(redirectTo)
-                })
-                return
-            }
-        }
+        // Show passkey registration prompt if supported
+        showRegisterPasskeyToast()
 
-        // Navigate immediately if passkey is not enabled or not available
         navigate(redirectTo)
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        try {
-            loginWithPasskey()
-        } catch (error) {
-            // TODO W-21056536: Add error message handling
-        }
+        loginWithPasskey().catch(() => {
+            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+        })
     }, [])
 
     /**************** Einstein ****************/

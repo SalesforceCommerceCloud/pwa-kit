@@ -33,15 +33,23 @@ export const usePasskeyLogin = () => {
         }
 
         // Check if conditional mediation is available. Conditional mediation is a feature of the WebAuthn API that allows passkeys to appear in the browser's standard autofill suggestions, alongside saved passwords. This allows users to sign in with a passkey using the standard username input field, rather than clicking a dedicated passkey login button.
-        // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/isConditionalMediationAvailable
+        // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isConditionalMediationAvailable_static
         const isCMA = await window.PublicKeyCredential.isConditionalMediationAvailable()
         if (!isCMA) {
             return
         }
 
-        const startWebauthnAuthenticationResponse = await startWebauthnAuthentication.mutateAsync(
-            {}
-        )
+        let startWebauthnAuthenticationResponse
+        try {
+            startWebauthnAuthenticationResponse = await startWebauthnAuthentication.mutateAsync({})
+        } catch (error) {
+            // 412 is returned when user attempts to authenticate within 1 minute of a previous attempt
+            // We return early in this case to avoid showing an error to the user
+            if (error.response?.status === 412) {
+                return
+            }
+            throw error
+        }
 
         // Transform response for WebAuthn API to send to navigator.credentials.get()
         // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static
@@ -63,6 +71,7 @@ export const usePasskeyLogin = () => {
             if (error.name == 'NotAllowedError') {
                 return
             }
+            console.error('Error getting passkey credential from browser:', error)
             throw error
         }
 

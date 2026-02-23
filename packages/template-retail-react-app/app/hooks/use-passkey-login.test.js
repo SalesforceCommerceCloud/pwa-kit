@@ -7,11 +7,13 @@
 import React from 'react'
 import {rest} from 'msw'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    registerUserToken
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {registerUserToken} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 const mockCredential = {
     id: 'test-credential-id',
@@ -78,9 +80,16 @@ const mockParseRequestOptionsFromJSON = jest.fn()
 
 const MockComponent = () => {
     const {loginWithPasskey} = usePasskeyLogin()
+    const [result, setResult] = React.useState(null)
+    const handleClick = () => {
+        loginWithPasskey()
+            .then(() => setResult('resolved'))
+            .catch(() => setResult('rejected'))
+    }
     return (
         <div>
-            <button data-testid="login-with-passkey" onClick={() => loginWithPasskey()} />
+            <button data-testid="login-with-passkey" onClick={handleClick} />
+            {result && <span data-testid="login-result">{result}</span>}
         </div>
     )
 }
@@ -261,26 +270,90 @@ describe('usePasskeyLogin', () => {
     })
 
     test('returns early without error when NotAllowedError is thrown from navigator.credentials.get', async () => {
-        // Create a NotAllowedError (typically thrown when user cancels passkey login)
+        // Create a NotAllowedError (thrown when user cancels passkey login)
         const notAllowedError = new Error('User cancelled')
         notAllowedError.name = 'NotAllowedError'
-
-        // Mock navigator.credentials.get to throw NotAllowedError
         mockGetCredentials.mockRejectedValue(notAllowedError)
 
         renderWithProviders(<MockComponent />)
 
         const trigger = screen.getByTestId('login-with-passkey')
-
-        // Click the button - should not throw an error even though NotAllowedError is thrown
         fireEvent.click(trigger)
 
-        // Wait for navigator.credentials.get to be called
-        await waitFor(() => {
-            expect(mockGetCredentials).toHaveBeenCalled()
-        })
+        await waitFor(() => expect(mockGetCredentials).toHaveBeenCalled())
+        await waitFor(() =>
+            expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
+        )
+    })
 
-        // Verify that no error message is displayed
-        expect(screen.queryByText('Something went wrong. Try again!')).not.toBeInTheDocument()
+    test('returns early without error when 412 is returned from startWebauthnAuthentication', async () => {
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(412),
+                    ctx.json({message: 'Authenticate not started for: user@example.com"'})
+                )
+            })
+        )
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+        fireEvent.click(trigger)
+
+        expect(mockGetCredentials).not.toHaveBeenCalled()
+        await waitFor(() =>
+            expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
+        )
+    })
+
+    test('throws error when other error is returned from startWebauthnAuthentication', async () => {
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
+            })
+        )
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+        fireEvent.click(trigger)
+
+        await waitFor(() =>
+            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+        )
+    })
+
+    test('throws error when other error is returned from finishWebauthnAuthentication', async () => {
+        global.server.use(
+            rest.post('*/oauth2/webauthn/authenticate/finish', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
+            })
+        )
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+        fireEvent.click(trigger)
+
+        await waitFor(() =>
+            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+        )
+    })
+
+    test('throws error when other error is returned from navigator.credentials.get', async () => {
+        const networkError = new Error('NetworkError')
+        networkError.name = 'NetworkError'
+        mockGetCredentials.mockRejectedValue(networkError)
+
+        renderWithProviders(<MockComponent />)
+
+        const trigger = screen.getByTestId('login-with-passkey')
+        fireEvent.click(trigger)
+
+        await waitFor(() =>
+            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+        )
     })
 })

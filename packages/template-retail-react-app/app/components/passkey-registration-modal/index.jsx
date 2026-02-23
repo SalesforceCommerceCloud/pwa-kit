@@ -37,6 +37,12 @@ import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/uti
 // SDK
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 
+// Constants
+import {
+    API_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Modal for registering a new passkey with a nickname
  */
@@ -73,13 +79,8 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             onClose()
             setIsOtpAuthOpen(true)
         } catch (err) {
-            setError(
-                err.message ||
-                    formatMessage({
-                        id: 'passkey_registration.modal.error.authorize_failed',
-                        defaultMessage: 'Failed to authorize passkey registration'
-                    })
-            )
+            // Set error message for the passkey registration modal
+            setError(formatMessage(API_ERROR_MESSAGE))
         } finally {
             setIsLoading(false)
         }
@@ -107,18 +108,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
 
             // navigator.credentials.create() will show a browser/system prompt
             // This may appear to hang if the user doesn't interact with the prompt
-            let credential
-            try {
-                credential = await navigator.credentials.create({
-                    publicKey
-                })
-            } catch (createError) {
-                // Handle user cancellation or other errors from the WebAuthn API
-                if (createError.name === 'NotAllowedError' || createError.name === 'AbortError') {
-                    throw new Error('Passkey registration was cancelled or timed out')
-                }
-                throw createError
-            }
+            const credential = await navigator.credentials.create({publicKey})
 
             if (!credential) {
                 throw new Error('Failed to create credential: user cancelled or operation failed')
@@ -160,17 +150,15 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
 
             return {success: true}
         } catch (err) {
-            const errorMessage =
-                err.message ||
-                formatMessage({
-                    id: 'passkey_registration.modal.error.registration_failed',
-                    defaultMessage: 'Failed to register passkey'
-                })
+            console.error('Error registering passkey:', err)
+            const message = /401/.test(err.message)
+                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
 
             // Return error result for OTP component to display
             return {
                 success: false,
-                error: errorMessage
+                error: message
             }
         } finally {
             setIsLoading(false)

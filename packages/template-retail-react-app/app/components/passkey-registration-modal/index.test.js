@@ -223,7 +223,7 @@ describe('PasskeyRegistrationModal', () => {
             await user.click(registerButton)
 
             await waitFor(() => {
-                expect(screen.getByText(errorMessage)).toBeInTheDocument()
+                expect(screen.getByText('Something went wrong. Try again!')).toBeInTheDocument()
             })
         })
 
@@ -457,7 +457,7 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: errorMessage
+                error: 'Something went wrong. Try again!'
             })
 
             // Verify modals are not closed on error
@@ -498,7 +498,7 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: 'WebAuthn API not available in this browser'
+                error: 'Something went wrong. Try again!'
             })
         })
 
@@ -537,7 +537,7 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: 'Passkey registration was cancelled or timed out'
+                error: 'Something went wrong. Try again!'
             })
         })
 
@@ -573,7 +573,7 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: 'Failed to create credential: user cancelled or operation failed'
+                error: 'Something went wrong. Try again!'
             })
         })
 
@@ -622,7 +622,7 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: errorMessage
+                error: 'Something went wrong. Try again!'
             })
         })
 
@@ -661,7 +661,34 @@ describe('PasskeyRegistrationModal', () => {
 
             expect(result).toEqual({
                 success: false,
-                error: 'Passkey registration was cancelled or timed out'
+                error: 'Something went wrong. Try again!'
+            })
+        })
+
+        test('returns INVALID_TOKEN_ERROR_MESSAGE when startWebauthnUserRegistration fails with 401', async () => {
+            const otpCode = '12345678'
+
+            mockStartWebauthnRegistration.mockRejectedValue(new Error('401'))
+
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
+                {
+                    wrapperProps: {appConfig: mockConfig.app}
+                }
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(otpVerificationHandler).toBeTruthy()
+            })
+
+            const result = await otpVerificationHandler(otpCode)
+
+            expect(result).toEqual({
+                success: false,
+                error: 'Invalid token, please try again.'
             })
         })
     })
