@@ -22,6 +22,7 @@ export function launchChat() {
     try {
         const utilAPI = window.embeddedservice_bootstrap?.utilAPI
         if (!utilAPI) return
+
         const hideChatButtonOnLoad =
             window.embeddedservice_bootstrap?.settings?.hideChatButtonOnLoad === true
         if (hideChatButtonOnLoad && typeof utilAPI.showChatButton === 'function') {
