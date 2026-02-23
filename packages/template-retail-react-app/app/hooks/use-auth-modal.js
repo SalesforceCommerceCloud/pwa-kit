@@ -75,7 +75,7 @@ export const AuthModal = ({
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
     const prevAuthType = usePrevious(customerType)
-    const {loginWithPasskey} = usePasskeyLogin()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const customer = useCustomer(
         {parameters: {customerId}},
         {enabled: !!customerId && isRegistered}
@@ -241,6 +241,11 @@ export const AuthModal = ({
             loginWithPasskey().catch(() => {
                 form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
             })
+        }
+
+        // Cleanup: abort passkey login when modal closes or component unmounts
+        return () => {
+            abortPasskeyLogin()
         }
     }, [isOpen])
 

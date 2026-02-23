@@ -818,6 +818,119 @@ describe('Passkey login', () => {
         })
     })
 
+    test('Passkey prompt is aborted when modal is closed', async () => {
+        // Capture the abort signal passed to credentials.get
+        let capturedSignal = null
+
+        // Mock credentials.get to capture the abort signal and stay pending
+        mockCredentialsGet.mockImplementation(({signal}) => {
+            capturedSignal = signal
+            return new Promise(() => {
+                // Never resolve - simulates passkey prompt staying open
+            })
+        })
+
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        // Wait for passkey conditional mediation to start and capture the signal
+        await waitFor(() => {
+            expect(mockCredentialsGet).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    mediation: 'conditional',
+                    signal: expect.any(AbortSignal)
+                })
+            )
+            expect(capturedSignal).not.toBeNull()
+        })
+
+        // Verify signal is not yet aborted
+        expect(capturedSignal.aborted).toBe(false)
+
+        // Close the modal by clicking the close button
+        const closeButton = screen.getByLabelText(/close login form/i)
+        await user.click(closeButton)
+
+        // Verify the signal was aborted when modal closed
+        expect(capturedSignal.aborted).toBe(true)
+    })
+
+    test('Passkey prompt is aborted when user logs in', async () => {
+        // This test verifies that when the user logs in while the passkey
+        // prompt is pending, the modal closes (login succeeds) and the passkey flow is
+        // aborted via the cleanup that runs when the modal closes.
+        let capturedSignal = null
+
+        mockCredentialsGet.mockImplementation(({signal}) => {
+            expect(signal).toBeInstanceOf(AbortSignal)
+            capturedSignal = signal
+            return new Promise(() => {
+                // Never resolve - simulates passkey prompt staying open
+            })
+        })
+
+        // Successful email/password login
+        global.server.use(
+            rest.post('*/oauth2/token', (req, res, ctx) =>
+                res(
+                    ctx.delay(0),
+                    ctx.json({
+                        customer_id: 'customerid_1',
+                        access_token: registerUserToken,
+                        refresh_token: 'testrefeshtoken_1',
+                        usid: 'testusid_1',
+                        enc_user_id: 'testEncUserId_1',
+                        id_token: 'testIdToken_1'
+                    })
+                )
+            ),
+            rest.post('*/baskets/actions/merge', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockMergedBasket))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
+        })
+
+        // Open the modal - passkey flow starts and stays pending
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(mockCredentialsGet).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    mediation: 'conditional',
+                    signal: expect.any(AbortSignal)
+                })
+            )
+            expect(capturedSignal).not.toBeNull()
+        })
+
+        // User logs in with password while passkey prompt is still open
+        await user.type(screen.getByLabelText(/email/i), 'customer@test.com')
+        await user.type(screen.getByLabelText(/^password$/i), 'Password!1')
+        await user.click(screen.getByRole('button', {name: /sign in/i}))
+
+        // Wait for login to succeed and modal to close (cleanup runs and aborts passkey)
+        await waitFor(
+            () => {
+                expect(screen.queryByText(/welcome back/i)).not.toBeInTheDocument()
+                expect(capturedSignal.aborted).toBe(true)
+            },
+            {timeout: 3000}
+        )
+    })
+
     test('Does not trigger passkey when not enabled', async () => {
         const mockAppConfig = {
             ...mockConfig.app,
