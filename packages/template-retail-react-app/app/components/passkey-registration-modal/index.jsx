@@ -151,7 +151,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             return {success: true}
         } catch (err) {
             console.error('Error registering passkey:', err)
-            const message = /Unauthorized/i.test(err.message)
+            const message = /401/.test(err.message)
                 ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
 

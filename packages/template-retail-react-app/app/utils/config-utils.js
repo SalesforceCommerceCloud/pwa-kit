@@ -21,7 +21,8 @@ export const getCommerceAgentConfig = () => {
         enableConversationContext: 'false',
         conversationContext: [],
         enableAgentFromHeader: 'false',
-        enableAgentFromFloatingButton: 'false'
+        enableAgentFromFloatingButton: 'false',
+        enableAgentFromSearchSuggestions: 'false'
     }
     return getConfig().app.commerceAgent ?? defaults
 }
