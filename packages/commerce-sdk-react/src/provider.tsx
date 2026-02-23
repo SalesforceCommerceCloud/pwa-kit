@@ -155,11 +155,12 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const configLogger = logger || console
 
     // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
-    const effectiveFetchOptions =
-        useHttpOnlySessionCookies &&
-        (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
+    const effectiveFetchOptions = useMemo(() => {
+        return useHttpOnlySessionCookies &&
+            (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
             ? {...fetchOptions, credentials: 'same-origin' as RequestCredentials}
             : fetchOptions
+    }, [useHttpOnlySessionCookies, fetchOptions])
 
     const auth = useMemo(() => {
         return new Auth({
