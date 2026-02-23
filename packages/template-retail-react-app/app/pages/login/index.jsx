@@ -191,15 +191,18 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        loginWithPasskey().catch(() => {
-            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
-        })
+        // Only prompt for passkey when the user is not already signed in
+        if (!isRegistered) {
+            loginWithPasskey().catch(() => {
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            })
+        }
 
         // Cleanup: abort passkey login when navigating away from login page
         return () => {
             abortPasskeyLogin()
         }
-    }, [])
+    }, [isRegistered])
 
     /**************** Einstein ****************/
     useEffect(() => {

@@ -20,11 +20,21 @@ import ResetPassword from '@salesforce/retail-react-app/app/pages/reset-password
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
 
 // Mock getConfig for passkey tests
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
+
+// Allow overriding useCustomerType for tests that need a specific auth state (e.g. "already signed in")
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        useCustomerType: jest.fn(actual.useCustomerType)
+    }
+})
 
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
@@ -434,6 +444,41 @@ describe('Passkey login', () => {
 
         // Should not call credentials API when passkey is disabled
         expect(mockCredentialsGet).not.toHaveBeenCalled()
+    })
+
+    test('Does not trigger passkey when user is already signed in', async () => {
+        // Use the same pattern as account/drawer-menu: mock useCustomerType so first render sees isRegistered: true.
+        // No need to mock /customers/:customerId — the passkey effect only checks useCustomerType(), not the API.
+        const realUseCustomerType = useCustomerType.getMockImplementation()
+        useCustomerType.mockReturnValue({
+            isRegistered: true,
+            customerType: 'registered',
+            isGuest: false,
+            isExternal: false
+        })
+        try {
+            renderWithProviders(<MockedComponent />, {
+                wrapperProps: {
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockAppConfig,
+                    bypassAuth: true,
+                    isGuest: false
+                }
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTestId('login-page')).toBeInTheDocument()
+            })
+
+            // Give it a moment for any async effects to run
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            // Rendering the login page should not trigger navigator.credentials.get when user is already registered
+            expect(mockCredentialsGet).not.toHaveBeenCalled()
+        } finally {
+            useCustomerType.mockImplementation(realUseCustomerType)
+        }
     })
 
     test('Successfully logs in with passkey', async () => {
