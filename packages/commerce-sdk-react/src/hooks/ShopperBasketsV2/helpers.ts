@@ -5,15 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCustomerId, useShopperBasketsMutation} from '../index'
+import {useCustomerId} from '../index'
+// make sure to import the v2 mutation from the correct file
+import {useShopperBasketsMutation} from './mutation'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
-import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsV2Types} from 'commerce-sdk-isomorphic'
 import {CLIENT_KEYS} from '../../constant'
 
-const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS_V2
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
-type Basket = ShopperBasketsTypes.Basket
+type Basket = ShopperBasketsV2Types.Basket
 
 /**
  * This is a helper function for Basket Mutations.
