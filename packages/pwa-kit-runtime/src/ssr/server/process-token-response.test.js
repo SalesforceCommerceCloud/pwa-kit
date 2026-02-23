@@ -155,6 +155,7 @@ describe('applyHttpOnlySessionCookies', () => {
         const res = makeRes()
         const accessToken = makeJWT({
             iat: 1000,
+            exp: 2800,
             isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1',
             dnt: '1'
         })
@@ -174,11 +175,11 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(atCookie.secure).toBe(true)
         expect(atCookie.path).toBe('/')
 
-        // cc-at-expires-at: expiry from iat (non-HttpOnly)
+        // cc-at-expires: expiry from JWT exp claim (non-HttpOnly)
         const expCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-at-expires-at_testsite='))
+            res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
         )
-        expect(expCookie.value).toBe(String(1000 + 1800))
+        expect(expCookie.value).toBe(String(2800))
         expect(expCookie.httpOnly).toBeUndefined()
 
         // cc-at-dnt: do-not-track from JWT (non-HttpOnly)
@@ -223,6 +224,7 @@ describe('applyHttpOnlySessionCookies', () => {
         const res = makeRes()
         const accessToken = makeJWT({
             iat: 2000,
+            exp: 3800,
             isb: 'uido:ecom::upn:john@example.com::uidn:John'
         })
         const buf = makeResponseBuffer({
@@ -236,11 +238,11 @@ describe('applyHttpOnlySessionCookies', () => {
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
         expect(atCookie.httpOnly).toBe(true)
 
-        // cc-at-expires-at (non-HttpOnly)
+        // cc-at-expires (non-HttpOnly)
         const expCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-at-expires-at_testsite='))
+            res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
         )
-        expect(expCookie.value).toBe(String(2000 + 1800))
+        expect(expCookie.value).toBe(String(3800))
 
         // cc-nx: registered refresh token (HttpOnly)
         const refreshCookie = parseCookie(
@@ -267,7 +269,7 @@ describe('applyHttpOnlySessionCookies', () => {
 
     test('omits uido cookie when uido is absent from JWT', () => {
         const res = makeRes()
-        const accessToken = makeJWT({iat: 1000, isb: '::upn:Guest'})
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: '::upn:Guest'})
         const buf = makeResponseBuffer({
             access_token: accessToken,
             refresh_token: 'refresh-value',
@@ -278,19 +280,6 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(res.cookies.find((c) => c.includes('uido_testsite'))).toBeUndefined()
     })
 
-    test('uses Date.now fallback for cc-at-expires-at when iat is missing', () => {
-        const res = makeRes()
-        const now = Math.floor(Date.now() / 1000)
-        const accessToken = makeJWT({isb: 'uido:ecom::upn:Guest'})
-        const buf = makeResponseBuffer({access_token: accessToken, expires_in: 900})
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
-
-        const expCookie = res.cookies.find((c) => c.includes('cc-at-expires-at_testsite='))
-        const expiresAt = parseInt(parseCookie(expCookie).value, 10)
-        expect(expiresAt).toBeGreaterThanOrEqual(now + 900 - 5)
-        expect(expiresAt).toBeLessThanOrEqual(now + 900 + 5)
-    })
-
     test('throws when access token JWT is invalid', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'not-a-jwt', expires_in: 1800})
@@ -299,15 +288,15 @@ describe('applyHttpOnlySessionCookies', () => {
         )
     })
 
-    test('defaults expires_in to 1800 when not a number', () => {
+    test('uses JWT exp for cookie expiry regardless of expires_in', () => {
         const res = makeRes()
-        const accessToken = makeJWT({iat: 5000, isb: 'uido:ecom::upn:Guest'})
+        const accessToken = makeJWT({iat: 5000, exp: 6800, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken})
         applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
 
-        const expCookie = res.cookies.find((c) => c.includes('cc-at-expires-at_testsite='))
+        const expCookie = res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
         const parsed = parseCookie(expCookie)
-        expect(parsed.value).toBe(String(5000 + 1800))
+        expect(parsed.value).toBe(String(6800))
     })
 
     test('handles response with no tokens (no cookies set, body returned stripped)', () => {

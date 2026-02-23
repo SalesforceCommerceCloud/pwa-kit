@@ -35,14 +35,11 @@ export function getRefreshTokenCookieTTL(refreshTokenExpiresInSLASValue, isGuest
 }
 
 /**
- * Decodes the SLAS access token JWT, extracts claims, and sets non-HttpOnly metadata cookies
- * (expires-at, dnt, uido) so the client can read them. Same field extraction as
+ * Decodes the SLAS access token JWT and extracts claims. Same field extraction as
  * commerce-sdk-react parseSlasJWT.
- *
- * Returns {isGuest} for the caller to determine the refresh token cookie name.
  * @private
  */
-function setTokenClaimCookies(res, siteId, accessToken, expiresInSeconds) {
+function getTokenClaims(accessToken) {
     let payload
     try {
         payload = jwtDecode(accessToken)
@@ -50,41 +47,7 @@ function setTokenClaimCookies(res, siteId, accessToken, expiresInSeconds) {
         throw new Error(`Failed to decode access token JWT: ${error.message || error}. `)
     }
 
-    const accessExpires = new Date(Date.now() + expiresInSeconds * 1000)
-
-    // Expiry timestamp — use JWT iat when available (non-HttpOnly so client can check expiry)
-    let expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds
-    if (typeof payload.iat === 'number') {
-        expiresAt = payload.iat + expiresInSeconds
-    }
-    res.append(
-        SET_COOKIE,
-        cookieAsString({
-            name: `cc-at-expires-at_${siteId}`,
-            value: String(expiresAt),
-            path: '/',
-            secure: true,
-            sameSite: 'lax',
-            httpOnly: false,
-            expires: accessExpires
-        })
-    )
-
-    // Do-not-track flag from JWT (non-HttpOnly so client can read it)
-    if (payload.dnt !== undefined) {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: `cc-at-dnt_${siteId}`,
-                value: String(payload.dnt),
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: false,
-                expires: accessExpires
-            })
-        )
-    }
+    const accessExpires = new Date(payload.exp * 1000)
 
     // Extract isGuest and uido from JWT isb claim
     let isGuest = true
@@ -96,66 +59,7 @@ function setTokenClaimCookies(res, siteId, accessToken, expiresInSeconds) {
         if (uidoPart) uido = uidoPart
     }
 
-    // uido: IDP origin (e.g. "slas", "ecom"); non-HttpOnly so client can read for useCustomerType/isExternal
-    if (uido) {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: `uido_${siteId}`,
-                value: uido,
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: false,
-                expires: accessExpires
-            })
-        )
-    }
-
-    return {isGuest}
-}
-
-/**
- * Sets the IDP access token as an HttpOnly cookie.
- * @private
- */
-function setIdpAccessTokenCookie(res, siteId, idpAccessToken, expiresInSeconds) {
-    const idpExpires = new Date(Date.now() + expiresInSeconds * 1000)
-    res.append(
-        SET_COOKIE,
-        cookieAsString({
-            name: `idp_access_token_${siteId}`,
-            value: idpAccessToken,
-            path: '/',
-            secure: true,
-            sameSite: 'lax',
-            httpOnly: true,
-            expires: idpExpires
-        })
-    )
-}
-
-/**
- * Sets the refresh token as an HttpOnly cookie. Cookie name depends on guest vs registered user.
- * @private
- */
-function setRefreshTokenCookie(res, siteId, refreshToken, refreshTokenExpiresIn, isGuest) {
-    const refreshTTL = getRefreshTokenCookieTTL(refreshTokenExpiresIn, isGuest)
-    const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
-    const refreshCookieName = isGuest ? `cc-nx-g_${siteId}` : `cc-nx_${siteId}`
-
-    res.append(
-        SET_COOKIE,
-        cookieAsString({
-            name: refreshCookieName,
-            value: refreshToken,
-            path: '/',
-            secure: true,
-            sameSite: 'lax',
-            httpOnly: true,
-            expires: refreshExpires
-        })
-    )
+    return {accessExpires, expiresAt: payload.exp, dnt: payload.dnt, isGuest, uido}
 }
 
 /**
@@ -180,13 +84,20 @@ export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, 
     }
 
     const site = siteId.trim()
-    const expiresInSeconds = typeof parsed.expires_in === 'number' ? parsed.expires_in : 1800
 
-    // Decode JWT, set metadata cookies (expires-at, dnt, uido), get isGuest
+    // Decode JWT and extract claims
     let isGuest = true
     if (parsed.access_token) {
+        const {
+            accessExpires,
+            expiresAt,
+            dnt,
+            uido,
+            isGuest: guest
+        } = getTokenClaims(parsed.access_token)
+        isGuest = guest
+
         // Access token (HttpOnly)
-        const accessExpires = new Date(Date.now() + expiresInSeconds * 1000)
         res.append(
             SET_COOKIE,
             cookieAsString({
@@ -200,23 +111,91 @@ export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, 
             })
         )
 
-        const claims = setTokenClaimCookies(res, site, parsed.access_token, expiresInSeconds)
-        isGuest = claims.isGuest
+        // Expiry timestamp from JWT exp claim (non-HttpOnly so client can check expiry)
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: `cc-at-expires_${site}`,
+                value: String(expiresAt),
+                path: '/',
+                secure: true,
+                sameSite: 'lax',
+                httpOnly: false,
+                expires: accessExpires
+            })
+        )
+
+        // Do-not-track flag from JWT (non-HttpOnly so client can read it)
+        if (dnt !== undefined) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: `cc-at-dnt_${site}`,
+                    value: String(dnt),
+                    path: '/',
+                    secure: true,
+                    sameSite: 'lax',
+                    httpOnly: false,
+                    expires: accessExpires
+                })
+            )
+        }
+
+        // uido: IDP origin (e.g. "slas", "ecom"); non-HttpOnly so client can read for useCustomerType/isExternal
+        if (uido) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: `uido_${site}`,
+                    value: uido,
+                    path: '/',
+                    secure: true,
+                    sameSite: 'lax',
+                    httpOnly: false,
+                    expires: accessExpires
+                })
+            )
+        }
+
+        // IDP access token (HttpOnly)
+        if (parsed.idp_access_token) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: `idp_access_token_${site}`,
+                    value: parsed.idp_access_token,
+                    path: '/',
+                    secure: true,
+                    sameSite: 'lax',
+                    httpOnly: true,
+                    expires: accessExpires
+                })
+            )
+        }
     }
 
-    // IDP access token
-    if (parsed.idp_access_token) {
-        setIdpAccessTokenCookie(res, site, parsed.idp_access_token, expiresInSeconds)
-    }
-
-    // Refresh token
+    // Refresh token (HttpOnly) — uses its own TTL, independent of access token expiry
     if (parsed.refresh_token) {
-        setRefreshTokenCookie(
-            res,
-            site,
-            parsed.refresh_token,
+        const commerceAPI = options.mobify?.app?.commerceAPI || {}
+        const refreshTTL = getRefreshTokenCookieTTL(
             parsed.refresh_token_expires_in,
-            isGuest
+            isGuest,
+            commerceAPI
+        )
+        const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
+        const refreshCookieName = isGuest ? `cc-nx-g_${site}` : `cc-nx_${site}`
+
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: refreshCookieName,
+                value: parsed.refresh_token,
+                path: '/',
+                secure: true,
+                sameSite: 'lax',
+                httpOnly: true,
+                expires: refreshExpires
+            })
         )
     }
 

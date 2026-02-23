@@ -582,7 +582,7 @@ describe('HttpOnly session cookies', () => {
             expect(response.headers['set-cookie']).toBeDefined()
             const cookies = response.headers['set-cookie']
             expect(cookies.some((c) => c.includes('cc-at_testsite'))).toBe(true)
-            expect(cookies.some((c) => c.includes('cc-at-expires-at_testsite'))).toBe(true)
+            expect(cookies.some((c) => c.includes('cc-at-expires_testsite'))).toBe(true)
             expect(cookies.some((c) => c.includes('cc-nx-g_testsite'))).toBe(true)
         } finally {
             mockSlasServerInstance.close()
@@ -692,7 +692,7 @@ describe('HttpOnly session cookies', () => {
             expect(response.headers['set-cookie']).toBeDefined()
             const cookies = response.headers['set-cookie']
             expect(cookies.some((c) => c.includes('cc-at_testsite'))).toBe(true)
-            expect(cookies.some((c) => c.includes('cc-at-expires-at_testsite'))).toBe(true)
+            expect(cookies.some((c) => c.includes('cc-at-expires_testsite'))).toBe(true)
         } finally {
             mockSlasServerInstance.close()
         }

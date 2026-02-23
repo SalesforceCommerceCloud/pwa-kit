@@ -138,7 +138,7 @@ type AuthDataKeys =
     | 'uido'
     | 'idp_refresh_token'
     | 'dnt'
-    | 'access_token_expires_at'
+    | 'cc-at-expires'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -254,9 +254,9 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'local',
         key: 'uido'
     },
-    access_token_expires_at: {
-        storageType: 'local',
-        key: 'access_token_expires_at'
+    'cc-at-expires': {
+        storageType: 'cookie',
+        key: 'cc-at-expires'
     }
 }
 
@@ -528,11 +528,11 @@ class Auth {
 
     /**
      * Returns whether the access token is expired. When useHttpOnlySessionCookies is true,
-     * uses access_token_expires_at from store; otherwise decodes the JWT from getAccessToken().
+     * uses cc-at-expires cookie from store; otherwise decodes the JWT from getAccessToken().
      */
     private isAccessTokenExpired(): boolean {
         if (this.useHttpOnlySessionCookies) {
-            const expiresAt = this.get('access_token_expires_at')
+            const expiresAt = this.get('cc-at-expires')
             if (expiresAt == null || expiresAt === '') return true
             const expiresAtSec = Number(expiresAt)
             if (Number.isNaN(expiresAtSec)) return true
@@ -734,14 +734,6 @@ class Auth {
             }
             const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
             this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
-        }
-        if (
-            res &&
-            typeof res === 'object' &&
-            'access_token_expires_at' in res &&
-            res.access_token_expires_at != null
-        ) {
-            this.set('access_token_expires_at', String(res.access_token_expires_at))
         }
     }
 
