@@ -25,7 +25,7 @@ test('renders Ask Shopping Agent banner with title and description', () => {
 
     expect(
         screen.getByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
     expect(screen.getByText((content) => content === 'Ask Shopping Agent')).toBeInTheDocument()
@@ -41,7 +41,7 @@ test('calls onClick when banner is clicked', async () => {
     renderWithProviders(<AskAssistantBanner onClick={onClick} styles={baseStyles} />)
 
     const button = screen.getByRole('button', {
-        name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     await user.click(button)
 

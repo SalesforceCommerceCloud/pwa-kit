@@ -46,7 +46,7 @@ test('when no suggestions: renders RecentSearches and shows Ask Shopping Agent b
     expect(screen.getByTestId('sf-suggestion-recent')).toBeInTheDocument()
     expect(
         screen.getByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
 })
@@ -65,7 +65,7 @@ test('when no suggestions and enableAgentFromSearchSuggestions false: does not s
     expect(screen.getByTestId('sf-suggestion-recent')).toBeInTheDocument()
     expect(
         screen.queryByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).not.toBeInTheDocument()
 })
@@ -82,7 +82,7 @@ test('when no suggestions and onAskAssistantClick not provided: does not show As
 
     expect(
         screen.queryByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).not.toBeInTheDocument()
 })
@@ -100,7 +100,7 @@ test('enableAgentFromSearchSuggestions string "true" shows banner when no sugges
 
     expect(
         screen.getByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
 })
@@ -121,7 +121,7 @@ test('when has suggestions: renders SuggestionSection with showAskAssistantBanne
 
     expect(screen.getByTestId('suggestion-section')).toBeInTheDocument()
     const banner = screen.getByRole('button', {
-        name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     expect(banner).toBeInTheDocument()
 })
@@ -142,7 +142,7 @@ test('when has suggestions and banner enabled: clicking banner calls onAskAssist
     )
 
     const banner = screen.getByRole('button', {
-        name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     await user.click(banner)
     expect(onAskAssistantClick).toHaveBeenCalledTimes(1)

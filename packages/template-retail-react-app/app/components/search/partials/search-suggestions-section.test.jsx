@@ -162,7 +162,7 @@ describe('Ask Shopping Agent banner', () => {
         )
 
         const banners = screen.getAllByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
         expect(banners.length).toBeGreaterThanOrEqual(1)
     })
@@ -184,7 +184,7 @@ describe('Ask Shopping Agent banner', () => {
 
         expect(
             screen.queryByRole('button', {
-                name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+                name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
             })
         ).not.toBeInTheDocument()
     })
@@ -205,7 +205,7 @@ describe('Ask Shopping Agent banner', () => {
 
         expect(
             screen.queryByRole('button', {
-                name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+                name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
             })
         ).not.toBeInTheDocument()
     })
@@ -228,7 +228,7 @@ describe('Ask Shopping Agent banner', () => {
         )
 
         const banner = screen.getAllByRole('button', {
-            name: /Ask Shopping Agent.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })[0]
         await user.click(banner)
 
