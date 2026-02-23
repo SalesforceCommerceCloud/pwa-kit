@@ -7,10 +7,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {SparkleIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const AskAssistantBanner = ({onClick, styles}) => {
+    const intl = useIntl()
+    const title = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.title',
+        defaultMessage: 'Ask Shopping Agent'
+    })
+    const description = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.description',
+        defaultMessage: 'Discover, compare, and shop smarter with your personal Shopping Agent.'
+    })
+    const ariaLabel = `${title} - ${description}`
+
     const handleInteraction = (e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -25,7 +36,7 @@ const AskAssistantBanner = ({onClick, styles}) => {
             textAlign="left"
             onMouseDown={handleInteraction}
             onClick={handleInteraction}
-            aria-label="Ask Shopping Agent - Discover, compare and shop smarter with your personal shopping assistant"
+            aria-label={ariaLabel}
         >
             <Box {...styles.askAssistantBannerIcon}>
                 <SparkleIcon boxSize={5} color="gray.800" />
