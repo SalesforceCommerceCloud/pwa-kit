@@ -665,10 +665,10 @@ describe('PasskeyRegistrationModal', () => {
             })
         })
 
-        test('returns INVALID_TOKEN_ERROR_MESSAGE when startWebauthnUserRegistration fails with Unauthorized', async () => {
+        test('returns INVALID_TOKEN_ERROR_MESSAGE when startWebauthnUserRegistration fails with 401', async () => {
             const otpCode = '12345678'
 
-            mockStartWebauthnRegistration.mockRejectedValue(new Error('Unauthorized'))
+            mockStartWebauthnRegistration.mockRejectedValue(new Error('401'))
 
             const {user} = renderWithProviders(
                 <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
