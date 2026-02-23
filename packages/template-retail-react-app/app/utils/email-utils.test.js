@@ -150,6 +150,24 @@ describe('isValidEmail', () => {
         test('should return false for email with hyphen at end of domain part', () => {
             expect(isValidEmail('test@example-.com')).toBe(false)
         })
+
+        test('should return false for single-character TLD', () => {
+            expect(isValidEmail('test@example.o')).toBe(false)
+            expect(isValidEmail('test@example.c')).toBe(false)
+        })
+    })
+
+    describe('TLD length', () => {
+        test('should accept two-character TLDs', () => {
+            expect(isValidEmail('test@example.co')).toBe(true)
+            expect(isValidEmail('test@example.uk')).toBe(true)
+        })
+
+        test('should accept longer TLDs', () => {
+            expect(isValidEmail('test@example.com')).toBe(true)
+            expect(isValidEmail('test@example.museum')).toBe(true)
+            expect(isValidEmail('test@example.travel')).toBe(true)
+        })
     })
 })
 

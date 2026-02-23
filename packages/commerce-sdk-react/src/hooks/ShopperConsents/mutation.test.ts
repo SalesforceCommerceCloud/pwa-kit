@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {act} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
 import {ShopperConsentsTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
@@ -95,6 +95,7 @@ describe('Cache update behavior', () => {
         test('invalidates `getSubscriptions` query', async () => {
             mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             mockMutationEndpoints(consentsEndpoint, {})
+            mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             const {result} = renderHookWithProviders(() => {
                 return {
                     query: queries.useSubscriptions(queryOptions),
@@ -169,6 +170,7 @@ describe('Cache update behavior', () => {
         test('invalidates `getSubscriptions` query', async () => {
             mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             mockMutationEndpoints(consentsEndpoint, {})
+            mockQueryEndpoint(consentsEndpoint, baseSubscriptionResponse)
             const {result} = renderHookWithProviders(() => {
                 return {
                     query: queries.useSubscriptions(queryOptions),
@@ -259,10 +261,10 @@ describe('Cache update behavior', () => {
             )
             await waitAndExpectSuccess(() => result.current.mutation)
 
-            // Wait for automatic refetch
-            await waitAndExpectSuccess(() => result.current.query)
-            // Should have fresh data, not stale
-            expect(result.current.query.data?.data).toHaveLength(2)
+            // Wait for refetch to complete with fresh data
+            await waitFor(() => {
+                expect(result.current.query.data?.data).toHaveLength(2)
+            })
             expect(result.current.query.data).toEqual(freshResponse)
         })
     })
