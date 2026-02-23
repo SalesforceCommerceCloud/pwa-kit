@@ -270,7 +270,8 @@ export const AuthModal = ({
         const isNowRegistered =
             (isOpen || isOtpAuthOpen) && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
-        if (!isNowRegistered) {
+        // Also ensure that the customer data is loaded.
+        if (!isNowRegistered || !customer.data) {
             return
         }
 
@@ -282,8 +283,7 @@ export const AuthModal = ({
         showRegisterPasskeyToast()
 
         // Show a toast only for those registed users returning to the site.
-        // Only show toast when customer data is available (user is logged in and data is loaded)
-        if (loggingIn && customer.data) {
+        if (loggingIn) {
             toast({
                 variant: 'subtle',
                 title: `${formatMessage(
