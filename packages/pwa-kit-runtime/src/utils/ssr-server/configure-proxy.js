@@ -12,6 +12,7 @@ import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging, isScapiDomain} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
+import {SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN} from '../../ssr/server/constants'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -195,7 +196,7 @@ export const configureProxy = ({
     appProtocol = /* istanbul ignore next */ 'https',
     caching,
     siteId = null,
-    slasEndpointsRequiringAccessToken = /\/oauth2\/logout/
+    slasEndpointsRequiringAccessToken = SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN
 }) => {
     // This configuration must match the behaviour of the proxying
     // in CloudFront.
@@ -380,7 +381,7 @@ export const configureProxyConfigs = (
     appHostname,
     appProtocol,
     siteId = null,
-    slasEndpointsRequiringAccessToken = /\/oauth2\/logout/
+    slasEndpointsRequiringAccessToken = SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN
 ) => {
     localDevLog('')
     proxyConfigs.forEach((config) => {
