@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCustomerId, useCustomerBaskets} from '@salesforce/commerce-sdk-react'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 

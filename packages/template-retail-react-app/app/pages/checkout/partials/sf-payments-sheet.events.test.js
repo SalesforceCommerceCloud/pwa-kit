@@ -24,7 +24,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...actual,
-        useShopperBasketsMutation: (mutationKey) => {
+        useShopperBasketsV2Mutation: (mutationKey) => {
             if (mutationKey === 'addPaymentInstrumentToBasket') {
                 return {mutateAsync: mockAddPaymentInstrument}
             }

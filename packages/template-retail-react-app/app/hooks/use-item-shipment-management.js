@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCallback} from 'react'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 

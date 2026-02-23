@@ -11,11 +11,11 @@ import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-75
 
 // Mock the dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useShopperBasketsMutation: jest.fn(() => ({
+    useShopperBasketsV2Mutation: jest.fn(() => ({
         mutateAsync: jest.fn(),
         isLoading: false
     })),
-    useShippingMethodsForShipment: jest.fn(() => ({
+    useShippingMethodsForShipmentV2: jest.fn(() => ({
         refetch: jest.fn()
     }))
 }))
@@ -481,7 +481,7 @@ describe('usePickupShipment', () => {
 
             // Get the mocked module and update the mock to include mutateAsync
             const commerceSdkMock = jest.requireMock('@salesforce/commerce-sdk-react')
-            commerceSdkMock.useShopperBasketsMutation.mockReturnValue({
+            commerceSdkMock.useShopperBasketsV2Mutation.mockReturnValue({
                 mutateAsync: mockMutateAsync,
                 isLoading: false
             })
@@ -601,11 +601,11 @@ describe('usePickupShipment', () => {
 
             // Get the mocked module and update the mock to include mutateAsync and refetch
             const commerceSdkMock = jest.requireMock('@salesforce/commerce-sdk-react')
-            commerceSdkMock.useShopperBasketsMutation.mockReturnValue({
+            commerceSdkMock.useShopperBasketsV2Mutation.mockReturnValue({
                 mutateAsync: mockMutateAsync,
                 isLoading: false
             })
-            commerceSdkMock.useShippingMethodsForShipment.mockReturnValue({
+            commerceSdkMock.useShippingMethodsForShipmentV2.mockReturnValue({
                 refetch: mockRefetchShippingMethods
             })
         })
@@ -963,7 +963,7 @@ describe('usePickupShipment', () => {
 
             // Get the mocked module and update the mock to include mutateAsync
             const commerceSdkMock = jest.requireMock('@salesforce/commerce-sdk-react')
-            commerceSdkMock.useShopperBasketsMutation.mockReturnValue({
+            commerceSdkMock.useShopperBasketsV2Mutation.mockReturnValue({
                 mutateAsync: mockMutateAsync,
                 isLoading: false
             })

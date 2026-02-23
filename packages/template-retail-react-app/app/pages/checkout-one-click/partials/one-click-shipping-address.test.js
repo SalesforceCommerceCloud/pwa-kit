@@ -41,7 +41,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+        useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateShippingAddressForShipment')
                 return mockUpdateShippingAddress
             return {mutateAsync: jest.fn()}
@@ -830,7 +830,7 @@ describe('ShippingAddress Component', () => {
             const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
             return {
                 ...originalModule,
-                useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+                useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
                     if (mutationType === 'updateShippingAddressForShipment')
                         return mockUpdateShippingAddress
                     return {mutateAsync: jest.fn()}
@@ -934,7 +934,7 @@ describe('ShippingAddress Component', () => {
             const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
             return {
                 ...originalModule,
-                useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+                useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
                     if (mutationType === 'updateShippingAddressForShipment')
                         return mockUpdateShippingAddress
                     return {mutateAsync: jest.fn()}
@@ -1095,7 +1095,7 @@ describe('ShippingAddress Component', () => {
             const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
             return {
                 ...originalModule,
-                useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+                useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
                     if (mutationType === 'updateShippingAddressForShipment')
                         return mockUpdateShippingAddress
                     return {mutateAsync: jest.fn()}

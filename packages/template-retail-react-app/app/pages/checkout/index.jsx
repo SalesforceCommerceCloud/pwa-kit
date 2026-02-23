@@ -33,7 +33,10 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
-import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperOrdersMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
