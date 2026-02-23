@@ -79,16 +79,21 @@ const mockIsConditionalMediationAvailable = jest.fn()
 const mockParseRequestOptionsFromJSON = jest.fn()
 
 const MockComponent = () => {
-    const {loginWithPasskey} = usePasskeyLogin()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const [result, setResult] = React.useState(null)
-    const handleClick = () => {
+
+    const handleLogin = () => {
         loginWithPasskey()
             .then(() => setResult('resolved'))
             .catch(() => setResult('rejected'))
     }
+    const handleAbort = () => {
+        abortPasskeyLogin()
+    }
     return (
         <div>
-            <button data-testid="login-with-passkey" onClick={handleClick} />
+            <button data-testid="login-with-passkey" onClick={handleLogin} />
+            <button data-testid="abort-passkey-login" onClick={handleAbort} />
             {result && <span data-testid="login-result">{result}</span>}
         </div>
     )
@@ -143,217 +148,265 @@ describe('usePasskeyLogin', () => {
         mockGetCredentials.mockResolvedValue(mockCredential)
     })
 
-    test('calls navigator.credentials.get with the correct parameters when all conditions are met', async () => {
-        renderWithProviders(<MockComponent />)
+    describe('loginWithPasskey', () => {
+        test('calls navigator.credentials.get with the correct parameters when all conditions are met', async () => {
+            renderWithProviders(<MockComponent />)
 
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
 
-        // Check that credentials.get is called with the correct parameters
-        await waitFor(() => {
-            expect(mockGetCredentials).toHaveBeenCalledWith({
-                publicKey: expect.objectContaining({
-                    challenge: expect.any(String),
-                    timeout: expect.any(Number),
-                    rpId: expect.any(String)
-                }),
-                mediation: 'conditional'
+            // Check that credentials.get is called with the correct parameters
+            await waitFor(() => {
+                expect(mockGetCredentials).toHaveBeenCalledWith({
+                    publicKey: expect.objectContaining({
+                        challenge: expect.any(String),
+                        timeout: expect.any(Number),
+                        rpId: expect.any(String)
+                    }),
+                    mediation: 'conditional',
+                    signal: expect.any(AbortSignal)
+                })
             })
         })
-    })
 
-    test('does not call navigator.credentials.get when passkey is not enabled', async () => {
-        getConfig.mockReturnValue({
-            ...mockConfig,
-            app: {
-                ...mockConfig.app,
-                login: {
-                    ...mockConfig.app.login,
-                    passkey: {
-                        enabled: false
+        test('does not call navigator.credentials.get when passkey is not enabled', async () => {
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {
+                        ...mockConfig.app.login,
+                        passkey: {
+                            enabled: false
+                        }
                     }
                 }
+            })
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            expect(mockGetCredentials).not.toHaveBeenCalled()
+        })
+
+        test('does not start passkey login when PublicKeyCredential is not available', async () => {
+            delete global.window.PublicKeyCredential
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            expect(mockGetCredentials).not.toHaveBeenCalled()
+        })
+
+        test('does not start passkey login when conditional mediation is not available', async () => {
+            mockIsConditionalMediationAvailable.mockResolvedValue(false)
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            await waitFor(() => {
+                expect(mockIsConditionalMediationAvailable).toHaveBeenCalled()
+            })
+
+            expect(mockGetCredentials).not.toHaveBeenCalled()
+        })
+
+        test('falls back to manual encoding when toJSON() is not supported', async () => {
+            // Create a credential mock where toJSON() throws an error (e.g., 1Password)
+            const credentialWithoutToJSON = {
+                ...mockCredential,
+                toJSON: jest.fn(() => {
+                    throw new Error('toJSON is not supported')
+                })
             }
-        })
 
-        renderWithProviders(<MockComponent />)
+            // Reset and set the mock for this specific test to ensure it returns the credential
+            mockGetCredentials.mockResolvedValue(credentialWithoutToJSON)
 
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
+            global.server.use(
+                rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                    return res(
+                        ctx.delay(0),
+                        ctx.status(200),
+                        ctx.json(mockStartWebauthnAuthenticationResponse)
+                    )
+                }),
+                rest.post('*/oauth2/webauthn/authenticate/finish', async (req, res, ctx) => {
+                    const body = await req.json()
+                    // Assert: credential is still manually encoded when toJSON() is not supported
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            credential: expect.objectContaining({
+                                id: 'test-credential-id',
+                                rawId: expect.any(String),
+                                type: 'public-key',
+                                clientExtensionResults: {},
+                                response: expect.objectContaining({
+                                    authenticatorData: expect.any(String),
+                                    clientDataJSON: expect.any(String),
+                                    signature: expect.any(String),
+                                    userHandle: expect.any(String)
+                                })
+                            }),
+                            // usid used in the test environment
+                            usid: '8e883973-68eb-41fe-a3c5-756232652ff5'
+                        })
+                    )
+                    return res(
+                        ctx.delay(0),
+                        ctx.status(200),
+                        ctx.json(mockFinishWebauthnAuthenticationResponse)
+                    )
+                })
+            )
 
-        expect(mockGetCredentials).not.toHaveBeenCalled()
-    })
+            renderWithProviders(<MockComponent />)
 
-    test('does not start passkey login when PublicKeyCredential is not available', async () => {
-        delete global.window.PublicKeyCredential
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
 
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        expect(mockGetCredentials).not.toHaveBeenCalled()
-    })
-
-    test('does not start passkey login when conditional mediation is not available', async () => {
-        mockIsConditionalMediationAvailable.mockResolvedValue(false)
-
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        await waitFor(() => {
-            expect(mockIsConditionalMediationAvailable).toHaveBeenCalled()
-        })
-
-        expect(mockGetCredentials).not.toHaveBeenCalled()
-    })
-
-    test('falls back to manual encoding when toJSON() is not supported', async () => {
-        // Create a credential mock where toJSON() throws an error (e.g., 1Password)
-        const credentialWithoutToJSON = {
-            ...mockCredential,
-            toJSON: jest.fn(() => {
-                throw new Error('toJSON is not supported')
+            await waitFor(() => {
+                expect(mockGetCredentials).toHaveBeenCalled()
             })
-        }
+        })
 
-        // Reset and set the mock for this specific test to ensure it returns the credential
-        mockGetCredentials.mockResolvedValue(credentialWithoutToJSON)
+        test.each(['NotAllowedError', 'AbortError'])(
+            'returns early without error when %s is thrown from navigator.credentials.get',
+            async (errorName) => {
+                const error = new Error()
+                error.name = errorName
+                mockGetCredentials.mockRejectedValue(error)
 
-        global.server.use(
-            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json(mockStartWebauthnAuthenticationResponse)
+                renderWithProviders(<MockComponent />)
+
+                const trigger = screen.getByTestId('login-with-passkey')
+                fireEvent.click(trigger)
+
+                await waitFor(() => expect(mockGetCredentials).toHaveBeenCalled())
+                await waitFor(() =>
+                    expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
                 )
-            }),
-            rest.post('*/oauth2/webauthn/authenticate/finish', async (req, res, ctx) => {
-                const body = await req.json()
-                // Assert: credential is still manually encoded when toJSON() is not supported
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        credential: expect.objectContaining({
-                            id: 'test-credential-id',
-                            rawId: expect.any(String),
-                            type: 'public-key',
-                            clientExtensionResults: {},
-                            response: expect.objectContaining({
-                                authenticatorData: expect.any(String),
-                                clientDataJSON: expect.any(String),
-                                signature: expect.any(String),
-                                userHandle: expect.any(String)
-                            })
-                        }),
-                        // usid used in the test environment
-                        usid: '8e883973-68eb-41fe-a3c5-756232652ff5'
+            }
+        )
+
+        test('returns early without error when 412 is returned from startWebauthnAuthentication', async () => {
+            global.server.use(
+                rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                    return res(
+                        ctx.delay(0),
+                        ctx.status(412),
+                        ctx.json({message: 'Authenticate not started for: user@example.com"'})
+                    )
+                })
+            )
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            expect(mockGetCredentials).not.toHaveBeenCalled()
+            await waitFor(() =>
+                expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
+            )
+        })
+
+        test('throws error when other error is returned from startWebauthnAuthentication', async () => {
+            global.server.use(
+                rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
+                })
+            )
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            await waitFor(() =>
+                expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+            )
+        })
+
+        test('throws error when other error is returned from finishWebauthnAuthentication', async () => {
+            global.server.use(
+                rest.post('*/oauth2/webauthn/authenticate/finish', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
+                })
+            )
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            await waitFor(() =>
+                expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+            )
+        })
+
+        test('throws error when other error is returned from navigator.credentials.get', async () => {
+            const networkError = new Error('NetworkError')
+            networkError.name = 'NetworkError'
+            mockGetCredentials.mockRejectedValue(networkError)
+
+            renderWithProviders(<MockComponent />)
+
+            const trigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(trigger)
+
+            await waitFor(() =>
+                expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
+            )
+        })
+    })
+
+    describe('abortPasskeyLogin', () => {
+        test('aborts the pending passkey request', async () => {
+            // Return a promise that rejects with AbortError when the abort signal fires
+            mockGetCredentials.mockImplementation(({signal}) => {
+                return new Promise((resolve, reject) => {
+                    signal.addEventListener('abort', () => {
+                        const abortError = new Error('Aborted')
+                        abortError.name = 'AbortError'
+                        reject(abortError)
                     })
-                )
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json(mockFinishWebauthnAuthenticationResponse)
-                )
+                })
             })
-        )
 
-        renderWithProviders(<MockComponent />)
+            renderWithProviders(<MockComponent />)
 
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
+            const loginTrigger = screen.getByTestId('login-with-passkey')
+            fireEvent.click(loginTrigger)
 
-        await waitFor(() => {
-            expect(mockGetCredentials).toHaveBeenCalled()
+            // Wait for credentials.get to be called (passkey prompt is "waiting")
+            await waitFor(() => expect(mockGetCredentials).toHaveBeenCalled())
+
+            // Abort while navigator.credentials.get is pending
+            const abortTrigger = screen.getByTestId('abort-passkey-login')
+            fireEvent.click(abortTrigger)
+
+            // Hook catches AbortError and returns, so loginWithPasskey resolves
+            await waitFor(() =>
+                expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
+            )
         })
-    })
 
-    test('returns early without error when NotAllowedError is thrown from navigator.credentials.get', async () => {
-        // Create a NotAllowedError (thrown when user cancels passkey login)
-        const notAllowedError = new Error('User cancelled')
-        notAllowedError.name = 'NotAllowedError'
-        mockGetCredentials.mockRejectedValue(notAllowedError)
+        test('abortPasskeyLogin does nothing when no passkey request is pending', async () => {
+            renderWithProviders(<MockComponent />)
 
-        renderWithProviders(<MockComponent />)
+            // Click abort without starting passkey login - should not throw
+            const abortTrigger = screen.getByTestId('abort-passkey-login')
+            fireEvent.click(abortTrigger)
 
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        await waitFor(() => expect(mockGetCredentials).toHaveBeenCalled())
-        await waitFor(() =>
-            expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
-        )
-    })
-
-    test('returns early without error when 412 is returned from startWebauthnAuthentication', async () => {
-        global.server.use(
-            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(412),
-                    ctx.json({message: 'Authenticate not started for: user@example.com"'})
-                )
-            })
-        )
-
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        expect(mockGetCredentials).not.toHaveBeenCalled()
-        await waitFor(() =>
-            expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
-        )
-    })
-
-    test('throws error when other error is returned from startWebauthnAuthentication', async () => {
-        global.server.use(
-            rest.post('*/oauth2/webauthn/authenticate/start', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
-            })
-        )
-
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        await waitFor(() =>
-            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
-        )
-    })
-
-    test('throws error when other error is returned from finishWebauthnAuthentication', async () => {
-        global.server.use(
-            rest.post('*/oauth2/webauthn/authenticate/finish', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(500), ctx.json({message: '500 Error'}))
-            })
-        )
-
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        await waitFor(() =>
-            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
-        )
-    })
-
-    test('throws error when other error is returned from navigator.credentials.get', async () => {
-        const networkError = new Error('NetworkError')
-        networkError.name = 'NetworkError'
-        mockGetCredentials.mockRejectedValue(networkError)
-
-        renderWithProviders(<MockComponent />)
-
-        const trigger = screen.getByTestId('login-with-passkey')
-        fireEvent.click(trigger)
-
-        await waitFor(() =>
-            expect(screen.getByTestId('login-result')).toHaveTextContent('rejected')
-        )
+            // No errors should occur
+            expect(mockGetCredentials).not.toHaveBeenCalled()
+        })
     })
 })
