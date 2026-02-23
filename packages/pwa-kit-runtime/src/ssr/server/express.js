@@ -8,6 +8,8 @@
  * @module progressive-web-sdk/ssr/server/express
  */
 
+import {createRequire} from 'module'
+import path from 'path'
 import URL from 'url'
 import {
     CachedResponse,
@@ -441,14 +443,18 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
  * @returns Shallow of the runtime object with bound methods
  */
 export const getRuntime = () => {
+    // Resolve pwa-kit-dev from the app context (required when entry point is ESM and require.main is undefined)
+    const appRequire =
+        typeof require !== 'undefined' && require.main
+            ? (id) => require.main.require(id)
+            : createRequire(path.join(process.env.CONTEXT || process.cwd(), 'package.json'))
     const runtime = isRemote()
         ? RemoteServerFactory
         : // The dev server is for development only, and should not be deployed to production.
           // To avoid deploying the dev server (and all of its dependencies) to production, it exists
-          // as an optional peer dependency to this package. The unusual `require` statement is needed
+          // as an optional peer dependency to this package. The unusual dynamic require is needed
           // to bypass webpack and ensure that the dev server does not get bundled.
-          eval('require').main.require('@salesforce/pwa-kit-dev/ssr/server/build-dev-server')
-              .DevServerFactory
+          appRequire('@salesforce/pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
 
     // The runtime is a JavaScript object.
     // Sometimes the runtime APIs are invoked directly as express middlewares.

@@ -989,7 +989,7 @@ describe('Auth', () => {
 
         const mockErrorResponse = {
             status: 400,
-            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+            text: jest.fn().mockResolvedValue(JSON.stringify({message: 'Invalid request'}))
         }
         ;(helpers.authorizePasswordless as jest.Mock).mockResolvedValueOnce(mockErrorResponse)
 

@@ -2501,6 +2501,34 @@
       "value": "]"
     }
   ],
+  "checkout_contact_info.error.turnstile_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ƈħḗḗƈķ ƒȧȧīŀḗḗḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout_contact_info.error.turnstile_loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ƈħḗḗƈķ īş şŧīŀŀ ŀǿǿȧȧḓīƞɠ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ īƞ ȧȧ ḿǿǿḿḗḗƞŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_contact_info.title.contact_info": [
     {
       "type": 0,

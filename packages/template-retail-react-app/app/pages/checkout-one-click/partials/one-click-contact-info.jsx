@@ -58,6 +58,8 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useLocation} from 'react-router-dom'
 import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import useTurnstile from '@salesforce/retail-react-app/app/hooks/use-turnstile'
+import {isTurnstileDisabled} from '@salesforce/retail-react-app/app/utils/turnstile-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -80,6 +82,15 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const passwordlessConfig = getConfig().app.login?.passwordless
     const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
+    // When deployment config omits turnstileSiteKey, fall back to same default as config/default.js so Turnstile still runs
+    const turnstileSiteKey =
+        passwordlessConfig?.turnstileSiteKey ??
+        (passwordlessConfig ? '0x4AAAAAACfqlP1dhxZPQ1qQ' : '')
+    // Allow disabling Turnstile from console: localStorage.setItem('pwaKitDisableTurnstile','1'); then reload
+    const effectiveTurnstileKey =
+        turnstileSiteKey && !isTurnstileDisabled() ? turnstileSiteKey : ''
+    const {getToken: getTurnstileToken, isReady: turnstileReady, turnstileContainerRef} =
+        useTurnstile(effectiveTurnstileKey)
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
 
@@ -232,11 +243,35 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         otpSendPromiseRef.current = (async () => {
             try {
+                let turnstileResponse
+                if (effectiveTurnstileKey) {
+                    if (!turnstileReady) {
+                        setError(
+                            formatMessage({
+                                defaultMessage: 'Security check is still loading. Please try again in a moment.',
+                                id: 'checkout_contact_info.error.turnstile_loading'
+                            })
+                        )
+                        return {isRegistered: false}
+                    }
+                    try {
+                        turnstileResponse = await getTurnstileToken()
+                    } catch (e) {
+                        setError(
+                            formatMessage({
+                                defaultMessage: 'Security check failed. Please try again.',
+                                id: 'checkout_contact_info.error.turnstile_failed'
+                            })
+                        )
+                        return {isRegistered: false}
+                    }
+                }
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
                     mode: passwordlessConfig?.mode,
                     locale: locale?.id,
-                    ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
+                    ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`}),
+                    ...(turnstileResponse && {turnstileResponse})
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
@@ -245,8 +280,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                // 404 = email not registered (guest); treat as guest and continue
-                const isGuestNotFound = String(error?.message || '').includes('404')
+                // 404 = email not registered (guest); treat as guest and continue.
+                // Empty 404 response can cause SyntaxError (res.json() on empty body); treat as guest too.
+                const msg = String(error?.message || '')
+                const isGuestNotFound =
+                    msg.includes('404') || msg.includes('Unexpected end of JSON input')
                 if (isGuestNotFound && isValidEmail(email)) {
                     setError('')
                     setShowContinueButton(true)
@@ -522,6 +560,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     return (
         <>
+            {/* Invisible Turnstile widget container when Turnstile is enabled (and not disabled via pwaKitDisableTurnstile) */}
+            {effectiveTurnstileKey && (
+                <div
+                    ref={turnstileContainerRef}
+                    aria-hidden="true"
+                    style={{position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden'}}
+                />
+            )}
             <ToggleCard
                 id="step-0"
                 title={formatMessage({

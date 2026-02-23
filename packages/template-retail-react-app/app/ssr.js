@@ -19,12 +19,16 @@
 import crypto from 'crypto'
 import express from 'express'
 import helmet from 'helmet'
+import {createRequire} from 'module'
 import {createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
 import path from 'path'
-import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express.js'
+import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware/index.js'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config.js'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url.js'
+
+const require = createRequire(import.meta.url)
+const turnstilePasswordlessVerify = require('./middleware/turnstile-passwordless-verify.js')
 
 const config = getConfig()
 
@@ -51,14 +55,26 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
+
+    onSLASPrivateProxyRes: (responseBuffer, proxyRes, req, res) => {
+        // Undo the 404 → 200 masking for /oauth2/passwordless/login
+        if (req.path?.match(/\/oauth2\/passwordless\/login/) && proxyRes.statusCode === 404) {
+            res.statusCode = 404
+            res.statusMessage = 'Not Found'
+        }
+        return responseBuffer
+    },
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+    applySLASPrivateClientToEndpoints:
+         /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+
+    // Run before the SLAS proxy: verify Cloudflare Turnstile token for passwordless login and strip it before forwarding to SLAS. Set TURNSTILE_SECRET_KEY when using Turnstile.
+    beforeSLASPrivateProxyMiddleware: [turnstilePasswordlessVerify],
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -361,7 +377,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         'maps.googleapis.com',
-                        'places.googleapis.com'
+                        'places.googleapis.com',
+                        // Cloudflare Turnstile for passwordless login
+                        'challenges.cloudflare.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -371,11 +389,15 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'maps.googleapis.com',
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com'
+                        '*.salesforce-scrt.com',
+                        // Cloudflare Turnstile
+                        'challenges.cloudflare.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
+                        '*.site.com',
+                        // Cloudflare Turnstile for passwordless login
+                        'challenges.cloudflare.com'
                     ]
                 }
             }

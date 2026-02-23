@@ -466,6 +466,12 @@
   "checkout_contact_info.action.sign_out": {
     "defaultMessage": "Sign Out"
   },
+  "checkout_contact_info.error.turnstile_failed": {
+    "defaultMessage": "Security check failed. Please try again."
+  },
+  "checkout_contact_info.error.turnstile_loading": {
+    "defaultMessage": "Security check is still loading. Please try again in a moment."
+  },
   "checkout_contact_info.title.contact_info": {
     "defaultMessage": "Contact Info"
   },

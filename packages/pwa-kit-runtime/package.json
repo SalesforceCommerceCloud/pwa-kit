@@ -69,6 +69,22 @@
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   },
+  "exports": {
+    "./ssr/server/express": "./ssr/server/express.js",
+    "./ssr/server/express.js": "./ssr/server/express.js",
+    "./ssr/server/build-remote-server": "./ssr/server/build-remote-server.js",
+    "./ssr/server/constants": "./ssr/server/constants.js",
+    "./utils/middleware": "./utils/middleware/index.js",
+    "./utils/middleware/index.js": "./utils/middleware/index.js",
+    "./utils/ssr-config": "./utils/ssr-config.js",
+    "./utils/ssr-config.js": "./utils/ssr-config.js",
+    "./utils/ssr-namespace-paths": "./utils/ssr-namespace-paths.js",
+    "./utils/ssr-shared": "./utils/ssr-shared.js",
+    "./utils/ssr-server": "./utils/ssr-server.js",
+    "./utils/ssr-proxying": "./utils/ssr-proxying.js",
+    "./utils/logger-factory": "./utils/logger-factory.js",
+    "./utils/ssr-request-processing": "./utils/ssr-request-processing.js"
+  },
   "publishConfig": {
     "directory": "dist"
   }

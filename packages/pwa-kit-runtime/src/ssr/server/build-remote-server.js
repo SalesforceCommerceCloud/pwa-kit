@@ -894,8 +894,10 @@ export const RemoteServerFactory = {
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
+        const beforeProxyMiddleware = options.beforeSLASPrivateProxyMiddleware || []
         app.use(
             slasPrivateProxyPath,
+            ...beforeProxyMiddleware,
             (req, res, next) => {
                 // Check if the request should be blocked before it reaches the proxy
                 // We run this outside of the proxy middleware because modifying the response
@@ -1392,6 +1394,9 @@ export const RemoteServerFactory = {
      * proxy handler. Requires PWA_KIT_SLAS_CLIENT_SECRET environment variable.
      * @param {RegExp} [options.applySLASPrivateClientToEndpoints] - A regex pattern to match
      * SLAS endpoints where the Authorization header should be injected.
+     * @param {Array<function>} [options.beforeSLASPrivateProxyMiddleware] - Array of Express middleware
+     * (req, res, next) that run before the SLAS private client proxy. Use e.g. to verify Turnstile tokens
+     * and strip them from the request body before forwarding to SLAS.
      * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
      * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
      * Use this to add custom headers or modify the proxy request.

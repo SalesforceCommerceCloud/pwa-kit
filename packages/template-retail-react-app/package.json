@@ -1,6 +1,6 @@
 {
-  "name": "@salesforce/retail-react-app",
-  "version": "9.0.0-preview.1",
+  "name": "stretch-armstrong",
+  "version": "stretch-armstrong",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {

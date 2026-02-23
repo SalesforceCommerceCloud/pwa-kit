@@ -14,6 +14,7 @@
         "lint": "lerna run --stream lint",
         "lint:fix": "lerna run lint:fix",
         "start": "npm start --prefix packages/template-retail-react-app",
+        "push-with-local-sdk": "node scripts/push-with-local-sdk.js",
         "pretest": "npm run lint",
         "test:e2e": "npx playwright test --project=chromium --project=mobile-chrome",
         "test:e2e:a11y": "npx playwright test --project=a11y-mobile --project=a11y-desktop",
