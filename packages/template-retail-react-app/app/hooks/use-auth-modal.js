@@ -275,8 +275,7 @@ export const AuthModal = ({
         const isNowRegistered =
             (isOpen || isOtpAuthOpen) && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
-        // Also ensure that the customer data is loaded.
-        if (!isNowRegistered || !customer.data) {
+        if (!isNowRegistered) {
             return
         }
 
@@ -297,7 +296,7 @@ export const AuthModal = ({
                         id: 'auth_modal.info.welcome_user'
                     },
                     {
-                        name: customer.data?.firstName || ''
+                        name: customer.data?.firstName || 'back'
                     }
                 )}`,
                 description: `${formatMessage({
@@ -318,7 +317,7 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [isRegistered, customer.data])
+    }, [isRegistered])
 
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)

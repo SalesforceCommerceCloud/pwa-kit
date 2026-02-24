@@ -922,11 +922,14 @@ describe('Passkey login', () => {
         await user.type(screen.getByLabelText(/^password$/i), 'Password!1')
         await user.click(screen.getByRole('button', {name: /sign in/i}))
 
-        // Wait for login to succeed and modal to close (cleanup runs and aborts passkey)
         await waitFor(
             () => {
-                expect(screen.queryByText(/welcome back/i)).not.toBeInTheDocument()
+                // Verify the passkey prompt was aborted
                 expect(capturedSignal.aborted).toBe(true)
+                // Verify the modal was closed
+                expect(screen.queryByRole('button', {name: /sign in/i})).not.toBeInTheDocument()
+                // Verify the user was signed in
+                expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
             },
             {timeout: 3000}
         )
@@ -958,6 +961,7 @@ describe('Passkey login', () => {
         const trigger = screen.getByText(/open modal/i)
         await user.click(trigger)
 
+        // Wait for modal to open
         await waitFor(() => {
             expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
         })
@@ -1030,7 +1034,8 @@ describe('Passkey login', () => {
 
         // login successfully and close the modal
         await waitFor(() => {
-            expect(screen.queryByText(/Welcome back/i)).not.toBeInTheDocument()
+            expect(screen.queryByRole('button', {name: /Sign in/i})).not.toBeInTheDocument()
+            expect(screen.getByText(/You're now signed in./i)).toBeInTheDocument()
         })
     })
 })
@@ -1062,7 +1067,11 @@ describe('Passkey Registration', () => {
     })
 
     test('shows passkey registration toast after login', async () => {
-        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />, {
+            wrapperProps: {
+                bypassAuth: false
+            }
+        })
         const validEmail = 'test@salesforce.com'
         const validPassword = 'Password123!'
 
