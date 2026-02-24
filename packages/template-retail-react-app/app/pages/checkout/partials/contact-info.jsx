@@ -169,7 +169,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             }
         }
 
-        if (!customer.isRegistered) {
+        // Only prompt for passkey when the user has not entered their contact info yet
+        if (step === STEPS.CONTACT_INFO) {
             handlePasskeyLogin()
         }
 
@@ -177,7 +178,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         return () => {
             abortPasskeyLogin()
         }
-    }, [customer.isRegistered])
+    }, [step])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')

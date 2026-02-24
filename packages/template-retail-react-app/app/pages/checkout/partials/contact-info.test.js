@@ -16,7 +16,8 @@ import {
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     mockGoToStep,
-    mockGoToNextStep
+    mockGoToNextStep,
+    useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -430,8 +431,34 @@ describe('navigation based on shipment context', () => {
 })
 
 describe('passkey login', () => {
+    let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+    const MOCK_STEPS = {CONTACT_INFO: 0, PAYMENT: 2}
+
     beforeEach(() => {
         jest.clearAllMocks()
+        // Reset useCheckout mock to default values
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step: MOCK_STEPS.CONTACT_INFO,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
+        })
+        global.server.use(
+            rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+                currentBasket.customerInfo.email = validEmail
+                return res(ctx.json(currentBasket))
+            })
+        )
+        // Provide basket with basketId and items for tests in this suite
+        useCurrentBasket.mockReturnValue({
+            data: currentBasket,
+            derivedData: {totalItems: currentBasket.productItems?.length || 0}
+        })
         // Default to guest user (not registered)
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -457,13 +484,18 @@ describe('passkey login', () => {
         })
     })
 
-    test('does not prompt for passkey when user is already logged in', async () => {
-        // When customer is registered, we must not trigger passkey (no prompt)
-        mockUseCurrentCustomer.mockReturnValue({
-            data: {
-                isRegistered: true,
-                email: 'test@example.com'
-            }
+    test('does not prompt for passkey when not on contact info step', async () => {
+        // When step is not CONTACT_INFO, we must not trigger passkey (no prompt)
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step: MOCK_STEPS.PAYMENT,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
         })
 
         renderWithProviders(<ContactInfo />)
@@ -493,24 +525,23 @@ describe('passkey login', () => {
 
     test('Passkey prompt is aborted when user logs in with password', async () => {
         // This test verifies that when the user logs in with password while the passkey
-        // flow is pending, the useEffect cleanup runs (customer becomes registered) and
+        // flow is pending, the useEffect cleanup runs (step changes) and
         // abortPasskeyLogin is called.
-        //
-        // The actual abort behavior is tested in use-passkey-login.test.js.
-
-        let customerRegistered = false
-        mockUseCurrentCustomer.mockImplementation(() => ({
-            data: {isRegistered: customerRegistered}
+        useCheckout.mockImplementation(() => ({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step:
+                // Make step "change" after goToNextStep is called so the effect cleanup runs.
+                mockGoToNextStep.mock.calls.length > 0
+                    ? MOCK_STEPS.PAYMENT
+                    : MOCK_STEPS.CONTACT_INFO,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
         }))
-
-        // When login succeeds, mark customer as registered so the next render triggers
-        // the useEffect cleanup (abortPasskeyLogin)
-        global.server.use(
-            rest.post('*/oauth2/login', (req, res, ctx) => {
-                customerRegistered = true
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-            })
-        )
 
         const {user} = renderWithProviders(<ContactInfo />)
 
@@ -530,13 +561,10 @@ describe('passkey login', () => {
         const loginButton = screen.getByText('Log In')
         await user.click(loginButton)
 
-        // Login succeeds; component re-renders with isRegistered: true; cleanup runs
-        await waitFor(
-            () => {
-                expect(mockAbortPasskeyLogin).toHaveBeenCalled()
-                expect(mockGoToNextStep).toHaveBeenCalled()
-            },
-            {timeout: 3000}
-        )
+        // Login succeeds; goToNextStep is called. Next render will see step change
+        await waitFor(() => {
+            expect(mockGoToNextStep).toHaveBeenCalled()
+            expect(mockAbortPasskeyLogin).toHaveBeenCalled()
+        })
     })
 })
