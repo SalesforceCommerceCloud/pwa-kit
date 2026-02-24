@@ -77,8 +77,9 @@ import {ENABLE_CONSENT_WITH_MARKETING_CLOUD} from '@salesforce/retail-react-app/
  * const hasEmailChannel = hasChannel('marketing-email', 'email')
  */
 export const useMarketingConsent = ({enabled = true, tags = [], expand} = {}) => {
-    // Check if the feature is enabled via Shopper Configurations
-    const {data: configurations} = useConfigurations()
+    // Check if the feature is enabled via Shopper Configurations.
+    // Client-only: skip during SSR to avoid adding an API call to every page render.
+    const {data: configurations} = useConfigurations({}, {enabled: typeof window !== 'undefined'})
     const isFeatureEnabled =
         configurations?.configurations?.find(
             (config) => config.id === ENABLE_CONSENT_WITH_MARKETING_CLOUD
