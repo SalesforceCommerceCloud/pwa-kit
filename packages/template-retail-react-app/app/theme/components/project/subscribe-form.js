@@ -43,11 +43,11 @@ export default {
             marginTop: 4
         },
         link: {
-            color: 'blue.600'
+            color: 'blue.500'
         },
         disclaimer: {
             fontSize: 'xs',
-            color: 'gray.600',
+            color: 'gray.500',
             marginTop: 2
         }
     }
