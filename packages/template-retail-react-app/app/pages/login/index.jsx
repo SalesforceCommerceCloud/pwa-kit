@@ -56,7 +56,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
-    const {isRegistered, customerType} = useCustomerType()
+    const {isRegistered, customerType, isGuest} = useCustomerType()
     const {locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
@@ -191,8 +191,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }, [isRegistered, redirectPath])
 
     useEffect(() => {
-        // Only prompt for passkey when the user is not already signed in
-        if (!isRegistered) {
+        if (isGuest) {
             loginWithPasskey().catch(() => {
                 form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
             })
@@ -202,7 +201,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         return () => {
             abortPasskeyLogin()
         }
-    }, [isRegistered])
+    }, [isGuest])
 
     /**************** Einstein ****************/
     useEffect(() => {
