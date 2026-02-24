@@ -125,7 +125,11 @@ export const useEmailSubscription = ({tag} = {}) => {
     // Required by react-hook-form's Proxy-based formState.
     const {errors, isSubmitting} = form.formState
 
-    const onSubmit = form.handleSubmit(submitSubscription)
+    const onSubmit = isFeatureEnabled
+        ? form.handleSubmit(submitSubscription)
+        : (e) => {
+              if (e?.preventDefault) e.preventDefault()
+          }
 
     return {form, onSubmit, successMessage, errors, isSubmitting}
 }
