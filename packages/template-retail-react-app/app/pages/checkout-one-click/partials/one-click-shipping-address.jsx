@@ -48,13 +48,14 @@ export default function ShippingAddress(props) {
     const {enableUserRegistration = false, isShipmentCleanupComplete = true} = props
     const {formatMessage} = useIntl()
     const [isManualSubmitLoading, setIsManualSubmitLoading] = useState(false)
-    const [isMultiShipping, setIsMultiShipping] = useState(false)
-    const [openedByUser, setOpenedByUser] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const deliveryShipments =
         basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+    const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
+    const [openedByUser, setOpenedByUser] = useState(false)
     const selectedShippingAddress = deliveryShipments[0]?.shippingAddress
     const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
@@ -65,7 +66,7 @@ export default function ShippingAddress(props) {
         'updateShippingAddressForShipment'
     )
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
     const {removeEmptyShipments} = useMultiship(basket)
     const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
 

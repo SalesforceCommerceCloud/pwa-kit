@@ -58,21 +58,22 @@ export default function ShippingOptions() {
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
     const targetDeliveryShipment = hasMultipleDeliveryShipments ? null : deliveryShipments[0]
 
-    const {data: shippingMethods} = useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: targetDeliveryShipment?.shipmentId || 'me'
+    const {data: shippingMethods, isFetching: isShippingMethodsFetching} =
+        useShippingMethodsForShipment(
+            {
+                parameters: {
+                    basketId: basket?.basketId,
+                    shipmentId: targetDeliveryShipment?.shipmentId || 'me'
+                }
+            },
+            {
+                enabled:
+                    Boolean(basket?.basketId) &&
+                    step === STEPS.SHIPPING_OPTIONS &&
+                    !hasMultipleDeliveryShipments
+                // Single-shipment "no methods" toast is handled in useEffect when data is available
             }
-        },
-        {
-            enabled:
-                Boolean(basket?.basketId) &&
-                step === STEPS.SHIPPING_OPTIONS &&
-                !hasMultipleDeliveryShipments
-            // Single-shipment "no methods" toast is handled in useEffect when data is available
-        }
-    )
+        )
 
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
@@ -84,6 +85,13 @@ export default function ShippingOptions() {
     useEffect(() => {
         setNoMethodsToastShown(false)
     }, [deliveryAddressStateKey])
+
+    useEffect(() => {
+        if (!hasMultipleDeliveryShipments) {
+            setShipmentIdsWithNoMethods(() => new Set())
+            setNoMethodsToastShown(false)
+        }
+    }, [hasMultipleDeliveryShipments])
 
     // Filter out pickup methods for delivery shipment
     const deliveryMethods = getDeliveryShippingMethods(
@@ -135,6 +143,7 @@ export default function ShippingOptions() {
     const singleShipmentNoMethods =
         !hasMultipleDeliveryShipments &&
         step === STEPS.SHIPPING_OPTIONS &&
+        !isShippingMethodsFetching &&
         shippingMethods != null &&
         deliveryMethods.length === 0
     useEffect(() => {

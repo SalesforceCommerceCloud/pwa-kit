@@ -377,6 +377,15 @@ const Cart = () => {
                 return
             }
 
+            // Don't assign methods until at least one delivery shipment has an address
+            const deliveryShipments = basket.shipments?.filter((s) => !isPickupShipment(s)) || []
+            const hasDeliveryWithAddress = deliveryShipments.some(
+                (s) => s.shippingAddress?.address1
+            )
+            if (deliveryShipments.length > 0 && !hasDeliveryWithAddress) {
+                return
+            }
+
             setIsProcessingShippingMethods(true)
             try {
                 await updateShipmentsWithoutMethods()
