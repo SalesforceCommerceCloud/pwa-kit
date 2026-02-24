@@ -772,6 +772,95 @@ describe('useEmailSubscription', () => {
         })
     })
 
+    describe('Feedback lifecycle — clearing on typing', () => {
+        test('clears success message when user types after successful submit', async () => {
+            mockUpdateSubscriptions.mockResolvedValue({})
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.form.setValue('email', 'test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.onSubmit()
+            })
+
+            await waitFor(() => {
+                expect(result.current.successMessage).toBe('Thanks for subscribing!')
+            })
+
+            // User starts typing a new email — success message should clear
+            act(() => {
+                result.current.form.setValue('email', 'n')
+            })
+
+            await waitFor(() => {
+                expect(result.current.successMessage).toBeNull()
+            })
+        })
+
+        test('does not show validation error when typing partial email after successful submit', async () => {
+            mockUpdateSubscriptions.mockResolvedValue({})
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.form.setValue('email', 'test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.onSubmit()
+            })
+
+            await waitFor(() => {
+                expect(result.current.successMessage).toBe('Thanks for subscribing!')
+            })
+
+            // Type a partial (invalid) email — should NOT trigger validation error
+            act(() => {
+                result.current.form.setValue('email', 'new-use')
+            })
+
+            await waitFor(() => {
+                expect(result.current.errors.email).toBeUndefined()
+                expect(result.current.successMessage).toBeNull()
+            })
+        })
+
+        test('clears error message when user types after failed submit', async () => {
+            mockUpdateSubscriptions.mockRejectedValue(new Error('API Error'))
+            const {result} = renderHook(() => useEmailSubscription({tag: 'email_capture'}), {
+                wrapper: createWrapper()
+            })
+
+            act(() => {
+                result.current.form.setValue('email', 'test@example.com')
+            })
+
+            await act(async () => {
+                await result.current.onSubmit()
+            })
+
+            await waitFor(() => {
+                expect(result.current.errors.email?.message).toBe(
+                    "We couldn't process the subscription. Try again."
+                )
+            })
+
+            // User starts correcting — error should clear
+            act(() => {
+                result.current.form.setValue('email', 'test@example.co')
+            })
+
+            await waitFor(() => {
+                expect(result.current.errors.email).toBeUndefined()
+            })
+        })
+    })
+
     describe('Edge cases', () => {
         test('handles undefined subscriptions data', () => {
             const mockRefetch = jest.fn().mockResolvedValue({data: undefined})

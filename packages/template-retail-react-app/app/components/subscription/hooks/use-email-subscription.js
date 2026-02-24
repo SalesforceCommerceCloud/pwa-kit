@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCallback, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useForm} from 'react-hook-form'
 import {
     CONSENT_CHANNELS,
@@ -47,8 +47,20 @@ export const useEmailSubscription = ({tag} = {}) => {
 
     const {formatMessage} = useIntl()
 
-    const form = useForm({defaultValues: {email: ''}})
+    const form = useForm({defaultValues: {email: ''}, reValidateMode: 'onSubmit'})
     const [successMessage, setSuccessMessage] = useState(null)
+
+    // Clear all feedback (success message + validation errors) when the user types.
+    // Prevents stale messages from a previous submission from lingering.
+    useEffect(() => {
+        const {unsubscribe} = form.watch((_, {name}) => {
+            if (name === 'email') {
+                setSuccessMessage(null)
+                form.clearErrors('email')
+            }
+        })
+        return () => unsubscribe()
+    }, [form])
 
     const messages = useMemo(
         () => ({
@@ -113,11 +125,7 @@ export const useEmailSubscription = ({tag} = {}) => {
     // Required by react-hook-form's Proxy-based formState.
     const {errors, isSubmitting} = form.formState
 
-    const onSubmit = isFeatureEnabled
-        ? form.handleSubmit(submitSubscription)
-        : (e) => {
-              if (e?.preventDefault) e.preventDefault()
-          }
+    const onSubmit = form.handleSubmit(submitSubscription)
 
     return {form, onSubmit, successMessage, errors, isSubmitting}
 }
