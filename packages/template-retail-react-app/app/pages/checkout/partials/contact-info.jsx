@@ -169,8 +169,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             }
         }
 
-        // Only prompt for passkey when we know the user is a guest (not loading, not registered)
-        if (customer && !customer.isRegistered) {
+        if (!customer.isRegistered) {
             handlePasskeyLogin()
         }
 
@@ -178,7 +177,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         return () => {
             abortPasskeyLogin()
         }
-    }, [customer?.isRegistered])
+    }, [customer.isRegistered])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')
