@@ -169,7 +169,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             }
         }
 
-        // Only prompt for passkey when the user has not entered their contact info yet
         if (step === STEPS.CONTACT_INFO) {
             handlePasskeyLogin()
         }

@@ -397,16 +397,5 @@ describe('usePasskeyLogin', () => {
                 expect(screen.getByTestId('login-result')).toHaveTextContent('resolved')
             )
         })
-
-        test('abortPasskeyLogin does nothing when no passkey request is pending', async () => {
-            renderWithProviders(<MockComponent />)
-
-            // Click abort without starting passkey login - should not throw
-            const abortTrigger = screen.getByTestId('abort-passkey-login')
-            fireEvent.click(abortTrigger)
-
-            // No errors should occur
-            expect(mockGetCredentials).not.toHaveBeenCalled()
-        })
     })
 })

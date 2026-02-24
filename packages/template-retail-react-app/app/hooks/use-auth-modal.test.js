@@ -907,7 +907,6 @@ describe('Passkey login', () => {
         const trigger = screen.getByText(/open modal/i)
         await user.click(trigger)
 
-        // Should show error - 401 error from WebAuthn API should be caught and converted to user-friendly message
         await waitFor(() => {
             expect(mockCredentialsGet).toHaveBeenCalledWith(
                 expect.objectContaining({

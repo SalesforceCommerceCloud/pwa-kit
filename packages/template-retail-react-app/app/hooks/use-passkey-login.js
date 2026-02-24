@@ -21,7 +21,7 @@ export const usePasskeyLogin = () => {
     /**
      * Aborts any pending passkey login request.
      * This is useful when the user logs in with a different method (e.g., password)
-     * while a passkey prompt (e.g., 1Password) is still open.
+     * while a passkey prompt (e.g., Touch ID, Face ID, etc.) is still open.
      */
     const abortPasskeyLogin = () => {
         if (abortControllerRef.current) {
@@ -72,7 +72,8 @@ export const usePasskeyLogin = () => {
         )
 
         // Create an AbortController to allow cancelling the passkey prompt
-        // This is needed when the user logs in with a different method while the passkey prompt is open
+        // This is needed when the user logs in with a different method or
+        // navigates away from the page while the passkey prompt is open
         abortControllerRef.current = new AbortController()
 
         // Get passkey credential from browser

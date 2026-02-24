@@ -11,6 +11,7 @@ import {
     renderWithProviders,
     createPathWithDefaults,
     guestToken,
+    registerUserToken,
     clearAllCookies
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import Login from '.'
@@ -28,7 +29,8 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
-// Allow overriding useCustomerType for tests that need a specific auth state (e.g. "already signed in")
+// Allows overriding useCustomerType for tests that need a specific auth
+// state (e.g. simulate a user being already authenticated on page load.
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -99,8 +101,7 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
-    // Clear auth state cookies to ensure test isolation
-    // Without this, authenticated state from previous tests can leak into subsequent tests
+    // Ensures authenticated state from previous tests don't leak into subsequent tests
     clearAllCookies()
 })
 
@@ -452,8 +453,7 @@ describe('Passkey login', () => {
     })
 
     test('Does not trigger passkey when user is already signed in', async () => {
-        // Use the same pattern as account/drawer-menu: mock useCustomerType so first render sees isRegistered: true.
-        // No need to mock /customers/:customerId — the passkey effect only checks useCustomerType(), not the API.
+        // Simulates a user being already authenticated on page load
         const realUseCustomerType = useCustomerType.getMockImplementation()
         useCustomerType.mockReturnValue({
             isRegistered: true,
@@ -629,16 +629,12 @@ describe('Passkey login', () => {
     })
 
     test('Passkey prompt is aborted when user logs in with password', async () => {
-        // This test verifies that navigator.credentials.get receives an AbortSignal
-        // which allows the passkey prompt to be aborted when user logs in via another method
-        //
-        // Note: The actual abort behavior is tested in use-passkey-login.test.js.
-        // This integration test verifies the signal is properly passed through.
+        // Capture the abort signal passed to credentials.get
+        let capturedSignal = null
 
-        // Mock credentials.get to capture and verify the signal is passed
+        // Mock credentials.get to capture the abort signal and stay pending
         mockCredentialsGet.mockImplementation(({signal}) => {
-            // Verify that an AbortSignal is passed to navigator.credentials.get
-            expect(signal).toBeInstanceOf(AbortSignal)
+            capturedSignal = signal
             return new Promise(() => {
                 // Never resolve - simulates passkey prompt staying open
             })
@@ -674,7 +670,7 @@ describe('Passkey login', () => {
             }
         })
 
-        // Wait for passkey conditional mediation to start and verify signal is passed
+        // Wait for passkey conditional mediation to start and capture the signal
         await waitFor(() => {
             expect(mockCredentialsGet).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -682,7 +678,11 @@ describe('Passkey login', () => {
                     signal: expect.any(AbortSignal)
                 })
             )
+            expect(capturedSignal).not.toBeNull()
         })
+
+        // Verify signal is not yet aborted
+        expect(capturedSignal.aborted).toBe(false)
 
         // User logs in with password while passkey prompt is still open
         await user.type(screen.getByLabelText('Email'), 'customer@test.com')
@@ -697,6 +697,9 @@ describe('Passkey login', () => {
             },
             {timeout: 3000}
         )
+
+        // Verify the signal was aborted when user logs in with password
+        expect(capturedSignal.aborted).toBe(true)
     })
 
     test('Passkey prompt is aborted when navigating away from login page', async () => {
@@ -769,8 +772,7 @@ describe('Passkey Registration', () => {
                     ctx.delay(0),
                     ctx.json({
                         customer_id: 'customerid_1',
-                        access_token:
-                            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494',
+                        access_token: registerUserToken,
                         refresh_token: 'testrefeshtoken_1',
                         usid: 'testusid_1',
                         enc_user_id: 'testEncUserId_1',
@@ -871,8 +873,7 @@ describe('Passwordless login tests', () => {
                     ctx.status(200),
                     ctx.json({
                         customer_id: 'customerid_1',
-                        access_token:
-                            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItZGlzY292ZXJ5LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLWV4cGVyaWVuY2Ugc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5hZGRyZXNzZXMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wcm9kdWN0bGlzdHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItcHJvbW90aW9ucyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMucncgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLWdpZnQtY2VydGlmaWNhdGVzIHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMDE6OnNjaWQ6YzljNDViZmQtMGVkMy00YWEyLTk5NzEtNDBmODg5NjJiODM2Ojp1c2lkOjhlODgzOTczLTY4ZWItNDFmZS1hM2M1LTc1NjIzMjY1MmZmNSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMDEiLCJpc3QiOjEsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC96enJmXzAwMSIsIm5iZiI6MTY3ODgzNDI3MSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOmtldjVAdGVzdC5jb206OnVpZG46a2V2aW4gaGU6OmdjaWQ6YWJtZXMybWJrM2xYa1JsSEZKd0dZWWt1eEo6OnJjaWQ6YWJVTXNhdnBEOVk2alcwMGRpMlNqeEdDTVU6OmNoaWQ6UmVmQXJjaEdsb2JhbCIsImV4cCI6MjY3ODgzNjEwMSwiaWF0IjoxNjc4ODM0MzAxLCJqdGkiOiJDMkM0ODU2MjAxODYwLTE4OTA2Nzg5MDM0ODA1ODMyNTcwNjY2NTQyIn0._tUrxeXdFYPj6ZoY-GILFRd3-aD1RGPkZX6TqHeS494',
+                        access_token: registerUserToken,
                         refresh_token: 'testrefeshtoken_1',
                         usid: 'testusid_1',
                         enc_user_id: 'testEncUserId_1',
