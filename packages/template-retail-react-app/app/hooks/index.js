@@ -19,3 +19,4 @@ export {useRuleBasedBonusProducts} from '@salesforce/retail-react-app/app/hooks/
 export {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 export {useCountdown} from '@salesforce/retail-react-app/app/hooks/use-countdown'
 export {useOtpInputs} from '@salesforce/retail-react-app/app/hooks/use-otp-inputs'
+export {useMarketingConsent} from '@salesforce/retail-react-app/app/hooks/use-marketing-consent'
