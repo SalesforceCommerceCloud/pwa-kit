@@ -690,9 +690,6 @@ describe('ShippingAddress Component', () => {
         await waitFor(() => {
             expect(mockRemoveEmptyShipments).toHaveBeenCalled()
         })
-        // updateItemsToDeliveryShipment is called when basket has productItems in multiple
-        // delivery shipments; that path is covered in "auto-selects preferred address for
-        // multi-shipment orders and consolidates items"
     })
 
     test('does not show multiship option when only one delivery item exists with pickup items', async () => {
