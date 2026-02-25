@@ -4011,6 +4011,34 @@
       "value": "]"
     }
   ],
+  "footer.error.enter_valid_email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.error.generic_error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ ƥřǿǿƈḗḗşş ŧħḗḗ şŭŭƀşƈřīƥŧīǿǿƞ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.link.about_us": [
     {
       "type": 0,
@@ -4172,7 +4200,7 @@
     },
     {
       "type": 0,
-      "value": "Şīɠƞ Ŭƥ"
+      "value": "Şŭŭƀşƈřīƀḗḗ"
     },
     {
       "type": 0,
@@ -4186,7 +4214,49 @@
     },
     {
       "type": 0,
-      "value": "Şīɠƞ ŭŭƥ ŧǿǿ şŧȧȧẏ īƞ ŧħḗḗ ŀǿǿǿǿƥ ȧȧƀǿǿŭŭŧ ŧħḗḗ ħǿǿŧŧḗḗşŧ ḓḗḗȧȧŀş"
+      "value": "Ɓḗḗ ŧħḗḗ ƒīřşŧ ŧǿǿ ķƞǿǿẇ ȧȧƀǿǿŭŭŧ ŀȧȧŧḗḗşŧ ǿǿƒƒḗḗřş, ƞḗḗẇş, ŧīƥş, ȧȧƞḓ ḿǿǿřḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.subscribe.disclaimer": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓẏ şŭŭƀḿīŧŧīƞɠ ŧħīş, Ī ȧȧɠřḗḗḗḗ ŧǿǿ ŧħḗḗ "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Ŧḗḗřḿş & Ƈǿǿƞḓīŧīǿǿƞş"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " ȧȧƞḓ "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ"
+        }
+      ],
+      "type": 8,
+      "value": "privacy"
+    },
+    {
+      "type": 0,
+      "value": "."
     },
     {
       "type": 0,
@@ -4207,14 +4277,42 @@
       "value": "]"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
+  "footer.subscribe.email.placeholder_text": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ɓḗḗ ŧħḗḗ ƒīřşŧ ŧǿǿ ķƞǿǿẇ"
+      "value": "Ḗƞŧḗḗř ẏǿǿŭŭř ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.subscribe.heading.stay_updated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şŭŭƀşƈřīƀḗḗ ŧǿǿ Şŧȧȧẏ Ŭƥḓȧȧŧḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "footer.success_confirmation": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħȧȧƞķş ƒǿǿř şŭŭƀşƈřīƀīƞɠ!"
     },
     {
       "type": 0,
