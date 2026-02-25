@@ -36,19 +36,25 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
+// Captured prepareBasket from SFPaymentsExpressButtons for tests
+let capturedPrepareBasket = null
+
 // Mock the SFPaymentsExpressButtons child component
 jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-buttons', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const PropTypes = require('prop-types')
+    const React = require('react') // eslint-disable-line -- require in jest.mock factory
 
     const MockSFPaymentsExpressButtons = ({
         usage,
         paymentCurrency,
         paymentCountryCode,
         initialAmount,
+        prepareBasket,
         expressButtonLayout,
         maximumButtonCount
     }) => {
+        capturedPrepareBasket = prepareBasket
         return (
             <div data-testid="sf-payments-express-buttons">
                 <div data-testid="usage">{usage}</div>
@@ -66,6 +72,7 @@ jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-butto
         paymentCurrency: PropTypes.string,
         paymentCountryCode: PropTypes.string,
         initialAmount: PropTypes.number,
+        prepareBasket: PropTypes.func,
         expressButtonLayout: PropTypes.string,
         maximumButtonCount: PropTypes.number
     }
@@ -127,6 +134,7 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.clearAllMocks()
+    capturedPrepareBasket = null
 })
 
 describe('SFPaymentsExpress', () => {
@@ -250,6 +258,56 @@ describe('SFPaymentsExpress', () => {
 
         expect(screen.getByTestId('sf-payments-express-buttons')).toBeInTheDocument()
         expect(useCurrentBasket).toHaveBeenCalled()
+    })
+})
+
+describe('prepareBasket', () => {
+    test('prepareBasket is passed to SFPaymentsExpressButtons when basket exists', () => {
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithSuit))
+
+        renderWithProviders(<SFPaymentsExpress />)
+
+        expect(capturedPrepareBasket).toBeDefined()
+        expect(typeof capturedPrepareBasket).toBe('function')
+    })
+
+    test('prepareBasket when invoked returns the current basket', async () => {
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithSuit))
+
+        renderWithProviders(<SFPaymentsExpress />)
+
+        expect(capturedPrepareBasket).toBeDefined()
+        const result = await capturedPrepareBasket()
+        const expectedBasket = normalizeBasket(basketWithSuit)
+        expect(result).toEqual(expectedBasket)
+        expect(result.basketId || result.basket_id).toBe(
+            basketWithSuit.basket_id || basketWithSuit.basketId
+        )
+    })
+
+    test('prepareBasket returns basket with currency and totals', async () => {
+        const basketWithTotals = {
+            ...basketWithSuit,
+            currency: 'EUR',
+            orderTotal: 99.99,
+            productSubTotal: 80
+        }
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithTotals))
+
+        renderWithProviders(<SFPaymentsExpress />)
+
+        const result = await capturedPrepareBasket()
+        expect(result.currency).toBe('EUR')
+        expect(result.orderTotal ?? result.order_total).toBe(99.99)
+    })
+
+    test('prepareBasket is not set when component returns null', () => {
+        useCurrentBasket.mockReturnValue(createMockBasket(null))
+
+        renderWithProviders(<SFPaymentsExpress />)
+
+        expect(screen.queryByTestId('sf-payments-express-buttons')).not.toBeInTheDocument()
+        expect(capturedPrepareBasket).toBeNull()
     })
 })
 
