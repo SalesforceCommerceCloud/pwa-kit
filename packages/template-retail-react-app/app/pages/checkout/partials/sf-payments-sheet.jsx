@@ -295,17 +295,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         ?.clientSecret
             }
 
-            // Read setup_future_usage from backend response, fallback to manual calculation if not available
-            // TODO: The fallback is temporary that's to be removed in next iteration.
-            const setupFutureUsage =
-                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
-                    ?.setup_future_usage
+            const orderStripeGatewayProperties =
+                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe || {}
+            const setupFutureUsage = orderStripeGatewayProperties?.setupFutureUsage
             if (setupFutureUsage) {
                 paymentIntent.setup_future_usage = setupFutureUsage
-            } else if (futureUsageOffSession) {
-                paymentIntent.setup_future_usage = 'off_session'
-            } else if (shouldSavePaymentMethod) {
-                paymentIntent.setup_future_usage = 'on_session'
             }
 
             // Update the redirect return URL to include the related order no
@@ -528,6 +522,16 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         () => transformPaymentMethodReferences(customer, paymentConfig),
         [customer, paymentConfig]
     )
+    // Stable key so we only re-init when SPM list actually changes.
+    const savedPaymentMethodsKey = useMemo(
+        () =>
+            (savedPaymentMethods ?? [])
+                .map((pm) => pm?.gatewayTokenId)
+                .filter(Boolean)
+                .sort()
+                .join(','),
+        [savedPaymentMethods]
+    )
 
     useEffect(() => {
         // Mount SFP only when all required data and DOM are ready; otherwise skip or wait for a later run.
@@ -601,7 +605,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         metadata,
         containerElementRef.current,
         paymentConfig,
-        cardCaptureAutomatic
+        cardCaptureAutomatic,
+        savedPaymentMethodsKey
     ])
 
     useEffect(() => {
