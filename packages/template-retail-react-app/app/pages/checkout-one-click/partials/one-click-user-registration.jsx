@@ -23,6 +23,10 @@ import {
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useTurnstile from '@salesforce/retail-react-app/app/hooks/use-turnstile'
+import useRecaptcha from '@salesforce/retail-react-app/app/hooks/use-recaptcha'
+import {isTurnstileDisabled} from '@salesforce/retail-react-app/app/utils/turnstile-utils'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -44,6 +48,23 @@ export default function UserRegistration({
     const {contactPhone} = useCheckout()
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const passwordlessConfig = getConfig().app.login?.passwordless
+    const captchaProvider = passwordlessConfig?.captchaProvider || 'recaptcha'
+    const turnstileSiteKey =
+        passwordlessConfig?.turnstileSiteKey ??
+        (passwordlessConfig ? '0x4AAAAAACfqlP1dhxZPQ1qQ' : '')
+    const recaptchaSiteKey =
+        passwordlessConfig?.recaptchaSiteKey ||
+        (captchaProvider === 'recaptcha' ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' : '')
+    const captchaDisabled = isTurnstileDisabled()
+    const effectiveTurnstileKey =
+        captchaProvider === 'turnstile' && turnstileSiteKey && !captchaDisabled ? turnstileSiteKey : ''
+    const effectiveRecaptchaKey =
+        captchaProvider === 'recaptcha' && recaptchaSiteKey && !captchaDisabled ? recaptchaSiteKey : ''
+    const {getToken: getTurnstileToken, isReady: turnstileReady, turnstileContainerRef} =
+        useTurnstile(effectiveTurnstileKey)
+    const {getToken: getRecaptchaToken, isReady: recaptchaReady, recaptchaContainerRef} =
+        useRecaptcha(effectiveRecaptchaKey)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const {locale} = useMultiSite()
     const {formatMessage} = useIntl()
@@ -61,6 +82,36 @@ export default function UserRegistration({
             title: message,
             status: 'error'
         })
+    }
+
+    const getCaptchaParams = async () => {
+        if (effectiveTurnstileKey) {
+            if (!turnstileReady) {
+                showError(formatMessage({defaultMessage: 'Security check is still loading. Please try again.', id: 'checkout.error.captcha_loading'}))
+                return null
+            }
+            try {
+                const token = await getTurnstileToken()
+                return token ? {turnstileResponse: token} : {}
+            } catch {
+                showError(formatMessage({defaultMessage: 'Security check failed. Please try again.', id: 'checkout.error.captcha_failed'}))
+                return null
+            }
+        }
+        if (effectiveRecaptchaKey) {
+            if (!recaptchaReady) {
+                showError(formatMessage({defaultMessage: 'Security check is still loading. Please try again.', id: 'checkout.error.captcha_loading'}))
+                return null
+            }
+            try {
+                const token = await getRecaptchaToken()
+                return token ? {recaptchaResponse: token} : {}
+            } catch {
+                showError(formatMessage({defaultMessage: 'Security check failed. Please try again.', id: 'checkout.error.captcha_failed'}))
+                return null
+            }
+        }
+        return {}
     }
 
     const handleOtpClose = () => {
@@ -84,13 +135,20 @@ export default function UserRegistration({
             setIsLoadingOtp(true)
             if (onLoadingChange) onLoadingChange(true)
             try {
+                const captchaParams = await getCaptchaParams()
+                if (captchaParams === null) {
+                    setIsLoadingOtp(false)
+                    if (onLoadingChange) onLoadingChange(false)
+                    return
+                }
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: basket.customerInfo.email,
                     mode: 'email',
                     locale: locale?.id,
                     register_customer: true,
                     last_name: basket.customerInfo.email,
-                    email: basket.customerInfo.email
+                    email: basket.customerInfo.email,
+                    ...captchaParams
                 })
                 otpSentRef.current = true
                 onOtpOpen()
@@ -244,6 +302,23 @@ export default function UserRegistration({
 
     return (
         <>
+            {effectiveTurnstileKey && (
+                <div
+                    ref={turnstileContainerRef}
+                    aria-hidden="true"
+                    style={{position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden'}}
+                />
+            )}
+            {effectiveRecaptchaKey && (
+                <div
+                    ref={recaptchaContainerRef}
+                    aria-label={formatMessage({
+                        defaultMessage: 'Security verification',
+                        id: 'checkout_user_registration.recaptcha_label'
+                    })}
+                    style={{minHeight: 1}}
+                />
+            )}
             <Box
                 border="1px solid"
                 borderColor="gray.200"
@@ -316,13 +391,16 @@ export default function UserRegistration({
                     setValue: () => {}
                 }}
                 handleSendEmailOtp={async (email) => {
+                    const captchaParams = await getCaptchaParams()
+                    if (captchaParams === null) return
                     return authorizePasswordlessLogin.mutateAsync({
                         userid: email,
                         mode: 'email',
                         locale: locale?.id,
                         register_customer: true,
                         last_name: email,
-                        email
+                        email,
+                        ...captchaParams
                     })
                 }}
                 handleOtpVerification={handleOtpVerification}

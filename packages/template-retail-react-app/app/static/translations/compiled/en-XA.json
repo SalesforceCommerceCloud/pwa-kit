@@ -1941,6 +1941,34 @@
       "value": "]"
     }
   ],
+  "checkout.error.captcha_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ƈħḗḗƈķ ƒȧȧīŀḗḗḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout.error.captcha_loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ƈħḗḗƈķ īş şŧīŀŀ ŀǿǿȧȧḓīƞɠ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout.label.user_registration": [
     {
       "type": 0,
@@ -2529,6 +2557,20 @@
       "value": "]"
     }
   ],
+  "checkout_contact_info.recaptcha_label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ṽḗḗřīƒīƈȧȧŧīǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_contact_info.title.contact_info": [
     {
       "type": 0,
@@ -2793,6 +2835,20 @@
     {
       "type": 0,
       "value": "Ƥȧȧẏḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout_user_registration.recaptcha_label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ṽḗḗřīƒīƈȧȧŧīǿǿƞ"
     },
     {
       "type": 0,

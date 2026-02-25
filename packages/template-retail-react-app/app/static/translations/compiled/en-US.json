@@ -989,6 +989,18 @@
       "value": "Could not save shipping address."
     }
   ],
+  "checkout.error.captcha_failed": [
+    {
+      "type": 0,
+      "value": "Security check failed. Please try again."
+    }
+  ],
+  "checkout.error.captcha_loading": [
+    {
+      "type": 0,
+      "value": "Security check is still loading. Please try again."
+    }
+  ],
   "checkout.label.user_registration": [
     {
       "type": 0,
@@ -1273,6 +1285,12 @@
       "value": "Security check is still loading. Please try again in a moment."
     }
   ],
+  "checkout_contact_info.recaptcha_label": [
+    {
+      "type": 0,
+      "value": "Security verification"
+    }
+  ],
   "checkout_contact_info.title.contact_info": [
     {
       "type": 0,
@@ -1389,6 +1407,12 @@
     {
       "type": 0,
       "value": "Payment"
+    }
+  ],
+  "checkout_user_registration.recaptcha_label": [
+    {
+      "type": 0,
+      "value": "Security verification"
     }
   ],
   "colorRefinements.label.hitCount": [

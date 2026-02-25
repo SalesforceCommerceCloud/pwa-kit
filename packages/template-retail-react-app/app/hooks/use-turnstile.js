@@ -9,14 +9,17 @@ import {useRef, useState, useEffect, useCallback} from 'react'
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
 
 /**
- * Load the Turnstile script once. Returns true when window.turnstile is ready.
+ * Load the Turnstile script once when enabled. Returns true when window.turnstile is ready.
+ * When enabled is false, does not load the script (so we only load Turnstile when using it, not when using reCAPTCHA).
+ * @param {boolean} enabled - If false, script is not loaded
  * @returns {{ isReady: boolean }}
  */
-function useTurnstileScript() {
+function useTurnstileScript(enabled = true) {
     const [isReady, setIsReady] = useState(() => typeof window !== 'undefined' && !!window.turnstile)
     const loadingRef = useRef(false)
 
     useEffect(() => {
+        if (!enabled) return
         if (typeof window === 'undefined' || window.turnstile) {
             if (window?.turnstile) setIsReady(true)
             return
@@ -41,9 +44,9 @@ function useTurnstileScript() {
             loadingRef.current = false
         }
         document.head.appendChild(script)
-    }, [])
+    }, [enabled])
 
-    return {isReady}
+    return {isReady: enabled ? isReady : false}
 }
 
 /**
@@ -57,7 +60,7 @@ function useTurnstileScript() {
 export function useTurnstile(siteKey, containerRef) {
     const internalContainerRef = useRef(null)
     const containerRefToUse = containerRef || internalContainerRef
-    const {isReady: scriptReady} = useTurnstileScript()
+    const {isReady: scriptReady} = useTurnstileScript(!!siteKey)
     const widgetIdRef = useRef(null)
     const resolveRef = useRef(null)
     const rejectRef = useRef(null)

@@ -59,6 +59,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useLocation} from 'react-router-dom'
 import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useTurnstile from '@salesforce/retail-react-app/app/hooks/use-turnstile'
+import useRecaptcha from '@salesforce/retail-react-app/app/hooks/use-recaptcha'
 import {isTurnstileDisabled} from '@salesforce/retail-react-app/app/utils/turnstile-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
@@ -82,15 +83,24 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const passwordlessConfig = getConfig().app.login?.passwordless
     const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
-    // When deployment config omits turnstileSiteKey, fall back to same default as config/default.js so Turnstile still runs
+    const captchaProvider = passwordlessConfig?.captchaProvider || 'recaptcha'
     const turnstileSiteKey =
         passwordlessConfig?.turnstileSiteKey ??
         (passwordlessConfig ? '0x4AAAAAACfqlP1dhxZPQ1qQ' : '')
-    // Allow disabling Turnstile from console: localStorage.setItem('pwaKitDisableTurnstile','1'); then reload
+    // Use Google test key when recaptchaSiteKey not set (POC/local dev)
+    const recaptchaSiteKey =
+        passwordlessConfig?.recaptchaSiteKey ||
+        (captchaProvider === 'recaptcha' ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' : '')
+    // Allow disabling captcha from console: localStorage.setItem('pwaKitDisableTurnstile','1'); then reload
+    const captchaDisabled = isTurnstileDisabled()
     const effectiveTurnstileKey =
-        turnstileSiteKey && !isTurnstileDisabled() ? turnstileSiteKey : ''
+        captchaProvider === 'turnstile' && turnstileSiteKey && !captchaDisabled ? turnstileSiteKey : ''
+    const effectiveRecaptchaKey =
+        captchaProvider === 'recaptcha' && recaptchaSiteKey && !captchaDisabled ? recaptchaSiteKey : ''
     const {getToken: getTurnstileToken, isReady: turnstileReady, turnstileContainerRef} =
         useTurnstile(effectiveTurnstileKey)
+    const {getToken: getRecaptchaToken, isReady: recaptchaReady, recaptchaContainerRef} =
+        useRecaptcha(effectiveRecaptchaKey)
 
     const {step, STEPS, goToStep, goToNextStep, setContactPhone} = useCheckout()
 
@@ -244,6 +254,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         otpSendPromiseRef.current = (async () => {
             try {
                 let turnstileResponse
+                let recaptchaResponse
                 if (effectiveTurnstileKey) {
                     if (!turnstileReady) {
                         setError(
@@ -265,13 +276,35 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                         )
                         return {isRegistered: false}
                     }
+                } else if (effectiveRecaptchaKey) {
+                    if (!recaptchaReady) {
+                        setError(
+                            formatMessage({
+                                defaultMessage: 'Security check is still loading. Please try again in a moment.',
+                                id: 'checkout_contact_info.error.turnstile_loading'
+                            })
+                        )
+                        return {isRegistered: false}
+                    }
+                    try {
+                        recaptchaResponse = await getRecaptchaToken()
+                    } catch (e) {
+                        setError(
+                            formatMessage({
+                                defaultMessage: 'Security check failed. Please try again.',
+                                id: 'checkout_contact_info.error.turnstile_failed'
+                            })
+                        )
+                        return {isRegistered: false}
+                    }
                 }
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: email,
                     mode: passwordlessConfig?.mode,
                     locale: locale?.id,
                     ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`}),
-                    ...(turnstileResponse && {turnstileResponse})
+                    ...(turnstileResponse && {turnstileResponse}),
+                    ...(recaptchaResponse && {recaptchaResponse})
                 })
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
@@ -560,7 +593,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     return (
         <>
-            {/* Invisible Turnstile widget container when Turnstile is enabled (and not disabled via pwaKitDisableTurnstile) */}
+            {/* Turnstile widget container (hidden; Turnstile badge is fixed) */}
             {effectiveTurnstileKey && (
                 <div
                     ref={turnstileContainerRef}
@@ -685,6 +718,16 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         isSocialEnabled={isSocialEnabled}
                                         idps={idps}
                                     />
+                                    {effectiveRecaptchaKey && (
+                                        <div
+                                            ref={recaptchaContainerRef}
+                                            aria-label={formatMessage({
+                                                defaultMessage: 'Security verification',
+                                                id: 'checkout_contact_info.recaptcha_label'
+                                            })}
+                                            style={{minHeight: 1}}
+                                        />
+                                    )}
                                     {showContinueButton && step === STEPS.CONTACT_INFO && (
                                         <Button
                                             type="submit"

@@ -6,24 +6,23 @@
  */
 
 /**
- * LocalStorage key used to temporarily disable Turnstile from the browser console.
- * When set to a truthy value, the app will not load the Turnstile widget or send turnstileResponse.
+ * LocalStorage key used to temporarily disable captcha (Turnstile or reCAPTCHA) from the browser console.
+ * When set to a truthy value, the app will not load the captcha widget or send the token.
  *
  * From the browser console:
- *   // Disable Turnstile (then refresh the page)
+ *   // Disable captcha (then refresh the page)
  *   localStorage.setItem('pwaKitDisableTurnstile', '1')
  *
- *   // Re-enable Turnstile (then refresh the page)
+ *   // Re-enable captcha (then refresh the page)
  *   localStorage.removeItem('pwaKitDisableTurnstile')
  *
- * Note: If the server has TURNSTILE_SECRET_KEY set, disabling Turnstile on the client means
- * no token is sent and the server will respond 403 (Turnstile token required). Unset
- * TURNSTILE_SECRET_KEY on the server for testing without Turnstile.
+ * Note: If the server has TURNSTILE_SECRET_KEY or RECAPTCHA_SECRET_KEY set, disabling on the client
+ * means no token is sent and the server will respond 403. Unset the secret on the server for testing.
  */
 export const TURNSTILE_DISABLE_STORAGE_KEY = 'pwaKitDisableTurnstile'
 
 /**
- * Returns true if Turnstile is disabled via localStorage (for testing/debugging).
+ * Returns true if captcha (Turnstile or reCAPTCHA) is disabled via localStorage (for testing/debugging).
  * Safe to call in SSR (returns false when window is undefined).
  */
 export function isTurnstileDisabled() {

@@ -37,8 +37,16 @@ module.exports = {
                 enabled: false,
                 mode: 'email',
                 landingPath: '/passwordless-login-landing',
-                // Cloudflare Turnstile site key for protecting passwordless login. When set, a token is obtained and sent as turnstileResponse; backend must verify via Siteverify and strip before SLAS.
-                turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '0x4AAAAAACfqlP1dhxZPQ1qQ'
+                // Captcha provider: 'turnstile' (Cloudflare) or 'recaptcha' (Google). Backend must verify and strip the token before SLAS.
+                captchaProvider: process.env.PASSWORDLESS_CAPTCHA_PROVIDER || 'recaptcha',
+                // Cloudflare Turnstile (when captchaProvider === 'turnstile')
+                turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '0x4AAAAAACfqlP1dhxZPQ1qQ',
+                // Google reCAPTCHA v2 invisible (when captchaProvider === 'recaptcha'). Set RECAPTCHA_SITE_KEY and RECAPTCHA_SECRET_KEY on server.
+                // For local/automated tests: RECAPTCHA_USE_TEST_KEYS=true uses Google's test keys (siteverify always passes). Never use test keys in production.
+                recaptchaSiteKey:
+                    process.env.RECAPTCHA_USE_TEST_KEYS === 'true'
+                        ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // Google reCAPTCHA test site key
+                        : process.env.RECAPTCHA_SITE_KEY || ''
             },
             social: {
                 enabled: false,

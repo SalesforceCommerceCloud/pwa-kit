@@ -357,6 +357,12 @@
   "checkout.error.cannot_save_address": {
     "defaultMessage": "Could not save shipping address."
   },
+  "checkout.error.captcha_failed": {
+    "defaultMessage": "Security check failed. Please try again."
+  },
+  "checkout.error.captcha_loading": {
+    "defaultMessage": "Security check is still loading. Please try again."
+  },
   "checkout.label.user_registration": {
     "defaultMessage": "Create an account to check out faster"
   },
@@ -472,6 +478,9 @@
   "checkout_contact_info.error.turnstile_loading": {
     "defaultMessage": "Security check is still loading. Please try again in a moment."
   },
+  "checkout_contact_info.recaptcha_label": {
+    "defaultMessage": "Security verification"
+  },
   "checkout_contact_info.title.contact_info": {
     "defaultMessage": "Contact Info"
   },
@@ -528,6 +537,9 @@
   },
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
+  },
+  "checkout_user_registration.recaptcha_label": {
+    "defaultMessage": "Security verification"
   },
   "colorRefinements.label.hitCount": {
     "defaultMessage": "{colorLabel} ({colorHitCount})"

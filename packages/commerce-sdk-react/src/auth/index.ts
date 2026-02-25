@@ -105,6 +105,8 @@ type AuthorizePasswordlessParams = {
     phone_number?: string
     /** Cloudflare Turnstile response token for bot protection. Backend/MRT should verify via Siteverify and strip before forwarding to SLAS. */
     turnstileResponse?: string
+    /** Google reCAPTCHA response token for bot protection. Backend/MRT should verify via siteverify and strip before forwarding to SLAS. */
+    recaptchaResponse?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -1292,13 +1294,13 @@ class Auth {
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
 
-        const {turnstileResponse, ...restParams} = parameters
+        const {turnstileResponse, recaptchaResponse, ...restParams} = parameters
 
         let res: Response
 
-        if (turnstileResponse) {
-            // commerce-sdk-isomorphic helper does not include turnstileResponse in the POST body.
-            // Perform the request ourselves so the Turnstile token reaches the server.
+        if (turnstileResponse || recaptchaResponse) {
+            // commerce-sdk-isomorphic helper does not include turnstileResponse/recaptchaResponse in the POST body.
+            // Perform the request ourselves so the captcha token reaches the server.
             const clientConfig = (this.client as {
                 clientConfig?: {
                     parameters?: { organizationId?: string; siteId?: string }
@@ -1331,7 +1333,8 @@ class Auth {
             if (restParams.email) bodyEntries.push(['email', restParams.email])
             if (restParams.first_name) bodyEntries.push(['first_name', restParams.first_name])
             if (restParams.phone_number) bodyEntries.push(['phone_number', restParams.phone_number])
-            bodyEntries.push(['turnstileResponse', turnstileResponse])
+            if (turnstileResponse) bodyEntries.push(['turnstileResponse', turnstileResponse])
+            if (recaptchaResponse) bodyEntries.push(['recaptchaResponse', recaptchaResponse])
 
             const body = new URLSearchParams(bodyEntries).toString()
             const fetchOptions = clientConfig?.fetchOptions ?? {}

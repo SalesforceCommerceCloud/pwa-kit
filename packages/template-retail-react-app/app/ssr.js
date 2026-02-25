@@ -379,7 +379,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'maps.googleapis.com',
                         'places.googleapis.com',
                         // Cloudflare Turnstile for passwordless login
-                        'challenges.cloudflare.com'
+                        'challenges.cloudflare.com',
+                        // Google reCAPTCHA for passwordless login
+                        'www.google.com',
+                        'www.gstatic.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -391,13 +394,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // Cloudflare Turnstile
-                        'challenges.cloudflare.com'
+                        'challenges.cloudflare.com',
+                        // Google reCAPTCHA siteverify
+                        'www.google.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
                         // Cloudflare Turnstile for passwordless login
-                        'challenges.cloudflare.com'
+                        'challenges.cloudflare.com',
+                        // Google reCAPTCHA for passwordless login
+                        'www.google.com',
+                        'www.recaptcha.net'
                     ]
                 }
             }
