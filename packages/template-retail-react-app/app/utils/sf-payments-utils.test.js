@@ -1954,22 +1954,52 @@ describe('sf-payments-utils', () => {
 
     describe('getExpressPaymentMethodType', () => {
         test('returns card for googlepay with Stripe gateway', () => {
-            const result = getExpressPaymentMethodType('googlepay', PAYMENT_GATEWAYS.STRIPE)
+            const paymentMethods = [
+                {paymentMethodType: 'googlepay', accountId: 'stripe_express_acct'}
+            ]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_express_acct'}]
+            const result = getExpressPaymentMethodType(
+                'googlepay',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
             expect(result).toBe('card')
         })
 
         test('returns googlepay for googlepay with Adyen gateway', () => {
-            const result = getExpressPaymentMethodType('googlepay', PAYMENT_GATEWAYS.ADYEN)
+            const paymentMethods = [
+                {paymentMethodType: 'googlepay', accountId: 'adyen_express_acct'}
+            ]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_express_acct'}]
+            const result = getExpressPaymentMethodType(
+                'googlepay',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
             expect(result).toBe('googlepay')
         })
 
         test('returns card for applepay with Stripe gateway', () => {
-            const result = getExpressPaymentMethodType('applepay', PAYMENT_GATEWAYS.STRIPE)
+            const paymentMethods = [
+                {paymentMethodType: 'applepay', accountId: 'stripe_express_acct'}
+            ]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_express_acct'}]
+            const result = getExpressPaymentMethodType(
+                'applepay',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
             expect(result).toBe('card')
         })
 
         test('returns type unchanged for non-mapped types', () => {
-            const result = getExpressPaymentMethodType('paypal', PAYMENT_GATEWAYS.STRIPE)
+            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'stripe_acct'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_acct'}]
+            const result = getExpressPaymentMethodType(
+                'paypal',
+                paymentMethods,
+                paymentMethodSetAccounts
+            )
             expect(result).toBe('paypal')
         })
     })
