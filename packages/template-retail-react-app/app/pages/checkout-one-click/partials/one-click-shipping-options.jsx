@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useCallback, useEffect, useState, useMemo} from 'react'
+import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -52,9 +52,15 @@ export default function ShippingOptions() {
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     const [shipmentIdsWithNoMethods, setShipmentIdsWithNoMethods] = useState(() => new Set())
-    // Identify delivery shipments (exclude pickup and those without shipping addresses)
+
+    const productItems = basket?.productItems || []
     const deliveryShipments =
-        basket?.shipments?.filter((s) => s.shippingAddress && !isPickupShipment(s)) || []
+        basket?.shipments?.filter(
+            (s) =>
+                s.shippingAddress &&
+                !isPickupShipment(s) &&
+                productItems.some((item) => item.shipmentId === s.shipmentId)
+        ) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
     const targetDeliveryShipment = hasMultipleDeliveryShipments ? null : deliveryShipments[0]
 
@@ -78,18 +84,22 @@ export default function ShippingOptions() {
     const selectedShippingMethod = targetDeliveryShipment?.shippingMethod
     const selectedShippingAddress = targetDeliveryShipment?.shippingAddress
 
-    // Reset error toast when address state changes (affecting applicable shipping methods)
     const deliveryAddressStateKey = hasMultipleDeliveryShipments
         ? deliveryShipments.map((s) => s.shippingAddress?.stateCode ?? '').join(',')
         : selectedShippingAddress?.stateCode
+    const prevHasMultipleRef = useRef(hasMultipleDeliveryShipments)
     useEffect(() => {
+        const wasMulti = prevHasMultipleRef.current
+        prevHasMultipleRef.current = hasMultipleDeliveryShipments
+
+        if (wasMulti && !hasMultipleDeliveryShipments) return
+
         setNoMethodsToastShown(false)
-    }, [deliveryAddressStateKey])
+    }, [deliveryAddressStateKey, hasMultipleDeliveryShipments])
 
     useEffect(() => {
         if (!hasMultipleDeliveryShipments) {
             setShipmentIdsWithNoMethods(() => new Set())
-            setNoMethodsToastShown(false)
         }
     }, [hasMultipleDeliveryShipments])
 
@@ -109,35 +119,35 @@ export default function ShippingOptions() {
         [formatMessage]
     )
 
-    // For multi-shipment, report whether this shipment has no applicable delivery methods
-    const handleShipmentMethodsResolved = useCallback(
-        (shipmentId, hasNoApplicableMethods) => {
-            setShipmentIdsWithNoMethods((prev) => {
-                const next = new Set(prev)
-                if (hasNoApplicableMethods) next.add(shipmentId)
-                else next.delete(shipmentId)
-                return next
-            })
-            if (
-                hasNoApplicableMethods &&
-                step === STEPS.SHIPPING_OPTIONS &&
-                hasMultipleDeliveryShipments
-            ) {
-                setNoMethodsToastShown((prev) => {
-                    if (!prev) showToast(noShippingMethodsToast)
-                    return true
-                })
-            }
-        },
-        [
-            step,
-            STEPS.SHIPPING_OPTIONS,
-            hasMultipleDeliveryShipments,
-            showToast,
-            noShippingMethodsToast
-        ]
-    )
+    const handleShipmentMethodsResolved = useCallback((shipmentId, hasNoApplicableMethods) => {
+        setShipmentIdsWithNoMethods((prev) => {
+            const next = new Set(prev)
+            if (hasNoApplicableMethods) next.add(shipmentId)
+            else next.delete(shipmentId)
+            return next
+        })
+    }, [])
     const hasAnyShipmentWithNoMethods = shipmentIdsWithNoMethods.size > 0
+
+    useEffect(() => {
+        if (
+            hasAnyShipmentWithNoMethods &&
+            !noMethodsToastShown &&
+            step === STEPS.SHIPPING_OPTIONS &&
+            hasMultipleDeliveryShipments
+        ) {
+            showToast(noShippingMethodsToast)
+            setNoMethodsToastShown(true)
+        }
+    }, [
+        hasAnyShipmentWithNoMethods,
+        noMethodsToastShown,
+        step,
+        STEPS.SHIPPING_OPTIONS,
+        hasMultipleDeliveryShipments,
+        showToast,
+        noShippingMethodsToast
+    ])
 
     // Single shipment: show toast when methods data is available and has no delivery methods
     const singleShipmentNoMethods =
@@ -576,7 +586,7 @@ const ShipmentMethods = ({shipment, index, currency, onShipmentMethodsResolved})
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
-    const {data: methods} = useShippingMethodsForShipment(
+    const {data: methods, isFetching: isMethodsFetching} = useShippingMethodsForShipment(
         {
             parameters: {
                 basketId: basket?.basketId,
@@ -584,24 +594,21 @@ const ShipmentMethods = ({shipment, index, currency, onShipmentMethodsResolved})
             }
         },
         {
-            enabled: Boolean(basket?.basketId && shipment?.shipmentId),
-            onSuccess: (data) => {
-                if (!onShipmentMethodsResolved) return
-                const deliveryOnly = getDeliveryShippingMethods(data?.applicableShippingMethods)
-                const noDeliveryMethods = !deliveryOnly || deliveryOnly.length === 0
-                onShipmentMethodsResolved(shipment.shipmentId, noDeliveryMethods)
-            }
+            enabled: Boolean(basket?.basketId && shipment?.shipmentId)
         }
     )
     const [selected, setSelected] = useState(shipment?.shippingMethod?.id || undefined)
     const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
-    // Sync to parent when methods are already available (from cache)
     useEffect(() => {
-        if (!onShipmentMethodsResolved || methods === undefined) return
+        if (!onShipmentMethodsResolved || methods === undefined || isMethodsFetching) return
         const deliveryMethods = getDeliveryShippingMethods(methods?.applicableShippingMethods)
         onShipmentMethodsResolved(shipment.shipmentId, deliveryMethods.length === 0)
-    }, [methods, shipment.shipmentId, onShipmentMethodsResolved])
+
+        return () => {
+            onShipmentMethodsResolved(shipment.shipmentId, false)
+        }
+    }, [methods, shipment.shipmentId, onShipmentMethodsResolved, isMethodsFetching])
 
     useEffect(() => {
         // Only attempt auto-select when there are applicable methods available and we haven't already auto-selected
