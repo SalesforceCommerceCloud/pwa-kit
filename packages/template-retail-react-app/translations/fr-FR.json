@@ -663,9 +663,6 @@
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "Adresse e-mail pour la newsletter"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Soyez parmi les premiers informés"
-  },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Annuler"
   },

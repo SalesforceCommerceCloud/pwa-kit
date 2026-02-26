@@ -777,6 +777,12 @@
   "footer.column.our_company": {
     "defaultMessage": "Our Company"
   },
+  "footer.error.enter_valid_email": {
+    "defaultMessage": "Enter a valid email address."
+  },
+  "footer.error.generic_error": {
+    "defaultMessage": "We couldn't process the subscription. Try again."
+  },
   "footer.link.about_us": {
     "defaultMessage": "About Us"
   },
@@ -811,16 +817,25 @@
     "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
   "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Sign Up"
+    "defaultMessage": "Subscribe"
   },
   "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
+    "defaultMessage": "Be the first to know about latest offers, news, tips, and more."
+  },
+  "footer.subscribe.disclaimer": {
+    "defaultMessage": "By submitting this, I agree to the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>."
   },
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "Email address for newsletter"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Be the first to know"
+  "footer.subscribe.email.placeholder_text": {
+    "defaultMessage": "Enter your email address..."
+  },
+  "footer.subscribe.heading.stay_updated": {
+    "defaultMessage": "Subscribe to Stay Updated"
+  },
+  "footer.success_confirmation": {
+    "defaultMessage": "Thanks for subscribing!"
   },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Cancel"
