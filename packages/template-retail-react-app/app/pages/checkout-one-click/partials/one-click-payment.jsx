@@ -286,14 +286,11 @@ const Payment = ({
             })
 
             if (isPickupOnly && paymentInstrument.billingAddress) {
-                const addr = {...paymentInstrument.billingAddress}
-                delete addr.addressId
-                delete addr.creationDate
-                delete addr.lastModified
-                delete addr.preferred
-
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const {addressId, creationDate, lastModified, preferred, ...address} =
+                    paymentInstrument.billingAddress
                 await updateBillingAddressForBasket({
-                    body: addr,
+                    body: address,
                     parameters: {
                         basketId: activeBasketIdRef.current || basket.basketId
                     }
@@ -349,13 +346,10 @@ const Payment = ({
                     )
                     const addr = saved?.billingAddress
                     if (addr) {
-                        const cleaned = {...addr}
-                        delete cleaned.addressId
-                        delete cleaned.creationDate
-                        delete cleaned.lastModified
-                        delete cleaned.preferred
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const {addressId, creationDate, lastModified, preferred, ...address} = addr
                         await updateBillingAddressForBasket({
-                            body: cleaned,
+                            body: address,
                             parameters: {basketId: activeBasketIdRef.current || basket.basketId}
                         })
                         await currentBasketQuery.refetch()
