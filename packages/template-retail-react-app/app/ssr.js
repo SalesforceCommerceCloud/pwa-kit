@@ -360,7 +360,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        // TODO: Used to load icons
                         '*.demandware.net',
                         '*.adyen.com'
                     ],
@@ -372,8 +371,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         '*.google.com',
-                        // TODO: Used to load a valid sfp.js
-                        '*.demandware.net',
+                        '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
                         'places.googleapis.com'
                     ],
@@ -387,9 +385,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // Payment gateways
-                        '*.adyen.com',
-                        // TODO: Used to load metadata
-                        '*.demandware.net',
+                        '*.demandware.net', // Used to load a valid payment scripts in test environment
                         '*.adyen.com',
                         '*.google.com'
                     ],
@@ -400,8 +396,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com',
-                        '*.adyen.com'
+                        '*.google.com'
                     ]
                 }
             }

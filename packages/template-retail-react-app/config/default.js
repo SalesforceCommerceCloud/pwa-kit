@@ -94,15 +94,20 @@ module.exports = {
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,
+        // Salesforce Payments configuration
+        // To enable, set enabled to true and provide the SDK and metadata URLs for your Commerce Cloud instance.
+        // Example URLs: https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js
+        //               https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json
+        /*sfPayments: {
+            enabled: false,
+            sdkUrl: '',
+            metadataUrl: ''
+        },*/
         sfPayments: {
             enabled: true,
             sdkUrl: 'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
             metadataUrl:
                 'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
-            // sdkUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
-            // metadataUrl: 'https://ocapi-mon.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
-            //sdkUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-RefArch-Site/-/default/v0/sfp/sfp.js',
-            //metadataUrl: 'https://zyom-011.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
