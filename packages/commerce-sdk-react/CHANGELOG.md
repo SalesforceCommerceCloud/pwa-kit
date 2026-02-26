@@ -1,8 +1,5 @@
-## v5.0.0-turnstile-preview.0 (Jan 30, 2026)
-
-- [Feature] Add custom fetch for `authorizePasswordless` when `turnstileResponse` is present. The commerce-sdk-isomorphic helper does not forward the Turnstile token; this change performs the request via custom fetch so the token reaches the BFF/MRT for server-side verification via Cloudflare Siteverify.
-
 ## v5.1.0-dev
+- Add custom fetch for `authorizePasswordless` when `turnstileResponse` is present (Cloudflare Turnstile support). The commerce-sdk-isomorphic helper does not forward the Turnstile token; this change performs the request via custom fetch so the token reaches the BFF/MRT for server-side verification via Cloudflare Siteverify.
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Shopper Consents API support [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 
