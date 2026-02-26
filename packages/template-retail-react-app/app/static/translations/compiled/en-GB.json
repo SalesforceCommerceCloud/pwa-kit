@@ -1947,6 +1947,18 @@
       "value": "Our Company"
     }
   ],
+  "footer.error.enter_valid_email": [
+    {
+      "type": 0,
+      "value": "Enter a valid email address."
+    }
+  ],
+  "footer.error.generic_error": [
+    {
+      "type": 0,
+      "value": "We couldn't process the subscription. Try again."
+    }
+  ],
   "footer.link.about_us": [
     {
       "type": 0,
@@ -2016,13 +2028,47 @@
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Subscribe"
     }
   ],
   "footer.subscribe.description.sign_up": [
     {
       "type": 0,
-      "value": "Sign up to stay in the loop about the hottest deals"
+      "value": "Be the first to know about latest offers, news, tips, and more."
+    }
+  ],
+  "footer.subscribe.disclaimer": [
+    {
+      "type": 0,
+      "value": "By submitting this, I agree to the "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Terms & Conditions"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Privacy Policy"
+        }
+      ],
+      "type": 8,
+      "value": "privacy"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "footer.subscribe.email.assistive_msg": [
@@ -2031,10 +2077,22 @@
       "value": "Email address for newsletter"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
+  "footer.subscribe.email.placeholder_text": [
     {
       "type": 0,
-      "value": "Be the first to know"
+      "value": "Enter your email address..."
+    }
+  ],
+  "footer.subscribe.heading.stay_updated": [
+    {
+      "type": 0,
+      "value": "Subscribe to Stay Updated"
+    }
+  ],
+  "footer.success_confirmation": [
+    {
+      "type": 0,
+      "value": "Thanks for subscribing!"
     }
   ],
   "form_action_buttons.button.cancel": [

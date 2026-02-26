@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -11,6 +11,7 @@ import {Logger} from './types'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
     ShopperBaskets,
+    ShopperConsents,
     ShopperContexts,
     ShopperConfigurations,
     ShopperCustomers,
@@ -257,6 +258,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
         return {
             shopperBaskets: new ShopperBaskets(config),
+            shopperConsents: new ShopperConsents(config),
             shopperContexts: new ShopperContexts(config),
             shopperConfigurations: new ShopperConfigurations(config),
             shopperCustomers: new ShopperCustomers(config),
