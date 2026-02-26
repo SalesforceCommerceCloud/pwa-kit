@@ -223,10 +223,12 @@ describe('ShippingOptions Component', () => {
         })
 
         test('shows error toast and hides controls when no shipping methods are available', async () => {
-            const emptyMethodsPayload = {
-                data: {applicableShippingMethods: [], defaultShippingMethodId: 'std'}
-            }
-            commerceSdk.useShippingMethodsForShipment.mockImplementation(() => emptyMethodsPayload)
+            commerceSdk.useShippingMethodsForShipment
+                .mockReturnValueOnce({data: null, isFetching: true})
+                .mockReturnValue({
+                    data: {applicableShippingMethods: [], defaultShippingMethodId: 'std'},
+                    isFetching: false
+                })
             mockUpdateShippingMethod.mutateAsync.mockResolvedValue({})
 
             renderWithProviders(<ShippingOptions />)

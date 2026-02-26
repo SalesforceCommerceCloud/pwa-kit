@@ -53,6 +53,8 @@ export default function ShippingOptions() {
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     const [shipmentIdsWithNoMethods, setShipmentIdsWithNoMethods] = useState(() => new Set())
     const [resolvedShipmentIds, setResolvedShipmentIds] = useState(() => new Set())
+    const [singleShipmentFetchCompleted, setSingleShipmentFetchCompleted] = useState(false)
+    const prevIsFetchingRef = useRef(false)
 
     const productItems = basket?.productItems || []
     const deliveryShipments =
@@ -93,7 +95,9 @@ export default function ShippingOptions() {
         const wasMulti = prevHasMultipleRef.current
         prevHasMultipleRef.current = hasMultipleDeliveryShipments
 
-        if (wasMulti && !hasMultipleDeliveryShipments) return
+        if (wasMulti && !hasMultipleDeliveryShipments) {
+            return
+        }
         if (step === STEPS.SHIPPING_OPTIONS) return
 
         setNoMethodsToastShown(false)
@@ -160,9 +164,24 @@ export default function ShippingOptions() {
         noShippingMethodsToast
     ])
 
-    // Single shipment: show toast when methods data is available and has no delivery methods
+    // Prevent false positives from stale cached data for single-shipment error toast
+    useEffect(() => {
+        setSingleShipmentFetchCompleted(false)
+        prevIsFetchingRef.current = false
+    }, [step, hasMultipleDeliveryShipments])
+
+    // Track the single-shipment query's fetch lifecycle
+    useEffect(() => {
+        const wasFetching = prevIsFetchingRef.current
+        prevIsFetchingRef.current = isShippingMethodsFetching
+        if (wasFetching && !isShippingMethodsFetching) {
+            setSingleShipmentFetchCompleted(true)
+        }
+    }, [isShippingMethodsFetching])
+
     const singleShipmentNoMethods =
         !hasMultipleDeliveryShipments &&
+        singleShipmentFetchCompleted &&
         step === STEPS.SHIPPING_OPTIONS &&
         !isShippingMethodsFetching &&
         shippingMethods != null &&

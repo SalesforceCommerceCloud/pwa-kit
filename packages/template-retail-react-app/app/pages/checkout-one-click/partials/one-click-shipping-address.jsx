@@ -59,7 +59,7 @@ export default function ShippingAddress(props) {
     const selectedShippingAddress = deliveryShipments[0]?.shippingAddress
     const targetDeliveryShipmentId = deliveryShipments[0]?.shipmentId || 'me'
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
-    const {step, STEPS, goToStep, goToNextStep, contactPhone} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep, contactPhone, setConsolidationLock} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -114,6 +114,14 @@ export default function ShippingAddress(props) {
             const targetShipment = findExistingDeliveryShipment(basket)
             const targetShipmentId = targetShipment?.shipmentId || DEFAULT_SHIPMENT_ID
             let basketAfterItemMoves = null
+
+            // Do not advance the step while basket mutations are in flight
+            const willConsolidate = deliveryItems.some(
+                (item) => item.shipmentId !== targetShipmentId
+            )
+            if (willConsolidate) {
+                setConsolidationLock(true)
+            }
 
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
@@ -173,6 +181,7 @@ export default function ShippingAddress(props) {
             }
             // Remove any empty shipments. Use updated basket if available
             await removeEmptyShipments(basketAfterItemMoves || basket)
+            setConsolidationLock(false)
 
             // For registered shoppers: if an existing shipping method is still valid for the new address,
             // skip the Shipping Options step and go straight to Payment.
@@ -199,6 +208,7 @@ export default function ShippingAddress(props) {
                 console.error('Error submitting shipping address:', error)
             }
         } finally {
+            setConsolidationLock(false)
             setIsManualSubmitLoading(false)
         }
     }

@@ -116,7 +116,8 @@ jest.mock(
             },
             goToStep: mockGoToStep,
             goToNextStep: mockGoToNextStep,
-            contactPhone: '(727) 555-0000'
+            contactPhone: '(727) 555-0000',
+            setConsolidationLock: jest.fn()
         })
     })
 )
@@ -524,7 +525,8 @@ describe('ShippingAddress Component', () => {
                     },
                     goToStep: mockGoToStep,
                     goToNextStep: mockGoToNextStep,
-                    contactPhone: '(727) 555-9999'
+                    contactPhone: '(727) 555-9999',
+                    setConsolidationLock: jest.fn()
                 })
             })
         )
@@ -820,7 +822,8 @@ describe('ShippingAddress Component', () => {
                     },
                     goToStep: mockGoToStep,
                     goToNextStep: mockGoToNextStep,
-                    contactPhone: '(727) 555-0000'
+                    contactPhone: '(727) 555-0000',
+                    setConsolidationLock: jest.fn()
                 })
             })
         )
@@ -1052,7 +1055,8 @@ describe('ShippingAddress Component', () => {
                     },
                     goToStep: mockGoToStep,
                     goToNextStep: mockGoToNextStep,
-                    contactPhone: '(727) 555-0000'
+                    contactPhone: '(727) 555-0000',
+                    setConsolidationLock: jest.fn()
                 })
             })
         )
@@ -1213,7 +1217,8 @@ describe('ShippingAddress Component', () => {
                     },
                     goToStep: mockGoToStep,
                     goToNextStep: mockGoToNextStep,
-                    contactPhone: '(727) 555-0000'
+                    contactPhone: '(727) 555-0000',
+                    setConsolidationLock: jest.fn()
                 })
             })
         )
