@@ -52,6 +52,7 @@ export default function ShippingOptions() {
     const showToast = useToast()
     const [noMethodsToastShown, setNoMethodsToastShown] = useState(false)
     const [shipmentIdsWithNoMethods, setShipmentIdsWithNoMethods] = useState(() => new Set())
+    const [resolvedShipmentIds, setResolvedShipmentIds] = useState(() => new Set())
 
     const productItems = basket?.productItems || []
     const deliveryShipments =
@@ -93,13 +94,15 @@ export default function ShippingOptions() {
         prevHasMultipleRef.current = hasMultipleDeliveryShipments
 
         if (wasMulti && !hasMultipleDeliveryShipments) return
+        if (step === STEPS.SHIPPING_OPTIONS) return
 
         setNoMethodsToastShown(false)
-    }, [deliveryAddressStateKey, hasMultipleDeliveryShipments])
+    }, [deliveryAddressStateKey, hasMultipleDeliveryShipments, step, STEPS.SHIPPING_OPTIONS])
 
     useEffect(() => {
         if (!hasMultipleDeliveryShipments) {
             setShipmentIdsWithNoMethods(() => new Set())
+            setResolvedShipmentIds(() => new Set())
         }
     }, [hasMultipleDeliveryShipments])
 
@@ -120,6 +123,11 @@ export default function ShippingOptions() {
     )
 
     const handleShipmentMethodsResolved = useCallback((shipmentId, hasNoApplicableMethods) => {
+        setResolvedShipmentIds((prev) => {
+            const next = new Set(prev)
+            next.add(shipmentId)
+            return next
+        })
         setShipmentIdsWithNoMethods((prev) => {
             const next = new Set(prev)
             if (hasNoApplicableMethods) next.add(shipmentId)
@@ -127,10 +135,12 @@ export default function ShippingOptions() {
             return next
         })
     }, [])
+    const allShipmentsResolved = resolvedShipmentIds.size >= deliveryShipments.length
     const hasAnyShipmentWithNoMethods = shipmentIdsWithNoMethods.size > 0
 
     useEffect(() => {
         if (
+            allShipmentsResolved &&
             hasAnyShipmentWithNoMethods &&
             !noMethodsToastShown &&
             step === STEPS.SHIPPING_OPTIONS &&
@@ -140,6 +150,7 @@ export default function ShippingOptions() {
             setNoMethodsToastShown(true)
         }
     }, [
+        allShipmentsResolved,
         hasAnyShipmentWithNoMethods,
         noMethodsToastShown,
         step,
