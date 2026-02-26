@@ -1493,7 +1493,7 @@ const Cart = () => {
             )}
 
             {/* Loading overlay during express payment confirmation */}
-            {confirmingBasket && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+            {confirmingBasket && <LoadingSpinner />}
         </Box>
     )
 }
