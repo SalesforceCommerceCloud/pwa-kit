@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useRef} from 'react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers, useUsid} from '@salesforce/commerce-sdk-react'
 import {arrayBufferToBase64Url} from '@salesforce/retail-react-app/app/utils/utils'
@@ -15,6 +16,19 @@ export const usePasskeyLogin = () => {
     const startWebauthnAuthentication = useAuthHelper(AuthHelpers.StartWebauthnAuthentication)
     const finishWebauthnAuthentication = useAuthHelper(AuthHelpers.FinishWebauthnAuthentication)
     const {usid} = useUsid()
+    const abortControllerRef = useRef(null)
+
+    /**
+     * Aborts any pending passkey login request.
+     * This is useful when the user logs in with a different method (e.g., password)
+     * while a passkey prompt (e.g., Touch ID, Face ID, etc.) is still open.
+     */
+    const abortPasskeyLogin = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort()
+            abortControllerRef.current = null
+        }
+    }
 
     const loginWithPasskey = async () => {
         const config = getConfig()
@@ -57,22 +71,31 @@ export const usePasskeyLogin = () => {
             startWebauthnAuthenticationResponse.publicKey
         )
 
+        // Create an AbortController to allow cancelling the passkey prompt
+        // This is needed when the user logs in with a different method or
+        // navigates away from the page while the passkey prompt is open
+        abortControllerRef.current = new AbortController()
+
         // Get passkey credential from browser
         // https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get
         let credential
         try {
             credential = await navigator.credentials.get({
                 publicKey: options,
-                mediation: 'conditional'
+                mediation: 'conditional',
+                signal: abortControllerRef.current.signal
             })
         } catch (error) {
             // NotAllowedError is thrown when the user cancels the passkey login
-            // We return early in this case to avoid showing an error to the user
-            if (error.name == 'NotAllowedError') {
+            // AbortError is thrown when the passkey login is aborted programmatically (e.g., user logged in with password)
+            // We return early in these cases to avoid showing an error to the user
+            if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
                 return
             }
             console.error('Error getting passkey credential from browser:', error)
             throw error
+        } finally {
+            abortControllerRef.current = null
         }
 
         // Encode credential before sending to SLAS
@@ -107,5 +130,5 @@ export const usePasskeyLogin = () => {
         return
     }
 
-    return {loginWithPasskey}
+    return {loginWithPasskey, abortPasskeyLogin}
 }

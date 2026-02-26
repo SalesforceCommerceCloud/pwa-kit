@@ -16,7 +16,8 @@ import {
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     mockGoToStep,
-    mockGoToNextStep
+    mockGoToNextStep,
+    useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -72,12 +73,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => {
 })
 
 const mockLoginWithPasskey = jest.fn().mockResolvedValue(undefined)
+const mockAbortPasskeyLogin = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-passkey-login', () => {
     return {
         __esModule: true,
         usePasskeyLogin: jest.fn(() => ({
-            loginWithPasskey: mockLoginWithPasskey
+            loginWithPasskey: mockLoginWithPasskey,
+            abortPasskeyLogin: mockAbortPasskeyLogin
         }))
     }
 })
@@ -428,8 +431,34 @@ describe('navigation based on shipment context', () => {
 })
 
 describe('passkey login', () => {
+    let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+    const MOCK_STEPS = {CONTACT_INFO: 0, PAYMENT: 2}
+
     beforeEach(() => {
         jest.clearAllMocks()
+        // Reset useCheckout mock to default values
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step: MOCK_STEPS.CONTACT_INFO,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
+        })
+        global.server.use(
+            rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+                currentBasket.customerInfo.email = validEmail
+                return res(ctx.json(currentBasket))
+            })
+        )
+        // Provide basket with basketId and items for tests in this suite
+        useCurrentBasket.mockReturnValue({
+            data: currentBasket,
+            derivedData: {totalItems: currentBasket.productItems?.length || 0}
+        })
         // Default to guest user (not registered)
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -455,20 +484,87 @@ describe('passkey login', () => {
         })
     })
 
-    test('does not call loginWithPasskey when customer is registered', async () => {
-        // Mock registered customer
-        mockUseCurrentCustomer.mockReturnValue({
-            data: {
-                isRegistered: true,
-                email: 'test@example.com'
-            }
+    test('does not prompt for passkey when not on contact info step', async () => {
+        // When step is not CONTACT_INFO, we must not trigger passkey (no prompt)
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step: MOCK_STEPS.PAYMENT,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
         })
 
         renderWithProviders(<ContactInfo />)
 
-        // Wait a bit to ensure useEffect has run
         await waitFor(() => {
             expect(mockLoginWithPasskey).not.toHaveBeenCalled()
+        })
+    })
+
+    test('calls abortPasskeyLogin when component unmounts', async () => {
+        const {unmount} = renderWithProviders(<ContactInfo />)
+
+        // Wait for passkey login to be triggered
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).toHaveBeenCalled()
+        })
+
+        // Verify abort hasn't been called yet
+        expect(mockAbortPasskeyLogin).not.toHaveBeenCalled()
+
+        // Unmount the component (simulates navigating away)
+        unmount()
+
+        // Verify abort was called during cleanup
+        expect(mockAbortPasskeyLogin).toHaveBeenCalled()
+    })
+
+    test('Passkey prompt is aborted when user logs in with password', async () => {
+        // This test verifies that when the user logs in with password while the passkey
+        // flow is pending, the useEffect cleanup runs (step changes) and
+        // abortPasskeyLogin is called.
+        useCheckout.mockImplementation(() => ({
+            customer: null,
+            basket: {},
+            isGuestCheckout: true,
+            setIsGuestCheckout: jest.fn(),
+            step:
+                // Make step "change" after goToNextStep is called so the effect cleanup runs.
+                mockGoToNextStep.mock.calls.length > 0
+                    ? MOCK_STEPS.PAYMENT
+                    : MOCK_STEPS.CONTACT_INFO,
+            login: null,
+            STEPS: MOCK_STEPS,
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
+        }))
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        // Wait for passkey login to be triggered (passkey prompt is "pending")
+        await waitFor(() => {
+            expect(mockLoginWithPasskey).toHaveBeenCalled()
+        })
+        expect(mockAbortPasskeyLogin).not.toHaveBeenCalled()
+
+        // User switches to login and logs in with password
+        const trigger = screen.getByText(/Already have an account\? Log in/i)
+        await user.click(trigger)
+
+        await user.type(screen.getByLabelText('Email'), validEmail)
+        await user.type(screen.getByLabelText('Password'), password)
+
+        const loginButton = screen.getByText('Log In')
+        await user.click(loginButton)
+
+        // Login succeeds; goToNextStep is called. Next render will see step change
+        await waitFor(() => {
+            expect(mockGoToNextStep).toHaveBeenCalled()
+            expect(mockAbortPasskeyLogin).toHaveBeenCalled()
         })
     })
 })

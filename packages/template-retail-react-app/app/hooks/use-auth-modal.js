@@ -75,7 +75,7 @@ export const AuthModal = ({
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
     const prevAuthType = usePrevious(customerType)
-    const {loginWithPasskey} = usePasskeyLogin()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const customer = useCustomer(
         {parameters: {customerId}},
         {enabled: !!customerId && isRegistered}
@@ -242,6 +242,11 @@ export const AuthModal = ({
                 form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
             })
         }
+
+        // Cleanup: abort passkey login when modal closes or component unmounts
+        return () => {
+            abortPasskeyLogin()
+        }
     }, [isOpen])
 
     // Auto-focus the first field in each form view
@@ -270,8 +275,7 @@ export const AuthModal = ({
         const isNowRegistered =
             (isOpen || isOtpAuthOpen) && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
-        // Also ensure that the customer data is loaded.
-        if (!isNowRegistered || !customer.data) {
+        if (!isNowRegistered) {
             return
         }
 
@@ -292,7 +296,7 @@ export const AuthModal = ({
                         id: 'auth_modal.info.welcome_user'
                     },
                     {
-                        name: customer.data?.firstName || ''
+                        name: customer.data?.firstName || 'back'
                     }
                 )}`,
                 description: `${formatMessage({
@@ -313,7 +317,7 @@ export const AuthModal = ({
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
-    }, [isRegistered, customer.data])
+    }, [isRegistered])
 
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)

@@ -62,7 +62,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    const {loginWithPasskey} = usePasskeyLogin()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -169,10 +169,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             }
         }
 
-        if (!customer.isRegistered) {
+        if (step === STEPS.CONTACT_INFO) {
             handlePasskeyLogin()
         }
-    }, [customer.isRegistered])
+
+        // Cleanup: abort passkey login when navigating away from checkout
+        return () => {
+            abortPasskeyLogin()
+        }
+    }, [step])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')
