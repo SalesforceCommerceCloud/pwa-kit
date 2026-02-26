@@ -989,13 +989,57 @@ describe('Auth', () => {
 
         const mockErrorResponse = {
             status: 400,
-            json: jest.fn().mockResolvedValue({message: 'Invalid request'})
+            text: jest.fn().mockResolvedValue(JSON.stringify({message: 'Invalid request'}))
         }
         ;(helpers.authorizePasswordless as jest.Mock).mockResolvedValueOnce(mockErrorResponse)
 
         await expect(auth.authorizePasswordless({userid: 'userid'})).rejects.toThrow(
             '400 Invalid request'
         )
+    })
+
+    test('authorizePasswordless with turnstileResponse uses custom fetch instead of helper', async () => {
+        const mockFetch = jest.fn().mockResolvedValue({status: 200, text: () => Promise.resolve('')})
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private method
+        auth.set('usid', 'test-usid')
+
+        await auth.authorizePasswordless({
+            userid: 'user@example.com',
+            turnstileResponse: 'turnstile-token-123'
+        })
+
+        expect(helpers.authorizePasswordless).not.toHaveBeenCalled()
+        expect(mockFetch).toHaveBeenCalledTimes(1)
+        const [url, options] = mockFetch.mock.calls[0]
+        expect(url).toBe(
+            'proxy/shopper/auth/v1/organizations/organizationId/oauth2/passwordless/login'
+        )
+        expect(options.method).toBe('POST')
+        expect(options.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+        const body = new URLSearchParams(options.body)
+        expect(body.get('user_id')).toBe('user@example.com')
+        expect(body.get('turnstileResponse')).toBe('turnstile-token-123')
+        expect(body.get('usid')).toBe('test-usid')
+    })
+
+    test('authorizePasswordless with turnstileResponse throws on non-200 fetch response', async () => {
+        const mockFetch = jest.fn().mockResolvedValue({
+            status: 404,
+            text: () => Promise.resolve('')
+        })
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+
+        await expect(
+            auth.authorizePasswordless({
+                userid: 'guest@example.com',
+                turnstileResponse: 'token'
+            })
+        ).rejects.toThrow('404')
     })
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {

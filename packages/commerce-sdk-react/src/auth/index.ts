@@ -103,6 +103,8 @@ type AuthorizePasswordlessParams = {
     last_name?: string
     email?: string
     phone_number?: string
+    /** Cloudflare Turnstile response token for bot protection. Backend/MRT should verify via Siteverify and strip before forwarding to SLAS. */
+    turnstileResponse?: string
 }
 
 type GetPasswordLessAccessTokenParams = {
@@ -284,14 +286,18 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
+    /** Base URL for SLAS client (same as proxy passed to ShopperLogin). Used for custom fetch when turnstileResponse is present. */
+    private slasClientBaseUrl: string
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
-        this.client = new ShopperLogin({
-            proxy: config.enablePWAKitPrivateClient
+        this.slasClientBaseUrl =
+            config.enablePWAKitPrivateClient && config.privateClientProxyEndpoint
                 ? config.privateClientProxyEndpoint
-                : config.proxy,
+                : config.proxy
+        this.client = new ShopperLogin({
+            proxy: this.slasClientBaseUrl,
             headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
@@ -1276,6 +1282,8 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     * When turnstileResponse is provided, we perform the request ourselves so the token
+     * is included in the body (commerce-sdk-isomorphic helper does not forward turnstileResponse).
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
@@ -1284,34 +1292,100 @@ class Auth {
         const mode = parameters.mode || 'callback'
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
 
-        const res = await helpers.authorizePasswordless({
-            slasClient: this.client,
-            credentials: {
-                clientSecret: this.clientSecret
-            },
-            parameters: {
-                ...(callbackURI && {callbackURI}),
-                ...(usid && {usid}),
-                ...(parameters.locale && {locale: parameters.locale}),
-                userid: parameters.userid,
-                mode,
-                ...(parameters.register_customer !== undefined && {
-                    registerCustomer:
-                        typeof parameters.register_customer === 'boolean'
-                            ? parameters.register_customer
-                            : parameters.register_customer === 'true'
-                            ? true
-                            : false
-                }),
-                ...(parameters.last_name && {lastName: parameters.last_name}),
-                ...(parameters.email && {email: parameters.email}),
-                ...(parameters.first_name && {firstName: parameters.first_name}),
-                ...(parameters.phone_number && {phoneNumber: parameters.phone_number})
+        const {turnstileResponse, ...restParams} = parameters
+
+        let res: Response
+
+        if (turnstileResponse) {
+            // commerce-sdk-isomorphic helper does not include turnstileResponse in the POST body.
+            // Perform the request ourselves so the Turnstile token reaches the server.
+            const clientConfig = (this.client as {
+                clientConfig?: {
+                    parameters?: { organizationId?: string; siteId?: string }
+                    fetchOptions?: RequestInit
+                }
+            }).clientConfig
+            const organizationId = clientConfig?.parameters?.organizationId
+            const channelId = clientConfig?.parameters?.siteId
+            if (!organizationId || !channelId) {
+                throw new Error('Missing organizationId or siteId for passwordless login')
             }
-        })
+            // Use SLAS proxy base URL (same-origin) so the request is allowed by CSP and reaches the app server
+            const url = `${this.slasClientBaseUrl}/shopper/auth/v1/organizations/${organizationId}/oauth2/passwordless/login`
+            const bodyEntries: Array<[string, string]> = [
+                ['user_id', restParams.userid],
+                ['mode', mode],
+                ['channel_id', channelId]
+            ]
+            if (restParams.locale) bodyEntries.push(['locale', restParams.locale])
+            if (usid) bodyEntries.push(['usid', usid])
+            if (callbackURI) bodyEntries.push(['callback_uri', callbackURI])
+            if (restParams.register_customer !== undefined) {
+                const val =
+                    typeof restParams.register_customer === 'boolean'
+                        ? restParams.register_customer
+                        : restParams.register_customer === 'true'
+                bodyEntries.push(['register_customer', val ? 'true' : 'false'])
+            }
+            if (restParams.last_name) bodyEntries.push(['last_name', restParams.last_name])
+            if (restParams.email) bodyEntries.push(['email', restParams.email])
+            if (restParams.first_name) bodyEntries.push(['first_name', restParams.first_name])
+            if (restParams.phone_number) bodyEntries.push(['phone_number', restParams.phone_number])
+            bodyEntries.push(['turnstileResponse', turnstileResponse])
+
+            const body = new URLSearchParams(bodyEntries).toString()
+            const fetchOptions = clientConfig?.fetchOptions ?? {}
+            res = await fetch(url, {
+                ...fetchOptions,
+                method: 'POST',
+                headers: {
+                    ...(fetchOptions.headers as Record<string, string>),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body
+            })
+        } else {
+            res = await helpers.authorizePasswordless({
+                slasClient: this.client,
+                credentials: {
+                    clientSecret: this.clientSecret
+                },
+                parameters: {
+                    ...(callbackURI && {callbackURI}),
+                    ...(usid && {usid}),
+                    ...(restParams.locale && {locale: restParams.locale}),
+                    userid: restParams.userid,
+                    mode,
+                    ...(restParams.register_customer !== undefined && {
+                        registerCustomer:
+                            typeof restParams.register_customer === 'boolean'
+                                ? restParams.register_customer
+                                : restParams.register_customer === 'true'
+                                ? true
+                                : false
+                    }),
+                    ...(restParams.last_name && {lastName: restParams.last_name}),
+                    ...(restParams.email && {email: restParams.email}),
+                    ...(restParams.first_name && {firstName: restParams.first_name}),
+                    ...(restParams.phone_number && {phoneNumber: restParams.phone_number})
+                }
+            })
+        }
+
         if (res && res.status !== 200) {
-            const errorData = await res.json()
-            throw new Error(`${res.status} ${String(errorData.message)}`)
+            let errorMessage = ''
+            try {
+                const text = await res.text()
+                if (text.trim()) {
+                    const errorData = JSON.parse(text) as { message?: string }
+                    errorMessage = String(errorData?.message ?? '').trim()
+                }
+            } catch {
+                // Empty or invalid JSON body (e.g. 404 for guest user)
+            }
+            throw new Error(
+                [res.status, errorMessage].filter(Boolean).join(' ') || String(res.status)
+            )
         }
         return res
     }
