@@ -80,8 +80,6 @@ export default {
         },
         askAssistantBanner: {
             borderRadius: {base: 'md', md: 0},
-            borderTopLeftRadius: {base: 'md', md: 0},
-            borderTopRightRadius: {base: 'md', md: 0},
             padding: {base: '14px 24px', md: '14px 30%'},
             margin: 0,
             marginBottom: {base: 0, md: -6},

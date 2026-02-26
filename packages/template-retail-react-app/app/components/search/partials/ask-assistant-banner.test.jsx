@@ -45,5 +45,5 @@ test('calls onClick when banner is clicked', async () => {
     })
     await user.click(button)
 
-    expect(onClick).toHaveBeenCalledTimes(2)
+    expect(onClick).toHaveBeenCalledTimes(1)
 })
