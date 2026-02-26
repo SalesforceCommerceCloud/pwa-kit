@@ -1299,12 +1299,14 @@ class Auth {
         if (turnstileResponse) {
             // commerce-sdk-isomorphic helper does not include turnstileResponse in the POST body.
             // Perform the request ourselves so the Turnstile token reaches the server.
-            const clientConfig = (this.client as {
-                clientConfig?: {
-                    parameters?: { organizationId?: string; siteId?: string }
-                    fetchOptions?: RequestInit
+            const clientConfig = (
+                this.client as {
+                    clientConfig?: {
+                        parameters?: {organizationId?: string; siteId?: string}
+                        fetchOptions?: RequestInit
+                    }
                 }
-            }).clientConfig
+            ).clientConfig
             const organizationId = clientConfig?.parameters?.organizationId
             const channelId = clientConfig?.parameters?.siteId
             if (!organizationId || !channelId) {
@@ -1377,7 +1379,7 @@ class Auth {
             try {
                 const text = await res.text()
                 if (text.trim()) {
-                    const errorData = JSON.parse(text) as { message?: string }
+                    const errorData = JSON.parse(text) as {message?: string}
                     errorMessage = String(errorData?.message ?? '').trim()
                 }
             } catch {

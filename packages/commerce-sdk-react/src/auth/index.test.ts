@@ -999,7 +999,9 @@ describe('Auth', () => {
     })
 
     test('authorizePasswordless with turnstileResponse uses custom fetch instead of helper', async () => {
-        const mockFetch = jest.fn().mockResolvedValue({status: 200, text: () => Promise.resolve('')})
+        const mockFetch = jest
+            .fn()
+            .mockResolvedValue({status: 200, text: () => Promise.resolve('')})
         global.fetch = mockFetch
 
         const auth = new Auth(configSLASPrivate)
