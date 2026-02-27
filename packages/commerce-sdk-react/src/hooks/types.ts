@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,6 +8,7 @@ import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@t
 import {
     ShopperBaskets,
     ShopperConfigurations,
+    ShopperConsents,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
@@ -86,6 +87,7 @@ export type ApiClientConfigParams = {
  */
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperConsents?: ShopperConsents<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>

@@ -1539,12 +1539,6 @@
       "value": "E-postadresse for nyhetsbrev"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Bli den første som får vite det"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,

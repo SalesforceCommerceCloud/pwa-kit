@@ -636,9 +636,6 @@
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "E-postadresse for nyhetsbrev"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Bli den første som får vite det"
-  },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Avbryt"
   },

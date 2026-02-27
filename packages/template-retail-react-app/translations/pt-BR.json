@@ -636,9 +636,6 @@
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "Endereço de e-mail para newsletter"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Seja o primeiro a saber"
-  },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Cancelar"
   },

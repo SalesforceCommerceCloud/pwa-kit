@@ -7,7 +7,10 @@
 import React from 'react'
 import {screen, waitFor, fireEvent, act} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
-import {setCheckoutGuestChoiceInStorage} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
+import {
+    setCheckoutGuestChoiceInStorage,
+    useCheckout
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {AuthHelpers, useCustomerType} from '@salesforce/commerce-sdk-react'
@@ -165,9 +168,20 @@ beforeEach(() => {
     mockUpdateCustomer.mutateAsync.mockResolvedValue({})
     // Reset useCustomerType mock to ensure phone input is not disabled
     useCustomerType.mockReturnValue({isRegistered: false})
+    // Reset useCheckout to default guest checkout state
+    useCheckout.mockReturnValue({
+        customer: null,
+        basket: {basketId: 'test-basket-id'},
+        isGuestCheckout: true,
+        setIsGuestCheckout: jest.fn(),
+        step: 0,
+        login: null,
+        STEPS: {CONTACT_INFO: 0},
+        goToStep: null,
+        goToNextStep: mockGoToNextStep,
+        setContactPhone: mockSetContactPhone
+    })
 })
-
-afterEach(() => {})
 
 describe('ContactInfo Component', () => {
     beforeEach(() => {
@@ -219,97 +233,43 @@ describe('ContactInfo Component', () => {
         expect(phoneInput.value).toMatch(/[0-9]/)
     })
 
-    test('shows phone disabled and prefilled for registered shopper', async () => {
-        jest.resetModules()
-        jest.doMock('@salesforce/commerce-sdk-react', () => {
-            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-            return {
-                ...originalModule,
-                useCustomerType: jest.fn(() => ({isRegistered: true})),
-                useAuthHelper: jest
-                    .fn()
-                    .mockImplementation(
-                        (helperType) =>
-                            mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
-                    )
+    test('shows phone disabled and prefilled for registered shopper', () => {
+        useCustomerType.mockReturnValue({isRegistered: true})
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                email: 'reg@salesforce.com',
+                isRegistered: true,
+                phoneHome: '(111) 222-3333'
             }
         })
-        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-            useCurrentCustomer: () => ({
-                data: {
-                    email: 'reg@salesforce.com',
-                    isRegistered: true,
-                    phoneHome: '(111) 222-3333'
-                }
-            })
-        }))
-        const {renderWithProviders: localRenderWithProviders} = await import(
-            '@salesforce/retail-react-app/app/utils/test-utils'
-        )
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
-        )
-        const Component = module.default
-
-        localRenderWithProviders(<Component />)
+        renderWithProviders(<ContactInfo />)
         const phoneInput = screen.getByLabelText('Phone')
         expect(phoneInput).toBeInTheDocument()
         expect(phoneInput).toHaveAttribute('disabled')
     })
 
-    test('displays phone number in summary card for registered user', async () => {
-        jest.resetModules()
-        jest.doMock('@salesforce/commerce-sdk-react', () => {
-            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-            return {
-                ...originalModule,
-                useCustomerType: jest.fn(() => ({isRegistered: true})),
-                useAuthHelper: jest
-                    .fn()
-                    .mockImplementation(
-                        (helperType) =>
-                            mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
-                    )
+    test('displays phone number in summary card for registered user', () => {
+        useCustomerType.mockReturnValue({isRegistered: true})
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                email: 'reg@salesforce.com',
+                isRegistered: true,
+                phoneHome: '(111) 222-3333'
             }
         })
-        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-            useCurrentCustomer: () => ({
-                data: {
-                    email: 'reg@salesforce.com',
-                    isRegistered: true,
-                    phoneHome: '(111) 222-3333'
-                }
-            })
-        }))
-        jest.doMock(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
-            () => {
-                return {
-                    useCheckout: jest.fn().mockReturnValue({
-                        customer: null,
-                        basket: {basketId: 'test-basket-id'},
-                        isGuestCheckout: false,
-                        setIsGuestCheckout: jest.fn(),
-                        step: 1, // Not on CONTACT_INFO step, so summary shows
-                        login: null,
-                        STEPS: {CONTACT_INFO: 0},
-                        goToStep: jest.fn(),
-                        goToNextStep: jest.fn(),
-                        setContactPhone: jest.fn()
-                    }),
-                    setCheckoutGuestChoiceInStorage: jest.fn()
-                }
-            }
-        )
-        const {renderWithProviders: localRenderWithProviders} = await import(
-            '@salesforce/retail-react-app/app/utils/test-utils'
-        )
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
-        )
-        const Component = module.default
-
-        localRenderWithProviders(<Component />)
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {basketId: 'test-basket-id'},
+            isGuestCheckout: false,
+            setIsGuestCheckout: jest.fn(),
+            step: 1, // Not on CONTACT_INFO step, so summary shows
+            login: null,
+            STEPS: {CONTACT_INFO: 0},
+            goToStep: jest.fn(),
+            goToNextStep: jest.fn(),
+            setContactPhone: jest.fn()
+        })
+        renderWithProviders(<ContactInfo />)
 
         // Verify email and phone are displayed in summary
         expect(screen.getByText('reg@salesforce.com')).toBeInTheDocument()
