@@ -3131,6 +3131,18 @@
       "value": "Cancelar"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Descubra, compare e compre com mais inteligência com seu assistente de compras pessoal."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Perguntar ao assistente de compras"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

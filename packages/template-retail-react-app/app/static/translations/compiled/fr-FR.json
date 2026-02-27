@@ -3181,6 +3181,18 @@
       "value": "Annuler"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Découvrez, comparez et achetez plus malin avec votre assistant shopping personnel."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Demander l'assistant shopping"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

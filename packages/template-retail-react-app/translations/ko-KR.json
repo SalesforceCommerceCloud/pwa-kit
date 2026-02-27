@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "취소"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "개인 쇼핑 어시스턴트와 함께 더 스마트하게 찾고, 비교하고, 쇼핑하세요."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "쇼핑 어시스턴트에게 문의"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "필터 모두 지우기"
   },

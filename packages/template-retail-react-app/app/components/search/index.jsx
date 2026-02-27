@@ -224,13 +224,13 @@ const Search = (props) => {
         }
     }
 
-    const clearInput = () => {
+    const clearInput = useCallback(() => {
         searchInputRef.current?.blur()
         setIsOpen(false)
-    }
+    }, [])
 
     // Function to set pre-chat fields only when launching a new chat session
-    const setPrechatFieldsForNewSession = () => {
+    const setPrechatFieldsForNewSession = useCallback(() => {
         // Only set pre-chat fields if this is a new chat launch (not already launched)
         if (!miawChatRef.current.newChatLaunched) {
             if (window.embeddedservice_bootstrap?.prechatAPI) {
@@ -247,7 +247,17 @@ const Search = (props) => {
                 })
             }
         }
-    }
+    }, [
+        siteId,
+        locale,
+        commerceOrgId,
+        usid,
+        refreshToken,
+        sfLanguage,
+        appOrigin,
+        buildUrl,
+        location
+    ])
 
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
@@ -274,7 +284,7 @@ const Search = (props) => {
             window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
         }
     }, [])
-    const launchChat = () => {
+    const launchChat = useCallback(() => {
         // Set pre-chat fields only for new sessions
         setPrechatFieldsForNewSession()
 
@@ -295,7 +305,7 @@ const Search = (props) => {
             ?.catch((err) => {
                 console.error('launchChat error', err)
             })
-    }
+    }, [setPrechatFieldsForNewSession])
 
     const onSubmitSearch = (e) => {
         e.preventDefault()
@@ -425,11 +435,12 @@ const Search = (props) => {
             <HideOnDesktop>
                 <Flex
                     display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
-                    postion="absolute"
+                    position="absolute"
                     background="white"
                     left={0}
                     right={0}
                     height="100vh"
+                    overflowX="hidden"
                 >
                     {searchSuggestion.isLoading ? (
                         <Spinner
