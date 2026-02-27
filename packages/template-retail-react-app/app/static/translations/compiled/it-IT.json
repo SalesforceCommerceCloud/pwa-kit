@@ -3099,6 +3099,18 @@
       "value": "Annulla"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Scopri, confronta e acquista in modo più intelligente con il tuo assistente shopping personale."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Chiedi all'assistente shopping"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

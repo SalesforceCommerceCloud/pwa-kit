@@ -3131,6 +3131,18 @@
       "value": "Anuluj"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Odkrywaj, porównuj i kupuj mądrzej z osobistym asystentem zakupów."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Zapytaj asystenta zakupów"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

@@ -3115,6 +3115,18 @@
       "value": "취소"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "개인 쇼핑 어시스턴트와 함께 더 스마트하게 찾고, 비교하고, 쇼핑하세요."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "쇼핑 어시스턴트에게 문의"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

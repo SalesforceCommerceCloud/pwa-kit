@@ -3123,6 +3123,18 @@
       "value": "Avbryt"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Upptäck, jämför och handla smartare med din personliga shoppingassistent."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Fråga shoppingassistenten"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

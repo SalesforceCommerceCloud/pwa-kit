@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "キャンセル"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "パーソナルショッピングアシスタントで、より賢く発見・比較・ショッピング。"
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "ショッピングアシスタントに聞く"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "すべてのフィルターをクリア"
   },
