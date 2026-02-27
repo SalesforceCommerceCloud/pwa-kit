@@ -30,7 +30,9 @@ import logger from './logger-instance'
 
 describe('PerformanceTimer', () => {
     beforeEach(() => {
-        jest.useFakeTimers()
+        // doNotFake 'performance' so that the polyfilled performance.mark/measure
+        // methods (from perf_hooks) remain available in the jsdom environment
+        jest.useFakeTimers({doNotFake: ['performance']})
     })
 
     afterAll(() => {

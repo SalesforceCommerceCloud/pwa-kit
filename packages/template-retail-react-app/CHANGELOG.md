@@ -1,4 +1,5 @@
 ## v9.1.0-dev
+- Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 - [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)

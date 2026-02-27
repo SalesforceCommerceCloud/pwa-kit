@@ -839,12 +839,15 @@ describe('Checkout One Click', () => {
             }
         })
 
-        await waitFor(() => {
-            expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
-        })
-
-        // Add address
-        await user.click(screen.getByText(/add new address/i))
+        // In one-click checkout for registered customers, the preferred address is
+        // auto-selected and the step may auto-advance to summary view. If it did,
+        // reopen the Shipping Address step to access the "Add New Address" button.
+        const reopenBtn = await screen
+            .findByRole('button', {name: /edit shipping address/i})
+            .catch(() => null)
+        if (reopenBtn) {
+            await user.click(reopenBtn)
+        }
 
         // Wait for the shipping address section to show a name (either address)
         await waitFor(() => {
