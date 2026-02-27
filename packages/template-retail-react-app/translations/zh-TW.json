@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "取消"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "透過您的個人購物助理，更聰明地發現、比較與購物。"
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "詢問購物助理"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "清除所有篩選條件"
   },
