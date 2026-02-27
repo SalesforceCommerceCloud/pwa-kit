@@ -7,10 +7,8 @@
  */
 /* istanbul ignore file */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const promisify = require('util').promisify
 const fs = require('fs')
 const fsPromises = require('fs').promises
-const rimraf = promisify(require('rimraf'))
 const path = require('path')
 const replace = require('replace-in-file')
 const packlist = require('npm-packlist')
@@ -55,7 +53,7 @@ const main = async () => {
     console.log('Preparing dist...')
     // Remove the dist/package.json so we don't end up including more files in
     // the package.
-    await rimraf(`${DEST_DIR}/package.json`)
+    await fsPromises.rm(`${DEST_DIR}/package.json`, {force: true})
 
     try {
         // Get a list of files from the `npm pack --dry-run` command.
