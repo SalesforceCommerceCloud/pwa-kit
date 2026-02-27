@@ -81,7 +81,10 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    isPickupShipment,
+    groupShipmentsByDeliveryOption
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
@@ -378,7 +381,7 @@ const Cart = () => {
             }
 
             // Don't assign methods until at least one delivery shipment has an address
-            const deliveryShipments = basket.shipments?.filter((s) => !isPickupShipment(s)) || []
+            const {deliveryShipments} = groupShipmentsByDeliveryOption(basket)
             const hasDeliveryWithAddress = deliveryShipments.some(
                 (s) => s.shippingAddress?.address1
             )
