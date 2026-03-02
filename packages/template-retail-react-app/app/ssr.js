@@ -40,11 +40,12 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3003,
+    port: 3000,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
+    // TODO: remove this and document instead in the release docs
     protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
 
     // SSL file path for HTTPS development
@@ -55,14 +56,14 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: true,
+    useSLASPrivateClient: false,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
     // applySLASPrivateClientToEndpoints:
-    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+    //    /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -360,7 +361,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        // TODO: Used to load icons
                         '*.demandware.net',
                         '*.adyen.com'
                     ],
@@ -372,8 +372,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         '*.google.com',
-                        // TODO: Used to load a valid sfp.js
-                        '*.demandware.net',
+                        '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
                         'places.googleapis.com'
                     ],
@@ -387,9 +386,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // Payment gateways
-                        '*.adyen.com',
-                        // TODO: Used to load metadata
-                        '*.demandware.net',
+                        '*.demandware.net', // Used to load a valid payment scripts in test environment
                         '*.adyen.com',
                         '*.google.com'
                     ],
@@ -400,8 +397,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com',
-                        '*.adyen.com'
+                        '*.google.com'
                     ]
                 }
             }

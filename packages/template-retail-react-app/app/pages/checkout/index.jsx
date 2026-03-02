@@ -132,7 +132,7 @@ const Checkout = () => {
             if (sfPaymentsEnabled) {
                 order = await sfPaymentsSheetRef.current.confirmPayment()
             } else {
-                order = doCreateOrder()
+                order = await doCreateOrder()
             }
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
