@@ -96,7 +96,7 @@ export const useSFPayments = () => {
 
 /**
  * Custom hook to check if Salesforce Payments is enabled
- * //?? true means: if the config is missing, default to "don't block it"
+ * ?? true means: if the config is missing, default to "don't block it"
  * and let the API decide. The local config only matters when someone explicitly sets it to false.
  * @returns {boolean} True if Salesforce Payments is enabled, false otherwise
  */

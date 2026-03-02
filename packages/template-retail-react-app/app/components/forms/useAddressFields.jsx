@@ -299,7 +299,7 @@ export default function useAddressFields({
             rules: {
                 required:
                     countryCode === 'CA'
-                        ? 'Please select your province.'
+                        ? 'Please select your province.' // FYI we won't translate this
                         : countryCode === 'US'
                         ? formatMessage({
                               defaultMessage: 'Please select your state.',
