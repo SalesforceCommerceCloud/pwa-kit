@@ -1291,3 +1291,95 @@ describe('Salesforce Payments Integration', () => {
         )
     })
 })
+
+describe('Checkout error display and submitOrder', () => {
+    test('place order calls create order and shows Place Order button (non-SF Payments)', async () => {
+        let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+        currentBasket.customerInfo.email = 'customer@test.com'
+        currentBasket.shipments[0].shippingAddress = {
+            address1: '123 Main St',
+            city: 'Tampa',
+            countryCode: 'US',
+            firstName: 'Test',
+            fullName: 'Test McTester',
+            id: 'addr1',
+            lastName: 'McTester',
+            phone: '(727) 555-1234',
+            postalCode: '33712',
+            stateCode: 'FL'
+        }
+        currentBasket.billingAddress = currentBasket.shipments[0].shippingAddress
+        currentBasket.paymentInstruments = [
+            {
+                amount: 0,
+                paymentCard: {cardType: 'Visa', numberLastDigits: '1111'},
+                paymentInstrumentId: 'pi1',
+                paymentMethodId: 'CREDIT_CARD'
+            }
+        ]
+
+        let orderPostCalled = false
+        global.server.use(
+            rest.post('*/orders', (req, res, ctx) => {
+                orderPostCalled = true
+                return res(
+                    ctx.json({
+                        ...currentBasket,
+                        ...scapiOrderResponse,
+                        status: 'created'
+                    })
+                )
+            }),
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(ctx.json({baskets: [currentBasket], total: 1}))
+            })
+        )
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout />, {
+            wrapperProps: {
+                bypassAuth: true,
+                isGuest: false,
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+
+        const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn')
+        await user.click(placeOrderBtn)
+
+        await waitFor(() => {
+            expect(orderPostCalled).toBe(true)
+        })
+        expect(
+            screen.queryByText(/An unexpected error occurred during checkout/i)
+        ).not.toBeInTheDocument()
+    })
+})
+
+describe('CheckoutContainer with basket and modal', () => {
+    test('renders checkout with Order Summary and basket productItems for modal', async () => {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        renderWithProviders(<WrappedCheckout />, {
+            wrapperProps: {
+                bypassAuth: true,
+                isGuest: false,
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+
+        expect(screen.getByTestId('sf-order-summary')).toBeInTheDocument()
+    })
+})
