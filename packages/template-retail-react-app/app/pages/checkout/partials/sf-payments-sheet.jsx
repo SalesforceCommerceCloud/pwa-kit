@@ -522,16 +522,6 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         () => transformPaymentMethodReferences(customer, paymentConfig),
         [customer, paymentConfig]
     )
-    // Stable key so we only re-init when SPM list actually changes.
-    const savedPaymentMethodsKey = useMemo(
-        () =>
-            (savedPaymentMethods ?? [])
-                .map((pm) => pm?.gatewayTokenId)
-                .filter(Boolean)
-                .sort()
-                .join(','),
-        [savedPaymentMethods]
-    )
 
     useEffect(() => {
         // Mount SFP only when all required data and DOM are ready; otherwise skip or wait for a later run.
@@ -599,14 +589,15 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
+        // Omit savedPaymentMethodsKey: init once with current SPM; re-initing when SPM list changes
+        // causes Stripe/Adyen to complain.
     }, [
         isCustomerDataLoading,
         sfp,
         metadata,
         containerElementRef.current,
         paymentConfig,
-        cardCaptureAutomatic,
-        savedPaymentMethodsKey
+        cardCaptureAutomatic
     ])
 
     useEffect(() => {
