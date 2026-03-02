@@ -7,7 +7,6 @@
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
-    ShopperBasketsV2,
     ShopperConfigurations,
     ShopperContexts,
     ShopperCustomers,

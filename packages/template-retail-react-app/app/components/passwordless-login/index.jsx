@@ -20,6 +20,7 @@ const PasswordlessLogin = ({
     handlePasswordlessLoginClick,
     isSocialEnabled = false,
     idps = [],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setLoginType: _setLoginType = noop
 }) => {
     const [showPasswordView, setShowPasswordView] = useState(false)

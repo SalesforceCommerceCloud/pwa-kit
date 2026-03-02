@@ -111,6 +111,7 @@ const defaultProps = {
 // TODO: Fix import resolution issues causing "Element type is invalid" errors in Jest
 // These tests fail due to absolute import paths not resolving correctly in the test environment
 // The component imports correctly but dependencies resolve to undefined during render
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('SelectBonusProductsCard', () => {
     test('renders with selection counter by default', () => {
         renderWithProviders(<SelectBonusProductsCard {...defaultProps} />)

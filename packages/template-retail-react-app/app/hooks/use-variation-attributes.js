@@ -100,6 +100,7 @@ export const useVariationAttributes = (
     isProductPartOfSet = false,
     isProductPartOfBundle = false,
     controlledVariationValues = null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onVariationChange = null
 ) => {
     const {variationAttributes = []} = product

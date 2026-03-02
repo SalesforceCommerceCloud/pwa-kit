@@ -14,10 +14,10 @@ export {
     useTaxesFromBasket as useTaxesFromBasketV2,
     ShopperBasketsMutations as ShopperBasketsV2Mutations,
     useShopperBasketsMutation as useShopperBasketsV2Mutation,
-    useShopperBasketsMutationHelper as useShopperBasketsV2MutationHelper,
+    useShopperBasketsMutationHelper as useShopperBasketsV2MutationHelper
 } from './ShopperBasketsV2'
 // Only needed if consumers want to type-annotate variables with it.
-export type { ShopperBasketsMutation as ShopperBasketsV2Mutation } from './ShopperBasketsV2'
+export type {ShopperBasketsMutation as ShopperBasketsV2Mutation} from './ShopperBasketsV2'
 
 export * from './ShopperContexts'
 export * from './ShopperCustomers'

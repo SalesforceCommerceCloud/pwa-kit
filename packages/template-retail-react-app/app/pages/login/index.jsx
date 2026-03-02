@@ -45,7 +45,8 @@ const LOGIN_ERROR_MESSAGE = defineMessage({
 const LOGIN_VIEW = 'login'
 const EMAIL_VIEW = 'email'
 
-const Login = ({initialView = LOGIN_VIEW}) => {
+// eslint-disable-next-line no-empty-pattern
+const Login = ({}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const form = useForm()

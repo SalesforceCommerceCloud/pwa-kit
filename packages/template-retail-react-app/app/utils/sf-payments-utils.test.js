@@ -20,8 +20,6 @@ import {
     getExpressPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 
-import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
-
 describe('sf-payments-utils', () => {
     describe('getSFPaymentsInstrument', () => {
         test('returns undefined when basketOrOrder is undefined', () => {

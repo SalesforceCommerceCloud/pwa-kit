@@ -186,7 +186,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
     return {
-        useCurrentCustomer: (expand) => {
+        useCurrentCustomer: () => {
             const query = mockUseCustomer()
             const data = query.data
                 ? {...query.data, customerId: 'customer123', isRegistered: true, isGuest: false}

@@ -140,6 +140,7 @@ test('Renders login modal by default', async () => {
 
 // TODO: Skipping this test because our jest version seems to too old and is run into issues with react-hooks-form
 // when trying to run jest.spyOn on useForm hook. Need to bump version for jest.
+/* eslint-disable jest/no-disabled-tests */
 test.skip('Renders check email modal on email mode', async () => {
     // Store the original useForm function
     const originalUseForm = ReactHookForm.useForm
@@ -171,6 +172,7 @@ test.skip('Renders check email modal on email mode', async () => {
     })
     mockUseForm.mockRestore()
 })
+/* eslint-enable jest/no-disabled-tests */
 
 test('allows regular login via Enter key in password mode', async () => {
     const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)

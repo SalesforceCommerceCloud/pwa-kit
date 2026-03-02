@@ -328,6 +328,7 @@ describe('Rendering tests', function () {
 })
 
 // TODO: Investigate failures in Orphaned Bonus Products tests and re-enable
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('Orphaned Bonus Products', function () {
     test('renders orphaned bonus products (missing bonusDiscountLineItemId) as regular cart items', async () => {
         // Create a mock basket with an orphaned bonus product (bonusProductLineItem: true but no bonusDiscountLineItemId)
