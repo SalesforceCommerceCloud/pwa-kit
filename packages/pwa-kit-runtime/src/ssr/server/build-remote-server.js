@@ -984,7 +984,10 @@ export const RemoteServerFactory = {
                         const cookieHeader = incomingRequest.headers.cookie
                         if (cookieHeader) {
                             const cookies = cookie.parse(cookieHeader)
-                            const siteId = options.mobify?.app?.commerceAPI?.parameters?.siteId
+                            // Prefer per-request siteId from header, fall back to static config
+                            const siteId =
+                                incomingRequest.headers['x-site-id'] ||
+                                options.mobify?.app?.commerceAPI?.parameters?.siteId
                             if (siteId) {
                                 const site = siteId.trim()
 

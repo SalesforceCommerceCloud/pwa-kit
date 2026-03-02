@@ -524,12 +524,69 @@ describe('HttpOnly session cookies', () => {
             const response = await request(app)
                 .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
                 .set('Cookie', 'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token')
+                .set('x-site-id', 'testsite')
 
             expect(response.status).toBe(200)
             expect(response.body.success).toBe(true)
             expect(capturedAuthHeader).toBe('Bearer mock-access-token')
             expect(capturedRefreshToken).toBe('mock-refresh-token')
             expect(response.headers['set-cookie']).toBeUndefined()
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
+
+    test('x-site-id header takes precedence over static config siteId for logout endpoint', async () => {
+        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+
+        let capturedAuthHeader
+        let capturedRefreshToken
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
+            capturedAuthHeader = req.headers.authorization
+            capturedRefreshToken = req.query.refresh_token
+            res.status(200).json({success: true})
+        })
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const app = mockExpress()
+            // Static config has siteId 'default-site', but x-site-id header will be 'othersite'
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id',
+                                siteId: 'default-site'
+                            }
+                        }
+                    }
+                }
+            })
+
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+            // Cookies are keyed to 'othersite', and x-site-id header says 'othersite'
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
+                .set(
+                    'Cookie',
+                    'cc-at_othersite=other-access-token; cc-nx_othersite=other-refresh-token'
+                )
+                .set('x-site-id', 'othersite')
+
+            expect(response.status).toBe(200)
+            expect(capturedAuthHeader).toBe('Bearer other-access-token')
+            expect(capturedRefreshToken).toBe('other-refresh-token')
         } finally {
             mockSlasServerInstance.close()
         }

@@ -68,7 +68,9 @@ function getTokenClaims(accessToken) {
  * @private
  */
 export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
-    const siteId = options.mobify?.app?.commerceAPI?.parameters?.siteId
+    // Prefer per-request siteId from header, fall back to static config
+    const siteId =
+        req.headers?.['x-site-id'] || options.mobify?.app?.commerceAPI?.parameters?.siteId
     if (!siteId || typeof siteId !== 'string' || siteId.trim() === '') {
         throw new Error(
             'HttpOnly session cookies are enabled but siteId is missing. ' +

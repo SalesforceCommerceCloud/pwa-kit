@@ -56,9 +56,11 @@ export const applyScapiAuthHeaders = ({
     targetHost
 }) => {
     const url = incomingRequest.url
+    // Prefer per-request siteId from header, fall back to static config
+    const resolvedSiteId = incomingRequest.headers?.['x-site-id'] || siteId
 
     // Skip if: caching proxy, no siteId, not SCAPI domain, or no URL
-    if (caching || !siteId || !isScapiDomain(targetHost) || !url) {
+    if (caching || !resolvedSiteId || !isScapiDomain(targetHost) || !url) {
         return
     }
     // SLAS auth endpoints are handled by the SLAS private client proxy
@@ -71,7 +73,7 @@ export const applyScapiAuthHeaders = ({
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const tokenKey = `cc-at_${siteId.trim()}`
+    const tokenKey = `cc-at_${resolvedSiteId.trim()}`
     const accessToken = cookies[tokenKey]
 
     if (accessToken) {

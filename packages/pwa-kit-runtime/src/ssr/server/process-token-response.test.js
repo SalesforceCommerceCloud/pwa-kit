@@ -314,4 +314,28 @@ describe('applyHttpOnlySessionCookies', () => {
         // No leading/trailing spaces in cookie name
         expect(res.cookies.find((c) => c.includes('cc-at_  mysite'))).toBeUndefined()
     })
+
+    test('x-site-id header overrides static config siteId', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
+        const req = {headers: {'x-site-id': 'headersite'}}
+        applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions('configsite'))
+
+        // Should use 'headersite' from the x-site-id header, not 'configsite' from options
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_headersite='))
+        expect(atCookie).toBeDefined()
+        expect(res.cookies.find((c) => c.includes('cc-at_configsite='))).toBeUndefined()
+    })
+
+    test('falls back to static config siteId when x-site-id header is absent', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
+        const req = {headers: {}}
+        applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions('configsite'))
+
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_configsite='))
+        expect(atCookie).toBeDefined()
+    })
 })

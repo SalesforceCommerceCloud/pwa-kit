@@ -238,4 +238,61 @@ describe('applyScapiAuthHeaders', () => {
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
+
+    it('x-site-id header overrides static siteId param', () => {
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({'cc-at_OtherSite': 'other-access-token'})
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {
+                cookie: 'cc-at_OtherSite=other-access-token',
+                'x-site-id': 'OtherSite'
+            }
+        }
+
+        applyScapiAuthHeaders({
+            proxyRequest,
+            incomingRequest,
+            caching: false,
+            siteId: 'RefArch', // static fallback — should be overridden by x-site-id
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
+        })
+
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer other-access-token'
+        )
+    })
+
+    it('falls back to static siteId when x-site-id header is absent', () => {
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+        }
+
+        applyScapiAuthHeaders({
+            proxyRequest,
+            incomingRequest,
+            caching: false,
+            siteId: 'RefArch',
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
+        })
+
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer test-access-token'
+        )
+    })
 })
