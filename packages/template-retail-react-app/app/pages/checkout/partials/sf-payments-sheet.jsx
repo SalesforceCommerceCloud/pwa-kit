@@ -295,17 +295,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                         ?.clientSecret
             }
 
-            // Read setup_future_usage from backend response, fallback to manual calculation if not available
-            // TODO: The fallback is temporary that's to be removed in next iteration.
-            const setupFutureUsage =
-                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe
-                    ?.setup_future_usage
+            const orderStripeGatewayProperties =
+                orderPaymentInstrument?.paymentReference?.gatewayProperties?.stripe || {}
+            const setupFutureUsage = orderStripeGatewayProperties?.setupFutureUsage
             if (setupFutureUsage) {
                 paymentIntent.setup_future_usage = setupFutureUsage
-            } else if (futureUsageOffSession) {
-                paymentIntent.setup_future_usage = 'off_session'
-            } else if (shouldSavePaymentMethod) {
-                paymentIntent.setup_future_usage = 'on_session'
             }
 
             // Update the redirect return URL to include the related order no
@@ -595,6 +589,8 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
+        // Omit savedPaymentMethodsKey: init once with current SPM; re-initing when SPM list changes
+        // causes Stripe/Adyen to complain.
     }, [
         isCustomerDataLoading,
         sfp,
