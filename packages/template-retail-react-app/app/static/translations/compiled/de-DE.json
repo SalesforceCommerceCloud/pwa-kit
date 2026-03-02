@@ -1543,12 +1543,6 @@
       "value": "E-Mail-Adresse für den Newsletter"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Aktuelle Infos für Sie"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3123,6 +3117,18 @@
     {
       "type": 0,
       "value": "Abbrechen"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Entdecken, vergleichen und mit Ihrem persönlichen Shopping-Assistenten cleverer einkaufen."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Shopping-Assistent fragen"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [
