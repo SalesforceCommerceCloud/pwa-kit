@@ -113,8 +113,7 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: false,
             siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).toHaveBeenCalledWith(
@@ -123,7 +122,7 @@ describe('applyScapiAuthHeaders', () => {
         )
     })
 
-    it('applies Bearer token for SLAS logout endpoint', () => {
+    it('skips all SLAS auth endpoints (handled by SLAS private proxy)', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
 
@@ -140,38 +139,10 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: false,
             siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
-        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
-            'authorization',
-            'Bearer test-access-token'
-        )
-    })
-
-    it('does not apply Bearer token for SLAS token endpoint', () => {
-        utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
-
-        const proxyRequest = {
-            setHeader: jest.fn()
-        }
-        const incomingRequest = {
-            url: '/shopper/auth/v1/oauth2/token',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
-        }
-
-        applyScapiAuthHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
-        })
-
-        // Should not set authorization header for token endpoint (uses Basic Auth)
+        // SLAS auth endpoints are handled by the SLAS private client proxy
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
@@ -192,8 +163,7 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: true,
             siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         // Caching proxies don't use auth
@@ -217,8 +187,7 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: false,
             siteId: null,
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
@@ -241,8 +210,7 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: false,
             siteId: 'RefArch',
-            targetHost: 'external-api.example.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'external-api.example.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
@@ -265,8 +233,7 @@ describe('applyScapiAuthHeaders', () => {
             incomingRequest,
             caching: false,
             siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com',
-            slasEndpointsRequiringAccessToken: /\/oauth2\/logout/
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
+import cookie from 'cookie'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -399,13 +400,7 @@ export const RemoteServerFactory = {
      */
     _configureProxyConfigs(options) {
         const siteId = options.siteId || null
-        const slasEndpointsRequiringAccessToken = options.slasEndpointsRequiringAccessToken
-        configureProxyConfigs(
-            options.appHostname,
-            options.protocol,
-            siteId,
-            slasEndpointsRequiringAccessToken
-        )
+        configureProxyConfigs(options.appHostname, options.protocol, siteId)
     },
 
     /**
@@ -982,6 +977,34 @@ export const RemoteServerFactory = {
                         // SLAS logout (/oauth2/logout), use the Authorization header for a different
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    } else if (
+                        incomingRequest.path?.match(options.slasEndpointsRequiringAccessToken)
+                    ) {
+                        // Inject tokens from HttpOnly cookies for endpoints like /oauth2/logout
+                        const cookieHeader = incomingRequest.headers.cookie
+                        if (cookieHeader) {
+                            const cookies = cookie.parse(cookieHeader)
+                            const siteId = options.mobify?.app?.commerceAPI?.parameters?.siteId
+                            if (siteId) {
+                                const site = siteId.trim()
+
+                                // Inject Bearer token from access token cookie
+                                const accessToken = cookies[`cc-at_${site}`]
+                                if (accessToken) {
+                                    proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
+                                }
+
+                                // Inject refresh_token into query string from HttpOnly cookie
+                                // Try registered user cookie first, then guest
+                                const refreshToken =
+                                    cookies[`cc-nx_${site}`] || cookies[`cc-nx-g_${site}`]
+                                if (refreshToken) {
+                                    const url = new URL(proxyRequest.path, 'http://localhost')
+                                    url.searchParams.set('refresh_token', refreshToken)
+                                    proxyRequest.path = url.pathname + url.search
+                                }
+                            }
+                        }
                     }
 
                     // Allow users to apply additional custom modifications to the proxy request

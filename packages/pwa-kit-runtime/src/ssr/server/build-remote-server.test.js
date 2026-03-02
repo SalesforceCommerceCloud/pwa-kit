@@ -483,11 +483,15 @@ describe('HttpOnly session cookies', () => {
         }
     })
 
-    test('skips non-token endpoints like logout', async () => {
+    test('injects Bearer token and refresh token from HttpOnly cookies for logout endpoint', async () => {
         process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
 
+        let capturedAuthHeader
+        let capturedRefreshToken
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
+            capturedAuthHeader = req.headers.authorization
+            capturedRefreshToken = req.query.refresh_token
             res.status(200).json({success: true})
         })
 
@@ -517,12 +521,14 @@ describe('HttpOnly session cookies', () => {
 
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
-            const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/logout'
-            )
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
+                .set('Cookie', 'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token')
 
             expect(response.status).toBe(200)
             expect(response.body.success).toBe(true)
+            expect(capturedAuthHeader).toBe('Bearer mock-access-token')
+            expect(capturedRefreshToken).toBe('mock-refresh-token')
             expect(response.headers['set-cookie']).toBeUndefined()
         } finally {
             mockSlasServerInstance.close()
