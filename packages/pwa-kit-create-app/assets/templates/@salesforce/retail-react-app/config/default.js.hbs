@@ -158,14 +158,14 @@ module.exports = {
             }
         },
         // Salesforce Payments configuration
-        // To enable, set enabled to true and provide the SDK and metadata URLs for your Commerce Cloud instance.
-        // Example URLs: https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js
-        //               https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json
+        // Set enabled to false to disable Salesforce Payments even if the Commerce Cloud instance supports it.
+        // Example URLs: sdkUrl: 'https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //               metadataUrl: 'https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         sfPayments: {
-            enabled: false,
+            enabled: true,
             sdkUrl: '',
             metadataUrl: ''
-        },
+        },  
         // Google Cloud api config
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY

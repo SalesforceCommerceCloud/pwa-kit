@@ -70,10 +70,13 @@ const SFPaymentsExpressButtons = ({
     const {countryCode: fallbackCountryCode} = useSFPaymentsCountry()
     const {sfp, metadata, startConfirming, endConfirming} = useSFPayments()
 
+    // Fetch payment configuration for the buyer's country. Falls back to 'US' if country
+    // detection hasn't resolved yet; React Query will re-fetch with the correct country once available.
+    // chances of not having a country code is very low with the country hook, so we can default to 'US'
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency: paymentCurrency,
-            countryCode: paymentCountryCode || fallbackCountryCode || 'US' // TODO: remove US when parameter made optional
+            countryCode: paymentCountryCode || fallbackCountryCode || 'US' 
             //,zoneId: "stripeUSTest" //if you need to test with a different zone
         }
     })

@@ -24,8 +24,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const {confirmingBasket} = useSFPayments()
     const {
         data: basketsData,
-        dataUpdatedAt: basketsDataUpdatedAt,
-        isLoading: basketsIsLoading
+        ...restOfQuery
     } = useCustomerBaskets(
         {parameters: {customerId}},
         {
@@ -100,8 +99,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
 
     return {
         data: currentBasket,
-        dataUpdatedAt: basketsDataUpdatedAt,
-        isLoading: basketsIsLoading,
+        ...restOfQuery,
         derivedData: {
             // Only true if a non-temporary basket exists (temporary baskets are filtered out above)
             hasBasket: !!currentBasket,
