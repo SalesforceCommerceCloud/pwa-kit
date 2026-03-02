@@ -17,6 +17,11 @@ const mockFetch = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
     useAppOrigin: () => mockUseAppOrigin()
 }))
+const mockUseMultiSite = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => mockUseMultiSite()
+}))
 
 // Test component that uses the hook
 const TestComponent = ({onHookData}) => {
@@ -60,7 +65,7 @@ describe('useSFPaymentsCountry', () => {
         jest.clearAllMocks()
         global.fetch = mockFetch
         mockUseAppOrigin.mockReturnValue('https://test-origin.com')
-
+        mockUseMultiSite.mockReturnValue({locale: {}})
         // Suppress console.warn for tests
         jest.spyOn(console, 'warn').mockImplementation(() => {})
     })
@@ -474,6 +479,63 @@ describe('useSFPaymentsCountry', () => {
 
             // Should still only have been called once (shared cache)
             expect(mockFetch).toHaveBeenCalledTimes(1)
+        })
+    })
+    describe('locale country fallback', () => {
+        test('falls back to locale country when server detection fails', async () => {
+            mockUseMultiSite.mockReturnValue({locale: {id: 'de-DE'}})
+            mockFetch.mockResolvedValue({ok: false, status: 500})
+
+            renderWithQueryClient(<TestComponent />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('country-code').textContent).toBe('DE')
+            })
+        })
+
+        test('server country takes priority over locale country', async () => {
+            mockUseMultiSite.mockReturnValue({locale: {id: 'de-DE'}})
+            mockFetch.mockResolvedValue({
+                ok: true,
+                json: async () => ({countryCode: 'GB'})
+            })
+
+            renderWithQueryClient(<TestComponent />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('country-code').textContent).toBe('GB')
+            })
+        })
+
+        test('returns null when both server and locale are unavailable', async () => {
+            mockUseMultiSite.mockReturnValue({locale: {}})
+            mockFetch.mockResolvedValue({ok: false, status: 500})
+
+            renderWithQueryClient(<TestComponent />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('country-code').textContent).toBe('null')
+            })
+        })
+
+        test('derives country from various locale formats', async () => {
+            mockFetch.mockResolvedValue({ok: false, status: 500})
+
+            const cases = [
+                {locale: 'fr-FR', expected: 'FR'},
+                {locale: 'ja-JP', expected: 'JP'},
+                {locale: 'zh-CN', expected: 'CN'}
+            ]
+
+            for (const {locale, expected} of cases) {
+                mockUseMultiSite.mockReturnValue({locale: {id: locale}})
+                const {unmount} = renderWithQueryClient(<TestComponent />)
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('country-code').textContent).toBe(expected)
+                })
+                unmount()
+            }
         })
     })
 })

@@ -7,6 +7,7 @@
 
 import {useQuery} from '@tanstack/react-query'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 /**
  * Hook to detect payment country code
@@ -17,6 +18,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
  * const {countryCode, isLoading} = useSFPaymentsCountry()
  */
 export const useSFPaymentsCountry = () => {
+    const {locale} = useMultiSite()
     const appOrigin = useAppOrigin()
 
     const {data: serverCountry, isLoading: serverLoading} = useQuery({
@@ -44,8 +46,11 @@ export const useSFPaymentsCountry = () => {
         }
     })
 
+    // Derive country from locale as fallback (e.g., "de-DE" -> "DE")
+    const localeCountry = locale?.id?.split('-')?.[1] || null
+
     return {
-        countryCode: serverCountry,
+        countryCode: serverCountry || localeCountry,
         isLoading: serverLoading
     }
 }

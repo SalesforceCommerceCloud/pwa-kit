@@ -22,11 +22,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
     const {confirmingBasket} = useSFPayments()
-    const {
-        data: basketsData,
-        dataUpdatedAt: basketsDataUpdatedAt,
-        isLoading: basketsIsLoading
-    } = useCustomerBaskets(
+    const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer
@@ -100,8 +96,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
 
     return {
         data: currentBasket,
-        dataUpdatedAt: basketsDataUpdatedAt,
-        isLoading: basketsIsLoading,
+        ...restOfQuery,
         derivedData: {
             // Only true if a non-temporary basket exists (temporary baskets are filtered out above)
             hasBasket: !!currentBasket,
