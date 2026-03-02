@@ -634,9 +634,9 @@ describe('HttpOnly session cookies', () => {
 
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
-            const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
-            )
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .set('x-site-id', 'testsite')
 
             expect(response.status).toBe(200)
             expect(response.body).not.toHaveProperty('access_token')
@@ -690,9 +690,9 @@ describe('HttpOnly session cookies', () => {
 
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
-            const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
-            )
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .set('x-site-id', 'testsite')
 
             expect(response.status).toBe(500)
             expect(response.body.error).toBe('Internal server error')
@@ -744,9 +744,9 @@ describe('HttpOnly session cookies', () => {
 
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
-            const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/token'
-            )
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/token')
+                .set('x-site-id', 'testsite')
 
             expect(response.status).toBe(200)
             expect(response.body).not.toHaveProperty('access_token')

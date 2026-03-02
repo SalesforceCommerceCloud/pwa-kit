@@ -233,16 +233,6 @@ export const RemoteServerFactory = {
         // Note: HttpOnly session cookies are controlled by the MRT_DISABLE_HTTPONLY_SESSION_COOKIES
         // env var (set by MRT in production, pwa-kit-dev locally). Read directly where needed.
 
-        // Extract siteId from app configuration for SCAPI auth
-        // This will be used to read the correct access token cookie
-        try {
-            const config = getConfig({buildDirectory: options.buildDir})
-            options.siteId = config?.app?.commerceAPI?.parameters?.siteId || null
-        } catch (e) {
-            // Config may not be available yet (e.g., during build), that's okay
-            options.siteId = null
-        }
-
         return options
     },
 
@@ -399,8 +389,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _configureProxyConfigs(options) {
-        const siteId = options.siteId || null
-        configureProxyConfigs(options.appHostname, options.protocol, siteId)
+        configureProxyConfigs(options.appHostname, options.protocol)
     },
 
     /**
@@ -984,10 +973,7 @@ export const RemoteServerFactory = {
                         const cookieHeader = incomingRequest.headers.cookie
                         if (cookieHeader) {
                             const cookies = cookie.parse(cookieHeader)
-                            // Prefer per-request siteId from header, fall back to static config
-                            const siteId =
-                                incomingRequest.headers['x-site-id'] ||
-                                options.mobify?.app?.commerceAPI?.parameters?.siteId
+                            const siteId = incomingRequest.headers['x-site-id']
                             if (siteId) {
                                 const site = siteId.trim()
 

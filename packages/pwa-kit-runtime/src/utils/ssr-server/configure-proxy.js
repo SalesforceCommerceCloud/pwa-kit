@@ -34,7 +34,7 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  *
  * Logic for determining if Bearer token should be applied:
  * 1. Caching proxies never use auth (skip)
- * 2. siteId must be provided (skip if not)
+ * 2. x-site-id header must be present (skip if not)
  * 3. Target must be SCAPI domain (skip if not)
  * 4. SLAS auth endpoints (/shopper/auth/*) are skipped — Bearer injection for SLAS
  *    is handled by the SLAS private client proxy in build-remote-server.js
@@ -45,19 +45,16 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param proxyRequest {http.ClientRequest} the request that will be sent to the target host
  * @param incomingRequest {http.IncomingMessage} the request made to this Express app
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
- * @param siteId {String} the site ID for the current request
  * @param targetHost {String} the target hostname (host+port)
  */
 export const applyScapiAuthHeaders = ({
     proxyRequest,
     incomingRequest,
     caching,
-    siteId,
     targetHost
 }) => {
     const url = incomingRequest.url
-    // Prefer per-request siteId from header, fall back to static config
-    const resolvedSiteId = incomingRequest.headers?.['x-site-id'] || siteId
+    const resolvedSiteId = incomingRequest.headers?.['x-site-id']
 
     // Skip if: caching proxy, no siteId, not SCAPI domain, or no URL
     if (caching || !resolvedSiteId || !isScapiDomain(targetHost) || !url) {
@@ -177,7 +174,6 @@ export const applyProxyRequestHeaders = ({
  * the origin ('http' or 'https', defaults to 'https')
  * @param caching {Boolean} true for a caching proxy, false for a
  * standard proxy.
- * @param siteId {String} the site ID for the current request
  * @returns {middleware} function to pass to expressApp.use()
  */
 export const configureProxy = ({
@@ -186,8 +182,7 @@ export const configureProxy = ({
     targetProtocol,
     targetHost,
     appProtocol = /* istanbul ignore next */ 'https',
-    caching,
-    siteId = null
+    caching
 }) => {
     // This configuration must match the behaviour of the proxying
     // in CloudFront.
@@ -269,7 +264,6 @@ export const configureProxy = ({
                 proxyRequest,
                 incomingRequest,
                 caching,
-                siteId,
                 targetHost
             })
         },
@@ -363,10 +357,9 @@ export const configureProxy = ({
  * to which requests are sent to the Express app)
  * @param {String} appProtocol {String} the protocol to use to make requests to
  * the origin ('http' or 'https', defaults to 'https')
- * @param {String} siteId - the site ID for the current request
  * @private
  */
-export const configureProxyConfigs = (appHostname, appProtocol, siteId = null) => {
+export const configureProxyConfigs = (appHostname, appProtocol) => {
     localDevLog('')
     proxyConfigs.forEach((config) => {
         localDevLog(
@@ -378,8 +371,7 @@ export const configureProxyConfigs = (appHostname, appProtocol, siteId = null) =
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: false,
-            siteId
+            caching: false
         })
         config.cachingProxy = configureProxy({
             proxyPath: config.cachingPath,
@@ -387,8 +379,7 @@ export const configureProxyConfigs = (appHostname, appProtocol, siteId = null) =
             targetHost: config.host,
             appProtocol,
             appHostname,
-            caching: true,
-            siteId: null // No auth for caching proxy
+            caching: true
         })
     })
     localDevLog('')

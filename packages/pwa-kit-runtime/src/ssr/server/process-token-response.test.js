@@ -24,16 +24,20 @@ function makeJWT(payload) {
     return `${header}.${payloadPart}.sig`
 }
 
-function makeOptions(siteId = 'testsite') {
+function makeOptions() {
     return {
         mobify: {
             app: {
                 commerceAPI: {
-                    parameters: {siteId}
+                    parameters: {}
                 }
             }
         }
     }
+}
+
+function makeReq(siteId = 'testsite') {
+    return {headers: {'x-site-id': siteId}}
 }
 
 function makeRes() {
@@ -127,18 +131,20 @@ describe('applyHttpOnlySessionCookies', () => {
         jest.clearAllMocks()
     })
 
-    test('throws when siteId is missing', () => {
+    test('throws when x-site-id header is missing', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'x'})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, {mobify: {}})).toThrow(
+        const req = {headers: {}}
+        expect(() => applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions())).toThrow(
             /siteId is missing/
         )
     })
 
-    test('throws when siteId is empty string', () => {
+    test('throws when x-site-id header is empty string', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'x'})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  '))).toThrow(
+        const req = makeReq('  ')
+        expect(() => applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions())).toThrow(
             /siteId is missing/
         )
     })
@@ -146,7 +152,7 @@ describe('applyHttpOnlySessionCookies', () => {
     test('returns buffer unchanged for non-JSON response', () => {
         const res = makeRes()
         const buf = Buffer.from('not json', 'utf8')
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
         expect(result).toBe(buf)
         expect(res.append).not.toHaveBeenCalled()
     })
@@ -166,7 +172,7 @@ describe('applyHttpOnlySessionCookies', () => {
             expires_in: 1800,
             customer_id: 'cust123'
         })
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
 
         // cc-at: access token (HttpOnly)
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
@@ -228,7 +234,7 @@ describe('applyHttpOnlySessionCookies', () => {
             refresh_token: 'refresh-value',
             expires_in: 1800
         })
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
 
         // cc-at (HttpOnly)
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
@@ -269,7 +275,7 @@ describe('applyHttpOnlySessionCookies', () => {
             refresh_token: 'refresh-value',
             expires_in: 1800
         })
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
 
         expect(res.cookies.find((c) => c.includes('uido_testsite'))).toBeUndefined()
     })
@@ -277,7 +283,7 @@ describe('applyHttpOnlySessionCookies', () => {
     test('throws when access token JWT is invalid', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'not-a-jwt', expires_in: 1800})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())).toThrow(
+        expect(() => applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())).toThrow(
             /Failed to decode access token JWT/
         )
     })
@@ -286,7 +292,7 @@ describe('applyHttpOnlySessionCookies', () => {
         const res = makeRes()
         const accessToken = makeJWT({iat: 5000, exp: 6800, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken})
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
 
         const expCookie = res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
         const parsed = parseCookie(expCookie)
@@ -296,18 +302,18 @@ describe('applyHttpOnlySessionCookies', () => {
     test('handles response with no tokens (no cookies set, body returned stripped)', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({expires_in: 1800, other_field: 'value'})
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = applyHttpOnlySessionCookies(buf, {}, makeReq(), res, makeOptions())
         const body = JSON.parse(result.toString('utf8'))
 
         expect(res.cookies).toHaveLength(0)
         expect(body.other_field).toBe('value')
     })
 
-    test('trims siteId and uses trimmed value in cookie names', () => {
+    test('trims x-site-id and uses trimmed value in cookie names', () => {
         const res = makeRes()
         const accessToken = makeJWT({iat: 1000, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  mysite  '))
+        applyHttpOnlySessionCookies(buf, {}, makeReq('  mysite  '), res, makeOptions())
 
         const atCookie = res.cookies.find((c) => c.includes('cc-at_mysite='))
         expect(atCookie).toBeDefined()
@@ -315,27 +321,13 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(res.cookies.find((c) => c.includes('cc-at_  mysite'))).toBeUndefined()
     })
 
-    test('x-site-id header overrides static config siteId', () => {
+    test('uses x-site-id header to resolve correct cookie names', () => {
         const res = makeRes()
         const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
-        const req = {headers: {'x-site-id': 'headersite'}}
-        applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions('configsite'))
+        applyHttpOnlySessionCookies(buf, {}, makeReq('othersite'), res, makeOptions())
 
-        // Should use 'headersite' from the x-site-id header, not 'configsite' from options
-        const atCookie = res.cookies.find((c) => c.includes('cc-at_headersite='))
-        expect(atCookie).toBeDefined()
-        expect(res.cookies.find((c) => c.includes('cc-at_configsite='))).toBeUndefined()
-    })
-
-    test('falls back to static config siteId when x-site-id header is absent', () => {
-        const res = makeRes()
-        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
-        const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
-        const req = {headers: {}}
-        applyHttpOnlySessionCookies(buf, {}, req, res, makeOptions('configsite'))
-
-        const atCookie = res.cookies.find((c) => c.includes('cc-at_configsite='))
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_othersite='))
         expect(atCookie).toBeDefined()
     })
 })

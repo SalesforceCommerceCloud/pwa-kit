@@ -105,14 +105,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
         applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -131,14 +133,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/auth/v1/oauth2/logout',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
         applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -155,14 +159,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
         applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: true,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -170,7 +176,7 @@ describe('applyScapiAuthHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('does not apply Bearer token when siteId is not provided', () => {
+    it('does not apply Bearer token when x-site-id header is missing', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({})
 
@@ -186,7 +192,6 @@ describe('applyScapiAuthHeaders', () => {
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: null,
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -202,14 +207,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/api/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
         applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'external-api.example.com'
         })
 
@@ -225,21 +232,20 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {}
+            headers: {'x-site-id': 'RefArch'}
         }
 
         applyScapiAuthHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('x-site-id header overrides static siteId param', () => {
+    it('uses x-site-id header to resolve correct cookie', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_OtherSite': 'other-access-token'})
 
@@ -259,40 +265,12 @@ describe('applyScapiAuthHeaders', () => {
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch', // static fallback — should be overridden by x-site-id
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).toHaveBeenCalledWith(
             'authorization',
             'Bearer other-access-token'
-        )
-    })
-
-    it('falls back to static siteId when x-site-id header is absent', () => {
-        utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
-
-        const proxyRequest = {
-            setHeader: jest.fn(),
-            removeHeader: jest.fn()
-        }
-        const incomingRequest = {
-            url: '/shopper/products/v1/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
-        }
-
-        applyScapiAuthHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com'
-        })
-
-        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
-            'authorization',
-            'Bearer test-access-token'
         )
     })
 })
