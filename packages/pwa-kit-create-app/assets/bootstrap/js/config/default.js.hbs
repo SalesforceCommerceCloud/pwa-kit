@@ -157,6 +157,15 @@ module.exports = {
                 groupBonusProductsWithQualifyingProduct: true
             }
         },
+        // Salesforce Payments configuration
+        // Set enabled to false to disable Salesforce Payments even if the Commerce Cloud instance supports it.
+        // Example URLs: sdkUrl: 'https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //               metadataUrl: 'https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        sfPayments: {
+            enabled: true,
+            sdkUrl: '',
+            metadataUrl: ''
+        },    
         // Google Cloud api config
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
