@@ -36,7 +36,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
                     aria-label={intl.formatMessage(msg.ariaLabelListPriceWithRange, {
                         listPrice: listPriceText || ''
                     })}
-                    color="gray.600"
+                    color="gray.700"
                 >
                     {listPriceText}
                 </Text>
@@ -47,7 +47,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
                     aria-label={intl.formatMessage(msg.ariaLabelListPrice, {
                         listPrice: listPriceText || ''
                     })}
-                    color="gray.600"
+                    color="gray.700"
                 >
                     {listPriceText}
                 </Text>

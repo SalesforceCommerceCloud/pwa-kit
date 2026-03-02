@@ -1836,7 +1836,7 @@
     "defaultMessage": "Continue to Payment"
   },
   "shipping_options.error.no_shipping_methods": {
-    "defaultMessage": "No shipping methods are available for this address. Please enter a different address."
+    "defaultMessage": "Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance."
   },
   "shipping_options.free": {
     "defaultMessage": "Free"
