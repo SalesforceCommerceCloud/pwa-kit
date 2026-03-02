@@ -4378,7 +4378,7 @@
   "shipping_options.error.no_shipping_methods": [
     {
       "type": 0,
-      "value": "No shipping methods are available for this address. Please enter a different address."
+      "value": "Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance."
     }
   ],
   "shipping_options.free": [
