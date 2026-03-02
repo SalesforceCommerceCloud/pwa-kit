@@ -10,8 +10,6 @@ import * as commerceSdk from '@salesforce/commerce-sdk-react'
 import * as checkoutContext from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal', () => ({
     AddToCartModalProvider: ({children}) => children
@@ -42,13 +40,8 @@ const mockShippingMethods = {
     ]
 }
 
-// Stable references for hook return values to prevent infinite re-render loops.
-// The component's useEffect depends on these; returning a new object each render
-// would destabilize the dependency array.
+// Stable reference for hook return value; tests can reassign for promotions etc.
 let mockShippingMethodsReturnValue = {data: mockShippingMethods}
-let mockCurrentCustomerReturnValue = {data: {customerId: 'test-customer-id', isRegistered: true}}
-let mockCurrentBasketReturnValue = {}
-let mockCheckoutReturnValue = {}
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -242,23 +235,19 @@ describe('ShippingOptions Component', () => {
 
     describe('for guest users', () => {
         beforeEach(() => {
-            mockCurrentCustomerReturnValue = {
-                data: {customerId: null, isRegistered: false}
+            mockCustomerData = {customerId: null, isRegistered: false}
+            mockBasketData = {
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingAddress: {address1: '123 Main St', city: 'Test City'},
+                        shippingMethod: null
+                    }
+                ],
+                shippingItems: [{price: 5.99, priceAdjustments: []}]
             }
-            mockCurrentBasketReturnValue = {
-                data: {
-                    basketId: 'test-basket-id',
-                    shipments: [
-                        {
-                            shipmentId: 'me',
-                            shippingAddress: {address1: '123 Main St', city: 'Test City'},
-                            shippingMethod: null
-                        }
-                    ],
-                    shippingItems: [{price: 5.99, priceAdjustments: []}]
-                },
-                derivedData: {hasBasket: true, totalItems: 1, totalShippingCost: 5.99}
-            }
+            mockBasketDerivedData = {hasBasket: true, totalItems: 1, totalShippingCost: 5.99}
         })
 
         test('displays shipping method options with prices and allows selection', async () => {
@@ -878,45 +867,41 @@ describe('ShippingOptions Component', () => {
                     {id: 'std', name: 'Standard', description: '4-5 days', price: 0}
                 ]
             }
-            mockCurrentCustomerReturnValue = {
-                data: {customerId: 'test-customer-id', isRegistered: false}
-            }
-            mockCurrentBasketReturnValue = {
-                data: {
-                    basketId: 'test-basket-id',
-                    shipments: [
-                        {
-                            shipmentId: 'ship1',
-                            shippingAddress: {
-                                firstName: 'Oscar',
-                                lastName: 'Robertson',
-                                address1: '333 South St',
-                                city: 'West Lafayette',
-                                stateCode: 'IN',
-                                postalCode: '98103'
-                            },
-                            shippingMethod: {id: 'std', name: 'Standard'}
+            mockCustomerData = {customerId: 'test-customer-id', isRegistered: false}
+            mockBasketData = {
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'ship1',
+                        shippingAddress: {
+                            firstName: 'Oscar',
+                            lastName: 'Robertson',
+                            address1: '333 South St',
+                            city: 'West Lafayette',
+                            stateCode: 'IN',
+                            postalCode: '98103'
                         },
-                        {
-                            shipmentId: 'ship2',
-                            shippingAddress: {
-                                firstName: 'Lee',
-                                lastName: 'Robertson',
-                                address1: '158 South St',
-                                city: 'West Lafayette',
-                                stateCode: 'IN',
-                                postalCode: '98103'
-                            },
-                            shippingMethod: {id: 'std', name: 'Standard'}
-                        }
-                    ],
-                    shippingItems: [
-                        {shipmentId: 'ship1', price: 0},
-                        {shipmentId: 'ship2', price: 0}
-                    ]
-                },
-                derivedData: {hasBasket: true, totalItems: 2, totalShippingCost: 0}
+                        shippingMethod: {id: 'std', name: 'Standard'}
+                    },
+                    {
+                        shipmentId: 'ship2',
+                        shippingAddress: {
+                            firstName: 'Lee',
+                            lastName: 'Robertson',
+                            address1: '158 South St',
+                            city: 'West Lafayette',
+                            stateCode: 'IN',
+                            postalCode: '98103'
+                        },
+                        shippingMethod: {id: 'std', name: 'Standard'}
+                    }
+                ],
+                shippingItems: [
+                    {shipmentId: 'ship1', price: 0},
+                    {shipmentId: 'ship2', price: 0}
+                ]
             }
+            mockBasketDerivedData = {hasBasket: true, totalItems: 2, totalShippingCost: 0}
             mockShippingMethodsReturnValue = {data: methods1}
 
             const {renderWithProviders: localRenderWithProviders} = await import(
@@ -1016,30 +1001,26 @@ describe('ShippingOptions Component', () => {
                     }
                 ]
             }
-            mockCurrentCustomerReturnValue = {
-                data: {customerId: null, isRegistered: false}
+            mockCustomerData = {customerId: null, isRegistered: false}
+            mockBasketData = {
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'ship1',
+                        shippingAddress: {
+                            firstName: 'John',
+                            lastName: 'Smith',
+                            address1: '789 Elm Street',
+                            city: 'Portland',
+                            stateCode: 'OR',
+                            postalCode: '97201'
+                        },
+                        shippingMethod: null
+                    }
+                ],
+                shippingItems: [{shipmentId: 'ship1', price: 0}]
             }
-            mockCurrentBasketReturnValue = {
-                data: {
-                    basketId: 'test-basket-id',
-                    shipments: [
-                        {
-                            shipmentId: 'ship1',
-                            shippingAddress: {
-                                firstName: 'John',
-                                lastName: 'Smith',
-                                address1: '789 Elm Street',
-                                city: 'Portland',
-                                stateCode: 'OR',
-                                postalCode: '97201'
-                            },
-                            shippingMethod: null
-                        }
-                    ],
-                    shippingItems: [{shipmentId: 'ship1', price: 0}]
-                },
-                derivedData: {hasBasket: true, totalItems: 1}
-            }
+            mockBasketDerivedData = {hasBasket: true, totalItems: 1}
             mockShippingMethodsReturnValue = {data: methodsWithPromos}
 
             renderWithProviders(<ShippingOptions />)
