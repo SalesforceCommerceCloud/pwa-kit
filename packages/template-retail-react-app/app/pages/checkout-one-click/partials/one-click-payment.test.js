@@ -12,7 +12,10 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
-import {useShopperBasketsV2Mutation as useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
+    useCustomerType
+} from '@salesforce/commerce-sdk-react'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'

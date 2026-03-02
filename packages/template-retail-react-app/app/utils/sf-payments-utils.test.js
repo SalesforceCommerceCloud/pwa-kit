@@ -16,7 +16,6 @@ import {
     findPaymentAccount,
     createPaymentInstrumentBody,
     getGatewayFromPaymentMethod,
-    getSetupFutureUsage,
     transformPaymentMethodReferences,
     getExpressPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
@@ -1301,7 +1300,7 @@ describe('sf-payments-utils', () => {
             })
         })
 
-        test('does not include gatewayProperties when storePaymentMethod is false and futureUsageOffSession is false', () => {
+        test('includes Stripe gateway with empty stripe props when storePaymentMethod is false (no setupFutureUsage)', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = createPaymentInstrumentBody({
@@ -1315,8 +1314,8 @@ describe('sf-payments-utils', () => {
                 paymentMethodSetAccounts
             })
 
-            expect(result.paymentReferenceRequest.gateway).toBeUndefined()
-            expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
+            expect(result.paymentReferenceRequest.gateway).toBe('stripe')
+            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({})
         })
 
         test('does not include shippingPreference when null', () => {
@@ -1546,32 +1545,6 @@ describe('sf-payments-utils', () => {
             )
 
             expect(result).toBeNull()
-        })
-    })
-
-    describe('getSetupFutureUsage', () => {
-        test('returns off_session when futureUsageOffSession is true', () => {
-            const result = getSetupFutureUsage(false, true)
-
-            expect(result).toBe('off_session')
-        })
-
-        test('returns on_session when storePaymentMethod is true and futureUsageOffSession is false', () => {
-            const result = getSetupFutureUsage(true, false)
-
-            expect(result).toBe('on_session')
-        })
-
-        test('returns null when both are false', () => {
-            const result = getSetupFutureUsage(false, false)
-
-            expect(result).toBeNull()
-        })
-
-        test('returns off_session when both are true (futureUsageOffSession takes precedence)', () => {
-            const result = getSetupFutureUsage(true, true)
-
-            expect(result).toBe('off_session')
         })
     })
 
@@ -1954,10 +1927,8 @@ describe('sf-payments-utils', () => {
 
     describe('getExpressPaymentMethodType', () => {
         test('returns card for googlepay with Stripe gateway', () => {
-            const paymentMethods = [
-                {paymentMethodType: 'googlepay', accountId: 'stripe_express_acct'}
-            ]
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_express_acct'}]
+            const paymentMethods = [{paymentMethodType: 'googlepay', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = getExpressPaymentMethodType(
                 'googlepay',
                 paymentMethods,
@@ -1967,10 +1938,8 @@ describe('sf-payments-utils', () => {
         })
 
         test('returns googlepay for googlepay with Adyen gateway', () => {
-            const paymentMethods = [
-                {paymentMethodType: 'googlepay', accountId: 'adyen_express_acct'}
-            ]
-            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_express_acct'}]
+            const paymentMethods = [{paymentMethodType: 'googlepay', accountId: 'adyen_acct'}]
+            const paymentMethodSetAccounts = [{vendor: 'Adyen', accountId: 'adyen_acct'}]
             const result = getExpressPaymentMethodType(
                 'googlepay',
                 paymentMethods,
@@ -1980,10 +1949,8 @@ describe('sf-payments-utils', () => {
         })
 
         test('returns card for applepay with Stripe gateway', () => {
-            const paymentMethods = [
-                {paymentMethodType: 'applepay', accountId: 'stripe_express_acct'}
-            ]
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_express_acct'}]
+            const paymentMethods = [{paymentMethodType: 'applepay', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = getExpressPaymentMethodType(
                 'applepay',
                 paymentMethods,
@@ -1993,8 +1960,8 @@ describe('sf-payments-utils', () => {
         })
 
         test('returns type unchanged for non-mapped types', () => {
-            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'stripe_acct'}]
-            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'stripe_acct'}]
+            const paymentMethods = [{paymentMethodType: 'paypal', accountId: 'acct_123'}]
+            const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = getExpressPaymentMethodType(
                 'paypal',
                 paymentMethods,
