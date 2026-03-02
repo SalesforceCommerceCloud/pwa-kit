@@ -22,10 +22,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
     const {confirmingBasket} = useSFPayments()
-    const {
-        data: basketsData,
-        ...restOfQuery
-    } = useCustomerBaskets(
+    const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer

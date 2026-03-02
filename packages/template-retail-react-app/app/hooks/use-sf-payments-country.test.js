@@ -485,52 +485,52 @@ describe('useSFPaymentsCountry', () => {
         test('falls back to locale country when server detection fails', async () => {
             mockUseMultiSite.mockReturnValue({locale: {id: 'de-DE'}})
             mockFetch.mockResolvedValue({ok: false, status: 500})
-    
+
             renderWithQueryClient(<TestComponent />)
-    
+
             await waitFor(() => {
                 expect(screen.getByTestId('country-code').textContent).toBe('DE')
             })
         })
-    
+
         test('server country takes priority over locale country', async () => {
             mockUseMultiSite.mockReturnValue({locale: {id: 'de-DE'}})
             mockFetch.mockResolvedValue({
                 ok: true,
                 json: async () => ({countryCode: 'GB'})
             })
-    
+
             renderWithQueryClient(<TestComponent />)
-    
+
             await waitFor(() => {
                 expect(screen.getByTestId('country-code').textContent).toBe('GB')
             })
         })
-    
+
         test('returns null when both server and locale are unavailable', async () => {
             mockUseMultiSite.mockReturnValue({locale: {}})
             mockFetch.mockResolvedValue({ok: false, status: 500})
-    
+
             renderWithQueryClient(<TestComponent />)
-    
+
             await waitFor(() => {
                 expect(screen.getByTestId('country-code').textContent).toBe('null')
             })
         })
-    
+
         test('derives country from various locale formats', async () => {
             mockFetch.mockResolvedValue({ok: false, status: 500})
-    
+
             const cases = [
                 {locale: 'fr-FR', expected: 'FR'},
                 {locale: 'ja-JP', expected: 'JP'},
                 {locale: 'zh-CN', expected: 'CN'}
             ]
-    
+
             for (const {locale, expected} of cases) {
                 mockUseMultiSite.mockReturnValue({locale: {id: locale}})
                 const {unmount} = renderWithQueryClient(<TestComponent />)
-    
+
                 await waitFor(() => {
                     expect(screen.getByTestId('country-code').textContent).toBe(expected)
                 })

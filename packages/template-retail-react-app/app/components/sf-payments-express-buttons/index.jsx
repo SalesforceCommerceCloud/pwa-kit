@@ -76,7 +76,7 @@ const SFPaymentsExpressButtons = ({
     const {data: paymentConfig} = usePaymentConfiguration({
         parameters: {
             currency: paymentCurrency,
-            countryCode: paymentCountryCode || fallbackCountryCode || 'US' 
+            countryCode: paymentCountryCode || fallbackCountryCode || 'US'
             //,zoneId: "stripeUSTest" //if you need to test with a different zone
         }
     })

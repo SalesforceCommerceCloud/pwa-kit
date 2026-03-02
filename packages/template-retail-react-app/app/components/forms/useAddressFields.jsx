@@ -289,18 +289,23 @@ export default function useAddressFields({
             label: formatMessage(countryCode === 'CA' ? messages.province : messages.state),
             defaultValue: '',
             type: countryCode === 'US' || countryCode === 'CA' ? 'select' : 'text',
-            options: countryCode === 'US' || countryCode === 'CA'
-                ? [{value: '', label: ''}, ...(countryCode === 'CA' ? provinceOptions : stateOptions)]
-                : undefined,
+            options:
+                countryCode === 'US' || countryCode === 'CA'
+                    ? [
+                          {value: '', label: ''},
+                          ...(countryCode === 'CA' ? provinceOptions : stateOptions)
+                      ]
+                    : undefined,
             rules: {
-                required: countryCode === 'CA'
-                    ? 'Please select your province.'
-                    : countryCode === 'US'
+                required:
+                    countryCode === 'CA'
+                        ? 'Please select your province.'
+                        : countryCode === 'US'
                         ? formatMessage({
-                                defaultMessage: 'Please select your state.',
-                                id: 'use_address_fields.error.please_select_your_state_or_province',
-                                description: 'Error message for a blank state (US-specific checkout)'
-                            })
+                              defaultMessage: 'Please select your state.',
+                              id: 'use_address_fields.error.please_select_your_state_or_province',
+                              description: 'Error message for a blank state (US-specific checkout)'
+                          })
                         : false
             },
             error: errors[`${prefix}stateCode`],
@@ -313,13 +318,15 @@ export default function useAddressFields({
             type: 'text',
             autoComplete: 'postal-code',
             rules: {
-                required: countryCode === 'CA'
-                    ? 'Please enter your postal code.'
-                    : countryCode === 'US'
+                required:
+                    countryCode === 'CA'
+                        ? 'Please enter your postal code.'
+                        : countryCode === 'US'
                         ? formatMessage({
                               defaultMessage: 'Please enter your zip code.',
                               id: 'use_address_fields.error.please_enter_your_postal_or_zip',
-                              description: 'Error message for a blank zip code (US-specific checkout)'
+                              description:
+                                  'Error message for a blank zip code (US-specific checkout)'
                           })
                         : formatMessage({
                               defaultMessage: 'Please enter your postal code.',
