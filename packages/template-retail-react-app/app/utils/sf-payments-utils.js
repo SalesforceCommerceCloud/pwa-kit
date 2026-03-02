@@ -200,21 +200,6 @@ export const getGatewayFromPaymentMethod = (
 }
 
 /**
- * Determines the setup_future_usage value for Stripe payment intents based on configuration and user preference.
- * @param {boolean} storePaymentMethod - Whether the user wants to save the payment method
- * @param {boolean} futureUsageOffSession - Whether off-session future usage is enabled in configuration
- * @returns {string|null} 'on_session', 'off_session', or null
- */
-export const getSetupFutureUsage = (storePaymentMethod, futureUsageOffSession) => {
-    if (futureUsageOffSession) {
-        return SETUP_FUTURE_USAGE.OFF_SESSION
-    } else if (storePaymentMethod) {
-        return SETUP_FUTURE_USAGE.ON_SESSION
-    }
-    return null
-}
-
-/**
  * Creates a payment instrument body for Salesforce Payments (for basket or order).
  * @param {Object} params - Parameters for creating payment instrument body
  * @param {number} params.amount - Payment amount
@@ -265,14 +250,16 @@ export const createPaymentInstrumentBody = ({
         }
     }
 
-    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
-        const setupFutureUsage = getSetupFutureUsage(storePaymentMethod, futureUsageOffSession)
-        if (setupFutureUsage) {
-            paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
-            paymentReferenceRequest.gatewayProperties = {
-                stripe: {
-                    setupFutureUsage
-                }
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE) {
+        const setupFutureUsage = storePaymentMethod
+            ? futureUsageOffSession
+                ? SETUP_FUTURE_USAGE.OFF_SESSION
+                : SETUP_FUTURE_USAGE.ON_SESSION
+            : null
+        paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
+        paymentReferenceRequest.gatewayProperties = {
+            stripe: {
+                ...(setupFutureUsage && {setupFutureUsage})
             }
         }
     }
