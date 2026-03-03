@@ -35,6 +35,15 @@
   "account_addresses.title.addresses": {
     "defaultMessage": "地址"
   },
+  "account_creation_notification.body": {
+    "defaultMessage": "我们已根据您的订单信息创建并验证了您的账户。下次结账时，只需输入我们发送的验证码即可登录，无需密码。"
+  },
+  "account_creation_notification.title": {
+    "defaultMessage": "账户已创建"
+  },
+  "account_creation_notification.verified": {
+    "defaultMessage": "已验证"
+  },
   "account_detail.title.account_details": {
     "defaultMessage": "账户详情"
   },
@@ -162,6 +171,9 @@
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "您现在已登录。"
   },
+  "auth_modal.description.now_signed_in_simple": {
+    "defaultMessage": "您已登录账户。"
+  },
   "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "您的电子邮件或密码有问题。重试"
   },
@@ -231,11 +243,29 @@
   "checkout.button.place_order": {
     "defaultMessage": "下订单"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "请输入账单地址。"
+  },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "无法保存配送地址。"
+  },
+  "checkout.label.user_registration": {
+    "defaultMessage": "创建账户以更快结账"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "结账时发生意外错误。"
   },
+  "checkout.message.user_registration": {
+    "defaultMessage": "您的付款、地址和联系信息将保存至新账户。请使用电子邮件发送的一次性密码 (OTP) 创建账户。创建账户后，可使用「忘记密码」功能设置新密码。"
+  },
   "checkout.title.checkout": {
     "defaultMessage": "结账"
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "保存结账信息供日后使用"
+  },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "保存此支付方式供日后使用"
   },
   "home.title.home": {
     "defaultMessage": "首页"
@@ -294,6 +324,9 @@
   "checkout_confirmation.label.free": {
     "defaultMessage": "免费"
   },
+  "checkout_confirmation.label.shipping.price": {
+    "defaultMessage": "{price}"
+  },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "订单编号"
   },
@@ -331,6 +364,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "我们会尽快向 <b>{email}</b> 发送带有您的确认号码和收据的电子邮件。"
   },
+  "checkout_contact_info.action.change": {
+    "defaultMessage": "更换"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "退出登录"
+  },
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "联系信息"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "隐私政策"
   },
@@ -358,6 +400,9 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "移除"
   },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "下订单"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "检查订单"
   },
@@ -366,6 +411,12 @@
   },
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "信用卡"
+  },
+  "checkout_payment.error.cannot_remove_applied_payment": {
+    "defaultMessage": "无法移除已应用的支付方式。请重试或使用当前支付方式下单。"
+  },
+  "checkout_payment.error.cannot_save_payment": {
+    "defaultMessage": "无法保存支付方式。请重试。"
   },
   "checkout_payment.label.billing_address_form": {
     "defaultMessage": "账单地址表格"
@@ -450,6 +501,15 @@
   },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "以访客身份结账"
+  },
+  "contact_info.button.continue_to_payment": {
+    "defaultMessage": "继续付款"
+  },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "继续填写收货地址"
+  },
+  "contact_info.error.generic_try_again": {
+    "defaultMessage": "发生错误，请重试。"
   },
   "contact_info.button.login": {
     "defaultMessage": "登录"
@@ -1087,6 +1147,36 @@
   "order_summary.label.tax": {
     "defaultMessage": "税项"
   },
+  "order_summary.label.tax_tbd": {
+    "defaultMessage": "待定"
+  },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "取消"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "以访客身份结账"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "重新发送验证码"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "验证码无效或已过期。请点击“重新发送验证码”后重试。"
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "我们已向您的邮箱发送了一次性密码（OTP）。要创建账户并继续结账，请在下方输入{otpLength}位验证码。"
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "要登录您的账户，请输入发送到您邮箱的验证码。"
+  },
+  "otp.message.resend_cooldown": {
+    "defaultMessage": "您可以在 {timer} {timer, plural, one {秒} other {秒}} 后请求新验证码。"
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "请确认是您本人"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "创建账户"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "返回上一页"
   },
@@ -1149,6 +1239,9 @@
   "password_reset_success.toast": {
     "defaultMessage": "密码重置成功"
   },
+  "payment_selection.button.view_all": {
+    "defaultMessage": "查看全部（还有 {count} 个）"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "信用卡"
   },
@@ -1157,6 +1250,27 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "这是一种安全的 SSL 加密支付。"
+  },
+  "pickup_address.bonus_products.title": {
+    "defaultMessage": "赠品"
+  },
+  "pickup_address.button.continue_to_payment": {
+    "defaultMessage": "继续付款"
+  },
+  "pickup_address.button.continue_to_shipping_address": {
+    "defaultMessage": "继续填写收货地址"
+  },
+  "pickup_address.button.show_products": {
+    "defaultMessage": "显示商品"
+  },
+  "pickup_address.message.loading_store_info": {
+    "defaultMessage": "正在加载门店信息…"
+  },
+  "pickup_address.title.pickup_address": {
+    "defaultMessage": "自提地址与信息"
+  },
+  "pickup_address.title.store_information": {
+    "defaultMessage": "门店信息"
   },
   "price_per_item.label.each": {
     "defaultMessage": "每件",
@@ -1367,6 +1481,12 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "全部清除"
   },
+  "shipping_address.action.ship_to_multiple_addresses": {
+    "defaultMessage": "配送到多个地址"
+  },
+  "shipping_address.button.add_new_address": {
+    "defaultMessage": "+ 添加新地址"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "继续并选择送货方式"
   },
@@ -1376,8 +1496,17 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "移除 {address}"
   },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "收货地址"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "送货地址表格"
+  },
+  "shipping_address.summary.multiple_addresses": {
+    "defaultMessage": "您的商品将配送到多个地址。"
+  },
+  "shipping_address.summary.multiple_locations": {
+    "defaultMessage": "您正在向多个地点发货。"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "送货地址"
@@ -1403,14 +1532,65 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "编辑送货地址"
   },
+  "shipping_multi_address.action.ship_to_single_address": {
+    "defaultMessage": "全部发往一个地址"
+  },
+  "shipping_multi_address.add_new_address.aria_label": {
+    "defaultMessage": "为 {productName} 添加新配送地址"
+  },
+  "shipping_multi_address.error.submit_failed": {
+    "defaultMessage": "设置配送时出错。请重试。"
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "{productName} 的产品图片"
+  },
+  "shipping_multi_address.label.note": {
+    "defaultMessage": "备注"
+  },
+  "shipping_multi_address.loading_addresses": {
+    "defaultMessage": "正在加载地址…"
+  },
+  "shipping_multi_address.message.no_delivery_items": {
+    "defaultMessage": "没有需配送的商品。所有商品均为自提。"
+  },
+  "shipping_multi_address.message.pickup_items": {
+    "defaultMessage": "部分商品设为自提，此处不显示。仅配送商品可分配地址。"
+  },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "无可用地址"
+  },
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "产品属性"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "数量"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "您想将此作为礼品发送吗？"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "继续并选择付款"
   },
+  "shipping_options.error.no_shipping_methods": {
+    "defaultMessage": "该地址无可用配送方式。请填写其他地址。"
+  },
+  "shipping_options.label.no_method_selected": {
+    "defaultMessage": "未选择配送方式"
+  },
+  "shipping_options.label.shipment_number": {
+    "defaultMessage": "配送 {index}："
+  },
+  "shipping_options.label.total_shipping": {
+    "defaultMessage": "运费总计"
+  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "送货与礼品选项"
+  },
+  "shipping_options.title.shipping_method": {
+    "defaultMessage": "配送方式"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "取消"
@@ -1429,6 +1609,18 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "如果您没有被自动重定向，请点击<link>此链接</link>以继续。"
+  },
+  "store_display.button.use_recent_store": {
+    "defaultMessage": "使用最近的门店"
+  },
+  "store_display.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "store_display.label.store_contact_info": {
+    "defaultMessage": "门店联系方式"
+  },
+  "store_display.label.store_hours": {
+    "defaultMessage": "营业时间"
   },
   "store_locator.action.find": {
     "defaultMessage": "查找"
@@ -1489,6 +1681,15 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}："
+  },
+  "toggle_card.action.change": {
+    "defaultMessage": "更换"
+  },
+  "toggle_card.action.changePaymentInfo": {
+    "defaultMessage": "更换"
+  },
+  "toggle_card.action.changeShippingOptions": {
+    "defaultMessage": "更换"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "编辑"
@@ -1623,6 +1824,9 @@
   },
   "use_login_fields.error.required_password": {
     "defaultMessage": "请输入您的密码。"
+  },
+  "use_login_fields.error.invalid_email": {
+    "defaultMessage": "请输入有效的电子邮件地址。"
   },
   "use_login_fields.label.email": {
     "defaultMessage": "电子邮件"

@@ -8,6 +8,63 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Kirjaudu ulos"
   },
+  "account.payments.action.retry": {
+    "defaultMessage": "Yritä uudelleen"
+  },
+  "account.payments.badge.default": {
+    "defaultMessage": "Oletus"
+  },
+  "account.payments.checkbox.make_default": {
+    "defaultMessage": "Aseta oletukseksi"
+  },
+  "account.payments.error.payment_method_remove_failed": {
+    "defaultMessage": "Maksutapaa ei voitu poistaa. Yritä uudelleen."
+  },
+  "account.payments.error.payment_method_save_failed": {
+    "defaultMessage": "Maksutapaa ei voitu tallentaa. Yritä uudelleen."
+  },
+  "account.payments.error.set_default_failed": {
+    "defaultMessage": "Maksutapaa ei voitu asettaa oletukseksi. Yritä uudelleen."
+  },
+  "account.payments.heading.payment_methods": {
+    "defaultMessage": "Maksutavat"
+  },
+  "account.payments.info.default_payment_updated": {
+    "defaultMessage": "Maksutapa asetettiin oletukseksi."
+  },
+  "account.payments.info.payment_method_removed": {
+    "defaultMessage": "Maksutapa poistettiin."
+  },
+  "account.payments.info.payment_method_saved": {
+    "defaultMessage": "Uusi maksutapa tallennettiin."
+  },
+  "account.payments.message.error": {
+    "defaultMessage": "Maksutapoja ei voitu ladata. Yritä uudelleen."
+  },
+  "account.payments.message.loading": {
+    "defaultMessage": "Ladataan maksutapoja…"
+  },
+  "account.payments.placeholder.heading": {
+    "defaultMessage": "Ei tallennettuja maksutapoja"
+  },
+  "account.payments.placeholder.text": {
+    "defaultMessage": "Lisää uusi maksutapa maksaaksesi nopeammin."
+  },
+  "account.payments.label.expires": {
+    "defaultMessage": "Vanhentuu {month}/{year}"
+  },
+  "account.payments.modal.title.set_default": {
+    "defaultMessage": "Asetetaanko oletusmaksutapa?"
+  },
+  "account.payments.modal.message.set_default": {
+    "defaultMessage": "{brand} ... {last4} on oletusmaksutapa kassalla."
+  },
+  "account.payments.modal.action.set_default": {
+    "defaultMessage": "Aseta oletukseksi"
+  },
+  "account.payments.modal.action.cancel": {
+    "defaultMessage": "Peruuta"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "Oletusarvoinen"
   },
@@ -34,6 +91,15 @@
   },
   "account_addresses.title.addresses": {
     "defaultMessage": "Osoitteet"
+  },
+  "account_creation_notification.body": {
+    "defaultMessage": "Olemme luoneet ja vahvistaneet tilisi tilauksesi tietojen perusteella. Seuraavalla kerralla kun teet ostoksia, syötä vain lähettämämme koodi kirjautuaksesi — salasanaa ei tarvita."
+  },
+  "account_creation_notification.title": {
+    "defaultMessage": "Tili luotu"
+  },
+  "account_creation_notification.verified": {
+    "defaultMessage": "Vahvistettu"
   },
   "account_detail.title.account_details": {
     "defaultMessage": "Tilin tiedot"
@@ -108,6 +174,9 @@
   "account_order_history.title.order_history": {
     "defaultMessage": "Tilaushistoria"
   },
+  "account_payments.button.add_payment": {
+    "defaultMessage": "Lisää maksutapa"
+  },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Jatka ostoksia"
   },
@@ -160,6 +229,9 @@
     "defaultMessage": "Tarkista sähköpostisi"
   },
   "auth_modal.description.now_signed_in": {
+    "defaultMessage": "Olet nyt kirjautunut sisään."
+  },
+  "auth_modal.description.now_signed_in_simple": {
     "defaultMessage": "Olet nyt kirjautunut sisään."
   },
   "auth_modal.error.incorrect_email_or_password": {
@@ -231,8 +303,26 @@
   "checkout.button.place_order": {
     "defaultMessage": "Tee tilaus"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "Syötä laskutusosoite."
+  },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "Toimitusosoitetta ei voitu tallentaa."
+  },
+  "checkout.label.user_registration": {
+    "defaultMessage": "Luo tili nopeampaa kassaa varten"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "Kassalla tapahtui odottamaton virhe."
+  },
+  "checkout.message.user_registration": {
+    "defaultMessage": "Maksutietosi, osoitteesi ja yhteystietosi tallennetaan uuteen tiliin. Käytä sähköpostitse lähetettyä kertasalasanaa (OTP) tilin luomiseen. Tilin luomisen jälkeen voit asettaa uuden salasanan käyttämällä Salasana unohtunut -toimintoa."
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "Tallenna kassatiedot myöhempää käyttöä varten"
+  },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "Tallenna tämä maksutapa myöhempää käyttöä varten"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Luo tili"
@@ -266,6 +356,9 @@
   },
   "checkout_confirmation.label.free": {
     "defaultMessage": "Veloituksetta"
+  },
+  "checkout_confirmation.label.shipping.price": {
+    "defaultMessage": "{price}"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "Tilausnumero"
@@ -304,6 +397,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "Lähetämme pian sähköpostiviestiä osoitteeseen <b>{email}</b>, jossa on vahvistusnumerosi ja kuittisi."
   },
+  "checkout_contact_info.action.change": {
+    "defaultMessage": "Vaihda"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "Yhteystiedot"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Tietosuojakäytäntö"
   },
@@ -331,6 +433,9 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "Poista"
   },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "Tilaa"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Tarkista tilaus"
   },
@@ -339,6 +444,12 @@
   },
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Luottokortti"
+  },
+  "checkout_payment.error.cannot_remove_applied_payment": {
+    "defaultMessage": "Käytettyä maksutapaa ei voitu poistaa. Yritä uudelleen tai käytä nykyistä maksutapaa tilauksen tekemiseen."
+  },
+  "checkout_payment.error.cannot_save_payment": {
+    "defaultMessage": "Maksutapaa ei voitu tallentaa. Yritä uudelleen."
   },
   "checkout_payment.label.billing_address_form": {
     "defaultMessage": "Laskutusosoitelomake"
@@ -424,6 +535,15 @@
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Tee tilaus vieraana"
   },
+  "contact_info.button.continue_to_payment": {
+    "defaultMessage": "Jatka maksuun"
+  },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "Jatka toimitusosoitteeseen"
+  },
+  "contact_info.error.generic_try_again": {
+    "defaultMessage": "Tapahtui virhe. Yritä uudelleen."
+  },
   "contact_info.button.login": {
     "defaultMessage": "Kirjaudu sisään"
   },
@@ -506,6 +626,9 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "Tilaushistoria"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "Maksutavat"
   },
   "drawer_menu.header.assistive_msg.title": {
     "defaultMessage": "Valikkolaatikko"
@@ -650,6 +773,9 @@
   },
   "global.account.link.order_history": {
     "defaultMessage": "Tilaushistoria"
+  },
+  "global.account.link.payment_methods": {
+    "defaultMessage": "Maksutavat"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Toivelista"
@@ -1060,6 +1186,36 @@
   "order_summary.label.tax": {
     "defaultMessage": "Verot"
   },
+  "order_summary.label.tax_tbd": {
+    "defaultMessage": "Ei laskettu"
+  },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "Peruuta"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "Tilaa vieraana"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Lähetä koodi uudelleen"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "Koodi on virheellinen tai vanhentunut. Napsauta Lähetä koodi uudelleen ja yritä uudelleen."
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "Lähetimme kertasalasanan (OTP) sähköpostiisi. Luodaksesi tilin ja jatkaaksesi kassalle, syötä alla oleva {otpLength}-numeroinen koodi."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "Kirjautuaksesi tilillesi syötä sähköpostiisi lähetetty koodi."
+  },
+  "otp.message.resend_cooldown": {
+    "defaultMessage": "Voit pyytää uuden koodin {timer} {timer, plural, one {sekunnin} other {sekunnin}} kuluttua."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "Vahvista henkilöllisyytesi"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "Luo tili"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Takaisin edelliselle sivulle"
   },
@@ -1122,6 +1278,9 @@
   "password_reset_success.toast": {
     "defaultMessage": "Salasanan nollaus onnistui"
   },
+  "payment_selection.button.view_all": {
+    "defaultMessage": "Näytä kaikki ({count} lisää)"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Luottokortti"
   },
@@ -1130,6 +1289,27 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Tämä on turvallinen SSL-salattu maksu."
+  },
+  "pickup_address.bonus_products.title": {
+    "defaultMessage": "Bonustuotteet"
+  },
+  "pickup_address.button.continue_to_payment": {
+    "defaultMessage": "Jatka maksuun"
+  },
+  "pickup_address.button.continue_to_shipping_address": {
+    "defaultMessage": "Jatka toimitusosoitteeseen"
+  },
+  "pickup_address.button.show_products": {
+    "defaultMessage": "Näytä tuotteet"
+  },
+  "pickup_address.message.loading_store_info": {
+    "defaultMessage": "Ladataan myymälätietoja…"
+  },
+  "pickup_address.title.pickup_address": {
+    "defaultMessage": "Nouto-osoite ja tiedot"
+  },
+  "pickup_address.title.store_information": {
+    "defaultMessage": "Myymälätiedot"
   },
   "price_per_item.label.each": {
     "defaultMessage": "kpl",
@@ -1340,6 +1520,12 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Poista kaikki"
   },
+  "shipping_address.action.ship_to_multiple_addresses": {
+    "defaultMessage": "Lähetä useaan osoitteeseen"
+  },
+  "shipping_address.button.add_new_address": {
+    "defaultMessage": "+ Lisää uusi osoite"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Jatka lähetystapaan"
   },
@@ -1349,8 +1535,17 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "Poista {address}"
   },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "Toimitusosoite"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Toimitusosoitelomake"
+  },
+  "shipping_address.summary.multiple_addresses": {
+    "defaultMessage": "Tuotteesi toimitetaan useaan osoitteeseen."
+  },
+  "shipping_address.summary.multiple_locations": {
+    "defaultMessage": "Lähetät useaan osoitteeseen."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Toimitusosoite"
@@ -1376,14 +1571,65 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Muokkaa toimitusosoitetta"
   },
+  "shipping_multi_address.action.ship_to_single_address": {
+    "defaultMessage": "Lähetä tuotteet yhteen osoitteeseen"
+  },
+  "shipping_multi_address.add_new_address.aria_label": {
+    "defaultMessage": "Lisää uusi toimitusosoite tuotteelle {productName}"
+  },
+  "shipping_multi_address.error.submit_failed": {
+    "defaultMessage": "Lähetysten määrittelyssä tapahtui virhe. Yritä uudelleen."
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "Tuotekuva tuotteelle {productName}"
+  },
+  "shipping_multi_address.label.note": {
+    "defaultMessage": "Huomautus"
+  },
+  "shipping_multi_address.loading_addresses": {
+    "defaultMessage": "Ladataan osoitteita…"
+  },
+  "shipping_multi_address.message.no_delivery_items": {
+    "defaultMessage": "Ei toimitettavia tuotteita. Kaikki tuotteet ovat noudettavissa."
+  },
+  "shipping_multi_address.message.pickup_items": {
+    "defaultMessage": "Jotkut tuotteet on asetettu noudettaviksi, eikä niitä näytetä täällä. Vain toimitettaville tuotteille voi määrittää osoitteita."
+  },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "Ei osoitetta käytettävissä"
+  },
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "Tuoteominaisuudet"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "Määrä"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Haluatko lähettää tämän lahjana?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Jatka maksuun"
   },
+  "shipping_options.error.no_shipping_methods": {
+    "defaultMessage": "Tälle osoitteelle ei ole lähetystapoja. Syötä toinen osoite."
+  },
+  "shipping_options.label.no_method_selected": {
+    "defaultMessage": "Lähetystapaa ei valittu"
+  },
+  "shipping_options.label.shipment_number": {
+    "defaultMessage": "Lähetys {index}:"
+  },
+  "shipping_options.label.total_shipping": {
+    "defaultMessage": "Toimitus yhteensä"
+  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Lähetys- ja lahjavaihtoehdot"
+  },
+  "shipping_options.title.shipping_method": {
+    "defaultMessage": "Toimitusvaihtoehdot"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Peruuta"
@@ -1402,6 +1648,18 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "Jos sinua ei ohjata eteenpäin automaattisesti, jatka valitsemalla <linkki>tämä linkki</linkki>."
+  },
+  "store_display.button.use_recent_store": {
+    "defaultMessage": "Käytä viimeisintä myymälää"
+  },
+  "store_display.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "store_display.label.store_contact_info": {
+    "defaultMessage": "Myymälän yhteystiedot"
+  },
+  "store_display.label.store_hours": {
+    "defaultMessage": "Aukioloajat"
   },
   "store_locator.action.find": {
     "defaultMessage": "Etsi"
@@ -1462,6 +1720,15 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
+  },
+  "toggle_card.action.change": {
+    "defaultMessage": "Vaihda"
+  },
+  "toggle_card.action.changePaymentInfo": {
+    "defaultMessage": "Vaihda"
+  },
+  "toggle_card.action.changeShippingOptions": {
+    "defaultMessage": "Vaihda"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Muokkaa"
@@ -1596,6 +1863,9 @@
   },
   "use_login_fields.error.required_password": {
     "defaultMessage": "Anna salasanasi."
+  },
+  "use_login_fields.error.invalid_email": {
+    "defaultMessage": "Syötä kelvollinen sähköpostiosoite."
   },
   "use_login_fields.label.email": {
     "defaultMessage": "Sähköposti"

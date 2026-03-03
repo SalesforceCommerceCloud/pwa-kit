@@ -8,6 +8,63 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "로그아웃"
   },
+  "account.payments.action.retry": {
+    "defaultMessage": "다시 시도"
+  },
+  "account.payments.badge.default": {
+    "defaultMessage": "기본"
+  },
+  "account.payments.checkbox.make_default": {
+    "defaultMessage": "기본으로 설정"
+  },
+  "account.payments.error.payment_method_remove_failed": {
+    "defaultMessage": "결제 수단을 제거할 수 없습니다. 다시 시도해 주세요."
+  },
+  "account.payments.error.payment_method_save_failed": {
+    "defaultMessage": "결제 수단을 저장할 수 없습니다. 다시 시도해 주세요."
+  },
+  "account.payments.error.set_default_failed": {
+    "defaultMessage": "결제 수단을 기본으로 설정할 수 없습니다. 다시 시도해 주세요."
+  },
+  "account.payments.heading.payment_methods": {
+    "defaultMessage": "결제 수단"
+  },
+  "account.payments.info.default_payment_updated": {
+    "defaultMessage": "결제 수단이 기본으로 설정되었습니다."
+  },
+  "account.payments.info.payment_method_removed": {
+    "defaultMessage": "결제 수단이 제거되었습니다."
+  },
+  "account.payments.info.payment_method_saved": {
+    "defaultMessage": "새 결제 수단이 저장되었습니다."
+  },
+  "account.payments.message.error": {
+    "defaultMessage": "결제 수단을 불러올 수 없습니다. 다시 시도해 주세요."
+  },
+  "account.payments.message.loading": {
+    "defaultMessage": "결제 수단 로딩 중…"
+  },
+  "account.payments.placeholder.heading": {
+    "defaultMessage": "저장된 결제 수단 없음"
+  },
+  "account.payments.placeholder.text": {
+    "defaultMessage": "더 빠르게 결제하려면 새 결제 수단을 추가하세요."
+  },
+  "account.payments.label.expires": {
+    "defaultMessage": "만료 {month}/{year}"
+  },
+  "account.payments.modal.title.set_default": {
+    "defaultMessage": "기본 결제 수단으로 설정하시겠습니까?"
+  },
+  "account.payments.modal.message.set_default": {
+    "defaultMessage": "결제 시 {brand} ... {last4}이(가) 기본으로 사용됩니다."
+  },
+  "account.payments.modal.action.set_default": {
+    "defaultMessage": "기본으로 설정"
+  },
+  "account.payments.modal.action.cancel": {
+    "defaultMessage": "취소"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "기본값"
   },
@@ -34,6 +91,15 @@
   },
   "account_addresses.title.addresses": {
     "defaultMessage": "주소"
+  },
+  "account_creation_notification.body": {
+    "defaultMessage": "주문 정보로 계정을 생성하고 확인했습니다. 다음 결제 시 보내드리는 코드만 입력하면 로그인할 수 있으며 비밀번호는 필요하지 않습니다."
+  },
+  "account_creation_notification.title": {
+    "defaultMessage": "계정 생성됨"
+  },
+  "account_creation_notification.verified": {
+    "defaultMessage": "확인됨"
   },
   "account_detail.title.account_details": {
     "defaultMessage": "계정 세부 정보"
@@ -108,6 +174,9 @@
   "account_order_history.title.order_history": {
     "defaultMessage": "주문 내역"
   },
+  "account_payments.button.add_payment": {
+    "defaultMessage": "결제 수단 추가"
+  },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "계속 쇼핑하기"
   },
@@ -160,6 +229,9 @@
     "defaultMessage": "이메일을 확인하십시오."
   },
   "auth_modal.description.now_signed_in": {
+    "defaultMessage": "이제 로그인되었습니다."
+  },
+  "auth_modal.description.now_signed_in_simple": {
     "defaultMessage": "이제 로그인되었습니다."
   },
   "auth_modal.error.incorrect_email_or_password": {
@@ -231,8 +303,26 @@
   "checkout.button.place_order": {
     "defaultMessage": "주문하기"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "청구 주소를 입력해 주세요."
+  },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "배송 주소를 저장할 수 없습니다."
+  },
+  "checkout.label.user_registration": {
+    "defaultMessage": "계정을 만들어 더 빠르게 결제"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "체크아웃하는 중에 예상치 못한 오류가 발생했습니다. "
+  },
+  "checkout.message.user_registration": {
+    "defaultMessage": "결제, 주소 및 연락처 정보가 새 계정에 저장됩니다. 이메일로 전송된 일회용 비밀번호(OTP)를 사용하여 계정을 만드세요. 계정 생성 후 비밀번호 찾기 기능을 사용하여 새 비밀번호를 설정할 수 있습니다."
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "나중에 사용할 결제 정보 저장"
+  },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "이 결제 수단을 나중에 사용할 수 있도록 저장"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "계정 생성"
@@ -266,6 +356,9 @@
   },
   "checkout_confirmation.label.free": {
     "defaultMessage": "무료"
+  },
+  "checkout_confirmation.label.shipping.price": {
+    "defaultMessage": "{price}"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "주문 번호"
@@ -304,6 +397,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "<b>{email}</b>(으)로 확인 번호와 영수증이 포함된 이메일을 곧 보내드리겠습니다."
   },
+  "checkout_contact_info.action.change": {
+    "defaultMessage": "변경"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "로그아웃"
+  },
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "연락처 정보"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "개인정보보호 정책"
   },
@@ -331,6 +433,9 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "제거"
   },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "주문하기"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "주문 검토"
   },
@@ -339,6 +444,12 @@
   },
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "신용카드"
+  },
+  "checkout_payment.error.cannot_remove_applied_payment": {
+    "defaultMessage": "적용된 결제 수단을 제거할 수 없습니다. 다시 시도하거나 현재 결제 수단으로 주문해 주세요."
+  },
+  "checkout_payment.error.cannot_save_payment": {
+    "defaultMessage": "결제 수단을 저장할 수 없습니다. 다시 시도해 주세요."
   },
   "checkout_payment.label.billing_address_form": {
     "defaultMessage": "청구 주소 양식"
@@ -424,6 +535,15 @@
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "비회원으로 체크아웃"
   },
+  "contact_info.button.continue_to_payment": {
+    "defaultMessage": "결제로 계속"
+  },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "배송 주소로 계속"
+  },
+  "contact_info.error.generic_try_again": {
+    "defaultMessage": "오류가 발생했습니다. 다시 시도해 주세요."
+  },
   "contact_info.button.login": {
     "defaultMessage": "로그인"
   },
@@ -506,6 +626,9 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "주문 내역"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "결제 수단"
   },
   "drawer_menu.header.assistive_msg.title": {
     "defaultMessage": "메뉴 서랍"
@@ -650,6 +773,9 @@
   },
   "global.account.link.order_history": {
     "defaultMessage": "주문 내역"
+  },
+  "global.account.link.payment_methods": {
+    "defaultMessage": "결제 수단"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "위시리스트"
@@ -1060,6 +1186,36 @@
   "order_summary.label.tax": {
     "defaultMessage": "세금"
   },
+  "order_summary.label.tax_tbd": {
+    "defaultMessage": "미정"
+  },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "취소"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "비회원으로 주문"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "코드 재전송"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "코드가 잘못되었거나 만료되었습니다. 코드 재전송을 클릭하고 다시 시도하세요."
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "이메일로 일회용 암호(OTP)를 보냈습니다. 계정을 만들고 결제를 진행하려면 아래 {otpLength}자리 코드를 입력하세요."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "계정에 로그인하려면 이메일로 전송된 코드를 입력하세요."
+  },
+  "otp.message.resend_cooldown": {
+    "defaultMessage": "{timer}{timer, plural, one {초} other {초}} 후에 새 코드를 요청할 수 있습니다."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "본인 확인"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "계정 만들기"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "이전 페이지로 돌아가기"
   },
@@ -1122,6 +1278,9 @@
   "password_reset_success.toast": {
     "defaultMessage": "암호 재설정 성공"
   },
+  "payment_selection.button.view_all": {
+    "defaultMessage": "전체 보기 ({count}개 더)"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "신용카드"
   },
@@ -1130,6 +1289,27 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "안전한 SSL 암호화 결제입니다."
+  },
+  "pickup_address.bonus_products.title": {
+    "defaultMessage": "보너스 상품"
+  },
+  "pickup_address.button.continue_to_payment": {
+    "defaultMessage": "결제로 계속"
+  },
+  "pickup_address.button.continue_to_shipping_address": {
+    "defaultMessage": "배송 주소로 계속"
+  },
+  "pickup_address.button.show_products": {
+    "defaultMessage": "상품 보기"
+  },
+  "pickup_address.message.loading_store_info": {
+    "defaultMessage": "매장 정보 로딩 중…"
+  },
+  "pickup_address.title.pickup_address": {
+    "defaultMessage": "픽업 주소 및 정보"
+  },
+  "pickup_address.title.store_information": {
+    "defaultMessage": "매장 정보"
   },
   "price_per_item.label.each": {
     "defaultMessage": "개",
@@ -1340,6 +1520,12 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "모두 지우기"
   },
+  "shipping_address.action.ship_to_multiple_addresses": {
+    "defaultMessage": "여러 주소로 배송"
+  },
+  "shipping_address.button.add_new_address": {
+    "defaultMessage": "+ 새 주소 추가"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "배송 방법으로 계속 진행하기"
   },
@@ -1349,8 +1535,17 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "{address} 제거"
   },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "배송 주소"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "배송 주소 양식"
+  },
+  "shipping_address.summary.multiple_addresses": {
+    "defaultMessage": "상품이 여러 주소로 배송됩니다."
+  },
+  "shipping_address.summary.multiple_locations": {
+    "defaultMessage": "여러 위치로 배송 중입니다."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "배송 주소"
@@ -1376,14 +1571,65 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "배송 주소 편집"
   },
+  "shipping_multi_address.action.ship_to_single_address": {
+    "defaultMessage": "한 주소로 배송"
+  },
+  "shipping_multi_address.add_new_address.aria_label": {
+    "defaultMessage": "{productName}에 대한 새 배송 주소 추가"
+  },
+  "shipping_multi_address.error.submit_failed": {
+    "defaultMessage": "배송 설정 중 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "{productName} 제품 이미지"
+  },
+  "shipping_multi_address.label.note": {
+    "defaultMessage": "참고"
+  },
+  "shipping_multi_address.loading_addresses": {
+    "defaultMessage": "주소 로드 중…"
+  },
+  "shipping_multi_address.message.no_delivery_items": {
+    "defaultMessage": "배송할 제품이 없습니다. 모든 제품은 픽업입니다."
+  },
+  "shipping_multi_address.message.pickup_items": {
+    "defaultMessage": "일부 제품은 픽업으로 설정되어 여기에 표시되지 않습니다. 배송 제품만 주소에 할당할 수 있습니다."
+  },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "사용 가능한 주소 없음"
+  },
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "제품 속성"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "수량"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "이 제품을 선물로 보내시겠습니까?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "결제로 계속 진행하기"
   },
+  "shipping_options.error.no_shipping_methods": {
+    "defaultMessage": "이 주소에는 배송 방법이 없습니다. 다른 주소를 입력해 주세요."
+  },
+  "shipping_options.label.no_method_selected": {
+    "defaultMessage": "배송 방법이 선택되지 않았습니다"
+  },
+  "shipping_options.label.shipment_number": {
+    "defaultMessage": "배송 {index}:"
+  },
+  "shipping_options.label.total_shipping": {
+    "defaultMessage": "총 배송비"
+  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "배송 및 선물 옵션"
+  },
+  "shipping_options.title.shipping_method": {
+    "defaultMessage": "배송 옵션"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "취소"
@@ -1402,6 +1648,18 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "자동으로 리디렉션되지 않으면 <link>이 링크</link>를 클릭하여 계속 진행하십시오."
+  },
+  "store_display.button.use_recent_store": {
+    "defaultMessage": "최근 매장 사용"
+  },
+  "store_display.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "store_display.label.store_contact_info": {
+    "defaultMessage": "매장 연락처"
+  },
+  "store_display.label.store_hours": {
+    "defaultMessage": "영업 시간"
   },
   "store_locator.action.find": {
     "defaultMessage": "찾기"
@@ -1462,6 +1720,15 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
+  },
+  "toggle_card.action.change": {
+    "defaultMessage": "변경"
+  },
+  "toggle_card.action.changePaymentInfo": {
+    "defaultMessage": "변경"
+  },
+  "toggle_card.action.changeShippingOptions": {
+    "defaultMessage": "변경"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "편집"
@@ -1596,6 +1863,9 @@
   },
   "use_login_fields.error.required_password": {
     "defaultMessage": "암호를 입력하십시오."
+  },
+  "use_login_fields.error.invalid_email": {
+    "defaultMessage": "유효한 이메일 주소를 입력하세요."
   },
   "use_login_fields.label.email": {
     "defaultMessage": "이메일"

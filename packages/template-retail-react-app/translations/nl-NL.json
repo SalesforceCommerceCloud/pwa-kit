@@ -8,6 +8,63 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Afmelden"
   },
+  "account.payments.action.retry": {
+    "defaultMessage": "Opnieuw proberen"
+  },
+  "account.payments.badge.default": {
+    "defaultMessage": "Standaard"
+  },
+  "account.payments.checkbox.make_default": {
+    "defaultMessage": "Als standaard instellen"
+  },
+  "account.payments.error.payment_method_remove_failed": {
+    "defaultMessage": "We konden de betaalmethode niet verwijderen. Probeer het opnieuw."
+  },
+  "account.payments.error.payment_method_save_failed": {
+    "defaultMessage": "We konden de betaalmethode niet opslaan. Probeer het opnieuw."
+  },
+  "account.payments.error.set_default_failed": {
+    "defaultMessage": "We konden de betaalmethode niet als standaard instellen. Probeer het opnieuw."
+  },
+  "account.payments.heading.payment_methods": {
+    "defaultMessage": "Betaalmethoden"
+  },
+  "account.payments.info.default_payment_updated": {
+    "defaultMessage": "Betaalmethode is als standaard ingesteld."
+  },
+  "account.payments.info.payment_method_removed": {
+    "defaultMessage": "Betaalmethode is verwijderd."
+  },
+  "account.payments.info.payment_method_saved": {
+    "defaultMessage": "Nieuwe betaalmethode is opgeslagen."
+  },
+  "account.payments.message.error": {
+    "defaultMessage": "We konden de betaalmethoden niet laden. Probeer het opnieuw."
+  },
+  "account.payments.message.loading": {
+    "defaultMessage": "Betaalmethoden laden…"
+  },
+  "account.payments.placeholder.heading": {
+    "defaultMessage": "Geen opgeslagen betaalmethoden"
+  },
+  "account.payments.placeholder.text": {
+    "defaultMessage": "Voeg een nieuwe betaalmethode toe om sneller te betalen."
+  },
+  "account.payments.label.expires": {
+    "defaultMessage": "Vervalt {month}/{year}"
+  },
+  "account.payments.modal.title.set_default": {
+    "defaultMessage": "Standaardbetaalmethode instellen?"
+  },
+  "account.payments.modal.message.set_default": {
+    "defaultMessage": "{brand} ... {last4} wordt de standaard bij het afrekenen."
+  },
+  "account.payments.modal.action.set_default": {
+    "defaultMessage": "Als standaard instellen"
+  },
+  "account.payments.modal.action.cancel": {
+    "defaultMessage": "Annuleren"
+  },
   "account_addresses.badge.default": {
     "defaultMessage": "Standaard"
   },
@@ -34,6 +91,15 @@
   },
   "account_addresses.title.addresses": {
     "defaultMessage": "Adressen"
+  },
+  "account_creation_notification.body": {
+    "defaultMessage": "We hebben uw account aangemaakt en geverifieerd met de gegevens van uw bestelling. Volgende keer dat u afrekent, voert u gewoon de code in die we sturen om in te loggen — geen wachtwoord nodig."
+  },
+  "account_creation_notification.title": {
+    "defaultMessage": "Account aangemaakt"
+  },
+  "account_creation_notification.verified": {
+    "defaultMessage": "Geverifieerd"
   },
   "account_detail.title.account_details": {
     "defaultMessage": "Accountgegevens"
@@ -108,6 +174,9 @@
   "account_order_history.title.order_history": {
     "defaultMessage": "Ordergeschiedenis"
   },
+  "account_payments.button.add_payment": {
+    "defaultMessage": "Betaalmethode toevoegen"
+  },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Doorgaan met shoppen"
   },
@@ -160,6 +229,9 @@
     "defaultMessage": "Controleer je e-mail"
   },
   "auth_modal.description.now_signed_in": {
+    "defaultMessage": "Je bent nu aangemeld."
+  },
+  "auth_modal.description.now_signed_in_simple": {
     "defaultMessage": "Je bent nu aangemeld."
   },
   "auth_modal.error.incorrect_email_or_password": {
@@ -231,8 +303,26 @@
   "checkout.button.place_order": {
     "defaultMessage": "Order plaatsen"
   },
+  "checkout.error.billing_address_required": {
+    "defaultMessage": "Voer een factuuradres in."
+  },
+  "checkout.error.cannot_save_address": {
+    "defaultMessage": "Verzendadres kon niet worden opgeslagen."
+  },
+  "checkout.label.user_registration": {
+    "defaultMessage": "Maak een account aan om sneller te betalen"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "Er is een onverwachte fout opgetreden tijdens het afrekenen."
+  },
+  "checkout.message.user_registration": {
+    "defaultMessage": "Uw betalings-, adres- en contactgegevens worden opgeslagen in een nieuw account. Gebruik het eenmalige wachtwoord (OTP) dat per e-mail is verzonden om uw account aan te maken. Na het aanmaken van uw account kunt u de functie Wachtwoord vergeten gebruiken om een nieuw wachtwoord in te stellen."
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "Checkoutgegevens opslaan voor later gebruik"
+  },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "Bewaar deze betaalmethode voor later gebruik"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Account maken"
@@ -266,6 +356,9 @@
   },
   "checkout_confirmation.label.free": {
     "defaultMessage": "Gratis"
+  },
+  "checkout_confirmation.label.shipping.price": {
+    "defaultMessage": "{price}"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "Ordernummer"
@@ -304,6 +397,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We sturen binnenkort een e-mail naar <b>{email}</b> met je bevestigingsnummer en ontvangstbewijs."
   },
+  "checkout_contact_info.action.change": {
+    "defaultMessage": "Wijzigen"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "Uitloggen"
+  },
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "Contactgegevens"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Privacybeleid"
   },
@@ -331,6 +433,9 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "Verwijderen"
   },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "Bestelling plaatsen"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Order controleren"
   },
@@ -339,6 +444,12 @@
   },
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Creditcard"
+  },
+  "checkout_payment.error.cannot_remove_applied_payment": {
+    "defaultMessage": "De toegepaste betaalmethode kon niet worden verwijderd. Probeer het opnieuw of gebruik de huidige betaalmethode om te bestellen."
+  },
+  "checkout_payment.error.cannot_save_payment": {
+    "defaultMessage": "Betaalmethode kon niet worden opgeslagen. Probeer het opnieuw."
   },
   "checkout_payment.label.billing_address_form": {
     "defaultMessage": "Adresformulier voor facturen"
@@ -424,6 +535,15 @@
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Afrekenen als gast"
   },
+  "contact_info.button.continue_to_payment": {
+    "defaultMessage": "Doorgaan naar betaling"
+  },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "Doorgaan naar verzendadres"
+  },
+  "contact_info.error.generic_try_again": {
+    "defaultMessage": "Er is een fout opgetreden. Probeer het opnieuw."
+  },
   "contact_info.button.login": {
     "defaultMessage": "Aanmelden"
   },
@@ -506,6 +626,9 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "Ordergeschiedenis"
+  },
+  "drawer_menu.button.payment_methods": {
+    "defaultMessage": "Betaalmethoden"
   },
   "drawer_menu.header.assistive_msg.title": {
     "defaultMessage": "Menulade"
@@ -650,6 +773,9 @@
   },
   "global.account.link.order_history": {
     "defaultMessage": "Ordergeschiedenis"
+  },
+  "global.account.link.payment_methods": {
+    "defaultMessage": "Betaalmethoden"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Verlanglijst"
@@ -1060,6 +1186,36 @@
   "order_summary.label.tax": {
     "defaultMessage": "Belasting"
   },
+  "order_summary.label.tax_tbd": {
+    "defaultMessage": "Nog niet berekend"
+  },
+  "otp.button.cancel_guest_registration": {
+    "defaultMessage": "Annuleren"
+  },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "Afrekenen als gast"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Code opnieuw verzenden"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "De code is ongeldig of verlopen. Klik op Code opnieuw verzenden en probeer het opnieuw."
+  },
+  "otp.message.enter_code_for_account_guest": {
+    "defaultMessage": "We hebben een eenmalig wachtwoord (OTP) naar je e-mail gestuurd. Voer de {otpLength}-cijferige code hieronder in om je account aan te maken en door te gaan naar het afrekenen."
+  },
+  "otp.message.enter_code_for_account_returning": {
+    "defaultMessage": "Voer de naar je e-mail verzonden code in om in te loggen op je account."
+  },
+  "otp.message.resend_cooldown": {
+    "defaultMessage": "Je kunt over {timer} {timer, plural, one {seconde} other {seconden}} een nieuwe code aanvragen."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "Bevestig je identiteit"
+  },
+  "otp.title.create_account": {
+    "defaultMessage": "Account aanmaken"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Terug naar vorige pagina"
   },
@@ -1122,6 +1278,9 @@
   "password_reset_success.toast": {
     "defaultMessage": "Het wachtwoord is opnieuw ingesteld"
   },
+  "payment_selection.button.view_all": {
+    "defaultMessage": "Alles weergeven ({count} meer)"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Creditcard"
   },
@@ -1130,6 +1289,27 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Dit is een beveiligde betaling met SSL-versleuteling."
+  },
+  "pickup_address.bonus_products.title": {
+    "defaultMessage": "Bonusartikelen"
+  },
+  "pickup_address.button.continue_to_payment": {
+    "defaultMessage": "Doorgaan naar betaling"
+  },
+  "pickup_address.button.continue_to_shipping_address": {
+    "defaultMessage": "Doorgaan naar verzendadres"
+  },
+  "pickup_address.button.show_products": {
+    "defaultMessage": "Producten tonen"
+  },
+  "pickup_address.message.loading_store_info": {
+    "defaultMessage": "Winkelgegevens laden…"
+  },
+  "pickup_address.title.pickup_address": {
+    "defaultMessage": "Afhaaladres en informatie"
+  },
+  "pickup_address.title.store_information": {
+    "defaultMessage": "Winkelinformatie"
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",
@@ -1340,6 +1520,12 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Alles wissen"
   },
+  "shipping_address.action.ship_to_multiple_addresses": {
+    "defaultMessage": "Verzenden naar meerdere adressen"
+  },
+  "shipping_address.button.add_new_address": {
+    "defaultMessage": "+ Nieuw adres toevoegen"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Doorgaan naar verzendmethode"
   },
@@ -1349,8 +1535,17 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "{address} verwijderen"
   },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "Bezorgadres"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Formulier voor verzendadres"
+  },
+  "shipping_address.summary.multiple_addresses": {
+    "defaultMessage": "Uw artikelen worden naar meerdere adressen verzonden."
+  },
+  "shipping_address.summary.multiple_locations": {
+    "defaultMessage": "U verzendt naar meerdere adressen."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Verzendadres"
@@ -1376,14 +1571,65 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Verzendadres bewerken"
   },
+  "shipping_multi_address.action.ship_to_single_address": {
+    "defaultMessage": "Verzend artikelen naar één adres"
+  },
+  "shipping_multi_address.add_new_address.aria_label": {
+    "defaultMessage": "Nieuw bezorgadres toevoegen voor {productName}"
+  },
+  "shipping_multi_address.error.submit_failed": {
+    "defaultMessage": "Er is iets misgegaan bij het instellen van de zendingen. Probeer het opnieuw."
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "Productafbeelding voor {productName}"
+  },
+  "shipping_multi_address.label.note": {
+    "defaultMessage": "Opmerking"
+  },
+  "shipping_multi_address.loading_addresses": {
+    "defaultMessage": "Adressen laden…"
+  },
+  "shipping_multi_address.message.no_delivery_items": {
+    "defaultMessage": "Er zijn geen artikelen om te bezorgen. Alle artikelen zijn af te halen."
+  },
+  "shipping_multi_address.message.pickup_items": {
+    "defaultMessage": "Sommige artikelen zijn ingesteld voor afhalen en worden hier niet getoond. Alleen bezorgartikelen kunnen aan adressen worden toegewezen."
+  },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "Geen adres beschikbaar"
+  },
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "Productattributen"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "Aantal"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Wil je dit als cadeau versturen?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Doorgaan naar betalen"
   },
+  "shipping_options.error.no_shipping_methods": {
+    "defaultMessage": "Er zijn geen verzendmethoden beschikbaar voor dit adres. Voer een ander adres in."
+  },
+  "shipping_options.label.no_method_selected": {
+    "defaultMessage": "Geen verzendmethode geselecteerd"
+  },
+  "shipping_options.label.shipment_number": {
+    "defaultMessage": "Zending {index}:"
+  },
+  "shipping_options.label.total_shipping": {
+    "defaultMessage": "Totaal verzendkosten"
+  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Verzending en cadeau-opties"
+  },
+  "shipping_options.title.shipping_method": {
+    "defaultMessage": "Verzendopties"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Annuleren"
@@ -1402,6 +1648,18 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "Als je niet automatisch wordt omgeleid, klik dan op <link>deze link</link> om verder te gaan."
+  },
+  "store_display.button.use_recent_store": {
+    "defaultMessage": "Recente winkel gebruiken"
+  },
+  "store_display.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "store_display.label.store_contact_info": {
+    "defaultMessage": "Winkelcontactgegevens"
+  },
+  "store_display.label.store_hours": {
+    "defaultMessage": "Openingstijden"
   },
   "store_locator.action.find": {
     "defaultMessage": "Zoeken"
@@ -1462,6 +1720,15 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
+  },
+  "toggle_card.action.change": {
+    "defaultMessage": "Wijzigen"
+  },
+  "toggle_card.action.changePaymentInfo": {
+    "defaultMessage": "Wijzigen"
+  },
+  "toggle_card.action.changeShippingOptions": {
+    "defaultMessage": "Wijzigen"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Bewerken"
@@ -1596,6 +1863,9 @@
   },
   "use_login_fields.error.required_password": {
     "defaultMessage": "Voer je wachtwoord in."
+  },
+  "use_login_fields.error.invalid_email": {
+    "defaultMessage": "Voer een geldig e-mailadres in."
   },
   "use_login_fields.label.email": {
     "defaultMessage": "E-mailadres"

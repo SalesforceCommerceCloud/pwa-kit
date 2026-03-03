@@ -17,6 +17,144 @@
       "value": "Log ud"
     }
   ],
+  "account.payments.action.retry": [
+    {
+      "type": 0,
+      "value": "Prøv igen"
+    }
+  ],
+  "account.payments.badge.default": [
+    {
+      "type": 0,
+      "value": "Standard"
+    }
+  ],
+  "account.payments.checkbox.make_default": [
+    {
+      "type": 0,
+      "value": "Sæt som standard"
+    }
+  ],
+  "account.payments.error.payment_method_remove_failed": [
+    {
+      "type": 0,
+      "value": "Vi kunne ikke fjerne betalingsmetoden. Prøv igen."
+    }
+  ],
+  "account.payments.error.payment_method_save_failed": [
+    {
+      "type": 0,
+      "value": "Vi kunne ikke gemme betalingsmetoden. Prøv igen."
+    }
+  ],
+  "account.payments.error.set_default_failed": [
+    {
+      "type": 0,
+      "value": "Vi kunne ikke angive betalingsmetoden som standard. Prøv igen."
+    }
+  ],
+  "account.payments.heading.payment_methods": [
+    {
+      "type": 0,
+      "value": "Betalingsmetoder"
+    }
+  ],
+  "account.payments.info.default_payment_updated": [
+    {
+      "type": 0,
+      "value": "Betalingsmetoden blev angivet som standard."
+    }
+  ],
+  "account.payments.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "Betalingsmetoden blev fjernet."
+    }
+  ],
+  "account.payments.info.payment_method_saved": [
+    {
+      "type": 0,
+      "value": "Ny betalingsmetode blev gemt."
+    }
+  ],
+  "account.payments.label.expires": [
+    {
+      "type": 0,
+      "value": "Udløber "
+    },
+    {
+      "type": 1,
+      "value": "month"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "year"
+    }
+  ],
+  "account.payments.message.error": [
+    {
+      "type": 0,
+      "value": "Vi kunne ikke hente betalingsmetoderne. Prøv igen."
+    }
+  ],
+  "account.payments.message.loading": [
+    {
+      "type": 0,
+      "value": "Henter betalingsmetoder…"
+    }
+  ],
+  "account.payments.modal.action.cancel": [
+    {
+      "type": 0,
+      "value": "Annuller"
+    }
+  ],
+  "account.payments.modal.action.set_default": [
+    {
+      "type": 0,
+      "value": "Angiv som standard"
+    }
+  ],
+  "account.payments.modal.message.set_default": [
+    {
+      "type": 1,
+      "value": "brand"
+    },
+    {
+      "type": 0,
+      "value": " ... "
+    },
+    {
+      "type": 1,
+      "value": "last4"
+    },
+    {
+      "type": 0,
+      "value": " vil være standard ved kassen."
+    }
+  ],
+  "account.payments.modal.title.set_default": [
+    {
+      "type": 0,
+      "value": "Angiv standardbetalingsmetode?"
+    }
+  ],
+  "account.payments.placeholder.heading": [
+    {
+      "type": 0,
+      "value": "Ingen gemte betalingsmetoder"
+    }
+  ],
+  "account.payments.placeholder.text": [
+    {
+      "type": 0,
+      "value": "Tilføj en ny betalingsmetode for at betale hurtigere."
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -69,6 +207,24 @@
     {
       "type": 0,
       "value": "Adresser"
+    }
+  ],
+  "account_creation_notification.body": [
+    {
+      "type": 0,
+      "value": "Vi har oprettet og bekræftet din konto med oplysningerne fra din ordre. Næste gang du betaler, skal du bare indtaste koden vi sender for at logge ind — ingen adgangskode nødvendig."
+    }
+  ],
+  "account_creation_notification.title": [
+    {
+      "type": 0,
+      "value": "Konto oprettet"
+    }
+  ],
+  "account_creation_notification.verified": [
+    {
+      "type": 0,
+      "value": "Bekræftet"
     }
   ],
   "account_detail.title.account_details": [
@@ -243,6 +399,12 @@
       "value": "Ordrehistorik"
     }
   ],
+  "account_payments.button.add_payment": [
+    {
+      "type": 0,
+      "value": "Tilføj betalingsmetode"
+    }
+  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
@@ -396,6 +558,12 @@
     }
   ],
   "auth_modal.description.now_signed_in": [
+    {
+      "type": 0,
+      "value": "Du er nu logget ind."
+    }
+  ],
+  "auth_modal.description.now_signed_in_simple": [
     {
       "type": 0,
       "value": "Du er nu logget ind."
@@ -603,10 +771,46 @@
       "value": "Afgiv ordre"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "Indtast venligst en faktureringsadresse."
+    }
+  ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "Kunne ikke gemme leveringsadressen."
+    }
+  ],
+  "checkout.label.user_registration": [
+    {
+      "type": 0,
+      "value": "Opret en konto for at betale hurtigere"
+    }
+  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "Der opstod en uventet fejl under afslutning af købet."
+    }
+  ],
+  "checkout.message.user_registration": [
+    {
+      "type": 0,
+      "value": "Dine betalingsoplysninger, adresse og kontaktoplysninger gemmes på en ny konto. Brug den e-mailede engangskode (OTP) til at oprette din konto. Efter oprettelse af kontoen kan du bruge funktionen Glemt adgangskode til at angive en ny adgangskode."
+    }
+  ],
+  "checkout.payment.save_payment_method": [
+    {
+      "type": 0,
+      "value": "Gem denne betalingsmetode til senere brug"
+    }
+  ],
+  "checkout.title.user_registration": [
+    {
+      "type": 0,
+      "value": "Gem kasseoplysninger til senere brug"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -697,6 +901,12 @@
     {
       "type": 0,
       "value": "Forsendelse"
+    }
+  ],
+  "checkout_confirmation.label.shipping.price": [
+    {
+      "type": 1,
+      "value": "price"
     }
   ],
   "checkout_confirmation.label.shipping.strikethrough.price": [
@@ -807,6 +1017,24 @@
       "value": " med dit bekræftelsesnummer og din kvittering inden for kort tid."
     }
   ],
+  "checkout_contact_info.action.change": [
+    {
+      "type": 0,
+      "value": "Ændre"
+    }
+  ],
+  "checkout_contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Log ud"
+    }
+  ],
+  "checkout_contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "Kontaktoplysninger"
+    }
+  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -865,10 +1093,28 @@
       "value": "Fjern"
     }
   ],
+  "checkout_payment.button.place_order": [
+    {
+      "type": 0,
+      "value": "Afgiv ordre"
+    }
+  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
       "value": "Gennemse ordre"
+    }
+  ],
+  "checkout_payment.error.cannot_remove_applied_payment": [
+    {
+      "type": 0,
+      "value": "Kunne ikke fjerne den anvendte betaling. Prøv igen eller brug den nuværende betaling til at afgive din ordre."
+    }
+  ],
+  "checkout_payment.error.cannot_save_payment": [
+    {
+      "type": 0,
+      "value": "Kunne ikke gemme betalingsmetoden. Prøv igen."
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -1063,6 +1309,18 @@
       "value": "Afslut køb som gæst"
     }
   ],
+  "contact_info.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Fortsæt til betaling"
+    }
+  ],
+  "contact_info.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Fortsæt til leveringsadresse"
+    }
+  ],
   "contact_info.button.login": [
     {
       "type": 0,
@@ -1079,6 +1337,12 @@
     {
       "type": 0,
       "value": "Sikkert link"
+    }
+  ],
+  "contact_info.error.generic_try_again": [
+    {
+      "type": 0,
+      "value": "Der opstod en fejl. Prøv igen."
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -1243,6 +1507,12 @@
     {
       "type": 0,
       "value": "Ordrehistorik"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Betalingsmetoder"
     }
   ],
   "drawer_menu.header.assistive_msg.title": [
@@ -1563,6 +1833,12 @@
     {
       "type": 0,
       "value": "Ordrehistorik"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "Betalingsmetoder"
     }
   ],
   "global.account.link.wishlist": [
@@ -2468,13 +2744,117 @@
   "order_summary.label.subtotal": [
     {
       "type": 0,
-      "value": "Subtotal"
+      "value": "Mellemsum"
     }
   ],
   "order_summary.label.tax": [
     {
       "type": 0,
       "value": "Moms"
+    }
+  ],
+  "order_summary.label.tax_tbd": [
+    {
+      "type": 0,
+      "value": "Ikke beregnet"
+    }
+  ],
+  "otp.button.cancel_guest_registration": [
+    {
+      "type": 0,
+      "value": "Annuller"
+    }
+  ],
+  "otp.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Afslut køb som gæst"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "Send kode igen"
+    }
+  ],
+  "otp.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "Koden er ugyldig eller udløbet. Klik på Send kode igen og prøv igen."
+    }
+  ],
+  "otp.message.enter_code_for_account_guest": [
+    {
+      "type": 0,
+      "value": "Vi har sendt en engangskode (OTP) til din e-mail. For at oprette din konto og fortsætte til kassen skal du indtaste den "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-cifrede kode nedenfor."
+    }
+  ],
+  "otp.message.enter_code_for_account_returning": [
+    {
+      "type": 0,
+      "value": "For at logge ind på din konto skal du indtaste koden sendt til din e-mail."
+    }
+  ],
+  "otp.message.resend_cooldown": [
+    {
+      "type": 0,
+      "value": "Du kan anmode om en ny kode om "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "sekund"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "sekunder"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "otp.title.confirm_its_you": [
+    {
+      "type": 0,
+      "value": "Bekræft, at det er dig"
+    }
+  ],
+  "otp.title.create_account": [
+    {
+      "type": 0,
+      "value": "Opret en konto"
     }
   ],
   "page_not_found.action.go_back": [
@@ -2595,6 +2975,20 @@
       "value": "Adgangskoden blev nulstillet"
     }
   ],
+  "payment_selection.button.view_all": [
+    {
+      "type": 0,
+      "value": "Se alle ("
+    },
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " flere)"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -2611,6 +3005,48 @@
     {
       "type": 0,
       "value": "Dette er en sikker SSL-krypteret betaling."
+    }
+  ],
+  "pickup_address.bonus_products.title": [
+    {
+      "type": 0,
+      "value": "Bonusvarer"
+    }
+  ],
+  "pickup_address.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Fortsæt til betaling"
+    }
+  ],
+  "pickup_address.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Fortsæt til leveringsadresse"
+    }
+  ],
+  "pickup_address.button.show_products": [
+    {
+      "type": 0,
+      "value": "Vis varer"
+    }
+  ],
+  "pickup_address.message.loading_store_info": [
+    {
+      "type": 0,
+      "value": "Henter butiksinformation…"
+    }
+  ],
+  "pickup_address.title.pickup_address": [
+    {
+      "type": 0,
+      "value": "Afhentningsadresse og oplysninger"
+    }
+  ],
+  "pickup_address.title.store_information": [
+    {
+      "type": 0,
+      "value": "Butiksinformation"
     }
   ],
   "price_per_item.label.each": [
@@ -3135,6 +3571,18 @@
       "value": "Ryd alt"
     }
   ],
+  "shipping_address.action.ship_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Send til flere adresser"
+    }
+  ],
+  "shipping_address.button.add_new_address": [
+    {
+      "type": 0,
+      "value": "+ Tilføj ny adresse"
+    }
+  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3161,10 +3609,28 @@
       "value": "address"
     }
   ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "Leveringsadresse"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
       "value": "Formular til leveringsadresse"
+    }
+  ],
+  "shipping_address.summary.multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Dine varer sendes til flere adresser."
+    }
+  ],
+  "shipping_address.summary.multiple_locations": [
+    {
+      "type": 0,
+      "value": "Du sender til flere adresser."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3215,6 +3681,102 @@
       "value": "Rediger leveringsadresse"
     }
   ],
+  "shipping_multi_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "Send varer til én adresse"
+    }
+  ],
+  "shipping_multi_address.add_new_address.aria_label": [
+    {
+      "type": 0,
+      "value": "Tilføj ny leveringsadresse for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "Noget gik galt under opsætning af forsendelser. Prøv igen."
+    }
+  ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "shipping_multi_address.image.alt": [
+    {
+      "type": 0,
+      "value": "Produktbillede for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.label.note": [
+    {
+      "type": 0,
+      "value": "Bemærkning"
+    }
+  ],
+  "shipping_multi_address.loading_addresses": [
+    {
+      "type": 0,
+      "value": "Henter adresser…"
+    }
+  ],
+  "shipping_multi_address.message.no_delivery_items": [
+    {
+      "type": 0,
+      "value": "Der er ingen varer at levere. Alle varer er afhentning."
+    }
+  ],
+  "shipping_multi_address.message.pickup_items": [
+    {
+      "type": 0,
+      "value": "Nogle varer er sat til afhentning og vises ikke her. Kun leveringsvarer kan tildeles adresser."
+    }
+  ],
+  "shipping_multi_address.no_addresses_available": [
+    {
+      "type": 0,
+      "value": "Ingen adresse tilgængelig"
+    }
+  ],
+  "shipping_multi_address.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "Produktattributter"
+    }
+  ],
+  "shipping_multi_address.quantity.label": [
+    {
+      "type": 0,
+      "value": "Antal"
+    }
+  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
@@ -3227,10 +3789,48 @@
       "value": "Fortsæt til betaling"
     }
   ],
+  "shipping_options.error.no_shipping_methods": [
+    {
+      "type": 0,
+      "value": "Ingen forsendelsesmetoder er tilgængelige for denne adresse. Indtast en anden adresse."
+    }
+  ],
+  "shipping_options.label.no_method_selected": [
+    {
+      "type": 0,
+      "value": "Ingen forsendelsesmetode valgt"
+    }
+  ],
+  "shipping_options.label.shipment_number": [
+    {
+      "type": 0,
+      "value": "Forsendelse "
+    },
+    {
+      "type": 1,
+      "value": "index"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    }
+  ],
+  "shipping_options.label.total_shipping": [
+    {
+      "type": 0,
+      "value": "Samlet forsendelse"
+    }
+  ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
       "value": "Forsendelse og gavemuligheder"
+    }
+  ],
+  "shipping_options.title.shipping_method": [
+    {
+      "type": 0,
+      "value": "Forsendelsesmuligheder"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -3281,6 +3881,46 @@
     {
       "type": 0,
       "value": " for at fortsætte."
+    }
+  ],
+  "store_display.button.use_recent_store": [
+    {
+      "type": 0,
+      "value": "Brug seneste butik"
+    }
+  ],
+  "store_display.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "store_display.label.store_contact_info": [
+    {
+      "type": 0,
+      "value": "Butikkontaktoplysninger"
+    }
+  ],
+  "store_display.label.store_hours": [
+    {
+      "type": 0,
+      "value": "Åbningstider"
     }
   ],
   "store_locator.action.find": [
@@ -3429,6 +4069,24 @@
     {
       "type": 0,
       "value": ":"
+    }
+  ],
+  "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "Ændre"
+    }
+  ],
+  "toggle_card.action.changePaymentInfo": [
+    {
+      "type": 0,
+      "value": "Ændre"
+    }
+  ],
+  "toggle_card.action.changeShippingOptions": [
+    {
+      "type": 0,
+      "value": "Ændre"
     }
   ],
   "toggle_card.action.edit": [
@@ -3681,6 +4339,12 @@
     {
       "type": 0,
       "value": "Sikkerhedskode"
+    }
+  ],
+  "use_login_fields.error.invalid_email": [
+    {
+      "type": 0,
+      "value": "Indtast venligst en gyldig e-mailadresse."
     }
   ],
   "use_login_fields.error.required_email": [

@@ -71,6 +71,24 @@
       "value": "地址"
     }
   ],
+  "account_creation_notification.body": [
+    {
+      "type": 0,
+      "value": "我們已根據您的訂單資訊建立並驗證您的帳戶。下次結帳時，只需輸入我們傳送的驗證碼即可登入，無需密碼。"
+    }
+  ],
+  "account_creation_notification.title": [
+    {
+      "type": 0,
+      "value": "帳戶已建立"
+    }
+  ],
+  "account_creation_notification.verified": [
+    {
+      "type": 0,
+      "value": "已驗證"
+    }
+  ],
   "account_detail.title.account_details": [
     {
       "type": 0,
@@ -401,6 +419,12 @@
       "value": "您現在已登入。"
     }
   ],
+  "auth_modal.description.now_signed_in_simple": [
+    {
+      "type": 0,
+      "value": "您已登入帳戶。"
+    }
+  ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
@@ -607,10 +631,46 @@
       "value": "送出訂單"
     }
   ],
+  "checkout.error.billing_address_required": [
+    {
+      "type": 0,
+      "value": "請輸入帳單地址。"
+    }
+  ],
+  "checkout.error.cannot_save_address": [
+    {
+      "type": 0,
+      "value": "無法儲存配送地址。"
+    }
+  ],
+  "checkout.label.user_registration": [
+    {
+      "type": 0,
+      "value": "建立帳戶以加快結帳"
+    }
+  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "結帳時發生意外錯誤。"
+    }
+  ],
+  "checkout.message.user_registration": [
+    {
+      "type": 0,
+      "value": "您的付款、地址與聯絡資訊將儲存至新帳戶。請使用電子郵件寄送的一次性密碼 (OTP) 建立帳戶。建立帳戶後，可使用「忘記密碼」功能設定新密碼。"
+    }
+  ],
+  "checkout.payment.save_payment_method": [
+    {
+      "type": 0,
+      "value": "儲存此付款方式供日後使用"
+    }
+  ],
+  "checkout.title.user_registration": [
+    {
+      "type": 0,
+      "value": "儲存結帳資訊供日後使用"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -701,6 +761,12 @@
     {
       "type": 0,
       "value": "運送"
+    }
+  ],
+  "checkout_confirmation.label.shipping.price": [
+    {
+      "type": 1,
+      "value": "price"
     }
   ],
   "checkout_confirmation.label.shipping.strikethrough.price": [
@@ -811,6 +877,24 @@
       "value": "，內含您的確認號碼和收據。"
     }
   ],
+  "checkout_contact_info.action.change": [
+    {
+      "type": 0,
+      "value": "變更"
+    }
+  ],
+  "checkout_contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "登出"
+    }
+  ],
+  "checkout_contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "聯絡資訊"
+    }
+  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -869,10 +953,28 @@
       "value": "移除"
     }
   ],
+  "checkout_payment.button.place_order": [
+    {
+      "type": 0,
+      "value": "送出訂單"
+    }
+  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
       "value": "檢查訂單"
+    }
+  ],
+  "checkout_payment.error.cannot_remove_applied_payment": [
+    {
+      "type": 0,
+      "value": "無法移除已套用的付款方式。請重試或使用目前付款方式下單。"
+    }
+  ],
+  "checkout_payment.error.cannot_save_payment": [
+    {
+      "type": 0,
+      "value": "無法儲存付款方式。請重試。"
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -1067,6 +1169,18 @@
       "value": "以訪客身份結帳"
     }
   ],
+  "contact_info.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "繼續付款"
+    }
+  ],
+  "contact_info.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "繼續填寫收貨地址"
+    }
+  ],
   "contact_info.button.login": [
     {
       "type": 0,
@@ -1083,6 +1197,12 @@
     {
       "type": 0,
       "value": "安全連結"
+    }
+  ],
+  "contact_info.error.generic_try_again": [
+    {
+      "type": 0,
+      "value": "發生錯誤，請重試。"
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -2477,6 +2597,110 @@
       "value": "稅項"
     }
   ],
+  "order_summary.label.tax_tbd": [
+    {
+      "type": 0,
+      "value": "待定"
+    }
+  ],
+  "otp.button.cancel_guest_registration": [
+    {
+      "type": 0,
+      "value": "取消"
+    }
+  ],
+  "otp.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "以訪客身分結帳"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "重新傳送驗證碼"
+    }
+  ],
+  "otp.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "驗證碼無效或已過期。請點擊「重新傳送驗證碼」後重試。"
+    }
+  ],
+  "otp.message.enter_code_for_account_guest": [
+    {
+      "type": 0,
+      "value": "我們已向您的電子郵件傳送了一次性密碼（OTP）。若要建立帳戶並繼續結帳，請在下方輸入"
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "位驗證碼。"
+    }
+  ],
+  "otp.message.enter_code_for_account_returning": [
+    {
+      "type": 0,
+      "value": "若要登入您的帳戶，請輸入傳送到您電子郵件的驗證碼。"
+    }
+  ],
+  "otp.message.resend_cooldown": [
+    {
+      "type": 0,
+      "value": "您可以在 "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "秒"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "秒"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " 後請求新驗證碼。"
+    }
+  ],
+  "otp.title.confirm_its_you": [
+    {
+      "type": 0,
+      "value": "請確認是您本人"
+    }
+  ],
+  "otp.title.create_account": [
+    {
+      "type": 0,
+      "value": "建立帳戶"
+    }
+  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2595,6 +2819,20 @@
       "value": "成功重設密碼"
     }
   ],
+  "payment_selection.button.view_all": [
+    {
+      "type": 0,
+      "value": "查看全部（還有 "
+    },
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " 個）"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -2611,6 +2849,48 @@
     {
       "type": 0,
       "value": "此為安全 SSL 加密付款。"
+    }
+  ],
+  "pickup_address.bonus_products.title": [
+    {
+      "type": 0,
+      "value": "贈品"
+    }
+  ],
+  "pickup_address.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "繼續結帳"
+    }
+  ],
+  "pickup_address.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "繼續填寫收貨地址"
+    }
+  ],
+  "pickup_address.button.show_products": [
+    {
+      "type": 0,
+      "value": "顯示商品"
+    }
+  ],
+  "pickup_address.message.loading_store_info": [
+    {
+      "type": 0,
+      "value": "正在載入門市資訊…"
+    }
+  ],
+  "pickup_address.title.pickup_address": [
+    {
+      "type": 0,
+      "value": "取貨地址與資訊"
+    }
+  ],
+  "pickup_address.title.store_information": [
+    {
+      "type": 0,
+      "value": "門市資訊"
     }
   ],
   "price_per_item.label.each": [
@@ -3127,6 +3407,18 @@
       "value": "全部清除"
     }
   ],
+  "shipping_address.action.ship_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "配送到多個地址"
+    }
+  ],
+  "shipping_address.button.add_new_address": [
+    {
+      "type": 0,
+      "value": "+ 新增地址"
+    }
+  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3153,10 +3445,28 @@
       "value": "address"
     }
   ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "收貨地址"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
       "value": "送貨地址表單"
+    }
+  ],
+  "shipping_address.summary.multiple_addresses": [
+    {
+      "type": 0,
+      "value": "您的商品將運送至多個地址。"
+    }
+  ],
+  "shipping_address.summary.multiple_locations": [
+    {
+      "type": 0,
+      "value": "您正在運送至多個地點。"
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3207,6 +3517,106 @@
       "value": "編輯運送地址"
     }
   ],
+  "shipping_multi_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "全部送往一個地址"
+    }
+  ],
+  "shipping_multi_address.add_new_address.aria_label": [
+    {
+      "type": 0,
+      "value": "為 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 新增配送地址"
+    }
+  ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "設定配送時發生錯誤。請重試。"
+    }
+  ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "shipping_multi_address.image.alt": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 的產品圖片"
+    }
+  ],
+  "shipping_multi_address.label.note": [
+    {
+      "type": 0,
+      "value": "備註"
+    }
+  ],
+  "shipping_multi_address.loading_addresses": [
+    {
+      "type": 0,
+      "value": "正在載入地址…"
+    }
+  ],
+  "shipping_multi_address.message.no_delivery_items": [
+    {
+      "type": 0,
+      "value": "沒有需配送的商品。所有商品均為自取。"
+    }
+  ],
+  "shipping_multi_address.message.pickup_items": [
+    {
+      "type": 0,
+      "value": "部分商品設為自取，此處不顯示。僅配送商品可分配地址。"
+    }
+  ],
+  "shipping_multi_address.no_addresses_available": [
+    {
+      "type": 0,
+      "value": "無可用地址"
+    }
+  ],
+  "shipping_multi_address.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "產品屬性"
+    }
+  ],
+  "shipping_multi_address.quantity.label": [
+    {
+      "type": 0,
+      "value": "數量"
+    }
+  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
@@ -3219,10 +3629,48 @@
       "value": "繼續前往付款"
     }
   ],
+  "shipping_options.error.no_shipping_methods": [
+    {
+      "type": 0,
+      "value": "此地址無可用配送方式。請輸入其他地址。"
+    }
+  ],
+  "shipping_options.label.no_method_selected": [
+    {
+      "type": 0,
+      "value": "未選擇配送方式"
+    }
+  ],
+  "shipping_options.label.shipment_number": [
+    {
+      "type": 0,
+      "value": "配送 "
+    },
+    {
+      "type": 1,
+      "value": "index"
+    },
+    {
+      "type": 0,
+      "value": "："
+    }
+  ],
+  "shipping_options.label.total_shipping": [
+    {
+      "type": 0,
+      "value": "運費總計"
+    }
+  ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
       "value": "運送與禮品選項"
+    }
+  ],
+  "shipping_options.title.shipping_method": [
+    {
+      "type": 0,
+      "value": "運送選項"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -3273,6 +3721,46 @@
     {
       "type": 0,
       "value": " 以繼續。"
+    }
+  ],
+  "store_display.button.use_recent_store": [
+    {
+      "type": 0,
+      "value": "使用最近的門市"
+    }
+  ],
+  "store_display.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "store_display.label.store_contact_info": [
+    {
+      "type": 0,
+      "value": "門市聯絡方式"
+    }
+  ],
+  "store_display.label.store_hours": [
+    {
+      "type": 0,
+      "value": "營業時間"
     }
   ],
   "store_locator.action.find": [
@@ -3421,6 +3909,24 @@
     {
       "type": 0,
       "value": "："
+    }
+  ],
+  "toggle_card.action.change": [
+    {
+      "type": 0,
+      "value": "變更"
+    }
+  ],
+  "toggle_card.action.changePaymentInfo": [
+    {
+      "type": 0,
+      "value": "變更"
+    }
+  ],
+  "toggle_card.action.changeShippingOptions": [
+    {
+      "type": 0,
+      "value": "變更"
     }
   ],
   "toggle_card.action.edit": [
@@ -3673,6 +4179,12 @@
     {
       "type": 0,
       "value": "安全碼"
+    }
+  ],
+  "use_login_fields.error.invalid_email": [
+    {
+      "type": 0,
+      "value": "請輸入有效的電子郵件地址。"
     }
   ],
   "use_login_fields.error.required_email": [

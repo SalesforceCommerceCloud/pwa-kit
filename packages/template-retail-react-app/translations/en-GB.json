@@ -15,7 +15,7 @@
     "defaultMessage": "Default"
   },
   "account.payments.checkbox.make_default": {
-    "defaultMessage": "Make default"
+    "defaultMessage": "Set as default"
   },
   "account.payments.error.payment_method_remove_failed": {
     "defaultMessage": "We couldn't remove the payment method. Try again."
@@ -37,6 +37,9 @@
   },
   "account.payments.info.payment_method_saved": {
     "defaultMessage": "New payment method was saved."
+  },
+  "account.payments.label.expires": {
+    "defaultMessage": "Expires {month}/{year}"
   },
   "account.payments.message.error": {
     "defaultMessage": "We couldn't load the payment methods. Try again."
@@ -612,6 +615,9 @@
   },
   "contact_info.button.secure_link": {
     "defaultMessage": "Secure Link"
+  },
+  "contact_info.error.generic_try_again": {
+    "defaultMessage": "An error occurred. Please try again."
   },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
@@ -1299,6 +1305,9 @@
   },
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
+  },
+  "order_summary.label.tax_tbd": {
+    "defaultMessage": "TBD"
   },
   "otp.button.cancel_guest_registration": {
     "defaultMessage": "Cancel"
@@ -2106,6 +2115,9 @@
   },
   "use_credit_card_fields.label.security_code": {
     "defaultMessage": "Security Code"
+  },
+  "use_login_fields.error.invalid_email": {
+    "defaultMessage": "Please enter a valid email address."
   },
   "use_login_fields.error.required_email": {
     "defaultMessage": "Please enter your email address."
