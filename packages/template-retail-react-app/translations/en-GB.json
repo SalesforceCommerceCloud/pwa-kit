@@ -2069,6 +2069,9 @@
   "use_address_fields.error.please_enter_phone_number": {
     "defaultMessage": "Please enter your phone number."
   },
+  "use_address_fields.error.please_enter_postal_code": {
+    "defaultMessage": "Please enter your postal code."
+  },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
     "defaultMessage": "Please enter your zip code.",
     "description": "Error message for a blank zip code (US-specific checkout)"
