@@ -15,6 +15,7 @@ import {Heading, Stack, Text} from '@salesforce/retail-react-app/app/components/
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 import {useOrder, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {useQueryClient} from '@tanstack/react-query'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPayments, STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {getSFPaymentsInstrument} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
@@ -42,6 +43,7 @@ const PaymentProcessing = () => {
     const navigate = useNavigation()
     const {sfp} = useSFPayments()
     const toast = useToast()
+    const queryClient = useQueryClient()
 
     const {mutateAsync: updatePaymentInstrumentForOrder} = useShopperOrdersMutation(
         'updatePaymentInstrumentForOrder'
@@ -51,7 +53,7 @@ const PaymentProcessing = () => {
     const params = new URLSearchParams(location.search)
     const vendor = params.get('vendor')
     const orderNo = params.get('orderNo')
-    const {data: order} = useOrder(
+    const {data: order, refetch} = useOrder(
         {
             parameters: {orderNo}
         },
@@ -117,16 +119,37 @@ const PaymentProcessing = () => {
         )
     }
 
-    async function failOrderForPayment() {
-        await failOrder({
-            parameters: {
-                orderNo,
-                reopenBasket: true
-            },
-            body: {
-                reasonCode: 'payment_confirm_failure'
+    /**
+     * Attempts to fail an order and reopen the basket.
+     * Only calls failOrder if the order status is 'created' (avoids hanging when order
+     * was already failed by webhook).
+     * @returns {Promise<void>}
+     */
+    async function attemptFailOrderForPayment() {
+        if (!orderNo) {
+            return
+        }
+
+        try {
+            const {data: currentOrder} = await refetch()
+            if (currentOrder?.status === 'created') {
+                await failOrder({
+                    parameters: {
+                        orderNo,
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
             }
-        })
+        } catch (error) {
+            // Swallow so flow continues (invalidate, navigate). Causes: (1) Race: refetch
+            // returned 'created' but webhook already failed the order, so failOrder fails. (2) refetch
+            // or failOrder threw (network, 4xx/5xx). Same behavior for all: don't hang.
+        } finally {
+            queryClient.invalidateQueries()
+        }
     }
 
     function showOrderConfirmation() {
@@ -139,7 +162,7 @@ const PaymentProcessing = () => {
             isHandled.current = true
 
             // Order exists but payment can't be processed for return URL
-            failOrderForPayment()
+            attemptFailOrderForPayment()
         } else if (!isError && sfp && order) {
             ;(async () => {
                 if (isHandled.current) {
@@ -175,8 +198,8 @@ const PaymentProcessing = () => {
                     duration: 30000
                 })
 
-                // Attempt to fail the order
-                await failOrderForPayment()
+                // Attempt to fail the order (no-op if already failed by webhook, e.g. 3DS declined)
+                await attemptFailOrderForPayment()
 
                 // Navigate back to the checkout page to try again
                 navigate('/checkout')
