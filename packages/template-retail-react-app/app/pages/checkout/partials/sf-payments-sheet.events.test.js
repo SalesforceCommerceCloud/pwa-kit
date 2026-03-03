@@ -425,7 +425,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
         const requestBody = updateCall[0].body
 
-        expect(requestBody.paymentReferenceRequest.gatewayProperties?.stripe?.setupFutureUsage).toBeUndefined()
+        expect(
+            requestBody.paymentReferenceRequest.gatewayProperties?.stripe?.setupFutureUsage
+        ).toBeUndefined()
     })
 
     test('handlePaymentButtonApprove includes required fields for PaymentsCustomer record creation', async () => {
