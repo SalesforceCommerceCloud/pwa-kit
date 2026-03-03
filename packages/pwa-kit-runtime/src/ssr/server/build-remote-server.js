@@ -978,6 +978,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     } else if (
+                        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false' &&
                         incomingRequest.path?.match(options.slasEndpointsRequiringAccessToken)
                     ) {
                         // Inject tokens from HttpOnly cookies for endpoints like /oauth2/logout
