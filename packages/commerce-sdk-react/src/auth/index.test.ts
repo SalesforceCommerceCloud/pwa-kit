@@ -1044,6 +1044,105 @@ describe('Auth', () => {
         ).rejects.toThrow('404')
     })
 
+    test('authorizePasswordless with turnstileResponse handles JSON error response', async () => {
+        const mockFetch = jest.fn().mockResolvedValue({
+            status: 400,
+            text: () => Promise.resolve(JSON.stringify({message: 'Invalid turnstile token'}))
+        })
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+
+        await expect(
+            auth.authorizePasswordless({
+                userid: 'user@example.com',
+                turnstileResponse: 'invalid-token'
+            })
+        ).rejects.toThrow('400 Invalid turnstile token')
+    })
+
+    test('authorizePasswordless with turnstileResponse handles malformed JSON error', async () => {
+        const mockFetch = jest.fn().mockResolvedValue({
+            status: 500,
+            text: () => Promise.resolve('Internal Server Error')
+        })
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+
+        await expect(
+            auth.authorizePasswordless({
+                userid: 'user@example.com',
+                turnstileResponse: 'token'
+            })
+        ).rejects.toThrow('500')
+    })
+
+    test('authorizePasswordless with turnstileResponse includes all optional parameters', async () => {
+        const mockFetch = jest
+            .fn()
+            .mockResolvedValue({status: 200, text: () => Promise.resolve('')})
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+
+        await auth.authorizePasswordless({
+            userid: 'user@example.com',
+            turnstileResponse: 'token',
+            mode: 'email',
+            locale: 'en-US',
+            callbackURI: 'https://example.com/callback',
+            register_customer: true,
+            first_name: 'John',
+            last_name: 'Doe',
+            email: 'john@example.com',
+            phone_number: '+15551234567'
+        })
+
+        expect(mockFetch).toHaveBeenCalledTimes(1)
+        const [, options] = mockFetch.mock.calls[0]
+        const body = new URLSearchParams(options.body)
+
+        expect(body.get('mode')).toBe('email')
+        expect(body.get('locale')).toBe('en-US')
+        expect(body.get('callback_uri')).toBe('https://example.com/callback')
+        expect(body.get('register_customer')).toBe('true')
+        expect(body.get('first_name')).toBe('John')
+        expect(body.get('last_name')).toBe('Doe')
+        expect(body.get('email')).toBe('john@example.com')
+        expect(body.get('phone_number')).toBe('+15551234567')
+        expect(body.get('turnstileResponse')).toBe('token')
+    })
+
+    test('authorizePasswordless with turnstileResponse normalizes register_customer string values', async () => {
+        const mockFetch = jest
+            .fn()
+            .mockResolvedValue({status: 200, text: () => Promise.resolve('')})
+        global.fetch = mockFetch
+
+        const auth = new Auth(configSLASPrivate)
+
+        await auth.authorizePasswordless({
+            userid: 'user@example.com',
+            turnstileResponse: 'token',
+            register_customer: 'true'
+        })
+
+        const body = new URLSearchParams(mockFetch.mock.calls[0][1].body)
+        expect(body.get('register_customer')).toBe('true')
+
+        mockFetch.mockClear()
+
+        await auth.authorizePasswordless({
+            userid: 'user@example.com',
+            turnstileResponse: 'token',
+            register_customer: 'false'
+        })
+
+        const body2 = new URLSearchParams(mockFetch.mock.calls[0][1].body)
+        expect(body2.get('register_customer')).toBe('false')
+    })
+
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
         const auth = new Auth(config)
         await auth.getPasswordLessAccessToken({pwdlessLoginToken: '12345678'})

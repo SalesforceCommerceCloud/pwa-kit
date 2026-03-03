@@ -1284,6 +1284,12 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      * When turnstileResponse is provided, we perform the request ourselves so the token
      * is included in the body (commerce-sdk-isomorphic helper does not forward turnstileResponse).
+     *
+     * SECURITY NOTICE: When using Cloudflare Turnstile (turnstileResponse parameter):
+     * - The backend/MRT MUST verify the token via Cloudflare Siteverify API
+     * - The backend MUST strip the turnstileResponse before forwarding to SLAS
+     * - Never trust client-side validation alone
+     * - See: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
@@ -1293,6 +1299,15 @@ class Auth {
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
 
         const {turnstileResponse, ...restParams} = parameters
+
+        // Helper to normalize register_customer parameter
+        const normalizeRegisterCustomer = (
+            value: boolean | string | undefined
+        ): boolean | undefined => {
+            if (value === undefined) return undefined
+            if (typeof value === 'boolean') return value
+            return value === 'true'
+        }
 
         let res: Response
 
@@ -1322,17 +1337,18 @@ class Auth {
             if (restParams.locale) bodyEntries.push(['locale', restParams.locale])
             if (usid) bodyEntries.push(['usid', usid])
             if (callbackURI) bodyEntries.push(['callback_uri', callbackURI])
-            if (restParams.register_customer !== undefined) {
-                const val =
-                    typeof restParams.register_customer === 'boolean'
-                        ? restParams.register_customer
-                        : restParams.register_customer === 'true'
-                bodyEntries.push(['register_customer', val ? 'true' : 'false'])
+
+            const registerCustomerValue = normalizeRegisterCustomer(restParams.register_customer)
+            if (registerCustomerValue !== undefined) {
+                bodyEntries.push(['register_customer', registerCustomerValue ? 'true' : 'false'])
             }
+
             if (restParams.last_name) bodyEntries.push(['last_name', restParams.last_name])
             if (restParams.email) bodyEntries.push(['email', restParams.email])
             if (restParams.first_name) bodyEntries.push(['first_name', restParams.first_name])
             if (restParams.phone_number) bodyEntries.push(['phone_number', restParams.phone_number])
+
+            // IMPORTANT: Backend must verify this token via Cloudflare Siteverify API
             bodyEntries.push(['turnstileResponse', turnstileResponse])
 
             const body = new URLSearchParams(bodyEntries).toString()
@@ -1347,6 +1363,7 @@ class Auth {
                 body
             })
         } else {
+            const registerCustomerValue = normalizeRegisterCustomer(restParams.register_customer)
             res = await helpers.authorizePasswordless({
                 slasClient: this.client,
                 credentials: {
@@ -1358,13 +1375,8 @@ class Auth {
                     ...(restParams.locale && {locale: restParams.locale}),
                     userid: restParams.userid,
                     mode,
-                    ...(restParams.register_customer !== undefined && {
-                        registerCustomer:
-                            typeof restParams.register_customer === 'boolean'
-                                ? restParams.register_customer
-                                : restParams.register_customer === 'true'
-                                ? true
-                                : false
+                    ...(registerCustomerValue !== undefined && {
+                        registerCustomer: registerCustomerValue
                     }),
                     ...(restParams.last_name && {lastName: restParams.last_name}),
                     ...(restParams.email && {email: restParams.email}),
@@ -1382,8 +1394,12 @@ class Auth {
                     const errorData = JSON.parse(text) as {message?: string}
                     errorMessage = String(errorData?.message ?? '').trim()
                 }
-            } catch {
-                // Empty or invalid JSON body (e.g. 404 for guest user)
+            } catch (parseError) {
+                // Log parsing failure but don't throw - error message will be constructed from status code
+                // This can happen with empty responses or non-JSON error pages (e.g., 404 for guest user)
+                if (typeof console !== 'undefined' && console.debug) {
+                    console.debug('Failed to parse passwordless auth error response:', parseError)
+                }
             }
             throw new Error(
                 [res.status, errorMessage].filter(Boolean).join(' ') || String(res.status)
