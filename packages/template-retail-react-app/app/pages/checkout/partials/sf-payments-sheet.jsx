@@ -64,10 +64,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
 
     const {data: basket} = useCurrentBasket()
     const {isRegistered} = useCustomerType()
-    const {data: customer, isLoading: customerLoading} = useCurrentCustomer(
-        isRegistered ? ['paymentmethodreferences'] : undefined
-    )
-    const isCustomerDataLoading = isRegistered && customerLoading
+    const {
+        data: customer,
+        isLoading: customerLoading,
+        isFetching: customerFetching
+    } = useCurrentCustomer(isRegistered ? ['paymentmethodreferences'] : undefined, {
+        refetchOnMount: 'always'
+    })
+    const isCustomerDataLoading = isRegistered && (customerLoading || customerFetching)
 
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
@@ -523,9 +527,14 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         [customer, paymentConfig]
     )
 
+    const [paymentStepReached, setPaymentStepReached] = useState(false)
+    useEffect(() => {
+        if (step === STEPS.PAYMENT) setPaymentStepReached(true)
+    }, [step, STEPS])
+
     useEffect(() => {
         // Mount SFP only when all required data and DOM are ready; otherwise skip or wait for a later run.
-
+        if (!paymentStepReached) return // Only run after user has reached payment step
         if (isCustomerDataLoading) return // Wait for savedPaymentMethods data to load for registered users
         if (checkoutComponent.current) return // Skip if Componenet Already mounted
         if (!sfp) return // Skip if SFP SDK not loaded yet
@@ -589,13 +598,11 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             checkoutComponent.current?.destroy()
             checkoutComponent.current = null
         }
-        // Omit savedPaymentMethodsKey: init once with current SPM; re-initing when SPM list changes
-        // causes Stripe/Adyen to complain.
     }, [
+        paymentStepReached,
         isCustomerDataLoading,
         sfp,
         metadata,
-        containerElementRef.current,
         paymentConfig,
         cardCaptureAutomatic
     ])
