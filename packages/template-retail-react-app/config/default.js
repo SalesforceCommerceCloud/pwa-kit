@@ -48,7 +48,7 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -57,17 +57,11 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '0bb3af38-b52c-4f4b-966e-fe7087ca47e2',
-                organizationId: 'f_ecom_zyoe_006',
-                shortCode: 'sandbox-001',
-                siteId: 'RefArch'
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: '8o7m175y',
+                siteId: 'RefArchGlobal'
             }
-            /*parameters: {
-                clientId: 'cc62dfa8-777f-486a-8af2-bdc048a4ba52',
-                organizationId: 'f_ecom_zyoe_009',
-                shortCode: 'sandbox-001',
-                siteId: 'RefArch'
-            }*/
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
@@ -94,20 +88,10 @@ module.exports = {
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,
-        // Salesforce Payments configuration
-        // To enable, set enabled to true and provide the SDK and metadata URLs for your Commerce Cloud instance.
-        // Example URLs: https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js
-        //               https://<instance>.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json
-        /*sfPayments: {
-            enabled: false,
-            sdkUrl: '',
-            metadataUrl: ''
-        },*/
         sfPayments: {
             enabled: true,
-            sdkUrl: 'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
-            metadataUrl:
-                'https://zyoe-006.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+            sdkUrl: '',
+            metadataUrl: ''
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
@@ -129,11 +113,11 @@ module.exports = {
         ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
-                host: 'sandbox-001.api.commercecloud.salesforce.com',
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zyoe-006.dx.commercecloud.salesforce.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]

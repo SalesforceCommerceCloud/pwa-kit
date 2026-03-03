@@ -1,4 +1,5 @@
 ## v5.1.0-dev
+- Bump commerce-sdk-isomorphic to 5.1.0-unstable-20260226081656
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
 ## v5.0.0 (Feb 12, 2026)
