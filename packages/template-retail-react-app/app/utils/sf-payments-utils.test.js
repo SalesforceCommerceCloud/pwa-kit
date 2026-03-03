@@ -1300,7 +1300,7 @@ describe('sf-payments-utils', () => {
             })
         })
 
-        test('includes Stripe gateway with empty stripe props when storePaymentMethod is false (no setupFutureUsage)', () => {
+        test('does not include Stripe gateway or gatewayProperties when storePaymentMethod is false (no setupFutureUsage)', () => {
             const paymentMethods = [{paymentMethodType: 'card', accountId: 'acct_123'}]
             const paymentMethodSetAccounts = [{vendor: 'Stripe', accountId: 'acct_123'}]
             const result = createPaymentInstrumentBody({
@@ -1314,8 +1314,8 @@ describe('sf-payments-utils', () => {
                 paymentMethodSetAccounts
             })
 
-            expect(result.paymentReferenceRequest.gateway).toBe('stripe')
-            expect(result.paymentReferenceRequest.gatewayProperties.stripe).toEqual({})
+            expect(result.paymentReferenceRequest.gateway).toBeUndefined()
+            expect(result.paymentReferenceRequest.gatewayProperties).toBeUndefined()
         })
 
         test('does not include shippingPreference when null', () => {
