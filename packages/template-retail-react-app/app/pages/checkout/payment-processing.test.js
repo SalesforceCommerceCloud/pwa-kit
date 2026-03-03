@@ -20,8 +20,7 @@ const mockUseOrder = jest.fn()
 const mockUpdatePaymentInstrumentForOrder = jest.fn()
 const mockFailOrder = jest.fn()
 const mockGetSFPaymentsInstrument = jest.fn()
-const mockGetOrder = jest.fn()
-const mockGetTokenWhenReady = jest.fn()
+const mockRefetchOrder = jest.fn()
 const mockInvalidateQueries = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
@@ -43,14 +42,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...actual,
-        useCommerceApi: () => ({
-            shopperOrders: {
-                getOrder: mockGetOrder
-            }
-        }),
-        useAccessToken: () => ({
-            getTokenWhenReady: mockGetTokenWhenReady
-        }),
         useShopperOrdersMutation: (mutationKey) => {
             if (mutationKey === 'updatePaymentInstrumentForOrder') {
                 return {mutateAsync: mockUpdatePaymentInstrumentForOrder}
@@ -104,16 +95,18 @@ describe('PaymentProcessing', () => {
 
         mockUseOrder.mockReturnValue({
             data: {
-                orderNo: '12345'
-            }
+                orderNo: '12345',
+                status: 'created'
+            },
+            refetch: mockRefetchOrder
+        })
+        mockRefetchOrder.mockResolvedValue({
+            data: {orderNo: '12345', status: 'created'}
         })
 
         mockUpdatePaymentInstrumentForOrder.mockReturnValue({})
 
         mockGetSFPaymentsInstrument.mockReturnValue({})
-
-        mockGetOrder.mockResolvedValue({status: 'created'})
-        mockGetTokenWhenReady.mockResolvedValue('token')
     })
 
     afterEach(() => {
@@ -220,6 +213,13 @@ describe('PaymentProcessing', () => {
 
         test('renders error message for invalid Adyen URL missing type', async () => {
             mockLocation.search = '?vendor=Adyen&orderNo=12345&zoneId=default&redirectResult=ABC123'
+            mockUseOrder.mockReturnValue({
+                data: {orderNo: '12345'},
+                refetch: mockRefetchOrder
+            })
+            mockRefetchOrder.mockResolvedValue({
+                data: {orderNo: '12345', status: 'created'}
+            })
 
             renderWithProviders(<PaymentProcessing />)
 
@@ -229,7 +229,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
-                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockRefetchOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -245,6 +245,13 @@ describe('PaymentProcessing', () => {
 
         test('renders error message for invalid Adyen URL missing zone id', async () => {
             mockLocation.search = '?vendor=Adyen&orderNo=12345&type=klarna&redirectResult=ABC123'
+            mockUseOrder.mockReturnValue({
+                data: {orderNo: '12345'},
+                refetch: mockRefetchOrder
+            })
+            mockRefetchOrder.mockResolvedValue({
+                data: {orderNo: '12345', status: 'created'}
+            })
 
             renderWithProviders(<PaymentProcessing />)
 
@@ -254,7 +261,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
-                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockRefetchOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -270,6 +277,13 @@ describe('PaymentProcessing', () => {
 
         test('renders error message for invalid Adyen URL missing redirect result', async () => {
             mockLocation.search = '?vendor=Adyen&orderNo=12345&type=klarna&zoneId=default'
+            mockUseOrder.mockReturnValue({
+                data: {orderNo: '12345'},
+                refetch: mockRefetchOrder
+            })
+            mockRefetchOrder.mockResolvedValue({
+                data: {orderNo: '12345', status: 'created'}
+            })
 
             renderWithProviders(<PaymentProcessing />)
 
@@ -279,7 +293,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
-                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockRefetchOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -419,6 +433,9 @@ describe('PaymentProcessing', () => {
 
             test('shows toast and calls failOrder before navigating on failed payment', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
+                mockRefetchOrder.mockResolvedValue({
+                    data: {orderNo: '12345', status: 'created'}
+                })
 
                 renderWithProviders(<PaymentProcessing />)
 
@@ -427,7 +444,7 @@ describe('PaymentProcessing', () => {
                 })
 
                 await waitFor(() => {
-                    expect(mockGetOrder).toHaveBeenCalled()
+                    expect(mockRefetchOrder).toHaveBeenCalled()
                     expect(mockFailOrder).toHaveBeenCalledTimes(1)
                     expect(mockFailOrder).toHaveBeenCalledWith({
                         parameters: {
@@ -445,7 +462,9 @@ describe('PaymentProcessing', () => {
 
             test('does not call failOrder when order already failed by webhook', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
-                mockGetOrder.mockResolvedValue({status: 'failed'})
+                mockRefetchOrder.mockResolvedValue({
+                    data: {orderNo: '12345', status: 'failed'}
+                })
 
                 renderWithProviders(<PaymentProcessing />)
 
@@ -454,13 +473,15 @@ describe('PaymentProcessing', () => {
                     expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
 
-                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockRefetchOrder).toHaveBeenCalled()
                 expect(mockFailOrder).not.toHaveBeenCalled()
             })
 
             test('shows toast and navigates to checkout when failOrder fails', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
-                mockGetOrder.mockResolvedValue({status: 'created'})
+                mockRefetchOrder.mockResolvedValue({
+                    data: {orderNo: '12345', status: 'created'}
+                })
                 mockFailOrder.mockRejectedValue(new Error('Order already failed'))
 
                 renderWithProviders(<PaymentProcessing />)
@@ -470,7 +491,7 @@ describe('PaymentProcessing', () => {
                     expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
 
-                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockRefetchOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockInvalidateQueries).toHaveBeenCalled()
             })
@@ -481,8 +502,13 @@ describe('PaymentProcessing', () => {
                 for (const code of errorCodes) {
                     jest.clearAllMocks()
                     mockHandleRedirect.mockResolvedValue({responseCode: code})
-                    mockGetOrder.mockResolvedValue({status: 'created'})
-                    mockGetTokenWhenReady.mockResolvedValue('token')
+                    mockUseOrder.mockReturnValue({
+                        data: {orderNo: '12345', status: 'created'},
+                        refetch: mockRefetchOrder
+                    })
+                    mockRefetchOrder.mockResolvedValue({
+                        data: {orderNo: '12345', status: 'created'}
+                    })
 
                     renderWithProviders(<PaymentProcessing />)
 
@@ -607,6 +633,10 @@ describe('PaymentProcessing', () => {
             })
 
             test('shows toast and calls failOrder before navigating on failed payment', async () => {
+                mockRefetchOrder.mockResolvedValue({
+                    data: {orderNo: '12345', status: 'created'}
+                })
+
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
@@ -614,7 +644,7 @@ describe('PaymentProcessing', () => {
                 })
 
                 await waitFor(() => {
-                    expect(mockGetOrder).toHaveBeenCalled()
+                    expect(mockRefetchOrder).toHaveBeenCalled()
                     expect(mockFailOrder).toHaveBeenCalledTimes(1)
                     expect(mockFailOrder).toHaveBeenCalledWith({
                         parameters: {
