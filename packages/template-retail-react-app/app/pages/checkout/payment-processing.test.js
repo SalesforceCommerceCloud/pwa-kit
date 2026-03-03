@@ -20,6 +20,9 @@ const mockUseOrder = jest.fn()
 const mockUpdatePaymentInstrumentForOrder = jest.fn()
 const mockFailOrder = jest.fn()
 const mockGetSFPaymentsInstrument = jest.fn()
+const mockGetOrder = jest.fn()
+const mockGetTokenWhenReady = jest.fn()
+const mockInvalidateQueries = jest.fn()
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     __esModule: true,
@@ -40,6 +43,14 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...actual,
+        useCommerceApi: () => ({
+            shopperOrders: {
+                getOrder: mockGetOrder
+            }
+        }),
+        useAccessToken: () => ({
+            getTokenWhenReady: mockGetTokenWhenReady
+        }),
         useShopperOrdersMutation: (mutationKey) => {
             if (mutationKey === 'updatePaymentInstrumentForOrder') {
                 return {mutateAsync: mockUpdatePaymentInstrumentForOrder}
@@ -50,6 +61,16 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             return {mutateAsync: jest.fn()}
         },
         useOrder: () => mockUseOrder()
+    }
+})
+
+jest.mock('@tanstack/react-query', () => {
+    const actual = jest.requireActual('@tanstack/react-query')
+    return {
+        ...actual,
+        useQueryClient: () => ({
+            invalidateQueries: mockInvalidateQueries
+        })
     }
 })
 
@@ -90,6 +111,9 @@ describe('PaymentProcessing', () => {
         mockUpdatePaymentInstrumentForOrder.mockReturnValue({})
 
         mockGetSFPaymentsInstrument.mockReturnValue({})
+
+        mockGetOrder.mockResolvedValue({status: 'created'})
+        mockGetTokenWhenReady.mockResolvedValue('token')
     })
 
     afterEach(() => {
@@ -205,6 +229,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
+                expect(mockGetOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -229,6 +254,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
+                expect(mockGetOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -253,6 +279,7 @@ describe('PaymentProcessing', () => {
             expect(screen.getByText('Return to Checkout')).toBeInTheDocument()
 
             await waitFor(() => {
+                expect(mockGetOrder).toHaveBeenCalled()
                 expect(mockFailOrder).toHaveBeenCalledTimes(1)
                 expect(mockFailOrder).toHaveBeenCalledWith({
                     parameters: {
@@ -380,13 +407,13 @@ describe('PaymentProcessing', () => {
                 })
             })
 
-            test('navigates back to checkout on failed payment', async () => {
+            test('navigates to cart on failed payment', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
 
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
-                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
                 })
             })
 
@@ -400,6 +427,7 @@ describe('PaymentProcessing', () => {
                 })
 
                 await waitFor(() => {
+                    expect(mockGetOrder).toHaveBeenCalled()
                     expect(mockFailOrder).toHaveBeenCalledTimes(1)
                     expect(mockFailOrder).toHaveBeenCalledWith({
                         parameters: {
@@ -412,7 +440,22 @@ describe('PaymentProcessing', () => {
                     })
                 })
 
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                expect(mockNavigate).toHaveBeenCalledWith('/cart')
+            })
+
+            test('does not call failOrder when order already failed by webhook (e.g. 3DS declined)', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: 1})
+                mockGetOrder.mockResolvedValue({status: 'failed'})
+
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockToast).toHaveBeenCalled()
+                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                })
+
+                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockFailOrder).not.toHaveBeenCalled()
             })
 
             test('handles different error response codes', async () => {
@@ -421,12 +464,14 @@ describe('PaymentProcessing', () => {
                 for (const code of errorCodes) {
                     jest.clearAllMocks()
                     mockHandleRedirect.mockResolvedValue({responseCode: code})
+                    mockGetOrder.mockResolvedValue({status: 'created'})
+                    mockGetTokenWhenReady.mockResolvedValue('token')
 
                     renderWithProviders(<PaymentProcessing />)
 
                     await waitFor(() => {
                         expect(mockToast).toHaveBeenCalled()
-                        expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                        expect(mockNavigate).toHaveBeenCalledWith('/cart')
                     })
                 }
             })
@@ -536,11 +581,11 @@ describe('PaymentProcessing', () => {
                 })
             })
 
-            test('navigates back to checkout on failed payment', async () => {
+            test('navigates to cart on failed payment', async () => {
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
-                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
                 })
             })
 
@@ -552,6 +597,7 @@ describe('PaymentProcessing', () => {
                 })
 
                 await waitFor(() => {
+                    expect(mockGetOrder).toHaveBeenCalled()
                     expect(mockFailOrder).toHaveBeenCalledTimes(1)
                     expect(mockFailOrder).toHaveBeenCalledWith({
                         parameters: {
@@ -564,7 +610,7 @@ describe('PaymentProcessing', () => {
                     })
                 })
 
-                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                expect(mockNavigate).toHaveBeenCalledWith('/cart')
             })
         })
     })
