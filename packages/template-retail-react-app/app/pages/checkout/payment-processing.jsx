@@ -90,7 +90,6 @@ const PaymentProcessing = () => {
 
     const isError = !isValidReturnUrl()
     const isHandled = useRef(false)
-    const failOrderCalledRef = useRef(false)
 
     async function handleAdyenRedirect() {
         // Find SF Payments payment instrument in order
@@ -134,7 +133,7 @@ const PaymentProcessing = () => {
      * @returns {Promise<void>}
      */
     async function attemptFailOrderForPayment() {
-        if (!orderNo || failOrderCalledRef.current) {
+        if (!orderNo) {
             return
         }
 
@@ -156,10 +155,11 @@ const PaymentProcessing = () => {
                     }
                 })
             }
-        } catch {
-            // Order may already be failed by webhook; avoid hanging
+        } catch (error) {
+            // Swallow so flow continues (invalidate, navigate). Causes: (1) Race: getOrder
+            // returned 'created' but webhook already failed the order, so failOrder fails. (2) getOrder,
+            // getTokenWhenReady, or failOrder threw error. Behavior for all: don't hang.
         } finally {
-            failOrderCalledRef.current = true
             queryClient.invalidateQueries()
         }
     }
@@ -210,11 +210,11 @@ const PaymentProcessing = () => {
                     duration: 30000
                 })
 
-                // Attempt to fail the order (no-op if already failed by webhook
+                // Attempt to fail the order (no-op if already failed by webhook)
                 await attemptFailOrderForPayment()
 
-                // Redirect to cart when payment fails
-                navigate('/cart')
+                // Navigate back to the checkout page to try again
+                navigate('/checkout')
             })()
         }
     }, [sfp, order])

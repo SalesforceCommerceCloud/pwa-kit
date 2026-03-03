@@ -407,13 +407,13 @@ describe('PaymentProcessing', () => {
                 })
             })
 
-            test('navigates to cart on failed payment', async () => {
+            test('navigates back to checkout on failed payment', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
 
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
-                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
             })
 
@@ -440,10 +440,10 @@ describe('PaymentProcessing', () => {
                     })
                 })
 
-                expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
             })
 
-            test('does not call failOrder when order already failed by webhook (e.g. 3DS declined)', async () => {
+            test('does not call failOrder when order already failed by webhook', async () => {
                 mockHandleRedirect.mockResolvedValue({responseCode: 1})
                 mockGetOrder.mockResolvedValue({status: 'failed'})
 
@@ -451,11 +451,28 @@ describe('PaymentProcessing', () => {
 
                 await waitFor(() => {
                     expect(mockToast).toHaveBeenCalled()
-                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
 
                 expect(mockGetOrder).toHaveBeenCalled()
                 expect(mockFailOrder).not.toHaveBeenCalled()
+            })
+
+            test('shows toast and navigates to checkout when failOrder fails', async () => {
+                mockHandleRedirect.mockResolvedValue({responseCode: 1})
+                mockGetOrder.mockResolvedValue({status: 'created'})
+                mockFailOrder.mockRejectedValue(new Error('Order already failed'))
+
+                renderWithProviders(<PaymentProcessing />)
+
+                await waitFor(() => {
+                    expect(mockToast).toHaveBeenCalled()
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
+                })
+
+                expect(mockGetOrder).toHaveBeenCalled()
+                expect(mockFailOrder).toHaveBeenCalledTimes(1)
+                expect(mockInvalidateQueries).toHaveBeenCalled()
             })
 
             test('handles different error response codes', async () => {
@@ -471,7 +488,7 @@ describe('PaymentProcessing', () => {
 
                     await waitFor(() => {
                         expect(mockToast).toHaveBeenCalled()
-                        expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                        expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                     })
                 }
             })
@@ -581,11 +598,11 @@ describe('PaymentProcessing', () => {
                 })
             })
 
-            test('navigates to cart on failed payment', async () => {
+            test('navigates back to checkout on failed payment', async () => {
                 renderWithProviders(<PaymentProcessing />)
 
                 await waitFor(() => {
-                    expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                    expect(mockNavigate).toHaveBeenCalledWith('/checkout')
                 })
             })
 
@@ -610,7 +627,7 @@ describe('PaymentProcessing', () => {
                     })
                 })
 
-                expect(mockNavigate).toHaveBeenCalledWith('/cart')
+                expect(mockNavigate).toHaveBeenCalledWith('/checkout')
             })
         })
     })
