@@ -48,10 +48,13 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             },
             passkey: {
-                enabled: false,
-                callbackURI: process.env.PASSKEY_CALLBACK_URI
+                enabled: true,
+                mode: 'callback',
+                callbackURI: 'https://webhook.site/1b592264-a9b1-4d75-a892-cf68fed334f1'
             }
         },
+        enableHybrid: true,
+        sfccOrigin: 'https://staging-realm26-qa223.demandware.net',
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
@@ -61,9 +64,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '472f318c-8628-4b8d-81cf-b48c2352e9e5',
+                organizationId: 'f_ecom_tbdq_stg',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -111,9 +114,18 @@ module.exports = {
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
+            // {
+            //     host: 'kv7kzm78.api.commercecloud.salesforce.com',
+            //     path: 'api'
+            // },
+            // For bjmk_dev, tbdq_stg
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
+            },
+            {
+                host: 'staging-realm26-qa223.demandware.net',
+                path: 'dwrestatic'
             },
             {
                 host: 'zzrf-001.dx.commercecloud.salesforce.com',

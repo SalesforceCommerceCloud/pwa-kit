@@ -15,7 +15,8 @@
 import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
+import {withRouter} from 'react-router-dom'
+import {useEffect} from 'react'
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
@@ -123,12 +124,16 @@ export const routes = [
 
 export default () => {
     const config = getConfig()
+    const enableHybrid = config?.app?.enableHybrid
     const loginConfig = config?.app?.login
     const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
     const socialLoginEnabled = loginConfig?.social?.enabled
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+
+    // Paths handled by SFRA in hybrid mode
+    const hybridPaths = ['/cart', '/checkout', '/checkout/confirmation/:orderNo']
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -151,11 +156,53 @@ export default () => {
             }
     ].filter(Boolean)
 
-    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
-        ignoredRoutes: ['/callback'],
-        fuzzyPathMatching: true
-    })
+    const allRoutes = configureRoutes(
+        [...routes, ...dynamicRoutes].filter(
+            (r) => !enableHybrid || !hybridPaths.includes(r.path)
+        ),
+        config,
+        {ignoredRoutes: ['/callback'], fuzzyPathMatching: true}
+    )
 
     // Add catch-all route at the end so it doesn't match before dynamic routes
-    return [...allRoutes, {path: '*', component: PageNotFound}]
+    return [
+        ...allRoutes,
+        {
+            path: '*',
+            component: withRouter((props) => {
+                const {location} = props
+                const urlParams = new URLSearchParams(location.search)
+
+                useEffect(() => {
+                    if (enableHybrid && !urlParams.has('redirected')) {
+                        // Redirect client-side navigations directly to SFRA
+                        const sfccOrigin = getConfig()?.app?.sfccOrigin
+                        const siteId = getConfig()?.app?.defaultSite || 'RefArchGlobal'
+                        // Strip the PWA Kit site/locale prefix (e.g. /global/en-GB) from the path
+                        const pwaPath = location.pathname.replace(
+                            /^\/[^/]+\/[^/]+\//,
+                            '/'
+                        )
+                        const isLocalhost = window.location.hostname === 'localhost'
+                        const target =
+                            sfccOrigin && !isLocalhost
+                                ? `${sfccOrigin}/s/${siteId}${pwaPath}`
+                                : `/s/${siteId}${pwaPath}`
+                        window.location.replace(target)
+                        return
+                    }
+                    const newURL = new URL(window.location)
+                    if (!urlParams.has('redirected')) {
+                        newURL.searchParams.append('redirected', '1')
+                        window.location.href = newURL
+                    }
+                }, [window.location.href])
+
+                if (urlParams.has('redirected')) {
+                    return <PageNotFound {...props} />
+                }
+                return null
+            })
+        }
+    ]
 }

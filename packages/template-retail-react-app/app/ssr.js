@@ -51,7 +51,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -79,7 +79,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: false,
+    localAllowCookies: true,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -94,10 +94,14 @@ const options = {
         // If this is enabled, the Hybrid Proxy will be enabled to proxy requests to the SFCC instance.
         // IMPORTANT: This should only be used for local development. For production, this should be disabled and use eCDN to direct requests to the SFCC instance.
         // Refer to https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-authentication.html for more details.
-        enabled: false,
+        enabled: true,
 
         // The origin of the SFCC instance (i.e. the instance that is being proxied to which hosts the storefront).
-        sfccOrigin: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+        // Use the direct demandware.net hostname here (not the CDN/eCDN hostname) so the proxy
+        // can reach SFCC server-to-server without hitting Cloudflare Zero Trust.
+        // The Location-header rewriter in hybrid-proxy.js handles redirects to any hostname
+        // (including the CDN hostname tbdq-stg.cc-bm-dev.net) by rewriting them back through the proxy.
+        sfccOrigin: 'https://staging-realm26-qa223.demandware.net',
 
         // The MRT rules to apply to the hybrid proxy.
         // These rules determine which requests are handled by PWA Kit (MRT) vs proxied to SFCC. The same rules should be used in the eCDN rules for the same requests.
