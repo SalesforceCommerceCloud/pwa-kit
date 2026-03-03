@@ -425,6 +425,7 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         const updateCall = mockUpdatePaymentInstrument.mock.calls[0]
         const requestBody = updateCall[0].body
 
+        expect(requestBody.paymentReferenceRequest.gateway).toBeUndefined()
         expect(requestBody.paymentReferenceRequest.gatewayProperties).toBeUndefined()
     })
 
@@ -450,9 +451,9 @@ describe('SFPaymentsSheet - SDK Event Handler Tests', () => {
         expect(requestParams.orderNo).toBe('ORDER123')
         expect(requestParams.paymentInstrumentId).toBe('PI123')
         expect(requestBody.paymentReferenceRequest.gateway).toBe('stripe')
-        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe.setupFutureUsage).toBe(
-            'on_session'
-        )
+        expect(requestBody.paymentReferenceRequest.gatewayProperties.stripe).toEqual({
+            setupFutureUsage: 'on_session'
+        })
         expect(requestBody.paymentReferenceRequest.paymentMethodType).toBe('card')
     })
 

@@ -250,17 +250,13 @@ export const createPaymentInstrumentBody = ({
         }
     }
 
-    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE) {
-        const setupFutureUsage = storePaymentMethod
-            ? futureUsageOffSession
-                ? SETUP_FUTURE_USAGE.OFF_SESSION
-                : SETUP_FUTURE_USAGE.ON_SESSION
-            : null
+    if (!isPostRequest && gateway === PAYMENT_GATEWAYS.STRIPE && storePaymentMethod) {
+        const setupFutureUsage = futureUsageOffSession
+            ? SETUP_FUTURE_USAGE.OFF_SESSION
+            : SETUP_FUTURE_USAGE.ON_SESSION
         paymentReferenceRequest.gateway = PAYMENT_GATEWAYS.STRIPE
         paymentReferenceRequest.gatewayProperties = {
-            stripe: {
-                ...(setupFutureUsage && {setupFutureUsage})
-            }
+            stripe: {setupFutureUsage}
         }
     }
 
