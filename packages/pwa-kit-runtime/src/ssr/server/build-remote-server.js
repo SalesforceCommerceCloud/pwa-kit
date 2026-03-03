@@ -995,13 +995,19 @@ export const RemoteServerFactory = {
                                 }
 
                                 // Inject refresh_token into query string from HttpOnly cookie
-                                // Try registered user cookie first, then guest
-                                const refreshToken =
-                                    cookies[`cc-nx_${site}`] || cookies[`cc-nx-g_${site}`]
+                                // refresh_token ishouls required for /oauth2/logout
+                                const refreshToken = cookies[`cc-nx_${site}`]
                                 if (refreshToken) {
                                     const url = new URL(proxyRequest.path, 'http://localhost')
                                     url.searchParams.set('refresh_token', refreshToken)
                                     proxyRequest.path = url.pathname + url.search
+                                } else {
+                                    logger.warn(
+                                        `Registered refresh token cookie (cc-nx_${site}) not found for ${incomingRequest.path}. The logout request may fail.`,
+                                        {
+                                            namespace: '_setupSlasPrivateClientProxy'
+                                        }
+                                    )
                                 }
                             }
                         }
