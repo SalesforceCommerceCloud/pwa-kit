@@ -14,7 +14,13 @@ import {FormattedMessage} from 'react-intl'
 import {Heading, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
-import {useOrder, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useOrder,
+    useShopperOrdersMutation,
+    useCommerceApi,
+    useAccessToken
+} from '@salesforce/commerce-sdk-react'
+import {useQueryClient} from '@tanstack/react-query'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useSFPayments, STATUS_SUCCESS} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {getSFPaymentsInstrument} from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
@@ -42,6 +48,9 @@ const PaymentProcessing = () => {
     const navigate = useNavigation()
     const {sfp} = useSFPayments()
     const toast = useToast()
+    const queryClient = useQueryClient()
+    const api = useCommerceApi()
+    const {getTokenWhenReady} = useAccessToken()
 
     const {mutateAsync: updatePaymentInstrumentForOrder} = useShopperOrdersMutation(
         'updatePaymentInstrumentForOrder'
@@ -81,6 +90,7 @@ const PaymentProcessing = () => {
 
     const isError = !isValidReturnUrl()
     const isHandled = useRef(false)
+    const failOrderCalledRef = useRef(false)
 
     async function handleAdyenRedirect() {
         // Find SF Payments payment instrument in order
@@ -117,16 +127,41 @@ const PaymentProcessing = () => {
         )
     }
 
-    async function failOrderForPayment() {
-        await failOrder({
-            parameters: {
-                orderNo,
-                reopenBasket: true
-            },
-            body: {
-                reasonCode: 'payment_confirm_failure'
+    /**
+     * Attempts to fail an order and reopen the basket.
+     * Only calls failOrder if the order status is 'created' (avoids hanging when order
+     * was already failed by webhook.)
+     * @returns {Promise<void>}
+     */
+    async function attemptFailOrderForPayment() {
+        if (!orderNo || failOrderCalledRef.current) {
+            return
+        }
+
+        try {
+            const token = await getTokenWhenReady()
+            const currentOrder = await api.shopperOrders.getOrder({
+                parameters: {orderNo},
+                headers: {Authorization: `Bearer ${token}`}
+            })
+
+            if (currentOrder.status === 'created') {
+                await failOrder({
+                    parameters: {
+                        orderNo,
+                        reopenBasket: true
+                    },
+                    body: {
+                        reasonCode: 'payment_confirm_failure'
+                    }
+                })
             }
-        })
+        } catch {
+            // Order may already be failed by webhook; avoid hanging
+        } finally {
+            failOrderCalledRef.current = true
+            queryClient.invalidateQueries()
+        }
     }
 
     function showOrderConfirmation() {
@@ -139,7 +174,7 @@ const PaymentProcessing = () => {
             isHandled.current = true
 
             // Order exists but payment can't be processed for return URL
-            failOrderForPayment()
+            attemptFailOrderForPayment()
         } else if (!isError && sfp && order) {
             ;(async () => {
                 if (isHandled.current) {
@@ -175,11 +210,11 @@ const PaymentProcessing = () => {
                     duration: 30000
                 })
 
-                // Attempt to fail the order
-                await failOrderForPayment()
+                // Attempt to fail the order (no-op if already failed by webhook
+                await attemptFailOrderForPayment()
 
-                // Navigate back to the checkout page to try again
-                navigate('/checkout')
+                // Redirect to cart when payment fails
+                navigate('/cart')
             })()
         }
     }, [sfp, order])
