@@ -360,7 +360,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.paypal.com',
                 '*.adyen.com',
                 '*.google.com',
-                '*.demandware.net', // Used to load a valid payment scripts in test environment
+                '*.demandware.net' // Used to load a valid payment scripts in test environment
             ],
             'connect-src': [
                 // Connect to Einstein APIs
@@ -372,7 +372,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 'places.googleapis.com',
                 // Connect to SCRT2 URLs
                 '*.salesforce-scrt.com',
-                // Payment gateways   
+                // Payment gateways
                 '*.demandware.net', // Used to load a valid payment scripts in test environment
                 '*.adyen.com',
                 '*.google.com'

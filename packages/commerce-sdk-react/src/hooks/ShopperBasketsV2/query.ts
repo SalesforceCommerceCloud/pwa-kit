@@ -40,7 +40,10 @@ export const useBasket = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBasketsV2.paramKeys[methodName])
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperBasketsV2.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -82,7 +85,10 @@ export const usePaymentMethodsForBasket = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBasketsV2.paramKeys[methodName])
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperBasketsV2.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -124,7 +130,10 @@ export const usePriceBooksForBasket = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBasketsV2.paramKeys[methodName])
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperBasketsV2.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -166,7 +175,10 @@ export const useShippingMethodsForShipment = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBasketsV2.paramKeys[methodName])
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperBasketsV2.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -208,7 +220,10 @@ export const useTaxesFromBasket = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBasketsV2.paramKeys[methodName])
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperBasketsV2.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

@@ -4921,6 +4921,12 @@
       "value": "Please enter your phone number."
     }
   ],
+  "use_address_fields.error.please_enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter your postal code."
+    }
+  ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
