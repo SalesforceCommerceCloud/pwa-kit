@@ -1,4 +1,5 @@
 ## v9.1.0-dev
+- [Feature] Add Salesforce Payments support in checkout
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 
 ## v9.0.0 (Feb 12, 2026)
