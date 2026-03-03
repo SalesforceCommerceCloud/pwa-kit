@@ -14,6 +14,16 @@ jest.mock('./utils', () => ({
     ...jest.requireActual('./utils'),
     isScapiDomain: jest.fn()
 }))
+jest.mock('../logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn()
+    }
+}))
+
+import logger from '../logger-instance'
 
 describe('applyProxyRequestHeaders', () => {
     it('removes a header not present in new headers', () => {
@@ -124,32 +134,6 @@ describe('applyScapiAuthHeaders', () => {
         )
     })
 
-    it('skips all SLAS auth endpoints (handled by SLAS private proxy)', () => {
-        utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
-
-        const proxyRequest = {
-            setHeader: jest.fn()
-        }
-        const incomingRequest = {
-            url: '/shopper/auth/v1/oauth2/logout',
-            headers: {
-                cookie: 'cc-at_RefArch=test-access-token',
-                'x-site-id': 'RefArch'
-            }
-        }
-
-        applyScapiAuthHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            targetHost: 'abc-001.api.commercecloud.salesforce.com'
-        })
-
-        // SLAS auth endpoints are handled by the SLAS private client proxy
-        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
-    })
-
     it('does not apply Bearer token when caching is true', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
@@ -176,7 +160,7 @@ describe('applyScapiAuthHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('does not apply Bearer token when x-site-id header is missing', () => {
+    it('logs warning and skips when x-site-id header is missing on SCAPI request', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({})
 
@@ -196,6 +180,10 @@ describe('applyScapiAuthHeaders', () => {
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+        expect(logger.warn).toHaveBeenCalledWith(
+            expect.stringContaining('x-site-id header is missing'),
+            expect.any(Object)
+        )
     })
 
     it('does not apply Bearer token when target is not SCAPI domain', () => {

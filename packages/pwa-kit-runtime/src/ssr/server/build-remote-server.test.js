@@ -523,7 +523,10 @@ describe('HttpOnly session cookies', () => {
 
             const response = await request(app)
                 .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
-                .set('Cookie', 'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token')
+                .set(
+                    'Cookie',
+                    'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token'
+                )
                 .set('x-site-id', 'testsite')
 
             expect(response.status).toBe(200)

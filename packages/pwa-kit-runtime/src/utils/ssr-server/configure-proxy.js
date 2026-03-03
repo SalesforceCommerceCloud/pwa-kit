@@ -36,9 +36,6 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * 1. Caching proxies never use auth (skip)
  * 2. x-site-id header must be present (skip if not)
  * 3. Target must be SCAPI domain (skip if not)
- * 4. SLAS auth endpoints (/shopper/auth/*) are skipped — Bearer injection for SLAS
- *    is handled by the SLAS private client proxy in build-remote-server.js
- * 5. For non-SLAS auth endpoints (e.g., /shopper/products, /shopper/baskets): Always apply Bearer token
  *
  * @private
  * @function
@@ -47,21 +44,20 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
  * @param targetHost {String} the target hostname (host+port)
  */
-export const applyScapiAuthHeaders = ({
-    proxyRequest,
-    incomingRequest,
-    caching,
-    targetHost
-}) => {
+export const applyScapiAuthHeaders = ({proxyRequest, incomingRequest, caching, targetHost}) => {
     const url = incomingRequest.url
     const resolvedSiteId = incomingRequest.headers?.['x-site-id']
 
-    // Skip if: caching proxy, no siteId, not SCAPI domain, or no URL
-    if (caching || !resolvedSiteId || !isScapiDomain(targetHost) || !url) {
+    // Skip if: caching proxy, not SCAPI domain, or no URL
+    if (caching || !isScapiDomain(targetHost) || !url) {
         return
     }
-    // SLAS auth endpoints are handled by the SLAS private client proxy
-    if (url.startsWith('/shopper/auth/')) {
+
+    if (!resolvedSiteId) {
+        logger.warn(
+            'x-site-id header is missing on SCAPI proxy request. Bearer token injection skipped.',
+            {namespace: 'configureProxy.applyScapiAuthHeaders'}
+        )
         return
     }
 
@@ -260,12 +256,14 @@ export const configureProxy = ({
             })
 
             // Apply Authorization header with shopper's access token from HttpOnly cookie
-            applyScapiAuthHeaders({
-                proxyRequest,
-                incomingRequest,
-                caching,
-                targetHost
-            })
+            if (process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false') {
+                applyScapiAuthHeaders({
+                    proxyRequest,
+                    incomingRequest,
+                    caching,
+                    targetHost
+                })
+            }
         },
 
         onProxyRes: (proxyResponse, req) => {
