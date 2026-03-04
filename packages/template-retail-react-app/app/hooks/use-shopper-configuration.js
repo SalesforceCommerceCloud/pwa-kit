@@ -13,7 +13,13 @@ import {useConfigurations} from '@salesforce/commerce-sdk-react'
  * @returns {*} The configuration value, or undefined if not found
  */
 export const useShopperConfiguration = (configurationId) => {
-    const {data: configurations} = useConfigurations()
+    // Stale time is set to 10 minutes to avoid unnecessary API calls
+    const {data: configurations} = useConfigurations(
+        {},
+        {
+            staleTime: 10 * 60 * 1000 // 10 minutes
+        }
+    )
     const config = configurations?.configurations?.find(
         (configuration) => configuration.id === configurationId
     )
