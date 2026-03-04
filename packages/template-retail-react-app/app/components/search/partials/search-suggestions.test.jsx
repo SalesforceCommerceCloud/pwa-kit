@@ -20,9 +20,9 @@ jest.mock(
                     <button
                         type="button"
                         onClick={props.onAskAssistantClick}
-                        aria-label="Ask Assistant - Discover, compare and shop smarter with your personal shopping assistant"
+                        aria-label="Ask Shopping Agent - Discover, compare and shop smarter with your personal shopping assistant"
                     >
-                        Ask Assistant
+                        Ask Shopping Agent
                     </button>
                 )}
             </div>
@@ -32,7 +32,7 @@ jest.mock(
     }
 )
 
-test('when no suggestions: renders RecentSearches and shows Ask Assistant banner when enabled with click handler', () => {
+test('when no suggestions: renders RecentSearches and shows Ask Shopping Agent banner when enabled with click handler', () => {
     renderWithProviders(
         <SearchSuggestions
             recentSearches={['shoes', 'dress']}
@@ -46,12 +46,12 @@ test('when no suggestions: renders RecentSearches and shows Ask Assistant banner
     expect(screen.getByTestId('sf-suggestion-recent')).toBeInTheDocument()
     expect(
         screen.getByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
 })
 
-test('when no suggestions and enableAgentFromSearchSuggestions false: does not show Ask Assistant banner', () => {
+test('when no suggestions and enableAgentFromSearchSuggestions false: does not show Ask Shopping Agent banner', () => {
     renderWithProviders(
         <SearchSuggestions
             recentSearches={['shoes']}
@@ -65,12 +65,12 @@ test('when no suggestions and enableAgentFromSearchSuggestions false: does not s
     expect(screen.getByTestId('sf-suggestion-recent')).toBeInTheDocument()
     expect(
         screen.queryByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).not.toBeInTheDocument()
 })
 
-test('when no suggestions and onAskAssistantClick not provided: does not show Ask Assistant banner', () => {
+test('when no suggestions and onAskAssistantClick not provided: does not show Ask Shopping Agent banner', () => {
     renderWithProviders(
         <SearchSuggestions
             recentSearches={['shoes']}
@@ -82,7 +82,7 @@ test('when no suggestions and onAskAssistantClick not provided: does not show As
 
     expect(
         screen.queryByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).not.toBeInTheDocument()
 })
@@ -100,7 +100,7 @@ test('enableAgentFromSearchSuggestions string "true" shows banner when no sugges
 
     expect(
         screen.getByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
 })
@@ -121,7 +121,7 @@ test('when has suggestions: renders SuggestionSection with showAskAssistantBanne
 
     expect(screen.getByTestId('suggestion-section')).toBeInTheDocument()
     const banner = screen.getByRole('button', {
-        name: /ask assistant.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     expect(banner).toBeInTheDocument()
 })
@@ -142,7 +142,7 @@ test('when has suggestions and banner enabled: clicking banner calls onAskAssist
     )
 
     const banner = screen.getByRole('button', {
-        name: /ask assistant.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     await user.click(banner)
     expect(onAskAssistantClick).toHaveBeenCalledTimes(1)

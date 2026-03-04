@@ -6,6 +6,7 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
+
 // fetch polyfill can be removed when node 16 is no longer supported
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
