@@ -1539,12 +1539,6 @@
       "value": "Adres e-mail do wysyłania newslettera"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Bądź na bieżąco"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3135,6 +3129,18 @@
     {
       "type": 0,
       "value": "Anuluj"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Odkrywaj, porównuj i kupuj mądrzej z osobistym asystentem zakupów."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Zapytaj asystenta zakupów"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [

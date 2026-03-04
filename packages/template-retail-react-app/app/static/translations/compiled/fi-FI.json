@@ -1543,12 +1543,6 @@
       "value": "Sähköpostiosoite uutiskirjettä varten"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Saat tietää ensimmäisten joukossa"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3139,6 +3133,18 @@
     {
       "type": 0,
       "value": "Peruuta"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Löydä, vertaile ja osta fiksummin henkilökohtaisen ostosavustajasi kanssa."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Kysy ostosavustajalta"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [
