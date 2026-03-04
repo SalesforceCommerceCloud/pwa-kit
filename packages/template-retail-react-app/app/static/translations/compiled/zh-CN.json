@@ -77,24 +77,6 @@
       "value": "地址"
     }
   ],
-  "account_creation_notification.body": [
-    {
-      "type": 0,
-      "value": "我们已根据您的订单信息创建并验证了您的账户。下次结账时，只需输入我们发送的验证码即可登录，无需密码。"
-    }
-  ],
-  "account_creation_notification.title": [
-    {
-      "type": 0,
-      "value": "账户已创建"
-    }
-  ],
-  "account_creation_notification.verified": [
-    {
-      "type": 0,
-      "value": "已验证"
-    }
-  ],
   "account_detail.title.account_details": [
     {
       "type": 0,
@@ -429,12 +411,6 @@
       "value": "您现在已登录。"
     }
   ],
-  "auth_modal.description.now_signed_in_simple": [
-    {
-      "type": 0,
-      "value": "您已登录账户。"
-    }
-  ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
@@ -651,52 +627,16 @@
       "value": "下订单"
     }
   ],
-  "checkout.error.billing_address_required": [
-    {
-      "type": 0,
-      "value": "请输入账单地址。"
-    }
-  ],
-  "checkout.error.cannot_save_address": [
-    {
-      "type": 0,
-      "value": "无法保存配送地址。"
-    }
-  ],
-  "checkout.label.user_registration": [
-    {
-      "type": 0,
-      "value": "创建账户以更快结账"
-    }
-  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "结账时发生意外错误。"
     }
   ],
-  "checkout.message.user_registration": [
-    {
-      "type": 0,
-      "value": "您的付款、地址和联系信息将保存至新账户。请使用电子邮件发送的一次性密码 (OTP) 创建账户。创建账户后，可使用「忘记密码」功能设置新密码。"
-    }
-  ],
-  "checkout.payment.save_payment_method": [
-    {
-      "type": 0,
-      "value": "保存此支付方式供日后使用"
-    }
-  ],
   "checkout.title.checkout": [
     {
       "type": 0,
       "value": "结账"
-    }
-  ],
-  "checkout.title.user_registration": [
-    {
-      "type": 0,
-      "value": "保存结账信息供日后使用"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -787,12 +727,6 @@
     {
       "type": 0,
       "value": "送货"
-    }
-  ],
-  "checkout_confirmation.label.shipping.price": [
-    {
-      "type": 1,
-      "value": "price"
     }
   ],
   "checkout_confirmation.label.shipping.strikethrough.price": [
@@ -903,24 +837,6 @@
       "value": " 发送带有您的确认号码和收据的电子邮件。"
     }
   ],
-  "checkout_contact_info.action.change": [
-    {
-      "type": 0,
-      "value": "更换"
-    }
-  ],
-  "checkout_contact_info.action.sign_out": [
-    {
-      "type": 0,
-      "value": "退出登录"
-    }
-  ],
-  "checkout_contact_info.title.contact_info": [
-    {
-      "type": 0,
-      "value": "联系信息"
-    }
-  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -979,28 +895,10 @@
       "value": "移除"
     }
   ],
-  "checkout_payment.button.place_order": [
-    {
-      "type": 0,
-      "value": "下订单"
-    }
-  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
       "value": "检查订单"
-    }
-  ],
-  "checkout_payment.error.cannot_remove_applied_payment": [
-    {
-      "type": 0,
-      "value": "无法移除已应用的支付方式。请重试或使用当前支付方式下单。"
-    }
-  ],
-  "checkout_payment.error.cannot_save_payment": [
-    {
-      "type": 0,
-      "value": "无法保存支付方式。请重试。"
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -1195,18 +1093,6 @@
       "value": "以访客身份结账"
     }
   ],
-  "contact_info.button.continue_to_payment": [
-    {
-      "type": 0,
-      "value": "继续付款"
-    }
-  ],
-  "contact_info.button.continue_to_shipping_address": [
-    {
-      "type": 0,
-      "value": "继续填写收货地址"
-    }
-  ],
   "contact_info.button.login": [
     {
       "type": 0,
@@ -1223,12 +1109,6 @@
     {
       "type": 0,
       "value": "安全链接"
-    }
-  ],
-  "contact_info.error.generic_try_again": [
-    {
-      "type": 0,
-      "value": "发生错误，请重试。"
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -2643,110 +2523,6 @@
       "value": "税项"
     }
   ],
-  "order_summary.label.tax_tbd": [
-    {
-      "type": 0,
-      "value": "待定"
-    }
-  ],
-  "otp.button.cancel_guest_registration": [
-    {
-      "type": 0,
-      "value": "取消"
-    }
-  ],
-  "otp.button.checkout_as_guest": [
-    {
-      "type": 0,
-      "value": "以访客身份结账"
-    }
-  ],
-  "otp.button.resend_code": [
-    {
-      "type": 0,
-      "value": "重新发送验证码"
-    }
-  ],
-  "otp.error.invalid_code": [
-    {
-      "type": 0,
-      "value": "验证码无效或已过期。请点击“重新发送验证码”后重试。"
-    }
-  ],
-  "otp.message.enter_code_for_account_guest": [
-    {
-      "type": 0,
-      "value": "我们已向您的邮箱发送了一次性密码（OTP）。要创建账户并继续结账，请在下方输入"
-    },
-    {
-      "type": 1,
-      "value": "otpLength"
-    },
-    {
-      "type": 0,
-      "value": "位验证码。"
-    }
-  ],
-  "otp.message.enter_code_for_account_returning": [
-    {
-      "type": 0,
-      "value": "要登录您的账户，请输入发送到您邮箱的验证码。"
-    }
-  ],
-  "otp.message.resend_cooldown": [
-    {
-      "type": 0,
-      "value": "您可以在 "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "秒"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "秒"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " 后请求新验证码。"
-    }
-  ],
-  "otp.title.confirm_its_you": [
-    {
-      "type": 0,
-      "value": "请确认是您本人"
-    }
-  ],
-  "otp.title.create_account": [
-    {
-      "type": 0,
-      "value": "创建账户"
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2871,20 +2647,6 @@
       "value": "密码重置成功"
     }
   ],
-  "payment_selection.button.view_all": [
-    {
-      "type": 0,
-      "value": "查看全部（还有 "
-    },
-    {
-      "type": 1,
-      "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " 个）"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -2901,48 +2663,6 @@
     {
       "type": 0,
       "value": "这是一种安全的 SSL 加密支付。"
-    }
-  ],
-  "pickup_address.bonus_products.title": [
-    {
-      "type": 0,
-      "value": "赠品"
-    }
-  ],
-  "pickup_address.button.continue_to_payment": [
-    {
-      "type": 0,
-      "value": "继续付款"
-    }
-  ],
-  "pickup_address.button.continue_to_shipping_address": [
-    {
-      "type": 0,
-      "value": "继续填写收货地址"
-    }
-  ],
-  "pickup_address.button.show_products": [
-    {
-      "type": 0,
-      "value": "显示商品"
-    }
-  ],
-  "pickup_address.message.loading_store_info": [
-    {
-      "type": 0,
-      "value": "正在加载门店信息…"
-    }
-  ],
-  "pickup_address.title.pickup_address": [
-    {
-      "type": 0,
-      "value": "自提地址与信息"
-    }
-  ],
-  "pickup_address.title.store_information": [
-    {
-      "type": 0,
-      "value": "门店信息"
     }
   ],
   "price_per_item.label.each": [
@@ -3497,18 +3217,6 @@
       "value": "全部清除"
     }
   ],
-  "shipping_address.action.ship_to_multiple_addresses": [
-    {
-      "type": 0,
-      "value": "配送到多个地址"
-    }
-  ],
-  "shipping_address.button.add_new_address": [
-    {
-      "type": 0,
-      "value": "+ 添加新地址"
-    }
-  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3535,28 +3243,10 @@
       "value": "address"
     }
   ],
-  "shipping_address.label.shipping_address": [
-    {
-      "type": 0,
-      "value": "收货地址"
-    }
-  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
       "value": "送货地址表格"
-    }
-  ],
-  "shipping_address.summary.multiple_addresses": [
-    {
-      "type": 0,
-      "value": "您的商品将配送到多个地址。"
-    }
-  ],
-  "shipping_address.summary.multiple_locations": [
-    {
-      "type": 0,
-      "value": "您正在向多个地点发货。"
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3607,106 +3297,6 @@
       "value": "编辑送货地址"
     }
   ],
-  "shipping_multi_address.action.ship_to_single_address": [
-    {
-      "type": 0,
-      "value": "全部发往一个地址"
-    }
-  ],
-  "shipping_multi_address.add_new_address.aria_label": [
-    {
-      "type": 0,
-      "value": "为 "
-    },
-    {
-      "type": 1,
-      "value": "productName"
-    },
-    {
-      "type": 0,
-      "value": " 添加新配送地址"
-    }
-  ],
-  "shipping_multi_address.error.submit_failed": [
-    {
-      "type": 0,
-      "value": "设置配送时出错。请重试。"
-    }
-  ],
-  "shipping_multi_address.format.address_line_2": [
-    {
-      "type": 1,
-      "value": "city"
-    },
-    {
-      "type": 0,
-      "value": ", "
-    },
-    {
-      "type": 1,
-      "value": "stateCode"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    }
-  ],
-  "shipping_multi_address.image.alt": [
-    {
-      "type": 1,
-      "value": "productName"
-    },
-    {
-      "type": 0,
-      "value": " 的产品图片"
-    }
-  ],
-  "shipping_multi_address.label.note": [
-    {
-      "type": 0,
-      "value": "备注"
-    }
-  ],
-  "shipping_multi_address.loading_addresses": [
-    {
-      "type": 0,
-      "value": "正在加载地址…"
-    }
-  ],
-  "shipping_multi_address.message.no_delivery_items": [
-    {
-      "type": 0,
-      "value": "没有需配送的商品。所有商品均为自提。"
-    }
-  ],
-  "shipping_multi_address.message.pickup_items": [
-    {
-      "type": 0,
-      "value": "部分商品设为自提，此处不显示。仅配送商品可分配地址。"
-    }
-  ],
-  "shipping_multi_address.no_addresses_available": [
-    {
-      "type": 0,
-      "value": "无可用地址"
-    }
-  ],
-  "shipping_multi_address.product_attributes.label": [
-    {
-      "type": 0,
-      "value": "产品属性"
-    }
-  ],
-  "shipping_multi_address.quantity.label": [
-    {
-      "type": 0,
-      "value": "数量"
-    }
-  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
@@ -3719,48 +3309,10 @@
       "value": "继续并选择付款"
     }
   ],
-  "shipping_options.error.no_shipping_methods": [
-    {
-      "type": 0,
-      "value": "该地址无可用配送方式。请填写其他地址。"
-    }
-  ],
-  "shipping_options.label.no_method_selected": [
-    {
-      "type": 0,
-      "value": "未选择配送方式"
-    }
-  ],
-  "shipping_options.label.shipment_number": [
-    {
-      "type": 0,
-      "value": "配送 "
-    },
-    {
-      "type": 1,
-      "value": "index"
-    },
-    {
-      "type": 0,
-      "value": "："
-    }
-  ],
-  "shipping_options.label.total_shipping": [
-    {
-      "type": 0,
-      "value": "运费总计"
-    }
-  ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
       "value": "送货与礼品选项"
-    }
-  ],
-  "shipping_options.title.shipping_method": [
-    {
-      "type": 0,
-      "value": "配送方式"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -3811,46 +3363,6 @@
     {
       "type": 0,
       "value": "以继续。"
-    }
-  ],
-  "store_display.button.use_recent_store": [
-    {
-      "type": 0,
-      "value": "使用最近的门店"
-    }
-  ],
-  "store_display.format.address_line_2": [
-    {
-      "type": 1,
-      "value": "city"
-    },
-    {
-      "type": 0,
-      "value": ", "
-    },
-    {
-      "type": 1,
-      "value": "stateCode"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    }
-  ],
-  "store_display.label.store_contact_info": [
-    {
-      "type": 0,
-      "value": "门店联系方式"
-    }
-  ],
-  "store_display.label.store_hours": [
-    {
-      "type": 0,
-      "value": "营业时间"
     }
   ],
   "store_locator.action.find": [
@@ -3995,24 +3507,6 @@
     {
       "type": 0,
       "value": "："
-    }
-  ],
-  "toggle_card.action.change": [
-    {
-      "type": 0,
-      "value": "更换"
-    }
-  ],
-  "toggle_card.action.changePaymentInfo": [
-    {
-      "type": 0,
-      "value": "更换"
-    }
-  ],
-  "toggle_card.action.changeShippingOptions": [
-    {
-      "type": 0,
-      "value": "更换"
     }
   ],
   "toggle_card.action.edit": [
@@ -4265,12 +3759,6 @@
     {
       "type": 0,
       "value": "安全码"
-    }
-  ],
-  "use_login_fields.error.invalid_email": [
-    {
-      "type": 0,
-      "value": "请输入有效的电子邮件地址。"
     }
   ],
   "use_login_fields.error.required_email": [

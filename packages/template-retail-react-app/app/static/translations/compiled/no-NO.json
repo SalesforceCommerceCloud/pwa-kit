@@ -17,144 +17,6 @@
       "value": "Logg av"
     }
   ],
-  "account.payments.action.retry": [
-    {
-      "type": 0,
-      "value": "Prøv igjen"
-    }
-  ],
-  "account.payments.badge.default": [
-    {
-      "type": 0,
-      "value": "Standard"
-    }
-  ],
-  "account.payments.checkbox.make_default": [
-    {
-      "type": 0,
-      "value": "Sett som standard"
-    }
-  ],
-  "account.payments.error.payment_method_remove_failed": [
-    {
-      "type": 0,
-      "value": "Vi kunne ikke fjerne betalingsmetoden. Prøv igjen."
-    }
-  ],
-  "account.payments.error.payment_method_save_failed": [
-    {
-      "type": 0,
-      "value": "Vi kunne ikke lagre betalingsmetoden. Prøv igjen."
-    }
-  ],
-  "account.payments.error.set_default_failed": [
-    {
-      "type": 0,
-      "value": "Vi kunne ikke sette betalingsmetoden som standard. Prøv igjen."
-    }
-  ],
-  "account.payments.heading.payment_methods": [
-    {
-      "type": 0,
-      "value": "Betalingsmetoder"
-    }
-  ],
-  "account.payments.info.default_payment_updated": [
-    {
-      "type": 0,
-      "value": "Betalingsmetoden ble satt som standard."
-    }
-  ],
-  "account.payments.info.payment_method_removed": [
-    {
-      "type": 0,
-      "value": "Betalingsmetoden ble fjernet."
-    }
-  ],
-  "account.payments.info.payment_method_saved": [
-    {
-      "type": 0,
-      "value": "Ny betalingsmetode ble lagret."
-    }
-  ],
-  "account.payments.label.expires": [
-    {
-      "type": 0,
-      "value": "Utløper "
-    },
-    {
-      "type": 1,
-      "value": "month"
-    },
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "year"
-    }
-  ],
-  "account.payments.message.error": [
-    {
-      "type": 0,
-      "value": "Vi kunne ikke laste betalingsmetodene. Prøv igjen."
-    }
-  ],
-  "account.payments.message.loading": [
-    {
-      "type": 0,
-      "value": "Laster betalingsmetoder…"
-    }
-  ],
-  "account.payments.modal.action.cancel": [
-    {
-      "type": 0,
-      "value": "Avbryt"
-    }
-  ],
-  "account.payments.modal.action.set_default": [
-    {
-      "type": 0,
-      "value": "Sett som standard"
-    }
-  ],
-  "account.payments.modal.message.set_default": [
-    {
-      "type": 1,
-      "value": "brand"
-    },
-    {
-      "type": 0,
-      "value": " ... "
-    },
-    {
-      "type": 1,
-      "value": "last4"
-    },
-    {
-      "type": 0,
-      "value": " vil være standard ved kassen."
-    }
-  ],
-  "account.payments.modal.title.set_default": [
-    {
-      "type": 0,
-      "value": "Angi standardbetalingsmetode?"
-    }
-  ],
-  "account.payments.placeholder.heading": [
-    {
-      "type": 0,
-      "value": "Ingen lagrede betalingsmetoder"
-    }
-  ],
-  "account.payments.placeholder.text": [
-    {
-      "type": 0,
-      "value": "Legg til en ny betalingsmetode for å betale raskere."
-    }
-  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -207,24 +69,6 @@
     {
       "type": 0,
       "value": "Adresser"
-    }
-  ],
-  "account_creation_notification.body": [
-    {
-      "type": 0,
-      "value": "Vi har opprettet og verifisert kontoen din med informasjonen fra bestillingen. Neste gang du betaler, skriver du bare inn koden vi sender for å logge inn — ikke passord nødvendig."
-    }
-  ],
-  "account_creation_notification.title": [
-    {
-      "type": 0,
-      "value": "Konto opprettet"
-    }
-  ],
-  "account_creation_notification.verified": [
-    {
-      "type": 0,
-      "value": "Verifisert"
     }
   ],
   "account_detail.title.account_details": [
@@ -399,12 +243,6 @@
       "value": "Bestillingshistorikk"
     }
   ],
-  "account_payments.button.add_payment": [
-    {
-      "type": 0,
-      "value": "Legg til betalingsmetode"
-    }
-  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
@@ -558,12 +396,6 @@
     }
   ],
   "auth_modal.description.now_signed_in": [
-    {
-      "type": 0,
-      "value": "Du er nå pålogget."
-    }
-  ],
-  "auth_modal.description.now_signed_in_simple": [
     {
       "type": 0,
       "value": "Du er nå pålogget."
@@ -775,46 +607,10 @@
       "value": "Legg inn ordre"
     }
   ],
-  "checkout.error.billing_address_required": [
-    {
-      "type": 0,
-      "value": "Vennligst oppgi en faktureringsadresse."
-    }
-  ],
-  "checkout.error.cannot_save_address": [
-    {
-      "type": 0,
-      "value": "Kunne ikke lagre leveringsadressen."
-    }
-  ],
-  "checkout.label.user_registration": [
-    {
-      "type": 0,
-      "value": "Opprett en konto for raskere utsjekking"
-    }
-  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "Det oppstod en uventet feil under betalingen."
-    }
-  ],
-  "checkout.message.user_registration": [
-    {
-      "type": 0,
-      "value": "Betalings-, adresse- og kontaktinformasjonen din lagres i en ny konto. Bruk engangspassordet (OTP) sendt på e-post for å opprette kontoen din. Etter at du har opprettet kontoen, kan du bruke funksjonen Glemt passord for å angi et nytt passord."
-    }
-  ],
-  "checkout.payment.save_payment_method": [
-    {
-      "type": 0,
-      "value": "Lagre denne betalingsmetoden for senere bruk"
-    }
-  ],
-  "checkout.title.user_registration": [
-    {
-      "type": 0,
-      "value": "Lagre kasseinformasjon til senere bruk"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -905,12 +701,6 @@
     {
       "type": 0,
       "value": "Frakt"
-    }
-  ],
-  "checkout_confirmation.label.shipping.price": [
-    {
-      "type": 1,
-      "value": "price"
     }
   ],
   "checkout_confirmation.label.shipping.strikethrough.price": [
@@ -1021,24 +811,6 @@
       "value": " med bekreftelsesnummer og kvittering innen kort tid."
     }
   ],
-  "checkout_contact_info.action.change": [
-    {
-      "type": 0,
-      "value": "Endre"
-    }
-  ],
-  "checkout_contact_info.action.sign_out": [
-    {
-      "type": 0,
-      "value": "Logg ut"
-    }
-  ],
-  "checkout_contact_info.title.contact_info": [
-    {
-      "type": 0,
-      "value": "Kontaktinformasjon"
-    }
-  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -1097,28 +869,10 @@
       "value": "Fjern"
     }
   ],
-  "checkout_payment.button.place_order": [
-    {
-      "type": 0,
-      "value": "Fullfør bestilling"
-    }
-  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
       "value": "Gjennomgå ordre"
-    }
-  ],
-  "checkout_payment.error.cannot_remove_applied_payment": [
-    {
-      "type": 0,
-      "value": "Kunne ikke fjerne den anvendte betalingsmetoden. Prøv igjen eller bruk nåværende betaling for å fullføre bestillingen."
-    }
-  ],
-  "checkout_payment.error.cannot_save_payment": [
-    {
-      "type": 0,
-      "value": "Kunne ikke lagre betalingsmetoden. Prøv igjen."
     }
   ],
   "checkout_payment.heading.billing_address": [
@@ -1313,18 +1067,6 @@
       "value": "Utfør betaling som gjest"
     }
   ],
-  "contact_info.button.continue_to_payment": [
-    {
-      "type": 0,
-      "value": "Fortsett til betaling"
-    }
-  ],
-  "contact_info.button.continue_to_shipping_address": [
-    {
-      "type": 0,
-      "value": "Fortsett til leveringsadresse"
-    }
-  ],
   "contact_info.button.login": [
     {
       "type": 0,
@@ -1341,12 +1083,6 @@
     {
       "type": 0,
       "value": "Sikker lenke"
-    }
-  ],
-  "contact_info.error.generic_try_again": [
-    {
-      "type": 0,
-      "value": "Det oppstod en feil. Prøv igjen."
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -1511,12 +1247,6 @@
     {
       "type": 0,
       "value": "Bestillingshistorikk"
-    }
-  ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "Betalingsmetoder"
     }
   ],
   "drawer_menu.header.assistive_msg.title": [
@@ -1837,12 +1567,6 @@
     {
       "type": 0,
       "value": "Bestillingshistorikk"
-    }
-  ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "Betalingsmetoder"
     }
   ],
   "global.account.link.wishlist": [
@@ -2757,110 +2481,6 @@
       "value": "Avgift"
     }
   ],
-  "order_summary.label.tax_tbd": [
-    {
-      "type": 0,
-      "value": "Ikke beregnet"
-    }
-  ],
-  "otp.button.cancel_guest_registration": [
-    {
-      "type": 0,
-      "value": "Avbryt"
-    }
-  ],
-  "otp.button.checkout_as_guest": [
-    {
-      "type": 0,
-      "value": "Sjekk ut som gjest"
-    }
-  ],
-  "otp.button.resend_code": [
-    {
-      "type": 0,
-      "value": "Send kode på nytt"
-    }
-  ],
-  "otp.error.invalid_code": [
-    {
-      "type": 0,
-      "value": "Koden er ugyldig eller utløpt. Klikk Send kode på nytt og prøv igjen."
-    }
-  ],
-  "otp.message.enter_code_for_account_guest": [
-    {
-      "type": 0,
-      "value": "Vi har sendt et engangspassord (OTP) til e-posten din. For å opprette kontoen og gå videre til kassen, skriv inn den "
-    },
-    {
-      "type": 1,
-      "value": "otpLength"
-    },
-    {
-      "type": 0,
-      "value": "-sifrede koden nedenfor."
-    }
-  ],
-  "otp.message.enter_code_for_account_returning": [
-    {
-      "type": 0,
-      "value": "For å logge inn på kontoen din, skriv inn koden som ble sendt til e-posten din."
-    }
-  ],
-  "otp.message.resend_cooldown": [
-    {
-      "type": 0,
-      "value": "Du kan be om en ny kode om "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "sekund"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "sekunder"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": "."
-    }
-  ],
-  "otp.title.confirm_its_you": [
-    {
-      "type": 0,
-      "value": "Bekreft at det er deg"
-    }
-  ],
-  "otp.title.create_account": [
-    {
-      "type": 0,
-      "value": "Opprett en konto"
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2979,20 +2599,6 @@
       "value": "Passordet er tilbakestilt"
     }
   ],
-  "payment_selection.button.view_all": [
-    {
-      "type": 0,
-      "value": "Vis alle ("
-    },
-    {
-      "type": 1,
-      "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " flere)"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -3009,48 +2615,6 @@
     {
       "type": 0,
       "value": "Dette er en sikker SSL-kryptert betaling."
-    }
-  ],
-  "pickup_address.bonus_products.title": [
-    {
-      "type": 0,
-      "value": "Bonusvarer"
-    }
-  ],
-  "pickup_address.button.continue_to_payment": [
-    {
-      "type": 0,
-      "value": "Fortsett til betaling"
-    }
-  ],
-  "pickup_address.button.continue_to_shipping_address": [
-    {
-      "type": 0,
-      "value": "Fortsett til leveringsadresse"
-    }
-  ],
-  "pickup_address.button.show_products": [
-    {
-      "type": 0,
-      "value": "Vis produkter"
-    }
-  ],
-  "pickup_address.message.loading_store_info": [
-    {
-      "type": 0,
-      "value": "Laster butikkinformasjon…"
-    }
-  ],
-  "pickup_address.title.pickup_address": [
-    {
-      "type": 0,
-      "value": "Henteadresse og informasjon"
-    }
-  ],
-  "pickup_address.title.store_information": [
-    {
-      "type": 0,
-      "value": "Butikkinformasjon"
     }
   ],
   "price_per_item.label.each": [
@@ -3583,18 +3147,6 @@
       "value": "Tøm alt"
     }
   ],
-  "shipping_address.action.ship_to_multiple_addresses": [
-    {
-      "type": 0,
-      "value": "Send til flere adresser"
-    }
-  ],
-  "shipping_address.button.add_new_address": [
-    {
-      "type": 0,
-      "value": "+ Legg til ny adresse"
-    }
-  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3621,28 +3173,10 @@
       "value": "address"
     }
   ],
-  "shipping_address.label.shipping_address": [
-    {
-      "type": 0,
-      "value": "Leveringsadresse"
-    }
-  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
       "value": "Skjema for leveringsadresse"
-    }
-  ],
-  "shipping_address.summary.multiple_addresses": [
-    {
-      "type": 0,
-      "value": "Varene dine sendes til flere adresser."
-    }
-  ],
-  "shipping_address.summary.multiple_locations": [
-    {
-      "type": 0,
-      "value": "Du sender til flere adresser."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3693,102 +3227,6 @@
       "value": "Rediger leveringsadresse"
     }
   ],
-  "shipping_multi_address.action.ship_to_single_address": [
-    {
-      "type": 0,
-      "value": "Send varer til én adresse"
-    }
-  ],
-  "shipping_multi_address.add_new_address.aria_label": [
-    {
-      "type": 0,
-      "value": "Legg til ny leveringsadresse for "
-    },
-    {
-      "type": 1,
-      "value": "productName"
-    }
-  ],
-  "shipping_multi_address.error.submit_failed": [
-    {
-      "type": 0,
-      "value": "Noe gikk galt under oppsett av forsendelser. Prøv igjen."
-    }
-  ],
-  "shipping_multi_address.format.address_line_2": [
-    {
-      "type": 1,
-      "value": "city"
-    },
-    {
-      "type": 0,
-      "value": ", "
-    },
-    {
-      "type": 1,
-      "value": "stateCode"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    }
-  ],
-  "shipping_multi_address.image.alt": [
-    {
-      "type": 0,
-      "value": "Produktbilde for "
-    },
-    {
-      "type": 1,
-      "value": "productName"
-    }
-  ],
-  "shipping_multi_address.label.note": [
-    {
-      "type": 0,
-      "value": "Merknad"
-    }
-  ],
-  "shipping_multi_address.loading_addresses": [
-    {
-      "type": 0,
-      "value": "Laster adresser…"
-    }
-  ],
-  "shipping_multi_address.message.no_delivery_items": [
-    {
-      "type": 0,
-      "value": "Det er ingen varer å levere. Alle varer hentes."
-    }
-  ],
-  "shipping_multi_address.message.pickup_items": [
-    {
-      "type": 0,
-      "value": "Noen varer er satt for henting og vises ikke her. Bare leveringsvarer kan tilordnes adresser."
-    }
-  ],
-  "shipping_multi_address.no_addresses_available": [
-    {
-      "type": 0,
-      "value": "Ingen adresse tilgjengelig"
-    }
-  ],
-  "shipping_multi_address.product_attributes.label": [
-    {
-      "type": 0,
-      "value": "Produktattributter"
-    }
-  ],
-  "shipping_multi_address.quantity.label": [
-    {
-      "type": 0,
-      "value": "Antall"
-    }
-  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
@@ -3801,48 +3239,10 @@
       "value": "Fortsett til betaling"
     }
   ],
-  "shipping_options.error.no_shipping_methods": [
-    {
-      "type": 0,
-      "value": "Ingen fraktmetoder tilgjengelig for denne adressen. Vennligst oppgi en annen adresse."
-    }
-  ],
-  "shipping_options.label.no_method_selected": [
-    {
-      "type": 0,
-      "value": "Ingen fraktmetode valgt"
-    }
-  ],
-  "shipping_options.label.shipment_number": [
-    {
-      "type": 0,
-      "value": "Forsendelse "
-    },
-    {
-      "type": 1,
-      "value": "index"
-    },
-    {
-      "type": 0,
-      "value": ":"
-    }
-  ],
-  "shipping_options.label.total_shipping": [
-    {
-      "type": 0,
-      "value": "Total frakt"
-    }
-  ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
       "value": "Frakt- og gavealternativer"
-    }
-  ],
-  "shipping_options.title.shipping_method": [
-    {
-      "type": 0,
-      "value": "Fraktalternativer"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
@@ -3893,46 +3293,6 @@
     {
       "type": 0,
       "value": " for å fortsette."
-    }
-  ],
-  "store_display.button.use_recent_store": [
-    {
-      "type": 0,
-      "value": "Bruk siste butikk"
-    }
-  ],
-  "store_display.format.address_line_2": [
-    {
-      "type": 1,
-      "value": "city"
-    },
-    {
-      "type": 0,
-      "value": ", "
-    },
-    {
-      "type": 1,
-      "value": "stateCode"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    }
-  ],
-  "store_display.label.store_contact_info": [
-    {
-      "type": 0,
-      "value": "Butikkontaktinfo"
-    }
-  ],
-  "store_display.label.store_hours": [
-    {
-      "type": 0,
-      "value": "Åpningstider"
     }
   ],
   "store_locator.action.find": [
@@ -4077,24 +3437,6 @@
     {
       "type": 0,
       "value": ":"
-    }
-  ],
-  "toggle_card.action.change": [
-    {
-      "type": 0,
-      "value": "Endre"
-    }
-  ],
-  "toggle_card.action.changePaymentInfo": [
-    {
-      "type": 0,
-      "value": "Endre"
-    }
-  ],
-  "toggle_card.action.changeShippingOptions": [
-    {
-      "type": 0,
-      "value": "Endre"
     }
   ],
   "toggle_card.action.edit": [
@@ -4347,12 +3689,6 @@
     {
       "type": 0,
       "value": "Sikkerhetskode"
-    }
-  ],
-  "use_login_fields.error.invalid_email": [
-    {
-      "type": 0,
-      "value": "Vennligst oppgi en gyldig e-postadresse."
     }
   ],
   "use_login_fields.error.required_email": [
