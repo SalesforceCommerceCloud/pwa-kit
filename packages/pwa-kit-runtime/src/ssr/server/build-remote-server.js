@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
+import cookie from 'cookie'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -399,13 +400,7 @@ export const RemoteServerFactory = {
      */
     _configureProxyConfigs(options) {
         const siteId = options.siteId || null
-        const slasEndpointsRequiringAccessToken = options.slasEndpointsRequiringAccessToken
-        configureProxyConfigs(
-            options.appHostname,
-            options.protocol,
-            siteId,
-            slasEndpointsRequiringAccessToken
-        )
+        configureProxyConfigs(options.appHostname, options.protocol, siteId)
     },
 
     /**
@@ -982,6 +977,41 @@ export const RemoteServerFactory = {
                         // SLAS logout (/oauth2/logout), use the Authorization header for a different
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    } else if (
+                        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false' &&
+                        incomingRequest.path?.match(options.slasEndpointsRequiringAccessToken)
+                    ) {
+                        // Inject tokens from HttpOnly cookies for endpoints like /oauth2/logout
+                        const cookieHeader = incomingRequest.headers.cookie
+                        if (cookieHeader) {
+                            const cookies = cookie.parse(cookieHeader)
+                            const siteId = options.mobify?.app?.commerceAPI?.parameters?.siteId
+                            if (siteId) {
+                                const site = siteId.trim()
+
+                                // Inject Bearer token from access token cookie
+                                const accessToken = cookies[`cc-at_${site}`]
+                                if (accessToken) {
+                                    proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
+                                }
+
+                                // Inject refresh_token into query string from HttpOnly cookie
+                                // refresh_token ishouls required for /oauth2/logout
+                                const refreshToken = cookies[`cc-nx_${site}`]
+                                if (refreshToken) {
+                                    const url = new URL(proxyRequest.path, 'http://localhost')
+                                    url.searchParams.set('refresh_token', refreshToken)
+                                    proxyRequest.path = url.pathname + url.search
+                                } else {
+                                    logger.warn(
+                                        `Registered refresh token cookie (cc-nx_${site}) not found for ${incomingRequest.path}. The logout request may fail.`,
+                                        {
+                                            namespace: '_setupSlasPrivateClientProxy'
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     // Allow users to apply additional custom modifications to the proxy request
