@@ -51,7 +51,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -355,13 +355,31 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay specific images
+                        'https://www.gstatic.com/',
+                        '*.demandware.net',
+                        '*.sfcc-store-internal.net',
+                        's3.amazonaws.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com',
+                        '*.cc.salesforce.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         'maps.googleapis.com',
-                        'places.googleapis.com'
+                        'places.googleapis.com',
+                        '*.adyen.com',
+                        'https://checkoutshopper-test.adyen.com',
+                        'https://pay.google.com/gp/p/js/pay.js',
+                        '*.site.com',
+                        '*.commercecloud.com',
+                        '*.test1.my.pc-rnd.site.com',
+                        '*.test2.my.pc-rnd.site.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -371,11 +389,35 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'maps.googleapis.com',
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com'
+                        '*.salesforce-scrt.com',
+                        '*.site.com',
+                        'checkoutshopper-test.adyen.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test2.my.pc-rnd.salesforce-scrt.com',
+                        '*.test2.my.pc-rnd.site.com',
+                        'https://*.exp-delivery.com',
+                        '*.test1.my.pc-rn.site.com',
+                        'https://*.exp-delivery-soak.com',
+                        'https://pay.google.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
+                        '*.site.com',
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay Specific frames
+                        'https://pay.google.com'
+                    ],
+                    'frame-ancestors': [
+                        'self',
+                        'https://*.test1.my.pc-rnd.site.com',
+                        'https://*.test2.my.pc-rnd.site.com',
+                        'https://*.mobify-storefront.com',
+                        'https://runtime.commercecloud.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com',
+                        'https://*.force.com',
+                        'https://*.lightning.force.com'
                     ]
                 }
             }

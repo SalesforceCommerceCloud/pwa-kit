@@ -164,7 +164,8 @@ export const EINSTEIN_RECOMMENDERS = {
 
 export const SHIPPING_COUNTRY_CODES = [
     {value: 'CA', label: 'Canada'},
-    {value: 'US', label: 'United States'}
+    {value: 'US', label: 'United States'},
+    {value: 'FR', label: 'France'}
 ]
 
 // Constant to Enable Active Data
