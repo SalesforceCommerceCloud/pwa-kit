@@ -127,7 +127,8 @@ describe('useSFPayments hook', () => {
         mockGetConfig.mockReturnValue({
             app: {
                 sfPayments: {
-                    sdkUrl: 'https://test.sfpayments.com/sdk.js'
+                    sdkUrl: 'https://test.sfpayments.com/sdk.js',
+                    metadataUrl: 'https://test.sfpayments.com/metadata'
                 }
             }
         })
@@ -294,6 +295,43 @@ describe('useSFPayments hook', () => {
                 expect(mockFetch).toHaveBeenCalledWith(
                     'https://custom-origin.com/api/payment-metadata'
                 )
+            })
+        })
+    })
+
+    describe ('metadata query guard', () => {
+        test('does not fetch metadata when metadataUrl is empty', async () => {
+            mockGetConfig.mockReturnValue({
+                app: {
+                    sfPayments: {
+                        sdkUrl: 'https://test.sfpayments.com/sdk.js',
+                        metadataUrl: ''
+                    }
+                }
+            })
+        
+            renderWithQueryClient(<TestComponent />)
+        
+            await waitFor(() => {
+                expect(mockFetch).not.toHaveBeenCalled()
+            })
+        })
+        
+        test('does not fetch metadata when sfPayments is disabled', async () => {
+            mockGetConfig.mockReturnValue({
+                app: {
+                    sfPayments: {
+                        enabled: false,
+                        sdkUrl: 'https://test.sfpayments.com/sdk.js',
+                        metadataUrl: 'https://test.sfpayments.com/metadata'
+                    }
+                }
+            })
+        
+            renderWithQueryClient(<TestComponent />)
+        
+            await waitFor(() => {
+                expect(mockFetch).not.toHaveBeenCalled()
             })
         })
     })

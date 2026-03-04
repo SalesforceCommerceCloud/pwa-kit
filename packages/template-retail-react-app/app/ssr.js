@@ -45,7 +45,6 @@ const options = {
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
-    // TODO: remove this and document instead in the release docs
     protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
 
     // SSL file path for HTTPS development

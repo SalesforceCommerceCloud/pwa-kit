@@ -95,8 +95,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     ])
 
     return {
-        data: currentBasket,
         ...restOfQuery,
+        data: currentBasket,
         derivedData: {
             // Only true if a non-temporary basket exists (temporary baskets are filtered out above)
             hasBasket: !!currentBasket,
