@@ -19,7 +19,6 @@
 import crypto from 'crypto'
 import express from 'express'
 import helmet from 'helmet'
-import https from 'https'
 import {createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
@@ -45,7 +44,6 @@ const options = {
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
-    // TODO: remove this and document instead in the release docs
     protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
 
     // SSL file path for HTTPS development
@@ -371,7 +369,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com',
+                        'pay.google.com',
+                        'www.gstatic.com',
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
                         'places.googleapis.com'
@@ -388,7 +387,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Payment gateways
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         '*.adyen.com',
-                        '*.google.com'
+                        '*.paypal.com',
+                        'pay.google.com',
+                        'payments.google.com',
+                        'google.com',
+                        'www.google.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -397,7 +400,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stripe.com',
                         '*.paypal.com',
                         '*.adyen.com',
-                        '*.google.com'
+                        'payments.google.com',
+                        'pay.google.com'
                     ]
                 }
             }
@@ -458,50 +462,33 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Helper function to transform relative icon paths to absolute URLs
     function transformIconPaths(data, ecomServerHost) {
         const baseUrl = `https://${ecomServerHost}/on/demandware.static/Sites-Site/-/-/internal`
-        const dataStr = JSON.stringify(data)
-        // Replace all relative icon paths with absolute URLs
-        const transformedStr = dataStr.replace(/"src":\s*"\/icons\//g, `"src":"${baseUrl}/icons/`)
-        return JSON.parse(transformedStr)
-    }
-
-    app.get('/api/payment-metadata', async (req, res) => {
-        try {
-            // Parse the URL to extract hostname and path
-            const url = new URL(config.app.sfPayments.metadataUrl)
-            // Use Node's https module instead of fetch
-            const data = await new Promise((resolve, reject) => {
-                const options = {
-                    hostname: url.hostname,
-                    path: url.pathname,
-                    method: 'GET',
-                    rejectUnauthorized: false, // This bypasses SSL verification
-                    headers: {
-                        Accept: 'application/json'
+        const methodTypes = data?.paymentMethodTypes
+        if (methodTypes) {
+            for (const method of Object.values(methodTypes)) {
+                for (const image of method.images ?? []) {
+                    if (image.src?.startsWith('/icons/')) {
+                        image.src = `${baseUrl}${image.src}`
                     }
                 }
+            }
+        }
+        return data
+    }
 
-                const req = https.request(options, (response) => {
-                    let data = ''
-                    response.on('data', (chunk) => {
-                        data += chunk
-                    })
-                    response.on('end', () => {
-                        try {
-                            resolve(JSON.parse(data))
-                        } catch (e) {
-                            reject(e)
-                        }
-                    })
-                })
-
-                req.on('error', reject)
-                req.end()
+    // Helper function to fetch payment metadata from the Commerce Cloud instance
+    app.get('/api/payment-metadata', async (req, res) => {
+        try {
+            const response = await fetch(config.app.sfPayments.metadataUrl, {
+                headers: {Accept: 'application/json'}
             })
-
-            // Transform relative icon paths to absolute URLs
-            const transformedData = transformIconPaths(data, url.hostname)
-
-            res.setHeader('Access-Control-Allow-Origin', '*')
+            if (!response.ok) {
+                throw new Error(`Metadata request failed with status: ${response.status}`)
+            }
+            const data = await response.json()
+            const transformedData = transformIconPaths(
+                data,
+                new URL(config.app.sfPayments.metadataUrl).hostname
+            )
             res.setHeader('Content-Type', 'application/json')
             res.json(transformedData)
         } catch (error) {
