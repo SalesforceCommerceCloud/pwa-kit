@@ -1557,12 +1557,6 @@
       "value": "Adresse e-mail pour la newsletter"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Soyez parmi les premiers informés"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3185,6 +3179,18 @@
     {
       "type": 0,
       "value": "Annuler"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Découvrez, comparez et achetez plus malin avec votre assistant shopping personnel."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Demander l'assistant shopping"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [
