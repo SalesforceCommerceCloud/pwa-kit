@@ -210,8 +210,12 @@ describe('applyHttpOnlySessionCookies', () => {
         expect(uidoCookie.value).toBe('ecom')
         expect(uidoCookie.httpOnly).toBeUndefined()
 
-        // Should NOT have registered refresh cookie
-        expect(res.cookies.find((c) => c.startsWith('cc-nx_testsite='))).toBeUndefined()
+        // Registered refresh cookie should be expired (deleted)
+        const staleRegisteredCookie = parseCookie(
+            res.cookies.find((c) => c.startsWith('cc-nx_testsite='))
+        )
+        expect(staleRegisteredCookie.value).toBe('')
+        expect(staleRegisteredCookie.expires).toEqual(new Date(0))
 
         // Tokens stripped from body, other fields preserved
         const body = JSON.parse(result.toString('utf8'))
@@ -255,8 +259,12 @@ describe('applyHttpOnlySessionCookies', () => {
         const uidoCookie = parseCookie(res.cookies.find((c) => c.includes('uido_testsite=')))
         expect(uidoCookie.value).toBe('ecom')
 
-        // Should NOT have guest refresh cookie
-        expect(res.cookies.find((c) => c.includes('cc-nx-g_testsite='))).toBeUndefined()
+        // Guest refresh cookie should be expired (deleted)
+        const staleGuestCookie = parseCookie(
+            res.cookies.find((c) => c.startsWith('cc-nx-g_testsite='))
+        )
+        expect(staleGuestCookie.value).toBe('')
+        expect(staleGuestCookie.expires).toEqual(new Date(0))
 
         // No dnt cookie when dnt absent from JWT
         expect(res.cookies.find((c) => c.includes('cc-at-dnt_testsite'))).toBeUndefined()

@@ -197,6 +197,23 @@ export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, 
                 expires: refreshExpires
             })
         )
+
+        // Delete the opposite refresh token cookie to mirror client-side behavior:
+        // Login (guest → registered): delete guest cookie cc-nx-g
+        // Logout (registered → guest): delete registered cookie cc-nx
+        const staleCookieName = isGuest ? `cc-nx_${site}` : `cc-nx-g_${site}`
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: staleCookieName,
+                value: '',
+                path: '/',
+                secure: true,
+                sameSite: 'lax',
+                httpOnly: true,
+                expires: new Date(0)
+            })
+        )
     }
 
     // Strip token fields from body so they are not exposed to the client
