@@ -1539,12 +1539,6 @@
       "value": "電子報的電子郵件地址"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "搶先獲得消息"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3119,6 +3113,18 @@
     {
       "type": 0,
       "value": "取消"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "透過您的個人購物助理，更聰明地發現、比較與購物。"
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "詢問購物助理"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
+import {isValidEmail, validateEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 
 describe('isValidEmail', () => {
     describe('valid email addresses', () => {
@@ -149,6 +149,92 @@ describe('isValidEmail', () => {
 
         test('should return false for email with hyphen at end of domain part', () => {
             expect(isValidEmail('test@example-.com')).toBe(false)
+        })
+
+        test('should return false for single-character TLD', () => {
+            expect(isValidEmail('test@example.o')).toBe(false)
+            expect(isValidEmail('test@example.c')).toBe(false)
+        })
+    })
+
+    describe('TLD length', () => {
+        test('should accept two-character TLDs', () => {
+            expect(isValidEmail('test@example.co')).toBe(true)
+            expect(isValidEmail('test@example.uk')).toBe(true)
+        })
+
+        test('should accept longer TLDs', () => {
+            expect(isValidEmail('test@example.com')).toBe(true)
+            expect(isValidEmail('test@example.museum')).toBe(true)
+            expect(isValidEmail('test@example.travel')).toBe(true)
+        })
+    })
+})
+
+describe('validateEmail', () => {
+    describe('valid emails', () => {
+        test('returns valid: true for standard email', () => {
+            expect(validateEmail('user@example.com')).toEqual({valid: true})
+        })
+
+        test('returns valid: true for email with subdomain', () => {
+            expect(validateEmail('user@mail.example.com')).toEqual({valid: true})
+        })
+
+        test('returns valid: true for email with plus addressing', () => {
+            expect(validateEmail('user+tag@example.com')).toEqual({valid: true})
+        })
+
+        test('returns valid: true for email with dots', () => {
+            expect(validateEmail('first.last@example.com')).toEqual({valid: true})
+        })
+
+        test('returns valid: true for email with numbers', () => {
+            expect(validateEmail('user123@example456.com')).toEqual({valid: true})
+        })
+    })
+
+    describe('invalid emails', () => {
+        test('returns error "required" for empty string', () => {
+            expect(validateEmail('')).toEqual({valid: false, error: 'required'})
+        })
+
+        test('returns error "required" for whitespace only', () => {
+            expect(validateEmail('   ')).toEqual({valid: false, error: 'required'})
+        })
+
+        test('returns error "required" for undefined', () => {
+            expect(validateEmail(undefined)).toEqual({valid: false, error: 'required'})
+        })
+
+        test('returns error "required" for null', () => {
+            expect(validateEmail(null)).toEqual({valid: false, error: 'required'})
+        })
+
+        test('returns error "invalid_format" for missing @', () => {
+            expect(validateEmail('userexample.com')).toEqual({
+                valid: false,
+                error: 'invalid_format'
+            })
+        })
+
+        test('returns error "invalid_format" for missing domain', () => {
+            expect(validateEmail('user@')).toEqual({valid: false, error: 'invalid_format'})
+        })
+
+        test('returns error "invalid_format" for missing TLD', () => {
+            expect(validateEmail('user@example')).toEqual({valid: false, error: 'invalid_format'})
+        })
+
+        test('returns error "invalid_format" for missing username', () => {
+            expect(validateEmail('@example.com')).toEqual({valid: false, error: 'invalid_format'})
+        })
+
+        test('returns error "invalid_format" for spaces in email', () => {
+            expect(validateEmail('user name@example.com')).toEqual({
+                valid: false,
+                error: 'invalid_format'
+            })
         })
     })
 })

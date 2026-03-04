@@ -26,6 +26,16 @@ export const isPickupMethod = (shippingMethod) => {
 }
 
 /**
+ * Returns only delivery (non-pickup) shipping methods from an array of applicable methods.
+ * @param {Array} applicableShippingMethods - Array of shipping method objects (e.g. from getShippingMethodsForShipment). May be null/undefined.
+ * @returns {Array} Array of shipping methods that are not pickup methods. Never null.
+ */
+export const getDeliveryShippingMethods = (applicableShippingMethods) => {
+    if (!Array.isArray(applicableShippingMethods)) return []
+    return applicableShippingMethods.filter((method) => !isPickupMethod(method))
+}
+
+/**
  * Checks if a shipment is configured for pickup-in-store
  * @param {object} shipment the shipment to check. can be null.
  * @returns {boolean} true if the shipment is configured for pickup-in-store.

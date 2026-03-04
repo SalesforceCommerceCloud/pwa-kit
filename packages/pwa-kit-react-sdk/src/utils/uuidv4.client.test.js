@@ -7,24 +7,19 @@
 
 import {uuidv4} from './uuidv4.client'
 
-let originalCrypto
-
 describe('uuidv4', () => {
-    beforeEach(() => {
-        originalCrypto = global.crypto
-    })
-
-    afterEach(() => {
-        global.crypto = originalCrypto
-    })
-
     test('returns correct format', () => {
-        global.crypto = {
-            // we mock the module because crypto.getRandomValues
-            // is not available on node v14 (came out in node v15)
-            getRandomValues: () => [123]
-        }
+        const uuid = uuidv4()
+        // Verify UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+        // where y is one of [89ab]
+        expect(uuid).toMatch(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+        )
+    })
 
-        expect(uuidv4()).toBe('abbbbbbb-abbb-4bbb-bbbb-abbbbbbbbbbb')
+    test('returns unique values', () => {
+        const uuid1 = uuidv4()
+        const uuid2 = uuidv4()
+        expect(uuid1).not.toBe(uuid2)
     })
 })

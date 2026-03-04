@@ -13,27 +13,23 @@ import {
     SimpleGrid,
     useMultiStyleConfig,
     Select as ChakraSelect,
-    Heading,
-    Input,
-    InputGroup,
-    InputRightElement,
     createStylesContext,
-    Button,
     FormControl
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 
 import LinksList from '@salesforce/retail-react-app/app/components/links-list'
-import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {CONSENT_TAGS} from '@salesforce/retail-react-app/app/constants/marketing-consent'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-const [StylesProvider, useStyles] = createStylesContext('Footer')
+const [StylesProvider] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
@@ -129,13 +125,13 @@ const Footer = ({...otherProps}) => {
                                 links={makeOurCompanyLinks()}
                             />
                             <Box>
-                                <Subscribe />
+                                <SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
                             </Box>
                         </SimpleGrid>
                     </HideOnMobile>
 
                     <HideOnDesktop>
-                        <Subscribe />
+                        <SubscribeMarketingConsent tag={CONSENT_TAGS.EMAIL_CAPTURE} />
                     </HideOnDesktop>
 
                     {showLocaleSelector && (
@@ -201,56 +197,6 @@ const Footer = ({...otherProps}) => {
 }
 
 export default Footer
-
-const Subscribe = ({...otherProps}) => {
-    const styles = useStyles()
-    const intl = useIntl()
-    return (
-        <Box {...styles.subscribe} {...otherProps}>
-            <Heading as="h2" {...styles.subscribeHeading}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the first to know'
-                })}
-            </Heading>
-            <Text {...styles.subscribeMessage}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.description.sign_up',
-                    defaultMessage: 'Sign up to stay in the loop about the hottest deals'
-                })}
-            </Text>
-
-            <Box>
-                <InputGroup>
-                    {/* Had to swap the following InputRightElement and Input
-                        to avoid the hydration error due to mismatched html between server and client side.
-                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
-                    */}
-                    <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button variant="footer">
-                            {intl.formatMessage({
-                                id: 'footer.subscribe.button.sign_up',
-                                defaultMessage: 'Sign Up'
-                            })}
-                        </Button>
-                    </InputRightElement>
-                    <Input
-                        type="email"
-                        placeholder="you@email.com"
-                        aria-label={intl.formatMessage({
-                            id: 'footer.subscribe.email.assistive_msg',
-                            defaultMessage: 'Email address for newsletter'
-                        })}
-                        id="subscribe-email"
-                        {...styles.subscribeField}
-                    />
-                </InputGroup>
-            </Box>
-
-            <SocialIcons variant="flex-start" pinterestInnerColor="black" {...styles.socialIcons} />
-        </Box>
-    )
-}
 
 const LegalLinks = ({variant}) => {
     const intl = useIntl()
