@@ -663,9 +663,6 @@
   "footer.subscribe.email.assistive_msg": {
     "defaultMessage": "Dirección de correo electrónico para el boletín informativo"
   },
-  "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Sea el primero en saber"
-  },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Cancelar"
   },
@@ -1363,6 +1360,12 @@
   },
   "search.action.cancel": {
     "defaultMessage": "Cancelar"
+  },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Descubre, compara y compra con más inteligencia con tu asistente de compras personal."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Preguntar al asistente de compras"
   },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Borrar todos los filtros"

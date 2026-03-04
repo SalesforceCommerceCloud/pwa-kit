@@ -31,6 +31,7 @@ const baseStyles = {
     phraseContainer: {},
     askAssistantBanner: {},
     askAssistantBannerContent: {},
+    askAssistantBannerTitleRow: {},
     askAssistantBannerIcon: {},
     askAssistantBannerTitle: {},
     askAssistantBannerDescription: {},
@@ -144,8 +145,8 @@ test('renders nothing when there are no categories, products, or phrase suggesti
     expect(screen.queryByTestId('sf-horizontal-product-suggestions')).not.toBeInTheDocument()
 })
 
-describe('Ask Assistant banner', () => {
-    test('renders Ask Assistant banner when showAskAssistantBanner and onAskAssistantClick are provided', () => {
+describe('Ask Shopping Agent banner', () => {
+    test('renders Ask Shopping Agent banner when showAskAssistantBanner and onAskAssistantClick are provided', () => {
         const searchSuggestions = makeSearchSuggestions({
             categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
         })
@@ -161,12 +162,12 @@ describe('Ask Assistant banner', () => {
         )
 
         const banners = screen.getAllByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
         expect(banners.length).toBeGreaterThanOrEqual(1)
     })
 
-    test('does not render Ask Assistant banner when showAskAssistantBanner is false', () => {
+    test('does not render Ask Shopping Agent banner when showAskAssistantBanner is false', () => {
         const searchSuggestions = makeSearchSuggestions({
             categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
         })
@@ -183,12 +184,12 @@ describe('Ask Assistant banner', () => {
 
         expect(
             screen.queryByRole('button', {
-                name: /ask assistant.*discover, compare and shop smarter/i
+                name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
             })
         ).not.toBeInTheDocument()
     })
 
-    test('does not render Ask Assistant banner when onAskAssistantClick is not provided', () => {
+    test('does not render Ask Shopping Agent banner when onAskAssistantClick is not provided', () => {
         const searchSuggestions = makeSearchSuggestions({
             categorySuggestions: [{type: 'category', name: 'Women', link: '/women'}]
         })
@@ -204,12 +205,12 @@ describe('Ask Assistant banner', () => {
 
         expect(
             screen.queryByRole('button', {
-                name: /ask assistant.*discover, compare and shop smarter/i
+                name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
             })
         ).not.toBeInTheDocument()
     })
 
-    test('clicking Ask Assistant banner calls onAskAssistantClick', async () => {
+    test('clicking Ask Shopping Agent banner calls onAskAssistantClick', async () => {
         const user = userEvent.setup()
         const onAskAssistantClick = jest.fn()
         const searchSuggestions = makeSearchSuggestions({
@@ -227,7 +228,7 @@ describe('Ask Assistant banner', () => {
         )
 
         const banner = screen.getAllByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })[0]
         await user.click(banner)
 

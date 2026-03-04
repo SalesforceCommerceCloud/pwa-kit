@@ -284,8 +284,10 @@ const CheckoutOneClick = () => {
         }
 
         const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
         return await updateBillingAddressForBasket({
-            body: billingAddress,
+            body: address,
             parameters: {basketId: latestBasketId}
         })
     }

@@ -202,7 +202,7 @@ export const SocialPinterestIcon = icon('social-pinterest', {
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
-export const SparkleIcon = icon('sparkle')
+export const SparkleIcon = icon('sparkle', {viewBox: '0 0 20 20'})
 export const StoreIcon = icon('store')
 export const SignoutIcon = icon('signout')
 export const UserIcon = icon('user')

@@ -7,38 +7,47 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {SparkleIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const AskAssistantBanner = ({onClick, styles}) => {
+    const intl = useIntl()
+    const title = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.title',
+        defaultMessage: 'Ask Shopping Agent'
+    })
+    const description = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.description',
+        defaultMessage: 'Discover, compare, and shop smarter with your personal Shopping Agent.'
+    })
+    const ariaLabel = `${title} - ${description}`
+
+    const handleInteraction = (e) => {
+        e.preventDefault()
+        onClick?.()
+    }
+
     return (
         <Box
             {...styles.askAssistantBanner}
             as="button"
             type="button"
-            width="full"
             textAlign="left"
-            onClick={onClick}
-            aria-label="Ask Assistant - Discover, compare and shop smarter with your personal shopping assistant"
+            onClick={handleInteraction}
+            aria-label={ariaLabel}
         >
-            <Box {...styles.askAssistantBannerContent}>
-                <Box {...styles.askAssistantBannerIcon} as={SparkleIcon} boxSize={6} />
-                <Box>
-                    <Text {...styles.askAssistantBannerTitle}>
-                        <FormattedMessage
-                            defaultMessage="Ask Shopping Agent"
-                            id="search.suggestions.askAssistant.title"
-                        />
-                    </Text>
-                    <Text {...styles.askAssistantBannerDescription}>
-                        <FormattedMessage
-                            defaultMessage="Discover, compare, and shop smarter with your personal Shopping Agent."
-                            id="search.suggestions.askAssistant.description"
-                        />
-                    </Text>
-                </Box>
+            <Box {...styles.askAssistantBannerIcon}>
+                <SparkleIcon boxSize={5} color="gray.800" />
             </Box>
-            <Box {...styles.askAssistantBannerArrow} as={ChevronRightIcon} boxSize={5} />
+            <Box {...styles.askAssistantBannerContent}>
+                <Box {...styles.askAssistantBannerTitleRow}>
+                    <Text {...styles.askAssistantBannerTitle}>{title}</Text>
+                    <Box {...styles.askAssistantBannerArrow}>
+                        <ChevronRightIcon boxSize={5} color="gray.800" />
+                    </Box>
+                </Box>
+                <Text {...styles.askAssistantBannerDescription}>{description}</Text>
+            </Box>
         </Box>
     )
 }
