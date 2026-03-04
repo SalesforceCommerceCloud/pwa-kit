@@ -299,7 +299,7 @@ describe('useSFPayments hook', () => {
         })
     })
 
-    describe ('metadata query guard', () => {
+    describe('metadata query guard', () => {
         test('does not fetch metadata when metadataUrl is empty', async () => {
             mockGetConfig.mockReturnValue({
                 app: {
@@ -309,14 +309,14 @@ describe('useSFPayments hook', () => {
                     }
                 }
             })
-        
+
             renderWithQueryClient(<TestComponent />)
-        
+
             await waitFor(() => {
                 expect(mockFetch).not.toHaveBeenCalled()
             })
         })
-        
+
         test('does not fetch metadata when sfPayments is disabled', async () => {
             mockGetConfig.mockReturnValue({
                 app: {
@@ -327,9 +327,9 @@ describe('useSFPayments hook', () => {
                     }
                 }
             })
-        
+
             renderWithQueryClient(<TestComponent />)
-        
+
             await waitFor(() => {
                 expect(mockFetch).not.toHaveBeenCalled()
             })

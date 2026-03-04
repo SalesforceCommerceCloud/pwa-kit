@@ -55,7 +55,7 @@ export const useSFPayments = () => {
             }
             return await response.json()
         },
-        // Only fetch metadata if metadataUrl is set and sfPayments is enabled, 
+        // Only fetch metadata if metadataUrl is set and sfPayments is enabled,
         // prevents any 500 on server side and unnecessary network requests
         enabled: localEnabled && !!metadataUrl,
         staleTime: 10 * 60 * 1000 // 10 minutes
