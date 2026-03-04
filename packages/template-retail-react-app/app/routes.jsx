@@ -12,9 +12,10 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {withRouter} from 'react-router-dom'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -30,15 +31,6 @@ const Registration = loadable(() => import('./pages/registration'), {
 })
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
-const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {
-    fallback
-})
-const CheckoutOneClick = loadable(() => import('./pages/checkout-one-click'), {
-    fallback
-})
-const CheckoutConfirmation = loadable(() => import('./pages/confirmation'), {fallback})
-const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
@@ -55,6 +47,11 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 export const routes = [
     {
         path: '/',
+        component: Home,
+        exact: true
+    },
+    {
+        path: '/home',
         component: Home,
         exact: true
     },
@@ -78,25 +75,8 @@ export const routes = [
         component: Account
     },
     {
-        path: '/checkout',
-        component: (props) => {
-            const enabled = getConfig()?.app?.oneClickCheckout?.enabled
-            return enabled ? <CheckoutOneClick {...props} /> : <Checkout {...props} />
-        },
-        exact: true
-    },
-    {
-        path: '/checkout/confirmation/:orderNo',
-        component: CheckoutConfirmation
-    },
-    {
         path: '/callback',
         component: LoginRedirect,
-        exact: true
-    },
-    {
-        path: '/cart',
-        component: Cart,
         exact: true
     },
     {
@@ -118,44 +98,31 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '*',
+        component: withRouter((props) => {
+            const {location} = props
+            const urlParams = new URLSearchParams(location.search)
+
+            useEffect(() => {
+                const newURL = new URL(window.location)
+                if (!urlParams.has('redirected')) {
+                    newURL.searchParams.append('redirected', '1')
+                    window.location.href = newURL
+                }
+            }, [window.location.href])
+            if (urlParams.has('redirected')) {
+                return <PageNotFound {...props} />
+            }
+            return null
+        })
     }
 ]
 
 export default () => {
     const config = getConfig()
-    const loginConfig = config?.app?.login
-    const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
-    const socialLoginEnabled = loginConfig?.social?.enabled
-    const socialRedirectURI = loginConfig?.social?.redirectURI
-    const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
-    const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
-
-    // Add dynamic routes conditionally (only if features are enabled and paths are defined)
-    const dynamicRoutes = [
-        resetPasswordLandingPath && {
-            path: resetPasswordLandingPath,
-            component: ResetPassword,
-            exact: true
-        },
-        passwordlessLoginEnabled &&
-            passwordlessLoginLandingPath && {
-                path: passwordlessLoginLandingPath,
-                component: Login,
-                exact: true
-            },
-        socialLoginEnabled &&
-            socialRedirectURI && {
-                path: socialRedirectURI,
-                component: SocialLoginRedirect,
-                exact: true
-            }
-    ].filter(Boolean)
-
-    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
-        ignoredRoutes: ['/callback'],
-        fuzzyPathMatching: true
+    return configureRoutes(routes, config, {
+        ignoredRoutes: ['/callback', '*']
     })
-
-    // Add catch-all route at the end so it doesn't match before dynamic routes
-    return [...allRoutes, {path: '*', component: PageNotFound}]
 }

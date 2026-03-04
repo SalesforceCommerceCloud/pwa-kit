@@ -48,23 +48,26 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             },
             passkey: {
-                enabled: false,
-                callbackURI: process.env.PASSKEY_CALLBACK_URI
+                enabled: true,
+                mode: 'callback',
+                callbackURI: 'https://webhook.site/1b592264-a9b1-4d75-a892-cf68fed334f1'
             }
         },
-        defaultSite: 'RefArchGlobal',
-        siteAliases: {
-            RefArch: 'us',
-            RefArchGlobal: 'global'
-        },
+        defaultSite: 'RefArch',
+        // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
+        // siteAliases: {
+        //    RefArch: 'us',
+        //    RefArchGlobal: 'global'
+        // },
+        // The sites for your app, which is imported from sites.js
         sites,
         commerceAPI: {
-            proxyPath: `/mobify/proxy/api`,
+            proxyPath: '/mobify/proxy/api',
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                clientId: 'c8dd028e-e65e-4654-9a2d-4b471d0ae694',
+                organizationId: 'f_ecom_tbdq_stg',
+                shortCode: 'sandbox-001',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
@@ -109,14 +112,14 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '24.x',
+        ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'ha-stg.phased-launch-testing.com',
                 path: 'ocapi'
             }
         ]
