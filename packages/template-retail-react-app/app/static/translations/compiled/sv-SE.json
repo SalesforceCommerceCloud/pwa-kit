@@ -1539,12 +1539,6 @@
       "value": "E-postadress för nyhetsbrev"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "Håll dig uppdaterad"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3131,6 +3125,18 @@
     {
       "type": 0,
       "value": "Avbryt"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Upptäck, jämför och handla smartare med din personliga shoppingassistent."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Fråga shoppingassistenten"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -48,6 +48,7 @@ export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',
     SHOPPER_BASKETS_V2: 'shopperBasketsV2',
     SHOPPER_CONFIGURATIONS: 'shopperConfigurations',
+    SHOPPER_CONSENTS: 'shopperConsents',
     SHOPPER_CONTEXTS: 'shopperContexts',
     SHOPPER_CUSTOMERS: 'shopperCustomers',
     SHOPPER_EXPERIENCE: 'shopperExperience',
