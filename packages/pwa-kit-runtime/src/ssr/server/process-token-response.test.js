@@ -24,7 +24,6 @@ function makeJWT(payload) {
     return `${header}.${payloadPart}.sig`
 }
 
-
 function makeReq(siteId = 'testsite') {
     return {headers: {'x-site-id': siteId}}
 }
@@ -124,9 +123,7 @@ describe('setHttpOnlySessionCookies', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'x'})
         const req = {headers: {}}
-        expect(() => setHttpOnlySessionCookies(buf, {}, req, res, {})).toThrow(
-            /siteId is missing/
-        )
+        expect(() => setHttpOnlySessionCookies(buf, {}, req, res, {})).toThrow(/siteId is missing/)
     })
 
     test('returns buffer unchanged for non-JSON response', () => {
