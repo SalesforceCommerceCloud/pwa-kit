@@ -33,6 +33,10 @@ module.exports = {
     ],
     testEnvironment: 'jest-environment-jsdom-global',
     testEnvironmentOptions: {
-        resources: 'usable'
+        resources: 'usable',
+        // Prevent jest-environment-jsdom from using 'browser' export conditions (Jest 29+).
+        // Without this, packages like uuid and nanoid resolve to ESM browser builds
+        // that Jest cannot parse in a CJS context.
+        customExportConditions: ['node', 'node-addons']
     }
 }

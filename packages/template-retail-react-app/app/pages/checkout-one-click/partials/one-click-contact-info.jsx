@@ -483,12 +483,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     // Save phone number to basket billing address for guest shoppers
                     if (phone) {
+                        const billingBody = {...basket?.billingAddress, phone}
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const {addressId, creationDate, lastModified, preferred, ...address} =
+                            billingBody
                         await updateBillingAddressForBasket.mutateAsync({
                             parameters: {basketId: basket.basketId},
-                            body: {
-                                ...basket?.billingAddress,
-                                phone: phone
-                            }
+                            body: address
                         })
                     }
 

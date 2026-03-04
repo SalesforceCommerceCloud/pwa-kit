@@ -13,21 +13,22 @@ import AskAssistantBanner from '@salesforce/retail-react-app/app/components/sear
 const baseStyles = {
     askAssistantBanner: {},
     askAssistantBannerContent: {},
+    askAssistantBannerTitleRow: {},
     askAssistantBannerIcon: {},
     askAssistantBannerTitle: {},
     askAssistantBannerDescription: {},
     askAssistantBannerArrow: {}
 }
 
-test('renders Ask Assistant banner with title and description', () => {
+test('renders Ask Shopping Agent banner with title and description', () => {
     renderWithProviders(<AskAssistantBanner onClick={jest.fn()} styles={baseStyles} />)
 
     expect(
         screen.getByRole('button', {
-            name: /ask assistant.*discover, compare and shop smarter/i
+            name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
         })
     ).toBeInTheDocument()
-    expect(screen.getByText('Ask Shopping Agent')).toBeInTheDocument()
+    expect(screen.getByText((content) => content === 'Ask Shopping Agent')).toBeInTheDocument()
     expect(
         screen.getByText(/Discover, compare, and shop smarter with your personal Shopping Agent/i)
     ).toBeInTheDocument()
@@ -40,7 +41,7 @@ test('calls onClick when banner is clicked', async () => {
     renderWithProviders(<AskAssistantBanner onClick={onClick} styles={baseStyles} />)
 
     const button = screen.getByRole('button', {
-        name: /ask assistant.*discover, compare and shop smarter/i
+        name: /Ask Shopping Agent.*discover, compare,? and shop smarter/i
     })
     await user.click(button)
 

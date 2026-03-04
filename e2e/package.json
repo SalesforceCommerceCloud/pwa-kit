@@ -16,7 +16,7 @@
     "@aws-sdk/client-s3": "3.450.0",
     "@aws-sdk/client-sts": "3.450.0",
     "@salesforce/pwa-kit-dev": "3.17.0-dev",
-    "jest": "^26.6.3"
+    "jest": "^29.7.0"
   },
   "jest": {
     "setupFilesAfterEnv": [
