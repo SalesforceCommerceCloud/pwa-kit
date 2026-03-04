@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {applyProxyRequestHeaders, applyScapiAuthHeaders, configureProxy} from './configure-proxy'
+import {applyProxyRequestHeaders, setScapiAuthRequestHeaders, configureProxy} from './configure-proxy'
 import * as ssrProxying from '../ssr-proxying'
 import * as utils from './utils'
 import cookie from 'cookie'
@@ -100,7 +100,7 @@ describe('configureProxy ALLOWED_CACHING_PROXY_REQUEST_METHODS', () => {
     })
 })
 
-describe('applyScapiAuthHeaders', () => {
+describe('setScapiAuthRequestHeaders', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
@@ -121,7 +121,7 @@ describe('applyScapiAuthHeaders', () => {
             }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -149,7 +149,7 @@ describe('applyScapiAuthHeaders', () => {
             }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: true,
@@ -172,7 +172,7 @@ describe('applyScapiAuthHeaders', () => {
             headers: {}
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -201,7 +201,7 @@ describe('applyScapiAuthHeaders', () => {
             }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -223,7 +223,7 @@ describe('applyScapiAuthHeaders', () => {
             headers: {'x-site-id': 'RefArch'}
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -249,7 +249,7 @@ describe('applyScapiAuthHeaders', () => {
             }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,

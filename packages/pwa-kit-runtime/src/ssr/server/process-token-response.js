@@ -67,9 +67,9 @@ function getTokenClaims(accessToken) {
  * strip token fields from body, and append our Set-Cookie headers (preserving upstream cookies).
  * @private
  */
-export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
+export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
     const siteId = req.headers?.['x-site-id']
-    if (!siteId || typeof siteId !== 'string' || siteId.trim() === '') {
+    if (!siteId) {
         throw new Error(
             'HttpOnly session cookies are enabled but siteId is missing. ' +
                 'Ensure the x-site-id header is set on the request.'
@@ -83,7 +83,7 @@ export function applyHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, 
         return responseBuffer
     }
 
-    const site = siteId.trim()
+    const site = siteId
 
     // Decode JWT and extract claims
     let isGuest = true

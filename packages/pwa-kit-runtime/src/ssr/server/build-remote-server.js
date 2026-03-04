@@ -64,7 +64,7 @@ import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
 import {getConfig} from '../../utils/ssr-config'
-import {applyHttpOnlySessionCookies} from './process-token-response'
+import {setHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -100,7 +100,7 @@ export const isBinary = (headers) => {
  * sets the Authorization header, and appends refresh_token to the query string.
  * @private
  */
-export const injectLogoutTokens = (proxyRequest, incomingRequest) => {
+export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     const cookieHeader = incomingRequest.headers.cookie
     if (!cookieHeader) return
 
@@ -111,29 +111,26 @@ export const injectLogoutTokens = (proxyRequest, incomingRequest) => {
             'x-site-id header is missing on SLAS logout request. ' +
                 'Token injection skipped. ' +
                 'Ensure the x-site-id header is set in CommerceApiProvider headers.',
-            {namespace: 'injectLogoutTokens'}
+            {namespace: 'setTokensInLogoutRequest'}
         )
         return
     }
 
-    const site = siteId.trim()
-
     // Inject Bearer token from access token cookie
-    const accessToken = cookies[`cc-at_${site}`]
+    const accessToken = cookies[`cc-at_${siteId}`]
     if (accessToken) {
         proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
     }
 
     // Inject refresh_token into query string from HttpOnly cookie
-    const refreshToken = cookies[`cc-nx_${site}`]
+    const refreshToken = cookies[`cc-nx_${siteId}`]
     if (refreshToken) {
-        const url = new URL(proxyRequest.path, 'http://localhost')
-        url.searchParams.set('refresh_token', refreshToken)
-        proxyRequest.path = url.pathname + url.search
+        const separator = proxyRequest.path.includes('?') ? '&' : '?'
+        proxyRequest.path += `${separator}refresh_token=${encodeURIComponent(refreshToken)}`
     } else {
         logger.warn(
-            `Refresh token cookie (cc-nx_${site}) not found for ${incomingRequest.path}. The logout request may fail.`,
-            {namespace: 'injectLogoutTokens'}
+            `Refresh token cookie (cc-nx_${siteId}) not found for ${incomingRequest.path}. The logout request may fail.`,
+            {namespace: 'setTokensInLogoutRequest'}
         )
     }
 }
@@ -213,11 +210,6 @@ export const RemoteServerFactory = {
             // in the response body. Used to determine which responses should have HttpOnly session
             // cookies applied when that feature is enabled. Users can override this in ssr.js.
             tokenResponseEndpoints: SLAS_TOKEN_RESPONSE_ENDPOINTS,
-
-            // A regex for matching the SLAS logout endpoint. When HttpOnly session cookies are
-            // enabled, the proxy injects the Bearer token and refresh token from HttpOnly cookies
-            // for this endpoint. Users can override this in ssr.js.
-            slasLogoutEndpoint: SLAS_LOGOUT_ENDPOINT,
 
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
@@ -1011,9 +1003,9 @@ export const RemoteServerFactory = {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     } else if (
                         process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false' &&
-                        incomingRequest.path?.match(options.slasLogoutEndpoint)
+                        incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
                     ) {
-                        injectLogoutTokens(proxyRequest, incomingRequest)
+                        setTokensInLogoutRequest(proxyRequest, incomingRequest)
                     }
 
                     // Allow users to apply additional custom modifications to the proxy request
@@ -1045,7 +1037,7 @@ export const RemoteServerFactory = {
                             isTokenEndpoint
                         ) {
                             try {
-                                workingBuffer = applyHttpOnlySessionCookies(
+                                workingBuffer = setHttpOnlySessionCookies(
                                     workingBuffer,
                                     proxyRes,
                                     req,
@@ -1501,9 +1493,7 @@ export const RemoteServerFactory = {
      * @param {RegExp} [options.tokenResponseEndpoints] - A regex pattern to match SLAS endpoints
      * that return tokens in the response body. Used to determine which responses should have HttpOnly
      * session cookies applied. Defaults to /\/oauth2\/(token|passwordless\/token)$/.
-     * @param {RegExp} [options.slasLogoutEndpoint] - A regex pattern to match the SLAS logout endpoint.
-     * When HttpOnly session cookies are enabled, the proxy injects the Bearer token and refresh token
-     * from HttpOnly cookies for this endpoint. Defaults to /\/oauth2\/logout/.
+
      * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
      * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
      * Use this to add custom headers or modify the proxy request.

@@ -44,7 +44,12 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
  * @param targetHost {String} the target hostname (host+port)
  */
-export const applyScapiAuthHeaders = ({proxyRequest, incomingRequest, caching, targetHost}) => {
+export const setScapiAuthRequestHeaders = ({
+    proxyRequest,
+    incomingRequest,
+    caching,
+    targetHost
+}) => {
     const url = incomingRequest.url
     const resolvedSiteId = incomingRequest.headers?.['x-site-id']
 
@@ -56,7 +61,7 @@ export const applyScapiAuthHeaders = ({proxyRequest, incomingRequest, caching, t
     if (!resolvedSiteId) {
         logger.warn(
             'x-site-id header is missing on SCAPI proxy request. Bearer token injection skipped.',
-            {namespace: 'configureProxy.applyScapiAuthHeaders'}
+            {namespace: 'configureProxy.setScapiAuthRequestHeaders'}
         )
         return
     }
@@ -66,7 +71,7 @@ export const applyScapiAuthHeaders = ({proxyRequest, incomingRequest, caching, t
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const tokenKey = `cc-at_${resolvedSiteId.trim()}`
+    const tokenKey = `cc-at_${resolvedSiteId}`
     const accessToken = cookies[tokenKey]
 
     if (accessToken) {
@@ -257,7 +262,7 @@ export const configureProxy = ({
 
             // Apply Authorization header with shopper's access token from HttpOnly cookie
             if (process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false') {
-                applyScapiAuthHeaders({
+                setScapiAuthRequestHeaders({
                     proxyRequest,
                     incomingRequest,
                     caching,
