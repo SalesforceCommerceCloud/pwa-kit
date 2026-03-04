@@ -1,5 +1,6 @@
 ## [Unreleased]
 - Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
+- Add `x-site-id` request header to read HttpOnly cookies on the server [#3700](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3700)
 
 ## v9.1.0-dev
 - Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
