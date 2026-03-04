@@ -77,24 +77,6 @@
       "value": "New payment method was saved."
     }
   ],
-  "account.payments.label.expires": [
-    {
-      "type": 0,
-      "value": "Expires "
-    },
-    {
-      "type": 1,
-      "value": "month"
-    },
-    {
-      "type": 0,
-      "value": "/"
-    },
-    {
-      "type": 1,
-      "value": "year"
-    }
-  ],
   "account.payments.message.error": [
     {
       "type": 0,
@@ -1587,12 +1569,6 @@
     {
       "type": 0,
       "value": "Secure Link"
-    }
-  ],
-  "contact_info.error.generic_try_again": [
-    {
-      "type": 0,
-      "value": "An error occurred. Please try again."
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -3141,12 +3117,6 @@
     {
       "type": 0,
       "value": "Tax"
-    }
-  ],
-  "order_summary.label.tax_tbd": [
-    {
-      "type": 0,
-      "value": "TBD"
     }
   ],
   "otp.button.cancel_guest_registration": [
@@ -5049,12 +5019,6 @@
     {
       "type": 0,
       "value": "Security Code"
-    }
-  ],
-  "use_login_fields.error.invalid_email": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address."
     }
   ],
   "use_login_fields.error.required_email": [
