@@ -8,63 +8,6 @@
   "account.logout_button.button.log_out": {
     "defaultMessage": "Esci"
   },
-  "account.payments.action.retry": {
-    "defaultMessage": "Riprova"
-  },
-  "account.payments.badge.default": {
-    "defaultMessage": "Predefinito"
-  },
-  "account.payments.checkbox.make_default": {
-    "defaultMessage": "Imposta come predefinito"
-  },
-  "account.payments.error.payment_method_remove_failed": {
-    "defaultMessage": "Impossibile rimuovere il metodo di pagamento. Riprova."
-  },
-  "account.payments.error.payment_method_save_failed": {
-    "defaultMessage": "Impossibile salvare il metodo di pagamento. Riprova."
-  },
-  "account.payments.error.set_default_failed": {
-    "defaultMessage": "Impossibile impostare il metodo di pagamento come predefinito. Riprova."
-  },
-  "account.payments.heading.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
-  },
-  "account.payments.info.default_payment_updated": {
-    "defaultMessage": "Il metodo di pagamento è stato impostato come predefinito."
-  },
-  "account.payments.info.payment_method_removed": {
-    "defaultMessage": "Il metodo di pagamento è stato rimosso."
-  },
-  "account.payments.info.payment_method_saved": {
-    "defaultMessage": "Il nuovo metodo di pagamento è stato salvato."
-  },
-  "account.payments.message.error": {
-    "defaultMessage": "Impossibile caricare i metodi di pagamento. Riprova."
-  },
-  "account.payments.message.loading": {
-    "defaultMessage": "Caricamento metodi di pagamento…"
-  },
-  "account.payments.placeholder.heading": {
-    "defaultMessage": "Nessun metodo di pagamento salvato"
-  },
-  "account.payments.placeholder.text": {
-    "defaultMessage": "Aggiungi un nuovo metodo di pagamento per pagare più velocemente."
-  },
-  "account.payments.label.expires": {
-    "defaultMessage": "Scade {month}/{year}"
-  },
-  "account.payments.modal.title.set_default": {
-    "defaultMessage": "Impostare il metodo di pagamento predefinito?"
-  },
-  "account.payments.modal.message.set_default": {
-    "defaultMessage": "{brand} ... {last4} sarà il predefinito al checkout."
-  },
-  "account.payments.modal.action.set_default": {
-    "defaultMessage": "Imposta predefinito"
-  },
-  "account.payments.modal.action.cancel": {
-    "defaultMessage": "Annulla"
-  },
   "account_addresses.badge.default": {
     "defaultMessage": "Predefinito"
   },
@@ -91,15 +34,6 @@
   },
   "account_addresses.title.addresses": {
     "defaultMessage": "Indirizzi"
-  },
-  "account_creation_notification.body": {
-    "defaultMessage": "Abbiamo creato e verificato il tuo account con le informazioni del tuo ordine. La prossima volta che effettui un acquisto, inserisci semplicemente il codice che inviamo per accedere — nessuna password necessaria."
-  },
-  "account_creation_notification.title": {
-    "defaultMessage": "Account creato"
-  },
-  "account_creation_notification.verified": {
-    "defaultMessage": "Verificato"
   },
   "account_detail.title.account_details": {
     "defaultMessage": "Dettagli account"
@@ -174,9 +108,6 @@
   "account_order_history.title.order_history": {
     "defaultMessage": "Cronologia ordini"
   },
-  "account_payments.button.add_payment": {
-    "defaultMessage": "Aggiungi metodo di pagamento"
-  },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Continua lo shopping"
   },
@@ -230,9 +161,6 @@
   },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "hai eseguito l'accesso."
-  },
-  "auth_modal.description.now_signed_in_simple": {
-    "defaultMessage": "Hai eseguito l'accesso."
   },
   "auth_modal.error.incorrect_email_or_password": {
     "defaultMessage": "Qualcosa non va nell'indirizzo email o nella password. Riprova."
@@ -303,26 +231,8 @@
   "checkout.button.place_order": {
     "defaultMessage": "Invia ordine"
   },
-  "checkout.error.billing_address_required": {
-    "defaultMessage": "Inserisci un indirizzo di fatturazione."
-  },
-  "checkout.error.cannot_save_address": {
-    "defaultMessage": "Impossibile salvare l'indirizzo di spedizione."
-  },
-  "checkout.label.user_registration": {
-    "defaultMessage": "Crea un account per un checkout più veloce"
-  },
   "checkout.message.generic_error": {
     "defaultMessage": "Si è verificato un errore inatteso durante il checkout."
-  },
-  "checkout.message.user_registration": {
-    "defaultMessage": "Le informazioni di pagamento, indirizzo e contatto verranno salvate in un nuovo account. Usa la password monouso (OTP) inviata via email per creare il tuo account. Dopo aver creato l'account, usa la funzione Password dimenticata per impostare una nuova password."
-  },
-  "checkout.title.user_registration": {
-    "defaultMessage": "Salva le informazioni di checkout per uso futuro"
-  },
-  "checkout.payment.save_payment_method": {
-    "defaultMessage": "Salva questo metodo di pagamento per un uso futuro"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Crea account"
@@ -356,9 +266,6 @@
   },
   "checkout_confirmation.label.free": {
     "defaultMessage": "Gratuita"
-  },
-  "checkout_confirmation.label.shipping.price": {
-    "defaultMessage": "{price}"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "Numero ordine"
@@ -397,15 +304,6 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "A breve invieremo un'email all'indirizzo <b>{email}</b> con il numero di conferma e la ricevuta."
   },
-  "checkout_contact_info.action.change": {
-    "defaultMessage": "Modifica"
-  },
-  "checkout_contact_info.action.sign_out": {
-    "defaultMessage": "Esci"
-  },
-  "checkout_contact_info.title.contact_info": {
-    "defaultMessage": "Informazioni di contatto"
-  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Informativa sulla privacy"
   },
@@ -433,9 +331,6 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "Rimuovi"
   },
-  "checkout_payment.button.place_order": {
-    "defaultMessage": "Invia ordine"
-  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Rivedi ordine"
   },
@@ -444,12 +339,6 @@
   },
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Carta di credito"
-  },
-  "checkout_payment.error.cannot_remove_applied_payment": {
-    "defaultMessage": "Impossibile rimuovere il metodo di pagamento applicato. Riprova o utilizza il pagamento attuale per effettuare l'ordine."
-  },
-  "checkout_payment.error.cannot_save_payment": {
-    "defaultMessage": "Impossibile salvare il metodo di pagamento. Riprova."
   },
   "checkout_payment.label.billing_address_form": {
     "defaultMessage": "Modulo indirizzo di fatturazione"
@@ -535,15 +424,6 @@
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout come ospite"
   },
-  "contact_info.button.continue_to_payment": {
-    "defaultMessage": "Continua al pagamento"
-  },
-  "contact_info.button.continue_to_shipping_address": {
-    "defaultMessage": "Continua all'indirizzo di spedizione"
-  },
-  "contact_info.error.generic_try_again": {
-    "defaultMessage": "Si è verificato un errore. Riprova."
-  },
   "contact_info.button.login": {
     "defaultMessage": "Accedi"
   },
@@ -626,9 +506,6 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "Cronologia ordini"
-  },
-  "drawer_menu.button.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
   },
   "drawer_menu.header.assistive_msg.title": {
     "defaultMessage": "Cassetto menu"
@@ -773,9 +650,6 @@
   },
   "global.account.link.order_history": {
     "defaultMessage": "Cronologia ordini"
-  },
-  "global.account.link.payment_methods": {
-    "defaultMessage": "Metodi di pagamento"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Lista desideri"
@@ -1186,36 +1060,6 @@
   "order_summary.label.tax": {
     "defaultMessage": "Imposta"
   },
-  "order_summary.label.tax_tbd": {
-    "defaultMessage": "Da calcolare"
-  },
-  "otp.button.cancel_guest_registration": {
-    "defaultMessage": "Annulla"
-  },
-  "otp.button.checkout_as_guest": {
-    "defaultMessage": "Checkout come ospite"
-  },
-  "otp.button.resend_code": {
-    "defaultMessage": "Invia di nuovo il codice"
-  },
-  "otp.error.invalid_code": {
-    "defaultMessage": "Il codice non è valido o è scaduto. Clicca su Invia di nuovo il codice e riprova."
-  },
-  "otp.message.enter_code_for_account_guest": {
-    "defaultMessage": "Abbiamo inviato una password monouso (OTP) alla tua email. Per creare il tuo account e procedere al pagamento, inserisci il codice a {otpLength} cifre qui sotto."
-  },
-  "otp.message.enter_code_for_account_returning": {
-    "defaultMessage": "Per accedere al tuo account, inserisci il codice inviato alla tua email."
-  },
-  "otp.message.resend_cooldown": {
-    "defaultMessage": "Puoi richiedere un nuovo codice tra {timer} {timer, plural, one {secondo} other {secondi}}."
-  },
-  "otp.title.confirm_its_you": {
-    "defaultMessage": "Conferma la tua identità"
-  },
-  "otp.title.create_account": {
-    "defaultMessage": "Crea un account"
-  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Torna alla pagina precedente"
   },
@@ -1278,9 +1122,6 @@
   "password_reset_success.toast": {
     "defaultMessage": "Reimpostazione password riuscita"
   },
-  "payment_selection.button.view_all": {
-    "defaultMessage": "Visualizza tutto ({count} altri)"
-  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Carta di credito"
   },
@@ -1289,27 +1130,6 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Questo è un pagamento crittografato con SSL sicuro."
-  },
-  "pickup_address.bonus_products.title": {
-    "defaultMessage": "Articoli bonus"
-  },
-  "pickup_address.button.continue_to_payment": {
-    "defaultMessage": "Continua al pagamento"
-  },
-  "pickup_address.button.continue_to_shipping_address": {
-    "defaultMessage": "Continua all'indirizzo di spedizione"
-  },
-  "pickup_address.button.show_products": {
-    "defaultMessage": "Mostra prodotti"
-  },
-  "pickup_address.message.loading_store_info": {
-    "defaultMessage": "Caricamento informazioni negozio…"
-  },
-  "pickup_address.title.pickup_address": {
-    "defaultMessage": "Indirizzo e informazioni di ritiro"
-  },
-  "pickup_address.title.store_information": {
-    "defaultMessage": "Informazioni sul negozio"
   },
   "price_per_item.label.each": {
     "defaultMessage": " cad.",
@@ -1526,12 +1346,6 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Deseleziona tutto"
   },
-  "shipping_address.action.ship_to_multiple_addresses": {
-    "defaultMessage": "Spedisci a più indirizzi"
-  },
-  "shipping_address.button.add_new_address": {
-    "defaultMessage": "+ Aggiungi nuovo indirizzo"
-  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Passa al metodo di spedizione"
   },
@@ -1541,17 +1355,8 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "Rimuovi {address}"
   },
-  "shipping_address.label.shipping_address": {
-    "defaultMessage": "Indirizzo di consegna"
-  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Modulo indirizzo di spedizione"
-  },
-  "shipping_address.summary.multiple_addresses": {
-    "defaultMessage": "I tuoi articoli saranno spediti a più indirizzi."
-  },
-  "shipping_address.summary.multiple_locations": {
-    "defaultMessage": "Stai spedendo a più indirizzi."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Indirizzo di spedizione"
@@ -1577,65 +1382,14 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Modifica indirizzo di spedizione"
   },
-  "shipping_multi_address.action.ship_to_single_address": {
-    "defaultMessage": "Spedisci articoli a un solo indirizzo"
-  },
-  "shipping_multi_address.add_new_address.aria_label": {
-    "defaultMessage": "Aggiungi nuovo indirizzo di consegna per {productName}"
-  },
-  "shipping_multi_address.error.submit_failed": {
-    "defaultMessage": "Si è verificato un errore durante l'impostazione delle spedizioni. Riprova."
-  },
-  "shipping_multi_address.format.address_line_2": {
-    "defaultMessage": "{city}, {stateCode} {postalCode}"
-  },
-  "shipping_multi_address.image.alt": {
-    "defaultMessage": "Immagine del prodotto per {productName}"
-  },
-  "shipping_multi_address.label.note": {
-    "defaultMessage": "Nota"
-  },
-  "shipping_multi_address.loading_addresses": {
-    "defaultMessage": "Caricamento indirizzi…"
-  },
-  "shipping_multi_address.message.no_delivery_items": {
-    "defaultMessage": "Non ci sono articoli da consegnare. Tutti gli articoli sono per il ritiro."
-  },
-  "shipping_multi_address.message.pickup_items": {
-    "defaultMessage": "Alcuni articoli sono impostati per il ritiro e non sono mostrati qui. Solo gli articoli da consegnare possono essere assegnati a indirizzi."
-  },
-  "shipping_multi_address.no_addresses_available": {
-    "defaultMessage": "Nessun indirizzo disponibile"
-  },
-  "shipping_multi_address.product_attributes.label": {
-    "defaultMessage": "Attributi del prodotto"
-  },
-  "shipping_multi_address.quantity.label": {
-    "defaultMessage": "Quantità"
-  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Inviare come regalo?"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Passa al pagamento"
   },
-  "shipping_options.error.no_shipping_methods": {
-    "defaultMessage": "Per questo indirizzo non sono disponibili metodi di spedizione. Inserisci un indirizzo diverso."
-  },
-  "shipping_options.label.no_method_selected": {
-    "defaultMessage": "Nessun metodo di spedizione selezionato"
-  },
-  "shipping_options.label.shipment_number": {
-    "defaultMessage": "Spedizione {index}:"
-  },
-  "shipping_options.label.total_shipping": {
-    "defaultMessage": "Spedizione totale"
-  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Opzioni di spedizione e regalo"
-  },
-  "shipping_options.title.shipping_method": {
-    "defaultMessage": "Opzioni di spedizione"
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Annulla"
@@ -1654,18 +1408,6 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "Se non si viene reindirizzati automaticamente, fare clic su <link>questo link</link> per procedere."
-  },
-  "store_display.button.use_recent_store": {
-    "defaultMessage": "Usa negozio recente"
-  },
-  "store_display.format.address_line_2": {
-    "defaultMessage": "{city}, {stateCode} {postalCode}"
-  },
-  "store_display.label.store_contact_info": {
-    "defaultMessage": "Contatti del negozio"
-  },
-  "store_display.label.store_hours": {
-    "defaultMessage": "Orari di apertura"
   },
   "store_locator.action.find": {
     "defaultMessage": "Trova"
@@ -1726,15 +1468,6 @@
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
-  },
-  "toggle_card.action.change": {
-    "defaultMessage": "Modifica"
-  },
-  "toggle_card.action.changePaymentInfo": {
-    "defaultMessage": "Modifica"
-  },
-  "toggle_card.action.changeShippingOptions": {
-    "defaultMessage": "Modifica"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Modifica"
@@ -1869,9 +1602,6 @@
   },
   "use_login_fields.error.required_password": {
     "defaultMessage": "Inserisci la password."
-  },
-  "use_login_fields.error.invalid_email": {
-    "defaultMessage": "Inserisci un indirizzo e-mail valido."
   },
   "use_login_fields.label.email": {
     "defaultMessage": "E-mail"
