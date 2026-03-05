@@ -177,7 +177,7 @@ const Header = ({
                 <Flex
                     wrap="wrap"
                     alignItems={['baseline', 'baseline', 'baseline', 'center']}
-                    {...styles.headerFlex}
+                    gap={3}
                 >
                     <IconButton
                         aria-label={intl.formatMessage({

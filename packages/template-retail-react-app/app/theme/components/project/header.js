@@ -21,9 +21,6 @@ export default {
             paddingTop: [1, 1, 2, 4],
             paddingBottom: [3, 3, 2, 4]
         },
-        headerFlex: {
-            gap: 3
-        },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],
             width: ['full', 'full', 'full', 60],
@@ -85,7 +82,6 @@ export default {
     parts: [
         'container',
         'content',
-        'headerFlex',
         'searchContainer',
         'bodyContainer',
         'logo',
