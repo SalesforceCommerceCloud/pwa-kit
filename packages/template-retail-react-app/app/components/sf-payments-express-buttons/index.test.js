@@ -330,7 +330,7 @@ const defaultProps = {
 }
 
 // --- Shared test helpers (reused across describes) ---
-const flush = () => new Promise((r) => setImmediate(r))
+const flush = () => new Promise((r) => setTimeout(r, 0))
 
 async function renderAndGetConfig(props = {}) {
     const prepareBasket = props.prepareBasket ?? jest.fn().mockResolvedValue(makeBasket('basket-1'))
