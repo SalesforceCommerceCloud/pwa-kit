@@ -76,7 +76,7 @@
     },
     {
       "type": 0,
-      "value": "Ḿȧȧķḗḗ ḓḗḗƒȧȧŭŭŀŧ"
+      "value": "Şḗḗŧ ȧȧş ḓḗḗƒȧȧŭŭŀŧ"
     },
     {
       "type": 0,
@@ -175,6 +175,32 @@
     {
       "type": 0,
       "value": "Ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ẇȧȧş şȧȧṽḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.label.expires": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗẋƥīřḗḗş "
+    },
+    {
+      "type": 1,
+      "value": "month"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "year"
     },
     {
       "type": 0,
@@ -3197,6 +3223,20 @@
     {
       "type": 0,
       "value": "Şḗḗƈŭŭřḗḗ Ŀīƞķ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "contact_info.error.generic_try_again": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧƞ ḗḗřřǿǿř ǿǿƈƈŭŭřřḗḗḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
     },
     {
       "type": 0,
@@ -6561,6 +6601,20 @@
     {
       "type": 0,
       "value": "Ŧȧȧẋ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order_summary.label.tax_tbd": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ŦƁḒ"
     },
     {
       "type": 0,
@@ -10591,6 +10645,20 @@
     {
       "type": 0,
       "value": "Şḗḗƈŭŭřīŧẏ Ƈǿǿḓḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "use_login_fields.error.invalid_email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş."
     },
     {
       "type": 0,
