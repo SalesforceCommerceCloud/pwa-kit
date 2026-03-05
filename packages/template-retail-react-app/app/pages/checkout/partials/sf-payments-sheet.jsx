@@ -26,7 +26,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePaymentConfiguration} from '@salesforce/commerce-sdk-react'
-import {useShopperConfiguration} from '@salesforce/retail-react-app/app/hooks/use-shopper-configuration'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
 import {
     STATUS_SUCCESS,
@@ -95,7 +94,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
         }
     })
 
-    const zoneId = useShopperConfiguration('zoneId')
+    const zoneId = paymentConfig?.zoneId
     const cardCaptureAutomatic = useAutomaticCapture()
     const futureUsageOffSession = useFutureUsageOffSession()
 
