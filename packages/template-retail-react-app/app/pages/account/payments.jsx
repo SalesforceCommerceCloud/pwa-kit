@@ -443,8 +443,14 @@ const AccountPayments = () => {
                                         </Text>
                                         <Text color="gray.600">{payment.paymentCard?.holder}</Text>
                                         <Text color="gray.600">
-                                            Expires {payment.paymentCard?.expirationMonth}/
-                                            {payment.paymentCard?.expirationYear}
+                                            <FormattedMessage
+                                                defaultMessage="Expires {month}/{year}"
+                                                id="account.payments.label.expires"
+                                                values={{
+                                                    month: payment.paymentCard?.expirationMonth,
+                                                    year: payment.paymentCard?.expirationYear
+                                                }}
+                                            />
                                         </Text>
                                     </Stack>
                                 </Stack>
