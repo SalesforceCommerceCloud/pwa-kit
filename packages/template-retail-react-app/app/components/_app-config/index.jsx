@@ -114,8 +114,8 @@ const AppConfig = ({children, locals = {}}) => {
             // hybridAuthEnabled={true}
             useHttpOnlySessionCookies={
                 typeof window !== 'undefined'
-                    ? window.__MRT_DISABLE_HTTPONLY_SESSION_COOKIES__ === 'false'
-                    : process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false'
+                    ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                    : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
             }
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >

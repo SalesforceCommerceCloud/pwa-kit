@@ -192,7 +192,7 @@ describe('SLAS private proxy', () => {
     afterEach(() => {
         // Clean up environment variables
         delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
-        delete process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES
+        delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
     })
 
     test('returns 404 when useSLASPrivateClient is false', async () => {
@@ -378,11 +378,11 @@ describe('HttpOnly session cookies', () => {
 
     afterEach(() => {
         delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
-        delete process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES
+        delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
     })
 
-    test('does not process when MRT_DISABLE_HTTPONLY_SESSION_COOKIES is not set', async () => {
-        delete process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES
+    test('does not process when MRT_ENABLE_HTTPONLY_SESSION_COOKIES is not enabled', async () => {
+        delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
 
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
@@ -434,7 +434,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('returns 500 when siteId is missing', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
@@ -484,7 +484,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('injects Bearer token and refresh token from HttpOnly cookies for logout endpoint', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         let capturedAuthHeader
         let capturedRefreshToken
@@ -540,7 +540,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('x-site-id header takes precedence over static config siteId for logout endpoint', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         let capturedAuthHeader
         let capturedRefreshToken
@@ -596,7 +596,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('sets HttpOnly cookies and strips tokens from response body', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
@@ -656,7 +656,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('returns 500 when JWT decode fails', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
@@ -706,7 +706,7 @@ describe('HttpOnly session cookies', () => {
     })
 
     test('processes passwordless token endpoint', async () => {
-        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES = 'false'
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/passwordless/token', (req, res) => {
