@@ -174,7 +174,11 @@ const Header = ({
         <Box as="header" role="banner" {...styles.container} {...props}>
             <Box {...styles.content}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-                <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']} {...styles.headerFlex}>
+                <Flex
+                    wrap="wrap"
+                    alignItems={['baseline', 'baseline', 'baseline', 'center']}
+                    {...styles.headerFlex}
+                >
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.menu',
