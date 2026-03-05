@@ -45,7 +45,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {
     AuthHelpers,
     useAuthHelper,
-    useShopperBasketsMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
     useCustomerType,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'

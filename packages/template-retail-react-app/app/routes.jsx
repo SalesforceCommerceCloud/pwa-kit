@@ -50,6 +50,7 @@ const StoreLocator = loadable(() => import('./pages/store-locator'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
+const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
@@ -88,6 +89,10 @@ export const routes = [
     {
         path: '/checkout/confirmation/:orderNo',
         component: CheckoutConfirmation
+    },
+    {
+        path: '/checkout/payment-processing',
+        component: PaymentProcessing
     },
     {
         path: '/callback',

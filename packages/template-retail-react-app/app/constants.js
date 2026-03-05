@@ -264,3 +264,21 @@ export const USER_NOT_FOUND_ERROR = /user not found/i
  * @deprecated Use `partialHydrationEnabled` in the config file instead
  */
 export const PARTIAL_HYDRATION_ENABLED = false
+
+// Constants for Salesforce Payments
+export const PAYMENT_METHOD_TYPES = {
+    CARD: 'card',
+    PAYPAL: 'paypal',
+    VENMO: 'venmo'
+}
+
+export const PAYMENT_GATEWAYS = {
+    STRIPE: 'stripe',
+    ADYEN: 'adyen',
+    PAYPAL: 'paypal'
+}
+
+export const SETUP_FUTURE_USAGE = {
+    ON_SESSION: 'on_session',
+    OFF_SESSION: 'off_session'
+}

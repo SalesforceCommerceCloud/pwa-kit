@@ -12,7 +12,7 @@ import ProductViewModal from '@salesforce/retail-react-app/app/components/produc
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2MutationHelper as useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 
 /**
  * Renders primary action on a product-item card in the form of a button.

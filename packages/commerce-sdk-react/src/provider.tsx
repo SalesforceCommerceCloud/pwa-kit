@@ -11,6 +11,7 @@ import {Logger} from './types'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
     ShopperBaskets,
+    ShopperBasketsV2,
     ShopperConsents,
     ShopperContexts,
     ShopperConfigurations,
@@ -19,6 +20,7 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
@@ -258,6 +260,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
         return {
             shopperBaskets: new ShopperBaskets(config),
+            shopperBasketsV2: new ShopperBasketsV2(config),
             shopperConsents: new ShopperConsents(config),
             shopperContexts: new ShopperContexts(config),
             shopperConfigurations: new ShopperConfigurations(config),
@@ -269,6 +272,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
+            shopperPayments: new ShopperPayments(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),

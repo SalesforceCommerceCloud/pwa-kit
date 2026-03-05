@@ -12,6 +12,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useConfigurations} from '@salesforce/commerce-sdk-react'
+import {useSFPaymentsEnabled} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const CheckoutContext = React.createContext()
 
@@ -22,15 +23,18 @@ export const CheckoutProvider = ({children}) => {
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const sfPaymentsEnabled = useSFPaymentsEnabled()
 
-    const CHECKOUT_STEPS_LIST = [
-        'CONTACT_INFO',
-        'PICKUP_ADDRESS',
-        'SHIPPING_ADDRESS',
-        'SHIPPING_OPTIONS',
-        'PAYMENT',
-        'REVIEW_ORDER'
-    ]
+    const CHECKOUT_STEPS_LIST = sfPaymentsEnabled
+        ? ['CONTACT_INFO', 'PICKUP_ADDRESS', 'SHIPPING_ADDRESS', 'SHIPPING_OPTIONS', 'PAYMENT']
+        : [
+              'CONTACT_INFO',
+              'PICKUP_ADDRESS',
+              'SHIPPING_ADDRESS',
+              'SHIPPING_OPTIONS',
+              'PAYMENT',
+              'REVIEW_ORDER'
+          ]
     const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
 
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
@@ -39,7 +43,7 @@ export const CheckoutProvider = ({children}) => {
         if (isBasketLoading || !customer || !basket) {
             return
         }
-        let step = STEPS.REVIEW_ORDER
+        let step = sfPaymentsEnabled ? STEPS.PAYMENT : STEPS.REVIEW_ORDER
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO

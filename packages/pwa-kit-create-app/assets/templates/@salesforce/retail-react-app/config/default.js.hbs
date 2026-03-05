@@ -157,6 +157,18 @@ module.exports = {
                 groupBonusProductsWithQualifyingProduct: true
             }
         },
+        // Salesforce Payments configuration
+        // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
+        // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
+        // sdkUrl and metadataUrl are hosted on your Commerce Cloud instance. Replace <hostname> with your instance hostname.
+        // This may be a demandware.net hostname (e.g., myinstance.unified.demandware.net) or a vanity/custom hostname.
+        //   sdkUrl:       'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   metadataUrl:  'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        sfPayments: {
+            enabled: false,
+            sdkUrl: '',
+            metadataUrl: ''
+        },
         // Google Cloud api config
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
