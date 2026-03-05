@@ -219,7 +219,7 @@ export const RemoteServerFactory = {
 
             // Custom callback to modify the SLAS private client proxy response. This callback is invoked
             // after the built-in proxy response handling (including HttpOnly session cookie handling when enabled).
-            // When HttpOnly session cookies are enabled (MRT_DISABLE_HTTPONLY_SESSION_COOKIES=false), the callback
+            // When HttpOnly session cookies are enabled (MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true), the callback
             // receives the response with tokens already moved to HttpOnly cookies and stripped from the body.
             // Custom callbacks must not rely on token fields in the response body in that case; read from
             // response headers (e.g. Set-Cookie) if needed.
@@ -265,7 +265,7 @@ export const RemoteServerFactory = {
             `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
         )
 
-        // Note: HttpOnly session cookies are controlled by the MRT_DISABLE_HTTPONLY_SESSION_COOKIES
+        // Note: HttpOnly session cookies are controlled by the MRT_ENABLE_HTTPONLY_SESSION_COOKIES
         // env var (set by MRT in production, pwa-kit-dev locally). Read directly where needed.
 
         return options
@@ -1002,7 +1002,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     } else if (
-                        process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false' &&
+                        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
                         incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
                     ) {
                         setTokensInLogoutRequest(proxyRequest, incomingRequest)
@@ -1030,7 +1030,7 @@ export const RemoteServerFactory = {
                         // Check against tokenResponseEndpoints regex (configurable in ssr.js)
                         const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
                         const httpOnlySessionCookiesEnabled =
-                            process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false'
+                            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
                         if (
                             httpOnlySessionCookiesEnabled &&
                             proxyRes.statusCode === 200 &&

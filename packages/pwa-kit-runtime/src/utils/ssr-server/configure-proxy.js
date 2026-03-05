@@ -261,7 +261,7 @@ export const configureProxy = ({
             })
 
             // Apply Authorization header with shopper's access token from HttpOnly cookie
-            if (process.env.MRT_DISABLE_HTTPONLY_SESSION_COOKIES === 'false') {
+            if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
                 setScapiAuthRequestHeaders({
                     proxyRequest,
                     incomingRequest,

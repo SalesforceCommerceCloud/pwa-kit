@@ -184,7 +184,7 @@ module.exports = {
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
         // Store the session cookies as HttpOnly for enhanced security.
-        disableHttpOnlySessionCookies: false,
+        enableHttpOnlySessionCookies: true,
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
