@@ -467,19 +467,21 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
         return data
     }
-    
+
     // Helper function to fetch payment metadata from the Commerce Cloud instance
     app.get('/api/payment-metadata', async (req, res) => {
         try {
             const response = await fetch(config.app.sfPayments.metadataUrl, {
-                headers: { Accept: 'application/json' }
+                headers: {Accept: 'application/json'}
             })
             if (!response.ok) {
                 throw new Error(`Metadata request failed with status: ${response.status}`)
             }
             const data = await response.json()
-            const transformedData = transformIconPaths(data, new URL(config.app.sfPayments.metadataUrl).hostname)
-            res.setHeader('Access-Control-Allow-Origin', '*')
+            const transformedData = transformIconPaths(
+                data,
+                new URL(config.app.sfPayments.metadataUrl).hostname
+            )
             res.setHeader('Content-Type', 'application/json')
             res.json(transformedData)
         } catch (error) {
