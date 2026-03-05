@@ -89,7 +89,7 @@ export type ApiClientConfigParams = {
  */
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
-    shopperBasketsV2?: ShopperBaskets<ApiClientConfigParams>
+    shopperBasketsV2?: ShopperBasketsV2<ApiClientConfigParams>
     shopperConsents?: ShopperConsents<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
