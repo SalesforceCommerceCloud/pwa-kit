@@ -1,3 +1,4 @@
+## v3.17.0-nightly-20260305080720 (Mar 05, 2026)
 ## v3.17.0-dev
 - Update jest, archiver and remove rimraf dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
