@@ -47,7 +47,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+        useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateShippingMethodForShipment') return mockUpdateShippingMethod
             return {mutateAsync: jest.fn()}
         }),

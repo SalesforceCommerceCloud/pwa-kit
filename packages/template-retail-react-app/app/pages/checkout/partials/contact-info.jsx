@@ -41,7 +41,13 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {
+    AuthHelpers,
+    useAuthHelper,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     getPasswordlessCallbackUrl,

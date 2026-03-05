@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {rest} from 'msw'
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
@@ -72,7 +73,63 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: true
     }))
+
+    // Reset MSW handlers to avoid conflicts
+    global.server.resetHandlers()
+
+    // Add MSW handlers to avoid 403 errors
+    global.server.use(
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    data: [],
+                    total: 0
+                })
+            )
+        }),
+        rest.post('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    id: 'test-list-id',
+                    type: 'wish_list'
+                })
+            )
+        }),
+        rest.get('*/configuration/shopper-configurations/*', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    configurations: []
+                })
+            )
+        }),
+        rest.get('*/product/shopper-products/*', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    data: []
+                })
+            )
+        }),
+        rest.get('*/api/payment-metadata', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    apiKey: 'test-key',
+                    publishableKey: 'pk_test'
+                })
+            )
+        })
+    )
 })
+
 afterEach(() => {
     jest.clearAllMocks()
     sessionStorage.clear()

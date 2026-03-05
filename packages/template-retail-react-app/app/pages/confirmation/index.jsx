@@ -47,6 +47,7 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import MultiShipOrderSummary from '@salesforce/retail-react-app/app/components/multiship/multiship-order-summary'
 import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/partials/shipment-details'
+import SFPaymentsOrderSummary from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-order-summary'
 
 // Hooks
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -76,6 +77,7 @@ const CheckoutConfirmation = () => {
             enabled: !!orderNo && onClient
         }
     )
+
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
@@ -546,47 +548,56 @@ const CheckoutConfirmation = () => {
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Credit Card"
-                                                id="checkout_confirmation.heading.credit_card"
+                                    {order.paymentInstruments?.[0]?.paymentMethodId ===
+                                    'Salesforce Payments' ? (
+                                        order.paymentInstruments?.[0]?.c_paymentReference_type ? (
+                                            <SFPaymentsOrderSummary
+                                                paymentInstrument={order.paymentInstruments[0]}
                                             />
-                                        </Heading>
+                                        ) : null
+                                    ) : (
+                                        <Stack spacing={1}>
+                                            <Heading as="h3" fontSize="sm">
+                                                <FormattedMessage
+                                                    defaultMessage="Credit Card"
+                                                    id="checkout_confirmation.heading.credit_card"
+                                                />
+                                            </Heading>
 
-                                        <Stack direction="row">
-                                            {CardIcon && <CardIcon layerStyle="ccIcon" />}
+                                            <Stack direction="row">
+                                                {CardIcon && <CardIcon layerStyle="ccIcon" />}
 
-                                            <Box>
-                                                <Text>
-                                                    {
-                                                        order.paymentInstruments[0].paymentCard
-                                                            ?.cardType
-                                                    }
-                                                </Text>
-                                                <Stack direction="row">
-                                                    <Text>
-                                                        &bull;&bull;&bull;&bull;{' '}
-                                                        {
-                                                            order.paymentInstruments[0].paymentCard
-                                                                ?.numberLastDigits
-                                                        }
-                                                    </Text>
+                                                <Box>
                                                     <Text>
                                                         {
                                                             order.paymentInstruments[0].paymentCard
-                                                                ?.expirationMonth
-                                                        }
-                                                        /
-                                                        {
-                                                            order.paymentInstruments[0].paymentCard
-                                                                ?.expirationYear
+                                                                ?.cardType
                                                         }
                                                     </Text>
-                                                </Stack>
-                                            </Box>
+                                                    <Stack direction="row">
+                                                        <Text>
+                                                            &bull;&bull;&bull;&bull;{' '}
+                                                            {
+                                                                order.paymentInstruments[0]
+                                                                    .paymentCard?.numberLastDigits
+                                                            }
+                                                        </Text>
+                                                        <Text>
+                                                            {
+                                                                order.paymentInstruments[0]
+                                                                    .paymentCard?.expirationMonth
+                                                            }
+                                                            /
+                                                            {
+                                                                order.paymentInstruments[0]
+                                                                    .paymentCard?.expirationYear
+                                                            }
+                                                        </Text>
+                                                    </Stack>
+                                                </Box>
+                                            </Stack>
                                         </Stack>
-                                    </Stack>
+                                    )}
                                 </SimpleGrid>
                             </Stack>
                         </Container>

@@ -1,4 +1,5 @@
 ## v9.1.0-dev
+- [Feature] Add Salesforce Payments support in checkout
 - Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - [Bugfix] Fix error toast for no applicable shipping methods in one-click checkout [#3673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3673)

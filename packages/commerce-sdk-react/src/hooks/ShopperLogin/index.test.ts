@@ -21,8 +21,11 @@ describe('Shopper Login hooks', () => {
             // don't work well with the current implementation of mutation hooks.
             'authenticateCustomer',
             'authorizeWebauthnRegistration',
+            'deletePasskeyCredential',
+            'deletePasskeyUser',
             'finishWebauthnAuthentication',
             'finishWebauthnUserRegistration',
+            'getPasskeyUserByLoginId',
             'getTrustedAgentAuthorizationToken',
             'startWebauthnAuthentication',
             'startWebauthnUserRegistration'

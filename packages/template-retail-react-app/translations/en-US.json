@@ -360,11 +360,23 @@
   "checkout.error.cannot_save_address": {
     "defaultMessage": "Could not save shipping address."
   },
+  "checkout.heading.express_checkout": {
+    "defaultMessage": "Express Checkout"
+  },
   "checkout.label.user_registration": {
     "defaultMessage": "Create an account to check out faster"
   },
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
+  },
+  "checkout.message.payment_button_cancel": {
+    "defaultMessage": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed."
+  },
+  "checkout.message.payment_confirm_failure": {
+    "defaultMessage": "Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+  },
+  "checkout.message.payment_processing_failed": {
+    "defaultMessage": "Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
   },
   "checkout.message.user_registration": {
     "defaultMessage": "Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
@@ -381,6 +393,12 @@
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
   },
+  "checkout_confirmation.heading.afterpay_clearpay": {
+    "defaultMessage": "Afterpay/Clearpay"
+  },
+  "checkout_confirmation.heading.bancontact": {
+    "defaultMessage": "Bancontact"
+  },
   "checkout_confirmation.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
@@ -395,6 +413,15 @@
   },
   "checkout_confirmation.heading.delivery_number": {
     "defaultMessage": "Delivery {number}"
+  },
+  "checkout_confirmation.heading.eps": {
+    "defaultMessage": "EPS"
+  },
+  "checkout_confirmation.heading.ideal": {
+    "defaultMessage": "iDEAL"
+  },
+  "checkout_confirmation.heading.klarna": {
+    "defaultMessage": "Klarna"
   },
   "checkout_confirmation.heading.order_summary": {
     "defaultMessage": "Order Summary"
@@ -411,6 +438,9 @@
   "checkout_confirmation.heading.pickup_location_number": {
     "defaultMessage": "Pickup Location {number}"
   },
+  "checkout_confirmation.heading.sepa_debit": {
+    "defaultMessage": "SEPA Debit"
+  },
   "checkout_confirmation.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -419,6 +449,9 @@
   },
   "checkout_confirmation.heading.thank_you_for_order": {
     "defaultMessage": "Thank you for your order!"
+  },
+  "checkout_confirmation.heading.unknown": {
+    "defaultMessage": "Unknown"
   },
   "checkout_confirmation.label.free": {
     "defaultMessage": "Free"
@@ -1401,6 +1434,21 @@
   "password_reset_success.toast": {
     "defaultMessage": "Password Reset Success"
   },
+  "payment_processing.error.unsuccessful": {
+    "defaultMessage": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order."
+  },
+  "payment_processing.heading.payment_processing": {
+    "defaultMessage": "Payment Processing"
+  },
+  "payment_processing.link.return_to_checkout": {
+    "defaultMessage": "Return to Checkout"
+  },
+  "payment_processing.message.unexpected_error": {
+    "defaultMessage": "There was an unexpected error processing your payment."
+  },
+  "payment_processing.message.working_on_your_payment": {
+    "defaultMessage": "Working on your payment..."
+  },
   "payment_selection.button.view_all": {
     "defaultMessage": "View All ({count} more)"
   },
@@ -1597,6 +1645,9 @@
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
   },
+  "product_view.prepareBasket": {
+    "defaultMessage": "Unable to determine product ID for basket"
+  },
   "product_view.status.in_stock_at_store": {
     "defaultMessage": "In stock at {storeName}"
   },
@@ -1717,6 +1768,33 @@
   },
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
+  },
+  "sf_payments_order_summary.label.bank.unknown": {
+    "defaultMessage": "Unknown"
+  },
+  "sf_payments_order_summary.label.brand.amex": {
+    "defaultMessage": "American Express"
+  },
+  "sf_payments_order_summary.label.brand.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "sf_payments_order_summary.label.brand.discover": {
+    "defaultMessage": "Discover"
+  },
+  "sf_payments_order_summary.label.brand.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "sf_payments_order_summary.label.brand.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "sf_payments_order_summary.label.brand.unionpay": {
+    "defaultMessage": "China UnionPay"
+  },
+  "sf_payments_order_summary.label.brand.unknown": {
+    "defaultMessage": "Unknown"
+  },
+  "sf_payments_order_summary.label.brand.visa": {
+    "defaultMessage": "Visa"
   },
   "shipping_address.action.ship_to_multiple_addresses": {
     "defaultMessage": "Ship to multiple addresses"
@@ -2014,6 +2092,9 @@
   },
   "use_address_fields.error.please_enter_phone_number": {
     "defaultMessage": "Please enter your phone number."
+  },
+  "use_address_fields.error.please_enter_postal_code": {
+    "defaultMessage": "Please enter your postal code."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
     "defaultMessage": "Please enter your zip code.",

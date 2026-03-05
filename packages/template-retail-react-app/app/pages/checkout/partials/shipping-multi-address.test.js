@@ -38,10 +38,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
             mutateAsync: jest.fn().mockResolvedValue({})
         }
     }),
-    useShopperBasketsMutation: jest.fn(() => ({
+    useShopperBasketsV2Mutation: jest.fn(() => ({
         mutateAsync: jest.fn().mockResolvedValue({})
     })),
-    useShippingMethodsForShipment: jest.fn(() => ({
+    useShippingMethodsForShipmentV2: jest.fn(() => ({
         refetch: jest.fn()
     }))
 }))
