@@ -21,10 +21,12 @@ export default {
             paddingTop: [1, 1, 2, 4],
             paddingBottom: [3, 3, 2, 4]
         },
+        headerFlex: {
+            gap: 3
+        },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],
             width: ['full', 'full', 'full', 60],
-            marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
         },
         bodyContainer: {
@@ -35,13 +37,9 @@ export default {
             height: [6, 6, 6, 8]
         },
         icons: {
-            marginBottom: [1, 1, 2, 0]
-        },
-        accountIcon: {
             height: 11,
             minWidth: 'auto',
-            cursor: 'pointer',
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            marginBottom: [1, 1, 2, 0],
             _focus: {
                 boxShadow: 'outline'
             },
@@ -49,23 +47,21 @@ export default {
                 outline: 0
             }
         },
+        agentIcon: {
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto']
+        },
+        accountIcon: {
+            cursor: 'pointer',
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto']
+        },
         arrowDown: {
-            height: 11,
-            minWidth: 'auto',
             marginRight: 0,
             alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
             cursor: 'pointer',
-            _focus: {
-                boxShadow: 'outline'
-            },
-            _focusVisible: {
-                outline: 0
-            },
             display: ['none', 'none', 'none', 'block']
         },
         wishlistIcon: {
-            // More breathing room between the account and wishlist icons
-            marginLeft: 2
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto']
         },
         signout: {
             width: '100%',
@@ -86,5 +82,16 @@ export default {
             marginRight: 2
         }
     },
-    parts: ['container', 'content', 'searchContainer', 'bodyContainer', 'logo', 'icons', 'signout']
+    parts: [
+        'container',
+        'content',
+        'headerFlex',
+        'searchContainer',
+        'bodyContainer',
+        'logo',
+        'icons',
+        'agentIcon',
+        'wishlistIcon',
+        'signout'
+    ]
 }

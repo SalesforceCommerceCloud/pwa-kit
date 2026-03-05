@@ -42,6 +42,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {launchChat as launchChatFromUtils} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
@@ -351,9 +352,11 @@ const Search = (props) => {
     }
 
     const onAskAssistantClick = useCallback(() => {
-        launchChat()
+        // When floating button is hidden (enableAgentFromFloatingButton false), show it first then launch
+        setPrechatFieldsForNewSession()
+        launchChatFromUtils()
         clearInput()
-    }, [launchChat, clearInput])
+    }, [setPrechatFieldsForNewSession, clearInput])
 
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
