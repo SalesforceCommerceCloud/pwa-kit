@@ -11,6 +11,7 @@ import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-uti
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMemo} from 'react'
+import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
@@ -20,15 +21,20 @@ import {useMemo} from 'react'
 export const useCurrentBasket = ({id = ''} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
+    const {confirmingBasket} = useSFPayments()
     const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer
         }
     )
-
+    // Select the current basket, prioritizing confirmingBasket, then matching id, then first non-temporary basket
+    // Filters out temporary baskets to prevent them from showing in the cart
     const currentBasket =
-        basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
+        confirmingBasket && !confirmingBasket.temporaryBasket
+            ? confirmingBasket
+            : basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
+              basketsData?.baskets?.find((basket) => !basket.temporaryBasket)
 
     const memoizedDerived = useMemo(() => {
         // count the number of items in each shipment and rollup total
@@ -92,7 +98,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         ...restOfQuery,
         data: currentBasket,
         derivedData: {
-            hasBasket: basketsData?.total > 0,
+            // Only true if a non-temporary basket exists (temporary baskets are filtered out above)
+            hasBasket: !!currentBasket,
             ...memoizedDerived
         }
     }

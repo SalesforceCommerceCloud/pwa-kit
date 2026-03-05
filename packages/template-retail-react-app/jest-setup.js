@@ -97,6 +97,13 @@ export const setupMockServer = () => {
         // Mock Data Cloud API
         rest.post('*.c360a.salesforce.com/web/events/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(204), ctx.json({}))
+        }),
+        // Mock Salesforce Payments metadata
+        rest.get('*/payment-metadata', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        }),
+        rest.get('*/configuration/shopper-configurations/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 }

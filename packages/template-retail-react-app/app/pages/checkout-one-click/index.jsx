@@ -21,7 +21,7 @@ import {
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
-    useShopperBasketsMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
     useShopperOrdersMutation,
     useShopperCustomersMutation,
     ShopperBasketsMutations,

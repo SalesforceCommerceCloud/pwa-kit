@@ -47,5 +47,21 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     createPaymentInstrumentForOrder: updateOrderQuery,
     updatePaymentInstrumentForOrder: updateOrderQuery,
-    removePaymentInstrumentFromOrder: updateOrderQuery
+    removePaymentInstrumentFromOrder: updateOrderQuery,
+    failOrder(customerId, {parameters}) {
+        // Exclude reopenBasket (not valid for getOrder) and pass only valid parameters
+        // to getOrder.queryKey, while preserving common params like organizationId, siteId
+        const {orderNo, reopenBasket, ...orderParams} = parameters
+        const invalidate: CacheUpdateInvalidate[] = [
+            {queryKey: getOrder.queryKey({...orderParams, orderNo})}
+        ]
+        // If reopenBasket is true, we should also invalidate customer baskets
+        // since a new basket may have been created
+        if (reopenBasket && customerId) {
+            invalidate.push({
+                queryKey: getCustomerBaskets.queryKey({...orderParams, customerId})
+            })
+        }
+        return {invalidate}
+    }
 }

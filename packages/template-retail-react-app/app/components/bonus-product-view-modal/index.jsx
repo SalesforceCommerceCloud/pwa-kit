@@ -23,7 +23,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
 import {useControlledVariations} from '@salesforce/retail-react-app/app/hooks/use-controlled-variations'
 import {useIntl} from 'react-intl'
-import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2MutationHelper as useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'

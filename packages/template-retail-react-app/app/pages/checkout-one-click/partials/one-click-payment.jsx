@@ -16,7 +16,10 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
+    useCustomerType
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'

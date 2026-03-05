@@ -19,7 +19,11 @@ import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Hooks
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useAuthHelper, AuthHelpers, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useAuthHelper,
+    AuthHelpers,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
