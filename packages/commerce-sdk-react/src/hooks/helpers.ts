@@ -56,7 +56,11 @@ export const generateCustomEndpointOptions = (
             ...options.options,
             method: options.options?.method || 'GET',
             headers: {
-                Authorization: `Bearer ${access_token}`,
+                // When HttpOnly session cookies are enabled, the proxy injects the
+                // Authorization header from the cookie — skip adding it here.
+                ...(config.useHttpOnlySessionCookies
+                    ? {}
+                    : {Authorization: `Bearer ${access_token}`}),
                 // Note the order of the following de-structured objects is important.
                 // Priority in ascending order: global config < query/mutation config < mutate func args
                 ...globalHeaders,

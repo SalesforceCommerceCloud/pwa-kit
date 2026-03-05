@@ -326,7 +326,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 defaultDnt,
                 passwordlessLoginCallbackURI,
                 refreshTokenRegisteredCookieTTL,
-                refreshTokenGuestCookieTTL
+                refreshTokenGuestCookieTTL,
+                useHttpOnlySessionCookies
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>
