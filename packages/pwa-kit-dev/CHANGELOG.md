@@ -1,6 +1,7 @@
 ## [Unreleased]
 - Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
 - Fix issue to correctly set the environment variable `MRT_DISABLE_HTTPONLY_SESSION_COOKIES` [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
+- Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
 
 ## v3.17.0-dev
 - Update jest, archiver and remove rimraf dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)

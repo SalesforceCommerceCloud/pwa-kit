@@ -2,6 +2,7 @@
 - Update test setup for Jest 29 compatibility [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
+- Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
 
 ## v3.16.0 (Feb 12, 2026)
 
