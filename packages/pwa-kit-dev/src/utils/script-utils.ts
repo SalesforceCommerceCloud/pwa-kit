@@ -17,7 +17,6 @@ import {
     mkdtemp,
     rm,
     readdir,
-    Stats,
     Dirent
 } from 'fs-extra'
 import {Minimatch} from 'minimatch'
@@ -417,23 +416,19 @@ export const createBundle = async ({
 
                         archive.pipe(output)
 
-                        // See https://web.archive.org/web/20160712064705/http://archiverjs.com/docs/global.html#TarEntryData
                         const newRoot = path.join(projectSlug, 'bld', '')
-                        // WARNING: There are a lot of type assertions here because we use a very old
-                        // version of archiver, and the types provided don't match the docs. :\
-                        archive.directory(buildDirectory, '', ((entry: EntryData) => {
-                            const stats = entry.stats as unknown as Stats | undefined
-                            if (stats?.isFile() && entry.name) {
+                        archive.directory(buildDirectory, '', (entry: EntryData) => {
+                            if (entry.stats?.isFile() && entry.name) {
                                 filesInArchive.push(entry.name)
                             }
                             entry.prefix = newRoot
                             return entry
-                        }) as unknown as EntryData)
+                        })
 
                         archive.on('error', reject)
                         output.on('finish', resolve)
 
-                        archive.finalize()
+                        void archive.finalize()
                     })
             )
             .then(async () => {

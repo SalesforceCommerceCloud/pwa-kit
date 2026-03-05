@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,13 +7,16 @@
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
+    ShopperBasketsV2,
     ShopperConfigurations,
+    ShopperConsents,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
@@ -86,12 +89,15 @@ export type ApiClientConfigParams = {
  */
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperBasketsV2?: ShopperBaskets<ApiClientConfigParams>
+    shopperConsents?: ShopperConsents<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
     shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperPayments?: ShopperPayments<ApiClientConfigParams>
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>

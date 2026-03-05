@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import {
@@ -19,6 +19,25 @@ import {
     mockProducts
 } from '@salesforce/retail-react-app/app/pages/confirmation/index.mock'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+
+// Mock getConfig to provide necessary configuration for SF Payments
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    const mockConfig = jest.requireActual('@salesforce/retail-react-app/config/mocks/default')
+    return {
+        ...actual,
+        getConfig: jest.fn(() => ({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                sfPayments: {
+                    enabled: true,
+                    sdkUrl: 'https://example.com/sfpayments.js'
+                }
+            }
+        }))
+    }
+})
 
 const MockedComponent = () => {
     return (
@@ -392,5 +411,106 @@ describe('Account form', () => {
             (addr) => addr.address1 === '789 Store Location Ave'
         )
         expect(hasPickupAddress).toBe(false)
+    })
+})
+
+describe('Salesforce Payments Integration', () => {
+    const mockSFPaymentsOrder = {
+        ...mockOrder,
+        paymentInstruments: [
+            {
+                amount: 82.56,
+                paymentInstrumentId: 'sfp123',
+                paymentMethodId: 'Salesforce Payments'
+            }
+        ]
+    }
+
+    const mockSFPaymentsOrderWithType = {
+        ...mockOrder,
+        paymentInstruments: [
+            {
+                amount: 82.56,
+                paymentInstrumentId: 'sfp123',
+                paymentMethodId: 'Salesforce Payments',
+                c_paymentReference_type: 'card',
+                c_paymentReference_brand: 'visa',
+                c_paymentReference_last4: '4242'
+            }
+        ]
+    }
+
+    test('does not render payment details for Salesforce Payments orders when c_paymentReference_type is missing', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrder))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrder.orderNo)
+
+        // Payment Details section should exist
+        expect(screen.getByText('Payment Details')).toBeInTheDocument()
+
+        // No payment method details should be shown for SFP orders when c_paymentReference_type is missing
+        expect(screen.queryByRole('heading', {name: /credit card/i})).not.toBeInTheDocument()
+    })
+
+    test('renders SFPaymentsOrderSummary for Salesforce Payments orders when c_paymentReference_type exists', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrderWithType))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrderWithType.orderNo)
+
+        // Payment Details section should exist
+        expect(screen.getByText('Payment Details')).toBeInTheDocument()
+
+        // SFPaymentsOrderSummary should render when c_paymentReference_type is available
+        expect(await screen.findByRole('heading', {name: /credit card/i})).toBeInTheDocument()
+        expect(screen.getByText('Visa')).toBeInTheDocument()
+        expect(screen.getByText(/4242/)).toBeInTheDocument()
+    })
+
+    test('renders billing address for Salesforce Payments orders', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockSFPaymentsOrder))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockSFPaymentsOrder.orderNo)
+
+        // Billing address should be shown
+        expect(screen.getByRole('heading', {name: /billing address/i})).toBeInTheDocument()
+
+        // Check that billing address is displayed
+        const addresses = screen.getAllByText(/123 Walnut Place/)
+        expect(addresses.length).toBeGreaterThan(0)
+    })
+
+    test('still renders traditional credit card display for non-SF Payments orders', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrder))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await screen.findByText(mockOrder.orderNo)
+
+        // Check for traditional credit card display
+        expect(await screen.findByText('Credit Card')).toBeInTheDocument()
+        expect(screen.getByText('Visa')).toBeInTheDocument()
+        expect(screen.getByText(/1111/)).toBeInTheDocument()
     })
 })

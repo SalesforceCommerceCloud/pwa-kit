@@ -6,8 +6,8 @@
  */
 
 import {
-    useShopperBasketsMutation,
-    useShippingMethodsForShipment
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
+    useShippingMethodsForShipmentV2 as useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import {getShippingAddressForStore} from '@salesforce/retail-react-app/app/utils/address-utils'
