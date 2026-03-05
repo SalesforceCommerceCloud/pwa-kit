@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getRefreshTokenCookieTTL, applyHttpOnlySessionCookies} from './process-token-response'
+import {getRefreshTokenCookieTTL, setHttpOnlySessionCookies} from './process-token-response'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
 jest.mock('../../utils/logger-instance', () => ({
@@ -24,16 +24,8 @@ function makeJWT(payload) {
     return `${header}.${payloadPart}.sig`
 }
 
-function makeOptions(siteId = 'testsite') {
-    return {
-        mobify: {
-            app: {
-                commerceAPI: {
-                    parameters: {siteId}
-                }
-            }
-        }
-    }
+function makeReq(siteId = 'testsite') {
+    return {headers: {'x-site-id': siteId}}
 }
 
 function makeRes() {
@@ -122,31 +114,22 @@ describe('getRefreshTokenCookieTTL', () => {
     })
 })
 
-describe('applyHttpOnlySessionCookies', () => {
+describe('setHttpOnlySessionCookies', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
-    test('throws when siteId is missing', () => {
+    test('throws when x-site-id header is missing', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'x'})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, {mobify: {}})).toThrow(
-            /siteId is missing/
-        )
-    })
-
-    test('throws when siteId is empty string', () => {
-        const res = makeRes()
-        const buf = makeResponseBuffer({access_token: 'x'})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  '))).toThrow(
-            /siteId is missing/
-        )
+        const req = {headers: {}}
+        expect(() => setHttpOnlySessionCookies(buf, {}, req, res, {})).toThrow(/siteId is missing/)
     })
 
     test('returns buffer unchanged for non-JSON response', () => {
         const res = makeRes()
         const buf = Buffer.from('not json', 'utf8')
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
         expect(result).toBe(buf)
         expect(res.append).not.toHaveBeenCalled()
     })
@@ -166,7 +149,7 @@ describe('applyHttpOnlySessionCookies', () => {
             expires_in: 1800,
             customer_id: 'cust123'
         })
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
 
         // cc-at: access token (HttpOnly)
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
@@ -232,7 +215,7 @@ describe('applyHttpOnlySessionCookies', () => {
             refresh_token: 'refresh-value',
             expires_in: 1800
         })
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
 
         // cc-at (HttpOnly)
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
@@ -277,7 +260,7 @@ describe('applyHttpOnlySessionCookies', () => {
             refresh_token: 'refresh-value',
             expires_in: 1800
         })
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
 
         expect(res.cookies.find((c) => c.includes('uido_testsite'))).toBeUndefined()
     })
@@ -285,7 +268,7 @@ describe('applyHttpOnlySessionCookies', () => {
     test('throws when access token JWT is invalid', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({access_token: 'not-a-jwt', expires_in: 1800})
-        expect(() => applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())).toThrow(
+        expect(() => setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})).toThrow(
             /Failed to decode access token JWT/
         )
     })
@@ -294,7 +277,7 @@ describe('applyHttpOnlySessionCookies', () => {
         const res = makeRes()
         const accessToken = makeJWT({iat: 5000, exp: 6800, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken})
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
 
         const expCookie = res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
         const parsed = parseCookie(expCookie)
@@ -304,22 +287,20 @@ describe('applyHttpOnlySessionCookies', () => {
     test('handles response with no tokens (no cookies set, body returned stripped)', () => {
         const res = makeRes()
         const buf = makeResponseBuffer({expires_in: 1800, other_field: 'value'})
-        const result = applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions())
+        const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
         const body = JSON.parse(result.toString('utf8'))
 
         expect(res.cookies).toHaveLength(0)
         expect(body.other_field).toBe('value')
     })
 
-    test('trims siteId and uses trimmed value in cookie names', () => {
+    test('uses x-site-id header to resolve correct cookie names', () => {
         const res = makeRes()
-        const accessToken = makeJWT({iat: 1000, isb: 'uido:ecom::upn:Guest'})
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
         const buf = makeResponseBuffer({access_token: accessToken, expires_in: 1800})
-        applyHttpOnlySessionCookies(buf, {}, {}, res, makeOptions('  mysite  '))
+        setHttpOnlySessionCookies(buf, {}, makeReq('othersite'), res, {})
 
-        const atCookie = res.cookies.find((c) => c.includes('cc-at_mysite='))
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_othersite='))
         expect(atCookie).toBeDefined()
-        // No leading/trailing spaces in cookie name
-        expect(res.cookies.find((c) => c.includes('cc-at_  mysite'))).toBeUndefined()
     })
 })

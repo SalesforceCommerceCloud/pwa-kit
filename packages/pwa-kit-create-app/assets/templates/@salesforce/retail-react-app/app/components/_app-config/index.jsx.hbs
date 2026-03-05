@@ -57,7 +57,8 @@ const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId,
-        sfdc_user_agent: sfdcUserAgent
+        sfdc_user_agent: sfdcUserAgent,
+        'x-site-id': locals.site?.id
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI

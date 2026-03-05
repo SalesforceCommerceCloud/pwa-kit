@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {applyProxyRequestHeaders, applyScapiAuthHeaders, configureProxy} from './configure-proxy'
+import {
+    applyProxyRequestHeaders,
+    setScapiAuthRequestHeaders,
+    configureProxy
+} from './configure-proxy'
 import * as ssrProxying from '../ssr-proxying'
 import * as utils from './utils'
 import cookie from 'cookie'
@@ -14,6 +18,16 @@ jest.mock('./utils', () => ({
     ...jest.requireActual('./utils'),
     isScapiDomain: jest.fn()
 }))
+jest.mock('../logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        info: jest.fn(),
+        error: jest.fn()
+    }
+}))
+
+import logger from '../logger-instance'
 
 describe('applyProxyRequestHeaders', () => {
     it('removes a header not present in new headers', () => {
@@ -90,7 +104,7 @@ describe('configureProxy ALLOWED_CACHING_PROXY_REQUEST_METHODS', () => {
     })
 })
 
-describe('applyScapiAuthHeaders', () => {
+describe('setScapiAuthRequestHeaders', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
@@ -105,14 +119,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -120,30 +136,6 @@ describe('applyScapiAuthHeaders', () => {
             'authorization',
             'Bearer test-access-token'
         )
-    })
-
-    it('skips all SLAS auth endpoints (handled by SLAS private proxy)', () => {
-        utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
-
-        const proxyRequest = {
-            setHeader: jest.fn()
-        }
-        const incomingRequest = {
-            url: '/shopper/auth/v1/oauth2/logout',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
-        }
-
-        applyScapiAuthHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            siteId: 'RefArch',
-            targetHost: 'abc-001.api.commercecloud.salesforce.com'
-        })
-
-        // SLAS auth endpoints are handled by the SLAS private client proxy
-        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
     it('does not apply Bearer token when caching is true', () => {
@@ -155,14 +147,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: true,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
@@ -170,7 +164,7 @@ describe('applyScapiAuthHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('does not apply Bearer token when siteId is not provided', () => {
+    it('logs warning and skips when x-site-id header is missing on SCAPI request', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({})
 
@@ -182,15 +176,18 @@ describe('applyScapiAuthHeaders', () => {
             headers: {}
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: null,
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+        expect(logger.warn).toHaveBeenCalledWith(
+            expect.stringContaining('x-site-id header is missing'),
+            expect.any(Object)
+        )
     })
 
     it('does not apply Bearer token when target is not SCAPI domain', () => {
@@ -202,14 +199,16 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/api/products',
-            headers: {cookie: 'cc-at_RefArch=test-access-token'}
+            headers: {
+                cookie: 'cc-at_RefArch=test-access-token',
+                'x-site-id': 'RefArch'
+            }
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'external-api.example.com'
         })
 
@@ -225,17 +224,45 @@ describe('applyScapiAuthHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {}
+            headers: {'x-site-id': 'RefArch'}
         }
 
-        applyScapiAuthHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
-            siteId: 'RefArch',
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+    })
+
+    it('uses x-site-id header to resolve correct cookie', () => {
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({'cc-at_OtherSite': 'other-access-token'})
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {
+                cookie: 'cc-at_OtherSite=other-access-token',
+                'x-site-id': 'OtherSite'
+            }
+        }
+
+        setScapiAuthRequestHeaders({
+            proxyRequest,
+            incomingRequest,
+            caching: false,
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
+        })
+
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer other-access-token'
+        )
     })
 })

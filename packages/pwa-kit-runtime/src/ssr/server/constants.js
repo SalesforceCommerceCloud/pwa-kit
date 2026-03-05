@@ -31,6 +31,7 @@ export const SLAS_CUSTOM_PROXY_PATH = '/mobify/slas/private'
 // Users can override these in their project's ssr.js options.
 export const SLAS_TOKEN_RESPONSE_ENDPOINTS = /\/oauth2\/(token|passwordless\/token)$/
 
-// Default regex patterns for SLAS endpoints that need access token in authorization header, used when httpOnly session cookies are enabled
-// Users can override these in their project's ssr.js options.
-export const SLAS_ENDPOINTS_REQUIRING_ACCESS_TOKEN = /\/oauth2\/logout/
+// Default regex pattern for the SLAS logout endpoint, used when httpOnly session cookies are enabled
+// to inject Bearer token and refresh token from HttpOnly cookies.
+// Users can override this in their project's ssr.js options.
+export const SLAS_LOGOUT_ENDPOINT = /\/oauth2\/logout/
