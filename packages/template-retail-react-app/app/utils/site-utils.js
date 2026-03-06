@@ -231,3 +231,34 @@ function getPathnameAndSearch(url) {
     const {pathname, search} = new URL(url, 'https://www.some-domain.com')
     return {pathname, search}
 }
+
+/**
+ * Extract Page Designer parameters from a given URL.
+ * These parameters are used when previewing pages in Page Designer edit mode.
+ * @param {string} url - The URL to extract parameters from
+ * @returns {{mode?: string, pdToken?: string, pageId?: string}} - Page Designer parameters
+ */
+export const resolvePageDesignerParamsFromUrl = (url) => {
+    if (!url) {
+        return {}
+    }
+    const {search} = getPathnameAndSearch(url)
+    const searchParams = new URLSearchParams(search)
+
+    const params = {}
+    const mode = searchParams.get('mode')
+    const pdToken = searchParams.get('pdToken')
+    const pageId = searchParams.get('pageId')
+
+    if (mode) {
+        params.mode = mode
+    }
+    if (pdToken) {
+        params.pdToken = pdToken
+    }
+    if (pageId) {
+        params.pageId = pageId
+    }
+
+    return params
+}
