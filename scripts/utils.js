@@ -16,7 +16,12 @@ const setPackageVersion = (version, shellOptions = {}) => {
     sh.exec(`npm version --no-git-tag ${version}`, {silent: true, ...shellOptions})
 }
 
+const getLatestVersion = (pkgName) => {
+    return sh.exec(`npm info ${pkgName}@latest version`, {silent: true}).trim()
+}
+
 module.exports = {
     saveJSONToFile,
-    setPackageVersion
+    setPackageVersion,
+    getLatestVersion
 }
