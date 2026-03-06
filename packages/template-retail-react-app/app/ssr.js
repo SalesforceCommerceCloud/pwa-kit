@@ -363,8 +363,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
                         '*.adyen.com',
-                        'pay.google.com',   // Google Pay payment handler icon
-                        'www.gstatic.com'   // optional, if icon is on gstatic
+                        'pay.google.com', // Google Pay payment handler icon
+                        'www.gstatic.com' // optional, if icon is on gstatic
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
