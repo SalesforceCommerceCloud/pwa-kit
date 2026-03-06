@@ -203,7 +203,7 @@ const emptyResponseTestCases = [
 // Most test cases only apply to non-empty response test cases, some (error handling) can include deleteBasket
 const allTestCases = [...nonEmptyResponseTestCases, ...emptyResponseTestCases]
 
-describe('ShopperBaskets mutations', () => {
+describe('ShopperBasketsV2 mutations', () => {
     const storedCustomerIdKey = `customer_id_${DEFAULT_TEST_CONFIG.siteId}`
     beforeAll(() => {
         // Make sure we don't accidentally overwrite something before setting up our test state

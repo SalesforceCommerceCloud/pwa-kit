@@ -160,10 +160,9 @@ module.exports = {
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
         // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
-        // sdkUrl and metadataUrl are hosted on your Commerce Cloud instance. Replace <hostname> with your instance hostname.
-        // This may be a demandware.net hostname (e.g., myinstance.unified.demandware.net) or a vanity/custom hostname.
-        //   sdkUrl:       'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
-        //   metadataUrl:  'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
+        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         sfPayments: {
             enabled: false,
             sdkUrl: '',

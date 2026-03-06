@@ -42,11 +42,13 @@ const options = {
     port: 3000,
 
     // The protocol on which the development Express app listens.
+    // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
     protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
 
-    // SSL file path for HTTPS development
+    // Optional. Path to SSL certificate (.pem) for HTTPS development. Typically a
+    // self-signed cert for localhost; set DEV_SERVER_SSL_FILE_PATH when using https.
     sslFilePath: process.env.DEV_SERVER_SSL_FILE_PATH,
 
     // Option for whether to set up a special endpoint for handling

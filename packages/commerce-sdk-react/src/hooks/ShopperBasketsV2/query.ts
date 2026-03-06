@@ -18,11 +18,11 @@ type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Gets a basket.
- * @group ShopperBaskets
+ * @group ShopperBasketsV2
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
- * @returns A TanStack Query query hook with data from the Shopper Baskets `getBasket` endpoint.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets V2 `getBasket` endpoint.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getBasket| Salesforce Developer Center} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
@@ -63,11 +63,11 @@ export const useBasket = (
 }
 /**
  * Gets applicable payment methods for an existing basket considering the open payment amount only.
- * @group ShopperBaskets
+ * @group ShopperBasketsV2
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
- * @returns A TanStack Query query hook with data from the Shopper Baskets `getPaymentMethodsForBasket` endpoint.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets V2 `getPaymentMethodsForBasket` endpoint.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPaymentMethodsForBasket| Salesforce Developer Center} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpaymentmethodsforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
@@ -108,11 +108,11 @@ export const usePaymentMethodsForBasket = (
 }
 /**
  * Gets applicable price books for an existing basket.
- * @group ShopperBaskets
+ * @group ShopperBasketsV2
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
- * @returns A TanStack Query query hook with data from the Shopper Baskets `getPriceBooksForBasket` endpoint.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets V2 `getPriceBooksForBasket` endpoint.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getPriceBooksForBasket| Salesforce Developer Center} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getpricebooksforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
@@ -153,11 +153,11 @@ export const usePriceBooksForBasket = (
 }
 /**
  * Gets the applicable shipping methods for a certain shipment of a basket.
- * @group ShopperBaskets
+ * @group ShopperBasketsV2
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
- * @returns A TanStack Query query hook with data from the Shopper Baskets `getShippingMethodsForShipment` endpoint.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets V2 `getShippingMethodsForShipment` endpoint.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getShippingMethodsForShipment| Salesforce Developer Center} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#getshippingmethodsforshipment | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
@@ -198,11 +198,11 @@ export const useShippingMethodsForShipment = (
 }
 /**
  * This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
- * @group ShopperBaskets
+ * @group ShopperBasketsV2
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
- * @returns A TanStack Query query hook with data from the Shopper Baskets `getTaxesFromBasket` endpoint.
+ * @returns A TanStack Query query hook with data from the Shopper Baskets V2 `getTaxesFromBasket` endpoint.
  * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=getTaxesFromBasket| Salesforce Developer Center} for more information about the API endpoint.
  * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#gettaxesfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
  * @see {@link https://tanstack.com/query/latest/docs/react/reference/useQuery | TanStack Query `useQuery` reference} for more information about the return value.
