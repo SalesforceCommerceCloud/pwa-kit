@@ -42,11 +42,13 @@ const options = {
     port: 3000,
 
     // The protocol on which the development Express app listens.
+    // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
     protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
 
-    // SSL file path for HTTPS development
+    // Optional. Path to SSL certificate (.pem) for HTTPS development. Typically a
+    // self-signed cert for localhost; set DEV_SERVER_SSL_FILE_PATH when using https.
     sslFilePath: process.env.DEV_SERVER_SSL_FILE_PATH,
 
     // Option for whether to set up a special endpoint for handling
@@ -360,7 +362,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
-                        '*.adyen.com'
+                        '*.adyen.com',
+                        'pay.google.com', // Google Pay payment handler icon
+                        'www.gstatic.com' // optional, if icon is on gstatic
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -385,13 +389,20 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // Payment gateways
+                        // Note: Google Pay requires different CSP entries depending on the integration and environment.
+                        // - 'pay.google.com' and 'payments.google.com' are generally needed for the SDK to load and create payment tokens.
+                        // - 'google.com/pay/' and 'www.google.com/pay/' may be required for certain flows (especially with Adyen) or in some browsers
+                        //   where the interactive payment sheet makes server calls directly to google.com/pay.
+                        // - You may need to adjust these URLs based on your environments.
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         '*.adyen.com',
                         '*.paypal.com',
                         'pay.google.com',
                         'payments.google.com',
-                        'google.com',
-                        'www.google.com',
+                        'google.com/pay',
+                        'google.com/pay/',
+                        'www.google.com/pay',
+                        'www.google.com/pay/',
                         // Connect to SFCC/ODS instances
                         '*.demandware.net'
                     ],

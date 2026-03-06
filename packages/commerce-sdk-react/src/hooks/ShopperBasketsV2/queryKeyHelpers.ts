@@ -16,7 +16,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/baskets/',
+        '/baskets/v2/',
         string | undefined,
         Params<'getBasket'>
     ]
@@ -24,7 +24,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/baskets/',
+        '/baskets/v2/',
         string | undefined,
         '/payment-methods',
         Params<'getPaymentMethodsForBasket'>
@@ -33,7 +33,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/baskets/',
+        '/baskets/v2/',
         string | undefined,
         '/price-books',
         Params<'getPriceBooksForBasket'>
@@ -42,7 +42,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/baskets/',
+        '/baskets/v2/',
         string | undefined,
         '/shipments/',
         string | undefined,
@@ -53,7 +53,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/baskets/',
+        '/baskets/v2/',
         string | undefined,
         '/taxes',
         Params<'getTaxesFromBasket'>
@@ -74,7 +74,7 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
         '/commerce-sdk-react',
         '/organizations/',
         params?.organizationId,
-        '/baskets/',
+        '/baskets/v2/',
         params?.basketId
     ],
     queryKey: (params: Params<'getBasket'>) => {
@@ -90,7 +90,7 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
         '/commerce-sdk-react',
         '/organizations/',
         params?.organizationId,
-        '/baskets/',
+        '/baskets/v2/',
         params?.basketId,
         '/payment-methods'
     ],
@@ -107,7 +107,7 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
         '/commerce-sdk-react',
         '/organizations/',
         params?.organizationId,
-        '/baskets/',
+        '/baskets/v2/',
         params?.basketId,
         '/price-books'
     ],
@@ -124,7 +124,7 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
         '/commerce-sdk-react',
         '/organizations/',
         params?.organizationId,
-        '/baskets/',
+        '/baskets/v2/',
         params?.basketId,
         '/shipments/',
         params?.shipmentId,
@@ -143,7 +143,7 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
         '/commerce-sdk-react',
         '/organizations/',
         params?.organizationId,
-        '/baskets/',
+        '/baskets/v2/',
         params?.basketId,
         '/taxes'
     ],

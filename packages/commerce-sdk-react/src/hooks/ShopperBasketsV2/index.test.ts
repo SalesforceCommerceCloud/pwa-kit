@@ -10,7 +10,7 @@ import {cacheUpdateMatrix} from './cache'
 import {ShopperBasketsMutations as mutations} from './mutation'
 import * as queries from './query'
 
-describe('Shopper Baskets hooks', () => {
+describe('Shopper Baskets V2 hooks', () => {
     test('all endpoints have hooks', () => {
         // unimplemented = SDK method exists, but no query hook or value in mutations enum
         const unimplemented = getUnimplementedEndpoints(ShopperBasketsV2, queries, mutations)

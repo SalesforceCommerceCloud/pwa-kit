@@ -15,8 +15,8 @@ const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS_V2
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
- * Mutations available for Shopper Baskets.
- * @group ShopperBaskets
+ * Mutations available for Shopper Baskets V2.
+ * @group ShopperBasketsV2
  * @category Mutation
  * @enum
  */
@@ -165,16 +165,16 @@ export const ShopperBasketsMutations = {
 } as const
 
 /**
- * Type for Shopper Baskets Mutation.
- * @group ShopperBaskets
+ * Type for Shopper Baskets V2 Mutation.
+ * @group ShopperBasketsV2
  * @category Mutation
  */
 export type ShopperBasketsMutation =
     (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
 
 /**
- * Mutation hook for Shopper Baskets.
- * @group ShopperBaskets
+ * Mutation hook for Shopper Baskets V2.
+ * @group ShopperBasketsV2
  * @category Mutation
  */
 export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutation>(
