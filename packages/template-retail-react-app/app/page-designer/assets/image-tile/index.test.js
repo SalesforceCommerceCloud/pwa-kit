@@ -13,13 +13,11 @@ test('ImageTile renders without errors', () => {
     const {getByTestId} = renderWithProviders(
         <ImageTile
             image={{
-                _type: 'Image',
-                focalPoint: {
-                    _type: 'Imagefocalpoint',
+                url: `${getAssetUrl('static/img/hero.png')}`,
+                focal_point: {
                     x: 0.5,
                     y: 0.5
-                },
-                url: `${getAssetUrl('static/img/hero.png')}`
+                }
             }}
         />
     )

@@ -17,7 +17,7 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "+(auth|components|hooks|scripts)/**/!(*.test*).{ts,js}",
+    "+(auth|components|hooks|scripts|page-designer)/**/!(*.test*).{ts,js}",
     "*.{js,d.ts}",
     "!*.test*.{js,d.ts}",
     "!test*.*",
@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "commerce-sdk-isomorphic": "5.1.0",
+    "@salesforce/storefront-next-runtime": "0.1.1",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },
@@ -86,6 +87,12 @@
   "engines": {
     "node": "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0",
     "npm": "^9.0.0 || ^10.0.0 || ^11.0.0"
+  },
+  "overrides": {
+    "@salesforce/storefront-next-runtime": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    }
   },
   "publishConfig": {
     "directory": "dist"

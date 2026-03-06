@@ -27,8 +27,14 @@
         "module": "esnext" /* Specify what module code is generated. */,
         // "rootDir": "./",                                  /* Specify the root folder within your source files. */
         "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
-        // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
-        // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
+        "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
+        "paths": {
+            "@salesforce/storefront-next-runtime/design/react/core": ["node_modules/@salesforce/storefront-next-runtime/dist/design-react-core.d.ts"],
+            "@salesforce/storefront-next-runtime/design/react": ["node_modules/@salesforce/storefront-next-runtime/dist/design-react.d.ts"],
+            "@salesforce/storefront-next-runtime/design": ["node_modules/@salesforce/storefront-next-runtime/dist/design.d.ts"],
+            "@salesforce/storefront-next-runtime/design/mode": ["node_modules/@salesforce/storefront-next-runtime/dist/design-mode.d.ts"],
+            "@salesforce/storefront-next-runtime/scapi": ["node_modules/@salesforce/storefront-next-runtime/dist/scapi.d.ts"]
+        } /* Specify a set of entries that re-map imports to additional lookup locations. */,
         // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
         // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
         // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
