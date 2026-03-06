@@ -1,5 +1,5 @@
 {
-  "version": "3.17.0-dev",
+  "version": "3.17.0-nightly-20260306080534",
   "packages": [
     "packages/*",
     "e2e"
