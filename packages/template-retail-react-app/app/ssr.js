@@ -362,7 +362,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
-                        '*.adyen.com'
+                        '*.adyen.com',
+                        'pay.google.com',   // Google Pay payment handler icon
+                        'www.gstatic.com'   // optional, if icon is on gstatic
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -392,8 +394,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         'pay.google.com',
                         'payments.google.com',
-                        'google.com',
-                        'www.google.com'
+                        'google.com/pay',
+                        'google.com/pay/',
+                        'www.google.com/pay',
+                        'www.google.com/pay/'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
