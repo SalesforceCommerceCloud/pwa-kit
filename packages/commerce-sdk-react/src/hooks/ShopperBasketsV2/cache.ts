@@ -183,7 +183,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ],
             remove: [
                 // We want to fuzzy match all queryKeys with `basketId` in their path
-                // [`/commerce-sdk-react,/organizations/,${organization},/baskets/,${basketId}`]
+                // [`/commerce-sdk-react,/organizations/,${organization},/baskets/v2/,${basketId}`]
                 {queryKey: getBasket.path(parameters)}
             ]
         }

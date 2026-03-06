@@ -74,9 +74,12 @@ module.exports = {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
-        // Note: this feature is in Developer Preview at this time. To use One Click Checkout,
-        // enable the oneClickCheckout flag and configure private SLAS client. For more details, please
-        // check https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.16.0
+        // One Click Checkout: When enabled, shoppers using passwordless OTP login can save shipping
+        // and payment information for faster checkout in the future. To use, enable the flag and
+        // configure private SLAS client. Security safeguards required:
+        // 1. Captcha - Protects the passwordless login from bots (e.g., Cloudflare Turnstile).
+        // 2. OTP for Email Changes - Verifies identity before an email update, prevents accidental
+        //    account lockouts from typos, and prevents unauthorized access to saved payment methods.
         oneClickCheckout: {
             enabled: false
         },
@@ -91,10 +94,9 @@ module.exports = {
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
         // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
-        // sdkUrl and metadataUrl are hosted on your Commerce Cloud instance. Replace <hostname> with your instance hostname.
-        // This may be a demandware.net hostname (e.g., myinstance.unified.demandware.net) or a vanity/custom hostname.
-        //   sdkUrl:       'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
-        //   metadataUrl:  'https://<hostname>/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
+        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         sfPayments: {
             enabled: false,
             sdkUrl: '',
