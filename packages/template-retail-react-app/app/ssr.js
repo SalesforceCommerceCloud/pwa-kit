@@ -389,6 +389,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
                         // Payment gateways
+                        // Note: Google Pay requires different CSP entries depending on the integration and environment.
+                        // - 'pay.google.com' and 'payments.google.com' are generally needed for the SDK to load and create payment tokens.
+                        // - 'google.com/pay/' and 'www.google.com/pay/' may be required for certain flows (especially with Adyen) or in some browsers
+                        //   where the interactive payment sheet makes server calls directly to google.com/pay.
+                        // - You may need to adjust these URLs based on your environments.
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         '*.adyen.com',
                         '*.paypal.com',
