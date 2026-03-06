@@ -119,6 +119,8 @@ module.exports = {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
+        // One Click Checkout: Saves shipping/payment for returning shoppers. Requires: (1) Captcha
+        // for passwordless login, (2) OTP for email changes. See config/default.js for full notes.
         oneClickCheckout: {
             enabled: false
         },

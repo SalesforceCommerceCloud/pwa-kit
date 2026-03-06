@@ -81,6 +81,8 @@ export const routes = [
     {
         path: '/checkout',
         component: (props) => {
+            // One Click Checkout: Saves shipping/payment for returning shoppers. Security required:
+            // (1) Captcha for passwordless login, (2) OTP for email changes. See config/default.js for details.
             const enabled = getConfig()?.app?.oneClickCheckout?.enabled
             return enabled ? <CheckoutOneClick {...props} /> : <Checkout {...props} />
         },

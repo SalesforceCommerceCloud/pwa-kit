@@ -145,8 +145,11 @@ module.exports = {
             appSourceId: '{{answers.project.dataCloud.appSourceId}}',
             tenantId: '{{answers.project.dataCloud.tenantId}}'
         },
-        // Note: this feature is in Developer Preview at this time. To use One Click Checkout,
-        // enable the oneClickCheckout flag and configure private SLAS client. For more details, please
+        // When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future.
+        //   To maintain security, implement these safeguards:
+        //   1. Captcha - Protects the passwordless login from bots.
+        //   2. OTP for Email Changes - Verifies your identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized users from gaining access to saved payment methods.
+        // To use One Click Checkout, enable the oneClickCheckout flag and configure private SLAS client. For more details, please
         // check https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.16.0
         oneClickCheckout: {
             enabled: false
