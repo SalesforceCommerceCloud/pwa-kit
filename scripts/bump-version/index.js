@@ -76,7 +76,7 @@ const main = (program) => {
             restoreVersion = getLatestVersion(name)
             notices.push(
                 `⚠️  Restoring ${name} to its latest published npm version (${restoreVersion}) instead of the repo's dev version (${repoVersion}).\n` +
-                `   This package is released independently and excluded from the monorepo SDK version bump to avoid publishing an unreleased dev version to npm.`
+                    `   This package is released independently and excluded from the monorepo SDK version bump to avoid publishing an unreleased dev version to npm.`
             )
         }
         // Restore to the original version
