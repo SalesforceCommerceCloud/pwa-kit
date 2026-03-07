@@ -18,17 +18,10 @@ import {
     useShopperBasketsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
-import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
-import {useQuery} from '@tanstack/react-query'
-import PropTypes from 'prop-types'
-import React, {useEffect, useMemo, useState} from 'react'
-import {useHistory, useLocation} from 'react-router-dom'
 
 // Chakra
 import {SkipNavContent, SkipNavLink} from '@chakra-ui/skip-nav'
