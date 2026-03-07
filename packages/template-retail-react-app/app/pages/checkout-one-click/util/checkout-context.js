@@ -4,12 +4,32 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {
+    getSessionJSONItem,
+    setSessionJSONItem,
+    clearSessionJSONItem
+} from '@salesforce/retail-react-app/app/utils/utils'
+
+/** SessionStorage key for "checkout as guest" choice so it persists when shopper navigates away and returns */
+export const CHECKOUT_GUEST_CHOICE_STORAGE_KEY = 'sf_checkout_one_click_guest_choice'
+
+export const getCheckoutGuestChoiceFromStorage = () => {
+    return getSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY) === true
+}
+
+export const setCheckoutGuestChoiceInStorage = (value) => {
+    if (value) {
+        setSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY, true)
+    } else {
+        clearSessionJSONItem(CHECKOUT_GUEST_CHOICE_STORAGE_KEY)
+    }
+}
 
 const CheckoutContext = React.createContext()
 
@@ -19,6 +39,7 @@ export const CheckoutProvider = ({children}) => {
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const [contactPhone, setContactPhone] = useState('')
+    const consolidationLockRef = useRef(false)
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -36,6 +57,7 @@ export const CheckoutProvider = ({children}) => {
         if (!customer || !basket) {
             return
         }
+        if (consolidationLockRef.current) return
 
         let step = STEPS.REVIEW_ORDER
 
@@ -114,13 +136,18 @@ export const CheckoutProvider = ({children}) => {
 
     const goToStep = (step) => setStep(step)
 
+    const setConsolidationLock = (locked) => {
+        consolidationLockRef.current = locked
+    }
+
     const value = {
         step,
         STEPS,
         goToNextStep,
         goToStep,
         contactPhone,
-        setContactPhone
+        setContactPhone,
+        setConsolidationLock
     }
 
     return <CheckoutContext.Provider value={value}>{children}</CheckoutContext.Provider>

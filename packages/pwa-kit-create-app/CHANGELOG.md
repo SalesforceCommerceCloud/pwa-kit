@@ -1,8 +1,16 @@
-## v3.16.0-dev (Dec 17, 2025)
+## v3.18.0-dev
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
+
+## v3.17.0-dev
+- Add Salesforce Payments configuration to generated projects [#3725] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+- Clear verdaccio npm cache during project generation [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
+
+## v3.16.0 (Feb 12, 2026)
 - Add new One-Click Checkout configuration [#3609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3609)
-- Support email mode by default for passwordless login and password reset in a generated app. [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+- Support email mode by default for passwordless login and password reset in a generated app [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 - Add `tokenLength` to login configuration [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 

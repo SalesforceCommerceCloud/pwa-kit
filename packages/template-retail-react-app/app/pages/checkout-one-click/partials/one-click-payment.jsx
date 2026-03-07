@@ -16,7 +16,10 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
+    useCustomerType
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckoutAutoSelect} from '@salesforce/retail-react-app/app/hooks/use-checkout-auto-select'
@@ -286,14 +289,11 @@ const Payment = ({
             })
 
             if (isPickupOnly && paymentInstrument.billingAddress) {
-                const addr = {...paymentInstrument.billingAddress}
-                delete addr.addressId
-                delete addr.creationDate
-                delete addr.lastModified
-                delete addr.preferred
-
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const {addressId, creationDate, lastModified, preferred, ...address} =
+                    paymentInstrument.billingAddress
                 await updateBillingAddressForBasket({
-                    body: addr,
+                    body: address,
                     parameters: {
                         basketId: activeBasketIdRef.current || basket.basketId
                     }
@@ -349,13 +349,10 @@ const Payment = ({
                     )
                     const addr = saved?.billingAddress
                     if (addr) {
-                        const cleaned = {...addr}
-                        delete cleaned.addressId
-                        delete cleaned.creationDate
-                        delete cleaned.lastModified
-                        delete cleaned.preferred
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const {addressId, creationDate, lastModified, preferred, ...address} = addr
                         await updateBillingAddressForBasket({
-                            body: cleaned,
+                            body: address,
                             parameters: {basketId: activeBasketIdRef.current || basket.basketId}
                         })
                         await currentBasketQuery.refetch()
@@ -441,8 +438,8 @@ const Payment = ({
                 disabled={appliedPayment == null}
                 onEdit={handleEditPayment}
                 editLabel={formatMessage({
-                    defaultMessage: 'Edit Payment Info',
-                    id: 'toggle_card.action.editPaymentInfo'
+                    defaultMessage: 'Change',
+                    id: 'toggle_card.action.changePaymentInfo'
                 })}
             >
                 <ToggleCardEdit>
@@ -528,27 +525,28 @@ const Payment = ({
                                         isBillingAddress
                                     />
                                 )}
-                                {(isGuest || showRegistrationNotice) && (
-                                    <UserRegistration
-                                        enableUserRegistration={enableUserRegistration}
-                                        setEnableUserRegistration={onUserRegistrationToggle}
-                                        onLoadingChange={onOtpLoadingChange}
-                                        isGuestCheckout={registeredUserChoseGuest}
-                                        isDisabled={
-                                            !(
-                                                appliedPayment ||
-                                                paymentMethodForm.formState.isValid ||
-                                                (isPickupOnly &&
-                                                    billingAddressForm.formState.isValid)
-                                            ) ||
-                                            (!effectiveBillingSameAsShipping &&
-                                                !billingAddressForm.formState.isValid)
-                                        }
-                                        onSavePreferenceChange={onSavePreferenceChange}
-                                        onRegistered={handleRegistrationSuccess}
-                                        showNotice={showRegistrationNotice}
-                                    />
-                                )}
+                                {(isGuest || showRegistrationNotice) &&
+                                    !registeredUserChoseGuest && (
+                                        <UserRegistration
+                                            enableUserRegistration={enableUserRegistration}
+                                            setEnableUserRegistration={onUserRegistrationToggle}
+                                            onLoadingChange={onOtpLoadingChange}
+                                            isGuestCheckout={registeredUserChoseGuest}
+                                            isDisabled={
+                                                !(
+                                                    appliedPayment ||
+                                                    paymentMethodForm.formState.isValid ||
+                                                    (isPickupOnly &&
+                                                        billingAddressForm.formState.isValid)
+                                                ) ||
+                                                (!effectiveBillingSameAsShipping &&
+                                                    !billingAddressForm.formState.isValid)
+                                            }
+                                            onSavePreferenceChange={onSavePreferenceChange}
+                                            onRegistered={handleRegistrationSuccess}
+                                            showNotice={showRegistrationNotice}
+                                        />
+                                    )}
                             </Stack>
                         </>
                     ) : null}
@@ -579,8 +577,7 @@ const Payment = ({
 
                         <Divider borderColor="gray.100" />
 
-                        {(selectedBillingAddress ||
-                            (effectiveBillingSameAsShipping && selectedShippingAddress)) && (
+                        {selectedBillingAddress && !effectiveBillingSameAsShipping && (
                             <Stack spacing={2}>
                                 <Heading as="h3" fontSize="md">
                                     <FormattedMessage
@@ -588,13 +585,11 @@ const Payment = ({
                                         id="checkout_payment.heading.billing_address"
                                     />
                                 </Heading>
-                                <AddressDisplay
-                                    address={selectedBillingAddress || selectedShippingAddress}
-                                />
+                                <AddressDisplay address={selectedBillingAddress} />
                             </Stack>
                         )}
 
-                        {(isGuest || showRegistrationNotice) && (
+                        {(isGuest || showRegistrationNotice) && !registeredUserChoseGuest && (
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}

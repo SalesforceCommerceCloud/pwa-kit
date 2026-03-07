@@ -17,7 +17,6 @@
 
 import {parse as parseSetCookie} from 'set-cookie-parser'
 import headerCase from 'header-case'
-import {URL} from 'url'
 import logger from './logger-instance'
 
 const AC_ALLOW_ORIGIN = 'access-control-allow-origin'

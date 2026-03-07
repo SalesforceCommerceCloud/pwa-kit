@@ -32,7 +32,7 @@
   "account.payments.checkbox.make_default": [
     {
       "type": 0,
-      "value": "Make default"
+      "value": "Set as default"
     }
   ],
   "account.payments.error.payment_method_remove_failed": [
@@ -75,6 +75,24 @@
     {
       "type": 0,
       "value": "New payment method was saved."
+    }
+  ],
+  "account.payments.label.expires": [
+    {
+      "type": 0,
+      "value": "Expires "
+    },
+    {
+      "type": 1,
+      "value": "month"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "year"
     }
   ],
   "account.payments.message.error": [
@@ -989,6 +1007,12 @@
       "value": "Could not save shipping address."
     }
   ],
+  "checkout.heading.express_checkout": [
+    {
+      "type": 0,
+      "value": "Express Checkout"
+    }
+  ],
   "checkout.label.user_registration": [
     {
       "type": 0,
@@ -999,6 +1023,24 @@
     {
       "type": 0,
       "value": "An unexpected error occurred during checkout."
+    }
+  ],
+  "checkout.message.payment_button_cancel": [
+    {
+      "type": 0,
+      "value": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed."
+    }
+  ],
+  "checkout.message.payment_confirm_failure": [
+    {
+      "type": 0,
+      "value": "Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+    }
+  ],
+  "checkout.message.payment_processing_failed": [
+    {
+      "type": 0,
+      "value": "Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
     }
   ],
   "checkout.message.user_registration": [
@@ -1029,6 +1071,18 @@
     {
       "type": 0,
       "value": "Create Account"
+    }
+  ],
+  "checkout_confirmation.heading.afterpay_clearpay": [
+    {
+      "type": 0,
+      "value": "Afterpay/Clearpay"
+    }
+  ],
+  "checkout_confirmation.heading.bancontact": [
+    {
+      "type": 0,
+      "value": "Bancontact"
     }
   ],
   "checkout_confirmation.heading.billing_address": [
@@ -1065,6 +1119,24 @@
       "value": "number"
     }
   ],
+  "checkout_confirmation.heading.eps": [
+    {
+      "type": 0,
+      "value": "EPS"
+    }
+  ],
+  "checkout_confirmation.heading.ideal": [
+    {
+      "type": 0,
+      "value": "iDEAL"
+    }
+  ],
+  "checkout_confirmation.heading.klarna": [
+    {
+      "type": 0,
+      "value": "Klarna"
+    }
+  ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
@@ -1099,6 +1171,12 @@
       "value": "number"
     }
   ],
+  "checkout_confirmation.heading.sepa_debit": [
+    {
+      "type": 0,
+      "value": "SEPA Debit"
+    }
+  ],
   "checkout_confirmation.heading.shipping_address": [
     {
       "type": 0,
@@ -1115,6 +1193,12 @@
     {
       "type": 0,
       "value": "Thank you for your order!"
+    }
+  ],
+  "checkout_confirmation.heading.unknown": [
+    {
+      "type": 0,
+      "value": "Unknown"
     }
   ],
   "checkout_confirmation.label.free": [
@@ -1249,10 +1333,10 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
-  "checkout_contact_info.action.edit": [
+  "checkout_contact_info.action.change": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Change"
     }
   ],
   "checkout_contact_info.action.sign_out": [
@@ -1569,6 +1653,12 @@
     {
       "type": 0,
       "value": "Secure Link"
+    }
+  ],
+  "contact_info.error.generic_try_again": [
+    {
+      "type": 0,
+      "value": "An error occurred. Please try again."
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
@@ -1947,6 +2037,18 @@
       "value": "Our Company"
     }
   ],
+  "footer.error.enter_valid_email": [
+    {
+      "type": 0,
+      "value": "Enter a valid email address."
+    }
+  ],
+  "footer.error.generic_error": [
+    {
+      "type": 0,
+      "value": "We couldn't process the subscription. Try again."
+    }
+  ],
   "footer.link.about_us": [
     {
       "type": 0,
@@ -2016,13 +2118,47 @@
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Subscribe"
     }
   ],
   "footer.subscribe.description.sign_up": [
     {
       "type": 0,
-      "value": "Sign up to stay in the loop about the hottest deals"
+      "value": "Be the first to know about latest offers, news, tips, and more."
+    }
+  ],
+  "footer.subscribe.disclaimer": [
+    {
+      "type": 0,
+      "value": "By submitting this, I agree to the "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Terms & Conditions"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Privacy Policy"
+        }
+      ],
+      "type": 8,
+      "value": "privacy"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "footer.subscribe.email.assistive_msg": [
@@ -2031,10 +2167,22 @@
       "value": "Email address for newsletter"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
+  "footer.subscribe.email.placeholder_text": [
     {
       "type": 0,
-      "value": "Be the first to know"
+      "value": "Enter your email address..."
+    }
+  ],
+  "footer.subscribe.heading.stay_updated": [
+    {
+      "type": 0,
+      "value": "Subscribe to Stay Updated"
+    }
+  ],
+  "footer.success_confirmation": [
+    {
+      "type": 0,
+      "value": "Thanks for subscribing!"
     }
   ],
   "form_action_buttons.button.cancel": [
@@ -3061,6 +3209,12 @@
       "value": "Tax"
     }
   ],
+  "order_summary.label.tax_tbd": [
+    {
+      "type": 0,
+      "value": "TBD"
+    }
+  ],
   "otp.button.cancel_guest_registration": [
     {
       "type": 0,
@@ -3077,20 +3231,6 @@
     {
       "type": 0,
       "value": "Resend Code"
-    }
-  ],
-  "otp.button.resend_timer": [
-    {
-      "type": 0,
-      "value": "Resend code in "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": " seconds..."
     }
   ],
   "otp.error.invalid_code": [
@@ -3119,10 +3259,46 @@
       "value": "To log in to your account, enter the code sent to your email."
     }
   ],
-  "otp.message.verifying": [
+  "otp.message.resend_cooldown": [
     {
       "type": 0,
-      "value": "Verifying code..."
+      "value": "You can request a new code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "second"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "seconds"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "otp.title.confirm_its_you": [
@@ -3259,6 +3435,36 @@
     {
       "type": 0,
       "value": "Password Reset Success"
+    }
+  ],
+  "payment_processing.error.unsuccessful": [
+    {
+      "type": 0,
+      "value": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed. Please select a different payment method and submit payment again to complete your checkout and place your order."
+    }
+  ],
+  "payment_processing.heading.payment_processing": [
+    {
+      "type": 0,
+      "value": "Payment Processing"
+    }
+  ],
+  "payment_processing.link.return_to_checkout": [
+    {
+      "type": 0,
+      "value": "Return to Checkout"
+    }
+  ],
+  "payment_processing.message.unexpected_error": [
+    {
+      "type": 0,
+      "value": "There was an unexpected error processing your payment."
+    }
+  ],
+  "payment_processing.message.working_on_your_payment": [
+    {
+      "type": 0,
+      "value": "Working on your payment..."
     }
   ],
   "payment_selection.button.view_all": [
@@ -3739,6 +3945,12 @@
       "value": "See full details"
     }
   ],
+  "product_view.prepareBasket": [
+    {
+      "type": 0,
+      "value": "Unable to determine product ID for basket"
+    }
+  ],
   "product_view.status.in_stock_at_store": [
     {
       "type": 0,
@@ -3945,6 +4157,18 @@
       "value": "Cancel"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Discover, compare, and shop smarter with your personal Shopping Agent."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Ask Shopping Agent"
+    }
+  ],
   "search.suggestions.categories": [
     {
       "type": 0,
@@ -3997,6 +4221,60 @@
     {
       "type": 0,
       "value": "In Stock"
+    }
+  ],
+  "sf_payments_order_summary.label.bank.unknown": [
+    {
+      "type": 0,
+      "value": "Unknown"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.amex": [
+    {
+      "type": 0,
+      "value": "American Express"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.diners": [
+    {
+      "type": 0,
+      "value": "Diners Club"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.discover": [
+    {
+      "type": 0,
+      "value": "Discover"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.jcb": [
+    {
+      "type": 0,
+      "value": "JCB"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.mastercard": [
+    {
+      "type": 0,
+      "value": "MasterCard"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.unionpay": [
+    {
+      "type": 0,
+      "value": "China UnionPay"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.unknown": [
+    {
+      "type": 0,
+      "value": "Unknown"
+    }
+  ],
+  "sf_payments_order_summary.label.brand.visa": [
+    {
+      "type": 0,
+      "value": "Visa"
     }
   ],
   "shipping_address.action.ship_to_multiple_addresses": [
@@ -4286,7 +4564,7 @@
   "shipping_options.error.no_shipping_methods": [
     {
       "type": 0,
-      "value": "No shipping methods are available for this address. Please enter a different address."
+      "value": "Unfortunately, we are unable to ship to this address at this time. Please reach out to customer support for further assistance."
     }
   ],
   "shipping_options.free": [
@@ -4659,6 +4937,18 @@
       "value": "Change"
     }
   ],
+  "toggle_card.action.changePaymentInfo": [
+    {
+      "type": 0,
+      "value": "Change"
+    }
+  ],
+  "toggle_card.action.changeShippingOptions": [
+    {
+      "type": 0,
+      "value": "Change"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
@@ -4717,6 +5007,12 @@
     {
       "type": 0,
       "value": "Please enter your phone number."
+    }
+  ],
+  "use_address_fields.error.please_enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter your postal code."
     }
   ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
@@ -4915,6 +5211,12 @@
     {
       "type": 0,
       "value": "Security Code"
+    }
+  ],
+  "use_login_fields.error.invalid_email": [
+    {
+      "type": 0,
+      "value": "Please enter a valid email address."
     }
   ],
   "use_login_fields.error.required_email": [

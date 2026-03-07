@@ -10,7 +10,7 @@
 const sh = require('shelljs')
 const path = require('path')
 const program = require('commander')
-const {saveJSONToFile, setPackageVersion} = require('../utils')
+const {saveJSONToFile, setPackageVersion, getLatestVersion} = require('../utils')
 
 // Exit upon error
 sh.set('-e')
@@ -68,11 +68,20 @@ const main = (program) => {
     // update versions for root package and root package lock
     setPackageVersion(newMonorepoVersion, {cwd: rootPath})
 
+    const notices = []
     independentPackages.forEach((pkg) => {
-        const {location, version: oldVersion} = pkg
+        const {name, location, version: repoVersion} = pkg
+        let restoreVersion = repoVersion
+        if (name === '@salesforce/pwa-kit-mcp') {
+            restoreVersion = getLatestVersion(name)
+            notices.push(
+                `⚠️  Restoring ${name} to its latest published npm version (${restoreVersion}) instead of the repo's dev version (${repoVersion}).\n` +
+                    `   This package is released independently and excluded from the monorepo SDK version bump to avoid publishing an unreleased dev version to npm.`
+            )
+        }
         // Restore to the original version
         // TODO: is it possible to _not_ trigger the lifecycle scripts? See commerce-sdk-react/CHANGELOG.md
-        setPackageVersion(oldVersion, {cwd: location})
+        setPackageVersion(restoreVersion, {cwd: location})
     })
 
     // Now that all of the package version updates are done,
@@ -91,6 +100,8 @@ const main = (program) => {
     sh.exec('npm install')
 
     listAllVersions()
+
+    notices.forEach((msg) => console.log(`\n${msg}`))
 }
 
 const updatePeerDeps = (pkgJson, newMonorepoVersion) => {

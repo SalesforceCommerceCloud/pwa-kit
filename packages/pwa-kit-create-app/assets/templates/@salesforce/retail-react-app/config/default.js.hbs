@@ -34,7 +34,10 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            enableAgentFromHeader: 'false',
+            enableAgentFromFloatingButton: 'false',
+            enableAgentFromSearchSuggestions: 'false'
         },
         // Customize settings for your url
         url: {
@@ -148,7 +151,12 @@ module.exports = {
             appSourceId: '{{answers.project.dataCloud.appSourceId}}',
             tenantId: '{{answers.project.dataCloud.tenantId}}'
         },
-        // Enable one-click checkout feature
+        // When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future.
+        //   To maintain security, implement these safeguards:
+        //   1. Captcha - Protects the passwordless login from bots.
+        //   2. OTP for Email Changes - Verifies your identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized users from gaining access to saved payment methods.
+        // To use One Click Checkout, enable the oneClickCheckout flag and configure private SLAS client. For more details, please
+        // check https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.16.0
         oneClickCheckout: {
             enabled: false
         },
@@ -157,6 +165,17 @@ module.exports = {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
             }
+        },
+        // Salesforce Payments configuration
+        // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
+        // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
+        // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
+        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        sfPayments: {
+            enabled: false,
+            sdkUrl: '',
+            metadataUrl: ''
         },
         // Google Cloud api config
         googleCloudAPI: {
@@ -183,7 +202,7 @@ module.exports = {
     ],
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
+        ssrFunctionNodeVersion: '24.x',
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',

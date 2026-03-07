@@ -17,7 +17,8 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
     getParamsFromPath,
     resolveLocaleFromUrl,
-    removeBasePathFromPath
+    removeBasePathFromPath,
+    resolvePageDesignerParamsFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
@@ -442,5 +443,59 @@ describe('resolveLocaleFromUrl', function () {
             const locale = resolveLocaleFromUrl(path)
             expect(locale).toEqual(expectedRes)
         })
+    })
+})
+
+describe('resolvePageDesignerParamsFromUrl', function () {
+    test('returns empty object when no url is provided', () => {
+        const result = resolvePageDesignerParamsFromUrl('')
+        expect(result).toEqual({})
+    })
+
+    test('returns empty object when url has no Page Designer params', () => {
+        const result = resolvePageDesignerParamsFromUrl('/category/womens')
+        expect(result).toEqual({})
+    })
+
+    test('extracts mode parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?mode=EDIT')
+        expect(result).toEqual({mode: 'EDIT'})
+    })
+
+    test('extracts pdToken parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?pdToken=abc123')
+        expect(result).toEqual({pdToken: 'abc123'})
+    })
+
+    test('extracts pageId parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?pageId=homepage')
+        expect(result).toEqual({pageId: 'homepage'})
+    })
+
+    test('extracts all Page Designer parameters from url', () => {
+        const result = resolvePageDesignerParamsFromUrl(
+            '/?mode=EDIT&pdToken=xyz789&pageId=homepage'
+        )
+        expect(result).toEqual({
+            mode: 'EDIT',
+            pdToken: 'xyz789',
+            pageId: 'homepage'
+        })
+    })
+
+    test('extracts Page Designer parameters with path and other query params', () => {
+        const result = resolvePageDesignerParamsFromUrl(
+            '/us/en-US/women?site=us&mode=PREVIEW&pdToken=token123&pageId=test-page'
+        )
+        expect(result).toEqual({
+            mode: 'PREVIEW',
+            pdToken: 'token123',
+            pageId: 'test-page'
+        })
+    })
+
+    test('ignores non-Page Designer query parameters', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?mode=EDIT&foo=bar&baz=qux')
+        expect(result).toEqual({mode: 'EDIT'})
     })
 })

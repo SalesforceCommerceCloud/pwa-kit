@@ -1,15 +1,29 @@
-## v9.0.0-dev (Jan 19, 2026)
-- [Feature] One Click Checkout [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+## v9.2.0-dev
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
 - Update storefront preview to support base paths [#3666](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3666)
+
+## v9.1.0-dev
+- Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
+- [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+- One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
+- Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
+- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- [Bugfix] Fix error toast for no applicable shipping methods in one-click checkout [#3673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3673)
+- [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
+- [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
+- [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
+
+## v9.0.0 (Feb 12, 2026)
+- [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
 - [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
 - [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)
 - [Feature] PWA Integration with OMS
   - Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
   - Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
   - Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
-  - BOPIS multishipment with OMS [#3613] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
+  - BOPIS multishipment with OMS [#3613](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
+  - Default to ECOM shipments in case OMS has no shipments [#3639](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3639)
 - [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 - Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
 - Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)

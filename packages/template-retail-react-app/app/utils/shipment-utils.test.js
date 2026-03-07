@@ -8,6 +8,7 @@
 import {
     isPickupMethod,
     isPickupShipment,
+    getDeliveryShippingMethods,
     getItemsForShipment,
     findEmptyShipments,
     groupItemsByAddress,
@@ -428,6 +429,37 @@ describe('shipment-utils', () => {
         test('should return false for null/undefined shipping method', () => {
             expect(isPickupMethod(null)).toBe(false)
             expect(isPickupMethod(undefined)).toBe(false)
+        })
+    })
+
+    describe('getDeliveryShippingMethods', () => {
+        test('returns only non-pickup methods', () => {
+            const methods = [
+                {id: '001', name: 'Standard', c_storePickupEnabled: false},
+                {id: '005', name: 'Store Pickup', c_storePickupEnabled: true},
+                {id: '002', name: 'Express', c_storePickupEnabled: false}
+            ]
+            expect(getDeliveryShippingMethods(methods)).toEqual([
+                {id: '001', name: 'Standard', c_storePickupEnabled: false},
+                {id: '002', name: 'Express', c_storePickupEnabled: false}
+            ])
+        })
+
+        test('returns empty array for null or undefined', () => {
+            expect(getDeliveryShippingMethods(null)).toEqual([])
+            expect(getDeliveryShippingMethods(undefined)).toEqual([])
+        })
+
+        test('returns empty array for non-array input', () => {
+            expect(getDeliveryShippingMethods({})).toEqual([])
+        })
+
+        test('returns all methods when none are pickup', () => {
+            const methods = [
+                {id: '001', name: 'Standard'},
+                {id: '002', name: 'Express'}
+            ]
+            expect(getDeliveryShippingMethods(methods)).toEqual(methods)
         })
     })
 

@@ -1,7 +1,14 @@
-## v3.16.0-dev (Dec 17, 2025)
+## v3.18.0-dev
 - Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
 - Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
 - Update storefront preview to support base paths [#3666](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3666)
+
+## v3.17.0-dev
+- Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+
+## v3.16.0 (Feb 12, 2026)
+- Migrate AWS SDK from v2 to v3 [#3566](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3566)
+- Updated the SLAS private client proxy to enable customizing the proxy response body [#3662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3662)
 
 ## v3.15.0 (Dec 17, 2025)
 - Fix multiple set-cookie headers [#3508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3508)

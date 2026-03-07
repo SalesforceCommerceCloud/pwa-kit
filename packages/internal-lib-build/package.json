@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "3.16.0-dev",
+  "version": "3.17.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -43,24 +43,23 @@
     "@babel/runtime": "^7.21.0",
     "@babel/runtime-corejs2": "^7.21.0",
     "@babel/traverse": "^7.23.2",
-    "babel-jest": "^26.6.3",
+    "babel-jest": "^29.7.0",
     "babel-loader": "^8.3.0",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.5.36",
     "commander": "^9.5.0",
-    "jest": "^26.6.3",
-    "jest-environment-jsdom": "^26.6.2",
-    "jest-environment-jsdom-global": "^2.0.4",
-    "jest-fetch-mock": "^2.1.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom-global": "^4.0.0",
+    "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.8.6",
     "raf": "^3.4.1",
     "regenerator-runtime": "^0.13.11",
     "replace-in-file": "^6.3.5",
-    "rimraf": "2.7.1",
     "shelljs": "^0.9.2"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.16.0-dev",
+    "@salesforce/pwa-kit-dev": "3.17.0-dev",
     "npm-packlist": "^4.0.0",
     "typescript": "4.9.5"
   },
@@ -73,7 +72,7 @@
     }
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
-    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
+    "node": "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0",
+    "npm": "^9.0.0 || ^10.0.0 || ^11.0.0"
   }
 }

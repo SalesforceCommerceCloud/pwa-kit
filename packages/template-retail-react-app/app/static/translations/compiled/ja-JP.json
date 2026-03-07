@@ -1547,12 +1547,6 @@
       "value": "ニュースレターの Eメールアドレス"
     }
   ],
-  "footer.subscribe.heading.first_to_know": [
-    {
-      "type": 0,
-      "value": "最新情報を誰よりも早く入手"
-    }
-  ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
@@ -3127,6 +3121,18 @@
     {
       "type": 0,
       "value": "キャンセル"
+    }
+  ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "パーソナルショッピングアシスタントで、より賢く発見・比較・ショッピング。"
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "ショッピングアシスタントに聞く"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [

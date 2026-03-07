@@ -7,6 +7,10 @@
 import React from 'react'
 import {screen, waitFor, fireEvent, act} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
+import {
+    setCheckoutGuestChoiceInStorage,
+    useCheckout
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {AuthHelpers, useCustomerType} from '@salesforce/commerce-sdk-react'
@@ -33,7 +37,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useAuthHelper: jest
             .fn()
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType]),
-        useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+        useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateCustomerForBasket') return mockUpdateCustomerForBasket
             if (mutationType === 'transferBasket') return mockTransferBasket
             if (mutationType === 'updateBillingAddressForBasket')
@@ -79,6 +83,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 const mockSetContactPhone = jest.fn()
 const mockGoToNextStep = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context', () => {
+    const setCheckoutGuestChoiceInStorage = jest.fn()
     return {
         useCheckout: jest.fn().mockReturnValue({
             customer: null,
@@ -91,7 +96,8 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checko
             goToStep: null,
             goToNextStep: mockGoToNextStep,
             setContactPhone: mockSetContactPhone
-        })
+        }),
+        setCheckoutGuestChoiceInStorage
     }
 })
 
@@ -110,13 +116,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
 // Mock OtpAuth to expose a verify trigger
 jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     // eslint-disable-next-line react/prop-types
-    return function MockOtpAuth({isOpen, handleOtpVerification, onCheckoutAsGuest}) {
+    return function MockOtpAuth({isOpen, handleOtpVerification, onCheckoutAsGuest, onClose}) {
+        const handleGuestClick = () => {
+            onCheckoutAsGuest?.()
+            onClose?.()
+        }
         return isOpen ? (
             <div>
                 <div>Confirm it&apos;s you</div>
                 <p>To log in to your account, enter the code sent to your email.</p>
                 <div>
-                    <button type="button" onClick={onCheckoutAsGuest}>
+                    <button type="button" onClick={handleGuestClick}>
                         Checkout as a guest
                     </button>
                     <button type="button">Resend Code</button>
@@ -158,9 +168,20 @@ beforeEach(() => {
     mockUpdateCustomer.mutateAsync.mockResolvedValue({})
     // Reset useCustomerType mock to ensure phone input is not disabled
     useCustomerType.mockReturnValue({isRegistered: false})
+    // Reset useCheckout to default guest checkout state
+    useCheckout.mockReturnValue({
+        customer: null,
+        basket: {basketId: 'test-basket-id'},
+        isGuestCheckout: true,
+        setIsGuestCheckout: jest.fn(),
+        step: 0,
+        login: null,
+        STEPS: {CONTACT_INFO: 0},
+        goToStep: null,
+        goToNextStep: mockGoToNextStep,
+        setContactPhone: mockSetContactPhone
+    })
 })
-
-afterEach(() => {})
 
 describe('ContactInfo Component', () => {
     beforeEach(() => {
@@ -212,96 +233,43 @@ describe('ContactInfo Component', () => {
         expect(phoneInput.value).toMatch(/[0-9]/)
     })
 
-    test('shows phone disabled and prefilled for registered shopper', async () => {
-        jest.resetModules()
-        jest.doMock('@salesforce/commerce-sdk-react', () => {
-            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-            return {
-                ...originalModule,
-                useCustomerType: jest.fn(() => ({isRegistered: true})),
-                useAuthHelper: jest
-                    .fn()
-                    .mockImplementation(
-                        (helperType) =>
-                            mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
-                    )
+    test('shows phone disabled and prefilled for registered shopper', () => {
+        useCustomerType.mockReturnValue({isRegistered: true})
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                email: 'reg@salesforce.com',
+                isRegistered: true,
+                phoneHome: '(111) 222-3333'
             }
         })
-        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-            useCurrentCustomer: () => ({
-                data: {
-                    email: 'reg@salesforce.com',
-                    isRegistered: true,
-                    phoneHome: '(111) 222-3333'
-                }
-            })
-        }))
-        const {renderWithProviders: localRenderWithProviders} = await import(
-            '@salesforce/retail-react-app/app/utils/test-utils'
-        )
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
-        )
-        const Component = module.default
-
-        localRenderWithProviders(<Component />)
+        renderWithProviders(<ContactInfo />)
         const phoneInput = screen.getByLabelText('Phone')
         expect(phoneInput).toBeInTheDocument()
         expect(phoneInput).toHaveAttribute('disabled')
     })
 
-    test('displays phone number in summary card for registered user', async () => {
-        jest.resetModules()
-        jest.doMock('@salesforce/commerce-sdk-react', () => {
-            const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-            return {
-                ...originalModule,
-                useCustomerType: jest.fn(() => ({isRegistered: true})),
-                useAuthHelper: jest
-                    .fn()
-                    .mockImplementation(
-                        (helperType) =>
-                            mockAuthHelperFunctions[helperType] || {mutateAsync: jest.fn()}
-                    )
+    test('displays phone number in summary card for registered user', () => {
+        useCustomerType.mockReturnValue({isRegistered: true})
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                email: 'reg@salesforce.com',
+                isRegistered: true,
+                phoneHome: '(111) 222-3333'
             }
         })
-        jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-            useCurrentCustomer: () => ({
-                data: {
-                    email: 'reg@salesforce.com',
-                    isRegistered: true,
-                    phoneHome: '(111) 222-3333'
-                }
-            })
-        }))
-        jest.doMock(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
-            () => {
-                return {
-                    useCheckout: jest.fn().mockReturnValue({
-                        customer: null,
-                        basket: {basketId: 'test-basket-id'},
-                        isGuestCheckout: false,
-                        setIsGuestCheckout: jest.fn(),
-                        step: 1, // Not on CONTACT_INFO step, so summary shows
-                        login: null,
-                        STEPS: {CONTACT_INFO: 0},
-                        goToStep: jest.fn(),
-                        goToNextStep: jest.fn(),
-                        setContactPhone: jest.fn()
-                    })
-                }
-            }
-        )
-        const {renderWithProviders: localRenderWithProviders} = await import(
-            '@salesforce/retail-react-app/app/utils/test-utils'
-        )
-        const module = await import(
-            '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
-        )
-        const Component = module.default
-
-        localRenderWithProviders(<Component />)
+        useCheckout.mockReturnValue({
+            customer: null,
+            basket: {basketId: 'test-basket-id'},
+            isGuestCheckout: false,
+            setIsGuestCheckout: jest.fn(),
+            step: 1, // Not on CONTACT_INFO step, so summary shows
+            login: null,
+            STEPS: {CONTACT_INFO: 0},
+            goToStep: jest.fn(),
+            goToNextStep: jest.fn(),
+            setContactPhone: jest.fn()
+        })
+        renderWithProviders(<ContactInfo />)
 
         // Verify email and phone are displayed in summary
         expect(screen.getByText('reg@salesforce.com')).toBeInTheDocument()
@@ -606,11 +574,10 @@ describe('ContactInfo Component', () => {
         expect(screen.getByText(/Resend Code/i)).toBeInTheDocument()
     })
 
-    test('shows error message when updateCustomerForBasket fails', async () => {
-        // Mock OTP authorization to succeed so modal opens
+    test('clicking "Checkout as a guest" does not update basket or advance step', async () => {
+        // "Checkout as Guest" only closes the modal and sets registeredUserChoseGuest state;
+        // basket is updated when the user later submits the form with phone and clicks Continue.
         mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
-        // Mock update to fail when choosing guest
-        mockUpdateCustomerForBasket.mutateAsync.mockRejectedValue(new Error('API Error'))
 
         const {user} = renderWithProviders(<ContactInfo />)
         const emailInput = screen.getByLabelText('Email')
@@ -625,22 +592,17 @@ describe('ContactInfo Component', () => {
         await user.click(submitButton)
         await screen.findByTestId('otp-verify')
 
-        // Click "Checkout as a guest" which triggers updateCustomerForBasket and should set error
+        // Click "Checkout as a guest" — should not call basket mutations or goToNextStep
         await user.click(screen.getByText(/Checkout as a guest/i))
 
         await waitFor(() => {
-            expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalled()
+            expect(mockUpdateCustomerForBasket.mutateAsync).not.toHaveBeenCalled()
+            expect(mockGoToNextStep).not.toHaveBeenCalled()
         })
-        // Error alert should be rendered; component maps errors via getPasswordlessErrorMessage to generic message
-        await waitFor(() => {
-            const alerts = screen.queryAllByRole('alert')
-            const hasError = alerts.some(
-                (n) =>
-                    n.textContent?.includes('Something went wrong') ||
-                    n.textContent?.includes('API Error')
-            )
-            expect(hasError).toBe(true)
-        })
+        // Modal closes; user stays on Contact Info (Continue button visible again)
+        expect(
+            screen.getByRole('button', {name: /continue to shipping address/i})
+        ).toBeInTheDocument()
     })
 
     test('does not proceed to next step when OTP modal is already open on form submission', async () => {
@@ -747,37 +709,41 @@ describe('ContactInfo Component', () => {
         expect(phoneInput.value).toBe('(555) 123-4567')
     })
 
-    test('saves phone number to billing address when guest checks out via "Checkout as Guest" button', async () => {
-        // Mock successful OTP authorization to open modal
+    test('notifies parent when guest chooses "Checkout as Guest" and stays on Contact Info', async () => {
+        // Open OTP modal (registered email), click "Checkout as a guest" — modal closes,
+        // parent is notified via onRegisteredUserChoseGuest(true), user stays on Contact Info.
         mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({})
-        mockUpdateCustomerForBasket.mutateAsync.mockResolvedValue({})
-        mockUpdateBillingAddressForBasket.mutateAsync.mockResolvedValue({})
 
-        const {user} = renderWithProviders(<ContactInfo />)
+        const onRegisteredUserChoseGuestSpy = jest.fn()
+        const {user} = renderWithProviders(
+            <ContactInfo onRegisteredUserChoseGuest={onRegisteredUserChoseGuestSpy} />
+        )
 
         const emailInput = screen.getByLabelText('Email')
-        const phoneInput = screen.getByLabelText('Phone')
 
-        // Enter phone first - use fireEvent to ensure value is set
-        fireEvent.change(phoneInput, {target: {value: '(727) 555-1234'}})
-
-        // Enter email and wait for OTP modal to open
+        // Enter email and open OTP modal (blur triggers registered-user check)
         await user.type(emailInput, validEmail)
         fireEvent.change(emailInput, {target: {value: validEmail}})
         fireEvent.blur(emailInput)
 
-        // Wait for OTP modal to open
         await screen.findByTestId('otp-verify')
 
-        // Click "Checkout as a guest" button
+        // Click "Checkout as a guest" — modal closes; parent is notified; no basket update
         await user.click(screen.getByText(/Checkout as a guest/i))
 
+        expect(onRegisteredUserChoseGuestSpy).toHaveBeenCalledWith(true)
+        expect(setCheckoutGuestChoiceInStorage).toHaveBeenCalledWith(true)
+        expect(mockUpdateCustomerForBasket.mutateAsync).not.toHaveBeenCalled()
+        expect(mockGoToNextStep).not.toHaveBeenCalled()
+
+        // Modal closes; user stays on Contact Info (Continue button visible for entering phone)
         await waitFor(() => {
-            expect(mockUpdateBillingAddressForBasket.mutateAsync).toHaveBeenCalled()
-            const callArgs = mockUpdateBillingAddressForBasket.mutateAsync.mock.calls[0]?.[0]
-            expect(callArgs?.parameters).toMatchObject({basketId: 'test-basket-id'})
-            expect(callArgs?.body?.phone).toMatch(/727/)
+            expect(screen.queryByText("Confirm it's you")).not.toBeInTheDocument()
         })
+        expect(
+            screen.getByRole('button', {name: /continue to shipping address/i})
+        ).toBeInTheDocument()
+        expect(screen.getByLabelText('Phone')).toBeInTheDocument()
     })
 
     test('uses phone from billing address when persisting to customer profile after OTP verification', async () => {
@@ -836,5 +802,8 @@ describe('ContactInfo Component', () => {
                 body: {phoneHome: billingPhone}
             })
         })
+
+        // Guest choice storage should be cleared when user signs in via OTP
+        expect(setCheckoutGuestChoiceInStorage).toHaveBeenCalledWith(false)
     })
 })

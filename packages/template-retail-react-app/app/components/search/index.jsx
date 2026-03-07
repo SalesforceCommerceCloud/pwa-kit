@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
     Input,
@@ -42,6 +42,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {launchChat as launchChatFromUtils} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
@@ -140,10 +141,19 @@ const Search = (props) => {
     const appOrigin = useAppOrigin()
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
 
-    const askAgentOnSearchEnabled = useMemo(() => {
-        const {enabled, askAgentOnSearch} = getCommerceAgentConfig()
-        return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
-    }, [config.app.commerceAgent])
+    const commerceAgentConfig = useMemo(
+        () => getCommerceAgentConfig(),
+        [config.app?.commerceAgent, config.app?.commerceAgentSettings]
+    )
+    const askAgentOnSearchEnabled = useMemo(
+        () =>
+            isAskAgentOnSearchEnabled(
+                commerceAgentConfig?.enabled,
+                commerceAgentConfig?.askAgentOnSearch
+            ),
+        [commerceAgentConfig]
+    )
+    const enableAgentFromSearchSuggestions = commerceAgentConfig?.enableAgentFromSearchSuggestions
 
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -215,13 +225,13 @@ const Search = (props) => {
         }
     }
 
-    const clearInput = () => {
-        searchInputRef.current.blur()
+    const clearInput = useCallback(() => {
+        searchInputRef.current?.blur()
         setIsOpen(false)
-    }
+    }, [])
 
     // Function to set pre-chat fields only when launching a new chat session
-    const setPrechatFieldsForNewSession = () => {
+    const setPrechatFieldsForNewSession = useCallback(() => {
         // Only set pre-chat fields if this is a new chat launch (not already launched)
         if (!miawChatRef.current.newChatLaunched) {
             if (window.embeddedservice_bootstrap?.prechatAPI) {
@@ -238,7 +248,17 @@ const Search = (props) => {
                 })
             }
         }
-    }
+    }, [
+        siteId,
+        locale,
+        commerceOrgId,
+        usid,
+        refreshToken,
+        sfLanguage,
+        appOrigin,
+        buildUrl,
+        location
+    ])
 
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
@@ -265,7 +285,7 @@ const Search = (props) => {
             window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
         }
     }, [])
-    const launchChat = () => {
+    const launchChat = useCallback(() => {
         // Set pre-chat fields only for new sessions
         setPrechatFieldsForNewSession()
 
@@ -286,7 +306,7 @@ const Search = (props) => {
             ?.catch((err) => {
                 console.error('launchChat error', err)
             })
-    }
+    }, [setPrechatFieldsForNewSession])
 
     const onSubmitSearch = (e) => {
         e.preventDefault()
@@ -330,6 +350,13 @@ const Search = (props) => {
             navigate(link)
         }
     }
+
+    const onAskAssistantClick = useCallback(() => {
+        // When floating button is hidden (enableAgentFromFloatingButton false), show it first then launch
+        setPrechatFieldsForNewSession()
+        launchChatFromUtils()
+        clearInput()
+    }, [setPrechatFieldsForNewSession, clearInput])
 
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
@@ -402,6 +429,8 @@ const Search = (props) => {
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}
                             searchSuggestions={searchSuggestions}
+                            enableAgentFromSearchSuggestions={enableAgentFromSearchSuggestions}
+                            onAskAssistantClick={onAskAssistantClick}
                         />
                     </PopoverContent>
                 </HideOnMobile>
@@ -409,11 +438,12 @@ const Search = (props) => {
             <HideOnDesktop>
                 <Flex
                     display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
-                    postion="absolute"
+                    position="absolute"
                     background="white"
                     left={0}
                     right={0}
                     height="100vh"
+                    overflowX="hidden"
                 >
                     {searchSuggestion.isLoading ? (
                         <Spinner
@@ -430,6 +460,8 @@ const Search = (props) => {
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}
                             searchSuggestions={searchSuggestions}
+                            enableAgentFromSearchSuggestions={enableAgentFromSearchSuggestions}
+                            onAskAssistantClick={onAskAssistantClick}
                         />
                     )}
                 </Flex>

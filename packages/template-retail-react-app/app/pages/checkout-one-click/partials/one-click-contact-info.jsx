@@ -26,7 +26,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
+import {
+    useCheckout,
+    setCheckoutGuestChoiceInStorage
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import {
     ToggleCard,
@@ -42,7 +45,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {
     AuthHelpers,
     useAuthHelper,
-    useShopperBasketsMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
     useCustomerType,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
@@ -110,7 +113,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isBlurChecking, setIsBlurChecking] = useState(false)
-    const [, setRegisteredUserChoseGuest] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
 
     // Auto-focus the email field when the component mounts
@@ -166,12 +169,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Validate email format
         if (!email) {
-            setEmailError('Please enter your email address.')
+            setEmailError(
+                formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'use_login_fields.error.required_email'
+                })
+            )
             return
         }
 
         if (!isValidEmail(email)) {
-            setEmailError('Please enter a valid email address.')
+            setEmailError(
+                formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'use_login_fields.error.invalid_email'
+                })
+            )
             return
         }
 
@@ -205,12 +218,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     }
 
     // Handle sending OTP email
-    const handleSendEmailOtp = async (email) => {
+    const handleSendEmailOtp = async (email, isResend = false) => {
         // Normalize email for comparison (trim and lowercase)
         const normalizedEmail = email?.trim().toLowerCase() || ''
 
-        // Skip if email hasn't changed from the last one we sent
-        if (lastEmailSentRef.current === normalizedEmail) {
+        // Skip if email hasn't changed from the last one we sent (unless user requested)
+        if (!isResend && lastEmailSentRef.current === normalizedEmail) {
             // Return cached result if we have one
             if (otpSendPromiseRef.current) {
                 return otpSendPromiseRef.current
@@ -219,8 +232,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             return {isRegistered: false}
         }
 
-        // Reuse in-flight request (single-flight) across blur and submit
-        if (otpSendPromiseRef.current) {
+        // Reuse in-flight request (single-flight) across blur and submit (but not for explicit resend)
+        if (!isResend && otpSendPromiseRef.current) {
             return otpSendPromiseRef.current
         }
 
@@ -242,11 +255,19 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 lastEmailSentRef.current = normalizedEmail
                 return {isRegistered: true}
             } catch (error) {
-                const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
-                setError(message)
-                // Keep continue button visible if email is valid (for unregistered users)
-                if (isValidEmail(email)) {
+                // 404 = email not registered (guest); treat as guest and continue
+                const isGuestNotFound = String(error?.message || '').includes('404')
+                if (isGuestNotFound && isValidEmail(email)) {
+                    setError('')
                     setShowContinueButton(true)
+                } else {
+                    const message = formatMessage(
+                        getAuthorizePasswordlessErrorMessage(error.message)
+                    )
+                    setError(message)
+                    if (isValidEmail(email)) {
+                        setShowContinueButton(true)
+                    }
                 }
                 // Update the last email sent ref even on error to prevent retrying immediately
                 lastEmailSentRef.current = normalizedEmail
@@ -270,37 +291,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     }
 
     // Handle checkout as guest from OTP modal
-    const handleCheckoutAsGuest = async () => {
-        try {
-            const email = form.getValues('email')
-            const phone = form.getValues('phone')
-            // Update basket with guest email
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: email}
-            })
-
-            // Save phone number to basket billing address for guest shoppers
-            if (phone) {
-                await updateBillingAddressForBasket.mutateAsync({
-                    parameters: {basketId: basket.basketId},
-                    body: {
-                        ...basket?.billingAddress,
-                        phone: phone
-                    }
-                })
-            }
-
-            // Set the flag that "Checkout as Guest" was clicked
-            setRegisteredUserChoseGuest(true)
-            if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(true)
-            }
-
-            // Proceed to next step (shipping address)
-            goToNextStep()
-        } catch (error) {
-            setError(error.message)
+    const handleCheckoutAsGuest = () => {
+        setRegisteredUserChoseGuest(true)
+        setCheckoutGuestChoiceInStorage(true)
+        if (onRegisteredUserChoseGuest) {
+            onRegisteredUserChoseGuest(true)
         }
     }
 
@@ -359,6 +354,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
+            setCheckoutGuestChoiceInStorage(false)
             if (onRegisteredUserChoseGuest) {
                 onRegisteredUserChoseGuest(false)
             }
@@ -438,13 +434,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Validate email before proceeding
         if (!formData.email) {
-            setError('Please enter your email address.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'use_login_fields.error.required_email'
+                })
+            )
             setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
 
         if (!isValidEmail(formData.email)) {
-            setError('Please enter a valid email address.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'use_login_fields.error.invalid_email'
+                })
+            )
             setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
@@ -470,7 +476,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 return
             }
 
-            if (!result.isRegistered) {
+            if (!result.isRegistered || registeredUserChoseGuest) {
                 // Guest shoppers must provide phone number before proceeding
                 const phone = (formData.phone || '').trim()
                 if (!phone) {
@@ -497,12 +503,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     // Save phone number to basket billing address for guest shoppers
                     if (phone) {
+                        const billingBody = {...basket?.billingAddress, phone}
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const {addressId, creationDate, lastModified, preferred, ...address} =
+                            billingBody
                         await updateBillingAddressForBasket.mutateAsync({
                             parameters: {basketId: basket.basketId},
-                            body: {
-                                ...basket?.billingAddress,
-                                phone: phone
-                            }
+                            body: address
                         })
                     }
 
@@ -515,7 +522,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     return
                 } catch (error) {
-                    setError('An error occurred. Please try again.')
+                    setError(
+                        formatMessage({
+                            defaultMessage: 'An error occurred. Please try again.',
+                            id: 'contact_info.error.generic_try_again'
+                        })
+                    )
                     // Show continue button again if there's an error
                     setShowContinueButton(true)
                     setIsSubmitting(false)
@@ -524,7 +536,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
             // If user is registered, OTP modal should be open, don't proceed to next step
         } catch (error) {
-            setError('An error occurred. Please try again.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'An error occurred. Please try again.',
+                    id: 'contact_info.error.generic_try_again'
+                })
+            )
         } finally {
             // Only reset submitting state for registered users (when OTP modal is open)
             // Guest users will have already returned above
@@ -533,6 +550,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
         }
     }
+
+    const customerEmail = customer?.email || form.getValues('email')
+    const customerPhone = customer?.phoneHome || form.getValues('phone')
 
     return (
         <>
@@ -557,8 +577,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                               id: 'checkout_contact_info.action.sign_out'
                           })
                         : formatMessage({
-                              defaultMessage: 'Edit',
-                              id: 'checkout_contact_info.action.edit'
+                              defaultMessage: 'Change',
+                              id: 'checkout_contact_info.action.change'
                           })
                 }
             >
@@ -688,18 +708,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     </Container>
                 </ToggleCardEdit>
 
-                {(customer?.email || form.getValues('email')) && (
+                {customerEmail ? (
                     <ToggleCardSummary>
                         <Stack spacing={1}>
-                            <Text>{customer?.email || form.getValues('email')}</Text>
-                            {(customer?.phoneHome || form.getValues('phone')) && (
-                                <Text fontSize="sm" color="gray.600">
-                                    {customer?.phoneHome || form.getValues('phone')}
-                                </Text>
-                            )}
+                            <Text>{customerEmail}</Text>
+                            {customerPhone && <Text>{customerPhone}</Text>}
                         </Stack>
                     </ToggleCardSummary>
-                )}
+                ) : null}
             </ToggleCard>
 
             {/* Sign Out Confirmation Dialog */}

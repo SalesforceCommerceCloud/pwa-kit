@@ -16,7 +16,7 @@ import {BonusProductSelectionModalProvider} from '@salesforce/retail-react-app/a
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
-import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
+import {PageContext, Region, registry} from '@salesforce/commerce-sdk-react/page-designer'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
@@ -279,11 +279,36 @@ export const withPageProvider = (Component, options) => {
         }
     }
     const wrappedComponentName = Component.displayName || Component.name
-    const WrappedComponent = (props) => (
-        <PageContext.Provider {...providerProps}>
-            <Component {...props} />
-        </PageContext.Provider>
-    )
+    const WrappedComponent = (props) => {
+        // Register mock components in the registry for any typeIds found in regions.
+        // The new Region/Component pipeline uses registry.getComponent() instead of PageContext.
+        const MockComponent = (mockProps) => (
+            <div>
+                <b>{mockProps.typeId}</b>
+            </div>
+        )
+        const collectTypeIds = (regions) => {
+            const typeIds = new Set()
+            regions?.forEach((region) => {
+                region.components?.forEach((comp) => {
+                    if (comp.typeId) typeIds.add(comp.typeId)
+                })
+            })
+            return typeIds
+        }
+        // eslint-disable-next-line react/prop-types
+        collectTypeIds(props.regions).forEach((typeId) => {
+            if (!registry.getComponent(typeId)) {
+                registry.registerComponent(typeId, MockComponent)
+            }
+        })
+
+        return (
+            <PageContext.Provider {...providerProps}>
+                <Component {...props} />
+            </PageContext.Provider>
+        )
+    }
     WrappedComponent.displayName = `withRouter(${wrappedComponentName})`
 
     return WrappedComponent

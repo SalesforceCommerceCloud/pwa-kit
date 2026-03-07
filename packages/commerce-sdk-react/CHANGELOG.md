@@ -1,12 +1,20 @@
-## v5.0.0-dev (Jan 28, 2026)
-- Upgrade to commerce-sdk-isomorphic v5.0.0 and introduce Payment Instrument SCAPI integration [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+## v5.2.0-dev
 - Update storefront preview to support base paths [#3666](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3666)
 
+## v5.1.0-dev
+- Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
+- Bump commerce-sdk-isomorphic to 5.1.0 [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+- Update ShopperBasketsV2 hooks documentation and query keys
+- Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- Add Shopper Consents API support [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
+
+## v5.0.0 (Feb 12, 2026)
+- Upgrade to commerce-sdk-isomorphic v5.0.0 and introduce Payment Instrument SCAPI integration [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
 
 ## v4.4.0-dev (Dec 17, 2025)
-- [Bugfix]Ensure code_verifier can be optional in resetPassword call [#3567](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3567)
+- [Bugfix] Ensure code_verifier can be optional in resetPassword call [#3567](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3567)
 - [Improvement] Strengthening typescript types on custom endpoint options and fetchOptions types [#3589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3589)
-- [Feature] update `authorizePasswordless`, `getPasswordResetToken`, and `resetPassword` to support use of `email` mode [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+- [Feature] Update `authorizePasswordless`, `getPasswordResetToken`, and `resetPassword` to support use of `email` mode [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
 
 ## v4.3.0 (Dec 17, 2025)
 
@@ -15,7 +23,7 @@
 ## v4.2.0 (Nov 04, 2025)
 
 - Upgrade to commerce-sdk-isomorphic v4.0.1 [#3449](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3449)
-- Prevent headers from being overriden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
+- Prevent headers from being overridden in `generateCustomEndpointOptions` [#3405](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3405/)
 
 ## v4.1.0 (Sep 25, 2025)
 
