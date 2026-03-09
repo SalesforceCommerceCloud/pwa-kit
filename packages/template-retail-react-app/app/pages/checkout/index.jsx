@@ -287,9 +287,8 @@ const Checkout = () => {
                     </Container>
                 </Box>
             )}
-
             {/* Loading overlay during express payment confirmation */}
-            {confirmingBasket && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+            {confirmingBasket && <LoadingSpinner wrapperStyles={{position: 'fixed'}} />}
         </Box>
     )
 }
@@ -340,7 +339,7 @@ const CheckoutContainer = () => {
 
     return (
         <CheckoutProvider>
-            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{position: 'fixed'}} />}
             <GoogleAPIProvider>
                 <Checkout />
             </GoogleAPIProvider>
