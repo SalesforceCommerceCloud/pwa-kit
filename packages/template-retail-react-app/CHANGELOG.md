@@ -1,4 +1,4 @@
-## v9.1.0-dev
+## v9.1.0-preview.0 (Mar 06, 2026)
 - [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
