@@ -1,6 +1,5 @@
 ## v3.18.0-dev
-- Move envBasePath into ssrParameters [#3590](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3590)
-- Support adding base paths to shopper facing URLs [#3615](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3615)
+- Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
 ## v3.17.0-dev
 - Update test setup for Jest 29 compatibility [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
