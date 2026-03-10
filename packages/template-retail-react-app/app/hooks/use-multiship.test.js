@@ -8,7 +8,7 @@
 import {renderHook, act} from '@testing-library/react'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
-import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
+import {useShippingMethodsForShipmentV2 as useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
@@ -19,7 +19,7 @@ import {
 
 // Mock dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useShippingMethodsForShipment: jest.fn()
+    useShippingMethodsForShipmentV2: jest.fn()
 }))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment', () => ({

@@ -25,7 +25,8 @@ import {MultiSiteProvider, StoreLocatorProvider} from '@salesforce/retail-react-
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {
     resolveSiteFromUrl,
-    resolveLocaleFromUrl
+    resolveLocaleFromUrl,
+    resolvePageDesignerParamsFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
@@ -93,6 +94,8 @@ const AppConfig = ({children, locals = {}}) => {
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
 
+    const pageDesignerParams = locals.pageDesignerParams || {}
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -118,6 +121,7 @@ const AppConfig = ({children, locals = {}}) => {
                     : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
             }
             logger={createLogger({packageName: 'commerce-sdk-react'})}
+            pageDesignerParams={pageDesignerParams}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
@@ -146,10 +150,13 @@ AppConfig.restore = (locals = {}) => {
 
     apiConfig.parameters.siteId = site.id
 
+    const pageDesignerParams = resolvePageDesignerParamsFromUrl(path)
+
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig
+    locals.pageDesignerParams = pageDesignerParams
 }
 
 AppConfig.freeze = () => undefined

@@ -2,6 +2,9 @@
 - Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
 
 ## v5.1.0-dev
+- Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
+- Bump commerce-sdk-isomorphic to 5.1.0 [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+- Update ShopperBasketsV2 hooks documentation and query keys
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Shopper Consents API support [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 
