@@ -5,23 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import React, {useState, useEffect, useMemo} from 'react'
+import PropTypes from 'prop-types'
+import {useHistory, useLocation} from 'react-router-dom'
+import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
+import {getAssetUrl, getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
     useShopperBasketsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
-import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
-import {useQuery} from '@tanstack/react-query'
-import PropTypes from 'prop-types'
-import React, {useEffect, useMemo, useState} from 'react'
-import {useHistory, useLocation} from 'react-router-dom'
 
 // Chakra
 import {SkipNavContent, SkipNavLink} from '@chakra-ui/skip-nav'
@@ -315,9 +315,14 @@ const App = (props) => {
         trackPage()
     }, [location])
 
+    const getHrefForLocale = (localeId) =>
+        `${appOrigin}${getRouterBasePath()}${getPathWithLocale(localeId, buildUrl, {
+            location: {...location, search: ''}
+        })}`
+
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview getToken={getTokenWhenReady}>
+            <StorefrontPreview getToken={getTokenWhenReady} getBasePath={getRouterBasePath}>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
@@ -362,12 +367,7 @@ const App = (props) => {
                                 <link
                                     rel="alternate"
                                     hrefLang={locale.id.toLowerCase()}
-                                    href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
-                                        location: {
-                                            ...location,
-                                            search: ''
-                                        }
-                                    })}`}
+                                    href={getHrefForLocale(locale.id)}
                                     key={locale.id}
                                 />
                             ))}
@@ -375,12 +375,7 @@ const App = (props) => {
                             <link
                                 rel="alternate"
                                 hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
-                                    location: {
-                                        ...location,
-                                        search: ''
-                                    }
-                                })}`}
+                                href={getHrefForLocale(locale.id)}
                             />
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />

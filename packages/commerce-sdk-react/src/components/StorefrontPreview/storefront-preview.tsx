@@ -18,19 +18,57 @@ type ContextChangeHandler = () => void | Promise<void>
 type OptionalWhenDisabled<T> = ({enabled?: true} & T) | ({enabled: false} & Partial<T>)
 
 /**
+ * Remove the base path from a path string.
+ * Only strips when path equals basePath or path starts with basePath + '/'.
+ */
+function removeBasePathFromPath(path: string, basePath: string): string {
+    const matches =
+        path.startsWith(basePath + '/') || path === basePath
+    return matches ? path.slice(basePath.length) || '/' : path
+}
+
+/**
+ * Strip the base path from a path
+ *
+ * React Router history re-adds the base path to the path, so we
+ * remove it here to avoid base path duplication.
+ */
+function removeBasePathFromLocation<T>(
+    pathOrLocation: LocationDescriptor<T>,
+    basePath: string
+): LocationDescriptor<T> {
+    if (!basePath) return pathOrLocation
+    if (typeof pathOrLocation === 'string') {
+        return removeBasePathFromPath(pathOrLocation, basePath) as LocationDescriptor<T>
+    }
+    const pathname = pathOrLocation.pathname ?? '/'
+    return {
+        ...pathOrLocation,
+        pathname: removeBasePathFromPath(pathname, basePath)
+    }
+}
+
+/**
  *
  * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
  * This flag only applies if storefront is running in a Runtime Admin iframe.
  * @param getToken - A method that returns the access token for the current user
+ * @param getBasePath - A method that returns the router base path of the app. Requird if using
+ * base path for router routes (showBasePath is true in url config).
  */
 export const StorefrontPreview = ({
     children,
     enabled = true,
     getToken,
-    onContextChange
+    onContextChange,
+    getBasePath
 }: React.PropsWithChildren<
     // Props are only required when Storefront Preview is enabled
-    OptionalWhenDisabled<{getToken: GetToken; onContextChange?: ContextChangeHandler}>
+    OptionalWhenDisabled<{
+        getToken: GetToken
+        onContextChange?: ContextChangeHandler
+        getBasePath?: () => string
+    }>
 >) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
@@ -49,11 +87,13 @@ export const StorefrontPreview = ({
                     action: 'push' | 'replace' = 'push',
                     ...args: unknown[]
                 ) => {
-                    history[action](path, ...args)
+                    const basePath = getBasePath?.() ?? ''
+                    const pathWithoutBase = removeBasePathFromLocation(path, basePath)
+                    history[action](pathWithoutBase, ...args)
                 }
             }
         }
-    }, [enabled, getToken, onContextChange, siteId])
+    }, [enabled, getToken, onContextChange, siteId, getBasePath])
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
@@ -99,7 +139,8 @@ StorefrontPreview.propTypes = {
     // to get to a place where both these props are simply optional and we will provide default implementations.
     // This would make the API simpler to use.
     getToken: CustomPropTypes.requiredFunctionWhenEnabled,
-    onContextChange: PropTypes.func
+    onContextChange: PropTypes.func,
+    getBasePath: PropTypes.func
 }
 
 export default StorefrontPreview

@@ -1,3 +1,6 @@
+## v3.18.0-dev
+- Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+
 ## v3.17.0-dev
 - Add Page Designer Design CSS Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - Update jest, archiver and remove rimraf dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)

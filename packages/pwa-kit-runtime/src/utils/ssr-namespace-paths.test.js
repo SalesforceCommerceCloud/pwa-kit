@@ -5,43 +5,108 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {getEnvBasePath} from './ssr-namespace-paths'
-import * as ssrConfig from './ssr-config'
-
-jest.mock('./ssr-config')
 
 describe('ssr-namespace-paths tests', () => {
-    test('getEnvBasePath returns base path from config', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample'})
-        expect(getEnvBasePath()).toBe('/sample')
+    const originalEnv = process.env
+
+    beforeEach(() => {
+        jest.resetModules()
+        process.env = {...originalEnv}
+        delete process.env.MRT_ENV_BASE_PATH
+        // Ensure we're in Node environment (no window)
+        delete global.window
     })
 
-    test('getEnvBasePath returns empty string if no base path is set', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
-        expect(getEnvBasePath()).toBe('')
+    afterEach(() => {
+        process.env = originalEnv
+        delete global.window
     })
 
-    test('getEnvBasePath returns empty string if envBasePath is not a string', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: 123})
-        expect(getEnvBasePath()).toBe('')
+    describe('Node environment (process.env)', () => {
+        test('getEnvBasePath returns base path from environment variable', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
+
+        test('getEnvBasePath returns empty string if no base path is set', () => {
+            expect(getEnvBasePath()).toBe('')
+        })
+
+        test('getEnvBasePath throws error for base path with trailing slash', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for just a slash', () => {
+            process.env.MRT_ENV_BASE_PATH = '/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error if invalid characters are detected in envBasePath', () => {
+            process.env.MRT_ENV_BASE_PATH = '/sample<script>'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for envBasePath with whitespace', () => {
+            process.env.MRT_ENV_BASE_PATH = '  /sample  '
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for multi-part base paths with slashes', () => {
+            process.env.MRT_ENV_BASE_PATH = '/test/sample'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath allows special characters: . + $ ~ " \' @ : -', () => {
+            process.env.MRT_ENV_BASE_PATH = '/a.b+c$d~e"f\'g@h:i-j_k'
+            expect(getEnvBasePath()).toBe('/a.b+c$d~e"f\'g@h:i-j_k')
+        })
+
+        test('getEnvBasePath throws error if base path exceeds 64 characters', () => {
+            // 65 characters total (1 slash + 64 chars)
+            process.env.MRT_ENV_BASE_PATH = '/' + 'a'.repeat(64)
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath allows base path of exactly 64 characters', () => {
+            // 64 characters total (1 slash + 63 chars)
+            process.env.MRT_ENV_BASE_PATH = '/' + 'a'.repeat(63)
+            expect(getEnvBasePath()).toBe('/' + 'a'.repeat(63))
+        })
     })
 
-    test('getEnvBasePath removes trailing slash', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample/'})
-        expect(getEnvBasePath()).toBe('/sample')
-    })
+    describe('Browser environment (window)', () => {
+        beforeEach(() => {
+            global.window = {}
+        })
 
-    test('getEnvBasePath returns empty string if invalid cahracters are detected in envBasePath', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*'})
-        expect(getEnvBasePath()).toBe('')
-    })
+        test('getEnvBasePath returns base path from window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample'
+            expect(getEnvBasePath()).toBe('/sample')
+        })
 
-    test('getEnvBasePath normalizes envBasePath', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '  //sample/  '})
-        expect(getEnvBasePath()).toBe('/sample')
-    })
+        test('getEnvBasePath returns empty string if window global is not set', () => {
+            expect(getEnvBasePath()).toBe('')
+        })
 
-    test('getEnvBasePath works with multiple part base path', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '//test/sample/  '})
-        expect(getEnvBasePath()).toBe('/test/sample')
+        test('getEnvBasePath throws error for base path with trailing slash from window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample/'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for window global value with whitespace', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '  /sample  '
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error if invalid characters in window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/sample<script>'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
+
+        test('getEnvBasePath throws error for multi-part base paths in window global', () => {
+            global.window.__MRT_ENV_BASE_PATH__ = '/test/sample'
+            expect(() => getEnvBasePath()).toThrow('Invalid envBasePath configuration')
+        })
     })
 })

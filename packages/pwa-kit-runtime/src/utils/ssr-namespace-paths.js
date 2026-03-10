@@ -5,9 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from './ssr-config'
-import logger from './logger-instance'
-
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
  *
@@ -26,41 +23,42 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 /*
  * Returns the base path. This is prepended to a /mobify path.
- * Returns an empty string if the base path is not set or is '/'.
+ * Returns an empty string if the base path is not set.
+ * Throws an error if the base path is not valid.
+ *
+ * Use this function if you are working with an express route
+ * (ie. The route is defined in ssr.js).
+ *
+ * Use getRouterBasePath (pwa-kit-react-sdk) if you are working
+ * with a React Router route
+ * (ie. The route is defined in routes.jsx).
  */
 export const getEnvBasePath = () => {
-    const config = getConfig()
-    let basePath = config?.envBasePath || ''
+    let basePath = ''
 
-    if (typeof basePath !== 'string') {
-        logger.warn('Invalid envBasePath configuration. No base path is applied.', {
-            namespace: 'ssr-namespace-paths.getEnvBasePath'
-        })
+    if (typeof window !== 'undefined') {
+        basePath = window.__MRT_ENV_BASE_PATH__ || ''
+    } else {
+        basePath = process.env.MRT_ENV_BASE_PATH || ''
+    }
+
+    // Return empty string if no base path is set
+    if (!basePath) {
         return ''
     }
 
-    // Normalize the base path
-    basePath = basePath
-        .trim()
-        .replace(/^\/?/, '/') // Ensure leading slash
-        .replace(/\/+/g, '/') // Normalize multiple slashes
-        .replace(/\/$/, '') // Remove trailing slash
-
-    // Return empty string for root path or empty result
-    if (basePath === '/' || !basePath) {
-        return ''
-    }
-
-    // only allow simple, safe characters
-    // eslint-disable-next-line no-useless-escape
-    if (!/^\/[a-zA-Z0-9\-_\/]*$/.test(basePath)) {
-        logger.warn(
-            'Invalid envBasePath configuration. Only letters, numbers, hyphens, underscores, and slashes allowed. No base path is applied.',
-            {
-                namespace: 'ssr-namespace-paths.getEnvBasePath'
-            }
+    // MRT will throw an error on bundle upload if the base path does not match
+    // the following regex: /^\/[a-zA-Z0-9_.+$~"'@:-]{1,63}$/
+    // This validates:
+    // - Starts with /
+    // - Followed by 1-63 characters (letters, numbers, and special chars: - _ . + $ ~ " ' @ :)
+    // - No additional slashes (multi-part paths not allowed, no trailing slashes)
+    // - No spaces
+    // - Total max length of 64 characters (1 slash + 63 chars)
+    if (!/^\/[a-zA-Z0-9_.+$~"'@:-]{1,63}$/.test(basePath)) {
+        throw new Error(
+            "Invalid envBasePath configuration. Base path must start with '/' followed by 1-63 characters. Only letters, numbers, and the following special characters are allowed: - _ . + $ ~ \" ' @ :"
         )
-        return ''
     }
 
     return basePath
