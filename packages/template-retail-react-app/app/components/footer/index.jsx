@@ -22,6 +22,7 @@ import LinksList from '@salesforce/retail-react-app/app/components/links-list'
 import SubscribeMarketingConsent from '@salesforce/retail-react-app/app/components/subscription'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
@@ -151,8 +152,8 @@ const Footer = ({...otherProps}) => {
                                         const newUrl = getPathWithLocale(target.value, buildUrl, {
                                             disallowParams: ['refine']
                                         })
-
-                                        window.location = newUrl
+                                        const basePath = getRouterBasePath()
+                                        window.location = basePath ? `${basePath}${newUrl}` : newUrl
                                     }}
                                     variant="filled"
                                     aria-label={intl.formatMessage({

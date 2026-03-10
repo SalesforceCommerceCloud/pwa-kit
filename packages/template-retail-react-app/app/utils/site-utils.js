@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 /**
  * This functions takes an url and returns a site object,
@@ -95,13 +96,32 @@ export const getSiteByReference = (siteRef) => {
 }
 
 /**
+ * Remove the base path from a path string only when path equals basePath or path starts with basePath + '/'.
+ * @param {string} path - the path to strip
+ * @param {string} basePath - the base path to remove
+ * @returns {string} the path with base path removed, or the original path
+ */
+export const removeBasePathFromPath = (path, basePath) => {
+    if (!basePath) return path
+    if (path.startsWith(basePath + '/') || path === basePath) {
+        return path.substring(basePath.length) || '/'
+    }
+    return path
+}
+
+/**
  * This function return the identifiers (site and locale) from the given url
  * The site will always go before locale if both of them are presented in the pathname
  * @param path {string}
  * @returns {{siteRef: string, localeRef: string}} - site and locale reference (it could either be id or alias)
  */
 export const getParamsFromPath = (path) => {
-    const {pathname, search} = getPathnameAndSearch(path)
+    let {pathname, search} = getPathnameAndSearch(path)
+
+    // Remove the base path from the pathname if present since
+    // it shifts the location of the site and locale in the pathname
+    const basePath = getRouterBasePath()
+    pathname = removeBasePathFromPath(pathname, basePath)
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
