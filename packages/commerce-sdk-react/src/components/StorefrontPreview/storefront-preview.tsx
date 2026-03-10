@@ -53,7 +53,8 @@ function removeBasePathFromLocation<T>(
  * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
  * This flag only applies if storefront is running in a Runtime Admin iframe.
  * @param getToken - A method that returns the access token for the current user
- * @param getBasePath - A method that returns the router base path of the app.
+ * @param getBasePath - A method that returns the router base path of the app. Requird if using
+ * base path for router routes (showBasePath is true in url config).
  */
 export const StorefrontPreview = ({
     children,
@@ -76,13 +77,6 @@ export const StorefrontPreview = ({
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
-            if (process.env.NODE_ENV !== 'production' && !getBasePath) {
-                console.warn(
-                    '[StorefrontPreview] No getBasePath prop provided. ' +
-                        'If your app uses a base path for router routes (showBasePath is true in url config), ' +
-                        'pass getBasePath to avoid base path duplication during navigation.'
-                )
-            }
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
