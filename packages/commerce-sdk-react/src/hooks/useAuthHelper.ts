@@ -36,7 +36,8 @@ export const AuthHelpers = {
     FinishWebauthnUserRegistration: 'finishWebauthnUserRegistration',
     AuthorizeWebauthnRegistration: 'authorizeWebauthnRegistration',
     StartWebauthnAuthentication: 'startWebauthnAuthentication',
-    FinishWebauthnAuthentication: 'finishWebauthnAuthentication'
+    FinishWebauthnAuthentication: 'finishWebauthnAuthentication',
+    GetPasskeyUserByLoginId: 'getPasskeyUserByLoginId'
 } as const
 /**
  * @group Helpers

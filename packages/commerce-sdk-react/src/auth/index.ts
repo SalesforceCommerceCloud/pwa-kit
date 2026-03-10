@@ -69,6 +69,11 @@ interface SlasJwtPayload extends JwtPayload {
 
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
 
+type GetPasskeyUserByLoginIdParams = {
+    loginId: string
+    channelId?: string
+}
+
 /**
  * Body type for loginRegisteredUserB2C - aligns with register function pattern
  */
@@ -1579,7 +1584,7 @@ class Auth {
             }
         }
 
-        return await slasClient.startWebauthnAuthentication(options)
+        return await slasClient.startWebauthnAuthentication(options as any)
     }
 
     /**
@@ -1615,6 +1620,26 @@ class Auth {
         this.handleTokenResponse(tokenResponse, false)
 
         return tokenResponse
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: getPasskeyUserByLoginId.
+     *
+     * This endpoint requires Shopper JWT authentication.
+     */
+    async getPasskeyUserByLoginId(parameters: GetPasskeyUserByLoginIdParams) {
+        const slasClient = this.client
+        const siteId = parameters.channelId || slasClient.clientConfig.parameters.siteId
+
+        return await slasClient.getPasskeyUserByLoginId({
+            parameters: {
+                loginId: parameters.loginId,
+                channel_id: siteId
+            },
+            headers: {
+                Authorization: `Bearer ${this.get('access_token')}`
+            }
+        })
     }
 }
 export default Auth

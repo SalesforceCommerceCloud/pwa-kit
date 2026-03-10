@@ -15,20 +15,26 @@ import {
 } from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 // Mock PasskeyRegistrationModal
+let mockOnSuccessCallback = null
 jest.mock('@salesforce/retail-react-app/app/components/passkey-registration-modal', () => {
     const PropTypes = jest.requireActual('prop-types')
-    const MockPasskeyRegistrationModal = ({isOpen, onClose}) => {
+    const MockPasskeyRegistrationModal = ({isOpen, onClose, onSuccess}) => {
+        mockOnSuccessCallback = onSuccess
         return isOpen ? (
             <div data-testid="passkey-registration-modal">
                 <button data-testid="modal-close" onClick={onClose}>
                     Close
+                </button>
+                <button data-testid="modal-success" onClick={onSuccess}>
+                    Succeed
                 </button>
             </div>
         ) : null
     }
     MockPasskeyRegistrationModal.propTypes = {
         isOpen: PropTypes.bool.isRequired,
-        onClose: PropTypes.func.isRequired
+        onClose: PropTypes.func.isRequired,
+        onSuccess: PropTypes.func
     }
     return MockPasskeyRegistrationModal
 })
@@ -42,7 +48,11 @@ describe('PasskeyRegistrationProvider', () => {
         children: PropTypes.node
     }
 
-    it('provides the expected context value', () => {
+    beforeEach(() => {
+        mockOnSuccessCallback = null
+    })
+
+    it('provides the expected context value including setOnSuccess', () => {
         let contextValue
         const TestComponent = () => {
             contextValue = React.useContext(PasskeyRegistrationContext)
@@ -60,6 +70,7 @@ describe('PasskeyRegistrationProvider', () => {
         expect(typeof contextValue?.passkeyModal.isOpen).toBe('boolean')
         expect(typeof contextValue?.passkeyModal.onOpen).toBe('function')
         expect(typeof contextValue?.passkeyModal.onClose).toBe('function')
+        expect(typeof contextValue?.passkeyModal.setOnSuccess).toBe('function')
     })
 
     it('initializes with modal closed', () => {
@@ -144,6 +155,98 @@ describe('PasskeyRegistrationProvider', () => {
             contextValue?.passkeyModal.onOpen()
         })
         expect(screen.getByTestId('passkey-registration-modal')).toBeInTheDocument()
+    })
+
+    describe('setOnSuccess / onSuccess callback', () => {
+        it('calls the registered onSuccess callback when modal fires onSuccess', () => {
+            const mockSuccessFn = jest.fn()
+            let contextValue
+            const TestComponent = () => {
+                contextValue = React.useContext(PasskeyRegistrationContext)
+                return null
+            }
+
+            render(
+                <TestWrapper>
+                    <TestComponent />
+                </TestWrapper>
+            )
+
+            // Register a success callback
+            act(() => {
+                contextValue.passkeyModal.setOnSuccess(mockSuccessFn)
+            })
+
+            // Open modal so onSuccess button is rendered
+            act(() => {
+                contextValue.passkeyModal.onOpen()
+            })
+
+            // Trigger onSuccess from the modal
+            act(() => {
+                mockOnSuccessCallback?.()
+            })
+
+            expect(mockSuccessFn).toHaveBeenCalledTimes(1)
+        })
+
+        it('replaces the previous onSuccess when setOnSuccess is called again', () => {
+            const firstFn = jest.fn()
+            const secondFn = jest.fn()
+            let contextValue
+            const TestComponent = () => {
+                contextValue = React.useContext(PasskeyRegistrationContext)
+                return null
+            }
+
+            render(
+                <TestWrapper>
+                    <TestComponent />
+                </TestWrapper>
+            )
+
+            act(() => {
+                contextValue.passkeyModal.setOnSuccess(firstFn)
+            })
+            act(() => {
+                contextValue.passkeyModal.setOnSuccess(secondFn)
+            })
+
+            act(() => {
+                contextValue.passkeyModal.onOpen()
+            })
+
+            act(() => {
+                mockOnSuccessCallback?.()
+            })
+
+            expect(firstFn).not.toHaveBeenCalled()
+            expect(secondFn).toHaveBeenCalledTimes(1)
+        })
+
+        it('does not throw when onSuccess fires with no callback registered', () => {
+            let contextValue
+            const TestComponent = () => {
+                contextValue = React.useContext(PasskeyRegistrationContext)
+                return null
+            }
+
+            render(
+                <TestWrapper>
+                    <TestComponent />
+                </TestWrapper>
+            )
+
+            act(() => {
+                contextValue.passkeyModal.onOpen()
+            })
+
+            expect(() => {
+                act(() => {
+                    mockOnSuccessCallback?.()
+                })
+            }).not.toThrow()
+        })
     })
 
     describe('usePasskeyRegistrationContext', () => {

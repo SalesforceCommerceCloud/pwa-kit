@@ -268,6 +268,72 @@ describe('PasskeyRegistrationModal', () => {
             })
         })
 
+        test('calls onSuccess after successful passkey registration', async () => {
+            const mockOnSuccess = jest.fn()
+            const otpCode = '12345678'
+            const mockStartResponse = {
+                challenge: 'dGVzdA==',
+                rp: {name: 'Test', id: 'example.com'},
+                user: {id: 'dGVzdA==', name: 'test@example.com'},
+                pubKeyCredParams: [],
+                timeout: 60000
+            }
+            const mockCredential = {
+                type: 'public-key',
+                id: 'test-id',
+                rawId: new ArrayBuffer(8),
+                response: {
+                    attestationObject: new ArrayBuffer(16),
+                    clientDataJSON: new ArrayBuffer(16)
+                }
+            }
+
+            mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
+            global.navigator.credentials.create.mockResolvedValue(mockCredential)
+            mockFinishWebauthnRegistration.mockResolvedValue({})
+
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />,
+                {wrapperProps: {appConfig: mockConfig.app}}
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(otpVerificationHandler).toBeTruthy()
+            })
+
+            const result = await otpVerificationHandler(otpCode)
+
+            expect(result).toEqual({success: true})
+            expect(mockOnSuccess).toHaveBeenCalledTimes(1)
+        })
+
+        test('does not call onSuccess when registration fails', async () => {
+            const mockOnSuccess = jest.fn()
+            const otpCode = '12345678'
+
+            mockStartWebauthnRegistration.mockRejectedValue(new Error('Registration failed'))
+
+            const {user} = renderWithProviders(
+                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />,
+                {wrapperProps: {appConfig: mockConfig.app}}
+            )
+
+            const registerButton = screen.getByText('Register Passkey')
+            await user.click(registerButton)
+
+            await waitFor(() => {
+                expect(otpVerificationHandler).toBeTruthy()
+            })
+
+            const result = await otpVerificationHandler(otpCode)
+
+            expect(result.success).toBe(false)
+            expect(mockOnSuccess).not.toHaveBeenCalled()
+        })
+
         test('successfully completes OTP verification and passkey registration flow', async () => {
             const otpCode = '12345678'
             const mockChallenge = 'dGVzdC1jaGFsbGVuZ2U='
