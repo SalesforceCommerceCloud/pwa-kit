@@ -73,6 +73,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
             finishWebauthnAuthentication: jest
                 .fn()
                 .mockResolvedValue({tokenResponse: TOKEN_RESPONSE}),
+            getPasskeyUserByLoginId: jest.fn().mockResolvedValue({}),
             getPasswordResetToken: jest.fn().mockResolvedValue({}),
             resetPassword: jest.fn().mockResolvedValue({})
         }))
@@ -1788,6 +1789,38 @@ describe('Webauthn', () => {
                     Authorization: ''
                 },
                 body: expectedBody
+            })
+        }
+    )
+
+    test.each([
+        [
+            'with loginId and explicit channelId',
+            {loginId: 'user@example.com', channelId: 'custom-channel-id'},
+            {loginId: 'user@example.com', channel_id: 'custom-channel-id'}
+        ],
+        [
+            'defaults channel_id from config when not specified',
+            {loginId: 'user@example.com'},
+            {loginId: 'user@example.com', channel_id: config.siteId}
+        ]
+    ])(
+        'getPasskeyUserByLoginId %s',
+        async (
+            _,
+            input: {loginId: string; channelId?: string},
+            expectedParams: {loginId: string; channel_id: string}
+        ) => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'test-access-token')
+            await auth.getPasskeyUserByLoginId(input)
+
+            expect((auth as any).client.getPasskeyUserByLoginId).toHaveBeenCalledWith({
+                parameters: expectedParams,
+                headers: {
+                    Authorization: 'Bearer test-access-token'
+                }
             })
         }
     )

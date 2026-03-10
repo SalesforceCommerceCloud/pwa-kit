@@ -46,7 +46,7 @@ import {
 /**
  * Modal for registering a new passkey with a nickname
  */
-const PasskeyRegistrationModal = ({isOpen, onClose}) => {
+const PasskeyRegistrationModal = ({isOpen, onClose, onSuccess}) => {
     const {data: customer} = useCurrentCustomer()
     const {formatMessage} = useIntl()
     const [passkeyNickname, setPasskeyNickname] = useState('')
@@ -147,6 +147,7 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
             // Step 6: Close OTP modal and main modal on success
             setIsOtpAuthOpen(false)
             onClose()
+            onSuccess?.()
 
             return {success: true}
         } catch (err) {
@@ -253,7 +254,8 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
 
 PasskeyRegistrationModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
+    onSuccess: PropTypes.func
 }
 
 export default PasskeyRegistrationModal

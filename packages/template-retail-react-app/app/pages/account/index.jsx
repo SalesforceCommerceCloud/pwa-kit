@@ -46,6 +46,7 @@ import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
+import AccountPasskeys from '@salesforce/retail-react-app/app/pages/account/passkeys'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
@@ -258,6 +259,9 @@ const Account = () => {
                             <AccountPayments />
                         </Route>
                     )}
+                    <Route exact path={`${path}/passkeys`}>
+                        <AccountPasskeys />
+                    </Route>
                 </Switch>
             </Grid>
         </Box>
