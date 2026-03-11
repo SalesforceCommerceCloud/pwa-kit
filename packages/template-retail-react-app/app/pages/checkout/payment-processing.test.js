@@ -531,7 +531,7 @@ describe('PaymentProcessing', () => {
                     gatewayProperties: {
                         adyen: {
                             adyenPaymentIntent: {
-                                resultCode: 'AUTHORISED'
+                                resultCode: 'Authorised'
                             }
                         }
                     }
