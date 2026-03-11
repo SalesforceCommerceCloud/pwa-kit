@@ -13,9 +13,9 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {
-    useShippingMethodsForShipment,
+    useShippingMethodsForShipmentV2 as useShippingMethodsForShipment,
     useProducts,
-    useShopperBasketsMutation
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 
 // Mock the hooks

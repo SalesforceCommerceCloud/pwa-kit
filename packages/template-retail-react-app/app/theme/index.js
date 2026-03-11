@@ -52,6 +52,7 @@ import SwatchGroup from '@salesforce/retail-react-app/app/theme/components/proje
 import ImageGallery from '@salesforce/retail-react-app/app/theme/components/project/image-gallery'
 import SearchSuggestions from '@salesforce/retail-react-app/app/theme/components/project/search-suggestions'
 import HorizontalSuggestions from '@salesforce/retail-react-app/app/theme/components/project/horizontal-suggestions'
+import SubscribeForm from '@salesforce/retail-react-app/app/theme/components/project/subscribe-form'
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -101,7 +102,8 @@ export const overrides = {
         SwatchGroup,
         ImageGallery,
         SearchSuggestions,
-        HorizontalSuggestions
+        HorizontalSuggestions,
+        SubscribeForm
     }
 }
 

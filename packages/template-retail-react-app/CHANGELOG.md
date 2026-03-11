@@ -1,5 +1,13 @@
 ## v9.1.0-dev
+- Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
+- [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+- One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
+- Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+- [Bugfix] Fix error toast for no applicable shipping methods in one-click checkout [#3673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3673)
+- [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
+- [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
+- [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
 
 ## v9.0.0 (Feb 12, 2026)
 - [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)

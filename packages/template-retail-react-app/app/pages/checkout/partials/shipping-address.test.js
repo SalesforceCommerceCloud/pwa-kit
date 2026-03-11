@@ -83,7 +83,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useShopperCustomersMutation: () => ({
             mutateAsync: mockCustomerMutateAsync
         }),
-        useShopperBasketsMutation: () => ({
+        useShopperBasketsV2Mutation: () => ({
             mutateAsync: mockMutateAsync
         })
     }

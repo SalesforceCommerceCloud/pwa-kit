@@ -4,41 +4,74 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {SparkleIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const AskAssistantBanner = ({onClick, styles}) => {
+    const intl = useIntl()
+    const handledByTouchRef = useRef(false)
+    const title = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.title',
+        defaultMessage: 'Ask Shopping Agent'
+    })
+    const description = intl.formatMessage({
+        id: 'search.suggestions.askAssistant.description',
+        defaultMessage: 'Discover, compare, and shop smarter with your personal Shopping Agent.'
+    })
+    const ariaLabel = `${title} - ${description}`
+
+    const handleInteraction = (e) => {
+        e.preventDefault()
+        onClick?.()
+    }
+
+    const handleTouchStart = (e) => {
+        // Prevent the search input from blurring when the user touches the banner.
+        // Otherwise onBlur closes the overlay before touchEnd/click fires, so the tap never runs.
+        e.preventDefault()
+    }
+
+    const handleTouchEnd = () => {
+        handledByTouchRef.current = true
+        onClick?.()
+        setTimeout(() => {
+            handledByTouchRef.current = false
+        }, 400)
+    }
+
+    const handleClick = (e) => {
+        if (handledByTouchRef.current) {
+            return
+        }
+        handleInteraction(e)
+    }
+
     return (
         <Box
             {...styles.askAssistantBanner}
             as="button"
             type="button"
-            width="full"
             textAlign="left"
-            onClick={onClick}
-            aria-label="Ask Assistant - Discover, compare and shop smarter with your personal shopping assistant"
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            aria-label={ariaLabel}
         >
-            <Box {...styles.askAssistantBannerContent}>
-                <Box {...styles.askAssistantBannerIcon} as={SparkleIcon} boxSize={6} />
-                <Box>
-                    <Text {...styles.askAssistantBannerTitle}>
-                        <FormattedMessage
-                            defaultMessage="Ask Shopping Agent"
-                            id="search.suggestions.askAssistant.title"
-                        />
-                    </Text>
-                    <Text {...styles.askAssistantBannerDescription}>
-                        <FormattedMessage
-                            defaultMessage="Discover, compare, and shop smarter with your personal Shopping Agent."
-                            id="search.suggestions.askAssistant.description"
-                        />
-                    </Text>
-                </Box>
+            <Box {...styles.askAssistantBannerIcon}>
+                <SparkleIcon boxSize={5} color="gray.800" />
             </Box>
-            <Box {...styles.askAssistantBannerArrow} as={ChevronRightIcon} boxSize={5} />
+            <Box {...styles.askAssistantBannerContent}>
+                <Box {...styles.askAssistantBannerTitleRow}>
+                    <Text {...styles.askAssistantBannerTitle}>{title}</Text>
+                    <Box {...styles.askAssistantBannerArrow}>
+                        <ChevronRightIcon boxSize={5} color="gray.800" />
+                    </Box>
+                </Box>
+                <Text {...styles.askAssistantBannerDescription}>{description}</Text>
+            </Box>
         </Box>
     )
 }

@@ -50,6 +50,7 @@
     "@salesforce/pwa-kit-dev": "3.17.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.17.0-dev",
     "@salesforce/pwa-kit-runtime": "3.17.0-dev",
+    "@salesforce/storefront-next-runtime": "0.1.1",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -67,7 +68,7 @@
     "framer-motion": "^10.12.9",
     "full-icu": "^1.5.0",
     "helmet": "^4.6.0",
-    "jest-fetch-mock": "^2.1.2",
+    "jest-fetch-mock": "^3.0.3",
     "jose": "^4.14.4",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^9.0.0",
@@ -92,6 +93,10 @@
   "overrides": {
     "react-router": {
       "path-to-regexp": "^1.9.0"
+    },
+    "@salesforce/storefront-next-runtime": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     }
   },
   "engines": {
@@ -101,11 +106,11 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "92 kB"
+      "maxSize": "102 kB"
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "366 kB"
+      "maxSize": "391 kB"
     }
   ]
 }

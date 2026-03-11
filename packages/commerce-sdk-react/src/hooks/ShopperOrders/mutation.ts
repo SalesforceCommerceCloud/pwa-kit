@@ -46,7 +46,13 @@ The payment instrument is added with the provided details. The payment method mu
      * Updates a payment instrument of an order.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `updatePaymentInstrumentForOrder` endpoint.
      */
-    UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
+    UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder',
+    /**
+     * Fails an unplaced order and optionally reopens the basket when indicated.
+     * Creates a HistoryEntry in the failed Order with provided reasonCode.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `failOrder` endpoint.
+     */
+    FailOrder: 'failOrder'
 } as const
 
 /**

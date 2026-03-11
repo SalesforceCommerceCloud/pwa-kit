@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sh = require('shelljs')
 const path = require('path')
-const {saveJSONToFile} = require('../utils')
+const {saveJSONToFile, getLatestVersion} = require('../utils')
 
 // Exit upon error
 sh.set('-e')
@@ -49,10 +49,6 @@ const main = () => {
     }
 
     saveJSONToFile(pkgJson, pathToPackageJson)
-}
-
-const getLatestVersion = (pkgName) => {
-    return sh.exec(`npm info ${pkgName}@latest version`, {silent: true}).trim()
 }
 
 main()

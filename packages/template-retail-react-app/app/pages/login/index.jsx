@@ -15,7 +15,7 @@ import {
     useCustomerBaskets,
     useCustomerId,
     useCustomerType,
-    useShopperBasketsMutation
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Seo from '@salesforce/retail-react-app/app/components/seo'

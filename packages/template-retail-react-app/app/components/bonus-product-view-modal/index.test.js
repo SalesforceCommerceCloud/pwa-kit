@@ -22,7 +22,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsV2MutationHelper as useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
 
 // Mock the use-product-view-modal hook at the top
@@ -32,7 +32,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-product-view-modal', () =>
 
 // Mock commerce-sdk-react for CommerceApiProvider
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useShopperBasketsMutationHelper: jest.fn(),
+    useShopperBasketsV2MutationHelper: jest.fn(),
     useCustomerId: jest.fn(() => 'test-customer-id'),
     useCustomerType: jest.fn(() => ({
         isRegistered: true,
@@ -44,6 +44,13 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useCustomerProductLists: jest.fn(() => ({data: null})),
     useShopperCustomersMutation: jest.fn(() => ({
         mutateAsync: jest.fn()
+    })),
+    useConfigurations: jest.fn(() => ({
+        data: {
+            configurations: []
+        },
+        isLoading: false,
+        error: null
     })),
     useProductSearch: jest.fn(() => ({
         data: null,

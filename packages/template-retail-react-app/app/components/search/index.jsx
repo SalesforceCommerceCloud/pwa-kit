@@ -42,6 +42,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {launchChat as launchChatFromUtils} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
@@ -224,13 +225,13 @@ const Search = (props) => {
         }
     }
 
-    const clearInput = () => {
+    const clearInput = useCallback(() => {
         searchInputRef.current?.blur()
         setIsOpen(false)
-    }
+    }, [])
 
     // Function to set pre-chat fields only when launching a new chat session
-    const setPrechatFieldsForNewSession = () => {
+    const setPrechatFieldsForNewSession = useCallback(() => {
         // Only set pre-chat fields if this is a new chat launch (not already launched)
         if (!miawChatRef.current.newChatLaunched) {
             if (window.embeddedservice_bootstrap?.prechatAPI) {
@@ -247,7 +248,17 @@ const Search = (props) => {
                 })
             }
         }
-    }
+    }, [
+        siteId,
+        locale,
+        commerceOrgId,
+        usid,
+        refreshToken,
+        sfLanguage,
+        appOrigin,
+        buildUrl,
+        location
+    ])
 
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
@@ -274,7 +285,7 @@ const Search = (props) => {
             window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
         }
     }, [])
-    const launchChat = () => {
+    const launchChat = useCallback(() => {
         // Set pre-chat fields only for new sessions
         setPrechatFieldsForNewSession()
 
@@ -295,7 +306,7 @@ const Search = (props) => {
             ?.catch((err) => {
                 console.error('launchChat error', err)
             })
-    }
+    }, [setPrechatFieldsForNewSession])
 
     const onSubmitSearch = (e) => {
         e.preventDefault()
@@ -341,9 +352,11 @@ const Search = (props) => {
     }
 
     const onAskAssistantClick = useCallback(() => {
-        launchChat()
+        // When floating button is hidden (enableAgentFromFloatingButton false), show it first then launch
+        setPrechatFieldsForNewSession()
+        launchChatFromUtils()
         clearInput()
-    }, [launchChat, clearInput])
+    }, [setPrechatFieldsForNewSession, clearInput])
 
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
@@ -425,11 +438,12 @@ const Search = (props) => {
             <HideOnDesktop>
                 <Flex
                     display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
-                    postion="absolute"
+                    position="absolute"
                     background="white"
                     left={0}
                     right={0}
                     height="100vh"
+                    overflowX="hidden"
                 >
                     {searchSuggestion.isLoading ? (
                         <Spinner
