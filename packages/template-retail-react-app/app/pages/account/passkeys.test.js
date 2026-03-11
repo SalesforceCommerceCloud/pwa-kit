@@ -15,9 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import AccountPasskeys from '@salesforce/retail-react-app/app/pages/account/passkeys'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {
-    PasskeyRegistrationContext
-} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
+import {PasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 const MockedComponent = () => {
     return (
@@ -202,4 +200,3 @@ test('refreshes passkey list after successful registration via onSuccess callbac
         expect(screen.getByText('New Passkey')).toBeInTheDocument()
     })
 })
-

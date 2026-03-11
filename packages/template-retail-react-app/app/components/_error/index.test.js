@@ -41,7 +41,11 @@ test('Error status 500 with stack trace', () => {
 
 test('clicking logo navigates to home', () => {
     // Mock window.location.href
-    Object.defineProperty(window, 'location', {value: {href: ''}, writable: true, configurable: true})
+    Object.defineProperty(window, 'location', {
+        value: {href: ''},
+        writable: true,
+        configurable: true
+    })
     render(<Error />)
     const logoBtn = screen.getByLabelText('logo')
     logoBtn.click()

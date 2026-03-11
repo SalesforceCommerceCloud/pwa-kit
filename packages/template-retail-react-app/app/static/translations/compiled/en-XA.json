@@ -855,6 +855,154 @@
       "value": "]"
     }
   ],
+  "account_passkeys.button.delete": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀḗḗŧḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.button.delete_not_available": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀḗḗŧḗḗ īşƞ’ŧ ȧȧṽȧȧīŀȧȧƀŀḗḗ ẏḗḗŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.button.register_new_passkey": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɠīşŧḗḗř Ƞḗḗẇ Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.button.retry": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧřẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.error.unable_to_load": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ ŀǿǿȧȧḓ ƥȧȧşşķḗḗẏş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.label.created": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗḓ: "
+    },
+    {
+      "type": 1,
+      "value": "createdAt"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.label.last_used": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀȧȧşŧ ŭŭşḗḗḓ: "
+    },
+    {
+      "type": 1,
+      "value": "lastUsedAt"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.label.unnamed_passkey": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞƞȧȧḿḗḗḓ ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.message.no_registered_passkeys": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭ ḓǿǿƞ'ŧ ħȧȧṽḗḗ ȧȧƞẏ řḗḗɠīşŧḗḗřḗḗḓ ƥȧȧşşķḗḗẏş ẏḗḗŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_passkeys.title.your_registered_passkeys": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭř Řḗḗɠīşŧḗḗřḗḗḓ Ƥȧȧşşķḗḗẏş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_payments.button.add_payment": [
     {
       "type": 0,
@@ -4397,6 +4545,20 @@
     {
       "type": 0,
       "value": "Ƥȧȧẏḿḗḗƞŧ Ḿḗḗŧħǿǿḓş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "global.account.link.registered_passkeys": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɠīşŧḗḗřḗḗḓ Ƥȧȧşşķḗḗẏş"
     },
     {
       "type": 0,

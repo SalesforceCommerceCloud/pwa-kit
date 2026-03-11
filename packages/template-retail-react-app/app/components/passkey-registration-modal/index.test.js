@@ -293,7 +293,11 @@ describe('PasskeyRegistrationModal', () => {
             mockFinishWebauthnRegistration.mockResolvedValue({})
 
             const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />,
+                <PasskeyRegistrationModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    onSuccess={mockOnSuccess}
+                />,
                 {wrapperProps: {appConfig: mockConfig.app}}
             )
 
@@ -317,7 +321,11 @@ describe('PasskeyRegistrationModal', () => {
             mockStartWebauthnRegistration.mockRejectedValue(new Error('Registration failed'))
 
             const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} onSuccess={mockOnSuccess} />,
+                <PasskeyRegistrationModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    onSuccess={mockOnSuccess}
+                />,
                 {wrapperProps: {appConfig: mockConfig.app}}
             )
 

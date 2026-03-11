@@ -40,35 +40,38 @@ const AccountPasskeys = () => {
     const [passkeyUser, setPasskeyUser] = useState(null)
     const [error, setError] = useState(null)
 
-    const fetchPasskeys = useCallback(async ({force = false} = {}) => {
-        if (!loginId) return
-        if (inFlightRef.current) return
+    const fetchPasskeys = useCallback(
+        async ({force = false} = {}) => {
+            if (!loginId) return
+            if (inFlightRef.current) return
 
-        // Avoid accidental request loops on re-render.
-        // If we already attempted this loginId very recently, don't immediately re-try unless forced.
-        const now = Date.now()
-        if (
-            !force &&
-            lastAttemptRef.current.loginId === loginId &&
-            now - lastAttemptRef.current.at < 30_000
-        ) {
-            return
-        }
+            // Avoid accidental request loops on re-render.
+            // If we already attempted this loginId very recently, don't immediately re-try unless forced.
+            const now = Date.now()
+            if (
+                !force &&
+                lastAttemptRef.current.loginId === loginId &&
+                now - lastAttemptRef.current.at < 30_000
+            ) {
+                return
+            }
 
-        lastAttemptRef.current = {loginId, at: now}
-        inFlightRef.current = true
+            lastAttemptRef.current = {loginId, at: now}
+            inFlightRef.current = true
 
-        try {
-            setError(null)
-            const res = await getPasskeyUserByLoginId.mutateAsync({loginId})
-            setPasskeyUser(res)
-        } catch (e) {
-            setPasskeyUser(null)
-            setError(e)
-        } finally {
-            inFlightRef.current = false
-        }
-    }, [getPasskeyUserByLoginId, loginId])
+            try {
+                setError(null)
+                const res = await getPasskeyUserByLoginId.mutateAsync({loginId})
+                setPasskeyUser(res)
+            } catch (e) {
+                setPasskeyUser(null)
+                setError(e)
+            } finally {
+                inFlightRef.current = false
+            }
+        },
+        [getPasskeyUserByLoginId, loginId]
+    )
 
     useEffect(() => {
         headingRef?.current?.focus()
@@ -222,4 +225,3 @@ const AccountPasskeys = () => {
 AccountPasskeys.getTemplateName = () => 'account-passkeys'
 
 export default AccountPasskeys
-

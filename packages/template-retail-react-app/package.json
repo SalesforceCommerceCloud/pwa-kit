@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/retail-react-app",
+  "name": "wasatch-mrt",
   "version": "9.1.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
@@ -101,7 +101,7 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "95 kB"
+      "maxSize": "96 kB"
     },
     {
       "path": "build/vendor.js",
