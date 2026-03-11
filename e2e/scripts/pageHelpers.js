@@ -791,3 +791,77 @@ export const selectStoreFromPLP = async ({page}) => {
         await page.getByRole('button', {name: 'Close'}).click()
     }
 }
+
+/**
+ * Tests that a master product in the wishlist can be added to cart via the "View Options" modal.
+ *
+ * Flow:
+ * 1. Log in or register a shopper
+ * 2. Navigate to PDP and add a product to wishlist without selecting all variants (master product)
+ * 3. Go to wishlist page
+ * 4. Click "View Options" to open the product modal
+ * 5. Select variant attributes in the modal
+ * 6. Click "Add to Cart"
+ * 7. Verify the item was added successfully
+ */
+export const wishlistMasterProductAddToCartFlow = async ({page, registeredUserCredentials}) => {
+    const isLoggedIn = await loginShopper({
+        page,
+        userCredentials: registeredUserCredentials
+    })
+
+    if (!isLoggedIn) {
+        try {
+            await registerShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+        } catch (error) {
+            const secondLoginAttempt = await loginShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+            if (!secondLoginAttempt) {
+                throw new Error('Authentication failed: Both login and registration unsuccessful')
+            }
+        }
+    }
+
+    await answerConsentTrackingForm(page)
+    await page.waitForLoadState()
+
+    // Navigate to PDP without selecting all variants so the master product is added to wishlist
+    await navigateToPDPDesktop({page})
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+
+    // Do NOT select a size — this ensures the master product ID is used for the wishlist item
+    await page.getByRole('button', {name: /Add to Wishlist/i}).click()
+    await expect(page.getByText(/1 item added to wishlist/i)).toBeVisible()
+
+    // Navigate to wishlist page
+    await page.goto(config.RETAIL_APP_HOME + '/account/wishlist')
+    await answerConsentTrackingForm(page)
+
+    await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+
+    // Master product should show "View Options" button instead of "Add to Cart"
+    const viewOptionsButton = page.getByRole('button', {name: /View Options/i})
+    await expect(viewOptionsButton).toBeVisible()
+    await viewOptionsButton.click()
+
+    // Wait for the product view modal to appear
+    const modal = page.getByTestId('product-view-modal')
+    await expect(modal).toBeVisible({timeout: 10000})
+
+    // Select variant attributes in the modal
+    await modal.getByRole('radio', {name: 'L', exact: true}).click()
+
+    // Click "Add to Cart" in the modal
+    const addToCartButton = modal.getByRole('button', {name: /Add to Cart/i})
+    await expect(addToCartButton).toBeEnabled({timeout: 5000})
+    await addToCartButton.click()
+
+    // Verify item was added to cart successfully (no API error)
+    await expect(page.getByText(/1 item added to cart/i)).toBeVisible({timeout: 10000})
+}
