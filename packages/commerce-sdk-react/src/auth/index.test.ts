@@ -72,19 +72,17 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-jest.mock('../utils', () => {
-    const originalModule = jest.requireActual('../utils')
+jest.mock('../utils', () => ({
+    ...jest.requireActual('../utils'),
+    __esModule: true,
+    onClient: jest.fn().mockReturnValue(true),
+    getParentOrigin: jest.fn().mockResolvedValue(''),
+    isOriginTrusted: () => false,
+    getDefaultCookieAttributes: () => {},
+    isAbsoluteUrl: () => true
+}))
 
-    return {
-        ...originalModule,
-        __esModule: true,
-        onClient: jest.fn().mockReturnValue(true),
-        getParentOrigin: jest.fn().mockResolvedValue(''),
-        isOriginTrusted: () => false,
-        getDefaultCookieAttributes: () => {},
-        isAbsoluteUrl: () => true
-    }
-})
+const onClientMock = utils.onClient as jest.Mock
 
 /** The auth data we store has a slightly different shape than what we use. */
 type StoredAuthData = Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string}
@@ -1231,7 +1229,7 @@ describe('Auth', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.
-        ;(utils.onClient as jest.Mock).mockReturnValue(false)
+        onClientMock.mockReturnValue(false)
 
         // Create a new auth instance and set its guest token.
         const authA = new Auth({...config, siteId: 'siteA'})
@@ -1250,7 +1248,7 @@ describe('Auth', () => {
         expect([...authB.stores['memory'].map.keys()]).toEqual([`cc-nx-g_siteA`, `cc-nx-g_siteB`])
 
         // Set mock value back to expected.
-        ;(utils.onClient as jest.Mock).mockReturnValue(true)
+        onClientMock.mockReturnValue(true)
     })
 
     test.each([
@@ -1582,7 +1580,7 @@ describe('HttpOnly Session Cookies', () => {
     })
 
     test('on server, isAccessTokenExpired falls back to JWT decoding even with httpOnly enabled', () => {
-        ;(utils.onClient as jest.Mock).mockReturnValue(false)
+        onClientMock.mockReturnValue(false)
 
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // Set cc-at-expires to a future time — on client this would mean "not expired"
@@ -1595,11 +1593,11 @@ describe('HttpOnly Session Cookies', () => {
         // @ts-expect-error private method
         expect(auth.isAccessTokenExpired()).toBe(true)
 
-        ;(utils.onClient as jest.Mock).mockReturnValue(true)
+        onClientMock.mockReturnValue(true)
     })
 
     test('on server, handleTokenResponse stores tokens normally even with httpOnly enabled', async () => {
-        ;(utils.onClient as jest.Mock).mockReturnValue(false)
+        onClientMock.mockReturnValue(false)
 
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         const loginGuestMock = helpers.loginGuestUser as jest.Mock
@@ -1610,8 +1608,6 @@ describe('HttpOnly Session Cookies', () => {
         // On server with httpOnly enabled, tokens should still be stored normally
         expect(auth.get('access_token')).toBe(TOKEN_RESPONSE.access_token)
         expect(auth.get('refresh_token_guest')).toBe(TOKEN_RESPONSE.refresh_token)
-
-        ;(utils.onClient as jest.Mock).mockReturnValue(true)
+        onClientMock.mockReturnValue(true)
     })
-
 })
