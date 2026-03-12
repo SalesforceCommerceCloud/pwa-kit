@@ -28,7 +28,7 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
         const {access_token} = await auth.ready()
         // When HttpOnly session cookies are enabled, the proxy injects the
         // Authorization header from the cookie — skip adding it here.
-        const authHeaders = config.useHttpOnlySessionCookies
+        const authHeaders = config.enableHttpOnlySessionCookies
             ? {}
             : {Authorization: `Bearer ${access_token}`}
         return await method({
@@ -39,7 +39,7 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
             }
         }).catch(async (error) => {
             const {access_token} = await handleInvalidToken(error, auth, logger)
-            const retryAuthHeaders = config.useHttpOnlySessionCookies
+            const retryAuthHeaders = config.enableHttpOnlySessionCookies
                 ? {}
                 : {Authorization: `Bearer ${access_token}`}
 

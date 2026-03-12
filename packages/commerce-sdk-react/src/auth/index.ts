@@ -55,7 +55,7 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
     /** When true, session tokens are set as HttpOnly cookies */
-    useHttpOnlySessionCookies?: boolean
+    enableHttpOnlySessionCookies?: boolean
 }
 
 interface JWTHeaders {
@@ -291,7 +291,7 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
-    private useHttpOnlySessionCookies: boolean
+    private enableHttpOnlySessionCookies: boolean
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -388,7 +388,7 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
-        this.useHttpOnlySessionCookies = config.useHttpOnlySessionCookies ?? false
+        this.enableHttpOnlySessionCookies = config.enableHttpOnlySessionCookies ?? false
     }
 
     get(name: AuthDataKeys) {
@@ -527,11 +527,11 @@ class Auth {
     }
 
     /**
-     * Returns whether the access token is expired. When useHttpOnlySessionCookies is true,
+     * Returns whether the access token is expired. When enableHttpOnlySessionCookies is true,
      * uses cc-at-expires cookie from store; otherwise decodes the JWT from getAccessToken().
      */
     private isAccessTokenExpired(): boolean {
-        if (this.useHttpOnlySessionCookies) {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
             const expiresAt = this.get('cc-at-expires')
             if (expiresAt == null || expiresAt === '') return true
             const expiresAtSec = Number(expiresAt)
@@ -539,6 +539,7 @@ class Auth {
             const bufferSeconds = 60
             return Date.now() / 1000 >= expiresAtSec - bufferSeconds
         }
+        // Server (SSR) or httpOnly disabled: decode JWT from stored token
         const token = this.getAccessToken()
         return !token || this.isTokenExpired(token)
     }
@@ -722,10 +723,12 @@ class Auth {
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
-        if (this.useHttpOnlySessionCookies) {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            // Browser: skip token storage, httpOnly cookies handle it
             const uidoFromCookie = this.stores['cookie'].get('uido')
             if (uidoFromCookie) this.set('uido', uidoFromCookie)
         } else {
+            // Server (SSR) or httpOnly disabled: store tokens normally
             this.set('access_token', res.access_token)
             this.set('idp_access_token', res.idp_access_token)
             if (res.access_token) {
@@ -754,7 +757,8 @@ class Auth {
                             },
                             credentials: {
                                 clientSecret: this.clientSecret
-                            }
+                            },
+                            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
                         }),
                     !!refreshTokenGuest
                 )
@@ -966,9 +970,11 @@ class Auth {
                 ...parameters
             }
         } as const
+        const enableHttpOnlySessionCookies = this.enableHttpOnlySessionCookies
         const callback = this.clientSecret
-            ? () => helpers.loginGuestUserPrivate({...guestPrivateArgs})
-            : () => helpers.loginGuestUser({...guestPublicArgs})
+            ? () =>
+                  helpers.loginGuestUserPrivate({...guestPrivateArgs, enableHttpOnlySessionCookies})
+            : () => helpers.loginGuestUser({...guestPublicArgs, enableHttpOnlySessionCookies})
 
         try {
             return await this.queueRequest(callback, isGuest)
@@ -1048,7 +1054,8 @@ class Auth {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            body: customParameters
+            body: customParameters,
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         }
 
         const token = await helpers.loginRegisteredUserB2C(loginParams)
@@ -1289,7 +1296,8 @@ class Auth {
                 code: parameters.code,
                 dnt: dntPref,
                 ...(usid && {usid})
-            }
+            },
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
@@ -1365,7 +1373,8 @@ class Auth {
                             ? String(parameters.register_customer)
                             : parameters.register_customer
                 })
-            }
+            },
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })
         const isGuest = false
         this.handleTokenResponse(token, isGuest)

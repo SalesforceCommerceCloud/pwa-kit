@@ -58,7 +58,7 @@ export const generateCustomEndpointOptions = (
             headers: {
                 // When HttpOnly session cookies are enabled, the proxy injects the
                 // Authorization header from the cookie — skip adding it here.
-                ...(config.useHttpOnlySessionCookies
+                ...(config.enableHttpOnlySessionCookies
                     ? {}
                     : {Authorization: `Bearer ${access_token}`}),
                 // Note the order of the following de-structured objects is important.
