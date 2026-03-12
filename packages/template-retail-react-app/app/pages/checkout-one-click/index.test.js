@@ -2881,25 +2881,22 @@ describe('Checkout One Click', () => {
         // Place order
         await user.click(placeOrderBtn)
 
-        // Wait for order placement or billing API call
+        // Wait for the billing API to be called with the custom address
         await waitFor(
             () => {
-                expect(billingApiCalls.length > 0 || screen.queryByText(/success/i)).toBeTruthy()
+                expect(billingApiCalls.length).toBeGreaterThan(0)
             },
             {timeout: 10000}
         )
 
         // Verify the billing API was called with the custom billing address, NOT the shipping address
-        if (billingApiCalls.length > 0) {
-            const lastBillingCall = billingApiCalls[billingApiCalls.length - 1]
-            expect(lastBillingCall.body.firstName).toBe('Billing')
-            expect(lastBillingCall.body.lastName).toBe('Custom')
-            expect(lastBillingCall.body.address1).toBe('999 Billing Ave')
-            expect(lastBillingCall.body.city).toBe('Billington')
-            // Should NOT be the shipping address
-            expect(lastBillingCall.body.address1).not.toBe('100 Shipping Rd')
-            expect(lastBillingCall.body.firstName).not.toBe('Ship')
-        }
+        const lastBillingCall = billingApiCalls[billingApiCalls.length - 1]
+        expect(lastBillingCall.body.firstName).toBe('Billing')
+        expect(lastBillingCall.body.lastName).toBe('Custom')
+        expect(lastBillingCall.body.address1).toBe('999 Billing Ave')
+        expect(lastBillingCall.body.city).toBe('Billington')
+        expect(lastBillingCall.body.address1).not.toBe('100 Shipping Rd')
+        expect(lastBillingCall.body.firstName).not.toBe('Ship')
     })
 
     test('CheckoutContainer does not show skeleton after checkout has rendered', async () => {
