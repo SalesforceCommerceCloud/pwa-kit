@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
     Alert,
     AlertIcon,
@@ -102,6 +102,12 @@ const CheckoutOneClick = () => {
     const hasDeliveryShipments = deliveryShipments.length > 0
     const isPickupOnly = hasPickupShipments && !hasDeliveryShipments
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
+
+    const billingSameAsShippingRef = useRef(billingSameAsShipping)
+    useEffect(() => {
+        billingSameAsShippingRef.current = billingSameAsShipping
+    }, [billingSameAsShipping])
+
     const [isShipmentCleanupComplete, setIsShipmentCleanupComplete] = useState(false)
     // For billing=shipping, align with legacy: use the first delivery shipment's address
     const selectedShippingAddress =
@@ -221,9 +227,11 @@ const CheckoutOneClick = () => {
         }
     }, [isPickupOnly])
 
-    const onBillingSubmit = async () => {
+    const onBillingSubmit = async (billingFormSnapshot) => {
         let billingAddress
-        if (billingSameAsShipping && selectedShippingAddress) {
+        // Read from ref to avoid stale closures during async onPlaceOrder flow
+        const isSameAsShipping = billingSameAsShippingRef.current
+        if (isSameAsShipping && selectedShippingAddress) {
             billingAddress = selectedShippingAddress
             // Validate that shipping address has required address fields
             if (!billingAddress?.address1) {
@@ -236,6 +244,11 @@ const CheckoutOneClick = () => {
                 return
             }
         } else {
+            // If a pre-captured snapshot was provided, restore it to the form.
+            if (billingFormSnapshot) {
+                billingAddressForm.reset(billingFormSnapshot, {keepDirty: true})
+            }
+
             // Validate all required address fields (excluding phone for billing)
             const fieldsToValidate = [
                 'address1',
@@ -423,6 +436,11 @@ const CheckoutOneClick = () => {
                 }
             }
 
+            // Snapshot billing form values BEFORE any payment mutations to preserve custom billing address during auth transitions
+            const billingFormSnapshot = !billingSameAsShippingRef.current
+                ? {...billingAddressForm.getValues()}
+                : null
+
             // PCI: Cardholder data (CHD) - use only for single submission to API. Do not log, persist, or expose.
             let fullCardDetails = null
             if (hasFormValues) {
@@ -482,7 +500,7 @@ const CheckoutOneClick = () => {
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
             // submit, `undefined` is returned.
-            const updatedBasket = await onBillingSubmit()
+            const updatedBasket = await onBillingSubmit(billingFormSnapshot)
 
             if (updatedBasket) {
                 await submitOrder(fullCardDetails)
@@ -621,6 +639,13 @@ const CheckoutContainer = () => {
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
 
+    // Track whether the checkout has rendered at least once to persist data during auth transitions
+    const hasRenderedCheckoutRef = useRef(false)
+    const canRender = !!customer?.customerId && !!basket?.basketId
+    if (canRender) {
+        hasRenderedCheckoutRef.current = true
+    }
+
     const handleRemoveItem = async (product) => {
         await removeItemFromBasketMutation.mutateAsync(
             {
@@ -653,7 +678,8 @@ const CheckoutContainer = () => {
         setIsDeletingUnavailableItem(false)
     }
 
-    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+    // Show skeleton only on the initial load
+    if (!canRender && !hasRenderedCheckoutRef.current) {
         return <CheckoutSkeleton />
     }
 
