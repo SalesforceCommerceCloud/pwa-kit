@@ -64,8 +64,12 @@ const AccountPasskeys = () => {
                 const res = await getPasskeyUserByLoginId.mutateAsync({loginId})
                 setPasskeyUser(res)
             } catch (e) {
-                setPasskeyUser(null)
-                setError(e)
+                if (e?.response?.status === 404) {
+                    setPasskeyUser(null)
+                } else {
+                    setPasskeyUser(null)
+                    setError(e)
+                }
             } finally {
                 inFlightRef.current = false
             }
