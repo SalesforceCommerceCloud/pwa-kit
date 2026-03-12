@@ -1,4 +1,4 @@
-## v9.1.0-preview.2 (Mar 12, 2026)
+## v9.1.0 (Mar 12, 2026)
 - [Bugfix] Fix edirect payment methods status value to pascal [#3734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3734)
 - [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
 - [Bugfix] Fix adding to cart from a master product in the wishlist [#3732](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3732)
