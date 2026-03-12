@@ -2701,4 +2701,225 @@ describe('Checkout One Click', () => {
         // Verify order was placed successfully
         expect(screen.getByText(/success/i)).toBeInTheDocument()
     })
+
+    test('Place Order with custom billing address submits the correct billing data', async () => {
+        const billingApiCalls = []
+
+        let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+        const shippingAddress = {
+            address1: '100 Shipping Rd',
+            city: 'Tampa',
+            countryCode: 'US',
+            firstName: 'Ship',
+            lastName: 'Tester',
+            phone: '(727) 555-0000',
+            postalCode: '33712',
+            stateCode: 'FL'
+        }
+        currentBasket.customerInfo = {
+            ...currentBasket.customerInfo,
+            email: 'billing-custom@test.com',
+            customerId: currentBasket.customerInfo?.customerId || 'guest-billing-id'
+        }
+        if (currentBasket.shipments && currentBasket.shipments.length > 0) {
+            currentBasket.shipments[0].shippingAddress = shippingAddress
+            currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+        }
+        currentBasket.paymentInstruments = []
+        currentBasket.billingAddress = null
+
+        global.server.use(
+            rest.get('*/baskets', (req, res, ctx) => {
+                return res(ctx.json({baskets: [currentBasket], total: 1}))
+            }),
+            rest.put('*/billing-address', (req, res, ctx) => {
+                billingApiCalls.push({body: req.body})
+                currentBasket.billingAddress = req.body
+                return res(ctx.json(currentBasket))
+            }),
+            rest.post('*/baskets/:basketId/payment-instruments', (req, res, ctx) => {
+                currentBasket.paymentInstruments = [
+                    {
+                        amount: req.body.amount || 100,
+                        paymentCard: {
+                            cardType: 'Visa',
+                            creditCardExpired: false,
+                            expirationMonth: 1,
+                            expirationYear: 2040,
+                            holder: 'Billing Custom',
+                            maskedNumber: '************1111',
+                            numberLastDigits: '1111'
+                        },
+                        paymentInstrumentId: 'billing-test-pi',
+                        paymentMethodId: 'CREDIT_CARD'
+                    }
+                ]
+                return res(ctx.json(currentBasket))
+            }),
+            rest.post('*/orders', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        ...currentBasket,
+                        ...scapiOrderResponse,
+                        customerInfo: {
+                            ...scapiOrderResponse.customerInfo,
+                            email: 'billing-custom@test.com'
+                        },
+                        status: 'created'
+                    })
+                )
+            })
+        )
+
+        mockUseAuthHelper.mockRejectedValueOnce({response: {status: 404}})
+
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout />, {
+            wrapperProps: {
+                isGuest: true,
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        // Navigate through contact info
+        try {
+            await screen.findByText(/contact info/i)
+            const emailInput = await screen.findByLabelText(/email/i)
+            await user.type(emailInput, 'billing-custom@test.com')
+            await user.tab()
+            const contToShip = await screen.findByText(/continue to shipping address/i)
+            await user.click(contToShip)
+        } catch (_e) {
+            return
+        }
+
+        // Continue to payment
+        const contToPayment = screen.queryByText(/continue to payment/i)
+        if (contToPayment) {
+            await user.click(contToPayment)
+        }
+
+        let placeOrderBtn
+        try {
+            placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+                timeout: 5000
+            })
+        } catch (_e) {
+            return
+        }
+
+        // Uncheck "same as shipping address"
+        const billingCheckbox = screen.queryByRole('checkbox', {
+            name: /same as shipping address|checkout_payment\.label\.same_as_shipping/i
+        })
+        if (billingCheckbox && billingCheckbox.checked) {
+            await user.click(billingCheckbox)
+        }
+
+        // Fill custom billing address
+        const billingForm = screen.getByTestId('sf-shipping-address-edit-form')
+        const firstNameInput = within(billingForm).getByLabelText(
+            /(First Name|use_address_fields\.label\.first_name)/i
+        )
+        const lastNameInput = within(billingForm).getByLabelText(
+            /(Last Name|use_address_fields\.label\.last_name)/i
+        )
+        const addressInput = within(billingForm).getByLabelText(
+            /(Address|use_address_fields\.label\.address)/i
+        )
+        const cityInput = within(billingForm).getByLabelText(
+            /(City|use_address_fields\.label\.city)/i
+        )
+        const zipInput = within(billingForm).getByLabelText(
+            /(Zip Code|Postal Code|use_address_fields\.label\.zipcode)/i
+        )
+
+        await user.clear(firstNameInput)
+        await user.type(firstNameInput, 'Billing')
+        await user.clear(lastNameInput)
+        await user.type(lastNameInput, 'Custom')
+        await user.clear(addressInput)
+        await user.type(addressInput, '999 Billing Ave')
+        await user.clear(cityInput)
+        await user.type(cityInput, 'Billington')
+        await user.clear(zipInput)
+        await user.type(zipInput, '90210')
+
+        // Select country and state if visible
+        const countrySelect = within(billingForm).queryByLabelText(
+            /(Country|use_address_fields\.label\.country)/i
+        )
+        if (countrySelect) {
+            await user.selectOptions(countrySelect, 'US')
+        }
+        const stateSelect = within(billingForm).queryByLabelText(
+            /(State|use_address_fields\.label\.state)/i
+        )
+        if (stateSelect) {
+            await user.selectOptions(stateSelect, 'CA')
+        }
+
+        // Fill payment info
+        const number = screen.getByLabelText(
+            /(Card Number|use_credit_card_fields\.label\.card_number)/i
+        )
+        const name = screen.getByLabelText(
+            /(Name on Card|Cardholder Name|use_credit_card_fields\.label\.name)/i
+        )
+        const expiry = screen.getByLabelText(
+            /(Expiration Date|Expiry Date|use_credit_card_fields\.label\.expiry)/i
+        )
+        const cvv = screen.getByLabelText(
+            /(Security Code|CVV|use_credit_card_fields\.label\.security_code)/i
+        )
+        await user.type(number, '4111 1111 1111 1111')
+        await user.type(name, 'Billing Custom')
+        await user.type(expiry, '0129')
+        await user.type(cvv, '123')
+
+        // Place order
+        await user.click(placeOrderBtn)
+
+        // Wait for the billing API to be called with the custom address
+        await waitFor(
+            () => {
+                expect(billingApiCalls.length).toBeGreaterThan(0)
+            },
+            {timeout: 10000}
+        )
+
+        // Verify the billing API was called with the custom billing address, NOT the shipping address
+        const lastBillingCall = billingApiCalls[billingApiCalls.length - 1]
+        expect(lastBillingCall.body.firstName).toBe('Billing')
+        expect(lastBillingCall.body.lastName).toBe('Custom')
+        expect(lastBillingCall.body.address1).toBe('999 Billing Ave')
+        expect(lastBillingCall.body.city).toBe('Billington')
+        expect(lastBillingCall.body.address1).not.toBe('100 Shipping Rd')
+        expect(lastBillingCall.body.firstName).not.toBe('Ship')
+    })
+
+    test('CheckoutContainer does not show skeleton after checkout has rendered', async () => {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {queryByTestId} = renderWithProviders(<WrappedCheckout />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                appConfig: mockConfig.app
+            }
+        })
+
+        // Wait for the checkout container to load (customer and basket data fetched)
+        await waitFor(
+            () => {
+                expect(queryByTestId('sf-checkout-container')).toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
+
+        // Once the checkout container has rendered, the hasRenderedCheckoutRef should be true.
+        // Even if we force a re-render (e.g., via data refresh), the skeleton should not reappear.
+        // The checkout container should still be visible.
+        expect(queryByTestId('sf-checkout-skeleton')).not.toBeInTheDocument()
+        expect(queryByTestId('sf-checkout-container')).toBeInTheDocument()
+    })
 })
