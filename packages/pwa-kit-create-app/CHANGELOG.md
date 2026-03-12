@@ -1,4 +1,4 @@
-## v3.17.0-preview.2 (Mar 12, 2026)
+## v3.17.0 (Mar 12, 2026)
 - Add Salesforce Payments configuration to generated projects [#3725] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
 - Clear verdaccio npm cache during project generation [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
