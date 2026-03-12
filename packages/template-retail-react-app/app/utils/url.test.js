@@ -17,33 +17,34 @@ import {
     removeSiteLocaleFromPath,
     serverSafeEncode
 } from '@salesforce/retail-react-app/app/utils/url'
-import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 afterEach(() => {
     jest.clearAllMocks()
 })
 
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
-    return {
-        ...original,
-        getConfig: jest.fn(() => mockConfig)
-    }
-})
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 
-jest.mock('./site-utils', () => {
-    const original = jest.requireActual('./site-utils')
-    return {
-        ...original,
-        getUrlConfig: jest.fn()
-    }
+beforeEach(() => {
+    getConfig.mockReturnValue(mockConfig)
 })
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths')
     return {
         ...original,
         getEnvBasePath: jest.fn(() => '')
+    }
+})
+
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getRouterBasePath: jest.fn(() => '')
     }
 })
 
@@ -138,8 +139,6 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
-
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
         const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
@@ -185,6 +184,34 @@ describe('getPathWithLocale', () => {
 
         const relativeUrl = getPathWithLocale('en-GB', buildUrl, {location})
         expect(relativeUrl).toBe(`/`)
+    })
+
+    test('getPathWithLocale returns path without base path if base path is present', () => {
+        const basePath = '/test-base'
+        getRouterBasePath.mockReturnValue(basePath)
+
+        const location = new URL(
+            `http://localhost:3000${basePath}/uk/it-IT/category/newarrivals-womens`
+        )
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+
+        const path = getPathWithLocale('fr-FR', buildUrl, {location})
+        expect(path).toBe('/uk/fr/category/newarrivals-womens')
+        expect(path).not.toContain(basePath)
+        // Caller uses basePath + path for window.location or full href
+        expect(`${basePath}${path}`).toBe(`${basePath}/uk/fr/category/newarrivals-womens`)
+    })
+
+    test('getPathWithLocale does not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+        const basePath = '/shop'
+        getRouterBasePath.mockReturnValue(basePath)
+
+        const location = new URL('http://localhost:3000/shopping/cart')
+        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'en-GB')
+
+        const path = getPathWithLocale('en-GB', buildUrl, {location})
+        expect(path).toContain('/shopping')
+        expect(path).not.toBe('/cart')
     })
 })
 

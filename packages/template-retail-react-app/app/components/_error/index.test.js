@@ -6,11 +6,17 @@
  */
 import React from 'react'
 import Error from '@salesforce/retail-react-app/app/components/_error/index'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 // !!! ----- WARNING ----- WARNING ----- WARNING ----- !!!
 // Tests use render instead of renderWithProviders because
 // error component is rendered outside provider tree
 // !!! ----------------------------------------------- !!!
 import {screen, render} from '@testing-library/react'
+
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
+    getRouterBasePath: jest.fn(() => '')
+}))
+
 const originalLocation = window.location
 
 afterEach(() => {
@@ -67,4 +73,14 @@ test('clicking Refresh the page calls window.location.reload', () => {
 test('renders custom error message', () => {
     render(<Error message="Custom error occurred" />)
     expect(screen.getByText('Custom error occurred')).toBeInTheDocument()
+})
+
+test('clicking logo navigates to base path when set', () => {
+    delete window.location
+    window.location = {href: ''}
+    getRouterBasePath.mockReturnValueOnce('/my-base')
+    render(<Error />)
+    const logoBtn = screen.getByLabelText('logo')
+    logoBtn.click()
+    expect(window.location.href).toBe('/my-base/')
 })

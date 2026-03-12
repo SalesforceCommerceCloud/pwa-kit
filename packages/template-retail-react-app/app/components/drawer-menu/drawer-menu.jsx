@@ -54,6 +54,7 @@ import {
 // Others
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {getPathWithLocale, categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -317,7 +318,10 @@ const DrawerMenu = ({
                                             const newUrl = getPathWithLocale(newLocale, buildUrl, {
                                                 disallowParams: ['refine']
                                             })
-                                            window.location = newUrl
+                                            const basePath = getRouterBasePath()
+                                            window.location = basePath
+                                                ? `${basePath}${newUrl}`
+                                                : newUrl
                                         }}
                                     />
                                 </Box>

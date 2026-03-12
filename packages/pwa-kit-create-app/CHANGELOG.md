@@ -1,4 +1,5 @@
 ## v3.18.0-dev (Mar 12, 2026)
+- Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
 ## v3.17.0 (Mar 12, 2026)
 - Add Salesforce Payments configuration to generated projects [#3725] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
