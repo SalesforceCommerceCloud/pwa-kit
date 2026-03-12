@@ -2884,9 +2884,7 @@ describe('Checkout One Click', () => {
         // Wait for order placement or billing API call
         await waitFor(
             () => {
-                expect(
-                    billingApiCalls.length > 0 || screen.queryByText(/success/i)
-                ).toBeTruthy()
+                expect(billingApiCalls.length > 0 || screen.queryByText(/success/i)).toBeTruthy()
             },
             {timeout: 10000}
         )
