@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsV2} from 'commerce-sdk-isomorphic'
 import {mergeOptions, getCustomKeys, pickValidParams} from './utils'
 
 describe('Hook utils', () => {
@@ -17,7 +17,7 @@ describe('Hook utils', () => {
             organizationId: 'organizationId',
             siteId: 'siteId'
         }
-        const client = new ShopperBaskets({
+        const client = new ShopperBasketsV2({
             parameters: {
                 ...config,
                 clientParameter: 'clientParameter'

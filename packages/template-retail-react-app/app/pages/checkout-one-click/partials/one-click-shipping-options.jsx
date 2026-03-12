@@ -25,7 +25,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import {
     useShippingMethodsForShipment,
-    useShopperBasketsMutation
+    useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'

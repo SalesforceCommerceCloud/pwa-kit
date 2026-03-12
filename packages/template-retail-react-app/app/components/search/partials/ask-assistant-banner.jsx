@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
@@ -12,6 +12,7 @@ import {SparkleIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/co
 
 const AskAssistantBanner = ({onClick, styles}) => {
     const intl = useIntl()
+    const handledByTouchRef = useRef(false)
     const title = intl.formatMessage({
         id: 'search.suggestions.askAssistant.title',
         defaultMessage: 'Ask Shopping Agent'
@@ -27,13 +28,36 @@ const AskAssistantBanner = ({onClick, styles}) => {
         onClick?.()
     }
 
+    const handleTouchStart = (e) => {
+        // Prevent the search input from blurring when the user touches the banner.
+        // Otherwise onBlur closes the overlay before touchEnd/click fires, so the tap never runs.
+        e.preventDefault()
+    }
+
+    const handleTouchEnd = () => {
+        handledByTouchRef.current = true
+        onClick?.()
+        setTimeout(() => {
+            handledByTouchRef.current = false
+        }, 400)
+    }
+
+    const handleClick = (e) => {
+        if (handledByTouchRef.current) {
+            return
+        }
+        handleInteraction(e)
+    }
+
     return (
         <Box
             {...styles.askAssistantBanner}
             as="button"
             type="button"
             textAlign="left"
-            onClick={handleInteraction}
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             aria-label={ariaLabel}
         >
             <Box {...styles.askAssistantBannerIcon}>

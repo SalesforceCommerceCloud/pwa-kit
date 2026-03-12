@@ -15,7 +15,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useShopperBasketsMutation: () => ({
+        useShopperBasketsV2Mutation: () => ({
             mutateAsync: mockMutateAsync
         }),
         useStores: () => ({

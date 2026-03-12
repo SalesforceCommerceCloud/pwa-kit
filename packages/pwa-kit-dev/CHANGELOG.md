@@ -4,6 +4,7 @@
 - Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
 
 ## v3.17.0-dev
+- Add Page Designer Design CSS Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - Update jest, archiver and remove rimraf dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
 - Add Node 24 support, remove legacy `url` module import. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 

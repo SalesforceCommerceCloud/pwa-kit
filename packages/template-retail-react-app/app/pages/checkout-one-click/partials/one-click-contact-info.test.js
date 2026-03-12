@@ -37,7 +37,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useAuthHelper: jest
             .fn()
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType]),
-        useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
+        useShopperBasketsV2Mutation: jest.fn().mockImplementation((mutationType) => {
             if (mutationType === 'updateCustomerForBasket') return mockUpdateCustomerForBasket
             if (mutationType === 'transferBasket') return mockTransferBasket
             if (mutationType === 'updateBillingAddressForBasket')

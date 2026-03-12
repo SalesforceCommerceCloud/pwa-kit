@@ -23,15 +23,30 @@ jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('../../hooks/use-update-shopper-context', () => ({
     useUpdateShopperContext: jest.fn()
 }))
+jest.mock('../../page-designer/registry', () => ({
+    initializeRegistry: jest.fn()
+}))
 
 let windowSpy
 
 const mockUpdateDnt = jest.fn()
+
+// Mock registry with required methods
+const mockRegistry = {
+    registerImporter: jest.fn(),
+    getComponent: jest.fn(),
+    has: jest.fn(() => false),
+    get: jest.fn()
+}
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useDNT: () => ({selectedDnt: undefined, updateDnt: mockUpdateDnt})
+        useDNT: () => ({selectedDnt: undefined, updateDnt: mockUpdateDnt}),
+        useUsid: () => ({usid: 'test-usid', getUsidWhenReady: () => Promise.resolve('test-usid')}),
+        useGlobalAnchorBlock: jest.fn(),
+        registry: mockRegistry
     }
 })
 
