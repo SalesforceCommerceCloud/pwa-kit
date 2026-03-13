@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-    envBasePath: '/',
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [

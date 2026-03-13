@@ -27,6 +27,7 @@ module.exports = {
             site: 'path',
             locale: 'path',
             showDefaults: true,
+            showBasePath: false,
             interpretPlusSignAsSpace: false
         },
         login: {
@@ -106,7 +107,6 @@ module.exports = {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
-    envBasePath: '/',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
