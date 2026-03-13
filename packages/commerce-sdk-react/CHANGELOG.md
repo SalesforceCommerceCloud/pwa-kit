@@ -1,7 +1,7 @@
 ## v5.2.0-dev (Mar 12, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
-## v5.1.0-dev
+## v5.1.0
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - Bump commerce-sdk-isomorphic to 5.1.0 [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
 - Update ShopperBasketsV2 hooks documentation and query keys [#3728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3728)
