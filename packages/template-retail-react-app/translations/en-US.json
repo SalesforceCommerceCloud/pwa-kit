@@ -1405,18 +1405,6 @@
   "pagination.link.prev.assistive_msg": {
     "defaultMessage": "Previous Page"
   },
-  "passkey_registration.modal.button.close.assistive_msg": {
-    "defaultMessage": "Close passkey form"
-  },
-  "passkey_registration.modal.button.register": {
-    "defaultMessage": "Register Passkey"
-  },
-  "passkey_registration.modal.label.nickname": {
-    "defaultMessage": "Passkey Nickname (optional)"
-  },
-  "passkey_registration.modal.title": {
-    "defaultMessage": "Create Passkey"
-  },
   "passkey_registration.toast.button.close.assistive_msg": {
     "defaultMessage": "Close toast"
   },
