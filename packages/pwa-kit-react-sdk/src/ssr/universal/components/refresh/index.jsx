@@ -8,6 +8,7 @@ import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
 import logger from '../../../../utils/logger-instance'
+import {getRouterBasePath} from '../../utils'
 
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500
@@ -53,6 +54,13 @@ const Refresh = () => {
                 })
                 referrer = '/'
             }
+
+            // Remove the base path before navigating (React Router will add it back)
+            const basePath = getRouterBasePath()
+            if (basePath && (referrer.startsWith(basePath + '/') || referrer === basePath)) {
+                referrer = referrer.slice(basePath.length) || '/'
+            }
+
             history.replace(referrer)
         }
         refetchData()

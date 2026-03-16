@@ -253,15 +253,18 @@ const main = async () => {
                 error('Could not determine app entrypoint.')
                 process.exit(1)
             }
-            // Load config to get envBasePath and enableHttpOnlySessionCookies from ssrParameters for local development
-            // This mimics how MRT sets the system environment variable
+
+            // Load config to get envBasePath from ssrParameters for local development
+            // This mimics how MRT sets the MRT_ENV_BASE_PATH system environment variable
             const config = getConfig() || {}
+            const envBasePath = config.ssrParameters?.envBasePath || ''
             const enableHttpOnlySessionCookies =
                 config.ssrParameters?.enableHttpOnlySessionCookies ?? false
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {}),
+                    ...(envBasePath ? {MRT_ENV_BASE_PATH: envBasePath} : {}),
                     MRT_ENABLE_HTTPONLY_SESSION_COOKIES: String(enableHttpOnlySessionCookies)
                 }
             })

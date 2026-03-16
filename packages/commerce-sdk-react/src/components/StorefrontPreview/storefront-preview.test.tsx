@@ -14,7 +14,16 @@ import {useCommerceApi, useConfig} from '../../hooks'
 
 declare global {
     interface Window {
-        STOREFRONT_PREVIEW?: Record<string, unknown>
+        STOREFRONT_PREVIEW?: {
+            getToken?: () => string | undefined | Promise<string | undefined>
+            onContextChange?: () => void | Promise<void>
+            siteId?: string
+            experimentalUnsafeNavigate?: (
+                path: string | {pathname: string; search?: string; hash?: string; state?: unknown},
+                action?: 'push' | 'replace',
+                ...args: unknown[]
+            ) => void
+        }
     }
 }
 
@@ -28,9 +37,24 @@ jest.mock('./utils', () => {
 jest.mock('../../auth/index.ts')
 jest.mock('../../hooks/useConfig', () => jest.fn())
 
+const mockPush = jest.fn()
+const mockReplace = jest.fn()
+jest.mock('react-router-dom', () => {
+    const actual = jest.requireActual('react-router-dom')
+    return {
+        ...actual,
+        useHistory: () => ({
+            push: mockPush,
+            replace: mockReplace
+        })
+    }
+})
+
 describe('Storefront Preview Component', function () {
     beforeEach(() => {
         delete window.STOREFRONT_PREVIEW
+        mockPush.mockClear()
+        mockReplace.mockClear()
         ;(useConfig as jest.Mock).mockReturnValue({siteId: 'site-id'})
     })
     afterEach(() => {
@@ -105,6 +129,88 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.siteId).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
+    })
+
+    test('experimentalUnsafeNavigate removes base path from path when getBasePath is provided', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/mybase/product/123', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/product/123')
+
+        mockPush.mockClear()
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/mybase/account', 'replace')
+        expect(mockReplace).toHaveBeenCalledWith('/account')
+    })
+
+    test('experimentalUnsafeNavigate does not remove when path does not start with base path', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/other/product/123', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/other/product/123')
+    })
+
+    test('experimentalUnsafeNavigate does not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/shop'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/shopping/cart', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/shopping/cart')
+    })
+
+    test('experimentalUnsafeNavigate strips to / when path exactly equals basePath', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/mybase', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/')
+    })
+
+    test('experimentalUnsafeNavigate removes base path from location object when getBasePath is provided', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/mybase'}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            {pathname: '/mybase/product/123', search: '?q=1'},
+            'push'
+        )
+        expect(mockPush).toHaveBeenCalledWith({pathname: '/product/123', search: '?q=1'})
     })
 
     test('cache breaker is added to the parameters of SCAPI requests, only if in storefront preview', () => {
