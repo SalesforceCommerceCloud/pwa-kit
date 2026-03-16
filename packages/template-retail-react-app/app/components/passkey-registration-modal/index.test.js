@@ -41,10 +41,10 @@ jest.mock('@salesforce/retail-react-app/app/components/otp-auth', () => {
     const React = jest.requireActual('react')
     const MockOtpAuth = ({isOpen, handleOtpVerification}) => {
         React.useEffect(() => {
-            if (handleOtpVerification) {
+            if (isOpen && handleOtpVerification) {
                 otpVerificationHandler = handleOtpVerification
             }
-        }, [handleOtpVerification])
+        }, [isOpen, handleOtpVerification])
         return isOpen ? <div data-testid="otp-auth-modal">OTP Auth Modal</div> : null
     }
     MockOtpAuth.propTypes = {
@@ -58,12 +58,6 @@ describe('PasskeyRegistrationModal', () => {
     const mockOnClose = jest.fn()
     const mockCustomer = {
         email: 'test@example.com'
-    }
-
-    function PasskeyRegistrationModalWrapper() {
-        const [isOpen, setIsOpen] = React.useState(true)
-
-        return <PasskeyRegistrationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     }
 
     beforeEach(() => {
@@ -111,82 +105,25 @@ describe('PasskeyRegistrationModal', () => {
     })
 
     describe('Rendering', () => {
-        test('renders modal when isOpen is true', () => {
-            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
-                wrapperProps: {appConfig: mockConfig.app}
-            })
-
-            expect(screen.getByText('Create Passkey')).toBeInTheDocument()
-            expect(screen.getByText(/Passkey Nickname/)).toBeInTheDocument()
-            expect(
-                screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-            ).toBeInTheDocument()
-            expect(screen.getByText('Register Passkey')).toBeInTheDocument()
-        })
-
-        test('does not render modal when isOpen is false', () => {
+        test('does not render OTP modal when isOpen is false', () => {
             renderWithProviders(<PasskeyRegistrationModal isOpen={false} onClose={mockOnClose} />)
 
-            expect(screen.queryByText('Create Passkey')).not.toBeInTheDocument()
-        })
-    })
-
-    describe('User Interactions', () => {
-        test('allows user to type in nickname input', async () => {
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const input = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-            await user.type(input, 'My iPhone')
-
-            expect(input).toHaveValue('My iPhone')
+            expect(screen.queryByTestId("Confirm it's you")).not.toBeInTheDocument()
         })
 
-        test('calls onClose when close button is clicked', async () => {
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const closeButton = screen.getByLabelText('Close passkey form')
-            await user.click(closeButton)
-
-            expect(mockOnClose).toHaveBeenCalledTimes(1)
-        })
-
-        test('resets form state when modal opens', async () => {
-            const {user} = renderWithProviders(<PasskeyRegistrationModalWrapper />)
-
-            const input = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-            await user.type(input, 'Test Nickname')
-            expect(input).toHaveValue('Test Nickname')
-
-            // Close modal
-            const closeButton = screen.getByTestId('passkey-registration-modal-close-button')
-            await user.click(closeButton)
-
-            await waitFor(() => {
-                expect(
-                    screen.queryByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-                ).not.toBeInTheDocument()
-            })
-
-            // Reopen modal - state should be reset
+        test('renders OTP modal when isOpen is true', () => {
             renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />)
-            const newInput = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-            expect(newInput).toHaveValue('')
+
+            expect(screen.getByTestId('otp-auth-modal')).toBeInTheDocument()
         })
     })
 
     describe('Passkey Registration', () => {
-        test('calls authorizeWebauthnRegistration on register button click', async () => {
+        test('calls authorizeWebauthnRegistration automatically on open', async () => {
             mockMutateAsync.mockResolvedValue({})
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -197,49 +134,28 @@ describe('PasskeyRegistrationModal', () => {
             })
         })
 
-        test('closes modal and opens OTP auth modal on successful registration', async () => {
+        test('opens OTP auth modal automatically on successful authorization', async () => {
             mockMutateAsync.mockResolvedValue({})
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
-                expect(mockOnClose).toHaveBeenCalled()
                 expect(screen.getByTestId('otp-auth-modal')).toBeInTheDocument()
             })
         })
 
-        test('displays error message when registration fails', async () => {
-            const errorMessage = 'Registration failed'
-            mockMutateAsync.mockRejectedValue(new Error(errorMessage))
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
-
-            await waitFor(() => {
-                expect(screen.getByText('Something went wrong. Try again!')).toBeInTheDocument()
+        test('does not close when authorization fails', async () => {
+            mockMutateAsync.mockRejectedValue(new Error('Registration failed'))
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
             })
-        })
 
-        test('shows loading state during registration', async () => {
-            mockMutateAsync.mockImplementation(
-                () => new Promise((resolve) => setTimeout(resolve, 100))
-            )
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />
-            )
-
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
-
-            expect(screen.getByText('Registering...')).toBeInTheDocument()
-            expect(registerButton).toBeDisabled()
+            // Auth failure is handled silently — OTP modal stays open
+            await waitFor(() => {
+                expect(screen.getByTestId('otp-auth-modal')).toBeInTheDocument()
+            })
+            expect(mockOnClose).not.toHaveBeenCalled()
         })
     })
 
@@ -314,16 +230,9 @@ describe('PasskeyRegistrationModal', () => {
             global.navigator.credentials.create.mockResolvedValue(mockCredential)
             mockFinishWebauthnRegistration.mockResolvedValue({})
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal first
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(screen.getByTestId('otp-auth-modal')).toBeInTheDocument()
@@ -372,63 +281,9 @@ describe('PasskeyRegistrationModal', () => {
             // Verify success result
             expect(result).toEqual({success: true})
 
-            // Verify modals are closed
+            // Verify modal is closed
             await waitFor(() => {
                 expect(mockOnClose).toHaveBeenCalled()
-            })
-        })
-
-        test('includes nickname in startWebauthnUserRegistration when provided', async () => {
-            const otpCode = '12345678'
-            const nickname = 'My iPhone'
-            const mockStartResponse = {
-                challenge: 'dGVzdA==',
-                rp: {name: 'Test', id: 'example.com'},
-                user: {id: 'dGVzdA==', name: 'test@example.com'},
-                pubKeyCredParams: [],
-                timeout: 60000
-            }
-
-            const mockCredential = {
-                type: 'public-key',
-                id: 'test-id',
-                rawId: new ArrayBuffer(8),
-                response: {
-                    attestationObject: new ArrayBuffer(16),
-                    clientDataJSON: new ArrayBuffer(16)
-                }
-            }
-
-            mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
-            global.navigator.credentials.create.mockResolvedValue(mockCredential)
-            mockFinishWebauthnRegistration.mockResolvedValue({})
-
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Set nickname
-            const input = screen.getByPlaceholderText("e.g., 'iPhone', 'Personal Laptop'")
-            await user.type(input, nickname)
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
-
-            await waitFor(() => {
-                expect(otpVerificationHandler).toBeTruthy()
-            })
-
-            await otpVerificationHandler(otpCode)
-
-            // Verify nickname was included
-            expect(mockStartWebauthnRegistration).toHaveBeenCalledWith({
-                user_id: 'test@example.com',
-                pwd_action_token: otpCode,
-                nick_name: nickname
             })
         })
 
@@ -438,16 +293,9 @@ describe('PasskeyRegistrationModal', () => {
 
             mockStartWebauthnRegistration.mockRejectedValue(new Error(errorMessage))
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -460,9 +308,8 @@ describe('PasskeyRegistrationModal', () => {
                 error: 'Something went wrong. Try again!'
             })
 
-            // Verify modals are not closed on error
-            // mockOnClose was called once when opening OTP modal, but not again after error
-            expect(mockOnClose).toHaveBeenCalledTimes(1)
+            // Verify onClose was not called on error
+            expect(mockOnClose).not.toHaveBeenCalled()
         })
 
         test('returns error when WebAuthn API is not available', async () => {
@@ -479,16 +326,9 @@ describe('PasskeyRegistrationModal', () => {
             // Remove credentials API
             delete global.navigator.credentials
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -518,16 +358,9 @@ describe('PasskeyRegistrationModal', () => {
             mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
             global.navigator.credentials.create.mockRejectedValue(notAllowedError)
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -554,16 +387,9 @@ describe('PasskeyRegistrationModal', () => {
             mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
             global.navigator.credentials.create.mockResolvedValue(null)
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -603,16 +429,9 @@ describe('PasskeyRegistrationModal', () => {
             global.navigator.credentials.create.mockResolvedValue(mockCredential)
             mockFinishWebauthnRegistration.mockRejectedValue(new Error(errorMessage))
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -642,16 +461,9 @@ describe('PasskeyRegistrationModal', () => {
             mockStartWebauthnRegistration.mockResolvedValue(mockStartResponse)
             global.navigator.credentials.create.mockRejectedValue(abortError)
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            // Open OTP modal
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
@@ -670,15 +482,9 @@ describe('PasskeyRegistrationModal', () => {
 
             mockStartWebauthnRegistration.mockRejectedValue(new Error('401'))
 
-            const {user} = renderWithProviders(
-                <PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />,
-                {
-                    wrapperProps: {appConfig: mockConfig.app}
-                }
-            )
-
-            const registerButton = screen.getByText('Register Passkey')
-            await user.click(registerButton)
+            renderWithProviders(<PasskeyRegistrationModal isOpen={true} onClose={mockOnClose} />, {
+                wrapperProps: {appConfig: mockConfig.app}
+            })
 
             await waitFor(() => {
                 expect(otpVerificationHandler).toBeTruthy()
