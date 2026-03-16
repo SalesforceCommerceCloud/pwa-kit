@@ -923,42 +923,73 @@ export const RemoteServerFactory = {
                 },
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
-                    applyProxyRequestHeaders({
-                        proxyRequest,
-                        incomingRequest,
-                        proxyPath: slasPrivateProxyPath,
-                        targetHost: options.slasHostName,
-                        targetProtocol: 'https'
-                    })
+                    try {
+                        applyProxyRequestHeaders({
+                            proxyRequest,
+                            incomingRequest,
+                            proxyPath: slasPrivateProxyPath,
+                            targetHost: options.slasHostName,
+                            targetProtocol: 'https'
+                        })
 
-                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
-                        // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
-                        // so the SLAS private client is sent via this special header
-                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                    } else if (
-                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
-                    ) {
-                        // We pattern match and add client secrets only to endpoints that
-                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                        //
-                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                        // purpose so we don't want to overwrite the header for those calls.
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    }
+                        if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                            // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
+                            // so the SLAS private client is sent via this special header
+                            proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                        } else if (
+                            incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
+                        ) {
+                            // We pattern match and add client secrets only to endpoints that
+                            // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                            //
+                            // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                            // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                            // purpose so we don't want to overwrite the header for those calls.
+                            proxyRequest.setHeader(
+                                'Authorization',
+                                `Basic ${encodedSlasCredentials}`
+                            )
+                        }
 
-                    // Allow users to apply additional custom modifications to the proxy request
-                    if (typeof options.onSLASPrivateProxyReq === 'function') {
-                        try {
-                            options.onSLASPrivateProxyReq(proxyRequest, incomingRequest, res)
-                        } catch (error) {
-                            logger.error('Error in custom onSLASPrivateProxyReq callback', {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {
-                                    error: error
-                                }
+                        // Allow users to apply additional custom modifications to the proxy request
+                        if (typeof options.onSLASPrivateProxyReq === 'function') {
+                            try {
+                                options.onSLASPrivateProxyReq(proxyRequest, incomingRequest, res)
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPrivateProxyReq callback', {
+                                    namespace: '_setupSlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        error: error
+                                    }
+                                })
+                            }
+                        }
+                    } catch (error) {
+                        logger.error('Error in SLAS private proxy request handling', {
+                            namespace: '_setupSlasPrivateClientProxy',
+                            additionalProperties: {
+                                error: error
+                            }
+                        })
+                        if (!res.headersSent) {
+                            res.status(500).json({
+                                message: 'Error preparing SLAS private proxy request'
                             })
                         }
+                    }
+                },
+                onError: (error, req, res) => {
+                    logger.error('Error in SLAS private proxy', {
+                        namespace: '_setupSlasPrivateClientProxy',
+                        additionalProperties: {
+                            error: error,
+                            path: req?.url
+                        }
+                    })
+                    if (!res.headersSent) {
+                        res.status(500).json({
+                            message: 'Error in SLAS private proxy request'
+                        })
                     }
                 },
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
@@ -1009,9 +1040,16 @@ export const RemoteServerFactory = {
 
                         return workingBuffer
                     } catch (error) {
-                        console.error(
+                        logger.error(
                             'There is an error processing the response from SLAS. Returning original response.',
-                            error
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    error: error,
+                                    statusCode: proxyRes?.statusCode,
+                                    path: req?.url
+                                }
+                            }
                         )
                         return workingBuffer
                     }
