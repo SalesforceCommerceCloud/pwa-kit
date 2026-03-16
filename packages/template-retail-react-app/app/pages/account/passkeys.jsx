@@ -6,6 +6,7 @@
  */
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -27,6 +28,11 @@ const AccountPasskeys = () => {
     const headingRef = useRef(null)
     const inFlightRef = useRef(false)
     const lastAttemptRef = useRef({loginId: '', at: 0})
+
+    const config = getConfig()
+    if (!config?.app?.login?.passkey?.enabled) {
+        return null
+    }
 
     const {data: customer} = useCurrentCustomer()
     const {passkeyModal} = usePasskeyRegistration()

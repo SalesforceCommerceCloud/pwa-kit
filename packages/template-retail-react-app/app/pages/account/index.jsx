@@ -101,13 +101,14 @@ const Account = () => {
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
-    const {oneClickCheckout = {}} = getConfig().app || {}
+    const {oneClickCheckout = {}, login = {}} = getConfig().app || {}
     const isOneClickCheckoutEnabled = oneClickCheckout.enabled
+    const isPasskeyEnabled = login?.passkey?.enabled
 
-    // Filter navigation links based on 1CC configuration
-    const filteredNavLinks = isOneClickCheckoutEnabled
-        ? navLinks
-        : navLinks.filter((link) => link.name !== 'payments')
+    // Filter navigation links based on feature configuration
+    const filteredNavLinks = navLinks
+        .filter((link) => isOneClickCheckoutEnabled || link.name !== 'payments')
+        .filter((link) => isPasskeyEnabled || link.name !== 'passkeys')
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -259,9 +260,11 @@ const Account = () => {
                             <AccountPayments />
                         </Route>
                     )}
-                    <Route exact path={`${path}/passkeys`}>
-                        <AccountPasskeys />
-                    </Route>
+                    {isPasskeyEnabled && (
+                        <Route exact path={`${path}/passkeys`}>
+                            <AccountPasskeys />
+                        </Route>
+                    )}
                 </Switch>
             </Grid>
         </Box>

@@ -140,13 +140,14 @@ const Header = ({
     const hasEnterPopoverContent = useRef()
 
     const styles = useMultiStyleConfig('Header')
-    const {oneClickCheckout = {}} = getConfig().app || {}
+    const {oneClickCheckout = {}, login = {}} = getConfig().app || {}
     const isOneClickCheckoutEnabled = oneClickCheckout.enabled
+    const isPasskeyEnabled = login?.passkey?.enabled
 
-    // Filter navigation links based on 1CC configuration
-    const filteredNavLinks = isOneClickCheckoutEnabled
-        ? navLinks
-        : navLinks.filter((link) => link.name !== 'payments')
+    // Filter navigation links based on feature configuration
+    const filteredNavLinks = navLinks
+        .filter((link) => isOneClickCheckoutEnabled || link.name !== 'payments')
+        .filter((link) => isPasskeyEnabled || link.name !== 'passkeys')
 
     const onSignoutClick = async () => {
         setShowLoading(true)

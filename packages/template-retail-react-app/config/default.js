@@ -49,6 +49,7 @@ module.exports = {
             },
             passkey: {
                 enabled: false,
+                mode: 'email',
                 callbackURI: process.env.PASSKEY_CALLBACK_URI
             }
         },
