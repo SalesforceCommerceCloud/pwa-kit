@@ -1584,7 +1584,7 @@ class Auth {
             }
         }
 
-        return await slasClient.startWebauthnAuthentication(options as any)
+        return await slasClient.startWebauthnAuthentication(options)
     }
 
     /**

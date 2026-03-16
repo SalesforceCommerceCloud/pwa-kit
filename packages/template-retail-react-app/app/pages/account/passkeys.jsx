@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef} from 'react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -19,80 +19,39 @@ import {
     Stack,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {usePasskeyUser} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
 
 const AccountPasskeys = () => {
     const {formatMessage} = useIntl()
     const headingRef = useRef(null)
-    const inFlightRef = useRef(false)
-    const lastAttemptRef = useRef({loginId: '', at: 0})
 
     const config = getConfig()
     const isPasskeyEnabled = config?.app?.login?.passkey?.enabled
 
     const {data: customer} = useCurrentCustomer()
     const {passkeyModal} = usePasskeyRegistration()
-    const getPasskeyUserByLoginId = useAuthHelper(AuthHelpers.GetPasskeyUserByLoginId)
 
     const loginId = useMemo(
         () => customer?.login || customer?.email || '',
         [customer?.login, customer?.email]
     )
 
-    const [passkeyUser, setPasskeyUser] = useState(null)
-    const [error, setError] = useState(null)
-
-    const fetchPasskeys = useCallback(
-        async ({force = false} = {}) => {
-            if (!loginId) return
-            if (inFlightRef.current) return
-
-            // Avoid accidental request loops on re-render.
-            // If we already attempted this loginId very recently, don't immediately re-try unless forced.
-            const now = Date.now()
-            if (
-                !force &&
-                lastAttemptRef.current.loginId === loginId &&
-                now - lastAttemptRef.current.at < 30_000
-            ) {
-                return
-            }
-
-            lastAttemptRef.current = {loginId, at: now}
-            inFlightRef.current = true
-
-            try {
-                setError(null)
-                const res = await getPasskeyUserByLoginId.mutateAsync({loginId})
-                setPasskeyUser(res)
-            } catch (e) {
-                if (e?.response?.status === 404) {
-                    setPasskeyUser(null)
-                } else {
-                    setPasskeyUser(null)
-                    setError(e)
-                }
-            } finally {
-                inFlightRef.current = false
-            }
-        },
-        [getPasskeyUserByLoginId, loginId]
-    )
+    const {
+        data: passkeyUser,
+        error,
+        isLoading,
+        refetch
+    } = usePasskeyUser({loginId}, {enabled: !!customer?.isRegistered && !!loginId})
 
     useEffect(() => {
         headingRef?.current?.focus()
     }, [])
 
     useEffect(() => {
-        if (!customer?.isRegistered) return
-        void fetchPasskeys()
-    }, [customer?.isRegistered, loginId])
-
-    useEffect(() => {
-        passkeyModal?.setOnSuccess?.(() => fetchPasskeys({force: true}))
-    }, [passkeyModal?.setOnSuccess, fetchPasskeys])
+        passkeyModal?.setOnSuccess?.(() => refetch())
+    }, [passkeyModal?.setOnSuccess, refetch])
 
     if (!isPasskeyEnabled) {
         return null
@@ -103,7 +62,7 @@ const AccountPasskeys = () => {
         const nameB = (b.nickName || '').toLowerCase()
         return nameA.localeCompare(nameB)
     })
-    const isLoading = getPasskeyUserByLoginId.isLoading && !passkeyUser
+    const showSkeleton = isLoading && !passkeyUser
 
     return (
         <Stack data-testid="account-passkeys-page" spacing={6}>
@@ -141,8 +100,8 @@ const AccountPasskeys = () => {
                         <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => fetchPasskeys({force: true})}
-                            isLoading={getPasskeyUserByLoginId.isLoading}
+                            onClick={() => refetch()}
+                            isLoading={isLoading}
                         >
                             <FormattedMessage
                                 defaultMessage="Retry"
@@ -153,7 +112,7 @@ const AccountPasskeys = () => {
                 </Alert>
             )}
 
-            {isLoading ? (
+            {showSkeleton ? (
                 <Stack spacing={4}>
                     <Skeleton height="92px" borderRadius="base" />
                     <Skeleton height="92px" borderRadius="base" />
