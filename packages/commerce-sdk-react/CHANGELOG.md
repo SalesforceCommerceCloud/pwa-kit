@@ -1,5 +1,6 @@
 ## v5.2.0-dev (Mar 12, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+- Fix TS build error in ShopperConsents mutation tests [#3752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3752)
 
 ## v5.1.0
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
