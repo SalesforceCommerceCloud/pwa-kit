@@ -9,6 +9,7 @@ import {X_ENCODED_HEADERS} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
 import logger from '../../utils/logger-instance'
 import {catchAndLog, parseRequestUrl} from '../../utils/ssr-server'
+import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 
 jest.mock('../../utils/ssr-config', () => {
     return {
@@ -28,6 +29,13 @@ jest.mock('../../utils/logger-instance', () => ({
         error: jest.fn()
     }
 }))
+jest.mock('../../utils/ssr-server/configure-proxy', () => {
+    const actual = jest.requireActual('../../utils/ssr-server/configure-proxy')
+    return {
+        ...actual,
+        applyProxyRequestHeaders: jest.fn(actual.applyProxyRequestHeaders)
+    }
+})
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -180,6 +188,7 @@ describe('SLAS private proxy', () => {
         // Mock express application
         mockExpress = require('express')
         request = require('supertest')
+        logger.error.mockClear()
     })
 
     afterEach(() => {
@@ -356,6 +365,98 @@ describe('SLAS private proxy', () => {
         } finally {
             mockSlasServerInstance.close()
         }
+    })
+
+    test('returns 500 when onProxyReq logic throws', async () => {
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
+            res.status(200).json({access_token: 'mock-token'})
+        })
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const app = mockExpress()
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id'
+                            }
+                        }
+                    }
+                }
+            })
+
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+            applyProxyRequestHeaders.mockImplementationOnce(() => {
+                throw new Error('boom')
+            })
+
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+            const response = await request(app).post(
+                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+            )
+
+            expect(response.status).toBe(500)
+            expect(response.body).toEqual({
+                message: 'Error preparing SLAS private proxy request'
+            })
+            expect(logger.error).toHaveBeenCalledWith(
+                'Error in SLAS private proxy request handling',
+                expect.objectContaining({
+                    namespace: '_setupSlasPrivateClientProxy'
+                })
+            )
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
+
+    test('returns 500 when proxy emits an error', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            slasTarget: 'http://127.0.0.1:1',
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+        )
+
+        expect(response.status).toBe(500)
+        expect(response.body).toEqual({
+            message: 'Error in SLAS private proxy request'
+        })
+        expect(logger.error).toHaveBeenCalledWith(
+            'Error in SLAS private proxy',
+            expect.objectContaining({
+                namespace: '_setupSlasPrivateClientProxy'
+            })
+        )
     })
 })
 
