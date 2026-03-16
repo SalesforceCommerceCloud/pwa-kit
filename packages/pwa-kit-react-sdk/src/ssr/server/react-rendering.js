@@ -40,6 +40,8 @@ import logger from '../../utils/logger-instance'
 import PerformanceTimer from '../../utils/performance'
 import {PERFORMANCE_MARKS} from '../../utils/performance-marks'
 
+import {getRouterBasePath} from '../universal/utils'
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
@@ -270,9 +272,11 @@ export const render = (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
+    const routerBasename = getRouterBasePath() || undefined
+
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext} basename={routerBasename}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
@@ -365,6 +369,7 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
+        __MRT_ENV_BASE_PATH__: process.env.MRT_ENV_BASE_PATH || '',
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

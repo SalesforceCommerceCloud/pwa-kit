@@ -7,6 +7,7 @@
 import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
 import {
     ShopperBaskets,
+    ShopperBasketsV2,
     ShopperConfigurations,
     ShopperConsents,
     ShopperContexts,
@@ -15,6 +16,7 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
@@ -87,6 +89,7 @@ export type ApiClientConfigParams = {
  */
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperBasketsV2?: ShopperBasketsV2<ApiClientConfigParams>
     shopperConsents?: ShopperConsents<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
@@ -94,6 +97,7 @@ export interface ApiClients {
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
     shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperPayments?: ShopperPayments<ApiClientConfigParams>
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>

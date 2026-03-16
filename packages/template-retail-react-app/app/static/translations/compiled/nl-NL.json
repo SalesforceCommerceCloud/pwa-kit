@@ -3127,6 +3127,18 @@
       "value": "Annuleren"
     }
   ],
+  "search.suggestions.askAssistant.description": [
+    {
+      "type": 0,
+      "value": "Ontdek, vergelijk en shop slimmer met je persoonlijke shoppingassistent."
+    }
+  ],
+  "search.suggestions.askAssistant.title": [
+    {
+      "type": 0,
+      "value": "Vraag de shoppingassistent"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

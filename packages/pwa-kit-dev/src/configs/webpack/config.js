@@ -202,6 +202,13 @@ const baseConfig = (target) => {
                               ]
                           }
                         : {}),
+                    conditionNames: [
+                        'import',
+                        'require',
+                        'module',
+                        ...(target === 'web' ? ['browser'] : ['node']),
+                        'default'
+                    ],
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         ...Object.assign(
@@ -272,6 +279,10 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
+                        },
+                        {
+                            test: /\.css$/,
+                            loader: findDepInStack('ignore-loader')
                         }
                     ].filter(Boolean)
                 }
@@ -342,6 +353,15 @@ const staticFolderCopyPlugin = new CopyPlugin({
                 .resolve(`${EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''}app/static`)
                 .replace(/\\/g, '/'),
             to: `static/`,
+            noErrorOnMissing: true
+        },
+        {
+            // Copy Page Designer CSS from storefront-next-runtime for dynamic loading
+            from: path.resolve(
+                projectDir,
+                'node_modules/@salesforce/storefront-next-runtime/dist/design-styles.css'
+            ),
+            to: 'static/pd-design-styles.css',
             noErrorOnMissing: true
         }
     ]

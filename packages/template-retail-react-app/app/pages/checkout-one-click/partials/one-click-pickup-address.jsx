@@ -18,7 +18,10 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
+    useStores
+} from '@salesforce/commerce-sdk-react'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const PickupAddress = () => {

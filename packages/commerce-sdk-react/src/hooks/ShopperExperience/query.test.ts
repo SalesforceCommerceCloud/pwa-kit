@@ -69,3 +69,88 @@ describe('Shopper Experience query hooks', () => {
         await waitAndExpectError(() => result.current)
     })
 })
+
+describe('Shopper Experience query hooks with Page Designer params', () => {
+    beforeEach(() => nock.cleanAll())
+    afterEach(() => {
+        expect(nock.pendingMocks()).toHaveLength(0)
+    })
+
+    test('usePage merges pageDesignerParams from provider config', async () => {
+        const pageData = {id: 'testPage', typeId: 'storePage'}
+        mockQueryEndpoint(experienceEndpoint, pageData)
+
+        const pageDesignerParams = {
+            mode: 'edit' as const,
+            pdToken: 'test-pd-token',
+            pageId: 'pd-page-id'
+        }
+
+        const {result} = renderHookWithProviders(
+            () => queries.usePage({parameters: {pageId: 'testPage'}}),
+            {pageDesignerParams}
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(pageData)
+    })
+
+    test('usePages merges pageDesignerParams from provider config', async () => {
+        const pagesData = {data: [{id: 'page1', typeId: 'storePage'}]}
+        mockQueryEndpoint(experienceEndpoint, pagesData)
+
+        const pageDesignerParams = {
+            mode: 'edit' as const,
+            pdToken: 'test-pd-token'
+        }
+
+        const {result} = renderHookWithProviders(
+            () => queries.usePages({parameters: {aspectTypeId: 'pdpAspect', categoryId: 'cat1'}}),
+            {pageDesignerParams}
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(pagesData)
+    })
+
+    test('usePage works without pageDesignerParams', async () => {
+        const pageData = {id: 'testPage', typeId: 'storePage'}
+        mockQueryEndpoint(experienceEndpoint, pageData)
+
+        const {result} = renderHookWithProviders(() =>
+            queries.usePage({parameters: {pageId: 'testPage'}})
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(pageData)
+    })
+
+    test('usePages works without pageDesignerParams', async () => {
+        const pagesData = {data: []}
+        mockQueryEndpoint(experienceEndpoint, pagesData)
+
+        const {result} = renderHookWithProviders(() =>
+            queries.usePages({parameters: {aspectTypeId: 'pdpAspect', categoryId: 'cat1'}})
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(pagesData)
+    })
+
+    test('usePage with partial pageDesignerParams (only mode)', async () => {
+        const pageData = {id: 'testPage', typeId: 'storePage'}
+        mockQueryEndpoint(experienceEndpoint, pageData)
+
+        const pageDesignerParams = {
+            mode: 'preview' as const
+        }
+
+        const {result} = renderHookWithProviders(
+            () => queries.usePage({parameters: {pageId: 'testPage'}}),
+            {pageDesignerParams}
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(pageData)
+    })
+})

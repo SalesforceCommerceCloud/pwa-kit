@@ -11,6 +11,7 @@ import {Logger} from './types'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
     ShopperBaskets,
+    ShopperBasketsV2,
     ShopperConsents,
     ShopperContexts,
     ShopperConfigurations,
@@ -19,6 +20,7 @@ import {
     ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
@@ -27,6 +29,12 @@ import {
     FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
+
+export interface PageDesignerParams {
+    mode?: string
+    pdToken?: string
+    pageId?: string
+}
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -49,6 +57,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    pageDesignerParams?: PageDesignerParams
 }
 
 /**
@@ -146,7 +155,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         disableAuthInit = false,
-        hybridAuthEnabled = false
+        hybridAuthEnabled = false,
+        pageDesignerParams = {}
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -258,6 +268,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
         return {
             shopperBaskets: new ShopperBaskets(config),
+            shopperBasketsV2: new ShopperBasketsV2(config),
             shopperConsents: new ShopperConsents(config),
             shopperContexts: new ShopperContexts(config),
             shopperConfigurations: new ShopperConfigurations(config),
@@ -269,6 +280,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
+            shopperPayments: new ShopperPayments(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
@@ -313,7 +325,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 defaultDnt,
                 passwordlessLoginCallbackURI,
                 refreshTokenRegisteredCookieTTL,
-                refreshTokenGuestCookieTTL
+                refreshTokenGuestCookieTTL,
+                pageDesignerParams
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

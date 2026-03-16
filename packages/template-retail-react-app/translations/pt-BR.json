@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Descubra, compare e compre com mais inteligência com seu assistente de compras pessoal."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Perguntar ao assistente de compras"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Apagar todos os filtros"
   },

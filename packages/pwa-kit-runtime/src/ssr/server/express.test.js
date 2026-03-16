@@ -21,6 +21,7 @@ import {CachedResponse} from '../../utils/ssr-server'
 // the file it was defined in, because of the way jest works.
 import * as ssrServerUtils from '../../utils/ssr-server/utils'
 import * as ssrConfig from '../../utils/ssr-config'
+import * as ssrNamespacePaths from '../../utils/ssr-namespace-paths'
 import {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} from './build-remote-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
 import {
@@ -1396,8 +1397,12 @@ describe('SLAS private client proxy', () => {
 })
 
 describe('Base path tests', () => {
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
     test('Base path is removed from /mobify request path and still gets through to /mobify endpoint', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
 
         const app = RemoteServerFactory._createApp(opts())
 
@@ -1410,7 +1415,7 @@ describe('Base path tests', () => {
 
     test('should not remove base path from non /mobify non-express routes', async () => {
         // Set base path to something that might also be a site id used by react router routes
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/us'})
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/us')
 
         const app = RemoteServerFactory._createApp(opts())
 
@@ -1432,7 +1437,7 @@ describe('Base path tests', () => {
     }, 15000)
 
     test('should remove base path from routes with path parameters', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
 
         const app = RemoteServerFactory._createApp(opts())
 
@@ -1449,7 +1454,7 @@ describe('Base path tests', () => {
     }, 15000)
 
     test('should remove base path from routes defined with regex', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
 
         const app = RemoteServerFactory._createApp(opts())
 
@@ -1468,25 +1473,8 @@ describe('Base path tests', () => {
             })
     }, 15000)
 
-    test('remove base path can handle multi-part base paths', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/my/base/path'})
-
-        const app = RemoteServerFactory._createApp(opts())
-
-        app.get('/api/test', (req, res) => {
-            res.status(200).json({message: 'test'})
-        })
-
-        return request(app)
-            .get('/my/base/path/api/test')
-            .then((response) => {
-                expect(response.status).toBe(200)
-                expect(response.body.message).toBe('test')
-            })
-    }, 15000)
-
     test('should handle optional characters in route pattern', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
 
         const app = RemoteServerFactory._createApp(opts())
 

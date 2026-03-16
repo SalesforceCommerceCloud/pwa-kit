@@ -11,11 +11,14 @@ import {
     resolveSiteFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
     getParamsFromPath,
-    resolveLocaleFromUrl
+    resolveLocaleFromUrl,
+    removeBasePathFromPath,
+    resolvePageDesignerParamsFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
@@ -25,8 +28,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getRouterBasePath: jest.fn(() => '')
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
+    // Reset the mock after resetModules
+    getRouterBasePath.mockReturnValue('')
 })
 
 afterEach(() => {
@@ -310,6 +323,64 @@ describe('getParamsFromPath', function () {
             expect(getParamsFromPath(path)).toEqual(expectedRes)
         })
     })
+
+    describe('getParamsFromPath with base path', () => {
+        test('should remove base path from path when showBasePath is true', () => {
+            const basePath = '/test-base'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const path = `${basePath}/us/en-US/category/womens`
+            const result = getParamsFromPath(path)
+            expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
+        })
+
+        test('should not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+            const basePath = '/shop'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const result = getParamsFromPath('/shopping/cart')
+            expect(result).toBeDefined()
+        })
+    })
+})
+
+describe('removeBasePathFromPath', () => {
+    test('removes when path starts with basePath + "/"', () => {
+        expect(removeBasePathFromPath('/shop/cart', '/shop')).toBe('/cart')
+        expect(removeBasePathFromPath('/test-base/uk/en-GB/foo', '/test-base')).toBe(
+            '/uk/en-GB/foo'
+        )
+    })
+    test('removes to "/" when path exactly equals basePath', () => {
+        expect(removeBasePathFromPath('/shop', '/shop')).toBe('/')
+    })
+    test('does not remove when basePath is only a substring (e.g. /shop vs /shopping/cart)', () => {
+        expect(removeBasePathFromPath('/shopping/cart', '/shop')).toBe('/shopping/cart')
+        expect(removeBasePathFromPath('/shopping', '/shop')).toBe('/shopping')
+    })
+    test('returns path unchanged when basePath is empty', () => {
+        expect(removeBasePathFromPath('/any/path', '')).toBe('/any/path')
+    })
 })
 
 describe('resolveLocaleFromUrl', function () {
@@ -372,5 +443,59 @@ describe('resolveLocaleFromUrl', function () {
             const locale = resolveLocaleFromUrl(path)
             expect(locale).toEqual(expectedRes)
         })
+    })
+})
+
+describe('resolvePageDesignerParamsFromUrl', function () {
+    test('returns empty object when no url is provided', () => {
+        const result = resolvePageDesignerParamsFromUrl('')
+        expect(result).toEqual({})
+    })
+
+    test('returns empty object when url has no Page Designer params', () => {
+        const result = resolvePageDesignerParamsFromUrl('/category/womens')
+        expect(result).toEqual({})
+    })
+
+    test('extracts mode parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?mode=EDIT')
+        expect(result).toEqual({mode: 'EDIT'})
+    })
+
+    test('extracts pdToken parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?pdToken=abc123')
+        expect(result).toEqual({pdToken: 'abc123'})
+    })
+
+    test('extracts pageId parameter from url', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?pageId=homepage')
+        expect(result).toEqual({pageId: 'homepage'})
+    })
+
+    test('extracts all Page Designer parameters from url', () => {
+        const result = resolvePageDesignerParamsFromUrl(
+            '/?mode=EDIT&pdToken=xyz789&pageId=homepage'
+        )
+        expect(result).toEqual({
+            mode: 'EDIT',
+            pdToken: 'xyz789',
+            pageId: 'homepage'
+        })
+    })
+
+    test('extracts Page Designer parameters with path and other query params', () => {
+        const result = resolvePageDesignerParamsFromUrl(
+            '/us/en-US/women?site=us&mode=PREVIEW&pdToken=token123&pageId=test-page'
+        )
+        expect(result).toEqual({
+            mode: 'PREVIEW',
+            pdToken: 'token123',
+            pageId: 'test-page'
+        })
+    })
+
+    test('ignores non-Page Designer query parameters', () => {
+        const result = resolvePageDesignerParamsFromUrl('/?mode=EDIT&foo=bar&baz=qux')
+        expect(result).toEqual({mode: 'EDIT'})
     })
 })
