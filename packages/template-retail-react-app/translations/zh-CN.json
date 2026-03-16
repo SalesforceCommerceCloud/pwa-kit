@@ -1361,6 +1361,12 @@
   "search.action.cancel": {
     "defaultMessage": "取消"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "通过您的个人购物助手，更智能地发现、比较和购物。"
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "询问购物助手"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "清除所有筛选器"
   },

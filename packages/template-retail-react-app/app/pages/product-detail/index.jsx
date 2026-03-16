@@ -18,9 +18,9 @@ import {
     useProducts,
     useCategory,
     useShopperCustomersMutation,
-    useShopperBasketsMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
     useCustomerId,
-    useShopperBasketsMutationHelper
+    useShopperBasketsV2MutationHelper as useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks

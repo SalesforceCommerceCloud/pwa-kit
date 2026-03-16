@@ -23,8 +23,8 @@ import http from 'http'
 import https from 'https'
 import nock from 'nock'
 import zlib from 'zlib'
+import fs from 'fs'
 import fse from 'fs-extra'
-import rimraf from 'rimraf'
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -702,7 +702,7 @@ describe('DevServer service worker', () => {
     })
 
     afterEach(() => {
-        rimraf.sync(tmpDir)
+        fs.rmSync(tmpDir, {recursive: true, force: true})
     })
 
     const createApp = () => {

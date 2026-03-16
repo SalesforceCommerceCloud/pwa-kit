@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "Peruuta"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Löydä, vertaile ja osta fiksummin henkilökohtaisen ostosavustajasi kanssa."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Kysy ostosavustajalta"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Poista kaikki suodattimet"
   },

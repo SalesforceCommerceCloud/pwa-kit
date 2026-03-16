@@ -18,6 +18,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 import {BrandLogo, FileIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 // <Error> is rendered when:
 //
@@ -53,7 +54,11 @@ const Error = (props) => {
                         // We need to use window.location.href here rather than history
                         // as the application is in an error state. We need to force a
                         // hard navigation to get back to the normal state.
-                        onClick={() => (window.location.href = '/')}
+                        // Include base path since this bypasses React Router
+                        onClick={() => {
+                            const basePath = getRouterBasePath()
+                            window.location.href = basePath ? `${basePath}/` : '/'
+                        }}
                     />
                 </Box>
             </Box>

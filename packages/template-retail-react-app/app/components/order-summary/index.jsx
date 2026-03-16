@@ -259,7 +259,10 @@ const OrderSummary = ({
                             </Text>
                         ) : (
                             <Text fontSize={fontSize} color="gray.700">
-                                TBD
+                                <FormattedMessage
+                                    defaultMessage="TBD"
+                                    id="order_summary.label.tax_tbd"
+                                />
                             </Text>
                         )}
                     </Flex>

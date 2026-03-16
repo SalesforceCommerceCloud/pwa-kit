@@ -45,7 +45,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {
     AuthHelpers,
     useAuthHelper,
-    useShopperBasketsMutation,
+    useShopperBasketsV2Mutation as useShopperBasketsMutation,
     useCustomerType,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
@@ -169,12 +169,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Validate email format
         if (!email) {
-            setEmailError('Please enter your email address.')
+            setEmailError(
+                formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'use_login_fields.error.required_email'
+                })
+            )
             return
         }
 
         if (!isValidEmail(email)) {
-            setEmailError('Please enter a valid email address.')
+            setEmailError(
+                formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'use_login_fields.error.invalid_email'
+                })
+            )
             return
         }
 
@@ -424,13 +434,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Validate email before proceeding
         if (!formData.email) {
-            setError('Please enter your email address.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'use_login_fields.error.required_email'
+                })
+            )
             setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
 
         if (!isValidEmail(formData.email)) {
-            setError('Please enter a valid email address.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'use_login_fields.error.invalid_email'
+                })
+            )
             setIsSubmitting(false) // Reset submitting state on validation error
             return
         }
@@ -483,12 +503,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     // Save phone number to basket billing address for guest shoppers
                     if (phone) {
+                        const billingBody = {...basket?.billingAddress, phone}
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const {addressId, creationDate, lastModified, preferred, ...address} =
+                            billingBody
                         await updateBillingAddressForBasket.mutateAsync({
                             parameters: {basketId: basket.basketId},
-                            body: {
-                                ...basket?.billingAddress,
-                                phone: phone
-                            }
+                            body: address
                         })
                     }
 
@@ -501,7 +522,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
                     return
                 } catch (error) {
-                    setError('An error occurred. Please try again.')
+                    setError(
+                        formatMessage({
+                            defaultMessage: 'An error occurred. Please try again.',
+                            id: 'contact_info.error.generic_try_again'
+                        })
+                    )
                     // Show continue button again if there's an error
                     setShowContinueButton(true)
                     setIsSubmitting(false)
@@ -510,7 +536,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             }
             // If user is registered, OTP modal should be open, don't proceed to next step
         } catch (error) {
-            setError('An error occurred. Please try again.')
+            setError(
+                formatMessage({
+                    defaultMessage: 'An error occurred. Please try again.',
+                    id: 'contact_info.error.generic_try_again'
+                })
+            )
         } finally {
             // Only reset submitting state for registered users (when OTP modal is open)
             // Guest users will have already returned above

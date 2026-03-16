@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {SimpleGrid} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {Region, regionPropType} from '@salesforce/commerce-sdk-react/components'
+import {Region, regionPropType} from '@salesforce/commerce-sdk-react/page-designer'
 
 /**
  * This layout component displays its children in a 1 x 1 grid on both mobile and desktop.

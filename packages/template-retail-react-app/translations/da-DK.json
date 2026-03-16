@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "Annuller"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Opdag, sammenlign og shop smartere med din personlige shoppingassistent."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Spørg shoppingassistenten"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Ryd alle filtre"
   },

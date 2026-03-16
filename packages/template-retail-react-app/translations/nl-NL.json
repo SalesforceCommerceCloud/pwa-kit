@@ -1334,6 +1334,12 @@
   "search.action.cancel": {
     "defaultMessage": "Annuleren"
   },
+  "search.suggestions.askAssistant.description": {
+    "defaultMessage": "Ontdek, vergelijk en shop slimmer met je persoonlijke shoppingassistent."
+  },
+  "search.suggestions.askAssistant.title": {
+    "defaultMessage": "Vraag de shoppingassistent"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Alle filters wissen"
   },
