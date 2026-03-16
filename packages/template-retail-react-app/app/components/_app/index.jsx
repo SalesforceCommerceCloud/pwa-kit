@@ -374,52 +374,24 @@ const App = (props) => {
                                     <link
                                         rel="alternate"
                                         hrefLang={locale.id.toLowerCase()}
-                                        href={`${appOrigin}${getPathWithLocale(
-                                            locale.id,
-                                            buildUrl,
-                                            {
-                                                location: {
-                                                    ...location,
-                                                    search: ''
-                                                }
-                                            }
-                                        )}`}
+                                        href={getHrefForLocale(locale.id)}
                                         key={locale.id}
                                     />
                                 ))}
                                 {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
+                                    hrefLang={site.l10n.defaultLocale.slice(0, 2)}
                                     href={getHrefForLocale(locale.id)}
-                                    key={locale.id}
                                 />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={getHrefForLocale(locale.id)}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
+                                {/* A wider fallback for user locales that the app does not support */}
+                                <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                            </Seo>
 
-                        {commerceAgentConfiguration?.enabled === 'true' && (
-                            <ShopperAgent
-                                commerceAgentConfiguration={commerceAgentConfiguration}
-                                basketDoneLoading={basketQueryLastUpdateTime > 0}
-                            />
-                        )}
-
-                        <ScrollToTop />
-
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {storeLocatorEnabled && (
-                                <StoreLocatorModal
-                                    isOpen={isStoreLocatorOpen}
-                                    onClose={onCloseStoreLocator}
+                            {commerceAgentConfiguration?.enabled === 'true' && (
+                                <ShopperAgent
+                                    commerceAgentConfiguration={commerceAgentConfiguration}
+                                    basketDoneLoading={basketQueryLastUpdateTime > 0}
                                 />
                             )}
 
