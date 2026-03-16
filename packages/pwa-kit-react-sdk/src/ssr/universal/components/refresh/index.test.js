@@ -9,6 +9,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import Refresh from './index'
+import {getRouterBasePath} from '../../utils'
 
 jest.useFakeTimers()
 
@@ -33,6 +34,10 @@ jest.mock('@tanstack/react-query', () => {
         }))
     }
 })
+
+jest.mock('../../utils', () => ({
+    getRouterBasePath: jest.fn(() => '')
+}))
 
 test('renders a loading spinner initially', () => {
     render(<Refresh />)
@@ -84,4 +89,55 @@ test('navigate to homepage if `referrer` search param cannot be found in the pag
         expect(console.warn).toHaveBeenCalled()
         expect(useHistory().replace).toHaveBeenCalledWith('/')
     })
+})
+
+test('strips base path from referrer when basePath is set', async () => {
+    const basePath = '/my-base'
+    getRouterBasePath.mockReturnValue(basePath)
+    useLocation.mockImplementationOnce(() => ({
+        search: `?referrer=${encodeURIComponent('/my-base/some-page')}`
+    }))
+
+    render(<Refresh />)
+    jest.runAllTimers()
+
+    await waitFor(() => {
+        expect(useHistory().replace).toHaveBeenCalledWith('/some-page')
+    })
+
+    getRouterBasePath.mockReturnValue('')
+})
+
+test('strips base path from referrer when referrer equals basePath exactly', async () => {
+    const basePath = '/my-base'
+    getRouterBasePath.mockReturnValue(basePath)
+    useLocation.mockImplementationOnce(() => ({
+        search: `?referrer=${encodeURIComponent('/my-base')}`
+    }))
+
+    render(<Refresh />)
+    jest.runAllTimers()
+
+    await waitFor(() => {
+        expect(useHistory().replace).toHaveBeenCalledWith('/')
+    })
+
+    getRouterBasePath.mockReturnValue('')
+})
+
+test('does not strip base path when referrer does not start with basePath', async () => {
+    const basePath = '/my-base'
+    getRouterBasePath.mockReturnValue(basePath)
+    useLocation.mockImplementationOnce(() => ({
+        search: `?referrer=${encodeURIComponent('/other-path/page')}`
+    }))
+
+    render(<Refresh />)
+    jest.runAllTimers()
+
+    await waitFor(() => {
+        expect(useHistory().replace).toHaveBeenCalledWith('/other-path/page')
+    })
+
+    getRouterBasePath.mockReturnValue('')
 })

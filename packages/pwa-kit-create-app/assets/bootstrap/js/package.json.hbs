@@ -18,6 +18,15 @@
     "{{@key}}": "{{{script this}}}"{{#unless @last}},{{/unless}}
     {{/each}}
   },
+  "overrides": {
+    "react-router": {
+      "path-to-regexp": "^1.9.0"
+    },
+    "@salesforce/storefront-next-runtime": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    }
+  },
   "bundlesize": [
     {
       "path": "build/main.js",

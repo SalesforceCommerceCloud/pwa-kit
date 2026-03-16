@@ -3,7 +3,10 @@
 - Add `x-site-id` request header to read HttpOnly cookies on the server [#3700](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3700)
 - Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
 
-## v9.1.0-dev
+## v9.2.0-dev (Mar 12, 2026)
+- Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+
+## v9.1.0 (Mar 12, 2026)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
 - One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
@@ -13,6 +16,10 @@
 - [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 - [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
 - [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
+- [Bugfix] Fix lost custom billing address after OTP registration [#3741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3741)
+- [Bugfix] Fix edirect payment methods status value to pascal [#3734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3734)
+- [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
+- [Bugfix] Fix adding to cart from a master product in the wishlist [#3732](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3732)
 
 ## v9.0.0 (Feb 12, 2026)
 - [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
@@ -29,7 +36,6 @@
 - Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
 - [BREAKING] Remove unused absoluteUrl util from retail react app [#3633](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3633)
 - Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
-- Add configuration flag `disableHttpOnlySessionCookies` to `ssrParameters` [#3635](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3635)
 
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)

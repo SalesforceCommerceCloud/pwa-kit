@@ -11,11 +11,13 @@ import {
     resolveSiteFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {
     getParamsFromPath,
     resolveLocaleFromUrl,
+    removeBasePathFromPath,
     resolvePageDesignerParamsFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
@@ -26,8 +28,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...original,
+        getRouterBasePath: jest.fn(() => '')
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
+    // Reset the mock after resetModules
+    getRouterBasePath.mockReturnValue('')
 })
 
 afterEach(() => {
@@ -310,6 +322,64 @@ describe('getParamsFromPath', function () {
             // })
             expect(getParamsFromPath(path)).toEqual(expectedRes)
         })
+    })
+
+    describe('getParamsFromPath with base path', () => {
+        test('should remove base path from path when showBasePath is true', () => {
+            const basePath = '/test-base'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const path = `${basePath}/us/en-US/category/womens`
+            const result = getParamsFromPath(path)
+            expect(result).toEqual({siteRef: 'us', localeRef: 'en-US'})
+        })
+
+        test('should not strip when path has basePath only as substring (e.g. /shop vs /shopping/cart)', () => {
+            const basePath = '/shop'
+            getRouterBasePath.mockReturnValue(basePath)
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    url: {
+                        ...mockConfig.app.url,
+                        showBasePath: true
+                    }
+                }
+            }))
+
+            const result = getParamsFromPath('/shopping/cart')
+            expect(result).toBeDefined()
+        })
+    })
+})
+
+describe('removeBasePathFromPath', () => {
+    test('removes when path starts with basePath + "/"', () => {
+        expect(removeBasePathFromPath('/shop/cart', '/shop')).toBe('/cart')
+        expect(removeBasePathFromPath('/test-base/uk/en-GB/foo', '/test-base')).toBe(
+            '/uk/en-GB/foo'
+        )
+    })
+    test('removes to "/" when path exactly equals basePath', () => {
+        expect(removeBasePathFromPath('/shop', '/shop')).toBe('/')
+    })
+    test('does not remove when basePath is only a substring (e.g. /shop vs /shopping/cart)', () => {
+        expect(removeBasePathFromPath('/shopping/cart', '/shop')).toBe('/shopping/cart')
+        expect(removeBasePathFromPath('/shopping', '/shop')).toBe('/shopping')
+    })
+    test('returns path unchanged when basePath is empty', () => {
+        expect(removeBasePathFromPath('/any/path', '')).toBe('/any/path')
     })
 })
 
