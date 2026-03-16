@@ -30,9 +30,7 @@ const AccountPasskeys = () => {
     const lastAttemptRef = useRef({loginId: '', at: 0})
 
     const config = getConfig()
-    if (!config?.app?.login?.passkey?.enabled) {
-        return null
-    }
+    const isPasskeyEnabled = config?.app?.login?.passkey?.enabled
 
     const {data: customer} = useCurrentCustomer()
     const {passkeyModal} = usePasskeyRegistration()
@@ -95,6 +93,10 @@ const AccountPasskeys = () => {
     useEffect(() => {
         passkeyModal?.setOnSuccess?.(() => fetchPasskeys({force: true}))
     }, [passkeyModal?.setOnSuccess, fetchPasskeys])
+
+    if (!isPasskeyEnabled) {
+        return null
+    }
 
     const credentials = [...(passkeyUser?.credentials || [])].sort((a, b) => {
         const nameA = (a.nickName || '').toLowerCase()
