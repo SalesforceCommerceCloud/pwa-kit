@@ -59,7 +59,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     hybridAuthEnabled?: boolean
     pageDesignerParams?: PageDesignerParams
     /** When true, proxy returns tokens in HttpOnly cookies. */
-    useHttpOnlySessionCookies?: boolean
+    enableHttpOnlySessionCookies?: boolean
 }
 
 /**
@@ -159,7 +159,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         disableAuthInit = false,
         hybridAuthEnabled = false,
         pageDesignerParams = {},
-        useHttpOnlySessionCookies = false
+        enableHttpOnlySessionCookies = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -167,11 +167,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
     // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
     const effectiveFetchOptions = useMemo(() => {
-        return useHttpOnlySessionCookies &&
+        return enableHttpOnlySessionCookies &&
             (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
             ? {...fetchOptions, credentials: 'same-origin' as RequestCredentials}
             : fetchOptions
-    }, [useHttpOnlySessionCookies, fetchOptions])
+    }, [enableHttpOnlySessionCookies, fetchOptions])
 
     const auth = useMemo(() => {
         return new Auth({
@@ -194,7 +194,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             refreshTokenRegisteredCookieTTL,
             refreshTokenGuestCookieTTL,
             hybridAuthEnabled,
-            useHttpOnlySessionCookies
+            enableHttpOnlySessionCookies
         })
     }, [
         clientId,
@@ -217,7 +217,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         hybridAuthEnabled,
-        useHttpOnlySessionCookies
+        enableHttpOnlySessionCookies
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -339,7 +339,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 passwordlessLoginCallbackURI,
                 refreshTokenRegisteredCookieTTL,
                 refreshTokenGuestCookieTTL,
-                pageDesignerParams
+                pageDesignerParams,
+                enableHttpOnlySessionCookies
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

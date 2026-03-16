@@ -8,6 +8,7 @@ import {ApiOptions, ApiMethod} from './types'
 import useAuthContext from './useAuthContext'
 import useConfig from './useConfig'
 import {handleInvalidToken} from './helpers'
+import {onClient} from '../utils'
 
 /**
  * Creates a method that waits for authentication to complete and automatically includes an
@@ -26,20 +27,30 @@ export const useAuthorizationHeader = <Options extends ApiOptions, Data>(
     const logger = config.logger || console
     return async (options) => {
         const {access_token} = await auth.ready()
+        // When HttpOnly session cookies are enabled on the client, the proxy injects the
+        // Authorization header from the cookie — skip adding it here.
+        const authHeaders =
+            config.enableHttpOnlySessionCookies && onClient()
+                ? {}
+                : {Authorization: `Bearer ${access_token}`}
         return await method({
             ...options,
             headers: {
-                Authorization: `Bearer ${access_token}`,
+                ...authHeaders,
                 ...options.headers
             }
         }).catch(async (error) => {
             const {access_token} = await handleInvalidToken(error, auth, logger)
+            const retryAuthHeaders =
+                config.enableHttpOnlySessionCookies && onClient()
+                    ? {}
+                    : {Authorization: `Bearer ${access_token}`}
 
             // Retry again after resetting auth state
             return await method({
                 ...options,
                 headers: {
-                    Authorization: `Bearer ${access_token}`,
+                    ...retryAuthHeaders,
                     ...options.headers
                 }
             })
