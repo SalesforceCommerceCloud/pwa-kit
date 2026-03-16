@@ -54,7 +54,6 @@ const PasskeyRegistrationModal = ({isOpen, onClose}) => {
                 })
             })
         } catch (err) {
-            // TODO: Propogate error to OTP modal
             form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
         }
     }
