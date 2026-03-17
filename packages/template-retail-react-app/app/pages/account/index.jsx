@@ -46,6 +46,7 @@ import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
+import AccountPasskeys from '@salesforce/retail-react-app/app/pages/account/passkeys'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
@@ -100,13 +101,14 @@ const Account = () => {
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
-    const {oneClickCheckout = {}} = getConfig().app || {}
+    const {oneClickCheckout = {}, login = {}} = getConfig().app || {}
     const isOneClickCheckoutEnabled = oneClickCheckout.enabled
+    const isPasskeyEnabled = login?.passkey?.enabled
 
-    // Filter navigation links based on 1CC configuration
-    const filteredNavLinks = isOneClickCheckoutEnabled
-        ? navLinks
-        : navLinks.filter((link) => link.name !== 'payments')
+    // Filter navigation links based on feature configuration
+    const filteredNavLinks = navLinks
+        .filter((link) => isOneClickCheckoutEnabled || link.name !== 'payments')
+        .filter((link) => isPasskeyEnabled || link.name !== 'passkeys')
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -256,6 +258,11 @@ const Account = () => {
                     {isOneClickCheckoutEnabled && (
                         <Route exact path={`${path}/payments`}>
                             <AccountPayments />
+                        </Route>
+                    )}
+                    {isPasskeyEnabled && (
+                        <Route exact path={`${path}/passkeys`}>
+                            <AccountPasskeys />
                         </Route>
                     )}
                 </Switch>

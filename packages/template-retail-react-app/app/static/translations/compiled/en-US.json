@@ -409,6 +409,68 @@
       "value": "Order History"
     }
   ],
+  "account_passkeys.button.delete": [
+    {
+      "type": 0,
+      "value": "Delete"
+    }
+  ],
+  "account_passkeys.button.delete_not_available": [
+    {
+      "type": 0,
+      "value": "Delete isn’t available yet."
+    }
+  ],
+  "account_passkeys.button.register_new_passkey": [
+    {
+      "type": 0,
+      "value": "Register New Passkey"
+    }
+  ],
+  "account_passkeys.button.retry": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "account_passkeys.error.unable_to_load": [
+    {
+      "type": 0,
+      "value": "Unable to load passkeys. Please try again."
+    }
+  ],
+  "account_passkeys.label.created": [
+    {
+      "type": 0,
+      "value": "Created: "
+    },
+    {
+      "type": 1,
+      "value": "createdAt"
+    }
+  ],
+  "account_passkeys.label.last_used": [
+    {
+      "type": 0,
+      "value": "Last used: "
+    },
+    {
+      "type": 1,
+      "value": "lastUsedAt"
+    }
+  ],
+  "account_passkeys.message.no_registered_passkeys": [
+    {
+      "type": 0,
+      "value": "You don't have any registered passkeys yet."
+    }
+  ],
+  "account_passkeys.title.your_registered_passkeys": [
+    {
+      "type": 0,
+      "value": "Your Registered Passkeys"
+    }
+  ],
   "account_payments.button.add_payment": [
     {
       "type": 0,
@@ -2219,6 +2281,12 @@
     {
       "type": 0,
       "value": "Payment Methods"
+    }
+  ],
+  "global.account.link.registered_passkeys": [
+    {
+      "type": 0,
+      "value": "Registered Passkeys"
     }
   ],
   "global.account.link.wishlist": [

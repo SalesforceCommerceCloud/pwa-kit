@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {createContext, useContext} from 'react'
+import React, {createContext, useContext, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
@@ -14,19 +14,27 @@ export const PasskeyRegistrationContext = createContext(null)
 
 export const PasskeyRegistrationProvider = ({children}) => {
     const passkeyModal = useDisclosure()
+    const onSuccessRef = useRef(null)
 
     const value = {
         passkeyModal: {
             isOpen: passkeyModal.isOpen,
             onOpen: passkeyModal.onOpen,
-            onClose: passkeyModal.onClose
+            onClose: passkeyModal.onClose,
+            setOnSuccess: (fn) => {
+                onSuccessRef.current = fn
+            }
         }
     }
 
     return (
         <PasskeyRegistrationContext.Provider value={value}>
             {children}
-            <PasskeyRegistrationModal isOpen={passkeyModal.isOpen} onClose={passkeyModal.onClose} />
+            <PasskeyRegistrationModal
+                isOpen={passkeyModal.isOpen}
+                onClose={passkeyModal.onClose}
+                onSuccess={() => onSuccessRef.current?.()}
+            />
         </PasskeyRegistrationContext.Provider>
     )
 }

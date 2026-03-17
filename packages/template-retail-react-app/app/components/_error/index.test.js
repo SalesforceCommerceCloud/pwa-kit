@@ -21,7 +21,11 @@ const originalLocation = window.location
 
 afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
-    window.location = originalLocation
+    Object.defineProperty(window, 'location', {
+        value: originalLocation,
+        writable: true,
+        configurable: true
+    })
 
     jest.resetModules()
 })
@@ -43,8 +47,11 @@ test('Error status 500 with stack trace', () => {
 
 test('clicking logo navigates to home', () => {
     // Mock window.location.href
-    delete window.location
-    window.location = {href: ''}
+    Object.defineProperty(window, 'location', {
+        value: {href: ''},
+        writable: true,
+        configurable: true
+    })
     render(<Error />)
     const logoBtn = screen.getByLabelText('logo')
     logoBtn.click()
@@ -62,7 +69,8 @@ test('clicking Refresh the page calls window.location.reload', () => {
     const reloadMock = jest.fn()
     Object.defineProperty(window, 'location', {
         value: {reload: reloadMock},
-        writable: true
+        writable: true,
+        configurable: true
     })
     render(<Error />)
     const refreshBtn = screen.getByRole('button', {name: 'Refresh the page'})
