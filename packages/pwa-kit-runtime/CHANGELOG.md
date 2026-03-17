@@ -1,3 +1,4 @@
+## v3.18.0-nightly-20260317081142 (Mar 17, 2026)
 ## v3.18.0-dev (Mar 12, 2026)
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750).
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
