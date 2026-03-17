@@ -198,9 +198,6 @@
   "account_passkeys.label.last_used": {
     "defaultMessage": "Last used: {lastUsedAt}"
   },
-  "account_passkeys.label.unnamed_passkey": {
-    "defaultMessage": "Unnamed passkey"
-  },
   "account_passkeys.message.no_registered_passkeys": {
     "defaultMessage": "You don't have any registered passkeys yet."
   },
