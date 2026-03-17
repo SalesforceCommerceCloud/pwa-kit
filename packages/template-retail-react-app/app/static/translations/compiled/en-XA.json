@@ -987,20 +987,6 @@
       "value": "]"
     }
   ],
-  "account_passkeys.label.unnamed_passkey": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞƞȧȧḿḗḗḓ ƥȧȧşşķḗḗẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account_passkeys.message.no_registered_passkeys": [
     {
       "type": 0,

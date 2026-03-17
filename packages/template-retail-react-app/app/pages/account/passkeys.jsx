@@ -129,13 +129,6 @@ const AccountPasskeys = () => {
             ) : (
                 <Stack spacing={4}>
                     {credentials.map((credential) => {
-                        const nickname =
-                            credential.nickName ||
-                            formatMessage({
-                                defaultMessage: 'Unnamed passkey',
-                                id: 'account_passkeys.label.unnamed_passkey'
-                            })
-
                         return (
                             <Box
                                 key={credential.credentialId || credential.id}
@@ -145,7 +138,7 @@ const AccountPasskeys = () => {
                                 <Flex align="flex-start" justify="space-between" gap={6}>
                                     <Box minWidth={0}>
                                         <Heading as="h3" size="sm" noOfLines={1}>
-                                            {nickname}
+                                            {credential.nickName}
                                         </Heading>
                                         <Stack spacing={1} marginTop={2}>
                                             {credential.createdAt && (
