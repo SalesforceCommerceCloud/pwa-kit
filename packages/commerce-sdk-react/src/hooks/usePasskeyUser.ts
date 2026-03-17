@@ -28,9 +28,9 @@ export const usePasskeyUser = (
     const auth = useAuthContext()
     const {loginId, channelId} = parameters
 
-    return useQuery(
-        ['/commerce-sdk-react', 'passkey-user', loginId, channelId],
-        async () => {
+    return useQuery({
+        queryKey: ['/commerce-sdk-react', 'passkey-user', loginId, channelId],
+        queryFn: async () => {
             try {
                 return await auth.whenReady(auth.getPasskeyUserByLoginId.bind(auth))(parameters)
             } catch (e: unknown) {
@@ -40,9 +40,7 @@ export const usePasskeyUser = (
                 throw e
             }
         },
-        {
-            enabled: !!loginId,
-            ...queryOptions
-        }
-    )
+        enabled: !!loginId,
+        ...queryOptions
+    })
 }
