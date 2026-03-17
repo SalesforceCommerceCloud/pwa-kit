@@ -1538,7 +1538,13 @@ describe('HttpOnly Session Cookies', () => {
         const loginGuestMock = helpers.loginGuestUser as jest.Mock
         loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
 
-        // First call: triggers loginGuestUser
+        // With HttpOnly cookies enabled, the first ready() attempts a refresh (since JS
+        // can't read the HttpOnly refresh token cookie). On a fresh session there's no
+        // refresh token cookie, so SLAS rejects — then it falls through to loginGuestUser.
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockRejectedValueOnce(new Error('no refresh token'))
+
+        // First call: refresh fails, falls through to loginGuestUser
         await auth.ready()
 
         // Set cc-at-expires cookie (as server would via Set-Cookie header)

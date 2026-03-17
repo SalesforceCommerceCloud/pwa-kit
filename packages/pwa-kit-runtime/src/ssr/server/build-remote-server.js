@@ -95,6 +95,36 @@ export const isBinary = (headers) => {
 }
 
 /**
+ * Inject the refresh token from HttpOnly cookies as the sfdc_refresh_token header.
+ * SLAS uses sfdc_refresh_token as a fallback when the refresh_token body parameter is
+ * missing or empty (which is the case when HttpOnly session cookies are enabled, because
+ * client-side JavaScript cannot read the HttpOnly refresh token cookie).
+ * @private
+ */
+export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = incomingRequest.headers['x-site-id']
+    if (!siteId) {
+        logger.warn(
+            'x-site-id header is missing on SLAS token request. ' +
+                'Refresh token header injection skipped. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.',
+            {namespace: 'setRefreshTokenHeader'}
+        )
+        return
+    }
+
+    // Try registered refresh token first, then guest
+    const refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
+    if (refreshToken) {
+        proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
+    }
+}
+
+/**
  * Inject Bearer token and refresh token from HttpOnly cookies for the SLAS logout endpoint.
  * Reads the access token and refresh token from cookies keyed by siteId (from the x-site-id header),
  * sets the Authorization header, and appends refresh_token to the query string.
@@ -1002,6 +1032,17 @@ export const RemoteServerFactory = {
                         // SLAS logout (/oauth2/logout), use the Authorization header for a different
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+
+                        // When HttpOnly session cookies are enabled, inject the refresh token
+                        // from the HttpOnly cookie as the sfdc_refresh_token header. SLAS uses
+                        // this header as a fallback for grant_type=refresh_token requests when
+                        // the refresh_token body parameter is empty.
+                        if (
+                            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
+                            incomingRequest.path?.match(/\/oauth2\/token$/)
+                        ) {
+                            setRefreshTokenHeader(proxyRequest, incomingRequest)
+                        }
                     } else if (
                         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
                         incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)

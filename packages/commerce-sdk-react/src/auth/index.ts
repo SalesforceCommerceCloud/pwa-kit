@@ -745,14 +745,24 @@ class Auth {
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
-        if (refreshToken) {
+
+        // When HttpOnly session cookies are enabled on the client, the refresh token is in an
+        // HttpOnly cookie that JavaScript cannot read. We still attempt the refresh request —
+        // the SLAS private proxy injects the refresh token via the sfdc_refresh_token header.
+        const hasHttpOnlyRefreshToken =
+            !refreshToken &&
+            this.enableHttpOnlySessionCookies &&
+            onClient()
+
+        if (refreshToken || hasHttpOnlyRefreshToken) {
             try {
+                const isGuest = this.get('customer_type') !== 'registered'
                 return await this.queueRequest(
                     () =>
                         helpers.refreshAccessToken({
                             slasClient: this.client,
                             parameters: {
-                                refreshToken,
+                                refreshToken: refreshToken || '',
                                 dnt: dntPref
                             },
                             credentials: {
@@ -760,7 +770,7 @@ class Auth {
                             },
                             enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
                         }),
-                    !!refreshTokenGuest
+                    isGuest
                 )
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
