@@ -3,6 +3,7 @@
 - Handle logout when HttpOnly session cookies is enabled  [#3699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3699)
 - Add `x-site-id` request header to read HttpOnly cookies on the server [#3700](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3700)
 - Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
+- updated package-lock [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
 
 ## v3.18.0-dev (Mar 12, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
