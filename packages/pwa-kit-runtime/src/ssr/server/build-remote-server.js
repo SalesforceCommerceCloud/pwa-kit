@@ -54,6 +54,7 @@ import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
+import {getConfig} from '../../utils/ssr-config'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
 import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
@@ -578,10 +579,16 @@ export const RemoteServerFactory = {
          * If the server receives a request containing the base path, remove it before allowing
          * the request through to the other express endpoints
          *
-         * We scope base path removal to /mobify routes and routes defined by the express app
-         * (For example /callback or /worker.js)
+         * We scope base path removal to /mobify routes, /__pwa-kit routes (when showBasePath
+         * is false), and routes defined by the express app (For example /callback or /worker.js).
          * This is to avoid affecting React Router routes where a site id or locale might be present
          * that is equal to the base path.
+         *
+         * /__pwa-kit routes are a special case. These are internal PWA Kit routes
+         * (e.g. /__pwa-kit/refresh) that are registered as React Router routes and are invoked
+         * by the Storefront Preview code on Runtime Admin (which always appends a base path if set).
+         * When showBasePath is false, React Router has no basename, so the base path must be stripped here.
+         * When showBasePath is true, React Router handles the base path via its basename prop.
          *
          * For example, if you have a base path of /us and a site id of /us we don't want
          * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
@@ -590,11 +597,18 @@ export const RemoteServerFactory = {
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
+        const showBasePath = getConfig()?.app?.url?.showBasePath === true
+
         const removeBasePathMiddleware = (req, res, next) => {
             const basePath = getEnvBasePath()
 
             // Fast path: /mobify routes always get the base path removed
-            if (req.path.startsWith(`${basePath}/mobify`)) {
+            // /__pwa-kit routes get the base path removed only when showBasePath is false,
+            // because when showBasePath is true, React Router handles it via basename.
+            if (
+                req.path.startsWith(`${basePath}/mobify`) ||
+                (!showBasePath && req.path.startsWith(`${basePath}/__pwa-kit`))
+            ) {
                 const cleanPath = removeBasePathFromPath(req.path)
                 const {search} = parseRequestUrl(req)
                 req.url = cleanPath + search
