@@ -587,7 +587,9 @@ export const RemoteServerFactory = {
          * /__pwa-kit routes are a special case. These are internal PWA Kit routes
          * (e.g. /__pwa-kit/refresh) that are registered as React Router routes and are invoked
          * by the Storefront Preview code on Runtime Admin (which always appends a base path if set).
-         * When showBasePath is false, React Router has no basename, so the base path must be stripped here.
+         * When showBasePath is false, React Router has no basename, so we redirect to the clean
+         * URL (without base path) so the browser navigates to a path that React Router can match
+         * and hydrate correctly on the client.
          * When showBasePath is true, React Router handles the base path via its basename prop.
          *
          * For example, if you have a base path of /us and a site id of /us we don't want
@@ -603,16 +605,20 @@ export const RemoteServerFactory = {
             const basePath = getEnvBasePath()
 
             // Fast path: /mobify routes always get the base path removed
-            // /__pwa-kit routes get the base path removed only when showBasePath is false,
-            // because when showBasePath is true, React Router handles it via basename.
-            if (
-                req.path.startsWith(`${basePath}/mobify`) ||
-                (!showBasePath && req.path.startsWith(`${basePath}/__pwa-kit`))
-            ) {
+            if (req.path.startsWith(`${basePath}/mobify`)) {
                 const cleanPath = removeBasePathFromPath(req.path)
                 const {search} = parseRequestUrl(req)
                 req.url = cleanPath + search
                 return next()
+            }
+
+            // /__pwa-kit routes: when showBasePath is false, the browser URL still has the
+            // base path but client-side React Router has no basename, so hydration would fail.
+            // Redirect to the clean URL so the browser navigates to a path React Router matches.
+            if (!showBasePath && req.path.startsWith(`${basePath}/__pwa-kit`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const {search} = parseRequestUrl(req)
+                return res.redirect(302, cleanPath + search)
             }
 
             // For other routes, only proceed if path equals basePath or path starts with basePath + '/'

@@ -1501,7 +1501,7 @@ describe('Base path tests', () => {
             })
     }, 15000)
 
-    test('should remove base path from /__pwa-kit routes when showBasePath is false', async () => {
+    test('should redirect /__pwa-kit routes to clean URL when showBasePath is false', async () => {
         jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({
             app: {url: {showBasePath: false}}
@@ -1509,17 +1509,12 @@ describe('Base path tests', () => {
 
         const app = RemoteServerFactory._createApp(opts())
 
-        let capturedPath = null
-        app.use((req, res, next) => {
-            capturedPath = req.path
-            next()
-        })
-
         return request(app)
-            .get('/basepath/__pwa-kit/refresh')
-            .then(() => {
-                // Base path should be stripped since showBasePath is false
-                expect(capturedPath).toBe('/__pwa-kit/refresh')
+            .get('/basepath/__pwa-kit/refresh?referrer=/some-page')
+            .expect(302)
+            .then((response) => {
+                // Should redirect to the clean URL without base path
+                expect(response.headers.location).toBe('/__pwa-kit/refresh?referrer=/some-page')
             })
     }, 15000)
 
