@@ -1397,6 +1397,12 @@ describe('SLAS private client proxy', () => {
 })
 
 describe('Base path tests', () => {
+    beforeEach(() => {
+        // Re-establish the getConfig mock that afterEach's restoreAllMocks clears.
+        // _setupBasePathMiddleware reads getConfig() at setup time.
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
+    })
+
     afterEach(() => {
         jest.restoreAllMocks()
     })
@@ -1492,6 +1498,45 @@ describe('Base path tests', () => {
             .then((response) => {
                 expect(response.status).toBe(200)
                 expect(response.body.message).toBe('test')
+            })
+    }, 15000)
+
+    test('should redirect /__pwa-kit routes to clean URL when showBasePath is false', async () => {
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({
+            app: {url: {showBasePath: false}}
+        })
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        return request(app)
+            .get('/basepath/__pwa-kit/refresh?referrer=/some-page')
+            .expect(302)
+            .then((response) => {
+                // Should redirect to the clean URL without base path
+                expect(response.headers.location).toBe('/__pwa-kit/refresh?referrer=/some-page')
+            })
+    }, 15000)
+
+    test('should not remove base path from /__pwa-kit routes when showBasePath is true', async () => {
+        jest.spyOn(ssrNamespacePaths, 'getEnvBasePath').mockReturnValue('/basepath')
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({
+            app: {url: {showBasePath: true}}
+        })
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        let capturedPath = null
+        app.use((req, res, next) => {
+            capturedPath = req.path
+            next()
+        })
+
+        return request(app)
+            .get('/basepath/__pwa-kit/refresh')
+            .then(() => {
+                // Base path should NOT be stripped since React Router handles it via basename
+                expect(capturedPath).toBe('/basepath/__pwa-kit/refresh')
             })
     }, 15000)
 })
