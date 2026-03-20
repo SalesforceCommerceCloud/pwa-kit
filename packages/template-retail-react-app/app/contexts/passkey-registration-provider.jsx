@@ -73,7 +73,7 @@ PasskeyRegistrationProvider.propTypes = {
     children: PropTypes.node.isRequired
 }
 
-export const usePasskeyRegistration = () => {
+export const usePasskeyRegistrationContext = () => {
     const context = useContext(PasskeyRegistrationContext)
     if (!context) {
         throw new Error(

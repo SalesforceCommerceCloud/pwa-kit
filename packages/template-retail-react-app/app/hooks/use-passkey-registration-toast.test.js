@@ -8,7 +8,7 @@ import React from 'react'
 import {rest} from 'msw'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
+import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
@@ -52,7 +52,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 }))
 
 const TestComponent = () => {
-    const {showRegisterPasskeyToast} = usePasskeyRegistration()
+    const {showRegisterPasskeyToast} = usePasskeyRegistrationContext()
 
     return (
         <div>

@@ -13,12 +13,33 @@ import {
     CloseButton,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
+/**
+ * Custom hook to manage passkey registration toast
+ * @returns {Object} Object containing showToast function
+ */
 export const usePasskeyRegistrationToast = ({onOpenModal}) => {
     const toast = useToast()
     const {formatMessage} = useIntl()
 
+    /**
+     * Shows the passkey registration toast only if passkey is enabled and the browser
+     * supports WebAuthn (platform authenticator and conditional mediation).
+     * Returns a Promise that resolves when the check (and optional toast) is complete.
+     * @returns {Promise<void>}
+     */
     const showToast = async () => {
+        const config = getConfig()
+
+        // Check if passkey is enabled in config
+        if (!config?.app?.login?.passkey?.enabled) return
+
+        // Check if the browser supports user verifying platform authenticator and conditional mediation
+        // User verifying platform authenticator is a feature of the WebAuthn API that allows the browser to use a platform authenticator to verify the user's identity.
+        // Conditional mediation is a feature of the WebAuthn API that allows passkeys to appear in the browser's standard autofill suggestions, alongside saved passwords. This allows users to sign in with a passkey using the standard username input field, rather than clicking a dedicated passkey login button.
+        // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static
+        // https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isConditionalMediationAvailable_static
         if (
             !window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable ||
             !window.PublicKeyCredential?.isConditionalMediationAvailable
