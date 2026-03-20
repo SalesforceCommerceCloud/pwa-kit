@@ -5,12 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
-import {PasskeyRegistrationProvider} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
@@ -65,14 +63,6 @@ const TestComponent = () => {
     )
 }
 
-const TestComponentWithProvider = ({children}) => (
-    <PasskeyRegistrationProvider>{children}</PasskeyRegistrationProvider>
-)
-
-TestComponentWithProvider.propTypes = {
-    children: PropTypes.node.isRequired
-}
-
 describe('usePasskeyRegistration', () => {
     beforeEach(() => {
         jest.clearAllMocks()
@@ -109,22 +99,14 @@ describe('usePasskeyRegistration', () => {
 
     describe('Hook Return Values', () => {
         test('returns showRegisterPasskeyToast function and passkeyModal state', () => {
-            renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            renderWithProviders(<TestComponent />)
 
             expect(screen.getByTestId('show-toast-button')).toBeInTheDocument()
             expect(screen.queryByTestId('passkey-registration-modal')).not.toBeInTheDocument()
         })
 
         test('initializes with modal closed', () => {
-            renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            renderWithProviders(<TestComponent />)
 
             expect(screen.queryByTestId('passkey-registration-modal')).not.toBeInTheDocument()
         })
@@ -132,11 +114,7 @@ describe('usePasskeyRegistration', () => {
 
     describe('Toast Functionality', () => {
         test('displays toast when showRegisterPasskeyToast is called', async () => {
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             const showToastButton = screen.getByTestId('show-toast-button')
             await user.click(showToastButton)
@@ -149,11 +127,7 @@ describe('usePasskeyRegistration', () => {
         })
 
         test('toast contains Create Passkey button', async () => {
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             const showToastButton = screen.getByTestId('show-toast-button')
             await user.click(showToastButton)
@@ -166,11 +140,7 @@ describe('usePasskeyRegistration', () => {
 
     describe('Modal Integration', () => {
         test('clicking Create Passkey button in toast opens modal', async () => {
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             // Show toast
             const showToastButton = screen.getByTestId('show-toast-button')
@@ -191,11 +161,7 @@ describe('usePasskeyRegistration', () => {
         })
 
         test('can close modal using onClose', async () => {
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             // Show toast and open modal
             const showToastButton = screen.getByTestId('show-toast-button')
@@ -250,11 +216,7 @@ describe('usePasskeyRegistration', () => {
             // When passkeyEnabled=false, usePasskeyUser has enabled:false so it never fetches
             mockUsePasskeyUser.mockReturnValue({data: undefined, isFetched: false})
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
             await waitFor(() => {
@@ -279,11 +241,7 @@ describe('usePasskeyRegistration', () => {
             delete global.PublicKeyCredential
             delete global.window.PublicKeyCredential
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -305,11 +263,7 @@ describe('usePasskeyRegistration', () => {
             })
             mockIsUserVerifying.mockResolvedValue(false)
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -331,11 +285,7 @@ describe('usePasskeyRegistration', () => {
             })
             mockIsConditionalMediation.mockResolvedValue(false)
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -352,11 +302,7 @@ describe('usePasskeyRegistration', () => {
                 isFetched: true
             })
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -371,11 +317,7 @@ describe('usePasskeyRegistration', () => {
                 isFetched: true
             })
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -392,11 +334,7 @@ describe('usePasskeyRegistration', () => {
                 isFetched: true
             })
 
-            const {user} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user} = renderWithProviders(<TestComponent />)
 
             await user.click(screen.getByTestId('show-toast-button'))
 
@@ -413,11 +351,7 @@ describe('usePasskeyRegistration', () => {
                 isFetched: false
             })
 
-            const {user, rerender} = renderWithProviders(
-                <TestComponentWithProvider>
-                    <TestComponent />
-                </TestComponentWithProvider>
-            )
+            const {user, rerender} = renderWithProviders(<TestComponent />)
 
             // Click while passkey data is still loading — toast must not appear yet
             await user.click(screen.getByTestId('show-toast-button'))
