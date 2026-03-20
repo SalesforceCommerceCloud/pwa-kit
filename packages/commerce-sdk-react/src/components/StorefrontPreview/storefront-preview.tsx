@@ -27,6 +27,28 @@ function removeBasePathFromPath(path: string, basePath: string): string {
     return matches ? path.slice(basePath.length) || '/' : path
 }
 
+const PWA_KIT_PATH_PREFIX = '/__pwa-kit/'
+
+/**
+ * Runtime Admin always prepends envBasePath to /__pwa-kit/ paths (e.g. /test/__pwa-kit/refresh),
+ * but when showBasePath is false, React Router has no basename and expects /__pwa-kit/refresh.
+ * 
+ * This ensures that regardless of the showBasePath setting, these paths are normalized to 
+ * remove the base path.
+ */
+function normalizePwaKitPath<T>(pathOrLocation: LocationDescriptor<T>): LocationDescriptor<T> {
+    if (typeof pathOrLocation === 'string') {
+        const idx = pathOrLocation.indexOf(PWA_KIT_PATH_PREFIX)
+        return idx > 0 ? pathOrLocation.slice(idx) : pathOrLocation
+    }
+    const pathname = pathOrLocation.pathname ?? '/'
+    const idx = pathname.indexOf(PWA_KIT_PATH_PREFIX)
+    if (idx > 0) {
+        return {...pathOrLocation, pathname: pathname.slice(idx)}
+    }
+    return pathOrLocation
+}
+
 /**
  * Strip the base path from a path
  *
@@ -53,8 +75,8 @@ function removeBasePathFromLocation<T>(
  * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
  * This flag only applies if storefront is running in a Runtime Admin iframe.
  * @param getToken - A method that returns the access token for the current user
- * @param getBasePath - A method that returns the router base path of the app. Requird if using
- * base path for router routes (showBasePath is true in url config).
+ * @param getBasePath - A method that returns the router base path of the app.
+ * Required if using a base path for router routes (showBasePath is true in url config).
  */
 export const StorefrontPreview = ({
     children,
@@ -88,7 +110,8 @@ export const StorefrontPreview = ({
                     ...args: unknown[]
                 ) => {
                     const basePath = getBasePath?.() ?? ''
-                    const pathWithoutBase = removeBasePathFromLocation(path, basePath)
+                    const normalizedPath = normalizePwaKitPath(path)
+                    const pathWithoutBase = removeBasePathFromLocation(normalizedPath, basePath)
                     history[action](pathWithoutBase, ...args)
                 }
             }

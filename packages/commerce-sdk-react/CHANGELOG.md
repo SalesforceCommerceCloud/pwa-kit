@@ -1,5 +1,6 @@
-## v5.1.1-preview.0 (Mar 13, 2026)
+## v5.1.1 (Mar 20, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+- Remove base path from /__pwa-kit route requests when showBasePath is false [#3758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3758)
 
 ## v5.1.0 (Mar 12, 2026)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
