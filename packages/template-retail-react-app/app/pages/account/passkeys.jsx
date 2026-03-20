@@ -21,7 +21,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {usePasskeyUser} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 const AccountPasskeys = () => {
     const {formatMessage} = useIntl()
@@ -31,7 +31,7 @@ const AccountPasskeys = () => {
     const isPasskeyEnabled = config?.app?.login?.passkey?.enabled
 
     const {data: customer} = useCurrentCustomer()
-    const {passkeyModal} = usePasskeyRegistration()
+    const {passkeyModal} = usePasskeyRegistrationContext()
 
     const loginId = useMemo(
         () => customer?.login || customer?.email || '',

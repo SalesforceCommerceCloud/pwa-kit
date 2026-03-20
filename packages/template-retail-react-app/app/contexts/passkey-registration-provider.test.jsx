@@ -14,6 +14,31 @@ import {
     usePasskeyRegistrationContext
 } from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({app: {login: {passkey: {enabled: false}}}}))
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    usePasskeyUser: jest.fn(() => ({data: undefined, isFetched: false}))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: jest.fn(() => ({data: undefined}))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+    const actual = jest.requireActual('@salesforce/retail-react-app/app/components/shared/ui')
+    return {
+        ...actual,
+        useToast: jest.fn(() => jest.fn())
+    }
+})
+
+jest.mock('react-intl', () => ({
+    ...jest.requireActual('react-intl'),
+    useIntl: jest.fn(() => ({formatMessage: ({defaultMessage}) => defaultMessage}))
+}))
+
 // Mock PasskeyRegistrationModal
 let mockOnSuccessCallback = null
 jest.mock('@salesforce/retail-react-app/app/components/passkey-registration-modal', () => {

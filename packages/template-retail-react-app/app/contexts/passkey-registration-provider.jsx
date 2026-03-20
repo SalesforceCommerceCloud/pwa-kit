@@ -5,16 +5,45 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {createContext, useContext, useRef} from 'react'
+import React, {createContext, useContext, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
+import {usePasskeyUser} from '@salesforce/commerce-sdk-react'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PasskeyRegistrationModal from '@salesforce/retail-react-app/app/components/passkey-registration-modal'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {usePasskeyRegistrationToast} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration-toast'
 
 export const PasskeyRegistrationContext = createContext(null)
 
 export const PasskeyRegistrationProvider = ({children}) => {
     const passkeyModal = useDisclosure()
     const onSuccessRef = useRef(null)
+    const [pendingToast, setPendingToast] = useState(false)
+
+    const {showToast} = usePasskeyRegistrationToast({onOpenModal: passkeyModal.onOpen})
+
+    const {data: customer} = useCurrentCustomer()
+    const loginId = customer?.login || customer?.email || ''
+    const isRegistered = !!customer?.isRegistered
+    const passkeyEnabled = !!getConfig()?.app?.login?.passkey?.enabled
+
+    const {data: passkeyUser, isFetched} = usePasskeyUser(
+        {loginId},
+        {enabled: passkeyEnabled && isRegistered && !!loginId}
+    )
+
+    useEffect(() => {
+        // Wait for passkey user data to be fetched
+        if (!pendingToast || !isFetched) return
+        setPendingToast(false)
+
+        // If user has passkeys, don't show toast
+        const hasPasskeys = (passkeyUser?.credentials?.length ?? 0) > 0
+        if (hasPasskeys) return
+
+        showToast()
+    }, [isFetched, passkeyUser, pendingToast])
 
     const value = {
         passkeyModal: {
@@ -24,7 +53,8 @@ export const PasskeyRegistrationProvider = ({children}) => {
             setOnSuccess: (fn) => {
                 onSuccessRef.current = fn
             }
-        }
+        },
+        showRegisterPasskeyToast: () => setPendingToast(true)
     }
 
     return (

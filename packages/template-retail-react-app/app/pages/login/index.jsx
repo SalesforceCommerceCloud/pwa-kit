@@ -25,7 +25,7 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
@@ -80,7 +80,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
-    const {showRegisterPasskeyToast} = usePasskeyRegistration()
+    const {showRegisterPasskeyToast} = usePasskeyRegistrationContext()
     const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 

@@ -13,16 +13,14 @@ import {
     CloseButton,
     useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
- * Custom hook to manage passkey registration prompt (toast and modal)
- * @returns {Object} Object containing showToast and passkey modal state
+ * Custom hook to manage passkey registration toast
+ * @returns {Object} Object containing showToast function
  */
-export const usePasskeyRegistration = () => {
+export const usePasskeyRegistrationToast = ({onOpenModal}) => {
     const toast = useToast()
-    const {passkeyModal} = usePasskeyRegistrationContext()
     const {formatMessage} = useIntl()
 
     /**
@@ -31,7 +29,7 @@ export const usePasskeyRegistration = () => {
      * Returns a Promise that resolves when the check (and optional toast) is complete.
      * @returns {Promise<void>}
      */
-    const showRegisterPasskeyToast = async () => {
+    const showToast = async () => {
         const config = getConfig()
 
         // Check if passkey is enabled in config
@@ -91,7 +89,7 @@ export const usePasskeyRegistration = () => {
                         colorScheme="whiteAlpha"
                         onClick={() => {
                             onClose()
-                            passkeyModal.onOpen()
+                            onOpenModal()
                         }}
                     >
                         {formatMessage({
@@ -104,8 +102,5 @@ export const usePasskeyRegistration = () => {
         })
     }
 
-    return {
-        showRegisterPasskeyToast,
-        passkeyModal
-    }
+    return {showToast}
 }
