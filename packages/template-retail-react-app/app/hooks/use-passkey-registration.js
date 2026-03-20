@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {useIntl} from 'react-intl'
+import {usePasskeyUser} from '@salesforce/commerce-sdk-react'
 import {
     Box,
     Button,
@@ -15,28 +16,34 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {usePasskeyRegistrationContext} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 /**
  * Custom hook to manage passkey registration prompt (toast and modal)
- * @returns {Object} Object containing showToast and passkey modal state
+ * @returns {Object} Object containing showRegisterPasskeyToast and passkey modal state
  */
 export const usePasskeyRegistration = () => {
     const toast = useToast()
     const {passkeyModal} = usePasskeyRegistrationContext()
     const {formatMessage} = useIntl()
 
+    const {data: customer} = useCurrentCustomer()
+    const [pendingToast, setPendingToast] = useState(false)
+
+    const loginId = customer?.login || customer?.email || ''
+    const isRegistered = !!customer?.isRegistered
+    const passkeyEnabled = !!getConfig()?.app?.login?.passkey?.enabled
+
+    const {data: passkeyUser, isFetched} = usePasskeyUser(
+        {loginId},
+        {enabled: passkeyEnabled && isRegistered && !!loginId}
+    )
+
     /**
-     * Shows the passkey registration toast only if passkey is enabled and the browser
-     * supports WebAuthn (platform authenticator and conditional mediation).
-     * Returns a Promise that resolves when the check (and optional toast) is complete.
-     * @returns {Promise<void>}
+     * Shows toast after verifying browser supports WebAuthn platform authenticator
+     * and conditional mediation.
      */
-    const showRegisterPasskeyToast = async () => {
-        const config = getConfig()
-
-        // Check if passkey is enabled in config
-        if (!config?.app?.login?.passkey?.enabled) return
-
+    const checkBrowserAndShowToast = async () => {
         // Check if the browser supports user verifying platform authenticator and conditional mediation
         // User verifying platform authenticator is a feature of the WebAuthn API that allows the browser to use a platform authenticator to verify the user's identity.
         // Conditional mediation is a feature of the WebAuthn API that allows passkeys to appear in the browser's standard autofill suggestions, alongside saved passwords. This allows users to sign in with a passkey using the standard username input field, rather than clicking a dedicated passkey login button.
@@ -103,6 +110,25 @@ export const usePasskeyRegistration = () => {
             )
         })
     }
+
+    useEffect(() => {
+        // Wait for passkey data to be fetched
+        if (!pendingToast || !isFetched) return
+        setPendingToast(false)
+
+        const hasPasskeys = (passkeyUser?.credentials?.length ?? 0) > 0
+        // If user has passkeys, don't show toast
+        if (hasPasskeys) return
+
+        checkBrowserAndShowToast()
+    }, [isFetched, passkeyUser, pendingToast])
+
+    /**
+     * Shows the passkey registration toast only if passkey is enabled, the browser
+     * supports WebAuthn, and the user has no existing passkeys.
+     * If passkey user data is still loading, defers the decision until data arrives.
+     */
+    const showRegisterPasskeyToast = () => setPendingToast(true)
 
     return {
         showRegisterPasskeyToast,

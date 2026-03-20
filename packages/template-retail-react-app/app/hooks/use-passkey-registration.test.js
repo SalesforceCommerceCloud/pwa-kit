@@ -40,9 +40,11 @@ jest.mock('@salesforce/retail-react-app/app/components/passkey-registration-moda
 // Mock Commerce SDK hooks
 const mockMutateAsync = jest.fn()
 const mockUseAuthHelper = jest.fn()
+const mockUsePasskeyUser = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
-    useAuthHelper: (param) => mockUseAuthHelper(param)
+    useAuthHelper: (param) => mockUseAuthHelper(param),
+    usePasskeyUser: (...args) => mockUsePasskeyUser(...args)
 }))
 
 // Mock useCurrentCustomer
@@ -76,11 +78,21 @@ describe('usePasskeyRegistration', () => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(mockConfig)
         mockUseCurrentCustomer.mockReturnValue({
-            data: {email: 'test@example.com'}
+            data: {email: 'test@example.com', isRegistered: true}
         })
         mockUseAuthHelper.mockReturnValue({
             mutateAsync: mockMutateAsync
         })
+        mockUsePasskeyUser.mockReturnValue({
+            data: {credentials: []},
+            isFetched: true
+        })
+
+        global.PublicKeyCredential = {
+            isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true),
+            isConditionalMediationAvailable: jest.fn().mockResolvedValue(true)
+        }
+        global.window.PublicKeyCredential = global.PublicKeyCredential
 
         // Mock product API calls that may be triggered by components in the provider tree
         global.server.use(
@@ -88,6 +100,11 @@ describe('usePasskeyRegistration', () => {
                 return res(ctx.delay(0), ctx.status(200), ctx.json({data: []}))
             })
         )
+    })
+
+    afterEach(() => {
+        delete global.PublicKeyCredential
+        delete global.window.PublicKeyCredential
     })
 
     describe('Hook Return Values', () => {
@@ -114,20 +131,6 @@ describe('usePasskeyRegistration', () => {
     })
 
     describe('Toast Functionality', () => {
-        beforeEach(() => {
-            getConfig.mockReturnValue(mockConfig)
-            global.PublicKeyCredential = {
-                isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true),
-                isConditionalMediationAvailable: jest.fn().mockResolvedValue(true)
-            }
-            global.window.PublicKeyCredential = global.PublicKeyCredential
-        })
-
-        afterEach(() => {
-            delete global.PublicKeyCredential
-            delete global.window.PublicKeyCredential
-        })
-
         test('displays toast when showRegisterPasskeyToast is called', async () => {
             const {user} = renderWithProviders(
                 <TestComponentWithProvider>
@@ -162,20 +165,6 @@ describe('usePasskeyRegistration', () => {
     })
 
     describe('Modal Integration', () => {
-        beforeEach(() => {
-            getConfig.mockReturnValue(mockConfig)
-            global.PublicKeyCredential = {
-                isUserVerifyingPlatformAuthenticatorAvailable: jest.fn().mockResolvedValue(true),
-                isConditionalMediationAvailable: jest.fn().mockResolvedValue(true)
-            }
-            global.window.PublicKeyCredential = global.PublicKeyCredential
-        })
-
-        afterEach(() => {
-            delete global.PublicKeyCredential
-            delete global.window.PublicKeyCredential
-        })
-
         test('clicking Create Passkey button in toast opens modal', async () => {
             const {user} = renderWithProviders(
                 <TestComponentWithProvider>
@@ -233,7 +222,7 @@ describe('usePasskeyRegistration', () => {
         })
     })
 
-    describe('Preconditions for showing the toast', () => {
+    describe('Config and browser capability checks', () => {
         let mockIsUserVerifying
         let mockIsConditionalMediation
 
@@ -247,11 +236,6 @@ describe('usePasskeyRegistration', () => {
             global.window.PublicKeyCredential = global.PublicKeyCredential
         })
 
-        afterEach(() => {
-            delete global.PublicKeyCredential
-            delete global.window.PublicKeyCredential
-        })
-
         test('does not display toast when passkey is disabled in config', async () => {
             getConfig.mockReturnValue({
                 ...mockConfig,
@@ -263,6 +247,8 @@ describe('usePasskeyRegistration', () => {
                     }
                 }
             })
+            // When passkeyEnabled=false, usePasskeyUser has enabled:false so it never fetches
+            mockUsePasskeyUser.mockReturnValue({data: undefined, isFetched: false})
 
             const {user} = renderWithProviders(
                 <TestComponentWithProvider>
@@ -356,6 +342,102 @@ describe('usePasskeyRegistration', () => {
             expect(
                 screen.queryByText('Create a passkey for a more secure and easier login')
             ).not.toBeInTheDocument()
+        })
+    })
+
+    describe('Passkey user data checks', () => {
+        test('does not show toast when user already has passkeys', async () => {
+            mockUsePasskeyUser.mockReturnValue({
+                data: {credentials: [{id: 'cred-1', nickname: 'My Passkey'}]},
+                isFetched: true
+            })
+
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
+
+            await user.click(screen.getByTestId('show-toast-button'))
+
+            expect(
+                screen.queryByText('Create a passkey for a more secure and easier login')
+            ).not.toBeInTheDocument()
+        })
+
+        test('shows toast when user has no passkeys', async () => {
+            mockUsePasskeyUser.mockReturnValue({
+                data: {credentials: []},
+                isFetched: true
+            })
+
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
+
+            await user.click(screen.getByTestId('show-toast-button'))
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText('Create a passkey for a more secure and easier login')
+                ).toBeInTheDocument()
+            })
+        })
+
+        test('shows toast when usePasskeyUser errors (safe fallback)', async () => {
+            mockUsePasskeyUser.mockReturnValue({
+                data: undefined,
+                isFetched: true
+            })
+
+            const {user} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
+
+            await user.click(screen.getByTestId('show-toast-button'))
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText('Create a passkey for a more secure and easier login')
+                ).toBeInTheDocument()
+            })
+        })
+
+        test('shows toast after data loads when called while query was in-flight', async () => {
+            mockUsePasskeyUser.mockReturnValue({
+                data: undefined,
+                isFetched: false
+            })
+
+            const {user, rerender} = renderWithProviders(
+                <TestComponentWithProvider>
+                    <TestComponent />
+                </TestComponentWithProvider>
+            )
+
+            // Click while passkey data is still loading — toast must not appear yet
+            await user.click(screen.getByTestId('show-toast-button'))
+
+            expect(
+                screen.queryByText('Create a passkey for a more secure and easier login')
+            ).not.toBeInTheDocument()
+
+            // Passkey data arrives: user has no passkeys — trigger a re-render
+            mockUsePasskeyUser.mockReturnValue({
+                data: {credentials: []},
+                isFetched: true
+            })
+            await rerender()
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText('Create a passkey for a more secure and easier login')
+                ).toBeInTheDocument()
+            })
         })
     })
 })
