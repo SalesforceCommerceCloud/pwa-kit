@@ -1,6 +1,9 @@
-## v3.18.0-dev (Mar 12, 2026)
-- Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750).
+## v3.18.0-dev (Mar 20, 2026)
+- Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
+
+## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+- Remove base path from /__pwa-kit route requests when showBasePath is false [#3758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3758)
 
 ## v3.17.0 (Mar 12, 2026)
 - Add Node 24 support. Migrate deprecated Node.js `url.parse()` and `url.format()` to the WHATWG `URL` [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)

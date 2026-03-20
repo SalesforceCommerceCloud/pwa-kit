@@ -1,4 +1,6 @@
-## v9.2.0-dev (Mar 12, 2026)
+## v9.2.0-dev (Mar 20, 2026)
+
+## v9.1.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
 ## v9.1.0 (Mar 12, 2026)

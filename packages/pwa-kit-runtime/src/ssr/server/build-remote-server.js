@@ -54,6 +54,7 @@ import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
+import {getConfig} from '../../utils/ssr-config'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
 import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
@@ -578,10 +579,18 @@ export const RemoteServerFactory = {
          * If the server receives a request containing the base path, remove it before allowing
          * the request through to the other express endpoints
          *
-         * We scope base path removal to /mobify routes and routes defined by the express app
-         * (For example /callback or /worker.js)
+         * We scope base path removal to /mobify routes, /__pwa-kit routes (when showBasePath
+         * is false), and routes defined by the express app (For example /callback or /worker.js).
          * This is to avoid affecting React Router routes where a site id or locale might be present
          * that is equal to the base path.
+         *
+         * /__pwa-kit routes are a special case. These are internal PWA Kit routes
+         * (e.g. /__pwa-kit/refresh) that are registered as React Router routes and are invoked
+         * by the Storefront Preview code on Runtime Admin (which always appends a base path if set).
+         * When showBasePath is false, React Router has no basename, so we redirect to the clean
+         * URL (without base path) so the browser navigates to a path that React Router can match
+         * and hydrate correctly on the client.
+         * When showBasePath is true, React Router handles the base path via its basename prop.
          *
          * For example, if you have a base path of /us and a site id of /us we don't want
          * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
@@ -590,6 +599,8 @@ export const RemoteServerFactory = {
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
+        const showBasePath = getConfig()?.app?.url?.showBasePath === true
+
         const removeBasePathMiddleware = (req, res, next) => {
             const basePath = getEnvBasePath()
 
@@ -599,6 +610,15 @@ export const RemoteServerFactory = {
                 const {search} = parseRequestUrl(req)
                 req.url = cleanPath + search
                 return next()
+            }
+
+            // /__pwa-kit routes: when showBasePath is false, the browser URL still has the
+            // base path but client-side React Router has no basename, so hydration would fail.
+            // Redirect to the clean URL so the browser navigates to a path React Router matches.
+            if (!showBasePath && req.path.startsWith(`${basePath}/__pwa-kit`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const {search} = parseRequestUrl(req)
+                return res.redirect(302, cleanPath + search)
             }
 
             // For other routes, only proceed if path equals basePath or path starts with basePath + '/'
