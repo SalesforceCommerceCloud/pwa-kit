@@ -21,7 +21,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {usePasskeyUser} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 
 const AccountPasskeys = () => {
     const {formatMessage} = useIntl()

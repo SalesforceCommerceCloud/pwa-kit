@@ -8,7 +8,7 @@ import React from 'react'
 import {rest} from 'msw'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/contexts/passkey-registration-provider'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
@@ -336,6 +336,19 @@ describe('usePasskeyRegistration', () => {
 
             const {user} = renderWithProviders(<TestComponent />)
 
+            await user.click(screen.getByTestId('show-toast-button'))
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText('Create a passkey for a more secure and easier login')
+                ).toBeInTheDocument()
+            })
+        })
+
+        test('shows toast when user has no passkey account (404 returns null)', async () => {
+            mockUsePasskeyUser.mockReturnValue({data: null, isFetched: true})
+
+            const {user} = renderWithProviders(<TestComponent />)
             await user.click(screen.getByTestId('show-toast-button'))
 
             await waitFor(() => {
