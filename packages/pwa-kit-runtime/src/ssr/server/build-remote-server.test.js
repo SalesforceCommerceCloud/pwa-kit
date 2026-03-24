@@ -810,10 +810,7 @@ describe('HttpOnly session cookies', () => {
 
             const response = await request(app)
                 .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
-                .set(
-                    'Cookie',
-                    'cc-nx-g_testsite=mock-guest-refresh-token'
-                )
+                .set('Cookie', 'cc-nx-g_testsite=mock-guest-refresh-token')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
 
@@ -880,10 +877,7 @@ describe('HttpOnly session cookies', () => {
             // Regular token request (e.g. guest login) — no x-grant-type header
             const response = await request(app)
                 .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
-                .set(
-                    'Cookie',
-                    'cc-nx-g_testsite=mock-guest-refresh-token'
-                )
+                .set('Cookie', 'cc-nx-g_testsite=mock-guest-refresh-token')
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(200)

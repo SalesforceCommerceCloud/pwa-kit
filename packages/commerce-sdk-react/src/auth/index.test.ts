@@ -1635,10 +1635,12 @@ describe('HttpOnly Session Cookies', () => {
         // Capture the header value during the refresh call
         let headerDuringCall: string | undefined
         const refreshMock = helpers.refreshAccessToken as jest.Mock
-        refreshMock.mockImplementationOnce((options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
-            headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
-            return Promise.resolve(TOKEN_RESPONSE)
-        })
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
 
         await auth.ready()
 
@@ -1691,10 +1693,12 @@ describe('HttpOnly Session Cookies', () => {
 
         let headerDuringCall: string | undefined
         const refreshMock = helpers.refreshAccessToken as jest.Mock
-        refreshMock.mockImplementationOnce((options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
-            headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
-            return Promise.resolve(TOKEN_RESPONSE)
-        })
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
 
         await auth.ready()
 
