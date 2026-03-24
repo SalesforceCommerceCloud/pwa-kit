@@ -6,7 +6,7 @@
  */
 import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
-import {SET_COOKIE} from './constants'
+import {SET_COOKIE, X_SITE_ID} from './constants'
 import logger from '../../utils/logger-instance'
 
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
@@ -68,7 +68,7 @@ function getTokenClaims(accessToken) {
  * @private
  */
 export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
-    const siteId = req.headers?.['x-site-id']
+    const siteId = req.headers?.[X_SITE_ID]
     if (!siteId) {
         throw new Error(
             'HttpOnly session cookies are enabled but siteId is missing. ' +

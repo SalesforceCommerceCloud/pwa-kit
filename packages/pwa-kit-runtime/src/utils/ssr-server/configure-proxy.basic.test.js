@@ -9,6 +9,7 @@ import {
     setScapiAuthRequestHeaders,
     configureProxy
 } from './configure-proxy'
+import {X_SITE_ID} from '../../ssr/server/constants'
 import * as ssrProxying from '../ssr-proxying'
 import * as utils from './utils'
 import cookie from 'cookie'
@@ -121,7 +122,7 @@ describe('setScapiAuthRequestHeaders', () => {
             url: '/shopper/products/v1/products',
             headers: {
                 cookie: 'cc-at_RefArch=test-access-token',
-                'x-site-id': 'RefArch'
+                [X_SITE_ID]: 'RefArch'
             }
         }
 
@@ -149,7 +150,7 @@ describe('setScapiAuthRequestHeaders', () => {
             url: '/shopper/products/v1/products',
             headers: {
                 cookie: 'cc-at_RefArch=test-access-token',
-                'x-site-id': 'RefArch'
+                [X_SITE_ID]: 'RefArch'
             }
         }
 
@@ -201,7 +202,7 @@ describe('setScapiAuthRequestHeaders', () => {
             url: '/api/products',
             headers: {
                 cookie: 'cc-at_RefArch=test-access-token',
-                'x-site-id': 'RefArch'
+                [X_SITE_ID]: 'RefArch'
             }
         }
 
@@ -224,7 +225,7 @@ describe('setScapiAuthRequestHeaders', () => {
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {'x-site-id': 'RefArch'}
+            headers: {[X_SITE_ID]: 'RefArch'}
         }
 
         setScapiAuthRequestHeaders({
@@ -249,7 +250,7 @@ describe('setScapiAuthRequestHeaders', () => {
             url: '/shopper/products/v1/products',
             headers: {
                 cookie: 'cc-at_OtherSite=other-access-token',
-                'x-site-id': 'OtherSite'
+                [X_SITE_ID]: 'OtherSite'
             }
         }
 

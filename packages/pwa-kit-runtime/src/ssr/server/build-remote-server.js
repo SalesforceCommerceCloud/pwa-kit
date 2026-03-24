@@ -16,7 +16,9 @@ import {
     X_ENCODED_HEADERS,
     CONTENT_SECURITY_POLICY,
     SLAS_TOKEN_RESPONSE_ENDPOINTS,
-    SLAS_LOGOUT_ENDPOINT
+    SLAS_LOGOUT_ENDPOINT,
+    X_SITE_ID,
+    X_GRANT_TYPE
 } from './constants'
 import {
     catchAndLog,
@@ -106,7 +108,7 @@ export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers['x-site-id']
+    const siteId = incomingRequest.headers[X_SITE_ID]
     if (!siteId) {
         logger.warn(
             'x-site-id header is missing on SLAS token request. ' +
@@ -135,7 +137,7 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers['x-site-id']
+    const siteId = incomingRequest.headers[X_SITE_ID]
     if (!siteId) {
         logger.warn(
             'x-site-id header is missing on SLAS logout request. ' +
@@ -1037,17 +1039,25 @@ export const RemoteServerFactory = {
                         // from the HttpOnly cookie as the sfdc_refresh_token header. SLAS uses
                         // this header as a fallback for grant_type=refresh_token requests when
                         // the refresh_token body parameter is empty.
+                        // The SDK sends x-grant-type: refresh_token to signal this is a refresh request.
                         if (
                             process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
-                            incomingRequest.path?.match(/\/oauth2\/token$/)
+                            incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token'
                         ) {
                             setRefreshTokenHeader(proxyRequest, incomingRequest)
+                            // Remove the signal header — it's only for our proxy, not SLAS.
+                            proxyRequest.removeHeader(X_GRANT_TYPE)
                         }
                     } else if (
                         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
                         incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
                     ) {
                         setTokensInLogoutRequest(proxyRequest, incomingRequest)
+                    }
+
+                    // Strip internal headers that are only used by our proxy, not by SLAS.
+                    if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
+                        proxyRequest.removeHeader(X_SITE_ID)
                     }
 
                     // Allow users to apply additional custom modifications to the proxy request

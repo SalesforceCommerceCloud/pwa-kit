@@ -12,6 +12,7 @@ import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging, isScapiDomain} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
+import {X_SITE_ID} from '../../ssr/server/constants'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -51,7 +52,7 @@ export const setScapiAuthRequestHeaders = ({
     targetHost
 }) => {
     const url = incomingRequest.url
-    const resolvedSiteId = incomingRequest.headers?.['x-site-id']
+    const resolvedSiteId = incomingRequest.headers?.[X_SITE_ID]
 
     // Skip if: caching proxy, not SCAPI domain, or no URL
     if (caching || !isScapiDomain(targetHost) || !url) {
@@ -268,6 +269,8 @@ export const configureProxy = ({
                     caching,
                     targetHost
                 })
+                // Strip internal header — only used by our proxy, not by SCAPI.
+                proxyRequest.removeHeader(X_SITE_ID)
             }
         },
 

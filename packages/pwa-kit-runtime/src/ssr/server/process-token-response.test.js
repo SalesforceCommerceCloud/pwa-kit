@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {getRefreshTokenCookieTTL, setHttpOnlySessionCookies} from './process-token-response'
+import {X_SITE_ID} from './constants'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
 jest.mock('../../utils/logger-instance', () => ({
@@ -25,7 +26,7 @@ function makeJWT(payload) {
 }
 
 function makeReq(siteId = 'testsite') {
-    return {headers: {'x-site-id': siteId}}
+    return {headers: {[X_SITE_ID]: siteId}}
 }
 
 function makeRes() {
