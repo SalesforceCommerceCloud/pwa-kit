@@ -30,7 +30,8 @@ import {
     SLAS_SECRET_OVERRIDE_MSG,
     DNT_COOKIE_NAME,
     DWSID_COOKIE_NAME,
-    SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG
+    SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
+    X_GRANT_TYPE
 } from '../constant'
 
 import {Logger} from '../types'
@@ -745,14 +746,27 @@ class Auth {
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
-        if (refreshToken) {
+
+        // When HttpOnly session cookies are enabled on the client, the refresh token is in an
+        // HttpOnly cookie that JavaScript cannot read. We still attempt the refresh request —
+        // the SLAS private proxy injects the refresh token via the sfdc_refresh_token header.
+        const hasHttpOnlyRefreshToken =
+            !refreshToken && this.enableHttpOnlySessionCookies && onClient()
+
+        if (refreshToken || hasHttpOnlyRefreshToken) {
             try {
+                const isGuest = this.get('customer_type') !== 'registered'
+                // Signal the proxy that this is a refresh token request so it can
+                // inject the HttpOnly refresh token cookie as the sfdc_refresh_token header.
+                if (this.enableHttpOnlySessionCookies) {
+                    this.client.clientConfig.headers[X_GRANT_TYPE] = 'refresh_token'
+                }
                 return await this.queueRequest(
                     () =>
                         helpers.refreshAccessToken({
                             slasClient: this.client,
                             parameters: {
-                                refreshToken,
+                                refreshToken: refreshToken || '',
                                 dnt: dntPref
                             },
                             credentials: {
@@ -760,7 +774,7 @@ class Auth {
                             },
                             enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
                         }),
-                    !!refreshTokenGuest
+                    isGuest
                 )
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
@@ -774,6 +788,8 @@ class Auth {
                         this.clearStorage()
                     }
                 }
+            } finally {
+                delete this.client.clientConfig.headers[X_GRANT_TYPE]
             }
         }
 

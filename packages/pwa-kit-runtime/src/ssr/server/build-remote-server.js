@@ -16,7 +16,9 @@ import {
     X_ENCODED_HEADERS,
     CONTENT_SECURITY_POLICY,
     SLAS_TOKEN_RESPONSE_ENDPOINTS,
-    SLAS_LOGOUT_ENDPOINT
+    SLAS_LOGOUT_ENDPOINT,
+    X_SITE_ID,
+    X_GRANT_TYPE
 } from './constants'
 import {
     catchAndLog,
@@ -95,6 +97,36 @@ export const isBinary = (headers) => {
 }
 
 /**
+ * Inject the refresh token from HttpOnly cookies as the sfdc_refresh_token header.
+ * SLAS uses sfdc_refresh_token as a fallback when the refresh_token body parameter is
+ * missing or empty (which is the case when HttpOnly session cookies are enabled, because
+ * client-side JavaScript cannot read the HttpOnly refresh token cookie).
+ * @private
+ */
+export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = incomingRequest.headers[X_SITE_ID]
+    if (!siteId) {
+        logger.warn(
+            'x-site-id header is missing on SLAS token request. ' +
+                'Refresh token header injection skipped. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.',
+            {namespace: 'setRefreshTokenHeader'}
+        )
+        return
+    }
+
+    // Try registered refresh token first, then guest
+    const refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
+    if (refreshToken) {
+        proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
+    }
+}
+
+/**
  * Inject Bearer token and refresh token from HttpOnly cookies for the SLAS logout endpoint.
  * Reads the access token and refresh token from cookies keyed by siteId (from the x-site-id header),
  * sets the Authorization header, and appends refresh_token to the query string.
@@ -105,7 +137,7 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers['x-site-id']
+    const siteId = incomingRequest.headers[X_SITE_ID]
     if (!siteId) {
         logger.warn(
             'x-site-id header is missing on SLAS logout request. ' +
@@ -1002,11 +1034,30 @@ export const RemoteServerFactory = {
                         // SLAS logout (/oauth2/logout), use the Authorization header for a different
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+
+                        // When HttpOnly session cookies are enabled, inject the refresh token
+                        // from the HttpOnly cookie as the sfdc_refresh_token header. SLAS uses
+                        // this header as a fallback for grant_type=refresh_token requests when
+                        // the refresh_token body parameter is empty.
+                        // The SDK sends x-grant-type: refresh_token to signal this is a refresh request.
+                        if (
+                            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
+                            incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token'
+                        ) {
+                            setRefreshTokenHeader(proxyRequest, incomingRequest)
+                            // Remove the signal header — it's only for our proxy, not SLAS.
+                            proxyRequest.removeHeader(X_GRANT_TYPE)
+                        }
                     } else if (
                         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
                         incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
                     ) {
                         setTokensInLogoutRequest(proxyRequest, incomingRequest)
+                    }
+
+                    // Strip internal headers that are only used by our proxy, not by SLAS.
+                    if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
+                        proxyRequest.removeHeader(X_SITE_ID)
                     }
 
                     // Allow users to apply additional custom modifications to the proxy request

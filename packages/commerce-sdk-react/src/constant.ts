@@ -44,6 +44,9 @@ export const EXCLUDE_COOKIE_SUFFIX = [DWSID_COOKIE_NAME, DNT_COOKIE_NAME]
  */
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
 
+// Custom header sent by the SDK to signal a refresh token request to the proxy.
+export const X_GRANT_TYPE = 'x-grant-type'
+
 export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',
     SHOPPER_BASKETS_V2: 'shopperBasketsV2',

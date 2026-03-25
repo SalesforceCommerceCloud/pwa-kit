@@ -9,7 +9,7 @@ import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-import {SLAS_SECRET_PLACEHOLDER} from '../constant'
+import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
@@ -62,6 +62,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     clientId: 'clientId',
                     siteId: 'siteId'
                 },
+                headers: config?.headers || {},
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
@@ -1538,7 +1539,13 @@ describe('HttpOnly Session Cookies', () => {
         const loginGuestMock = helpers.loginGuestUser as jest.Mock
         loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
 
-        // First call: triggers loginGuestUser
+        // With HttpOnly cookies enabled, the first ready() attempts a refresh (since JS
+        // can't read the HttpOnly refresh token cookie). On a fresh session there's no
+        // refresh token cookie, so SLAS rejects — then it falls through to loginGuestUser.
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockRejectedValueOnce(new Error('no refresh token'))
+
+        // First call: refresh fails, falls through to loginGuestUser
         await auth.ready()
 
         // Set cc-at-expires cookie (as server would via Set-Cookie header)
@@ -1609,5 +1616,94 @@ describe('HttpOnly Session Cookies', () => {
         expect(auth.get('access_token')).toBe(TOKEN_RESPONSE.access_token)
         expect(auth.get('refresh_token_guest')).toBe(TOKEN_RESPONSE.refresh_token)
         onClientMock.mockReturnValue(true)
+    })
+
+    test('refreshAccessToken sets x-grant-type header during the call and cleans it up after', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // Simulate an expired access token with a valid refresh token
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        // Capture the header value during the refresh call
+        let headerDuringCall: string | undefined
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
+
+        await auth.ready()
+
+        // x-grant-type was set to 'refresh_token' during the call
+        expect(headerDuringCall).toBe('refresh_token')
+        // x-grant-type is cleaned up after the call
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+    })
+
+    test('refreshAccessToken cleans up x-grant-type header even when the call fails', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        // Mock a failure with an 'invalid refresh_token' response
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockRejectedValueOnce(
+            Object.assign(new Error('invalid refresh_token'), {
+                response: {json: () => Promise.resolve({message: 'invalid refresh_token'})}
+            })
+        )
+        // After refresh fails, it falls through to loginGuestUser
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        await auth.ready()
+
+        // x-grant-type is cleaned up despite the failure
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+        expect(refreshMock).toHaveBeenCalled()
+    })
+
+    test('refreshAccessToken does not set x-grant-type header when httpOnly cookies are disabled', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: false})
+
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+
+        let headerDuringCall: string | undefined
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
+
+        await auth.ready()
+
+        expect(headerDuringCall).toBeUndefined()
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
     })
 })
