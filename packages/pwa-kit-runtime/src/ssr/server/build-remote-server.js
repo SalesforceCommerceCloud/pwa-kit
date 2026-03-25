@@ -59,13 +59,13 @@ import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {hybridProxy} from '../../utils/ssr-server/hybrid-proxy'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
+import {getConfig} from '../../utils/ssr-config'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
 import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
-import {getConfig} from '../../utils/ssr-config'
 import {setHttpOnlySessionCookies} from './process-token-response'
 
 /**
@@ -667,10 +667,18 @@ export const RemoteServerFactory = {
          * If the server receives a request containing the base path, remove it before allowing
          * the request through to the other express endpoints
          *
-         * We scope base path removal to /mobify routes and routes defined by the express app
-         * (For example /callback or /worker.js)
+         * We scope base path removal to /mobify routes, /__pwa-kit routes (when showBasePath
+         * is false), and routes defined by the express app (For example /callback or /worker.js).
          * This is to avoid affecting React Router routes where a site id or locale might be present
          * that is equal to the base path.
+         *
+         * /__pwa-kit routes are a special case. These are internal PWA Kit routes
+         * (e.g. /__pwa-kit/refresh) that are registered as React Router routes and are invoked
+         * by the Storefront Preview code on Runtime Admin (which always appends a base path if set).
+         * When showBasePath is false, React Router has no basename, so we redirect to the clean
+         * URL (without base path) so the browser navigates to a path that React Router can match
+         * and hydrate correctly on the client.
+         * When showBasePath is true, React Router handles the base path via its basename prop.
          *
          * For example, if you have a base path of /us and a site id of /us we don't want
          * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
@@ -679,6 +687,8 @@ export const RemoteServerFactory = {
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
+        const showBasePath = getConfig()?.app?.url?.showBasePath === true
+
         const removeBasePathMiddleware = (req, res, next) => {
             const basePath = getEnvBasePath()
 
@@ -688,6 +698,15 @@ export const RemoteServerFactory = {
                 const {search} = parseRequestUrl(req)
                 req.url = cleanPath + search
                 return next()
+            }
+
+            // /__pwa-kit routes: when showBasePath is false, the browser URL still has the
+            // base path but client-side React Router has no basename, so hydration would fail.
+            // Redirect to the clean URL so the browser navigates to a path React Router matches.
+            if (!showBasePath && req.path.startsWith(`${basePath}/__pwa-kit`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const {search} = parseRequestUrl(req)
+                return res.redirect(302, cleanPath + search)
             }
 
             // For other routes, only proceed if path equals basePath or path starts with basePath + '/'
@@ -1012,66 +1031,97 @@ export const RemoteServerFactory = {
                 },
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
-                    applyProxyRequestHeaders({
-                        proxyRequest,
-                        incomingRequest,
-                        proxyPath: slasPrivateProxyPath,
-                        targetHost: options.slasHostName,
-                        targetProtocol: 'https'
-                    })
+                    try {
+                        applyProxyRequestHeaders({
+                            proxyRequest,
+                            incomingRequest,
+                            proxyPath: slasPrivateProxyPath,
+                            targetHost: options.slasHostName,
+                            targetProtocol: 'https'
+                        })
 
-                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
-                        // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
-                        // so the SLAS private client is sent via this special header
-                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                    } else if (
-                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
-                    ) {
-                        // We pattern match and add client secrets only to endpoints that
-                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                        //
-                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                        // purpose so we don't want to overwrite the header for those calls.
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-
-                        // When HttpOnly session cookies are enabled, inject the refresh token
-                        // from the HttpOnly cookie as the sfdc_refresh_token header. SLAS uses
-                        // this header as a fallback for grant_type=refresh_token requests when
-                        // the refresh_token body parameter is empty.
-                        // The SDK sends x-grant-type: refresh_token to signal this is a refresh request.
-                        if (
-                            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
-                            incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token'
+                        if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                            // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
+                            // so the SLAS private client is sent via this special header
+                            proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                        } else if (
+                            incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
                         ) {
-                            setRefreshTokenHeader(proxyRequest, incomingRequest)
-                            // Remove the signal header — it's only for our proxy, not SLAS.
-                            proxyRequest.removeHeader(X_GRANT_TYPE)
+                            // We pattern match and add client secrets only to endpoints that
+                            // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                            //
+                            // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                            // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                            // purpose so we don't want to overwrite the header for those calls.
+                            proxyRequest.setHeader(
+                                'Authorization',
+                                `Basic ${encodedSlasCredentials}`
+                            )
+
+                            // When HttpOnly session cookies are enabled, inject the refresh token
+                            // from the HttpOnly cookie as the sfdc_refresh_token header. SLAS uses
+                            // this header as a fallback for grant_type=refresh_token requests when
+                            // the refresh_token body parameter is empty.
+                            // The SDK sends x-grant-type: refresh_token to signal this is a refresh request.
+                            if (
+                                process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
+                                incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token'
+                            ) {
+                                setRefreshTokenHeader(proxyRequest, incomingRequest)
+                                // Remove the signal header — it's only for our proxy, not SLAS.
+                                proxyRequest.removeHeader(X_GRANT_TYPE)
+                            }
+                        } else if (
+                            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
+                            incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
+                        ) {
+                            setTokensInLogoutRequest(proxyRequest, incomingRequest)
                         }
-                    } else if (
-                        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true' &&
-                        incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
-                    ) {
-                        setTokensInLogoutRequest(proxyRequest, incomingRequest)
-                    }
 
-                    // Strip internal headers that are only used by our proxy, not by SLAS.
-                    if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
-                        proxyRequest.removeHeader(X_SITE_ID)
-                    }
+                        // Strip internal headers that are only used by our proxy, not by SLAS.
+                        if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
+                            proxyRequest.removeHeader(X_SITE_ID)
+                        }
 
-                    // Allow users to apply additional custom modifications to the proxy request
-                    if (typeof options.onSLASPrivateProxyReq === 'function') {
-                        try {
-                            options.onSLASPrivateProxyReq(proxyRequest, incomingRequest, res)
-                        } catch (error) {
-                            logger.error('Error in custom onSLASPrivateProxyReq callback', {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {
-                                    error: error
-                                }
+                        // Allow users to apply additional custom modifications to the proxy request
+                        if (typeof options.onSLASPrivateProxyReq === 'function') {
+                            try {
+                                options.onSLASPrivateProxyReq(proxyRequest, incomingRequest, res)
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPrivateProxyReq callback', {
+                                    namespace: '_setupSlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        error: error
+                                    }
+                                })
+                            }
+                        }
+                    } catch (error) {
+                        logger.error('Error in SLAS private proxy request handling', {
+                            namespace: '_setupSlasPrivateClientProxy',
+                            additionalProperties: {
+                                error: error
+                            }
+                        })
+                        if (!res.headersSent) {
+                            res.status(500).json({
+                                message: 'Error preparing SLAS private proxy request'
                             })
                         }
+                    }
+                },
+                onError: (error, req, res) => {
+                    logger.error('Error in SLAS private proxy', {
+                        namespace: '_setupSlasPrivateClientProxy',
+                        additionalProperties: {
+                            error: error,
+                            path: req?.url
+                        }
+                    })
+                    if (!res.headersSent) {
+                        res.status(500).json({
+                            message: 'Error in SLAS private proxy request'
+                        })
                     }
                 },
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
@@ -1163,9 +1213,16 @@ export const RemoteServerFactory = {
 
                         return workingBuffer
                     } catch (error) {
-                        console.error(
+                        logger.error(
                             'There is an error processing the response from SLAS. Returning original response.',
-                            error
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    error: error,
+                                    statusCode: proxyRes?.statusCode,
+                                    path: req?.url
+                                }
+                            }
                         )
                         return workingBuffer
                     }

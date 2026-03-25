@@ -3,10 +3,13 @@
 - use nightly release of isomorphic sdk that supports httponly cookies [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
 - Handle refresh token flow for HttpOnly session cookies [#3759](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3759)
 
-## v5.2.0-dev (Mar 12, 2026)
-- Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+## v5.2.0-dev (Mar 20, 2026)
 
-## v5.1.0
+## v5.1.1 (Mar 20, 2026)
+- Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+- Remove base path from /__pwa-kit route requests when showBasePath is false [#3758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3758)
+
+## v5.1.0 (Mar 12, 2026)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - Bump commerce-sdk-isomorphic to 5.1.0 [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
 - Update ShopperBasketsV2 hooks documentation and query keys [#3728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3728)

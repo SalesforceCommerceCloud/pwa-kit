@@ -213,6 +213,102 @@ describe('Storefront Preview Component', function () {
         expect(mockPush).toHaveBeenCalledWith({pathname: '/product/123', search: '?q=1'})
     })
 
+    test('experimentalUnsafeNavigate strips base path prefix from /__pwa-kit/ paths when getBasePath returns empty (showBasePath false)', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => ''}
+            />
+        )
+
+        // Runtime Admin sends /test/__pwa-kit/refresh but React Router has no basename
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            '/test/__pwa-kit/refresh?referrer=/some-page',
+            'replace'
+        )
+        expect(mockReplace).toHaveBeenCalledWith('/__pwa-kit/refresh?referrer=/some-page')
+    })
+
+    test('experimentalUnsafeNavigate strips base path prefix from /__pwa-kit/ location objects when getBasePath returns empty', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => ''}
+            />
+        )
+
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            {pathname: '/test/__pwa-kit/refresh', search: '?referrer=/some-page'},
+            'replace'
+        )
+        expect(mockReplace).toHaveBeenCalledWith({
+            pathname: '/__pwa-kit/refresh',
+            search: '?referrer=/some-page'
+        })
+    })
+
+    test('experimentalUnsafeNavigate normalizes /__pwa-kit/ paths and then strips router base path (showBasePath true)', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => '/test'}
+            />
+        )
+
+        // Runtime Admin sends /test/__pwa-kit/refresh, normalizePwaKitPath strips to
+        // /__pwa-kit/refresh, then removeBasePathFromLocation is a no-op (doesn't start with /test/)
+        // React Router re-adds the basename, so history receives /__pwa-kit/refresh
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            '/test/__pwa-kit/refresh?referrer=/test/some-page',
+            'replace'
+        )
+        expect(mockReplace).toHaveBeenCalledWith('/__pwa-kit/refresh?referrer=/test/some-page')
+    })
+
+    test('experimentalUnsafeNavigate does not alter /__pwa-kit/ paths that have no prefix', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => ''}
+            />
+        )
+
+        // Path already starts with /__pwa-kit/ — no prefix to strip
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
+            '/__pwa-kit/refresh?referrer=/some-page',
+            'push'
+        )
+        expect(mockPush).toHaveBeenCalledWith('/__pwa-kit/refresh?referrer=/some-page')
+    })
+
+    test('experimentalUnsafeNavigate does not affect non /__pwa-kit/ paths when showBasePath is false', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                getBasePath={() => ''}
+            />
+        )
+
+        // Regular navigation paths should pass through untouched
+        window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.('/products/123', 'push')
+        expect(mockPush).toHaveBeenCalledWith('/products/123')
+    })
+
     test('cache breaker is added to the parameters of SCAPI requests, only if in storefront preview', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
         mockQueryEndpoint('baskets/123', {})
