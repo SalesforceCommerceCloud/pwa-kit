@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export * from './ShopperBaskets'
+export * from './ShopperAgents'
 // V2 — available under explicit V2 names
 export {
     useBasket as useBasketV2,

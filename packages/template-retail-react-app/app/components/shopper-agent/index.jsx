@@ -7,7 +7,7 @@
 import React, {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useConfig, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -181,6 +181,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {organizationId, siteId: configSiteId} = useConfig()
+    const postSessionInitMutation = useShopperAgentsMutation('postSessionInit')
 
     /**
      * Retrieves conversation context data based on configuration.
@@ -289,6 +291,31 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
          * site configuration, and locale settings.
          */
         const handleEmbeddedMessagingReady = () => {
+            if (organizationId && configSiteId) {
+                postSessionInitMutation.mutate(
+                    {
+                        parameters: {organizationId, siteId: configSiteId},
+                        body: {
+                            // Placeholder for now; replace with auth-link key value source.
+                            sessionInitKey: 'test-session-init-key-on-ready'
+                        }
+                    },
+                    {
+                        onSuccess: (data) => {
+                            console.log(
+                                'Snigdha postSessionInit response (onEmbeddedMessagingReady)',
+                                data
+                            )
+                        },
+                        onError: (error) => {
+                            console.log(
+                                'Snigdha postSessionInit error (onEmbeddedMessagingReady)',
+                                error
+                            )
+                        }
+                    }
+                )
+            }
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 SiteId: siteId,
                 Locale: locale.id,
@@ -339,7 +366,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         usid,
         theme.zIndices.sticky,
         refreshToken,
-        domainUrl
+        domainUrl,
+        organizationId,
+        configSiteId
     ])
 
     // Load the embedded messaging script asynchronously
