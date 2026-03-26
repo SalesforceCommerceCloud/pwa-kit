@@ -302,16 +302,18 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                     },
                     {
                         onSuccess: (data) => {
-                            console.log(
-                                'Snigdha postSessionInit response (onEmbeddedMessagingReady)',
-                                data
-                            )
+                            console.info('postSessionInit succeeded onEmbeddedMessagingReady', {
+                                organizationId,
+                                siteId: configSiteId,
+                                response: data
+                            })
                         },
                         onError: (error) => {
-                            console.log(
-                                'Snigdha postSessionInit error (onEmbeddedMessagingReady)',
+                            console.error('postSessionInit failed onEmbeddedMessagingReady', {
+                                organizationId,
+                                siteId: configSiteId,
                                 error
-                            )
+                            })
                         }
                     }
                 )
