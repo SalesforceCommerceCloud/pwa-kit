@@ -19,7 +19,6 @@ import {
     isRemote,
     MetricsSender,
     outgoingRequestHook,
-    parseRequestUrl,
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
@@ -29,6 +28,7 @@ import dns from 'dns'
 import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
+import URL from 'url'
 import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
@@ -411,7 +411,8 @@ export const RemoteServerFactory = {
 
             // Apply the request processor
             const requestProcessor = that._getRequestProcessor(req)
-            let {search, query: originalQuerystring} = parseRequestUrl(req)
+            const parsed = URL.parse(req.url)
+            const originalQuerystring = parsed.query
             let updatedQuerystring = originalQuerystring
             let updatedPath = req.path
 
@@ -468,7 +469,8 @@ export const RemoteServerFactory = {
 
             // Update the request.
             if (updatedQuerystring !== originalQuerystring) {
-                search = updatedQuerystring ? `?${updatedQuerystring}` : ''
+                // Update the string in the parsed URL
+                parsed.search = updatedQuerystring ? `?${updatedQuerystring}` : ''
 
                 // Let Express re-parse the parameters
                 if (updatedQuerystring) {
@@ -479,9 +481,11 @@ export const RemoteServerFactory = {
                 }
             }
 
+            parsed.pathname = updatedPath
+
             // This will update the request's URL with the new path
             // and querystring.
-            req.url = updatedPath + search
+            req.url = URL.format(parsed)
 
             // Get the request class and store it for general use. We
             // must do this AFTER the request-processor, because that's
