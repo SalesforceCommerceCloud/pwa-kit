@@ -45,6 +45,7 @@ export const EXCLUDE_COOKIE_SUFFIX = [DWSID_COOKIE_NAME, DNT_COOKIE_NAME]
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
 
 export const CLIENT_KEYS = {
+    SHOPPER_AGENTS: 'shopperAgents',
     SHOPPER_BASKETS: 'shopperBaskets',
     SHOPPER_BASKETS_V2: 'shopperBasketsV2',
     SHOPPER_CONFIGURATIONS: 'shopperConfigurations',
