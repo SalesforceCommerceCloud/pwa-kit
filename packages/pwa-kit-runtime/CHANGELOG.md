@@ -1,3 +1,4 @@
+## v3.18.0-nightly-20260327081215 (Mar 27, 2026)
 ## v3.18.0-dev (Mar 20, 2026)
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
 
