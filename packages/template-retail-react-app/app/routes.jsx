@@ -12,9 +12,11 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React from 'react'
+import React, {useEffect} from 'react'
+import {withRouter} from 'react-router-dom'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -128,8 +130,12 @@ export const routes = [
     }
 ]
 
+// Remove SFRA/SiteGenesis routes from PWA Kit
+const ecomRoutes = ['/cart', '/checkout', '*']
+
 export default () => {
     const config = getConfig()
+    const enableHybrid = config?.app?.enableHybrid
     const loginConfig = config?.app?.login
     const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
     const socialLoginEnabled = loginConfig?.social?.enabled
@@ -158,11 +164,46 @@ export default () => {
             }
     ].filter(Boolean)
 
-    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
-        ignoredRoutes: ['/callback'],
-        fuzzyPathMatching: true
-    })
+    const allBaseRoutes = [...routes, ...dynamicRoutes]
 
-    // Add catch-all route at the end so it doesn't match before dynamic routes
-    return [...allRoutes, {path: '*', component: PageNotFound}]
+    const hybridRoutes = [
+        ...allBaseRoutes.filter((route) => !ecomRoutes.includes(route.path)),
+        {
+            path: '*',
+            component: withRouter((props) => {
+                const {location} = props
+                const urlParams = new URLSearchParams(location.search)
+                const {site} = useMultiSite()
+                const siteId = site && site.id ? site.id : config?.app?.defaultSite
+
+                if (typeof window !== 'undefined') {
+                    useEffect(() => {
+                        const newURL = new URL(window.location)
+                        if (!urlParams.has('redirected')) {
+                            newURL.searchParams.append('redirected', '1')
+                            newURL.pathname = `/s/${siteId}/${window.location.pathname
+                                .split('/')
+                                .slice(2)
+                                .join('/')}`
+                            window.location.replace(newURL)
+                        }
+                    }, [window.location.href])
+                }
+
+                if (urlParams.has('redirected')) {
+                    return <PageNotFound {...props} />
+                }
+
+                return null
+            })
+        }
+    ]
+
+    // Only use these routes if we are in hybrid mode otherwise use defaults
+    // This is driven via the config and env variables
+    const routesToConfigure = enableHybrid ? hybridRoutes : allBaseRoutes
+
+    return configureRoutes(routesToConfigure, config, {
+        ignoredRoutes: ['/callback', '*']
+    })
 }
