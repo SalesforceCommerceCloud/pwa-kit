@@ -58,7 +58,7 @@ export const getCookieSameSiteAttribute = () => {
     if (!onClient()) return
     const isLocalHost = window.location.hostname === 'localhost'
     const parentOrigin = getParentOrigin()
-    return !isLocalHost && isOriginTrusted(parentOrigin) ? 'none' : 'Lax'
+    return !isLocalHost && isOriginTrusted(parentOrigin) ? 'None' : 'Lax'
 }
 
 /**
@@ -77,6 +77,19 @@ export const getDefaultCookieAttributes = (): CookieAttributes => {
         // list. Outside of iframe, we want to keep most browser default value (Chrome or Firefox uses Lax)
         // https://web.dev/samesite-cookie-recipes/
         sameSite: getCookieSameSiteAttribute()
+    }
+}
+
+/**
+ * Gets cookie attributes for cookies that need to work with external APIs.
+ * These cookies use SameSite=None to ensure they are sent with cross-site requests.
+ */
+export const getExternalApiCookieAttributes = (): CookieAttributes => {
+    return {
+        // External API cookies must be secure when using SameSite=None
+        secure: true,
+        // Use SameSite=None for cookies that need to be sent to external APIs
+        sameSite: !onClient() ? undefined : 'None'
     }
 }
 

@@ -700,6 +700,12 @@ class Auth {
         }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+
+        // Set usid cookie with the same expiry as refresh token to prevent refresh token failures
+        this.set('usid', res.usid, {
+            expires: expiresDate
+        })
+
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
