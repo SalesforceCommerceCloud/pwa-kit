@@ -336,11 +336,11 @@ const testProjectAnswers = () => {
 const demoProjectAnswers = () => {
     const config = {
         projectName: 'demo-storefront',
-        instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
-        clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+        instanceUrl: 'https://production-sitegenesis-dw.demandware.net',
+        clientId: '44cfcf31-d64d-4227-9cce-1d9b0716c321',
         siteId: 'RefArch',
-        organizationId: 'f_ecom_zzte_053',
-        shortCode: 'kv7kzm78',
+        organizationId: 'f_ecom_aaia_prd',
+        shortCode: 'xfdy2axw',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
         einsteinSiteId: 'aaij-MobileFirst'
     }
