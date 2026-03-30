@@ -188,6 +188,14 @@ describe('setHttpOnlySessionCookies', () => {
         expect(uidoCookie.value).toBe('ecom')
         expect(uidoCookie.httpOnly).toBeUndefined()
 
+        // cc-nx-exists: non-HttpOnly indicator that a refresh token cookie exists
+        const nxExistsCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))
+        )
+        expect(nxExistsCookie.value).toBe('1')
+        expect(nxExistsCookie.httpOnly).toBeUndefined()
+        expect(nxExistsCookie.secure).toBe(true)
+
         // Registered refresh cookie should be expired (deleted)
         const staleRegisteredCookie = parseCookie(
             res.cookies.find((c) => c.startsWith('cc-nx_testsite='))
@@ -236,6 +244,13 @@ describe('setHttpOnlySessionCookies', () => {
         // uido (non-HttpOnly)
         const uidoCookie = parseCookie(res.cookies.find((c) => c.includes('uido_testsite=')))
         expect(uidoCookie.value).toBe('ecom')
+
+        // cc-nx-exists: non-HttpOnly indicator that a refresh token cookie exists
+        const nxExistsCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))
+        )
+        expect(nxExistsCookie.value).toBe('1')
+        expect(nxExistsCookie.httpOnly).toBeUndefined()
 
         // Guest refresh cookie should be expired (deleted)
         const staleGuestCookie = parseCookie(
@@ -292,6 +307,8 @@ describe('setHttpOnlySessionCookies', () => {
         const body = JSON.parse(result.toString('utf8'))
 
         expect(res.cookies).toHaveLength(0)
+        // cc-nx-exists should NOT be set when there is no refresh token
+        expect(res.cookies.find((c) => c.includes('cc-nx-exists'))).toBeUndefined()
         expect(body.other_field).toBe('value')
     })
 

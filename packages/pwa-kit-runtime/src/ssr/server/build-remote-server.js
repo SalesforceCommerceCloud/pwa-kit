@@ -97,33 +97,50 @@ export const isBinary = (headers) => {
 }
 
 /**
+ * Error thrown when the refresh token HttpOnly cookie is not found on the incoming request.
+ * Handled specifically in the SLAS proxy to return a 401 instead of forwarding to SLAS.
+ */
+export class RefreshTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'RefreshTokenNotFoundError'
+    }
+}
+
+/**
  * Inject the refresh token from HttpOnly cookies as the sfdc_refresh_token header.
  * SLAS uses sfdc_refresh_token as a fallback when the refresh_token body parameter is
  * missing or empty (which is the case when HttpOnly session cookies are enabled, because
  * client-side JavaScript cannot read the HttpOnly refresh token cookie).
+ * @throws {RefreshTokenNotFoundError} If the refresh token cookie is missing.
  * @private
  */
 export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
     const cookieHeader = incomingRequest.headers.cookie
-    if (!cookieHeader) return
+    if (!cookieHeader) {
+        throw new RefreshTokenNotFoundError(
+            'No cookies present on request. Cannot inject refresh token.'
+        )
+    }
 
     const cookies = cookie.parse(cookieHeader)
     const siteId = incomingRequest.headers[X_SITE_ID]
     if (!siteId) {
-        logger.warn(
+        throw new RefreshTokenNotFoundError(
             'x-site-id header is missing on SLAS token request. ' +
-                'Refresh token header injection skipped. ' +
-                'Ensure the x-site-id header is set in CommerceApiProvider headers.',
-            {namespace: 'setRefreshTokenHeader'}
+                'Cannot inject refresh token. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.'
         )
-        return
     }
 
     // Try registered refresh token first, then guest
     const refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
-    if (refreshToken) {
-        proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
+    if (!refreshToken) {
+        throw new RefreshTokenNotFoundError(
+            'Refresh token cookie not found. Cannot proceed with refresh token flow.'
+        )
     }
+    proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
 }
 
 /**
@@ -1097,6 +1114,18 @@ export const RemoteServerFactory = {
                             }
                         }
                     } catch (error) {
+                        if (error instanceof RefreshTokenNotFoundError) {
+                            logger.warn(error.message, {
+                                namespace: 'setRefreshTokenHeader'
+                            })
+                            if (!res.headersSent) {
+                                proxyRequest.destroy()
+                                res.status(401).json({
+                                    message: 'invalid refresh_token'
+                                })
+                            }
+                            return
+                        }
                         logger.error('Error in SLAS private proxy request handling', {
                             namespace: '_setupSlasPrivateClientProxy',
                             additionalProperties: {

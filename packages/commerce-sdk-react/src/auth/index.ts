@@ -140,6 +140,7 @@ type AuthDataKeys =
     | 'idp_refresh_token'
     | 'dnt'
     | 'cc-at-expires'
+    | 'cc-nx-exists'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -258,6 +259,10 @@ const DATA_MAP: AuthDataMap = {
     'cc-at-expires': {
         storageType: 'cookie',
         key: 'cc-at-expires'
+    },
+    'cc-nx-exists': {
+        storageType: 'cookie',
+        key: 'cc-nx-exists'
     }
 }
 
@@ -528,6 +533,15 @@ class Auth {
     }
 
     /**
+     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript cannot
+     * read HttpOnly cookies, we check the non-HttpOnly indicator cookie (cc-nx-exists) that
+     * is set alongside the refresh token with the same expiry.
+     */
+    private hasHttpOnlyRefreshToken(): boolean {
+        return this.enableHttpOnlySessionCookies && onClient() && this.get('cc-nx-exists') === '1'
+    }
+
+    /**
      * Returns whether the access token is expired. When enableHttpOnlySessionCookies is true,
      * uses cc-at-expires cookie from store; otherwise decodes the JWT from getAccessToken().
      */
@@ -748,12 +762,11 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
 
         // When HttpOnly session cookies are enabled on the client, the refresh token is in an
-        // HttpOnly cookie that JavaScript cannot read. We still attempt the refresh request —
-        // the SLAS private proxy injects the refresh token via the sfdc_refresh_token header.
-        const hasHttpOnlyRefreshToken =
-            !refreshToken && this.enableHttpOnlySessionCookies && onClient()
-
-        if (refreshToken || hasHttpOnlyRefreshToken) {
+        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly indicator
+        // cookie (cc-nx-exists) to avoid a wasted round-trip when the refresh token is absent.
+        // If cc-nx-exists is also missing (e.g. cleared by the user), the proxy layer will
+        // catch the missing refresh token and return a 401, falling through to guest login.
+        if (refreshToken || (!refreshToken && this.hasHttpOnlyRefreshToken())) {
             try {
                 const isGuest = this.get('customer_type') !== 'registered'
                 // Signal the proxy that this is a refresh token request so it can
