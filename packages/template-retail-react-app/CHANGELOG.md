@@ -1,4 +1,4 @@
-## v2.11.0-preview.0 (Feb 12, 2026)
+## v2.11.0 (Mar 30, 2026)
 - Add Node 24 support. Drop Node 16 support
 - Bump commerce-sdk-react dependency to support Node 24
 
