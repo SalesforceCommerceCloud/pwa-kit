@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, within} from '@testing-library/react'
+import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -17,10 +17,14 @@ import {
     mockOrderProducts
 } from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import useNavigation from '../../hooks/use-navigation'
 import Account from './index'
 import mockConfig from '../../../config/mocks/default'
 
 jest.mock('../../commerce-api/einstein')
+jest.mock('../../hooks/use-navigation')
+
+const mockNavigate = jest.fn()
 
 const MockedComponent = () => {
     const customer = useCustomer()
@@ -44,6 +48,8 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
+    mockNavigate.mockReset()
+    useNavigation.mockReturnValue(mockNavigate)
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -105,21 +111,31 @@ test('Renders account detail page by default for logged-in customer', async () =
 })
 
 test('Allows customer to sign out', async () => {
+    let customerRequestCount = 0
     global.server.use(
         rest.post('*/logout', (req, res, ctx) => {
             return res(ctx.json({success: true}))
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
-            return res(ctx.json(mockedGuestCustomer))
+            customerRequestCount += 1
+            return res(
+                ctx.json(
+                    customerRequestCount === 1 ? mockedRegisteredCustomer : mockedGuestCustomer
+                )
+            )
         })
     )
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-    user.click(screen.getAllByText(/Log Out/)[0])
+    const logoutButtons = screen
+        .getAllByText(/Log Out/)
+        .map((el) => el.closest('button'))
+        .filter(Boolean)
+    fireEvent.click(logoutButtons[logoutButtons.length - 1])
     await waitFor(() => {
-        expect(window.location.pathname).toEqual(`${expectedBasePath}/login`)
+        expect(mockNavigate).toHaveBeenCalledWith('/login')
     })
 })
 
