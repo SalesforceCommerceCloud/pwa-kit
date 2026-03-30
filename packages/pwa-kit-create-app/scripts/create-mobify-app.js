@@ -336,7 +336,7 @@ const testProjectAnswers = () => {
 const demoProjectAnswers = () => {
     const config = {
         projectName: 'demo-storefront',
-        instanceUrl: 'https://production-sitegenesis-dw.demandware.net',
+        instanceUrl: 'https://aaia-prd.my.commercecloud.salesforce.com',
         clientId: '44cfcf31-d64d-4227-9cce-1d9b0716c321',
         siteId: 'RefArch',
         organizationId: 'f_ecom_aaia_prd',
