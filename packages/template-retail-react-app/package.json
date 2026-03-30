@@ -18,7 +18,7 @@
         "@lhci/cli": "^0.9.0",
         "@loadable/component": "^5.15.3",
         "@peculiar/webcrypto": "^1.4.2",
-        "@salesforce/commerce-sdk-react": "^3.4.0",
+        "@salesforce/commerce-sdk-react": "^5.1.1",
         "@tanstack/react-query": "4.28.0",
         "@testing-library/dom": "^9.0.1",
         "@testing-library/jest-dom": "^5.16.5",
@@ -30,7 +30,7 @@
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.31",
         "card-validator": "^8.1.1",
-        "commerce-sdk-isomorphic": "^3.3.0",
+        "commerce-sdk-isomorphic": "^5.1.0",
         "cross-env": "^5.2.1",
         "cross-fetch": "^3.1.5",
         "focus-visible": "^5.2.0",
@@ -96,5 +96,11 @@
         "iOS >= 9.0",
         "Android >= 4.4.4",
         "last 4 ChromeAndroid versions"
-    ]
+    ],
+    "overrides": {
+        "@salesforce/commerce-sdk-react": {
+          "react": "^17.0.2",
+          "react-dom": "^17.0.2"
+        }
+    }
 }
