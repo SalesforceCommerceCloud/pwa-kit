@@ -198,6 +198,21 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             })
         )
 
+        // Non-HttpOnly indicator so the client can check if a refresh token cookie exists
+        // (JavaScript cannot read HttpOnly cookies). Shares the same expiry as the refresh token.
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: `cc-nx-exists_${site}`,
+                value: '1',
+                path: '/',
+                secure: true,
+                sameSite: 'lax',
+                httpOnly: false,
+                expires: refreshExpires
+            })
+        )
+
         // Delete the opposite refresh token cookie to mirror client-side behavior:
         // Login (guest → registered): delete guest cookie cc-nx-g
         // Logout (registered → guest): delete registered cookie cc-nx

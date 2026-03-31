@@ -1563,6 +1563,45 @@ describe('HttpOnly Session Cookies', () => {
         )
     })
 
+    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-exists)', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // First visit: no cc-nx-exists cookie, no refresh token, no cc-at-expires
+        // Should NOT attempt refresh — should go straight to loginGuestUser
+        await auth.ready()
+
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+    })
+
+    test('ready attempts refresh when cc-nx-exists is set (returning visitor)', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // Simulate a returning visitor: expired access token + cc-nx-exists indicator
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('cc-nx-exists', '1')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        await auth.ready()
+
+        // Should attempt refresh because cc-nx-exists indicates an HttpOnly refresh token exists
+        expect(helpers.refreshAccessToken).toHaveBeenCalledTimes(1)
+        expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
+            expect.objectContaining({enableHttpOnlySessionCookies: true})
+        )
+    })
+
     test('ready triggers refresh when cc-at-expires cookie is expired', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
 
