@@ -31,7 +31,8 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     getEnvBasePath,
-    slasPrivateProxyPath
+    slasPrivateProxyPath,
+    slasPublicProxyPath
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
@@ -93,6 +94,7 @@ const AppConfig = ({children, locals = {}}) => {
     const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
+    const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPublicProxyPath}`
 
     const pageDesignerParams = locals.pageDesignerParams || {}
 
@@ -113,6 +115,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
+            publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
             enableHttpOnlySessionCookies={

@@ -44,6 +44,7 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     headers?: Record<string, string>
     privateClientProxyEndpoint?: string
+    publicClientProxyEndpoint?: string
     fetchOptions?: FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -305,6 +306,8 @@ class Auth {
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
+                : config.enableHttpOnlySessionCookies
+                ? config.publicClientProxyEndpoint
                 : config.proxy,
             headers: config.headers || {},
             parameters: {
@@ -361,7 +364,7 @@ class Auth {
 
         /*
          * There are 2 ways to enable SLAS private client mode.
-         * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
+         * If enablePWAKitPrivateClient=true, we route SLAS calls to
          * and set an internal placeholder as the client secret. The proxy will override the placeholder
          * with the actual client secret so any truthy value as the placeholder works here.
          *

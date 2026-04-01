@@ -1511,6 +1511,34 @@ describe('HttpOnly Session Cookies', () => {
         jest.clearAllMocks()
     })
 
+    test('routes SLAS calls through publicClientProxyEndpoint when httpOnly enabled and private client disabled', () => {
+        const {ShopperLogin} = require('commerce-sdk-isomorphic')
+        ShopperLogin.mockClear()
+        new Auth({
+            ...config,
+            enableHttpOnlySessionCookies: true,
+            enablePWAKitPrivateClient: false,
+            publicClientProxyEndpoint: '/mobify/slas/public'
+        })
+        expect(ShopperLogin).toHaveBeenCalledWith(
+            expect.objectContaining({proxy: '/mobify/slas/public'})
+        )
+    })
+
+    test('routes SLAS calls through standard proxy when httpOnly disabled', () => {
+        const {ShopperLogin} = require('commerce-sdk-isomorphic')
+        ShopperLogin.mockClear()
+        new Auth({
+            ...config,
+            enableHttpOnlySessionCookies: false,
+            enablePWAKitPrivateClient: false,
+            publicClientProxyEndpoint: '/mobify/slas/public'
+        })
+        expect(ShopperLogin).toHaveBeenCalledWith(
+            expect.objectContaining({proxy: 'proxy'})
+        )
+    })
+
     test('loginGuestUser does not store tokens when HttpOnly cookies are enabled', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         const loginGuestMock = helpers.loginGuestUser as jest.Mock

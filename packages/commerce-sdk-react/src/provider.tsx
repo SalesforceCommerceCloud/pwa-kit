@@ -47,6 +47,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
     privateClientProxyEndpoint?: string
+    publicClientProxyEndpoint?: string
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
@@ -148,6 +149,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         logger,
@@ -186,6 +188,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchedToken,
             enablePWAKitPrivateClient,
             privateClientProxyEndpoint,
+            publicClientProxyEndpoint,
             clientSecret,
             silenceWarnings,
             logger: configLogger,
@@ -208,6 +211,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         configLogger,
@@ -290,7 +294,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
+                proxy: enablePWAKitPrivateClient
+                    ? privateClientProxyEndpoint
+                    : enableHttpOnlySessionCookies
+                    ? publicClientProxyEndpoint
+                    : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperPayments: new ShopperPayments(config),
