@@ -72,7 +72,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
 
 // Mock the useUsid hook
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useUsid: jest.fn()
+    useUsid: jest.fn(),
+    useConfig: jest.fn(),
+    useShopperAgentsMutation: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -89,7 +91,7 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useConfig, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -98,9 +100,12 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseUsid = useUsid
+const mockedUseConfig = useConfig
+const mockedUseShopperAgentsMutation = useShopperAgentsMutation
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
+const mockPostSessionInitMutate = jest.fn()
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -135,6 +140,18 @@ describe('ShopperAgent Component', () => {
 
         // Mock useUsid hook
         mockedUseUsid.mockReturnValue({usid: 'test-usid'})
+
+        // Mock useConfig hook
+        mockedUseConfig.mockReturnValue({
+            organizationId: '00DTEST00000001',
+            siteId: 'RefArchGlobal'
+        })
+
+        // Mock useShopperAgentsMutation hook
+        mockPostSessionInitMutate.mockReset()
+        mockedUseShopperAgentsMutation.mockReturnValue({
+            mutate: mockPostSessionInitMutate
+        })
 
         // Mock useMultiSite hook with proper structure
         mockedUseMultiSite.mockReturnValue({
@@ -241,6 +258,74 @@ describe('ShopperAgent Component', () => {
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
         })
+    })
+
+    test('should call postSessionInit mutation with expected payload on embedded messaging ready', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockPostSessionInitMutate).toHaveBeenCalledWith(
+            {
+                parameters: {organizationId: '00DTEST00000001', siteId: 'RefArchGlobal'},
+                body: {
+                    sessionInitKey: 'test-session-init-key-on-ready'
+                }
+            },
+            expect.objectContaining({
+                onSuccess: expect.any(Function),
+                onError: expect.any(Function)
+            })
+        )
+    })
+
+    test('should log session init success and error through mutation callbacks', async () => {
+        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
+        const successResponse = {status: 'ok'}
+        const mutationError = new Error('session init failed')
+
+        callbacks.onSuccess(successResponse)
+        callbacks.onError(mutationError)
+
+        expect(infoSpy).toHaveBeenCalledWith('postSessionInit succeeded onEmbeddedMessagingReady', {
+            organizationId: '00DTEST00000001',
+            siteId: 'RefArchGlobal',
+            response: successResponse
+        })
+        expect(errorSpy).toHaveBeenCalledWith('postSessionInit failed onEmbeddedMessagingReady', {
+            organizationId: '00DTEST00000001',
+            siteId: 'RefArchGlobal',
+            error: mutationError
+        })
+
+        infoSpy.mockRestore()
+        errorSpy.mockRestore()
+    })
+
+    test('should not call postSessionInit mutation when organizationId or siteId is missing', async () => {
+        mockedUseConfig.mockReturnValue({
+            organizationId: '',
+            siteId: ''
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
     })
 
     test('should update prechat fields when refresh token changes', async () => {
