@@ -3,6 +3,7 @@
 - use nightly release of isomorphic sdk that supports httponly cookies [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
 - Handle refresh token flow for HttpOnly session cookies [#3759](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3759)
 - Handle missing refresh token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3771)
+- Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 
 ## v5.2.0-dev (Mar 20, 2026)
 

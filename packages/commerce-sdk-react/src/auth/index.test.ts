@@ -7,7 +7,12 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperCustomersTypes,
+    ShopperCustomers,
+    ShopperLogin
+} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -1512,31 +1517,29 @@ describe('HttpOnly Session Cookies', () => {
     })
 
     test('routes SLAS calls through publicClientProxyEndpoint when httpOnly enabled and private client disabled', () => {
-        const {ShopperLogin} = require('commerce-sdk-isomorphic')
-        ShopperLogin.mockClear()
+        const ShopperLoginMock = ShopperLogin as unknown as jest.Mock
+        ShopperLoginMock.mockClear()
         new Auth({
             ...config,
             enableHttpOnlySessionCookies: true,
             enablePWAKitPrivateClient: false,
             publicClientProxyEndpoint: '/mobify/slas/public'
         })
-        expect(ShopperLogin).toHaveBeenCalledWith(
+        expect(ShopperLoginMock).toHaveBeenCalledWith(
             expect.objectContaining({proxy: '/mobify/slas/public'})
         )
     })
 
     test('routes SLAS calls through standard proxy when httpOnly disabled', () => {
-        const {ShopperLogin} = require('commerce-sdk-isomorphic')
-        ShopperLogin.mockClear()
+        const ShopperLoginMock = ShopperLogin as unknown as jest.Mock
+        ShopperLoginMock.mockClear()
         new Auth({
             ...config,
             enableHttpOnlySessionCookies: false,
             enablePWAKitPrivateClient: false,
             publicClientProxyEndpoint: '/mobify/slas/public'
         })
-        expect(ShopperLogin).toHaveBeenCalledWith(
-            expect.objectContaining({proxy: 'proxy'})
-        )
+        expect(ShopperLoginMock).toHaveBeenCalledWith(expect.objectContaining({proxy: 'proxy'}))
     })
 
     test('loginGuestUser does not store tokens when HttpOnly cookies are enabled', async () => {

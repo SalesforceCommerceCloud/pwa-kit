@@ -1159,9 +1159,7 @@ describe('SLAS public proxy', () => {
 
         RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
 
-        const response = await request(app).get(
-            '/mobify/slas/public/shopper/products/v1'
-        )
+        const response = await request(app).get('/mobify/slas/public/shopper/products/v1')
 
         expect(response.status).toBe(403)
     })
