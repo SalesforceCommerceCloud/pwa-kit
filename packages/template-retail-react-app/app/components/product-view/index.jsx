@@ -37,7 +37,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {
     useSFPaymentsEnabled,
-    useSFPayments
+    useSFPayments,
+    useExpressCheckoutEnabled
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 // project components
@@ -218,6 +219,8 @@ const ProductView = forwardRef(
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
         const sfPaymentsEnabled = useSFPaymentsEnabled()
+        const {pdp: expressOnPDP} = useExpressCheckoutEnabled()
+        const showExpressOnPDP = sfPaymentsEnabled && expressOnPDP
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -470,7 +473,7 @@ const ProductView = forwardRef(
             }
 
             if (
-                sfPaymentsEnabled &&
+                showExpressOnPDP &&
                 !isProductASet &&
                 !isProductPartOfBundle &&
                 activeCurrency &&

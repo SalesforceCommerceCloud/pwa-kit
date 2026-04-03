@@ -13,6 +13,7 @@ import {
     useSFPaymentsEnabled,
     useAutomaticCapture,
     useFutureUsageOffSession,
+    useExpressCheckoutEnabled,
     EXPRESS_BUY_NOW,
     EXPRESS_PAY_NOW,
     STATUS_SUCCESS,
@@ -714,5 +715,129 @@ describe('useFutureUsageOffSession hook', () => {
 
         expect(result.current).toBe(false)
         expect(mockUseShopperConfiguration).toHaveBeenCalledWith('futureUsageOffSession')
+    })
+})
+
+describe('useExpressCheckoutEnabled hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('returns an object with boolean properties for each page', () => {
+        mockUseShopperConfiguration.mockReturnValue(['PDP', 'CART', 'MINICART'])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: true,
+            miniCart: true,
+            cart: true,
+            checkout: false
+        })
+        expect(mockUseShopperConfiguration).toHaveBeenCalledWith('expressOnCheckoutPagesEnabled')
+    })
+
+    test('returns all true when all pages are in the config', () => {
+        mockUseShopperConfiguration.mockReturnValue(['PDP', 'MINICART', 'CART', 'CHECKOUT'])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: true,
+            miniCart: true,
+            cart: true,
+            checkout: true
+        })
+    })
+
+    test('returns all false when configuration value is undefined', () => {
+        mockUseShopperConfiguration.mockReturnValue(undefined)
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('returns all false when configuration value is null', () => {
+        mockUseShopperConfiguration.mockReturnValue(null)
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('returns all false when configuration value is an empty array', () => {
+        mockUseShopperConfiguration.mockReturnValue([])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('returns all false when configuration value is not an array (string)', () => {
+        mockUseShopperConfiguration.mockReturnValue('PDP')
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('returns all false when configuration value is not an array (boolean)', () => {
+        mockUseShopperConfiguration.mockReturnValue(true)
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('is case-sensitive when matching page identifiers', () => {
+        mockUseShopperConfiguration.mockReturnValue(['pdp', 'cart'])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
+    test('only enables pages present in the config', () => {
+        mockUseShopperConfiguration.mockReturnValue(['CHECKOUT'])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: true
+        })
     })
 })

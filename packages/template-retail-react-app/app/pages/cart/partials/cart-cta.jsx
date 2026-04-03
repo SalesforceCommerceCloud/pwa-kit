@@ -16,10 +16,15 @@ import {
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
-import {useSFPaymentsEnabled} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {
+    useSFPaymentsEnabled,
+    useExpressCheckoutEnabled
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const CartCta = () => {
     const sfPaymentsEnabled = useSFPaymentsEnabled()
+    const {cart: expressOnCart} = useExpressCheckoutEnabled()
+    const showExpressOnCart = sfPaymentsEnabled && expressOnCart
 
     return (
         <Fragment>
@@ -28,7 +33,7 @@ const CartCta = () => {
                 to="/checkout"
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
-                mb={sfPaymentsEnabled ? 2 : 4}
+                mb={showExpressOnCart ? 2 : 4}
                 rightIcon={<LockIcon />}
                 variant="solid"
             >
@@ -37,7 +42,7 @@ const CartCta = () => {
                     id="cart_cta.link.checkout"
                 />
             </Button>
-            {sfPaymentsEnabled ? (
+            {showExpressOnCart ? (
                 <SFPaymentsExpress expressButtonLayout="vertical" maximumButtonCount={4} />
             ) : (
                 <Flex justify={'center'}>

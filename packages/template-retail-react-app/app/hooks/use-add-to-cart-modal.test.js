@@ -63,13 +63,20 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
 // Mock useSFPaymentsEnabled as a simple jest function
 const mockUseSFPaymentsEnabled = jest.fn(() => false)
 const mockUseSFPayments = jest.fn(() => ({confirmingBasket: null}))
+const mockUseExpressCheckoutEnabled = jest.fn(() => ({
+    pdp: false,
+    miniCart: false,
+    cart: false,
+    checkout: false
+}))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
         useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled(),
-        useSFPayments: () => mockUseSFPayments()
+        useSFPayments: () => mockUseSFPayments(),
+        useExpressCheckoutEnabled: () => mockUseExpressCheckoutEnabled()
     }
 })
 
@@ -1162,9 +1169,14 @@ test('selects bonusDiscountLineItem with remaining capacity when first one is fu
     expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })
 
-test('renders SFPaymentsExpress when sfPayments is enabled', () => {
-    // Enable sfPayments
+test('renders SFPaymentsExpress when sfPayments is enabled and MINICART is in expressOnCheckoutPagesEnabled', () => {
     mockUseSFPaymentsEnabled.mockReturnValue(true)
+    mockUseExpressCheckoutEnabled.mockReturnValue({
+        pdp: false,
+        miniCart: true,
+        cart: false,
+        checkout: false
+    })
 
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
@@ -1290,5 +1302,51 @@ test('does not render SFPaymentsExpress when useSFPaymentsEnabled returns false'
     )
 
     // Verify SFPaymentsExpress component is NOT rendered
+    expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
+})
+
+test('does not render SFPaymentsExpress when sfPayments is enabled but MINICART is not in expressOnCheckoutPagesEnabled', () => {
+    mockUseSFPaymentsEnabled.mockReturnValue(true)
+    mockUseExpressCheckoutEnabled.mockReturnValue({
+        pdp: true,
+        miniCart: false,
+        cart: true,
+        checkout: false
+    })
+
+    const MOCK_DATA = {
+        product: MOCK_PRODUCT,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ]
+    }
+
+    mockUseCurrentBasket.mockReturnValue({
+        data: {
+            productSubTotal: 14.99,
+            currency: 'USD'
+        },
+        derivedData: {
+            totalItems: 1
+        },
+        currency: 'USD'
+    })
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA,
+                onClose: jest.fn()
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
     expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
 })
