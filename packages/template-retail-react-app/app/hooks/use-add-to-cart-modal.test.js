@@ -1169,7 +1169,7 @@ test('selects bonusDiscountLineItem with remaining capacity when first one is fu
     expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })
 
-test('renders SFPaymentsExpress when sfPayments is enabled and MINICART is in expressOnCheckoutPagesEnabled', () => {
+test('renders SFPaymentsExpress when sfPayments is enabled and express checkout is enabled for minicart', () => {
     mockUseSFPaymentsEnabled.mockReturnValue(true)
     mockUseExpressCheckoutEnabled.mockReturnValue({
         pdp: false,
@@ -1305,7 +1305,7 @@ test('does not render SFPaymentsExpress when useSFPaymentsEnabled returns false'
     expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
 })
 
-test('does not render SFPaymentsExpress when sfPayments is enabled but MINICART is not in expressOnCheckoutPagesEnabled', () => {
+test('does not render SFPaymentsExpress when sfPayments is enabled but express checkout is disabled for minicart', () => {
     mockUseSFPaymentsEnabled.mockReturnValue(true)
     mockUseExpressCheckoutEnabled.mockReturnValue({
         pdp: true,
