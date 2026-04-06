@@ -30,8 +30,7 @@ export default {
             },
             description: {
                 fontSize: 'sm',
-                ml: 3,
-                color: `${colorScheme}.700`
+                color: 'black'
             }
         }
     },
