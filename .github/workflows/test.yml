@@ -73,7 +73,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+          node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
           cache: npm
 
       - name: Update NPM version
@@ -178,7 +179,8 @@ jobs:
         - name: Setup Node
           uses: actions/setup-node@v4
           with:
-            node-version: ${{ matrix.node }}
+            # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+            node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
             cache: npm
 
         - name: Update NPM version
