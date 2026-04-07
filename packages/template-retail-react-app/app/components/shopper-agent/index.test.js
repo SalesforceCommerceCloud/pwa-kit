@@ -9,18 +9,24 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
 
-// Mock useLocation hook
-const mockUseLocation = jest.fn()
-jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useLocation: () => mockUseLocation()
-}))
-
 // Mock useAppOrigin hook
 const mockUseAppOrigin = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
     __esModule: true,
     useAppOrigin: () => mockUseAppOrigin()
+}))
+
+const mockShowToast = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    __esModule: true,
+    useToast: jest.fn(() => mockShowToast)
+}))
+
+const mockFormatMessage = jest.fn((descriptor) => descriptor.defaultMessage ?? descriptor.id)
+jest.mock('react-intl', () => ({
+    __esModule: true,
+    ...jest.requireActual('react-intl'),
+    useIntl: jest.fn(() => ({formatMessage: mockFormatMessage}))
 }))
 
 // Import ShopperAgent after all mocks are set up
@@ -33,6 +39,9 @@ const mockEmbeddedService = {
     },
     utilAPI: {
         sendTextMessage: jest.fn()
+    },
+    userVerificationAPI: {
+        clearSession: jest.fn().mockResolvedValue(undefined)
     }
 }
 
@@ -166,18 +175,15 @@ describe('ShopperAgent Component', () => {
             }
         })
 
-        // Mock useLocation hook
-        mockUseLocation.mockReturnValue({
-            pathname: '/current-page',
-            search: '',
-            hash: ''
-        })
-
         // Mock useAppOrigin hook
         mockUseAppOrigin.mockReturnValue('https://example.com')
 
-        // Clear any existing scripts
-        delete global.window.embeddedservice_bootstrap
+        mockShowToast.mockClear()
+        mockFormatMessage.mockImplementation((descriptor) => descriptor.defaultMessage ?? descriptor.id)
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+        mockEmbeddedService.userVerificationAPI.clearSession.mockResolvedValue(undefined)
+
+        global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
 
     afterEach(() => {
@@ -260,11 +266,21 @@ describe('ShopperAgent Component', () => {
         })
     })
 
-    test('should call postSessionInit mutation with expected payload on embedded messaging ready', async () => {
+    test('should not call postSessionInit mutation on embedded messaging ready', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+    })
+
+    test('should call postSessionInit mutation with expected payload when conversation starts', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
         expect(mockPostSessionInitMutate).toHaveBeenCalledWith(
@@ -281,6 +297,25 @@ describe('ShopperAgent Component', () => {
         )
     })
 
+    test('should dedupe postSessionInit for duplicate started events with same conversationId', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        const evt = new CustomEvent('onEmbeddedMessagingConversationStarted', {
+            detail: {conversationId: 'same-id'}
+        })
+
+        await act(async () => {
+            window.dispatchEvent(evt)
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'same-id'}
+                })
+            )
+        })
+
+        expect(mockPostSessionInitMutate).toHaveBeenCalledTimes(1)
+    })
+
     test('should log session init success and error through mutation callbacks', async () => {
         const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -288,7 +323,7 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
         const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
@@ -298,19 +333,84 @@ describe('ShopperAgent Component', () => {
         callbacks.onSuccess(successResponse)
         callbacks.onError(mutationError)
 
-        expect(infoSpy).toHaveBeenCalledWith('postSessionInit succeeded onEmbeddedMessagingReady', {
-            organizationId: '00DTEST00000001',
-            siteId: 'RefArchGlobal',
-            response: successResponse
-        })
-        expect(errorSpy).toHaveBeenCalledWith('postSessionInit failed onEmbeddedMessagingReady', {
-            organizationId: '00DTEST00000001',
-            siteId: 'RefArchGlobal',
-            error: mutationError
-        })
+        expect(infoSpy).toHaveBeenCalledWith(
+            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+            {
+                organizationId: '00DTEST00000001',
+                siteId: 'RefArchGlobal',
+                response: successResponse
+            }
+        )
+        expect(errorSpy).toHaveBeenCalledWith(
+            'postSessionInit failed onEmbeddedMessagingConversationStarted',
+            {
+                organizationId: '00DTEST00000001',
+                siteId: 'RefArchGlobal',
+                error: mutationError
+            }
+        )
 
         infoSpy.mockRestore()
         errorSpy.mockRestore()
+    })
+
+    test('should call userVerificationAPI.clearSession and show error toast when postSessionInit fails', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
+        const mutationError = new Error('session init failed')
+
+        await act(async () => {
+            callbacks.onError(mutationError)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
+        expect(mockShowToast).toHaveBeenCalledTimes(1)
+        const toastPayload = mockShowToast.mock.calls[0][0]
+        expect(toastPayload.status).toBe('error')
+        const expectedTitle = 'We could not start the shopping assistant. Please try again.'
+        const titleText =
+            typeof toastPayload.title === 'string'
+                ? toastPayload.title
+                : Array.isArray(toastPayload.title)
+                  ? toastPayload.title.map((chunk) => chunk?.value ?? '').join('')
+                  : ''
+        expect(titleText).toBe(expectedTitle)
+
+        errorSpy.mockRestore()
+    })
+
+    test('should show error toast when postSessionInit fails and userVerificationAPI is unavailable', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const bootstrapWithoutUv = {
+            ...mockEmbeddedService,
+            userVerificationAPI: undefined
+        }
+        global.window.embeddedservice_bootstrap = bootstrapWithoutUv
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
+
+        await act(async () => {
+            callbacks.onError(new Error('session init failed'))
+        })
+
+        expect(mockShowToast).toHaveBeenCalledTimes(1)
+        expect(mockShowToast.mock.calls[0][0].status).toBe('error')
+
+        errorSpy.mockRestore()
+        global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
 
     test('should not call postSessionInit mutation when organizationId or siteId is missing', async () => {
@@ -322,7 +422,7 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
         expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
@@ -564,15 +664,16 @@ describe('ShopperAgent Component', () => {
     test('should clean up event listeners on unmount', () => {
         const {unmount} = render(<ShopperAgent {...defaultProps} />)
 
-        // Spy on removeEventListener
         const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
 
-        // Unmount the component
         unmount()
 
-        // Verify that event listeners were removed
         expect(removeEventListenerSpy).toHaveBeenCalledWith(
             'onEmbeddedMessagingReady',
+            expect.any(Function)
+        )
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            'onEmbeddedMessagingConversationStarted',
             expect.any(Function)
         )
         expect(removeEventListenerSpy).toHaveBeenCalledWith(
@@ -580,7 +681,6 @@ describe('ShopperAgent Component', () => {
             expect.any(Function)
         )
 
-        // Clean up
         removeEventListenerSpy.mockRestore()
     })
 
