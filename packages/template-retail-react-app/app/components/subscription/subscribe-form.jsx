@@ -89,7 +89,7 @@ const SubscribeForm = ({
             <Text {...styles.message}>{messages.description}</Text>
 
             {feedbackMessage && (
-                <Alert status={feedbackType} mb={4}>
+                <Alert variant="outlined" status={feedbackType} mb={4}>
                     <AlertIcon />
                     <AlertDescription>{feedbackMessage}</AlertDescription>
                 </Alert>
