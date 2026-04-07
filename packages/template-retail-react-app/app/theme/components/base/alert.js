@@ -45,6 +45,18 @@ export default {
                     borderStyle: 'solid'
                 }
             }
+        },
+        marketing: (props) => {
+            const colorScheme = getColorScheme(props)
+
+            return {
+                container: {
+                    bg: `${colorScheme}.50`
+                },
+                description: {
+                    color: `${colorScheme}.700`
+                }
+            }
         }
     }
 }
