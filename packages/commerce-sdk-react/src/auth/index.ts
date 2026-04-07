@@ -364,7 +364,7 @@ class Auth {
 
         /*
          * There are 2 ways to enable SLAS private client mode.
-         * If enablePWAKitPrivateClient=true, we route SLAS calls to
+         * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
          * and set an internal placeholder as the client secret. The proxy will override the placeholder
          * with the actual client secret so any truthy value as the placeholder works here.
          *

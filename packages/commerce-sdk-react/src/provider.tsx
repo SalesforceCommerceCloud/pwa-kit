@@ -283,6 +283,16 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions: effectiveFetchOptions
         }
 
+        // Determine the proxy endpoint for ShopperLogin based on the client mode:
+        // - Private client mode uses a dedicated private proxy endpoint
+        // - HttpOnly session cookies mode uses a public proxy endpoint
+        // - Otherwise, fall back to the default proxy
+        const shopperLoginProxy = enablePWAKitPrivateClient
+            ? privateClientProxyEndpoint
+            : enableHttpOnlySessionCookies
+            ? publicClientProxyEndpoint
+            : config.proxy
+
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperBasketsV2: new ShopperBasketsV2(config),
@@ -294,11 +304,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient
-                    ? privateClientProxyEndpoint
-                    : enableHttpOnlySessionCookies
-                    ? publicClientProxyEndpoint
-                    : config.proxy
+                proxy: shopperLoginProxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperPayments: new ShopperPayments(config),
@@ -318,7 +324,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         headers?.['correlation-id'],
-        apiClients
+        apiClients,
+        enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
+        enableHttpOnlySessionCookies
     ])
 
     // Initialize the session
