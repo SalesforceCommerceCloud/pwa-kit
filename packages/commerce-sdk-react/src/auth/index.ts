@@ -44,6 +44,7 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     headers?: Record<string, string>
     privateClientProxyEndpoint?: string
+    publicClientProxyEndpoint?: string
     fetchOptions?: FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -305,6 +306,8 @@ class Auth {
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
+                : config.enableHttpOnlySessionCookies
+                ? config.publicClientProxyEndpoint
                 : config.proxy,
             headers: config.headers || {},
             parameters: {

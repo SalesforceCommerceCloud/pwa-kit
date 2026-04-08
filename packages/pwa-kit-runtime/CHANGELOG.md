@@ -6,6 +6,7 @@
 - updated package-lock [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
 - Handle refresh token flow and consolidate `x-site-id` header usage for HttpOnly session cookies [#3759](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3759)
 - Handle missing refresh token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3771)
+- Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 
 ## v3.18.0-dev (Mar 20, 2026)
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)

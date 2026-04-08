@@ -3,6 +3,7 @@
 - Add `x-site-id` request header to read HttpOnly cookies on the server [#3700](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3700)
 - Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
 - Increase msxSize for vendor.js [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
+- Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 
 ## v9.2.0-dev (Mar 20, 2026)
 
