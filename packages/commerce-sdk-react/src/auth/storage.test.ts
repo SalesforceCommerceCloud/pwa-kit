@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint jest/expect-expect: ['error', {assertFunctionNames: ['validate']}] */
+import Cookies from 'js-cookie'
 import {BaseStorage, MemoryStorage, CookieStorage} from './storage'
 
 const key = 'key'
@@ -24,6 +25,51 @@ const testCases = [
             expect(storage.get(key)).toBe(value)
             storage.delete(key)
             expect(storage.get(key)).toBe('')
+        }
+    },
+    {
+        description: 'CookieStorage passes cookieDomain to set',
+        storageOptions: {cookieDomain: '.example.com'},
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            const setSpy = jest.spyOn(Cookies, 'set')
+            storage.set(key, value)
+            expect(setSpy).toHaveBeenCalledWith(
+                key,
+                value,
+                expect.objectContaining({domain: '.example.com'})
+            )
+            setSpy.mockRestore()
+        }
+    },
+    {
+        description: 'CookieStorage passes cookieDomain to delete',
+        storageOptions: {cookieDomain: '.example.com'},
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value)
+            const removeSpy = jest.spyOn(Cookies, 'remove')
+            storage.delete(key)
+            expect(removeSpy).toHaveBeenCalledWith(
+                key,
+                expect.objectContaining({domain: '.example.com'})
+            )
+            removeSpy.mockRestore()
+        }
+    },
+    {
+        description: 'CookieStorage does not set domain when cookieDomain is undefined',
+        storageOptions: undefined,
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            const setSpy = jest.spyOn(Cookies, 'set')
+            storage.set(key, value)
+            expect(setSpy).toHaveBeenCalledWith(
+                key,
+                value,
+                expect.not.objectContaining({domain: expect.anything()})
+            )
+            setSpy.mockRestore()
         }
     },
     {

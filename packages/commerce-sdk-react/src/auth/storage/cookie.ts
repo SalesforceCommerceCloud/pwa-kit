@@ -16,19 +16,25 @@ import {EXCLUDE_COOKIE_SUFFIX} from '../../constant'
  * to store authentication tokens.
  */
 export class CookieStorage extends BaseStorage {
+    private cookieDomain: string | undefined
     constructor(options?: BaseStorageOptions) {
         // TODO: Use detectCookiesAvailable when app can better handle clients with cookies disabled
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not available on the current environment.')
         }
         super(options)
+        this.cookieDomain = options?.cookieDomain
+    }
+    private getAttributes(options?: Cookies.CookieAttributes): Cookies.CookieAttributes {
+        return {
+            ...getDefaultCookieAttributes(),
+            ...(this.cookieDomain && {domain: this.cookieDomain}),
+            ...options
+        }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
-        Cookies.set(suffixedKey, value, {
-            ...getDefaultCookieAttributes(),
-            ...options
-        })
+        Cookies.set(suffixedKey, value, this.getAttributes(options))
     }
     get(key: string) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
@@ -50,11 +56,9 @@ export class CookieStorage extends BaseStorage {
     }
     delete(key: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        const attrs = this.getAttributes(options)
 
-        Cookies.remove(suffixedKey, {
-            ...getDefaultCookieAttributes(),
-            ...options
-        })
+        Cookies.remove(suffixedKey, attrs)
 
         // Some values, like the access token, may be split
         // across multiple keys to fit under ECOM cookie size
@@ -62,10 +66,7 @@ export class CookieStorage extends BaseStorage {
         let chunk = 2
         let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
         while (additionalPart) {
-            Cookies.remove(`${suffixedKey}_${chunk}`, {
-                ...getDefaultCookieAttributes(),
-                ...options
-            })
+            Cookies.remove(`${suffixedKey}_${chunk}`, attrs)
             chunk++
             additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
         }

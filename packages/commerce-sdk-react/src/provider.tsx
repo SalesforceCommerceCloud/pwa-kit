@@ -57,6 +57,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    cookieDomain?: string
     pageDesignerParams?: PageDesignerParams
 }
 
@@ -156,6 +157,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         apiClients,
         disableAuthInit = false,
         hybridAuthEnabled = false,
+        cookieDomain,
         pageDesignerParams = {}
     } = props
 
@@ -182,7 +184,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             passwordlessLoginCallbackURI,
             refreshTokenRegisteredCookieTTL,
             refreshTokenGuestCookieTTL,
-            hybridAuthEnabled
+            hybridAuthEnabled,
+            cookieDomain
         })
     }, [
         clientId,
@@ -204,7 +207,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
         apiClients,
-        hybridAuthEnabled
+        hybridAuthEnabled,
+        cookieDomain
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)

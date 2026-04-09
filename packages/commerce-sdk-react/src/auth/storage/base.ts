@@ -7,6 +7,7 @@
 
 export interface BaseStorageOptions {
     keySuffix?: string
+    cookieDomain?: string
 }
 
 export abstract class BaseStorage {
