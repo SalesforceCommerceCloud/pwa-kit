@@ -98,6 +98,24 @@ describe('SubscribeForm', () => {
         expect(screen.getByRole('alert')).toHaveAttribute('data-status', 'success')
     })
 
+    test('displays error feedback message with error status', () => {
+        const SubscribeFormWithError = () => {
+            const form = useForm({defaultValues: {email: ''}})
+            return (
+                <SubscribeForm
+                    form={form}
+                    onSubmit={jest.fn()}
+                    errors={{email: {message: 'Enter a valid email address.'}}}
+                />
+            )
+        }
+        renderWithProviders(<SubscribeFormWithError />)
+
+        const alert = screen.getByRole('alert')
+        expect(alert).toHaveAttribute('data-status', 'error')
+        expect(screen.getByText(/enter a valid email address/i)).toBeInTheDocument()
+    })
+
     test('does not display alert when no feedback', () => {
         renderWithProviders(<SubscribeFormWithForm />)
 
