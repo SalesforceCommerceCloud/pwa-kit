@@ -7,7 +7,12 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useConfig, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useConfig,
+    useCustomerType,
+    useShopperAgentsMutation,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -15,6 +20,7 @@ import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -153,6 +159,7 @@ const isEnabled = (enabled) => {
  * - Calls postSessionInit when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
+ * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
  * - Cleans up resources on unmount
  *
  * @param {Object} props - Component props
@@ -189,7 +196,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     toastRef.current = toast
 
     // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {locale} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
@@ -213,8 +220,33 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
     const postSessionInitMutation = useShopperAgentsMutation('postSessionInit')
+
+    const prevCommerceCustomerTypeRef = useRef(undefined)
+
+    /**
+     * Guest ↔ registered transitions require a new agentic messaging context; clear the embedded
+     * session so the UI returns to the FAB (see `resetEmbeddedMessagingForCommerceSessionChange`).
+     */
+    useEffect(() => {
+        if (customerType === null) {
+            return
+        }
+        const prev = prevCommerceCustomerTypeRef.current
+        prevCommerceCustomerTypeRef.current = customerType
+        if (prev === undefined) {
+            return
+        }
+        if (
+            prev !== customerType &&
+            (prev === 'guest' || prev === 'registered') &&
+            (customerType === 'guest' || customerType === 'registered')
+        ) {
+            resetEmbeddedMessagingForCommerceSessionChange()
+        }
+    }, [customerType])
     const postSessionInitMutateRef = useRef(postSessionInitMutation.mutate)
     postSessionInitMutateRef.current = postSessionInitMutation.mutate
 
