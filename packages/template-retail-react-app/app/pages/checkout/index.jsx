@@ -48,7 +48,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {
     useSFPaymentsEnabled,
-    useSFPayments
+    useSFPayments,
+    useExpressCheckoutEnabled
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
 
@@ -70,6 +71,7 @@ const Checkout = () => {
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const sfPaymentsEnabled = useSFPaymentsEnabled()
+    const {checkout: showExpressOnCheckout} = useExpressCheckoutEnabled()
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
@@ -168,7 +170,7 @@ const Checkout = () => {
                                     {error}
                                 </Alert>
                             )}
-                            {sfPaymentsEnabled && (
+                            {showExpressOnCheckout && (
                                 <Box
                                     layerStyle="card"
                                     rounded={[0, 0, 'base']}
