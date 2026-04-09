@@ -221,9 +221,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const formatMessageRef = useRef(formatMessage)
     formatMessageRef.current = formatMessage
 
-    const themeStickyRef = useRef(theme.zIndices.sticky)
-    themeStickyRef.current = theme.zIndices.sticky
-
     /** Latest values for embedded messaging handlers (stable window listeners). */
     const embeddedLifecycleRef = useRef({})
     embeddedLifecycleRef.current = {
