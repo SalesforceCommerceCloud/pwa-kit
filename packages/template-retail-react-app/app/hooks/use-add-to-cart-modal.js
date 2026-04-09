@@ -40,8 +40,8 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
 import {
-    useSFPaymentsEnabled,
-    useSFPayments
+    useSFPayments,
+    useExpressCheckoutEnabled
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 import {
@@ -94,7 +94,7 @@ export const AddToCartModal = () => {
         : Array.isArray(itemsAdded)
         ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
         : 0
-    const sfPaymentsEnabled = useSFPaymentsEnabled()
+    const {miniCart: showExpressOnMiniCart} = useExpressCheckoutEnabled()
     const {confirmingBasket} = useSFPayments()
 
     // Close modal after express payment completes
@@ -488,7 +488,7 @@ export const AddToCartModal = () => {
                                     })}
                                 </Button>
 
-                                {sfPaymentsEnabled && (
+                                {showExpressOnMiniCart && (
                                     <SFPaymentsExpress
                                         expressButtonLayout="vertical"
                                         maximumButtonCount={1}
@@ -565,7 +565,7 @@ export const AddToCartModal = () => {
                             })}
                         </Button>
 
-                        {sfPaymentsEnabled && (
+                        {showExpressOnMiniCart && (
                             <SFPaymentsExpress
                                 expressButtonLayout="vertical"
                                 maximumButtonCount={1}
