@@ -36,7 +36,6 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {
-    useSFPaymentsEnabled,
     useSFPayments,
     useExpressCheckoutEnabled
 } from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
@@ -218,9 +217,7 @@ const ProductView = forwardRef(
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
-        const sfPaymentsEnabled = useSFPaymentsEnabled()
-        const {pdp: expressOnPDP} = useExpressCheckoutEnabled()
-        const showExpressOnPDP = sfPaymentsEnabled && expressOnPDP
+        const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage

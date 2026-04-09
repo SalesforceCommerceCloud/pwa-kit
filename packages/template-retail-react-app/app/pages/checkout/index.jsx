@@ -71,8 +71,7 @@ const Checkout = () => {
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const sfPaymentsEnabled = useSFPaymentsEnabled()
-    const {checkout: expressOnCheckout} = useExpressCheckoutEnabled()
-    const showExpressOnCheckout = sfPaymentsEnabled && expressOnCheckout
+    const {checkout: showExpressOnCheckout} = useExpressCheckoutEnabled()
     const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
     const sfPaymentsSheetRef = useRef(null)
     const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)

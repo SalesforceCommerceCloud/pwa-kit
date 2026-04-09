@@ -16,15 +16,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
-import {
-    useSFPaymentsEnabled,
-    useExpressCheckoutEnabled
-} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {useExpressCheckoutEnabled} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const CartCta = () => {
-    const sfPaymentsEnabled = useSFPaymentsEnabled()
-    const {cart: expressOnCart} = useExpressCheckoutEnabled()
-    const showExpressOnCart = sfPaymentsEnabled && expressOnCart
+    const {cart: showExpressOnCart} = useExpressCheckoutEnabled()
 
     return (
         <Fragment>

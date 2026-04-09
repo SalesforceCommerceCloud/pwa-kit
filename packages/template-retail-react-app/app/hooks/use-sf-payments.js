@@ -138,8 +138,9 @@ export const useFutureUsageOffSession = () => {
  * @returns {{pdp: boolean, miniCart: boolean, cart: boolean, checkout: boolean}} Per-page express checkout flags
  */
 export const useExpressCheckoutEnabled = () => {
+    const sfPaymentsEnabled = useSFPaymentsEnabled()
     const enabledPages = useShopperConfiguration('expressOnCheckoutPagesEnabled')
-    const pages = Array.isArray(enabledPages) ? enabledPages : []
+    const pages = sfPaymentsEnabled && Array.isArray(enabledPages) ? enabledPages : []
     return {
         pdp: pages.includes('PDP'),
         miniCart: pages.includes('MINICART'),

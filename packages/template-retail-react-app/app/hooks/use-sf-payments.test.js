@@ -719,12 +719,20 @@ describe('useFutureUsageOffSession hook', () => {
 })
 
 describe('useExpressCheckoutEnabled hook', () => {
+    const mockShopperConfig = (sfPaymentsAllowed, enabledPages) => {
+        mockUseShopperConfiguration.mockImplementation((configId) => {
+            if (configId === 'SalesforcePaymentsAllowed') return sfPaymentsAllowed
+            if (configId === 'expressOnCheckoutPagesEnabled') return enabledPages
+            return undefined
+        })
+    }
+
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     test('returns an object with boolean properties for each page', () => {
-        mockUseShopperConfiguration.mockReturnValue(['PDP', 'CART', 'MINICART'])
+        mockShopperConfig(true, ['PDP', 'CART', 'MINICART'])
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -738,7 +746,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('returns all true when all pages are in the config', () => {
-        mockUseShopperConfiguration.mockReturnValue(['PDP', 'MINICART', 'CART', 'CHECKOUT'])
+        mockShopperConfig(true, ['PDP', 'MINICART', 'CART', 'CHECKOUT'])
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -750,8 +758,21 @@ describe('useExpressCheckoutEnabled hook', () => {
         })
     })
 
+    test('returns all false when sfPaymentsEnabled is false even if pages are configured', () => {
+        mockShopperConfig(false, ['PDP', 'MINICART', 'CART', 'CHECKOUT'])
+
+        const {result} = renderHook(() => useExpressCheckoutEnabled())
+
+        expect(result.current).toEqual({
+            pdp: false,
+            miniCart: false,
+            cart: false,
+            checkout: false
+        })
+    })
+
     test('returns all false when configuration value is undefined', () => {
-        mockUseShopperConfiguration.mockReturnValue(undefined)
+        mockShopperConfig(true, undefined)
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -764,7 +785,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('returns all false when configuration value is null', () => {
-        mockUseShopperConfiguration.mockReturnValue(null)
+        mockShopperConfig(true, null)
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -777,7 +798,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('returns all false when configuration value is an empty array', () => {
-        mockUseShopperConfiguration.mockReturnValue([])
+        mockShopperConfig(true, [])
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -790,7 +811,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('returns all false when configuration value is not an array (string)', () => {
-        mockUseShopperConfiguration.mockReturnValue('PDP')
+        mockShopperConfig(true, 'PDP')
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -803,7 +824,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('returns all false when configuration value is not an array (boolean)', () => {
-        mockUseShopperConfiguration.mockReturnValue(true)
+        mockShopperConfig(true, true)
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -816,7 +837,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('is case-sensitive when matching page identifiers', () => {
-        mockUseShopperConfiguration.mockReturnValue(['pdp', 'cart'])
+        mockShopperConfig(true, ['pdp', 'cart'])
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 
@@ -829,7 +850,7 @@ describe('useExpressCheckoutEnabled hook', () => {
     })
 
     test('only enables pages present in the config', () => {
-        mockUseShopperConfiguration.mockReturnValue(['CHECKOUT'])
+        mockShopperConfig(true, ['CHECKOUT'])
 
         const {result} = renderHook(() => useExpressCheckoutEnabled())
 

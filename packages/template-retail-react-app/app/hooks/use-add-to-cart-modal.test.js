@@ -60,8 +60,6 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     default: jest.fn(() => jest.fn())
 }))
 
-// Mock useSFPaymentsEnabled as a simple jest function
-const mockUseSFPaymentsEnabled = jest.fn(() => false)
 const mockUseSFPayments = jest.fn(() => ({confirmingBasket: null}))
 const mockUseExpressCheckoutEnabled = jest.fn(() => ({
     pdp: false,
@@ -74,7 +72,6 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
-        useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled(),
         useSFPayments: () => mockUseSFPayments(),
         useExpressCheckoutEnabled: () => mockUseExpressCheckoutEnabled()
     }
@@ -786,8 +783,12 @@ beforeEach(() => {
         derivedData: {},
         currency: 'USD'
     })
-    // Default mock with sfPayments disabled
-    mockUseSFPaymentsEnabled.mockReturnValue(false)
+    mockUseExpressCheckoutEnabled.mockReturnValue({
+        pdp: false,
+        miniCart: false,
+        cart: false,
+        checkout: false
+    })
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -1169,8 +1170,7 @@ test('selects bonusDiscountLineItem with remaining capacity when first one is fu
     expect(bonusProductsCard).toHaveAttribute('data-hide-selection-counter', 'true')
 })
 
-test('renders SFPaymentsExpress when sfPayments is enabled and express checkout is enabled for minicart', () => {
-    mockUseSFPaymentsEnabled.mockReturnValue(true)
+test('renders SFPaymentsExpress when express checkout is enabled for minicart', () => {
     mockUseExpressCheckoutEnabled.mockReturnValue({
         pdp: false,
         miniCart: true,
@@ -1223,8 +1223,8 @@ test('renders SFPaymentsExpress when sfPayments is enabled and express checkout 
     })
 })
 
-test('does not render SFPaymentsExpress when sfPayments is disabled', () => {
-    // sfPayments disabled by default in beforeEach
+test('does not render SFPaymentsExpress when express checkout is disabled for minicart', () => {
+    // All express checkout flags are false by default in the mock
     const MOCK_DATA = {
         product: MOCK_PRODUCT,
         itemsAdded: [
@@ -1263,50 +1263,7 @@ test('does not render SFPaymentsExpress when sfPayments is disabled', () => {
     expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
 })
 
-test('does not render SFPaymentsExpress when useSFPaymentsEnabled returns false', () => {
-    // Explicitly set sfPayments to false
-    mockUseSFPaymentsEnabled.mockReturnValue(false)
-
-    const MOCK_DATA = {
-        product: MOCK_PRODUCT,
-        itemsAdded: [
-            {
-                product: MOCK_PRODUCT,
-                variant: MOCK_PRODUCT.variants[0],
-                quantity: 1
-            }
-        ]
-    }
-
-    mockUseCurrentBasket.mockReturnValue({
-        data: {
-            productSubTotal: 14.99,
-            currency: 'USD'
-        },
-        derivedData: {
-            totalItems: 1
-        },
-        currency: 'USD'
-    })
-
-    renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: true,
-                data: MOCK_DATA,
-                onClose: jest.fn()
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
-
-    // Verify SFPaymentsExpress component is NOT rendered
-    expect(screen.queryByTestId('sf-payments-express')).not.toBeInTheDocument()
-})
-
-test('does not render SFPaymentsExpress when sfPayments is enabled but express checkout is disabled for minicart', () => {
-    mockUseSFPaymentsEnabled.mockReturnValue(true)
+test('does not render SFPaymentsExpress when express checkout is enabled for other pages but not minicart', () => {
     mockUseExpressCheckoutEnabled.mockReturnValue({
         pdp: true,
         miniCart: false,
