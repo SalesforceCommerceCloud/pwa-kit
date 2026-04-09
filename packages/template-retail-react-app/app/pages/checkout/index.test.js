@@ -30,12 +30,19 @@ jest.mock('@vis.gl/react-google-maps', () => ({
 
 // Mock useSFPaymentsEnabled as a simple jest function
 const mockUseSFPaymentsEnabled = jest.fn(() => false)
+const mockUseExpressCheckoutEnabled = jest.fn(() => ({
+    pdp: true,
+    miniCart: true,
+    cart: true,
+    checkout: true
+}))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
     const actual = jest.requireActual('@salesforce/retail-react-app/app/hooks/use-sf-payments')
     return {
         ...actual,
-        useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled()
+        useSFPaymentsEnabled: () => mockUseSFPaymentsEnabled(),
+        useExpressCheckoutEnabled: () => mockUseExpressCheckoutEnabled()
     }
 })
 

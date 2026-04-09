@@ -1,4 +1,5 @@
 ## v9.2.0-dev (Mar 20, 2026)
+- [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
 - [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
 
 ## v9.1.1 (Mar 20, 2026)
