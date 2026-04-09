@@ -7,7 +7,8 @@
 
 import {
     launchChat,
-    openShopperAgent
+    openShopperAgent,
+    resetEmbeddedMessagingForCommerceSessionChange
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 describe('shopper-agent-utils', () => {
@@ -228,6 +229,36 @@ describe('shopper-agent-utils', () => {
 
             // Should not throw, launchChat handles missing bootstrap gracefully
             expect(() => openShopperAgent()).not.toThrow()
+        })
+    })
+
+    describe('resetEmbeddedMessagingForCommerceSessionChange', () => {
+        test('should call userVerificationAPI.clearSession(true) when available', async () => {
+            const clearSession = jest.fn().mockResolvedValue(undefined)
+            global.window = {
+                embeddedservice_bootstrap: {
+                    userVerificationAPI: {clearSession}
+                }
+            }
+
+            resetEmbeddedMessagingForCommerceSessionChange()
+
+            await Promise.resolve()
+            expect(clearSession).toHaveBeenCalledWith(true)
+        })
+
+        test('should no-op when clearSession is missing', () => {
+            global.window = {
+                embeddedservice_bootstrap: {}
+            }
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+        })
+
+        test('should return early when not on client', () => {
+            delete global.window
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
         })
     })
 })

@@ -83,7 +83,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useUsid: jest.fn(),
     useConfig: jest.fn(),
-    useShopperAgentsMutation: jest.fn()
+    useShopperAgentsMutation: jest.fn(),
+    useCustomerType: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -100,7 +101,7 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useConfig, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
+import {useConfig, useCustomerType, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -110,6 +111,7 @@ const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseUsid = useUsid
 const mockedUseConfig = useConfig
+const mockedUseCustomerType = useCustomerType
 const mockedUseShopperAgentsMutation = useShopperAgentsMutation
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
@@ -160,6 +162,13 @@ describe('ShopperAgent Component', () => {
         mockPostSessionInitMutate.mockReset()
         mockedUseShopperAgentsMutation.mockReturnValue({
             mutate: mockPostSessionInitMutate
+        })
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
         })
 
         // Mock useMultiSite hook with proper structure
@@ -243,6 +252,51 @@ describe('ShopperAgent Component', () => {
 
         // Component should render (even though it returns null, it should not throw)
         expect(() => render(<ShopperAgent {...defaultProps} />)).not.toThrow()
+    })
+
+    test('should reset embedded messaging when customer type changes from guest to registered', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from registered to guest', async () => {
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
     })
 
     test('should set up prechat fields when embedded messaging is ready', async () => {
