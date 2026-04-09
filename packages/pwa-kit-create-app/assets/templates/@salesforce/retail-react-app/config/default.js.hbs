@@ -134,7 +134,11 @@ module.exports = {
                 organizationId: '{{answers.project.commerce.organizationId}}',
                 shortCode: '{{answers.project.commerce.shortCode}}',
                 siteId: '{{answers.project.commerce.siteId}}'
-            }
+            },
+            // Optional: Set the cookie domain for auth cookies.
+            // Useful for sharing cookies across subdomains (e.g., '.example.com').
+            // If not set, cookies default to the current host.
+            cookieDomain: undefined
         },
         // Einstein api config
         einsteinAPI: {
