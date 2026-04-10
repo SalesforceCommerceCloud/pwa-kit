@@ -84,6 +84,12 @@ export const setScapiAuthRequestHeaders = ({
     if (cookies.dwsid) {
         proxyRequest.setHeader('sfdc_dwsid', cookies.dwsid)
     }
+
+    // Strip session cookies — the proxy has already extracted the tokens
+    // it needs. These cookies should not be forwarded to SCAPI.
+    stripSessionCookies(proxyRequest, incomingRequest)
+    // Strip internal header — only used by our proxy, not by SCAPI.
+    proxyRequest.removeHeader(X_SITE_ID)
 }
 
 /**
@@ -308,7 +314,9 @@ export const configureProxy = ({
                 targetProtocol
             })
 
-            // Apply Authorization header with shopper's access token from HttpOnly cookie
+            // For SCAPI proxy requests with HttpOnly cookies enabled:
+            // inject auth headers from cookies, strip session cookies, and
+            // remove internal headers. Non-SCAPI proxies are left untouched.
             if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
                 setScapiAuthRequestHeaders({
                     proxyRequest,
@@ -316,11 +324,6 @@ export const configureProxy = ({
                     caching,
                     targetHost
                 })
-                // Strip session cookies — the proxy has already extracted the tokens
-                // it needs. These cookies should not be forwarded to SCAPI.
-                stripSessionCookies(proxyRequest, incomingRequest)
-                // Strip internal header — only used by our proxy, not by SCAPI.
-                proxyRequest.removeHeader(X_SITE_ID)
             }
         },
 
