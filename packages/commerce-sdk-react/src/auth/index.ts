@@ -328,7 +328,9 @@ class Auth {
         const cookieOptions = {...baseOptions, cookieDomain: config.cookieDomain}
 
         this.stores = {
-            cookie: onClient() ? new CookieStorage(cookieOptions) : new MemoryStorage(memoryOptions),
+            cookie: onClient()
+                ? new CookieStorage(cookieOptions)
+                : new MemoryStorage(memoryOptions),
             local: onClient() ? new LocalStorage(baseOptions) : new MemoryStorage(memoryOptions),
             memory: new MemoryStorage(memoryOptions)
         }

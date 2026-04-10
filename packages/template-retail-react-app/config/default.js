@@ -62,7 +62,7 @@ module.exports = {
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
-            },
+            }
             // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
             // cookieDomain: '.example.com'
