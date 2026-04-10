@@ -79,6 +79,53 @@ export const setScapiAuthRequestHeaders = ({
         // Always override - cookie-based auth takes precedence
         proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
     }
+
+    // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
+    if (cookies.dwsid) {
+        proxyRequest.setHeader('sfdc_dwsid', cookies.dwsid)
+    }
+}
+
+/**
+ * Strip HttpOnly session cookies from a proxy request after the proxy has already
+ * extracted the tokens it needs (e.g., to set Authorization headers).
+ *
+ * This mirrors the MRT CloudFront Lambda@Edge logic in transformHttpOnlyCookies
+ * (cloudfront-proxy-origin-rewriter.js), using exact cookie names based on siteId
+ * rather than prefix matching.
+ *
+ * Removes: cc-at_{siteId}, cc-nx-g_{siteId}, cc-nx_{siteId}, and dwsid.
+ * Any remaining cookies are preserved and forwarded.
+ *
+ * @private
+ * @param proxyRequest {http.ClientRequest} the outgoing proxy request
+ * @param incomingRequest {http.IncomingMessage} the original incoming request
+ */
+export const stripSessionCookies = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = incomingRequest.headers[X_SITE_ID]
+
+    // Build the exact list of cookies to delete, matching MRT's approach
+    const cookiesToDelete = new Set(['dwsid'])
+    if (siteId) {
+        cookiesToDelete.add(`cc-at_${siteId}`)
+        cookiesToDelete.add(`cc-nx-g_${siteId}`)
+        cookiesToDelete.add(`cc-nx_${siteId}`)
+    }
+
+    const filtered = Object.entries(cookies).filter(([name]) => !cookiesToDelete.has(name))
+
+    if (filtered.length === 0) {
+        proxyRequest.removeHeader('cookie')
+    } else {
+        proxyRequest.setHeader(
+            'cookie',
+            filtered.map(([name, value]) => cookie.serialize(name, value)).join('; ')
+        )
+    }
 }
 
 /**
@@ -269,6 +316,9 @@ export const configureProxy = ({
                     caching,
                     targetHost
                 })
+                // Strip session cookies — the proxy has already extracted the tokens
+                // it needs. These cookies should not be forwarded to SCAPI.
+                stripSessionCookies(proxyRequest, incomingRequest)
                 // Strip internal header — only used by our proxy, not by SCAPI.
                 proxyRequest.removeHeader(X_SITE_ID)
             }
