@@ -1,4 +1,5 @@
 ## v5.2.0-dev (Mar 20, 2026)
+- Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
 
 ## v5.1.1 (Mar 20, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

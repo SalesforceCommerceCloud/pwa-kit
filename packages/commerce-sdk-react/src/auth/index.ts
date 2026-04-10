@@ -54,6 +54,7 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
+    cookieDomain?: string
 }
 
 interface JWTHeaders {
@@ -321,16 +322,17 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        const options = {
-            keySuffix: config.siteId,
-            // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
-            sharedContext: !onClient()
-        }
+        const baseOptions = {keySuffix: config.siteId}
+        // Setting sharedContext to true on the server allows us to reuse guest auth tokens across lambda runs
+        const memoryOptions = {...baseOptions, sharedContext: !onClient()}
+        const cookieOptions = {...baseOptions, cookieDomain: config.cookieDomain}
 
         this.stores = {
-            cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
-            local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
-            memory: new MemoryStorage(options)
+            cookie: onClient()
+                ? new CookieStorage(cookieOptions)
+                : new MemoryStorage(memoryOptions),
+            local: onClient() ? new LocalStorage(baseOptions) : new MemoryStorage(memoryOptions),
+            memory: new MemoryStorage(memoryOptions)
         }
 
         this.redirectURI = config.redirectURI
