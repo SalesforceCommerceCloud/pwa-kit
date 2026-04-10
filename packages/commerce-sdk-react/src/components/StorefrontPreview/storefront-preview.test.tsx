@@ -16,6 +16,7 @@ declare global {
     interface Window {
         STOREFRONT_PREVIEW?: {
             getToken?: () => string | undefined | Promise<string | undefined>
+            getUsid?: () => Promise<string>
             onContextChange?: () => void | Promise<void>
             siteId?: string
             experimentalUnsafeNavigate?: (
@@ -126,6 +127,7 @@ describe('Storefront Preview Component', function () {
             />
         )
         expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.getUsid).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.siteId).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
