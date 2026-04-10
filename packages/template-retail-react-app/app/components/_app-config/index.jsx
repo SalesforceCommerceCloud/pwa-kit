@@ -114,6 +114,7 @@ const AppConfig = ({children, locals = {}}) => {
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
+            cookieDomain={commerceApiConfig.cookieDomain}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
             pageDesignerParams={pageDesignerParams}
         >
