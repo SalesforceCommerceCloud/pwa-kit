@@ -30,8 +30,7 @@ export default {
             },
             description: {
                 fontSize: 'sm',
-                ml: 3,
-                color: `${colorScheme}.700`
+                color: `black`
             }
         }
     },
@@ -44,6 +43,22 @@ export default {
                     borderColor: `${colorScheme}.600`,
                     borderWidth: 1,
                     borderStyle: 'solid'
+                }
+            }
+        },
+        outlined: (props) => {
+            const colorScheme = getColorScheme(props)
+
+            return {
+                container: {
+                    bg: `${colorScheme}.50`,
+                    borderColor: `${colorScheme}.600`,
+                    borderWidth: 1,
+                    borderStyle: 'solid'
+                },
+                description: {
+                    ml: 3,
+                    color: `${colorScheme}.700`
                 }
             }
         }
