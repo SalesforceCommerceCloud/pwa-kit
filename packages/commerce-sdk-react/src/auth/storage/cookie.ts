@@ -74,6 +74,12 @@ export class CookieStorage extends BaseStorage {
         // implicit host (no domain attribute). Without this, the browser would keep both
         // the old host-scoped cookie and the new domain-scoped cookie, causing conflicts
         // since Cookies.get() returns a non-deterministic match when duplicates exist.
+        //
+        // Note: The reverse case (removing cookieDomain after it was previously set) is
+        // not handled here because we have no way to know the previous domain value.
+        // In that scenario, old domain-scoped cookies will persist until they expire
+        // naturally. Merchants disabling cookieDomain should be aware that existing
+        // shoppers may need to clear their cookies manually.
         if (this.cookieDomain && Cookies.get(suffixedKey)) {
             this.removeHostAndDomainCookie(suffixedKey, options)
         }
