@@ -58,6 +58,16 @@ const testCases = [
         }
     },
     {
+        description: 'CookieStorage warns on invalid cookieDomain',
+        storageOptions: {cookieDomain: '*.example.com'},
+        StorageClass: CookieStorage,
+        validate: () => {
+            expect(console.warn).toHaveBeenCalledWith(
+                expect.stringContaining('Invalid cookieDomain')
+            )
+        }
+    },
+    {
         description: 'CookieStorage does not set domain when cookieDomain is undefined',
         storageOptions: undefined,
         StorageClass: CookieStorage,
@@ -116,6 +126,12 @@ const testCases = [
 ]
 
 describe('Storage Classes', () => {
+    beforeEach(() => {
+        jest.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
     testCases.forEach(({description, storageOptions, validate, StorageClass}) => {
         test(`${description}`, () => {
             const storage = new StorageClass(storageOptions)

@@ -63,10 +63,9 @@ module.exports = {
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
             },
-            // Optional: Set the cookie domain for auth cookies.
-            // Useful for sharing cookies across subdomains (e.g., '.example.com').
+            // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
-            cookieDomain: undefined
+            // cookieDomain: '.example.com'
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',

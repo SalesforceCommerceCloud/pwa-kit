@@ -9,6 +9,10 @@ import {getDefaultCookieAttributes} from '../../utils'
 import {BaseStorage, BaseStorageOptions} from './base'
 import {EXCLUDE_COOKIE_SUFFIX} from '../../constant'
 
+export interface CookieStorageOptions extends BaseStorageOptions {
+    cookieDomain?: string
+}
+
 /**
  * A normalized implementation for Cookie store. It implements the BaseStorage interface
  * which allows developers to easily switch between Cookie, LocalStorage, Memory store
@@ -17,14 +21,33 @@ import {EXCLUDE_COOKIE_SUFFIX} from '../../constant'
  */
 export class CookieStorage extends BaseStorage {
     private cookieDomain: string | undefined
-    constructor(options?: BaseStorageOptions) {
+    constructor(options?: CookieStorageOptions) {
         // TODO: Use detectCookiesAvailable when app can better handle clients with cookies disabled
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not available on the current environment.')
         }
         super(options)
-        this.cookieDomain = options?.cookieDomain
+        // We can catch known-invalid patterns here, but complete validation is not possible
+        // since domain matching depends on the runtime host (e.g., '.example.com' is valid
+        // on shop.example.com but will be silently rejected by the browser on localhost).
+        if (options?.cookieDomain) {
+            if (/[*,;=\s]/.test(options.cookieDomain)) {
+                console.warn(
+                    `CookieStorage: Invalid cookieDomain "${options.cookieDomain}". ` +
+                        'Cookie domains must not contain wildcards or special characters. ' +
+                        'Example: ".example.com"'
+                )
+            }
+            this.cookieDomain = options.cookieDomain
+        }
     }
+    /**
+     * Merges cookie attributes in order of increasing precedence:
+     * 1. Default attributes (secure, sameSite) from getDefaultCookieAttributes()
+     * 2. The cookieDomain configured at construction time (if set)
+     * 3. Per-call options passed to set() or delete(), which take highest priority
+     *    and can override any of the above, including the domain
+     */
     private getAttributes(options?: Cookies.CookieAttributes): Cookies.CookieAttributes {
         return {
             ...getDefaultCookieAttributes(),
