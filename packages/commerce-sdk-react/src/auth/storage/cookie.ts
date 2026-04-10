@@ -55,8 +55,28 @@ export class CookieStorage extends BaseStorage {
             ...options
         }
     }
+    /**
+     * Removes a cookie by key, targeting both the domain-scoped version and any
+     * pre-existing host-scoped version. When cookieDomain is configured, browsers
+     * treat host-scoped and domain-scoped cookies as separate entries. Without
+     * cleaning up both, stale host-scoped cookies from before cookieDomain was
+     * enabled would persist and cause session conflicts.
+     */
+    private removeHostAndDomainCookie(key: string, options?: Cookies.CookieAttributes) {
+        Cookies.remove(key, this.getAttributes(options))
+        if (this.cookieDomain) {
+            Cookies.remove(key, getDefaultCookieAttributes())
+        }
+    }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        // When cookieDomain is configured, remove any pre-existing cookie scoped to the
+        // implicit host (no domain attribute). Without this, the browser would keep both
+        // the old host-scoped cookie and the new domain-scoped cookie, causing conflicts
+        // since Cookies.get() returns a non-deterministic match when duplicates exist.
+        if (this.cookieDomain && Cookies.get(suffixedKey)) {
+            this.removeHostAndDomainCookie(suffixedKey, options)
+        }
         Cookies.set(suffixedKey, value, this.getAttributes(options))
     }
     get(key: string) {
@@ -79,9 +99,8 @@ export class CookieStorage extends BaseStorage {
     }
     delete(key: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
-        const attrs = this.getAttributes(options)
 
-        Cookies.remove(suffixedKey, attrs)
+        this.removeHostAndDomainCookie(suffixedKey, options)
 
         // Some values, like the access token, may be split
         // across multiple keys to fit under ECOM cookie size
@@ -89,7 +108,7 @@ export class CookieStorage extends BaseStorage {
         let chunk = 2
         let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
         while (additionalPart) {
-            Cookies.remove(`${suffixedKey}_${chunk}`, attrs)
+            this.removeHostAndDomainCookie(`${suffixedKey}_${chunk}`, options)
             chunk++
             additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
         }
