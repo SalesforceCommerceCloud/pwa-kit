@@ -812,21 +812,19 @@ class Auth {
                 if (this.enableHttpOnlySessionCookies) {
                     this.client.clientConfig.headers[X_GRANT_TYPE] = 'refresh_token'
                 }
-                return await this.queueRequest(
-                    () =>
-                        helpers.refreshAccessToken({
-                            slasClient: this.client,
-                            parameters: {
-                                refreshToken: refreshToken || '',
-                                dnt: dntPref
-                            },
-                            credentials: {
-                                clientSecret: this.clientSecret
-                            },
-                            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
-                        }),
-                    isGuest
-                )
+                const token = await helpers.refreshAccessToken({
+                    slasClient: this.client,
+                    parameters: {
+                        refreshToken: refreshToken || '',
+                        dnt: dntPref
+                    },
+                    credentials: {
+                        clientSecret: this.clientSecret
+                    },
+                    enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
+                })
+                this.handleTokenResponse(token, isGuest)
+                return this.data
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
                 if (error instanceof Error && 'response' in error) {
@@ -850,10 +848,9 @@ class Auth {
             try {
                 const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
                 if (isAgent) {
-                    return await this.queueRequest(
-                        () => this.refreshTrustedAgent(loginId, usid),
-                        isGuest
-                    )
+                    const token = await this.refreshTrustedAgent(loginId, usid)
+                    this.handleTokenResponse(token, isGuest)
+                    return this.data
                 }
             } catch (e) {
                 /* catch invalid jwt */
@@ -870,22 +867,6 @@ class Auth {
             token = await this.loginGuestUser()
         }
         return token
-    }
-
-    /**
-     * This method queues the requests and handles the SLAS token response.
-     *
-     * It returns the queue.
-     *
-     * @Internal
-     */
-    async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
-        const token = await fn()
-        this.handleTokenResponse(token, isGuest)
-        // Q: Why don't we just return token? Why re-construct the same object again?
-        // A: because a user could open multiple tabs and the data in memory could be out-dated
-        // We must always grab the data from the storage (cookie/localstorage) directly
-        return this.data
     }
 
     logWarning = (msg: string) => {
@@ -1038,7 +1019,9 @@ class Auth {
             : () => helpers.loginGuestUser({...guestPublicArgs, enableHttpOnlySessionCookies})
 
         try {
-            return await this.queueRequest(callback, isGuest)
+            const token = await callback()
+            this.handleTokenResponse(token, isGuest)
+            return this.data
         } catch (error) {
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.

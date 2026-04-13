@@ -343,11 +343,9 @@ describe('Auth', () => {
             'secret'
         )
         const auth = new Auth({...config, fetchedToken})
-        jest.spyOn(auth, 'queueRequest')
         await auth.ready()
-        // The "unbound method" isn't being called, so the rule isn't applicable
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(auth.queueRequest).not.toHaveBeenCalled()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+        expect(helpers.loginGuestUser).not.toHaveBeenCalled()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
