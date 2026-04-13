@@ -271,6 +271,15 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 
 /**
+ * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
+ * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
+ * so instance-level dedup via `this.pendingToken` is insufficient. This map ensures only one
+ * in-flight refresh request exists per siteId+clientId combination.
+ * @internal — exported for test access only
+ */
+export const pendingRefreshTokens = new Map<string, Promise<AuthData>>()
+
+/**
  * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
  * and refresh tokens on server/browser environments. As well as providing
@@ -282,7 +291,6 @@ class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
-    private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private clientSecret: string
@@ -758,7 +766,34 @@ class Auth {
         }
     }
 
+    private get refreshDedupKey(): string {
+        const params = this.client.clientConfig.parameters
+        return `refresh:${params.siteId}:${params.clientId}`
+    }
+
     async refreshAccessToken() {
+        // Dedup uses a module-level map (not an instance field) because React may recreate
+        // the Auth instance on re-renders, giving each instance its own state. The map is
+        // keyed by siteId+clientId so different sites/clients remain independent.
+        const key = this.refreshDedupKey
+        const existing = pendingRefreshTokens.get(key)
+        if (existing) {
+            await existing
+            return this.data
+        }
+
+        const promise = this._refreshAccessToken().finally(() => {
+            pendingRefreshTokens.delete(key)
+        })
+        pendingRefreshTokens.set(key, promise)
+        return await promise
+    }
+
+    /**
+     * Internal implementation of the refresh flow. Called only via refreshAccessToken()
+     * which wraps it in the module-level pendingRefreshTokens map for deduplication.
+     */
+    private async _refreshAccessToken() {
         const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -845,20 +880,12 @@ class Auth {
      * @Internal
      */
     async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
-        const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue
-            .then(async () => {
-                const token = await fn()
-                this.handleTokenResponse(token, isGuest)
-                // Q: Why don't we just return token? Why re-construct the same object again?
-                // A: because a user could open multiple tabs and the data in memory could be out-dated
-                // We must always grab the data from the storage (cookie/localstorage) directly
-                return this.data
-            })
-            .finally(() => {
-                this.pendingToken = undefined
-            })
-        return await this.pendingToken
+        const token = await fn()
+        this.handleTokenResponse(token, isGuest)
+        // Q: Why don't we just return token? Why re-construct the same object again?
+        // A: because a user could open multiple tabs and the data in memory could be out-dated
+        // We must always grab the data from the storage (cookie/localstorage) directly
+        return this.data
     }
 
     logWarning = (msg: string) => {
@@ -948,8 +975,10 @@ class Auth {
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
-        if (this.pendingToken) {
-            return await this.pendingToken
+        const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
+        if (pendingRefresh) {
+            await pendingRefresh
+            return this.data
         }
 
         if (!this.isAccessTokenExpired()) {

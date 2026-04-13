@@ -18,7 +18,8 @@ import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
-    DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+    DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL,
+    pendingRefreshTokens
 } from './index'
 import {RequireKeys} from '../hooks/types'
 
@@ -146,6 +147,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
 describe('Auth', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        pendingRefreshTokens.clear()
     })
     test('get/set storage value', () => {
         const auth = new Auth(config)
@@ -279,24 +281,31 @@ describe('Auth', () => {
         expect(newAuth.get('access_token')).not.toBe('123')
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
-    test('ready - re-use pendingToken', async () => {
+    test('ready - re-use pending refresh from module-level map', async () => {
         const auth = new Auth(config)
-        const data = {
-            refresh_token: 'refresh_token_guest',
+        const data: Record<string, string> = {
+            refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
-            expires_in: 1800,
+            expires_in: '1800',
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest'
         }
-        // @ts-expect-error private method
-        auth.pendingToken = Promise.resolve(data)
+        // Populate storage to simulate tokens stored by a previous Auth instance
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+        // Simulate an in-flight refresh from another Auth instance
+        pendingRefreshTokens.set('refresh:siteId:clientId', Promise.resolve(data as any))
 
-        await expect(auth.ready()).resolves.toEqual(data)
+        const result = await auth.ready()
+        expect(result.access_token).toBe('access_token')
+        expect(result.customer_id).toBe('customer_id')
     })
     test('ready - re-use valid access token', async () => {
         const auth = new Auth(config)
@@ -324,8 +333,6 @@ describe('Auth', () => {
         })
 
         await expect(auth.ready()).resolves.toEqual(result)
-        // @ts-expect-error private method
-        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const fetchedToken = jwt.sign(
@@ -341,8 +348,6 @@ describe('Auth', () => {
         // The "unbound method" isn't being called, so the rule isn't applicable
         // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(auth.queueRequest).not.toHaveBeenCalled()
-        // @ts-expect-error private method
-        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
