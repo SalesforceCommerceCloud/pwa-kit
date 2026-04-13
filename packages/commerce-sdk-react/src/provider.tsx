@@ -177,7 +177,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     const stableHeaders = useMemo(() => {
         headersRef.current = headers
         return headers
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [headersKey])
 
     const loggerRef = useRef(configLogger)
