@@ -41,6 +41,11 @@ jest.mock('../../hooks/useAuthContext', () =>
         ready: jest.fn(() => Promise.resolve({usid: 'mock-usid'}))
     }))
 )
+jest.mock('../../hooks/useUsid', () =>
+    jest.fn(() => ({
+        getUsidWhenReady: jest.fn(() => Promise.resolve('mock-usid'))
+    }))
+)
 jest.mock('../../hooks/useConfig', () => jest.fn())
 
 const mockPush = jest.fn()
@@ -335,12 +340,16 @@ describe('Storefront Preview Component', function () {
             )
         }
 
-        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />)
+        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />, {
+            disableAuthInit: true
+        })
         expect(getBasketSpy).toHaveBeenCalledWith({
             parameters: {...parameters, c_cache_breaker: 1000}
         })
 
-        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />)
+        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />, {
+            disableAuthInit: true
+        })
         expect(getBasketSpy).toHaveBeenCalledWith({
             parameters
         })
