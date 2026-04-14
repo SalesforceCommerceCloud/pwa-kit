@@ -54,7 +54,7 @@ import {
     slasPrivateProxyPath,
     slasPublicProxyPath
 } from '../../utils/ssr-namespace-paths'
-import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
+import {applyProxyRequestHeaders, stripSessionCookies} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
@@ -1099,8 +1099,10 @@ export const RemoteServerFactory = {
                             setTokensInLogoutRequest(proxyRequest, incomingRequest)
                         }
 
-                        // Strip internal headers that are only used by our proxy, not by SLAS.
+                        // Strip internal headers and session cookies that are only used
+                        // by our proxy, not by SLAS.
                         if (httpOnlyCookiesEnabled) {
+                            stripSessionCookies(proxyRequest, incomingRequest)
                             proxyRequest.removeHeader(X_SITE_ID)
                         }
 

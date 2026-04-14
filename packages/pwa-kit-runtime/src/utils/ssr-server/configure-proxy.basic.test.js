@@ -7,6 +7,7 @@
 import {
     applyProxyRequestHeaders,
     setScapiAuthRequestHeaders,
+    stripSessionCookies,
     configureProxy
 } from './configure-proxy'
 import {X_SITE_ID} from '../../ssr/server/constants'
@@ -110,9 +111,12 @@ describe('setScapiAuthRequestHeaders', () => {
         jest.clearAllMocks()
     })
 
-    it('applies Bearer token for non-SLAS Shopper API endpoints', () => {
+    it('applies Bearer token and sfdc_dwsid header for SCAPI endpoints', () => {
         utils.isScapiDomain.mockReturnValue(true)
-        cookie.parse.mockReturnValue({'cc-at_RefArch': 'test-access-token'})
+        cookie.parse.mockReturnValue({
+            'cc-at_RefArch': 'test-access-token',
+            dwsid: 'test-session-id'
+        })
 
         const proxyRequest = {
             setHeader: jest.fn(),
@@ -121,7 +125,7 @@ describe('setScapiAuthRequestHeaders', () => {
         const incomingRequest = {
             url: '/shopper/products/v1/products',
             headers: {
-                cookie: 'cc-at_RefArch=test-access-token',
+                cookie: 'cc-at_RefArch=test-access-token; dwsid=test-session-id',
                 [X_SITE_ID]: 'RefArch'
             }
         }
@@ -137,6 +141,7 @@ describe('setScapiAuthRequestHeaders', () => {
             'authorization',
             'Bearer test-access-token'
         )
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith('sfdc_dwsid', 'test-session-id')
     })
 
     it('does not apply Bearer token when caching is true', () => {
@@ -265,5 +270,76 @@ describe('setScapiAuthRequestHeaders', () => {
             'authorization',
             'Bearer other-access-token'
         )
+    })
+})
+
+describe('stripSessionCookies', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('strips siteId-specific session cookies and dwsid, preserves others', () => {
+        cookie.parse.mockReturnValue({
+            'cc-at_SiteA': 'access-token-a',
+            'cc-at_SiteB': 'access-token-b',
+            'cc-nx-g_SiteA': 'guest-refresh-a',
+            'cc-nx_SiteA': 'registered-refresh-a',
+            dwsid: 'session-id',
+            'custom-cookie': 'keep-me'
+        })
+        cookie.serialize.mockImplementation((name, value) => `${name}=${value}`)
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            headers: {cookie: 'any', [X_SITE_ID]: 'SiteA'}
+        }
+
+        stripSessionCookies(proxyRequest, incomingRequest)
+
+        // Only SiteA cookies are stripped; SiteB cookies are preserved
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'cookie',
+            'cc-at_SiteB=access-token-b; custom-cookie=keep-me'
+        )
+        expect(proxyRequest.removeHeader).not.toHaveBeenCalled()
+    })
+
+    it('removes cookie header entirely when all cookies are session cookies', () => {
+        cookie.parse.mockReturnValue({
+            'cc-at_RefArch': 'access-token',
+            'cc-nx-g_RefArch': 'guest-refresh-token',
+            dwsid: 'session-id'
+        })
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            headers: {cookie: 'any', [X_SITE_ID]: 'RefArch'}
+        }
+
+        stripSessionCookies(proxyRequest, incomingRequest)
+
+        expect(proxyRequest.removeHeader).toHaveBeenCalledWith('cookie')
+        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+    })
+
+    it('does nothing when no cookie header is present', () => {
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            headers: {}
+        }
+
+        stripSessionCookies(proxyRequest, incomingRequest)
+
+        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+        expect(proxyRequest.removeHeader).not.toHaveBeenCalled()
     })
 })
