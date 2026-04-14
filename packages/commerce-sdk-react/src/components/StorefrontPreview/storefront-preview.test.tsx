@@ -35,12 +35,6 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
-jest.mock('../../hooks/useAuthContext', () =>
-    jest.fn(() => ({
-        get: jest.fn(() => 'mock-usid'),
-        ready: jest.fn(() => Promise.resolve({usid: 'mock-usid'}))
-    }))
-)
 jest.mock('../../hooks/useUsid', () =>
     jest.fn(() => ({
         getUsidWhenReady: jest.fn(() => Promise.resolve('mock-usid'))
