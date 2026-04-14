@@ -131,28 +131,26 @@ describe('createRefreshTokenDeduplicator', () => {
         jest.clearAllMocks()
     })
 
-    test('passes through non-refresh requests without deduplication', (done) => {
+    test('passes through non-refresh requests without deduplication', async () => {
         const middleware = createRefreshTokenDeduplicator()
         const req = makeReq({grantType: 'authorization_code', cookies: {'cc-nx_testsite': 'rt'}})
         const res = makeRes()
-        middleware(req, res, () => {
-            // next() was called — request passed through
-            done()
-        })
+        const next = jest.fn()
+        middleware(req, res, next)
+        expect(next).toHaveBeenCalledTimes(1)
     })
 
-    test('passes through first refresh request and wraps res.end', (done) => {
+    test('passes through first refresh request and wraps res.end', async () => {
         const middleware = createRefreshTokenDeduplicator()
         const req = makeReq({cookies: {'cc-nx_testsite': 'rt-abc'}})
         const res = makeRes()
         const originalEnd = res.end
 
-        middleware(req, res, () => {
-            // next() was called
-            expect(res.end).not.toBe(originalEnd) // res.end was wrapped
-            // Simulate the proxy completing
-            res.end('response body')
-            done()
+        await new Promise((resolve) => {
+            middleware(req, res, () => {
+                expect(res.end).not.toBe(originalEnd)
+                resolve()
+            })
         })
     })
 
@@ -207,21 +205,21 @@ describe('createRefreshTokenDeduplicator', () => {
         expect(res2.end).toHaveBeenCalledWith(Buffer.from('{"customer_id":"c1"}'))
     })
 
-    test('does not deduplicate requests with different refresh tokens', (done) => {
+    test('does not deduplicate requests with different refresh tokens', async () => {
         const middleware = createRefreshTokenDeduplicator()
+        const next = jest.fn()
 
         // First request
         const req1 = makeReq({cookies: {'cc-nx_testsite': 'token-A'}})
         const res1 = makeRes()
-        middleware(req1, res1, () => {
-            // Second request with different token
-            const req2 = makeReq({cookies: {'cc-nx_testsite': 'token-B'}})
-            const res2 = makeRes()
-            middleware(req2, res2, () => {
-                // Both passed through — no deduplication
-                done()
-            })
-        })
+        middleware(req1, res1, next)
+
+        // Second request with different token — should also pass through
+        const req2 = makeReq({cookies: {'cc-nx_testsite': 'token-B'}})
+        const res2 = makeRes()
+        middleware(req2, res2, next)
+
+        expect(next).toHaveBeenCalledTimes(2)
     })
 
     test('cleans up pending entry after first request completes', async () => {
