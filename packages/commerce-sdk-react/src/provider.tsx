@@ -172,12 +172,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // Without this, the Auth useMemo would recreate the Auth instance on every render,
     // causing unnecessary useEffect re-runs, context re-renders, and breaking
     // request deduplication.
-    const headersRef = useRef(headers)
     const headersKey = JSON.stringify(headers)
-    const stableHeaders = useMemo(() => {
-        headersRef.current = headers
-        return headers
-    }, [headersKey])
+
+    const stableHeaders = useMemo(() => headers, [headersKey])
 
     const loggerRef = useRef(configLogger)
     loggerRef.current = configLogger
