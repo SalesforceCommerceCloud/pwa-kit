@@ -65,7 +65,7 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │  Set-Cookie: cc-at-expires_RefArch=<exp>; Secure                       │
 ```
 
-### 2. SCAPI Shopper API Calls (e.g., Product Search)
+### 2. SCAPI Shopper API Calls (Product Search)
 
 #### Local Development (SCAPI Proxy in Express App)
 
