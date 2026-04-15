@@ -211,11 +211,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
      * This ensures the chat context is cleared when user authentication state changes.
      */
     useEffect(() => {
-        console.log('[ShopperAgent] customerType changed:', {
-            prev: prevCommerceCustomerTypeRef.current,
-            current: customerType
-        })
-
         const prev = prevCommerceCustomerTypeRef.current
         prevCommerceCustomerTypeRef.current = customerType
 
@@ -226,7 +221,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
         // Reset on any customerType change (login, logout, register)
         if (prev !== customerType) {
-            console.log('[ShopperAgent] Triggering reset - auth transition detected')
             resetEmbeddedMessagingForCommerceSessionChange()
         }
     }, [customerType])
