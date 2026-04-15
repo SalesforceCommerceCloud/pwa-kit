@@ -3,8 +3,9 @@
 ## Overview
 
 When `enableHttpOnlySessionCookies` is enabled, SLAS access and refresh tokens are stored as
-HttpOnly cookies instead of localStorage. This prevents client-side JavaScript from accessing tokens,
-improving security against XSS attacks. The proxy layer handles token injection transparently.
+HttpOnly cookies instead of localStorage. This prevents client-side JavaScript from accessing
+tokens, improving session security. The server-side SLAS proxy layer handles token injection
+transparently.
 
 ### Private vs Public Client
 
@@ -34,6 +35,10 @@ SLAS proxy requests (`/mobify/slas/private` or `/mobify/slas/public`) are handle
 Express app (not routed through CloudFront). The flows are identical — the only difference is that
 the **private** proxy injects `Authorization: Basic` credentials, while the **public** proxy does not.
 
+> **Note:** For public clients, the SDK invokes `/authorize` (PKCE) before `/token` to obtain an
+> authorization code. There is no change in how `/authorize` is invoked. The diagram below shows
+> only the `/token` call, which is where HttpOnly cookie processing occurs.
+
 ```
 Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │                                  │
@@ -49,8 +54,8 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │  1. Read x-site-id → "RefArch"   │
   │                                     │  2. Decode JWT (access_token)    │
   │                                     │  3. Set HttpOnly cookies:        │
-  │                                     │     - cc-at_RefArch (HttpOnly)   │
-  │                                     │     - cc-nx-g_RefArch (HttpOnly) │
+  │                                     │     - cc-at_RefArch              │
+  │                                     │     - cc-nx-g_RefArch            │
   │                                     │     - cc-at-expires_RefArch      │
   │                                     │     - cc-at-dnt_RefArch          │
   │                                     │     - uido_RefArch               │
