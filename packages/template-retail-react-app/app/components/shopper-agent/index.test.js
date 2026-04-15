@@ -101,7 +101,12 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useConfig, useCustomerType, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useConfig,
+    useCustomerType,
+    useShopperAgentsMutation,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -188,7 +193,9 @@ describe('ShopperAgent Component', () => {
         mockUseAppOrigin.mockReturnValue('https://example.com')
 
         mockShowToast.mockClear()
-        mockFormatMessage.mockImplementation((descriptor) => descriptor.defaultMessage ?? descriptor.id)
+        mockFormatMessage.mockImplementation(
+            (descriptor) => descriptor.defaultMessage ?? descriptor.id
+        )
         mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
         mockEmbeddedService.userVerificationAPI.clearSession.mockResolvedValue(undefined)
 
@@ -297,6 +304,78 @@ describe('ShopperAgent Component', () => {
         })
 
         expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from registered to null (logout)', async () => {
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: null,
+            isGuest: false,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from guest to null', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: null,
+            isGuest: false,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should NOT reset embedded messaging on initial mount', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        // Initial mount should not trigger clearSession
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+    })
+
+    test('should NOT reset embedded messaging when customer type stays the same', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        // Re-render with same customerType
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
     })
 
     test('should set up prechat fields when embedded messaging is ready', async () => {
@@ -433,8 +512,8 @@ describe('ShopperAgent Component', () => {
             typeof toastPayload.title === 'string'
                 ? toastPayload.title
                 : Array.isArray(toastPayload.title)
-                  ? toastPayload.title.map((chunk) => chunk?.value ?? '').join('')
-                  : ''
+                ? toastPayload.title.map((chunk) => chunk?.value ?? '').join('')
+                : ''
         expect(titleText).toBe(expectedTitle)
 
         errorSpy.mockRestore()

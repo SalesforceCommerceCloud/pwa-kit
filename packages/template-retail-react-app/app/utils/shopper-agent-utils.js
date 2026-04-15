@@ -74,7 +74,8 @@ export function openShopperAgent() {
  * @returns {void}
  */
 export function resetEmbeddedMessagingForCommerceSessionChange() {
-    if (!onClient) {
+    if (typeof window === 'undefined') {
+        console.log('[ShopperAgent] Not on client, skipping reset')
         return
     }
 
