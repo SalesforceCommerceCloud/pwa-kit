@@ -29,7 +29,7 @@ enableHttpOnlySessionCookies=false?
 ### 1. Token Acquisition (Login / Guest Token)
 
 SLAS proxy requests (`/mobify/slas/private` or `/mobify/slas/public`) are handled directly by the
-Express app (not routed through CloudFront). The flows are identical — the only difference is that
+Express app (not routed through CloudFront). The flows are identical—the only difference is that
 the **private** proxy injects `Authorization: Basic` credentials, while the **public** proxy does not.
 
 > **Note:** For public clients, the SDK invokes `/authorize` (PKCE) before `/token` to obtain an
