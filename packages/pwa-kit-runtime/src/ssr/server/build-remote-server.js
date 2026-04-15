@@ -68,7 +68,6 @@ import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
 import {setHttpOnlySessionCookies} from './process-token-response'
-import {createRefreshTokenDeduplicator} from './request-deduplication'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -1028,12 +1027,6 @@ export const RemoteServerFactory = {
 
         localDevLog(`Proxying ${proxyPath} to ${options.slasTarget}`)
 
-        // When HttpOnly session cookies are enabled, deduplicate concurrent refresh
-        // token requests so only one is forwarded to SLAS per session.
-        const deduplicateMiddleware = httpOnlyCookiesEnabled
-            ? createRefreshTokenDeduplicator()
-            : (req, res, next) => next()
-
         app.use(
             proxyPath,
             (req, res, next) => {
@@ -1052,7 +1045,6 @@ export const RemoteServerFactory = {
                 }
                 next()
             },
-            deduplicateMiddleware,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,

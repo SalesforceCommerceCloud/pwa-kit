@@ -826,14 +826,21 @@ class Auth {
                 this.handleTokenResponse(token, isGuest)
                 return this.data
             } catch (error) {
-                // If the refresh token is invalid, we need to re-login the user
+                // If the refresh token is invalid, we need to re-login the user.
                 if (error instanceof Error && 'response' in error) {
                     // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
                     // We can't use `instanceof`, so instead we just check for the `response` property
                     // and assume it is a fetch Response.
                     const json = await (error['response'] as Response).json()
                     if (json.message === 'invalid refresh_token') {
-                        // clean up storage and restart the login flow
+                        // In a multi-tab scenario, another tab may have already consumed the
+                        // one-time-use refresh token and stored fresh tokens. Re-check storage
+                        // before clearing — if a valid access token exists, use it instead of
+                        // wiping the other tab's work and falling back to guest login.
+                        if (!this.isAccessTokenExpired()) {
+                            return this.data
+                        }
+                        // No valid token found — clean up storage and restart the login flow.
                         this.clearStorage()
                     }
                 }
