@@ -30,7 +30,7 @@ enableHttpOnlySessionCookies=false?
 
 SLAS proxy requests (`/mobify/slas/private` or `/mobify/slas/public`) are handled directly by the
 Express app (not routed through CloudFront). The flows are identical—the only difference is that
-the **private** proxy injects `Authorization: Basic` credentials, while the **public** proxy does not.
+the **private** proxy injects `Authorization: Basic` credentials, while the **public** proxy doesn't.
 
 > **Note:** For public clients, the SDK invokes `/authorize` (PKCE) before `/token` to obtain an
 > authorization code. There is no change in how `/authorize` is invoked. The diagram below shows
