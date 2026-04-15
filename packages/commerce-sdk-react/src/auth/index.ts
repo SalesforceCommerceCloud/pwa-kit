@@ -271,6 +271,15 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 
 /**
+ * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
+ * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
+ * so instance-level dedup via `this.pendingToken` is insufficient. This map ensures only one
+ * in-flight refresh request exists per siteId+clientId combination.
+ * @internal — exported for test access only
+ */
+export const pendingRefreshTokens = new Map<string, Promise<AuthData>>()
+
+/**
  * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
  * and refresh tokens on server/browser environments. As well as providing
@@ -282,7 +291,6 @@ class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
-    private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private clientSecret: string
@@ -758,7 +766,34 @@ class Auth {
         }
     }
 
+    private get refreshDedupKey(): string {
+        const params = this.client.clientConfig.parameters
+        return `refresh:${params.siteId}:${params.clientId}`
+    }
+
     async refreshAccessToken() {
+        // Dedup uses a module-level map (not an instance field) because React may recreate
+        // the Auth instance on re-renders, giving each instance its own state. The map is
+        // keyed by siteId+clientId so different sites/clients remain independent.
+        const key = this.refreshDedupKey
+        const existing = pendingRefreshTokens.get(key)
+        if (existing) {
+            await existing
+            return this.data
+        }
+
+        const promise = this._refreshAccessToken().finally(() => {
+            pendingRefreshTokens.delete(key)
+        })
+        pendingRefreshTokens.set(key, promise)
+        return await promise
+    }
+
+    /**
+     * Internal implementation of the refresh flow. Called only via refreshAccessToken()
+     * which wraps it in the module-level pendingRefreshTokens map for deduplication.
+     */
+    private async _refreshAccessToken() {
         const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -777,30 +812,35 @@ class Auth {
                 if (this.enableHttpOnlySessionCookies) {
                     this.client.clientConfig.headers[X_GRANT_TYPE] = 'refresh_token'
                 }
-                return await this.queueRequest(
-                    () =>
-                        helpers.refreshAccessToken({
-                            slasClient: this.client,
-                            parameters: {
-                                refreshToken: refreshToken || '',
-                                dnt: dntPref
-                            },
-                            credentials: {
-                                clientSecret: this.clientSecret
-                            },
-                            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
-                        }),
-                    isGuest
-                )
+                const token = await helpers.refreshAccessToken({
+                    slasClient: this.client,
+                    parameters: {
+                        refreshToken: refreshToken || '',
+                        dnt: dntPref
+                    },
+                    credentials: {
+                        clientSecret: this.clientSecret
+                    },
+                    enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
+                })
+                this.handleTokenResponse(token, isGuest)
+                return this.data
             } catch (error) {
-                // If the refresh token is invalid, we need to re-login the user
+                // If the refresh token is invalid, we need to re-login the user.
                 if (error instanceof Error && 'response' in error) {
                     // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
                     // We can't use `instanceof`, so instead we just check for the `response` property
                     // and assume it is a fetch Response.
                     const json = await (error['response'] as Response).json()
                     if (json.message === 'invalid refresh_token') {
-                        // clean up storage and restart the login flow
+                        // In a multi-tab scenario, another tab may have already consumed the
+                        // one-time-use refresh token and stored fresh tokens. Re-check storage
+                        // before clearing — if a valid access token exists, use it instead of
+                        // wiping the other tab's work and falling back to guest login.
+                        if (!this.isAccessTokenExpired()) {
+                            return this.data
+                        }
+                        // No valid token found — clean up storage and restart the login flow.
                         this.clearStorage()
                     }
                 }
@@ -815,10 +855,9 @@ class Auth {
             try {
                 const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
                 if (isAgent) {
-                    return await this.queueRequest(
-                        () => this.refreshTrustedAgent(loginId, usid),
-                        isGuest
-                    )
+                    const token = await this.refreshTrustedAgent(loginId, usid)
+                    this.handleTokenResponse(token, isGuest)
+                    return this.data
                 }
             } catch (e) {
                 /* catch invalid jwt */
@@ -835,30 +874,6 @@ class Auth {
             token = await this.loginGuestUser()
         }
         return token
-    }
-
-    /**
-     * This method queues the requests and handles the SLAS token response.
-     *
-     * It returns the queue.
-     *
-     * @Internal
-     */
-    async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
-        const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue
-            .then(async () => {
-                const token = await fn()
-                this.handleTokenResponse(token, isGuest)
-                // Q: Why don't we just return token? Why re-construct the same object again?
-                // A: because a user could open multiple tabs and the data in memory could be out-dated
-                // We must always grab the data from the storage (cookie/localstorage) directly
-                return this.data
-            })
-            .finally(() => {
-                this.pendingToken = undefined
-            })
-        return await this.pendingToken
     }
 
     logWarning = (msg: string) => {
@@ -948,8 +963,10 @@ class Auth {
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
-        if (this.pendingToken) {
-            return await this.pendingToken
+        const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
+        if (pendingRefresh) {
+            await pendingRefresh
+            return this.data
         }
 
         if (!this.isAccessTokenExpired()) {
@@ -1009,7 +1026,9 @@ class Auth {
             : () => helpers.loginGuestUser({...guestPublicArgs, enableHttpOnlySessionCookies})
 
         try {
-            return await this.queueRequest(callback, isGuest)
+            const token = await callback()
+            this.handleTokenResponse(token, isGuest)
+            return this.data
         } catch (error) {
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.
