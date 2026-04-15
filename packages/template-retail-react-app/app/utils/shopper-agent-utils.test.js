@@ -233,6 +233,19 @@ describe('shopper-agent-utils', () => {
     })
 
     describe('resetEmbeddedMessagingForCommerceSessionChange', () => {
+        let consoleLogSpy
+        let consoleWarnSpy
+
+        beforeEach(() => {
+            consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+            consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        })
+
+        afterEach(() => {
+            consoleLogSpy.mockRestore()
+            consoleWarnSpy.mockRestore()
+        })
+
         test('should call userVerificationAPI.clearSession(true) when available', async () => {
             const clearSession = jest.fn().mockResolvedValue(undefined)
             global.window = {
@@ -245,9 +258,43 @@ describe('shopper-agent-utils', () => {
 
             await Promise.resolve()
             expect(clearSession).toHaveBeenCalledWith(true)
+            expect(consoleLogSpy).toHaveBeenCalledWith(
+                '[ShopperAgent] resetEmbeddedMessagingForCommerceSessionChange called'
+            )
+        })
+
+        test('should handle clearSession rejection and log error', async () => {
+            const clearSession = jest.fn().mockRejectedValue(new Error('Clear session failed'))
+            global.window = {
+                embeddedservice_bootstrap: {
+                    userVerificationAPI: {clearSession}
+                }
+            }
+
+            resetEmbeddedMessagingForCommerceSessionChange()
+
+            await Promise.resolve()
+            await Promise.resolve() // Wait for rejection to be caught
+
+            expect(clearSession).toHaveBeenCalledWith(true)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Shopper Agent: clearSession after Commerce auth transition failed',
+                expect.any(Error)
+            )
         })
 
         test('should no-op when clearSession is missing', () => {
+            global.window = {
+                embeddedservice_bootstrap: {}
+            }
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                '[ShopperAgent] clearSession function not available'
+            )
+        })
+
+        test('should no-op when userVerificationAPI is missing', () => {
             global.window = {
                 embeddedservice_bootstrap: {}
             }
@@ -259,6 +306,9 @@ describe('shopper-agent-utils', () => {
             delete global.window
 
             expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+            expect(consoleLogSpy).toHaveBeenCalledWith(
+                '[ShopperAgent] Not on client, skipping reset'
+            )
         })
     })
 })

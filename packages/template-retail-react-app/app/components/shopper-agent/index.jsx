@@ -30,26 +30,6 @@ const SESSION_INIT_ERROR_MESSAGE = defineMessage({
 })
 
 /**
- * Clears embedded messaging user verification state and closes the chat window when supported.
- * @see https://developer.salesforce.com/docs/service/messaging-web/references/m4w-reference/userVerificationAPI.html
- */
-const clearEmbeddedMessagingUserSession = () => {
-    if (!onClient) {
-        return
-    }
-    try {
-        const clearSession = window.embeddedservice_bootstrap?.userVerificationAPI?.clearSession
-        if (typeof clearSession === 'function') {
-            void Promise.resolve(clearSession()).catch((err) => {
-                console.error('userVerificationAPI.clearSession failed', err)
-            })
-        }
-    } catch (err) {
-        console.error('Error calling userVerificationAPI.clearSession', err)
-    }
-}
-
-/**
  * Validates that a URL is from a trusted Salesforce domain.
  *
  * @param {string} url - The URL to validate (e.g., 'https://myorg.salesforce.com/script.js')
@@ -227,23 +207,26 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const prevCommerceCustomerTypeRef = useRef(undefined)
 
     /**
-     * Guest ↔ registered transitions require a new agentic messaging context; clear the embedded
-     * session so the UI returns to the FAB (see `resetEmbeddedMessagingForCommerceSessionChange`).
+     * Reset embedded messaging whenever customerType changes (login, logout, registration).
+     * This ensures the chat context is cleared when user authentication state changes.
      */
     useEffect(() => {
-        if (customerType === null) {
-            return
-        }
+        console.log('[ShopperAgent] customerType changed:', {
+            prev: prevCommerceCustomerTypeRef.current,
+            current: customerType
+        })
+
         const prev = prevCommerceCustomerTypeRef.current
         prevCommerceCustomerTypeRef.current = customerType
+
+        // Skip initial mount
         if (prev === undefined) {
             return
         }
-        if (
-            prev !== customerType &&
-            (prev === 'guest' || prev === 'registered') &&
-            (customerType === 'guest' || customerType === 'registered')
-        ) {
+
+        // Reset on any customerType change (login, logout, register)
+        if (prev !== customerType) {
+            console.log('[ShopperAgent] Triggering reset - auth transition detected')
             resetEmbeddedMessagingForCommerceSessionChange()
         }
     }, [customerType])
@@ -415,19 +398,26 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 },
                 {
                     onSuccess: (data) => {
-                        console.info('postSessionInit succeeded onEmbeddedMessagingConversationStarted', {
-                            organizationId: orgId,
-                            siteId: sid,
-                            response: data
-                        })
+                        console.info(
+                            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+                            {
+                                organizationId: orgId,
+                                siteId: sid,
+                                response: data
+                            }
+                        )
                     },
                     onError: (error) => {
-                        console.error('postSessionInit failed onEmbeddedMessagingConversationStarted', {
-                            organizationId: orgId,
-                            siteId: sid,
-                            error
-                        })
-                        clearEmbeddedMessagingUserSession()
+                        console.error(
+                            'postSessionInit failed onEmbeddedMessagingConversationStarted',
+                            {
+                                organizationId: orgId,
+                                siteId: sid,
+                                error
+                            }
+                        )
+                        // Close the chat if session initialization fails
+                        resetEmbeddedMessagingForCommerceSessionChange()
                         toastRef.current({
                             title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
                             status: 'error'
