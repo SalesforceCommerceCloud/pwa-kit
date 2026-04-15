@@ -2,10 +2,7 @@
 
 ## Overview
 
-When `enableHttpOnlySessionCookies` is enabled, SLAS access and refresh tokens are stored as
-HttpOnly cookies instead of localStorage. This prevents client-side JavaScript from accessing
-tokens, improving session security. The server-side SLAS proxy layer handles token injection
-transparently.
+When you turn on `enableHttpOnlySessionCookies`, SLAS access and refresh tokens are stored as HttpOnly cookies to improve security. The server-side SLAS proxy layer handles token injection transparently.
 
 ### Private vs Public Client
 
