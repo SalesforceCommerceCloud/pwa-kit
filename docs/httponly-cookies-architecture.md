@@ -69,7 +69,7 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 #### Local Development (SCAPI Proxy in Express App)
 
-Locally, `/mobify/proxy` requests are handled by the Express app's proxy middleware.
+Locally, the Express app's proxy middleware handles `/mobify/proxy` requests.
 
 ```
 Browser                  Express Dev Server (SCAPI Proxy)               SCAPI
