@@ -103,7 +103,7 @@ Browser                  Express Dev Server (SCAPI Proxy)               SCAPI
 #### Production: Managed Runtime (MRT) - CloudFront Edge
 
 On MRT, `/mobify/proxy` requests are proxied at the CloudFront edge. The Lambda@Edge
-origin-request handler injects Authorization and sfdc_dwsid headers from HttpOnly cookies,
+origin-request handler injects Authorization and `sfdc_dwsid` headers from HttpOnly cookies,
 then strips session cookies before forwarding to SCAPI.
 
 ```
