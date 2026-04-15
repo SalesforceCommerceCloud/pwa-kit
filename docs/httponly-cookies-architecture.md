@@ -216,6 +216,8 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 ## Configuration
 
+This diagram shows how the configuration setting flows from the app to MRT and the API provider.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  config/default.js                                              │
