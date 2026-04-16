@@ -23,11 +23,23 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
     }
 
     const response = await error?.response?.json()
-    if (response?.detail !== 'Customer credentials changed after token was issued.') {
-        throw error
+    if (response?.detail === 'Customer credentials changed after token was issued.') {
+        logger.info('Login was invalidated. Clearing login state.')
+        return await auth.logout()
     }
-    logger.info('Login was invalidated. Clearing login state.')
-    return await auth.logout()
+
+    // The proxy returns this message when the HttpOnly access token cookie (cc-at_{siteId})
+    // is missing. This can happen if the cookie was deleted externally (e.g. via dev tools)
+    // while the non-HttpOnly expiry cookie (cc-at-expires) remained valid, causing
+    // isAccessTokenExpired() to incorrectly report the token as not expired. Clear the
+    // stale expiry cookie and trigger a token refresh.
+    if (response?.message === 'access_token_cookie_missing') {
+        logger.info('Access token cookie missing. Clearing expiry and refreshing token.')
+        auth.clearAccessTokenExpiry()
+        return await auth.refreshAccessToken()
+    }
+
+    throw error
 }
 
 /**

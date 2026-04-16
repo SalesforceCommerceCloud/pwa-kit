@@ -130,7 +130,7 @@ describe('setScapiAuthRequestHeaders', () => {
             }
         }
 
-        setScapiAuthRequestHeaders({
+        const result = setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -142,6 +142,7 @@ describe('setScapiAuthRequestHeaders', () => {
             'Bearer test-access-token'
         )
         expect(proxyRequest.setHeader).toHaveBeenCalledWith('sfdc_dwsid', 'test-session-id')
+        expect(result).toBe(true)
     })
 
     it('does not apply Bearer token when caching is true', () => {
@@ -221,26 +222,31 @@ describe('setScapiAuthRequestHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('does not apply Bearer token when cookie is not present', () => {
+    it('returns false when access token cookie is not present', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({}) // No access token cookie
 
         const proxyRequest = {
-            setHeader: jest.fn()
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {[X_SITE_ID]: 'RefArch'}
+            headers: {
+                cookie: 'some-other-cookie=value',
+                [X_SITE_ID]: 'RefArch'
+            }
         }
 
-        setScapiAuthRequestHeaders({
+        const result = setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
-        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
+        expect(result).toBe(false)
     })
 
     it('uses x-site-id header to resolve correct cookie', () => {

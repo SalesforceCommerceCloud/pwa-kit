@@ -45,6 +45,10 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
  * @param targetHost {String} the target hostname (host+port)
  */
+/**
+ * @returns {boolean} false if this is an SCAPI request and the access token cookie is missing,
+ *   true otherwise (including non-SCAPI requests where auth injection is not applicable).
+ */
 export const setScapiAuthRequestHeaders = ({
     proxyRequest,
     incomingRequest,
@@ -56,7 +60,7 @@ export const setScapiAuthRequestHeaders = ({
 
     // Skip if: caching proxy, not SCAPI domain, or no URL
     if (caching || !isScapiDomain(targetHost) || !url) {
-        return
+        return true
     }
 
     if (!resolvedSiteId) {
@@ -64,14 +68,12 @@ export const setScapiAuthRequestHeaders = ({
             'x-site-id header is missing on SCAPI proxy request. Bearer token injection skipped.',
             {namespace: 'configureProxy.setScapiAuthRequestHeaders'}
         )
-        return
+        return true
     }
 
     // Get access token from HttpOnly cookie
     const cookieHeader = incomingRequest.headers.cookie
-    if (!cookieHeader) return
-
-    const cookies = cookie.parse(cookieHeader)
+    const cookies = cookieHeader ? cookie.parse(cookieHeader) : {}
     const tokenKey = `cc-at_${resolvedSiteId}`
     const accessToken = cookies[tokenKey]
 
@@ -90,6 +92,8 @@ export const setScapiAuthRequestHeaders = ({
     stripSessionCookies(proxyRequest, incomingRequest)
     // Strip internal header — only used by our proxy, not by SCAPI.
     proxyRequest.removeHeader(X_SITE_ID)
+
+    return !!accessToken
 }
 
 /**
@@ -303,7 +307,7 @@ export const configureProxy = ({
          * @param incomingRequest {http.IncomingMessage} the request made to
          * this Express app that prompted the proxying
          */
-        onProxyReq: (proxyRequest, incomingRequest) => {
+        onProxyReq: (proxyRequest, incomingRequest, res) => {
             // First, apply standard proxy headers (Host, Origin, etc.)
             applyProxyRequestHeaders({
                 proxyRequest,
@@ -318,12 +322,21 @@ export const configureProxy = ({
             // inject auth headers from cookies, strip session cookies, and
             // remove internal headers. Non-SCAPI proxies are left untouched.
             if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
-                setScapiAuthRequestHeaders({
+                const hasAccessToken = setScapiAuthRequestHeaders({
                     proxyRequest,
                     incomingRequest,
                     caching,
                     targetHost
                 })
+
+                // If the access token cookie is missing, short-circuit instead of
+                // forwarding an unauthenticated request to SCAPI.
+                if (!hasAccessToken && !res.headersSent) {
+                    proxyRequest.destroy()
+                    res.status(401).json({
+                        message: 'access_token_cookie_missing'
+                    })
+                }
             }
         },
 
