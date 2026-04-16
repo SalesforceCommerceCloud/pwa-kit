@@ -286,10 +286,12 @@ export const configureProxy = ({
                 })
             }
 
-            res.writeHead(500, {
-                'Content-Type': 'text/plain'
-            })
-            res.end(`Error in proxy request to ${req.url}: ${err}`)
+            if (!res.headersSent) {
+                res.writeHead(500, {
+                    'Content-Type': 'text/plain'
+                })
+                res.end(`Error in proxy request to ${req.url}: ${err}`)
+            }
         },
 
         /**
