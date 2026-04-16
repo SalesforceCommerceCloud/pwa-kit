@@ -37,7 +37,8 @@ jest.mock('./utils', () => {
 })
 jest.mock('../../hooks/useUsid', () =>
     jest.fn(() => ({
-        getUsidWhenReady: jest.fn(() => Promise.resolve('mock-usid'))
+        getUsidWhenReady: jest.fn(() => Promise.resolve('mock-usid')),
+        getUsidForPreview: jest.fn(() => Promise.resolve('mock-usid'))
     }))
 )
 jest.mock('../../hooks/useConfig', () => jest.fn())
@@ -223,11 +224,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Runtime Admin sends /test/__pwa-kit/refresh but React Router has no basename
@@ -242,11 +239,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
@@ -284,11 +277,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Path already starts with /__pwa-kit/ — no prefix to strip
@@ -303,11 +292,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Regular navigation paths should pass through untouched
