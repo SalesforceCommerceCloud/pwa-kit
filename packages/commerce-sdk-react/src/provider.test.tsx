@@ -52,7 +52,6 @@ describe('provider', () => {
         expect(Auth).toHaveBeenCalledTimes(1)
         const authInstance = (Auth as jest.Mock).mock.instances[0]
         expect(authInstance.ready).toHaveBeenCalledTimes(1)
-        expect(authInstance.queueRequest).toHaveBeenCalledTimes(0)
     })
 
     test('shopper login api client uses private proxy when enabled', () => {

@@ -565,10 +565,12 @@ describe('HttpOnly session cookies', () => {
 
         let capturedAuthHeader
         let capturedRefreshToken
+        let capturedCookieHeader
         const mockSlasServer = mockExpress()
         mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
             capturedAuthHeader = req.headers.authorization
             capturedRefreshToken = req.query.refresh_token
+            capturedCookieHeader = req.headers.cookie
             res.status(200).json({success: true})
         })
 
@@ -610,6 +612,8 @@ describe('HttpOnly session cookies', () => {
             expect(response.body.success).toBe(true)
             expect(capturedAuthHeader).toBe('Bearer mock-access-token')
             expect(capturedRefreshToken).toBe('mock-refresh-token')
+            // Session cookies should not be forwarded to SLAS
+            expect(capturedCookieHeader).toBeUndefined()
             expect(response.headers['set-cookie']).toBeUndefined()
         } finally {
             mockSlasServerInstance.close()
@@ -897,6 +901,8 @@ describe('HttpOnly session cookies', () => {
             // x-grant-type and x-site-id were stripped from the outgoing request
             expect(capturedHeaders[X_GRANT_TYPE]).toBeUndefined()
             expect(capturedHeaders[X_SITE_ID]).toBeUndefined()
+            // Session cookies should not be forwarded to SLAS
+            expect(capturedHeaders.cookie).toBeUndefined()
             // HttpOnly cookies are set on the response
             expect(response.headers['set-cookie']).toBeDefined()
             const cookies = response.headers['set-cookie']
@@ -1067,6 +1073,8 @@ describe('HttpOnly session cookies', () => {
             expect(capturedHeaders['sfdc_refresh_token']).toBeUndefined()
             // x-site-id should still be stripped
             expect(capturedHeaders[X_SITE_ID]).toBeUndefined()
+            // Session cookies should not be forwarded to SLAS
+            expect(capturedHeaders.cookie).toBeUndefined()
         } finally {
             mockSlasServerInstance.close()
         }
@@ -1119,6 +1127,8 @@ describe('HttpOnly session cookies', () => {
             expect(response.status).toBe(200)
             // x-site-id should be stripped from the outgoing request
             expect(capturedHeaders[X_SITE_ID]).toBeUndefined()
+            // Session cookies should not be forwarded to SLAS
+            expect(capturedHeaders.cookie).toBeUndefined()
         } finally {
             mockSlasServerInstance.close()
         }
@@ -1334,6 +1344,8 @@ describe('SLAS public proxy', () => {
             // x-grant-type and x-site-id were stripped
             expect(capturedHeaders[X_GRANT_TYPE]).toBeUndefined()
             expect(capturedHeaders[X_SITE_ID]).toBeUndefined()
+            // Session cookies should not be forwarded to SLAS
+            expect(capturedHeaders.cookie).toBeUndefined()
         } finally {
             mockSlasServerInstance.close()
         }
