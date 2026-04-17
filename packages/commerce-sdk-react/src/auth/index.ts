@@ -1513,20 +1513,15 @@ class Auth {
 
     /**
      * Get the current USID for Storefront Preview by forcing a SLAS refresh.
-     * Throws when there is no active SLAS session — Preview must not silently
-     * fall through to guest login (it would replace the merchant's session and
-     * re-seed the USID from a JS-readable cookie).
+     *
+     * Works for both guest and registered shoppers: when an existing refresh
+     * token is present (guest or registered, legacy or HttpOnly), the SLAS
+     * response provides a fresh USID. When no refresh token is present,
+     * `refreshAccessToken()` falls through to a guest login, which also yields
+     * a fresh USID. Preview can therefore always obtain a USID without
+     * requiring the shopper to sign in.
      */
     async getUsidForPreview(): Promise<string> {
-        const hasRefresh =
-            !!(this.get('refresh_token_registered') || this.get('refresh_token_guest')) ||
-            this.hasHttpOnlyRefreshToken()
-        if (!hasRefresh) {
-            throw new Error(
-                'Storefront Preview requires an active SLAS session. Sign in to the storefront first.'
-            )
-        }
-
         await this.refreshAccessToken()
 
         const usid = this.get('usid')
