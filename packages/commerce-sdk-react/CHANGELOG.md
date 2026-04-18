@@ -5,6 +5,7 @@
 - Handle missing refresh token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3771)
 - Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 - Ensure client-side refresh token requests are deduped [#3786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3786/)
+- Add USID support to StorefrontPreview for HttpOnly cookies [#3785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3785)
 
 ## v5.2.0-dev (Mar 20, 2026)
 

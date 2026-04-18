@@ -12,6 +12,7 @@ import useAuthContext from './useAuthContext'
 interface Usid {
     usid: string | null
     getUsidWhenReady: () => Promise<string>
+    getUsidForPreview: () => Promise<string>
 }
 
 /**
@@ -31,8 +32,9 @@ const useUsid = (): Usid => {
     const usid = auth.get('usid')
 
     const getUsidWhenReady = () => auth.ready().then(({usid}) => usid)
+    const getUsidForPreview = () => auth.getUsidForPreview()
 
-    return {usid, getUsidWhenReady}
+    return {usid, getUsidWhenReady, getUsidForPreview}
 }
 
 export default useUsid
