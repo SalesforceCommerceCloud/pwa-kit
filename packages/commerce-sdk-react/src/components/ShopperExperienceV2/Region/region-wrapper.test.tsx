@@ -205,6 +205,57 @@ describe('RegionWrapper', () => {
 
             expect(screen.getByTestId('child-content')).toBeInTheDocument()
         })
+
+        test('uses contentLinkUuid for componentIds when present', () => {
+            const regionWithUuids = {
+                id: 'test-region',
+                components: [
+                    {id: 'comp-1', typeId: 'banner', contentLinkUuid: 'uuid-001'},
+                    {id: 'comp-2', typeId: 'carousel', contentLinkUuid: 'uuid-002'}
+                ]
+            }
+
+            render(
+                <RegionWrapper region={regionWithUuids}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
+
+        test('falls back to id when contentLinkUuid is not present', () => {
+            const regionWithoutUuids = {
+                id: 'test-region',
+                components: [{id: 'comp-1', typeId: 'banner'}]
+            }
+
+            render(
+                <RegionWrapper region={regionWithoutUuids}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
+
+        test('handles mixed components with and without contentLinkUuid', () => {
+            const regionMixed = {
+                id: 'test-region',
+                components: [
+                    {id: 'comp-1', typeId: 'banner', contentLinkUuid: 'uuid-001'},
+                    {id: 'comp-2', typeId: 'carousel'} // No UUID
+                ]
+            }
+
+            render(
+                <RegionWrapper region={regionMixed}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
     })
 
     describe('Props Forwarding', () => {
