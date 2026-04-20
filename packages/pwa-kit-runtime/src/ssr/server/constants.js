@@ -38,5 +38,6 @@ export const SLAS_LOGOUT_ENDPOINT = /\/oauth2\/logout/
 
 // Custom headers used by the proxy layer for HttpOnly session cookie support.
 // These are internal to our proxy and stripped before forwarding to SLAS/SCAPI.
+export const DWSID_COOKIE_NAME = 'dwsid'
 export const X_SITE_ID = 'x-site-id'
 export const X_GRANT_TYPE = 'x-grant-type'

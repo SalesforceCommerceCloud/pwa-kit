@@ -6,7 +6,8 @@
  */
 import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
-import {SET_COOKIE, X_SITE_ID} from './constants'
+import {SET_COOKIE} from './constants'
+import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
 import logger from '../../utils/logger-instance'
 
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
@@ -68,7 +69,7 @@ function getTokenClaims(accessToken) {
  * @private
  */
 export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, options) {
-    const siteId = req.headers?.[X_SITE_ID]
+    const siteId = getSiteId(req)
     if (!siteId) {
         throw new Error(
             'HttpOnly session cookies are enabled but siteId is missing. ' +
@@ -84,30 +85,31 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
     }
 
     const site = siteId
+    const {
+        accessToken,
+        accessTokenExpires,
+        accessTokenDnt,
+        uido,
+        idpAccessToken,
+        refreshTokenGuest,
+        refreshTokenRegistered,
+        refreshTokenExists
+    } = SESSION_COOKIE_CONFIG
 
     // Decode JWT and extract claims
     let isGuest = true
     if (parsed.access_token) {
-        const {
-            accessExpires,
-            expiresAt,
-            dnt,
-            uido,
-            isGuest: guest
-        } = getTokenClaims(parsed.access_token)
-        isGuest = guest
+        const tokenClaims = getTokenClaims(parsed.access_token)
+        isGuest = tokenClaims.isGuest
 
         // Access token (HttpOnly)
         res.append(
             SET_COOKIE,
             cookieAsString({
-                name: `cc-at_${site}`,
+                name: getCookieName(accessToken, site),
                 value: parsed.access_token,
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: true,
-                expires: accessExpires
+                expires: tokenClaims.accessExpires,
+                ...accessToken.attributes
             })
         )
 
@@ -115,44 +117,35 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         res.append(
             SET_COOKIE,
             cookieAsString({
-                name: `cc-at-expires_${site}`,
-                value: String(expiresAt),
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: false,
-                expires: accessExpires
+                name: getCookieName(accessTokenExpires, site),
+                value: String(tokenClaims.expiresAt),
+                expires: tokenClaims.accessExpires,
+                ...accessTokenExpires.attributes
             })
         )
 
         // Do-not-track flag from JWT (non-HttpOnly so client can read it)
-        if (dnt !== undefined) {
+        if (tokenClaims.dnt !== undefined) {
             res.append(
                 SET_COOKIE,
                 cookieAsString({
-                    name: `cc-at-dnt_${site}`,
-                    value: String(dnt),
-                    path: '/',
-                    secure: true,
-                    sameSite: 'lax',
-                    httpOnly: false,
-                    expires: accessExpires
+                    name: getCookieName(accessTokenDnt, site),
+                    value: String(tokenClaims.dnt),
+                    expires: tokenClaims.accessExpires,
+                    ...accessTokenDnt.attributes
                 })
             )
         }
 
         // uido: IDP origin (e.g. "slas", "ecom"); non-HttpOnly so client can read for useCustomerType/isExternal
-        if (uido) {
+        if (tokenClaims.uido) {
             res.append(
                 SET_COOKIE,
                 cookieAsString({
-                    name: `uido_${site}`,
-                    value: uido,
-                    path: '/',
-                    secure: true,
-                    sameSite: 'lax',
-                    httpOnly: false,
-                    expires: accessExpires
+                    name: getCookieName(uido, site),
+                    value: tokenClaims.uido,
+                    expires: tokenClaims.accessExpires,
+                    ...uido.attributes
                 })
             )
         }
@@ -162,13 +155,10 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             res.append(
                 SET_COOKIE,
                 cookieAsString({
-                    name: `idp_access_token_${site}`,
+                    name: getCookieName(idpAccessToken, site),
                     value: parsed.idp_access_token,
-                    path: '/',
-                    secure: true,
-                    sameSite: 'lax',
-                    httpOnly: true,
-                    expires: accessExpires
+                    expires: tokenClaims.accessExpires,
+                    ...idpAccessToken.attributes
                 })
             )
         }
@@ -183,18 +173,15 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             commerceAPI
         )
         const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
-        const refreshCookieName = isGuest ? `cc-nx-g_${site}` : `cc-nx_${site}`
+        const refreshConfig = isGuest ? refreshTokenGuest : refreshTokenRegistered
 
         res.append(
             SET_COOKIE,
             cookieAsString({
-                name: refreshCookieName,
+                name: getCookieName(refreshConfig, site),
                 value: parsed.refresh_token,
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: true,
-                expires: refreshExpires
+                expires: refreshExpires,
+                ...refreshConfig.attributes
             })
         )
 
@@ -203,30 +190,24 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         res.append(
             SET_COOKIE,
             cookieAsString({
-                name: `cc-nx-exists_${site}`,
+                name: getCookieName(refreshTokenExists, site),
                 value: '1',
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: false,
-                expires: refreshExpires
+                expires: refreshExpires,
+                ...refreshTokenExists.attributes
             })
         )
 
         // Delete the opposite refresh token cookie to mirror client-side behavior:
         // Login (guest → registered): delete guest cookie cc-nx-g
         // Logout (registered → guest): delete registered cookie cc-nx
-        const staleCookieName = isGuest ? `cc-nx_${site}` : `cc-nx-g_${site}`
+        const staleRefreshConfig = isGuest ? refreshTokenRegistered : refreshTokenGuest
         res.append(
             SET_COOKIE,
             cookieAsString({
-                name: staleCookieName,
+                name: getCookieName(staleRefreshConfig, site),
                 value: '',
-                path: '/',
-                secure: true,
-                sameSite: 'lax',
-                httpOnly: true,
-                expires: new Date(0)
+                expires: new Date(0),
+                ...staleRefreshConfig.attributes
             })
         )
     }
