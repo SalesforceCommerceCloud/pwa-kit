@@ -94,16 +94,18 @@ function renderRegionContent(
             designMetadata={getDesignMetadata(regionId, metadata)}
             {...rest}
         >
-            {region.components?.map(
-                (comp) =>
+            {region.components?.map((comp) => {
+                const key = (comp as any).contentLinkUuid || comp.id
+                return (
                     comp.id && (
                         <Component
-                            key={comp.id}
+                            key={key}
                             component={comp as ComponentType}
                             regionId={region.id}
                         />
                     )
-            )}
+                )
+            })}
         </RegionWrapper>
     )
 }
