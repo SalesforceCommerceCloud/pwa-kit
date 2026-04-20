@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyRequests} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
-import {useCommerceApi, useConfig} from '../../hooks'
+import {useCommerceApi, useConfig, useUsid} from '../../hooks'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
 type ContextChangeHandler = () => void | Promise<void>
@@ -22,8 +22,7 @@ type OptionalWhenDisabled<T> = ({enabled?: true} & T) | ({enabled: false} & Part
  * Only strips when path equals basePath or path starts with basePath + '/'.
  */
 function removeBasePathFromPath(path: string, basePath: string): string {
-    const matches =
-        path.startsWith(basePath + '/') || path === basePath
+    const matches = path.startsWith(basePath + '/') || path === basePath
     return matches ? path.slice(basePath.length) || '/' : path
 }
 
@@ -32,8 +31,8 @@ const PWA_KIT_PATH_PREFIX = '/__pwa-kit/'
 /**
  * Runtime Admin always prepends envBasePath to /__pwa-kit/ paths (e.g. /test/__pwa-kit/refresh),
  * but when showBasePath is false, React Router has no basename and expects /__pwa-kit/refresh.
- * 
- * This ensures that regardless of the showBasePath setting, these paths are normalized to 
+ *
+ * This ensures that regardless of the showBasePath setting, these paths are normalized to
  * remove the base path.
  */
 function normalizePwaKitPath<T>(pathOrLocation: LocationDescriptor<T>): LocationDescriptor<T> {
@@ -96,12 +95,14 @@ export const StorefrontPreview = ({
     const isHostTrusted = detectStorefrontPreview()
     const apiClients = useCommerceApi()
     const {siteId} = useConfig()
+    const {getUsidForPreview} = useUsid()
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
+                getUsid: getUsidForPreview,
                 onContextChange,
                 siteId,
                 experimentalUnsafeNavigate: (
@@ -116,7 +117,7 @@ export const StorefrontPreview = ({
                 }
             }
         }
-    }, [enabled, getToken, onContextChange, siteId, getBasePath])
+    }, [enabled, getToken, getUsidForPreview, onContextChange, siteId, getBasePath])
 
     useEffect(() => {
         if (enabled && isHostTrusted) {

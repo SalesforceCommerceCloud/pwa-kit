@@ -1525,6 +1525,26 @@ class Auth {
     }
 
     /**
+     * Get the current USID for Storefront Preview by forcing a SLAS refresh.
+     *
+     * Works for both guest and registered shoppers: when an existing refresh
+     * token is present (guest or registered, legacy or HttpOnly), the SLAS
+     * response provides a fresh USID. When no refresh token is present,
+     * `refreshAccessToken()` falls through to a guest login, which also yields
+     * a fresh USID. Preview can therefore always obtain a USID without
+     * requiring the shopper to sign in.
+     */
+    async getUsidForPreview(): Promise<string> {
+        await this.refreshAccessToken()
+
+        const usid = this.get('usid')
+        if (!usid) {
+            throw new Error('SLAS refresh did not return a USID')
+        }
+        return usid
+    }
+
+    /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
