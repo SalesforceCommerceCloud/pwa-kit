@@ -14,6 +14,17 @@ import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
 import {X_SITE_ID} from '../../ssr/server/constants'
 
+/**
+ * Error thrown when the access token HttpOnly cookie is not found on an SCAPI proxy request.
+ * Handled in onProxyReq to return a 400 instead of forwarding an unauthenticated request to SCAPI.
+ */
+export class AccessTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'AccessTokenNotFoundError'
+    }
+}
+
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
 /**
@@ -46,8 +57,7 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param targetHost {String} the target hostname (host+port)
  */
 /**
- * @returns {boolean} false if this is an SCAPI request and the access token cookie is missing,
- *   true otherwise (including non-SCAPI requests where auth injection is not applicable).
+ * @throws {AccessTokenNotFoundError} If this is an SCAPI request and the access token cookie is missing.
  */
 export const setScapiAuthRequestHeaders = ({
     proxyRequest,
@@ -60,7 +70,7 @@ export const setScapiAuthRequestHeaders = ({
 
     // Skip if: caching proxy, not SCAPI domain, or no URL
     if (caching || !isScapiDomain(targetHost) || !url) {
-        return true
+        return
     }
 
     if (!resolvedSiteId) {
@@ -68,7 +78,7 @@ export const setScapiAuthRequestHeaders = ({
             'x-site-id header is missing on SCAPI proxy request. Bearer token injection skipped.',
             {namespace: 'configureProxy.setScapiAuthRequestHeaders'}
         )
-        return true
+        return
     }
 
     // Get access token from HttpOnly cookie
@@ -77,10 +87,14 @@ export const setScapiAuthRequestHeaders = ({
     const tokenKey = `cc-at_${resolvedSiteId}`
     const accessToken = cookies[tokenKey]
 
-    if (accessToken) {
-        // Always override - cookie-based auth takes precedence
-        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+    if (!accessToken) {
+        throw new AccessTokenNotFoundError(
+            'Access token cookie not found. Cannot proceed with SCAPI request.'
+        )
     }
+
+    // Always override - cookie-based auth takes precedence
+    proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
     if (cookies.dwsid) {
@@ -92,8 +106,6 @@ export const setScapiAuthRequestHeaders = ({
     stripSessionCookies(proxyRequest, incomingRequest)
     // Strip internal header — only used by our proxy, not by SCAPI.
     proxyRequest.removeHeader(X_SITE_ID)
-
-    return !!accessToken
 }
 
 /**
@@ -324,20 +336,27 @@ export const configureProxy = ({
             // inject auth headers from cookies, strip session cookies, and
             // remove internal headers. Non-SCAPI proxies are left untouched.
             if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
-                const hasAccessToken = setScapiAuthRequestHeaders({
-                    proxyRequest,
-                    incomingRequest,
-                    caching,
-                    targetHost
-                })
-
-                // If the access token cookie is missing, short-circuit instead of
-                // forwarding an unauthenticated request to SCAPI.
-                if (!hasAccessToken && !res.headersSent) {
-                    proxyRequest.destroy()
-                    res.status(401).json({
-                        message: 'access_token_cookie_missing'
+                try {
+                    setScapiAuthRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
+                        caching,
+                        targetHost
                     })
+                } catch (error) {
+                    if (error instanceof AccessTokenNotFoundError) {
+                        logger.warn(error.message, {
+                            namespace: 'configureProxy.setScapiAuthRequestHeaders'
+                        })
+                        if (!res.headersSent) {
+                            proxyRequest.destroy()
+                            res.status(400).json({
+                                message: 'access_token_cookie_missing'
+                            })
+                        }
+                        return
+                    }
+                    throw error
                 }
             }
         },

@@ -8,7 +8,8 @@ import {
     applyProxyRequestHeaders,
     setScapiAuthRequestHeaders,
     stripSessionCookies,
-    configureProxy
+    configureProxy,
+    AccessTokenNotFoundError
 } from './configure-proxy'
 import {X_SITE_ID} from '../../ssr/server/constants'
 import * as ssrProxying from '../ssr-proxying'
@@ -130,7 +131,7 @@ describe('setScapiAuthRequestHeaders', () => {
             }
         }
 
-        const result = setScapiAuthRequestHeaders({
+        setScapiAuthRequestHeaders({
             proxyRequest,
             incomingRequest,
             caching: false,
@@ -142,7 +143,6 @@ describe('setScapiAuthRequestHeaders', () => {
             'Bearer test-access-token'
         )
         expect(proxyRequest.setHeader).toHaveBeenCalledWith('sfdc_dwsid', 'test-session-id')
-        expect(result).toBe(true)
     })
 
     it('does not apply Bearer token when caching is true', () => {
@@ -222,7 +222,7 @@ describe('setScapiAuthRequestHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('returns false when access token cookie is not present', () => {
+    it('throws AccessTokenNotFoundError when access token cookie is not present', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({}) // No access token cookie
 
@@ -238,15 +238,16 @@ describe('setScapiAuthRequestHeaders', () => {
             }
         }
 
-        const result = setScapiAuthRequestHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            targetHost: 'abc-001.api.commercecloud.salesforce.com'
-        })
+        expect(() =>
+            setScapiAuthRequestHeaders({
+                proxyRequest,
+                incomingRequest,
+                caching: false,
+                targetHost: 'abc-001.api.commercecloud.salesforce.com'
+            })
+        ).toThrow(AccessTokenNotFoundError)
 
         expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
-        expect(result).toBe(false)
     })
 
     it('uses x-site-id header to resolve correct cookie', () => {

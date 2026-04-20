@@ -16,9 +16,9 @@ const mockLogger = {
     debug: jest.fn()
 }
 
-const createMock401Error = (responseBody: Record<string, unknown>) => ({
+const createMockError = (status: number, responseBody: Record<string, unknown>) => ({
     response: {
-        status: 401,
+        status,
         json: () => responseBody
     }
 })
@@ -43,7 +43,7 @@ describe('handleInvalidToken', () => {
     })
 
     test('calls auth.logout() when detail is "Customer credentials changed after token was issued."', async () => {
-        const error = createMock401Error({
+        const error = createMockError(401, {
             detail: 'Customer credentials changed after token was issued.'
         })
 
@@ -54,7 +54,7 @@ describe('handleInvalidToken', () => {
     })
 
     test('clears access token expiry and refreshes when proxy reports missing access token cookie', async () => {
-        const error = createMock401Error({
+        const error = createMockError(400, {
             message: 'access_token_cookie_missing'
         })
 
@@ -63,13 +63,23 @@ describe('handleInvalidToken', () => {
         expect(mockAuth.clearAccessTokenExpiry).toHaveBeenCalled()
         expect(mockAuth.refreshAccessToken).toHaveBeenCalled()
         expect(result).toEqual({access_token: 'refreshed_token'})
-        expect(mockLogger.info).toHaveBeenCalledWith(
+        expect(mockLogger.warn).toHaveBeenCalledWith(
             expect.stringContaining('Access token cookie missing')
         )
     })
 
+    test('re-throws 400 with unrecognized response body', async () => {
+        const error = createMockError(400, {
+            detail: 'Some other error.'
+        })
+
+        await expect(handleInvalidToken(error, mockAuth as any, mockLogger)).rejects.toEqual(error)
+
+        expect(mockAuth.clearAccessTokenExpiry).not.toHaveBeenCalled()
+    })
+
     test('re-throws 401 with unrecognized response body', async () => {
-        const error = createMock401Error({
+        const error = createMockError(401, {
             detail: 'Some other SCAPI error.'
         })
 
