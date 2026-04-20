@@ -76,12 +76,7 @@ describe('getCookieName', () => {
 describe('getCookieNamesToStripFromProxy', () => {
     it('returns access token, both refresh tokens, and dwsid', () => {
         const names = getCookieNamesToStripFromProxy('RefArch')
-        expect(names).toEqual([
-            'cc-at_RefArch',
-            'cc-nx-g_RefArch',
-            'cc-nx_RefArch',
-            'dwsid'
-        ])
+        expect(names).toEqual(['cc-at_RefArch', 'cc-nx-g_RefArch', 'cc-nx_RefArch', 'dwsid'])
     })
 
     it('always includes dwsid regardless of siteId', () => {
