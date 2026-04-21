@@ -180,7 +180,10 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 10 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                // On the server, set cacheTime to 0 so inactive queries are garbage-collected
+                // immediately after dehydration, preventing memory retention across warm
+                // Lambda invocations. This does not affect client-side caching.
+                ...(isServerSide ? {retryOnMount: false, cacheTime: 0} : {})
             },
             mutations: {
                 retry: false
