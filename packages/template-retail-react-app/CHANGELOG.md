@@ -1,4 +1,5 @@
 ## v9.2.0-dev (Mar 20, 2026)
+- Add opt-in `app.mrtDataStore.enabled` to `config/default.js` (default `false`). Set to `true` or use `PWAKIT_MRT_DATA_STORE_ENABLED=true` to resolve MRT Data Store custom preferences during SSR. Local defaults without DynamoDB: `PWAKIT_MRT_DATA_STORE_DEFAULTS` and related env vars (see `config/default.js` comments).
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
 - [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
 - [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
