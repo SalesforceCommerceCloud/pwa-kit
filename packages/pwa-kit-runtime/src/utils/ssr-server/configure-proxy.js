@@ -88,13 +88,20 @@ export const setScapiAuthRequestHeaders = ({
     const accessToken = cookies[tokenKey]
 
     if (!accessToken) {
-        throw new AccessTokenNotFoundError(
-            'Access token cookie not found. Cannot proceed with SCAPI request.'
-        )
+        // During SSR, the SDK sets the Authorization header directly (onClient() is false),
+        // so the cookie won't be present on the server-side loopback request. Only throw
+        // when there is no existing Authorization header — meaning the client relied on
+        // the proxy to inject it from the cookie, but the cookie is missing.
+        const hasExistingAuth = incomingRequest.headers.authorization
+        if (!hasExistingAuth) {
+            throw new AccessTokenNotFoundError(
+                'Access token cookie not found. Cannot proceed with SCAPI request.'
+            )
+        }
+    } else {
+        // Cookie-based auth takes precedence over any existing header
+        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
     }
-
-    // Always override - cookie-based auth takes precedence
-    proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
     if (cookies.dwsid) {
