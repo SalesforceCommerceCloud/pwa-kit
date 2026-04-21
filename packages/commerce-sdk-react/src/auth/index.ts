@@ -553,6 +553,19 @@ class Auth {
     }
 
     /**
+     * Clears the non-HttpOnly access token expiry cookie (cc-at-expires).
+     *
+     * This is needed when SCAPI returns a 401 because the HttpOnly access token cookie
+     * (cc-at_{siteId}) was deleted externally while the expiry cookie remained valid.
+     * Clearing the expiry cookie ensures isAccessTokenExpired() returns true, so
+     * subsequent calls to ready() will trigger a refresh instead of assuming the token
+     * is still valid.
+     */
+    clearAccessTokenExpiry(): void {
+        this.delete('cc-at-expires')
+    }
+
+    /**
      * Returns whether the access token is expired. When enableHttpOnlySessionCookies is true,
      * uses cc-at-expires cookie from store; otherwise decodes the JWT from getAccessToken().
      */

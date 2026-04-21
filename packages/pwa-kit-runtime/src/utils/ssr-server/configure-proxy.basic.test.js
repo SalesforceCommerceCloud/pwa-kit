@@ -8,7 +8,8 @@ import {
     applyProxyRequestHeaders,
     setScapiAuthRequestHeaders,
     stripSessionCookies,
-    configureProxy
+    configureProxy,
+    AccessTokenNotFoundError
 } from './configure-proxy'
 import {X_SITE_ID} from '../../ssr/server/constants'
 import * as ssrProxying from '../ssr-proxying'
@@ -221,26 +222,32 @@ describe('setScapiAuthRequestHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalled()
     })
 
-    it('does not apply Bearer token when cookie is not present', () => {
+    it('throws AccessTokenNotFoundError when access token cookie is not present', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({}) // No access token cookie
 
         const proxyRequest = {
-            setHeader: jest.fn()
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
         }
         const incomingRequest = {
             url: '/shopper/products/v1/products',
-            headers: {[X_SITE_ID]: 'RefArch'}
+            headers: {
+                cookie: 'some-other-cookie=value',
+                [X_SITE_ID]: 'RefArch'
+            }
         }
 
-        setScapiAuthRequestHeaders({
-            proxyRequest,
-            incomingRequest,
-            caching: false,
-            targetHost: 'abc-001.api.commercecloud.salesforce.com'
-        })
+        expect(() =>
+            setScapiAuthRequestHeaders({
+                proxyRequest,
+                incomingRequest,
+                caching: false,
+                targetHost: 'abc-001.api.commercecloud.salesforce.com'
+            })
+        ).toThrow(AccessTokenNotFoundError)
 
-        expect(proxyRequest.setHeader).not.toHaveBeenCalled()
+        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
     })
 
     it('uses x-site-id header to resolve correct cookie', () => {

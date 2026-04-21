@@ -20,6 +20,17 @@ import {
     getSiteId
 } from '../../ssr/server/httponly-cookie-config'
 
+/**
+ * Error thrown when the access token HttpOnly cookie is not found on an SCAPI proxy request.
+ * Handled in onProxyReq to return a 400 instead of forwarding an unauthenticated request to SCAPI.
+ */
+export class AccessTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'AccessTokenNotFoundError'
+    }
+}
+
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
 /**
@@ -75,16 +86,18 @@ export const setScapiAuthRequestHeaders = ({
 
     // Get access token from HttpOnly cookie
     const cookieHeader = incomingRequest.headers.cookie
-    if (!cookieHeader) return
-
-    const cookies = cookie.parse(cookieHeader)
+    const cookies = cookieHeader ? cookie.parse(cookieHeader) : {}
     const tokenKey = getCookieName(SESSION_COOKIE_CONFIG.accessToken, resolvedSiteId)
     const accessToken = cookies[tokenKey]
 
-    if (accessToken) {
-        // Always override - cookie-based auth takes precedence
-        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+    if (!accessToken) {
+        throw new AccessTokenNotFoundError(
+            'Access token cookie not found. Cannot proceed with SCAPI request.'
+        )
     }
+
+    // Always override - cookie-based auth takes precedence
+    proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
     if (cookies[DWSID_COOKIE_NAME]) {
