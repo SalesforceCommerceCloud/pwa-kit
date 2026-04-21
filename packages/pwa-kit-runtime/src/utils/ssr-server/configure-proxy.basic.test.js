@@ -250,6 +250,36 @@ describe('setScapiAuthRequestHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
     })
 
+    it('does not throw when access token cookie is missing but Authorization header exists (SSR)', () => {
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({}) // No access token cookie
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {
+                cookie: 'some-other-cookie=value',
+                authorization: 'Bearer server-side-token',
+                [X_SITE_ID]: 'RefArch'
+            }
+        }
+
+        expect(() =>
+            setScapiAuthRequestHeaders({
+                proxyRequest,
+                incomingRequest,
+                caching: false,
+                targetHost: 'abc-001.api.commercecloud.salesforce.com'
+            })
+        ).not.toThrow()
+
+        // Should not override the existing Authorization header
+        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
+    })
+
     it('uses x-site-id header to resolve correct cookie', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_OtherSite': 'other-access-token'})
