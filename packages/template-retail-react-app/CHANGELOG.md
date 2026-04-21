@@ -5,6 +5,7 @@
 - Increase msxSize for vendor.js [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
 - Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 
+
 ## v9.2.0-dev (Mar 20, 2026)
 
 ## v9.1.1 (Mar 20, 2026)
