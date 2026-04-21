@@ -21,6 +21,11 @@ import {
     X_GRANT_TYPE
 } from './constants'
 import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+const {
+    refreshTokenRegistered,
+    refreshTokenGuest,
+    accessToken: accessTokenConfig
+} = SESSION_COOKIE_CONFIG
 import {
     catchAndLog,
     getHashForString,
@@ -137,8 +142,8 @@ export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
 
     // Try registered refresh token first, then guest
     const refreshToken =
-        cookies[getCookieName(SESSION_COOKIE_CONFIG.refreshTokenRegistered, siteId)] ||
-        cookies[getCookieName(SESSION_COOKIE_CONFIG.refreshTokenGuest, siteId)]
+        cookies[getCookieName(refreshTokenRegistered, siteId)] ||
+        cookies[getCookieName(refreshTokenGuest, siteId)]
     if (!refreshToken) {
         throw new RefreshTokenNotFoundError(
             'Refresh token cookie not found. Cannot proceed with refresh token flow.'
@@ -170,21 +175,20 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     }
 
     // Inject Bearer token from access token cookie
-    const accessToken = cookies[getCookieName(SESSION_COOKIE_CONFIG.accessToken, siteId)]
+    const accessToken = cookies[getCookieName(accessTokenConfig, siteId)]
     if (accessToken) {
         proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
     }
 
     // Inject refresh_token into query string from HttpOnly cookie
-    const refreshToken =
-        cookies[getCookieName(SESSION_COOKIE_CONFIG.refreshTokenRegistered, siteId)]
+    const refreshToken = cookies[getCookieName(refreshTokenRegistered, siteId)]
     if (refreshToken) {
         const separator = proxyRequest.path.includes('?') ? '&' : '?'
         proxyRequest.path += `${separator}refresh_token=${encodeURIComponent(refreshToken)}`
     } else {
         logger.warn(
             `Refresh token cookie (${getCookieName(
-                SESSION_COOKIE_CONFIG.refreshTokenRegistered,
+                refreshTokenRegistered,
                 siteId
             )}) not found for ${incomingRequest.path}. The logout request may fail.`,
             {namespace: 'setTokensInLogoutRequest'}
