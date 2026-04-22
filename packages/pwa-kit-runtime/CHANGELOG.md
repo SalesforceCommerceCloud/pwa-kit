@@ -9,6 +9,7 @@
 - Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
 - Do not forward sesssion cookies to SCAPI [#3783](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3783)
 - Handle missing access token for HttpOnly session cookies [#3790](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3790)
+- Fix missing access token logic so error is not thrown when `Authorization` header is set by the SDK [#3793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3793)
 - Centralize HttpOnly session cookie config [#3792](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3792)
 
 ## v3.18.0-dev (Mar 20, 2026)

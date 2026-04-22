@@ -62,6 +62,9 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
  * @param targetHost {String} the target hostname (host+port)
  */
+/**
+ * @throws {AccessTokenNotFoundError} If this is an SCAPI request and the access token cookie is missing.
+ */
 export const setScapiAuthRequestHeaders = ({
     proxyRequest,
     incomingRequest,
@@ -91,13 +94,20 @@ export const setScapiAuthRequestHeaders = ({
     const accessToken = cookies[tokenKey]
 
     if (!accessToken) {
-        throw new AccessTokenNotFoundError(
-            'Access token cookie not found. Cannot proceed with SCAPI request.'
-        )
+        // During SSR, the SDK sets the Authorization header directly (onClient() is false),
+        // so the cookie won't be present on the server-side loopback request. Only throw
+        // when there is no existing Authorization header — meaning the client relied on
+        // the proxy to inject it from the cookie, but the cookie is missing.
+        const hasExistingAuth = incomingRequest.headers.authorization
+        if (!hasExistingAuth) {
+            throw new AccessTokenNotFoundError(
+                'Access token cookie not found. Cannot proceed with SCAPI request.'
+            )
+        }
+    } else {
+        // Cookie-based auth takes precedence over any existing header
+        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
     }
-
-    // Always override - cookie-based auth takes precedence
-    proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
     if (cookies[DWSID_COOKIE_NAME]) {
@@ -296,10 +306,12 @@ export const configureProxy = ({
                 })
             }
 
-            res.writeHead(500, {
-                'Content-Type': 'text/plain'
-            })
-            res.end(`Error in proxy request to ${req.url}: ${err}`)
+            if (!res.headersSent) {
+                res.writeHead(500, {
+                    'Content-Type': 'text/plain'
+                })
+                res.end(`Error in proxy request to ${req.url}: ${err}`)
+            }
         },
 
         /**
@@ -317,7 +329,7 @@ export const configureProxy = ({
          * @param incomingRequest {http.IncomingMessage} the request made to
          * this Express app that prompted the proxying
          */
-        onProxyReq: (proxyRequest, incomingRequest) => {
+        onProxyReq: (proxyRequest, incomingRequest, res) => {
             // First, apply standard proxy headers (Host, Origin, etc.)
             applyProxyRequestHeaders({
                 proxyRequest,
@@ -332,12 +344,28 @@ export const configureProxy = ({
             // inject auth headers from cookies, strip session cookies, and
             // remove internal headers. Non-SCAPI proxies are left untouched.
             if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
-                setScapiAuthRequestHeaders({
-                    proxyRequest,
-                    incomingRequest,
-                    caching,
-                    targetHost
-                })
+                try {
+                    setScapiAuthRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
+                        caching,
+                        targetHost
+                    })
+                } catch (error) {
+                    if (error instanceof AccessTokenNotFoundError) {
+                        logger.warn(error.message, {
+                            namespace: 'configureProxy.setScapiAuthRequestHeaders'
+                        })
+                        if (!res.headersSent) {
+                            proxyRequest.destroy()
+                            res.status(400).json({
+                                message: 'access_token_cookie_missing'
+                            })
+                        }
+                        return
+                    }
+                    throw error
+                }
             }
         },
 
