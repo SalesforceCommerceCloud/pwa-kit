@@ -7,7 +7,12 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useConfig, useShopperAgentsMutation, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useConfig,
+    useCustomerType,
+    useShopperAgentsMutation,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -15,6 +20,7 @@ import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -22,26 +28,6 @@ const SESSION_INIT_ERROR_MESSAGE = defineMessage({
     id: 'shopper_agent.error.session_init_failed',
     defaultMessage: 'We could not start the shopping assistant. Please try again.'
 })
-
-/**
- * Clears embedded messaging user verification state and closes the chat window when supported.
- * @see https://developer.salesforce.com/docs/service/messaging-web/references/m4w-reference/userVerificationAPI.html
- */
-const clearEmbeddedMessagingUserSession = () => {
-    if (!onClient) {
-        return
-    }
-    try {
-        const clearSession = window.embeddedservice_bootstrap?.userVerificationAPI?.clearSession
-        if (typeof clearSession === 'function') {
-            void Promise.resolve(clearSession()).catch((err) => {
-                console.error('userVerificationAPI.clearSession failed', err)
-            })
-        }
-    } catch (err) {
-        console.error('Error calling userVerificationAPI.clearSession', err)
-    }
-}
 
 /**
  * Validates that a URL is from a trusted Salesforce domain.
@@ -153,6 +139,7 @@ const isEnabled = (enabled) => {
  * - Calls postSessionInit when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
+ * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
  * - Cleans up resources on unmount
  *
  * @param {Object} props - Component props
@@ -189,7 +176,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     toastRef.current = toast
 
     // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {locale} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
@@ -213,8 +200,30 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
     const postSessionInitMutation = useShopperAgentsMutation('postSessionInit')
+
+    const prevCommerceCustomerTypeRef = useRef(undefined)
+
+    /**
+     * Reset embedded messaging whenever customerType changes (login, logout, registration).
+     * This ensures the chat context is cleared when user authentication state changes.
+     */
+    useEffect(() => {
+        const prev = prevCommerceCustomerTypeRef.current
+        prevCommerceCustomerTypeRef.current = customerType
+
+        // Skip initial mount
+        if (prev === undefined) {
+            return
+        }
+
+        // Reset on any customerType change (login, logout, register)
+        if (prev !== customerType) {
+            resetEmbeddedMessagingForCommerceSessionChange()
+        }
+    }, [customerType])
     const postSessionInitMutateRef = useRef(postSessionInitMutation.mutate)
     postSessionInitMutateRef.current = postSessionInitMutation.mutate
 
@@ -383,19 +392,26 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 },
                 {
                     onSuccess: (data) => {
-                        console.info('postSessionInit succeeded onEmbeddedMessagingConversationStarted', {
-                            organizationId: orgId,
-                            siteId: sid,
-                            response: data
-                        })
+                        console.info(
+                            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+                            {
+                                organizationId: orgId,
+                                siteId: sid,
+                                response: data
+                            }
+                        )
                     },
                     onError: (error) => {
-                        console.error('postSessionInit failed onEmbeddedMessagingConversationStarted', {
-                            organizationId: orgId,
-                            siteId: sid,
-                            error
-                        })
-                        clearEmbeddedMessagingUserSession()
+                        console.error(
+                            'postSessionInit failed onEmbeddedMessagingConversationStarted',
+                            {
+                                organizationId: orgId,
+                                siteId: sid,
+                                error
+                            }
+                        )
+                        // Close the chat if session initialization fails
+                        resetEmbeddedMessagingForCommerceSessionChange()
                         toastRef.current({
                             title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
                             status: 'error'

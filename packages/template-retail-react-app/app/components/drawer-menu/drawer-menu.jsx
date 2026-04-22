@@ -62,6 +62,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -108,6 +109,8 @@ const DrawerMenu = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const onSignoutClick = async () => {
         setShowLoading(true)
+        // Reset embedded messaging before logout to close the chat
+        resetEmbeddedMessagingForCommerceSessionChange()
         await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
