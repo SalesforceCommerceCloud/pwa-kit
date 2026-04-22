@@ -186,9 +186,6 @@ The logout call is awaited so the browser processes the Set-Cookie response head
 HttpOnly session cookies) before the subsequent guest login sets fresh cookies. The proxy expires
 cookies on SLAS logout response, regardless of whether SLAS returned success or failure.
 
-> **Note:** When `enableHttpOnlySessionCookies=false`, logout is fire-and-forget because the client
-> can expire all cookies directly.
-
 ```
 Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │                                  │
