@@ -12,7 +12,13 @@ import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging, isScapiDomain} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
-import {X_SITE_ID} from '../../ssr/server/constants'
+import {X_SITE_ID, DWSID_COOKIE_NAME} from '../../ssr/server/constants'
+import {
+    SESSION_COOKIE_CONFIG,
+    getCookieName,
+    getCookieNamesToStripFromProxy,
+    getSiteId
+} from '../../ssr/server/httponly-cookie-config'
 
 /**
  * Error thrown when the access token HttpOnly cookie is not found on an SCAPI proxy request.
@@ -66,7 +72,7 @@ export const setScapiAuthRequestHeaders = ({
     targetHost
 }) => {
     const url = incomingRequest.url
-    const resolvedSiteId = incomingRequest.headers?.[X_SITE_ID]
+    const resolvedSiteId = getSiteId(incomingRequest)
 
     // Skip if: caching proxy, not SCAPI domain, or no URL
     if (caching || !isScapiDomain(targetHost) || !url) {
@@ -84,7 +90,7 @@ export const setScapiAuthRequestHeaders = ({
     // Get access token from HttpOnly cookie
     const cookieHeader = incomingRequest.headers.cookie
     const cookies = cookieHeader ? cookie.parse(cookieHeader) : {}
-    const tokenKey = `cc-at_${resolvedSiteId}`
+    const tokenKey = getCookieName(SESSION_COOKIE_CONFIG.accessToken, resolvedSiteId)
     const accessToken = cookies[tokenKey]
 
     if (!accessToken) {
@@ -104,8 +110,8 @@ export const setScapiAuthRequestHeaders = ({
     }
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
-    if (cookies.dwsid) {
-        proxyRequest.setHeader('sfdc_dwsid', cookies.dwsid)
+    if (cookies[DWSID_COOKIE_NAME]) {
+        proxyRequest.setHeader('sfdc_dwsid', cookies[DWSID_COOKIE_NAME])
     }
 
     // Strip session cookies — the proxy has already extracted the tokens
@@ -135,15 +141,10 @@ export const stripSessionCookies = (proxyRequest, incomingRequest) => {
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers[X_SITE_ID]
+    const siteId = getSiteId(incomingRequest)
 
     // Build the exact list of cookies to delete, matching MRT's approach
-    const cookiesToDelete = new Set(['dwsid'])
-    if (siteId) {
-        cookiesToDelete.add(`cc-at_${siteId}`)
-        cookiesToDelete.add(`cc-nx-g_${siteId}`)
-        cookiesToDelete.add(`cc-nx_${siteId}`)
-    }
+    const cookiesToDelete = new Set(getCookieNamesToStripFromProxy(siteId))
 
     const filtered = Object.entries(cookies).filter(([name]) => !cookiesToDelete.has(name))
 

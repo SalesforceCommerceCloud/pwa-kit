@@ -20,6 +20,12 @@ import {
     X_SITE_ID,
     X_GRANT_TYPE
 } from './constants'
+import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+const {
+    refreshTokenRegistered,
+    refreshTokenGuest,
+    accessToken: accessTokenConfig
+} = SESSION_COOKIE_CONFIG
 import {
     catchAndLog,
     getHashForString,
@@ -125,7 +131,7 @@ export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
     }
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers[X_SITE_ID]
+    const siteId = getSiteId(incomingRequest)
     if (!siteId) {
         throw new RefreshTokenNotFoundError(
             'x-site-id header is missing on SLAS token request. ' +
@@ -135,7 +141,9 @@ export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
     }
 
     // Try registered refresh token first, then guest
-    const refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
+    const refreshToken =
+        cookies[getCookieName(refreshTokenRegistered, siteId)] ||
+        cookies[getCookieName(refreshTokenGuest, siteId)]
     if (!refreshToken) {
         throw new RefreshTokenNotFoundError(
             'Refresh token cookie not found. Cannot proceed with refresh token flow.'
@@ -155,7 +163,7 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     if (!cookieHeader) return
 
     const cookies = cookie.parse(cookieHeader)
-    const siteId = incomingRequest.headers[X_SITE_ID]
+    const siteId = getSiteId(incomingRequest)
     if (!siteId) {
         logger.warn(
             'x-site-id header is missing on SLAS logout request. ' +
@@ -167,19 +175,22 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
     }
 
     // Inject Bearer token from access token cookie
-    const accessToken = cookies[`cc-at_${siteId}`]
+    const accessToken = cookies[getCookieName(accessTokenConfig, siteId)]
     if (accessToken) {
         proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
     }
 
     // Inject refresh_token into query string from HttpOnly cookie
-    const refreshToken = cookies[`cc-nx_${siteId}`]
+    const refreshToken = cookies[getCookieName(refreshTokenRegistered, siteId)]
     if (refreshToken) {
         const separator = proxyRequest.path.includes('?') ? '&' : '?'
         proxyRequest.path += `${separator}refresh_token=${encodeURIComponent(refreshToken)}`
     } else {
         logger.warn(
-            `Refresh token cookie (cc-nx_${siteId}) not found for ${incomingRequest.path}. The logout request may fail.`,
+            `Refresh token cookie (${getCookieName(
+                refreshTokenRegistered,
+                siteId
+            )}) not found for ${incomingRequest.path}. The logout request may fail.`,
             {namespace: 'setTokensInLogoutRequest'}
         )
     }
