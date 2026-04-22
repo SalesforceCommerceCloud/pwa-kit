@@ -276,6 +276,8 @@ const baseConfig = (target) => {
                         {
                             test: /\.js$/,
                             enforce: 'pre',
+                            // Published @salesforce/mrt-utilities maps reference unpublished src/*.ts → ENOENT noise.
+                            exclude: /node_modules[\\/]@salesforce[\\/]mrt-utilities/,
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }

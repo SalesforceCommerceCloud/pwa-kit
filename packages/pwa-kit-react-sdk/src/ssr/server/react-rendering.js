@@ -20,6 +20,17 @@ import PropTypes from 'prop-types'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {
+    DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY,
+    DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY,
+    DATA_STORE_WINDOW_GLOBAL
+} from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
+import {
+    getCustomGlobalPreferences,
+    getCustomSitePreferences,
+    initializeDataStore,
+    isMrtDataStoreEnabled
+} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
 import {shutdownServerTracing, tracePerformance} from './opentelemetry-server'
@@ -136,6 +147,26 @@ const performRender = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
+    // MRT Data Store (opt-in): when disabled, skip preference resolution and omit `__MRT_DATA_STORE__` from
+    // `#mobify-data`. Enable via `app.mrtDataStore.enabled` or `PWAKIT_MRT_DATA_STORE_ENABLED=true`.
+    // When enabled, `initializeDataStore` from runtime mirrors the storefront-next flow (provider once, then keys).
+    const mrtDataStoreEnabled = isMrtDataStoreEnabled(config)
+    let customSitePreferences = {}
+    let customGlobalPreferences = {}
+    if (mrtDataStoreEnabled) {
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'start')
+        await initializeDataStore()
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'end')
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'start')
+        ;[customSitePreferences, customGlobalPreferences] = await Promise.all([
+            getCustomSitePreferences({
+                siteId: res.locals.site?.id
+            }),
+            getCustomGlobalPreferences()
+        ])
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'end')
+    }
+
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
@@ -220,7 +251,10 @@ const performRender = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX
+            appJSX,
+            customSitePreferences,
+            customGlobalPreferences,
+            mrtDataStoreEnabled
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -305,7 +339,17 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config} = args
+    const {
+        req,
+        res,
+        appStateError,
+        appJSX,
+        appState,
+        config,
+        customSitePreferences,
+        customGlobalPreferences,
+        mrtDataStoreEnabled = false
+    } = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -373,6 +417,13 @@ const renderApp = (args) => {
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
+    }
+
+    if (mrtDataStoreEnabled) {
+        windowGlobals[DATA_STORE_WINDOW_GLOBAL] = {
+            [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: customSitePreferences ?? {},
+            [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: customGlobalPreferences ?? {}
+        }
     }
 
     const scripts = [
