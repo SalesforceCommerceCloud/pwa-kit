@@ -255,9 +255,7 @@ describe('Region', () => {
                 regions: [
                     {
                         id: 'main-region',
-                        components: [
-                            {id: 'comp-1', typeId: 'commerce_assets.banner', data: {}}
-                        ]
+                        components: [{id: 'comp-1', typeId: 'commerce_assets.banner', data: {}}]
                     }
                 ]
             } as unknown as PageWithDesignMetadata
