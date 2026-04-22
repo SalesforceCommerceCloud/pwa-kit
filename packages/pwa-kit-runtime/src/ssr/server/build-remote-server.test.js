@@ -614,7 +614,10 @@ describe('HttpOnly session cookies', () => {
             expect(capturedRefreshToken).toBe('mock-refresh-token')
             // Session cookies should not be forwarded to SLAS
             expect(capturedCookieHeader).toBeUndefined()
-            expect(response.headers['set-cookie']).toBeUndefined()
+            // Proxy should expire all HttpOnly session cookies on logout
+            const setCookies = response.headers['set-cookie']
+            expect(setCookies).toBeDefined()
+            expect(setCookies.every((c) => c.includes('Expires=Thu, 01 Jan 1970'))).toBe(true)
         } finally {
             mockSlasServerInstance.close()
         }
