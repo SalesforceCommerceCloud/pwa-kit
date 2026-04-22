@@ -1224,9 +1224,10 @@ describe('Auth', () => {
         expect(logoutDone).toBe(true)
         expect(logoutMock).toHaveBeenCalled()
     })
-    test('logout with enableHttpOnlySessionCookies swallows SLAS errors', async () => {
+    test('logout with enableHttpOnlySessionCookies swallows SLAS errors and logs warning', async () => {
         const logoutMock = helpers.logout as jest.Mock
         logoutMock.mockRejectedValue(new Error('SLAS error'))
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
         auth.set('customer_type', 'registered')
@@ -1235,6 +1236,12 @@ describe('Auth', () => {
         await auth.logout()
         expect(logoutMock).toHaveBeenCalled()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
+        expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining(
+                'SLAS logout failed: SLAS error. The error is ignored and session cookies are still cleared by the proxy.'
+            )
+        )
+        warnSpy.mockRestore()
     })
     test('logout without enableHttpOnlySessionCookies does not await the logout call', async () => {
         const logoutMock = helpers.logout as jest.Mock

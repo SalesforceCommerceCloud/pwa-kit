@@ -1256,9 +1256,12 @@ class Auth {
                 // Set-Cookie headers before guest login sets new cookies.
                 try {
                     await logoutPromise
-                } catch {
-                    // The proxy expires cookies regardless of SLAS success/failure,
-                    // so we can safely swallow the error.
+                } catch (error) {
+                    this.logger.warn(
+                        `SLAS logout failed: ${
+                            error instanceof Error ? error.message : String(error)
+                        }. The error is ignored and session cookies are still cleared by the proxy.`
+                    )
                 }
             }
         }
