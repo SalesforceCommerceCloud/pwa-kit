@@ -42,6 +42,8 @@ export const getSiteId = (request) => request.headers?.[X_SITE_ID]
 
 export const getCookieName = (config, siteId) => `${config.key}_${siteId}`
 
+export const getAllCookieConfigs = () => Object.values(SESSION_COOKIE_CONFIG)
+
 export const getCookieNamesToStripFromProxy = (siteId) => [
     getCookieName(SESSION_COOKIE_CONFIG.accessToken, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenGuest, siteId),

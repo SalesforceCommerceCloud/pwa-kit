@@ -182,7 +182,12 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 ### 4. Logout
 
-Handled directly by the Express app (not CloudFront). Same flow for both client types.
+The logout call is awaited so the browser processes the Set-Cookie response headers (which expire the
+HttpOnly session cookies) before the subsequent guest login sets fresh cookies. The proxy expires
+cookies on SLAS logout response, regardless of whether SLAS returned success or failure.
+
+> **Note:** When `enableHttpOnlySessionCookies=false`, logout is fire-and-forget because the client
+> can expire all cookies directly.
 
 ```
 Browser                       Express App (SLAS Proxy)                    SLAS
@@ -211,7 +216,12 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │  (no session cookies forwarded)  │
   │                                     │ ───────────────────────────────► │
   │                                     │◄───────────────────────────────  │
+  │                                     │                                  │
+  │                                     │  Expire HttpOnly session cookies │
+  │                                     │                                  │
   │◄─────────────────────────────────── │                                  │
+  │  Cookies expired; guest login next  │                                  │
+  │ ───────────────────────────────────►│  (new guest token flow)          │
 ```
 
 ## Configuration
