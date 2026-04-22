@@ -1206,7 +1206,7 @@ describe('Auth', () => {
     })
     test('logout with enableHttpOnlySessionCookies awaits the logout call', async () => {
         const logoutMock = helpers.logout as jest.Mock
-        let resolveLogout: Function
+        let resolveLogout: (value: unknown) => void
         logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
@@ -1238,7 +1238,7 @@ describe('Auth', () => {
     })
     test('logout without enableHttpOnlySessionCookies does not await the logout call', async () => {
         const logoutMock = helpers.logout as jest.Mock
-        let resolveLogout: Function
+        let resolveLogout: (value: unknown) => void
         logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
         const auth = new Auth(config)
         // @ts-expect-error private method
