@@ -1207,9 +1207,7 @@ describe('Auth', () => {
     test('logout with enableHttpOnlySessionCookies awaits the logout call', async () => {
         const logoutMock = helpers.logout as jest.Mock
         let resolveLogout: Function
-        logoutMock.mockImplementation(
-            () => new Promise((resolve) => (resolveLogout = resolve))
-        )
+        logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
         auth.set('customer_type', 'registered')
@@ -1241,9 +1239,7 @@ describe('Auth', () => {
     test('logout without enableHttpOnlySessionCookies does not await the logout call', async () => {
         const logoutMock = helpers.logout as jest.Mock
         let resolveLogout: Function
-        logoutMock.mockImplementation(
-            () => new Promise((resolve) => (resolveLogout = resolve))
-        )
+        logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
         const auth = new Auth(config)
         // @ts-expect-error private method
         auth.set('customer_type', 'registered')
