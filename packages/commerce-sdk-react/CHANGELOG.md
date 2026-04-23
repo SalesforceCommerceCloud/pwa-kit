@@ -1,3 +1,6 @@
+## v5.2.0-nightly-20260423083220 (Apr 23, 2026)
+## v5.2.0-dev (Apr 23, 2026)
+## v3.18.0-nightly-20260423083220 (Apr 23, 2026)
 ## v5.2.0-dev (Mar 20, 2026)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
 
