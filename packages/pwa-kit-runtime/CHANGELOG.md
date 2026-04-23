@@ -12,6 +12,7 @@
 - Fix missing access token logic so error is not thrown when `Authorization` header is set by the SDK [#3793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3793)
 - Centralize HttpOnly session cookie config [#3792](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3792)
 - Expire HttpOnly session cookies on SLAS logout [#3794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3794)
+- Refactor: Consolidate HttpOnly session cookie proxy logic [#3799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3799)
 
 ## v3.18.0-dev (Mar 20, 2026)
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
