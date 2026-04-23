@@ -467,8 +467,8 @@ describe('DevServer proxying', () => {
 
                 expect(headers['accept-encoding']).toBe('gzip')
 
-                // This value is fixed
-                expect(headers['user-agent']).toBe('Amazon CloudFront')
+                // The client's user-agent is now passed through unchanged
+                expect(headers['user-agent']).toBe('test-agent')
 
                 return 'Success'
             })
@@ -485,7 +485,8 @@ describe('DevServer proxying', () => {
                 cookie: 'abc=123',
                 // These headers are allowed
                 'accept-encoding': 'gzip',
-                'accept-language': 'en'
+                'accept-language': 'en',
+                'user-agent': 'test-agent'
             })
             .then((response) => {
                 // Expected that proxy request would be fetched

@@ -787,7 +787,8 @@ export const ALLOWED_CACHING_PROXY_REQUEST_HEADERS = {
     'if-modified-since': true,
     'if-none-match': true,
     'if-range': true,
-    'if-unmodified-since': true
+    'if-unmodified-since': true,
+    'user-agent': true
 }
 
 /**
@@ -835,9 +836,6 @@ export const rewriteProxyRequestHeaders = ({
                 workingHeaders.deleteHeader(key)
             }
         })
-
-        // Override user-agent - mimic the behaviour of CloudFront
-        workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
 
     // Fix up any Host header. We ignore any current value and
@@ -881,12 +879,6 @@ export const rewriteProxyRequestHeaders = ({
             )
         }
         workingHeaders.setHeader(ORIGIN, targetOrigin)
-    }
-
-    // Replace some headers with hardwired values
-    if (workingHeaders.getHeader(USER_AGENT)) {
-        // Mimic the behaviour of CloudFront
-        workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
 
     // Add some specific X-headers
