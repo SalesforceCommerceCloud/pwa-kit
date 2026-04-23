@@ -140,20 +140,6 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 const performRender = async (req, res, next) => {
-    // Clean up the per-request QueryClient after the response finishes to prevent
-    // server-side cache retention across warm Lambda invocations. Without this,
-    // cached query data and related timers can persist beyond the request lifecycle
-    // when cacheTime > 0, increasing memory pressure and triggering GC spikes.
-    const cleanupQueryClient = () => {
-        const queryClient = res.locals.__queryClient
-        if (queryClient) {
-            queryClient.clear()
-            res.locals.__queryClient = null
-        }
-    }
-    res.on('finish', cleanupQueryClient)
-    res.on('close', cleanupQueryClient)
-
     res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.

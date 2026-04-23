@@ -807,6 +807,18 @@ export const RemoteServerFactory = {
                 /* istanbul ignore else */
                 if (!locals.afterResponseCalled) {
                     locals.afterResponseCalled = true
+
+                    // Clean up the per-request QueryClient to prevent server-side
+                    // cache retention across warm Lambda invocations. Without this,
+                    // cached query data and related timers can persist beyond the
+                    // request lifecycle when cacheTime > 0, increasing memory
+                    // pressure and triggering GC spikes.
+                    const queryClient = locals.__queryClient
+                    if (queryClient) {
+                        queryClient.clear()
+                        locals.__queryClient = null
+                    }
+
                     // Emit timing unless the request is for a proxy
                     // or bundle path. We don't want to emit metrics
                     // for those requests. We test req.originalUrl

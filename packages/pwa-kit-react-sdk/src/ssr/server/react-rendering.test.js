@@ -1112,7 +1112,9 @@ describe('Additional branch coverage for react-rendering', () => {
         expect(res.statusCode).toBe(302)
         expect(res.headers.location).toBeDefined()
     })
+})
 
+describe('QueryClient cleanup after SSR response', () => {
     test('cleans up QueryClient after response finishes', async () => {
         const app = RemoteServerFactory._createApp(opts())
         let capturedLocals
@@ -1121,8 +1123,6 @@ describe('Additional branch coverage for react-rendering', () => {
         app.get('/*', (req, res, next) => {
             const originalSend = res.send.bind(res)
             res.send = function (...args) {
-                // After send, the QueryClient should still exist briefly
-                // but will be cleaned up on 'finish'
                 capturedLocals = res.locals
                 return originalSend(...args)
             }
@@ -1155,13 +1155,6 @@ describe('Additional branch coverage for react-rendering', () => {
 
         // After the redirect response finishes, the QueryClient should be cleaned up
         expect(capturedLocals.__queryClient).toBeNull()
-    })
-
-    test('handles unrecoverable error in render (duplicate)', async () => {
-        const app = RemoteServerFactory._createApp(opts())
-        app.get('/*', render)
-        const res = await request(app).get('/unrecoverable-error/')
-        expect(res.statusCode).toBe(500)
     })
 })
 
