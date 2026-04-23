@@ -49,11 +49,13 @@ import {
     useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import {
     getPasswordlessCallbackUrl,
     getAuthorizePasswordlessErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -66,6 +68,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -113,15 +116,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 })
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
-
-                const hasBasketItem = basket.productItems?.length > 0
-                if (hasBasketItem) {
-                    mergeBasket.mutate({
-                        parameters: {
-                            createDestinationBasket: true
-                        }
-                    })
-                }
+                handleMergeBasket()
             }
             goToNextStep()
         } catch (error) {
@@ -153,11 +148,42 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         authModal.onOpen()
     }
 
+    const handleMergeBasket = () => {
+        const hasBasketItem = basket.productItems?.length > 0
+        if (hasBasketItem) {
+            mergeBasket.mutate({
+                parameters: {
+                    createDestinationBasket: true
+                }
+            })
+        }
+    }
+
     useEffect(() => {
         if (!showPasswordField) {
             form.unregister('password')
         }
     }, [showPasswordField])
+
+    useEffect(() => {
+        const handlePasskeyLogin = async () => {
+            try {
+                await loginWithPasskey()
+                handleMergeBasket()
+            } catch (error) {
+                setError(formatMessage(API_ERROR_MESSAGE))
+            }
+        }
+
+        if (step === STEPS.CONTACT_INFO) {
+            handlePasskeyLogin()
+        }
+
+        // Cleanup: abort passkey login when navigating away from checkout
+        return () => {
+            abortPasskeyLogin()
+        }
+    }, [step])
 
     const onPasswordlessLoginClick = async (e) => {
         const isValid = await form.trigger('email')

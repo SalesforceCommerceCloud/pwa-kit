@@ -25,6 +25,8 @@ import {useLocation} from 'react-router-dom'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
+import {usePasskeyRegistration} from '@salesforce/retail-react-app/app/hooks/use-passkey-registration'
+import {usePasskeyLogin} from '@salesforce/retail-react-app/app/hooks/use-passkey-login'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -54,12 +56,13 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
-    const {isRegistered, customerType} = useCustomerType()
+    const {isRegistered, customerType, isGuest} = useCustomerType()
     const {locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const config = getConfig()
+    const {passwordless = {}, social = {}} = config.app.login || {}
     const isPasswordlessEnabled = !!passwordless?.enabled
     const passwordlessMode = passwordless?.mode
     const passwordlessLoginLandingPath = passwordless?.landingPath
@@ -77,6 +80,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
+    const {showRegisterPasskeyToast} = usePasskeyRegistration()
+    const {loginWithPasskey, abortPasskeyLogin} = usePasskeyLogin()
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
 
     const handleMergeBasket = () => {
@@ -171,13 +176,32 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
     // If customer is registered push to account page and merge the basket
     useEffect(() => {
-        if (isRegistered) {
-            setIsOtpAuthOpen(false)
-            handleMergeBasket()
-            const redirectTo = redirectPath ? redirectPath : '/account'
-            navigate(redirectTo)
+        if (!isRegistered) {
+            return
         }
+
+        setIsOtpAuthOpen(false)
+        handleMergeBasket()
+        const redirectTo = redirectPath ? redirectPath : '/account'
+
+        // Show passkey registration prompt if supported
+        showRegisterPasskeyToast()
+
+        navigate(redirectTo)
     }, [isRegistered, redirectPath])
+
+    useEffect(() => {
+        if (isGuest) {
+            loginWithPasskey().catch(() => {
+                form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            })
+        }
+
+        // Cleanup: abort passkey login when navigating away from login page
+        return () => {
+            abortPasskeyLogin()
+        }
+    }, [isGuest])
 
     /**************** Einstein ****************/
     useEffect(() => {

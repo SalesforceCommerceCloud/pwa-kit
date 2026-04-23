@@ -64,7 +64,8 @@ const Checkout = () => {
     const {confirmingBasket} = useSFPayments()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const config = getConfig()
+    const {passwordless = {}, social = {}} = config.app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled

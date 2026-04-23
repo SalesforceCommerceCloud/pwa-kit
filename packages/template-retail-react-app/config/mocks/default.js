@@ -43,6 +43,11 @@ module.exports = {
                 enabled: false,
                 idps: ['google', 'apple']
             },
+            passkey: {
+                enabled: true,
+                mode: 'callback',
+                callbackURI: 'https://webhook.site/ee47be40-e9fc-4313-8b56-18e4fe819043'
+            },
             resetPassword: {
                 mode: 'email',
                 landingPath: '/reset-password-landing'

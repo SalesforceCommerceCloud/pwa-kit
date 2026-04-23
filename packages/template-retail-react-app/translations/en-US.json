@@ -1360,6 +1360,9 @@
   "otp.message.enter_code_for_account_returning": {
     "defaultMessage": "To log in to your account, enter the code sent to your email."
   },
+  "otp.message.enter_code_for_passkey_registration": {
+    "defaultMessage": "We sent a one-time password (OTP) to your email to confirm your identity. Enter the {otpLength}-digit code below to continue."
+  },
   "otp.message.resend_cooldown": {
     "defaultMessage": "You can request a new code in {timer} {timer, plural, one {second} other {seconds}}."
   },
@@ -1401,6 +1404,15 @@
   },
   "pagination.link.prev.assistive_msg": {
     "defaultMessage": "Previous Page"
+  },
+  "passkey_registration.toast.button.close.assistive_msg": {
+    "defaultMessage": "Close toast"
+  },
+  "passkey_registration.toast.button.create": {
+    "defaultMessage": "Create Passkey"
+  },
+  "passkey_registration.toast.message": {
+    "defaultMessage": "Create a passkey for a more secure and easier login"
   },
   "password_card.info.password_updated": {
     "defaultMessage": "Password updated"

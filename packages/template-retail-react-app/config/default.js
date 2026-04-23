@@ -57,6 +57,10 @@ module.exports = {
             resetPassword: {
                 mode: 'email',
                 landingPath: '/reset-password-landing'
+            },
+            passkey: {
+                enabled: false,
+                callbackURI: process.env.PASSKEY_CALLBACK_URI
             }
         },
         defaultSite: 'RefArchGlobal',

@@ -6867,6 +6867,28 @@
       "value": "]"
     }
   ],
+  "otp.message.enter_code_for_passkey_registration": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ şḗḗƞŧ ȧȧ ǿǿƞḗḗ-ŧīḿḗḗ ƥȧȧşşẇǿǿřḓ (ǾŦƤ) ŧǿǿ ẏǿǿŭŭř ḗḗḿȧȧīŀ ŧǿǿ ƈǿǿƞƒīřḿ ẏǿǿŭŭř īḓḗḗƞŧīŧẏ. Ḗƞŧḗḗř ŧħḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "otpLength"
+    },
+    {
+      "type": 0,
+      "value": "-ḓīɠīŧ ƈǿǿḓḗḗ ƀḗḗŀǿǿẇ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "otp.message.resend_cooldown": [
     {
       "type": 0,
@@ -7097,6 +7119,48 @@
     {
       "type": 0,
       "value": "Ƥřḗḗṽīǿǿŭŭş Ƥȧȧɠḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ŧǿǿȧȧşŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.button.create": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗ Ƥȧȧşşķḗḗẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "passkey_registration.toast.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈřḗḗȧȧŧḗḗ ȧȧ ƥȧȧşşķḗḗẏ ƒǿǿř ȧȧ ḿǿǿřḗḗ şḗḗƈŭŭřḗḗ ȧȧƞḓ ḗḗȧȧşīḗḗř ŀǿǿɠīƞ"
     },
     {
       "type": 0,

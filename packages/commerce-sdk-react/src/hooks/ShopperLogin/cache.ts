@@ -28,5 +28,11 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     resetPassword: noop,
     getPasswordLessAccessToken: noop,
     revokeToken: noop,
-    introspectToken: noop
+    introspectToken: noop,
+    // WebAuthn methods - these will be available when commerce-sdk-isomorphic is updated
+    startWebauthnUserRegistration: noop,
+    finishWebauthnUserRegistration: noop,
+    authorizeWebauthnRegistration: noop,
+    startWebauthnAuthentication: noop,
+    finishWebauthnAuthentication: noop
 }

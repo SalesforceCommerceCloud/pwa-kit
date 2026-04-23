@@ -28,6 +28,19 @@ const CLIENT_KEY = CLIENT_KEYS.SHOPPER_LOGIN
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 const loginEndpoint = '/shopper/auth/'
+
+const PUBLIC_KEY_CREDENTIAL_JSON: ShopperLoginTypes.PublicKeyCredentialJson = {
+    id: 'credential-id',
+    rawId: 'raw-credential-id',
+    type: 'public-key',
+    response: {
+        authenticatorData: [],
+        clientDataJSON: [],
+        signature: [],
+        userHandle: null
+    } as ShopperLoginTypes.AuthenticatorAssertionResponseJson
+}
+
 // Additional properties are ignored, so we can use this mega-options object for all endpoints
 const OPTIONS = {
     parameters: {
@@ -46,6 +59,7 @@ const OPTIONS = {
         code: 'code',
         code_challenge: 'code_challenge',
         code_verifier: 'code_verifier',
+        credential: PUBLIC_KEY_CREDENTIAL_JSON,
         dwsid: 'dwsid',
         grant_type: 'client_credentials' as const,
         hint: 'hint',
@@ -56,6 +70,7 @@ const OPTIONS = {
         pwd_action_token: 'pwd_action_token',
         pwdless_login_token: 'pwdless_login_token',
         redirect_uri: 'redirect_uri',
+        username: 'username',
         token: 'token',
         user_id: 'user_id'
     }
@@ -71,6 +86,14 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     usid: 'usid',
     idp_access_token: 'idp_access_token',
     refresh_token_expires_in: 0
+}
+
+const PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS: ShopperLoginTypes.PublicKeyCredentialRequestOptions = {
+    challenge: 'challenge',
+    timeout: 60000,
+    rpId: 'rp-id',
+    allowCredentials: [],
+    userVerification: 'preferred'
 }
 
 // --- TEST CASES --- //
@@ -91,7 +114,12 @@ const testMap: TestMap = {
     introspectToken: [OPTIONS, {token: 'token'}],
     resetPassword: [OPTIONS, undefined],
     revokeToken: [OPTIONS, {token: 'token'}],
-    logoutCustomer: [OPTIONS, TOKEN_RESPONSE]
+    logoutCustomer: [OPTIONS, TOKEN_RESPONSE],
+    startWebauthnUserRegistration: [OPTIONS, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS],
+    finishWebauthnUserRegistration: [OPTIONS, undefined],
+    authorizeWebauthnRegistration: [OPTIONS, undefined],
+    startWebauthnAuthentication: [OPTIONS, PUBLIC_KEY_CREDENTIAL_REQUEST_OPTIONS],
+    finishWebauthnAuthentication: [OPTIONS, TOKEN_RESPONSE]
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Implemented]]>

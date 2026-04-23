@@ -66,6 +66,13 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
             },
+            authorizeWebauthnRegistration: jest.fn().mockResolvedValue({}),
+            startWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
+            finishWebauthnUserRegistration: jest.fn().mockResolvedValue({}),
+            startWebauthnAuthentication: jest.fn().mockResolvedValue({}),
+            finishWebauthnAuthentication: jest
+                .fn()
+                .mockResolvedValue({tokenResponse: TOKEN_RESPONSE}),
             getPasswordResetToken: jest.fn().mockResolvedValue({}),
             resetPassword: jest.fn().mockResolvedValue({})
         }))
@@ -1501,4 +1508,287 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
         // Verify the cookie was NOT cleared
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
     })
+})
+
+describe('Webauthn', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    const PUBLIC_KEY_CREDENTIAL_JSON: ShopperLoginTypes.PublicKeyCredentialJson = {
+        id: 'credential-id',
+        rawId: 'raw-credential-id',
+        type: 'public-key',
+        response: {
+            authenticatorData: [],
+            clientDataJSON: [],
+            signature: [],
+            userHandle: null
+        } as ShopperLoginTypes.AuthenticatorAssertionResponseJson
+    }
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                user_id: 'user@example.com',
+                mode: 'email',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                locale: 'en-GB',
+                code_challenge: 'test-code-challenge',
+                callback_uri: 'https://example.com/callback',
+                idp_name: 'customIdp',
+                hint: 'custom_hint'
+            },
+            {
+                user_id: 'user@example.com',
+                mode: 'email',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                locale: 'en-GB',
+                code_challenge: 'test-code-challenge',
+                callback_uri: 'https://example.com/callback',
+                idp_name: 'customIdp',
+                hint: 'custom_hint'
+            }
+        ],
+        [
+            'defaults optional parameters when only required parameters are specified',
+            {
+                user_id: 'user@example.com',
+                mode: 'email'
+            },
+            {
+                user_id: 'user@example.com',
+                mode: 'email',
+                channel_id: config.siteId
+            }
+        ]
+    ])(
+        'authorizeWebauthnRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.authorizeWebauthnRegistrationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.authorizeWebauthnRegistrationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.authorizeWebauthnRegistration(
+                input as ShopperLoginTypes.authorizeWebauthnRegistrationBodyType
+            )
+
+            expect((auth as any).client.authorizeWebauthnRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                user_id: 'user@example.com',
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                display_name: 'Test Display Name',
+                nick_name: 'Test Nick Name'
+            },
+            {
+                user_id: 'user@example.com',
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                display_name: 'Test Display Name',
+                nick_name: 'Test Nick Name'
+            }
+        ],
+        [
+            'defaults optional parameters when only required parameters are specified',
+            {
+                user_id: 'user@example.com',
+                pwd_action_token: 'test-pwd-action-token'
+            },
+            {
+                user_id: 'user@example.com',
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: config.siteId
+            }
+        ]
+    ])(
+        'startWebauthnUserRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.startWebauthnUserRegistrationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.startWebauthnUserRegistrationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.startWebauthnUserRegistration(
+                input as ShopperLoginTypes.startWebauthnUserRegistrationBodyType
+            )
+
+            expect((auth as any).client.startWebauthnUserRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                username: 'user@example.com',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON,
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id'
+            },
+            {
+                username: 'user@example.com',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON,
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id'
+            }
+        ],
+        [
+            'defaults optional parameters when only required parameters are specified',
+            {
+                username: 'user@example.com',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON,
+                pwd_action_token: 'test-pwd-action-token'
+            },
+            {
+                username: 'user@example.com',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON,
+                pwd_action_token: 'test-pwd-action-token',
+                channel_id: config.siteId,
+                client_id: config.clientId
+            }
+        ]
+    ])(
+        'finishWebauthnUserRegistration %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.RegistrationFinishRequest>,
+            expectedBody: Partial<ShopperLoginTypes.RegistrationFinishRequest>
+        ) => {
+            const auth = new Auth(config)
+            await auth.finishWebauthnUserRegistration(
+                input as ShopperLoginTypes.RegistrationFinishRequest
+            )
+
+            expect((auth as any).client.finishWebauthnUserRegistration).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                user_id: 'user@example.com',
+                tenant_id: 'tenant-123',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id'
+            },
+            {
+                user_id: 'user@example.com',
+                tenant_id: 'tenant-123',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id'
+            }
+        ],
+        [
+            'defaults optional parameters when empty object is provided',
+            {},
+            {
+                channel_id: config.siteId,
+                client_id: config.clientId
+            }
+        ]
+    ])(
+        'startWebauthnAuthentication %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.startWebauthnAuthenticationBodyType>,
+            expectedBody: Partial<ShopperLoginTypes.startWebauthnAuthenticationBodyType>
+        ) => {
+            const auth = new Auth(config)
+            await auth.startWebauthnAuthentication(
+                input as ShopperLoginTypes.startWebauthnAuthenticationBodyType
+            )
+
+            expect((auth as any).client.startWebauthnAuthentication).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
+
+    test.each([
+        [
+            'with all parameters specified',
+            {
+                user_id: 'user@example.com',
+                email: 'user@example.com',
+                tenant_id: 'tenant-123',
+                usid: 'usid-123',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON
+            },
+            {
+                user_id: 'user@example.com',
+                email: 'user@example.com',
+                tenant_id: 'tenant-123',
+                usid: 'usid-123',
+                channel_id: 'custom-channel-id',
+                client_id: 'custom-client-id',
+                credential: PUBLIC_KEY_CREDENTIAL_JSON
+            }
+        ],
+        [
+            'defaults optional parameters when only required parameters are specified',
+            {
+                credential: PUBLIC_KEY_CREDENTIAL_JSON
+            },
+            {
+                channel_id: config.siteId,
+                client_id: config.clientId,
+                credential: PUBLIC_KEY_CREDENTIAL_JSON
+            }
+        ]
+    ])(
+        'finishWebauthnAuthentication %s',
+        async (
+            _,
+            input: Partial<ShopperLoginTypes.AuthenticateFinishRequest>,
+            expectedBody: Partial<ShopperLoginTypes.AuthenticateFinishRequest>
+        ) => {
+            const auth = new Auth(config)
+            await auth.finishWebauthnAuthentication(
+                input as ShopperLoginTypes.AuthenticateFinishRequest
+            )
+
+            expect((auth as any).client.finishWebauthnAuthentication).toHaveBeenCalledWith({
+                headers: {
+                    Authorization: ''
+                },
+                body: expectedBody
+            })
+        }
+    )
 })
