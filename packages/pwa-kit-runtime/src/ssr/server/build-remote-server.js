@@ -73,7 +73,7 @@ import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
-import {setHttpOnlySessionCookies} from './process-token-response'
+import {setHttpOnlySessionCookies, expireHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -1201,6 +1201,21 @@ export const RemoteServerFactory = {
                                     }),
                                     'utf8'
                                 )
+                            }
+                        }
+
+                        // Expire all HttpOnly session cookies on logout, regardless
+                        // of whether SLAS returned success or failure.
+                        if (httpOnlyCookiesEnabled && req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+                            try {
+                                expireHttpOnlySessionCookies(req, res)
+                            } catch (error) {
+                                logger.warn('Error expiring HttpOnly session cookies on logout', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {
+                                        error: error.message || error
+                                    }
+                                })
                             }
                         }
 

@@ -1243,14 +1243,27 @@ class Auth {
      */
     async logout() {
         if (this.get('customer_type') === 'registered') {
-            // Not awaiting on purpose because there isn't much we can do if this fails.
-            void helpers.logout({
+            const logoutPromise = helpers.logout({
                 slasClient: this.client,
                 parameters: {
                     accessToken: this.get('access_token'),
                     refreshToken: this.get('refresh_token_registered')
                 }
             })
+            if (this.enableHttpOnlySessionCookies) {
+                // When HttpOnly cookies are enabled, the proxy expires session cookies
+                // on the logout response. We must await so the browser processes the
+                // Set-Cookie headers before guest login sets new cookies.
+                try {
+                    await logoutPromise
+                } catch (error) {
+                    this.logger.warn(
+                        `SLAS logout failed: ${
+                            error instanceof Error ? error.message : String(error)
+                        }. The error is ignored and session cookies are still cleared by the proxy.`
+                    )
+                }
+            }
         }
         this.clearStorage()
         return await this.ready()

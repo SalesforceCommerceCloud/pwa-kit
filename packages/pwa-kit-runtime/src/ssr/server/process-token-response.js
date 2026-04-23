@@ -7,7 +7,12 @@
 import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
 import {SET_COOKIE} from './constants'
-import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+import {
+    SESSION_COOKIE_CONFIG,
+    getAllCookieConfigs,
+    getCookieName,
+    getSiteId
+} from './httponly-cookie-config'
 import logger from '../../utils/logger-instance'
 
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
@@ -218,4 +223,34 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
     delete stripped.idp_access_token
     delete stripped.refresh_token
     return Buffer.from(JSON.stringify(stripped), 'utf8')
+}
+
+/**
+ * When a SLAS logout response is received, expire all HttpOnly session cookies so that
+ * stale tokens are not sent with subsequent requests.
+ * @private
+ */
+export function expireHttpOnlySessionCookies(req, res) {
+    const siteId = getSiteId(req)
+    if (!siteId) {
+        throw new Error(
+            'HttpOnly session cookies are enabled but siteId is missing. ' +
+                'Ensure the x-site-id header is set on the request.'
+        )
+    }
+
+    const site = siteId
+    const expired = new Date(0)
+
+    for (const config of getAllCookieConfigs()) {
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: getCookieName(config, site),
+                value: '',
+                expires: expired,
+                ...config.attributes
+            })
+        )
+    }
 }

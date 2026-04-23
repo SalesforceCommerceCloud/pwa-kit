@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getRefreshTokenCookieTTL, setHttpOnlySessionCookies} from './process-token-response'
+import {
+    getRefreshTokenCookieTTL,
+    setHttpOnlySessionCookies,
+    expireHttpOnlySessionCookies
+} from './process-token-response'
 import {X_SITE_ID} from './constants'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
@@ -320,5 +324,69 @@ describe('setHttpOnlySessionCookies', () => {
 
         const atCookie = res.cookies.find((c) => c.includes('cc-at_othersite='))
         expect(atCookie).toBeDefined()
+    })
+})
+
+describe('expireHttpOnlySessionCookies', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('throws when x-site-id header is missing', () => {
+        const res = makeRes()
+        const req = {headers: {}}
+        expect(() => expireHttpOnlySessionCookies(req, res)).toThrow(/siteId is missing/)
+    })
+
+    test('expires all session cookies for the given site', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReq(), res)
+
+        const expectedCookieKeys = [
+            'cc-at_testsite',
+            'cc-at-expires_testsite',
+            'cc-at-dnt_testsite',
+            'uido_testsite',
+            'idp_access_token_testsite',
+            'cc-nx-g_testsite',
+            'cc-nx_testsite',
+            'cc-nx-exists_testsite'
+        ]
+
+        expect(res.cookies).toHaveLength(expectedCookieKeys.length)
+
+        for (const key of expectedCookieKeys) {
+            const cookie = parseCookie(res.cookies.find((c) => c.includes(`${key}=`)))
+            expect(cookie).toBeDefined()
+            expect(cookie.value).toBe('')
+            expect(cookie.expires).toEqual(new Date(0))
+        }
+    })
+
+    test('uses x-site-id header to resolve correct cookie names', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReq('mysite'), res)
+
+        const atCookie = res.cookies.find((c) => c.includes('cc-at_mysite='))
+        expect(atCookie).toBeDefined()
+        expect(res.cookies.find((c) => c.includes('cc-at_testsite='))).toBeUndefined()
+    })
+
+    test('preserves cookie attributes (Secure, HttpOnly, Path) from config', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReq(), res)
+
+        // cc-at should be HttpOnly + Secure
+        const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
+        expect(atCookie.httpOnly).toBe(true)
+        expect(atCookie.secure).toBe(true)
+        expect(atCookie.path).toBe('/')
+
+        // cc-at-expires should NOT be HttpOnly, but should be Secure
+        const expCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-at-expires_testsite='))
+        )
+        expect(expCookie.httpOnly).toBeUndefined()
+        expect(expCookie.secure).toBe(true)
     })
 })
