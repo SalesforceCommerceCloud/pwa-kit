@@ -50,6 +50,49 @@ describe('the once function', () => {
     })
 })
 
+describe('_normalizeSlasPath', () => {
+    test('decodes percent-encoded characters', () => {
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%2Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('resolves dot-segment path traversals', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/trusted-system/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('handles combined encoding and traversal', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/trusted%2Dsystem/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('normalizes encoded forward slash in path segment', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/passwordless%2Flogin')
+        ).toBe('/oauth2/passwordless/login')
+    })
+
+    test('does not double-decode already-decoded paths', () => {
+        const doubleEncoded = '/oauth2/trusted%252Dsystem/token'
+        const result = RemoteServerFactory._normalizeSlasPath(doubleEncoded)
+        expect(result).toBe('/oauth2/trusted%2Dsystem/token')
+    })
+
+    test('returns raw path on malformed percent encoding', () => {
+        const malformed = '/oauth2/%ZZbad/path'
+        expect(RemoteServerFactory._normalizeSlasPath(malformed)).toBe(malformed)
+    })
+
+    test('passes through clean paths unchanged', () => {
+        expect(RemoteServerFactory._normalizeSlasPath('/shopper/auth/v1/oauth2/token')).toBe(
+            '/shopper/auth/v1/oauth2/token'
+        )
+    })
+})
+
 describe('remote server factory test coverage', () => {
     test('getSlasEndpoint returns undefined if useSLASPrivateClient is false', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({})
@@ -293,6 +336,62 @@ describe('SLAS private proxy', () => {
 
         const response = await request(app).post(
             '/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token'
+        )
+
+        expect(response.status).toBe(403)
+    })
+
+    test('returns 403 for trusted-system paths with percent-encoded hyphen', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%2Dsystem/token'
+        )
+
+        expect(response.status).toBe(403)
+    })
+
+    test('returns 403 for trusted-system paths reached via encoded dot-segments', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted%2Dsystem/token'
         )
 
         expect(response.status).toBe(403)

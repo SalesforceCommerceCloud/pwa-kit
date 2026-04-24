@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import path from 'path'
+import path, {posix as posixPath} from 'path'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -881,6 +881,35 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * URL-decode and normalize a request path for consistent security checks.
+     *
+     * Express exposes `req.path` in its raw, percent-encoded form while
+     * upstream services decode and normalize before routing. Matching
+     * against the raw value alone would miss equivalent encoded forms,
+     * so we decode and collapse dot-segments to ensure consistent path
+     * evaluation.
+     *
+     * Examples:
+     *   "/oauth2/trusted%2Dsystem/token"            → "/oauth2/trusted-system/token"
+     *   "/oauth2/token/%2E%2E/trusted-system/token" → "/oauth2/trusted-system/token"
+     *   "/oauth2/passwordless%2Flogin"              → "/oauth2/passwordless/login"
+     *
+     * @param {string} rawPath - The raw, potentially percent-encoded path
+     * @returns {string} The decoded, normalized path
+     * @private
+     */
+    _normalizeSlasPath(rawPath) {
+        try {
+            const decoded = decodeURIComponent(rawPath)
+            return posixPath.normalize(decoded)
+        } catch {
+            // If decoding fails (e.g. malformed percent encoding), return the
+            // raw path so that the existing guards can still apply.
+            return rawPath
+        }
+    },
+
+    /**
      * @private
      */
     _setupSlasPrivateClientProxy(app, options) {
@@ -913,12 +942,17 @@ export const RemoteServerFactory = {
         app.use(
             slasPrivateProxyPath,
             (req, res, next) => {
+                // Normalize the path before applying security checks so that
+                // encoded equivalents of the same path are evaluated consistently
+                // (e.g. %2D → "-", %2E%2E → ".." which then collapses via normalize).
+                const normalizedPath = this._normalizeSlasPath(req.path)
+
                 // Check if the request should be blocked before it reaches the proxy
                 // We run this outside of the proxy middleware because modifying the response
                 // to send a 403 in the proxy causes issues with the response interceptor.
                 if (
-                    !req.path?.match(options.slasApiPath) ||
-                    req.path?.match(/\/oauth2\/trusted-system/)
+                    !normalizedPath?.match(options.slasApiPath) ||
+                    normalizedPath?.match(/\/oauth2\/trusted-system/)
                 ) {
                     const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
                     logger.error(message)
@@ -952,12 +986,18 @@ export const RemoteServerFactory = {
                             targetProtocol: 'https'
                         })
 
-                        if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                        // Normalize the path before making credential-injection
+                        // decisions so that encoded equivalents are evaluated
+                        // consistently with the pre-proxy guard
+                        // (e.g. %2D → "-", %2E%2E → ".." collapsed by normalize).
+                        const normalizedReqPath = this._normalizeSlasPath(incomingRequest.path)
+
+                        if (normalizedReqPath?.match(/\/oauth2\/trusted-agent\/token/)) {
                             // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
                             // so the SLAS private client is sent via this special header
                             proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
                         } else if (
-                            incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
+                            normalizedReqPath?.match(options.applySLASPrivateClientToEndpoints)
                         ) {
                             // We pattern match and add client secrets only to endpoints that
                             // match the regex specified by options.applySLASPrivateClientToEndpoints.
@@ -1019,8 +1059,11 @@ export const RemoteServerFactory = {
                         // email not being found, we mask it with a 200 OK response so that it is not
                         // obvious that the user does not exist.
                         // We do this to prevent user enumeration.
+                        // Normalize the path so that encoded equivalents are
+                        // matched consistently (e.g. passwordles%73 → passwordless).
+                        const normalizedResPath = this._normalizeSlasPath(req.path)
                         if (
-                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
+                            normalizedResPath?.match(/\/oauth2\/passwordless\/login/) &&
                             proxyRes.statusCode === 404
                         ) {
                             res.statusCode = 200

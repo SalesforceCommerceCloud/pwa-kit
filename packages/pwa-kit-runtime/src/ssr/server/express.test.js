@@ -1330,6 +1330,40 @@ describe('SLAS private client proxy', () => {
             .expect(403)
     }, 15000)
 
+    test('returns 403 if trusted-system path contains percent-encoded characters', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted%2Dsystem/token')
+            .expect(403)
+    }, 15000)
+
+    test('returns 403 if trusted-system is reached via encoded dot-segments', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .post('/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted%2Dsystem/token')
+            .expect(403)
+    }, 15000)
+
+    test('does not inject credentials when trusted-system is reached via encoded dot-segments', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .post('/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted%2Dsystem/token')
+            .then((response) => {
+                // Should be blocked with 403, credentials never injected
+                expect(response.status).toBe(403)
+                expect(response.body.authorization).toBeUndefined()
+            })
+    }, 15000)
+
     test('throws an error if /oauth2/trusted-system/* is included in applySLASPrivateClientToEndpoints', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
@@ -1385,6 +1419,44 @@ describe('SLAS private client proxy', () => {
 
             return await request(app)
                 .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/login')
+                .expect(200)
+                .then((response) => {
+                    expect(response.text).toBe('')
+                })
+        } finally {
+            // Clean up the test server
+            testProxyServer.close()
+        }
+    })
+
+    test('proxy masks 404 for passwordless login with percent-encoded path', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        // Create a new mock server specifically for this test so we can mock a response from SLAS
+        const testProxyApp = express()
+        const testProxyPort = 12347
+        const testSlasTarget = `http://localhost:${testProxyPort}/shopper/auth/responseHeaders`
+
+        testProxyApp.use('/shopper/auth/responseHeaders', (req, res) => {
+            if (req.url.includes('passwordless') || req.url.includes('passwordles')) {
+                res.status(404).send()
+            } else {
+                res.send(req.headers)
+            }
+        })
+
+        const testProxyServer = testProxyApp.listen(testProxyPort)
+
+        try {
+            const testAppConfig = {
+                ...appConfig,
+                slasTarget: testSlasTarget
+            }
+
+            const app = RemoteServerFactory._createApp(opts(testAppConfig))
+
+            return await request(app)
+                .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordles%73/login')
                 .expect(200)
                 .then((response) => {
                     expect(response.text).toBe('')
