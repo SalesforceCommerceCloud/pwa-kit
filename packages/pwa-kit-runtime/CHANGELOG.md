@@ -1,3 +1,6 @@
+## 3.19.0
+- Keep original User Agent header in proxy requests
+
 ## v3.18.0-dev (Mar 20, 2026)
 - **`utils/ssr-server/data-store`** imports **`@salesforce/mrt-utilities/data-store`** (DataStore + error classes). **Requires** a published **`@salesforce/mrt-utilities`** release that declares **`exports["./data-store"]`** — pin **`package.json`** accordingly before shipping. Jest **`moduleNameMapper`** maps **`data-store`** (and legacy **`middleware`**) to the ESM Data Store slice for tests.
 - When the real Data Store is unavailable, **`getPlainObjectForDataStoreKey`** can load **`@salesforce/pwa-kit-dev`**’s in-memory local provider (`createLocalMrtDataStoreProvider`, env `PWAKIT_MRT_DATA_STORE_DEFAULTS`, allow rules in `utils/data-store/local-dev-provider-loader.js`). Dynamic `import()` tries `dist/utils` then `utils` paths for workspace vs published layouts.
