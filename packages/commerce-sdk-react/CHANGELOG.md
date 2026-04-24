@@ -8,6 +8,7 @@
 - Handle missing access token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3790)
 - Add USID support to StorefrontPreview for HttpOnly cookies [#3785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3785)
 - Expire HttpOnly session cookies on SLAS logout [#3794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3794)
+- Handle DNT for HttpOnly cookies [#3801](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3801)
 
 ## v5.2.0-dev (Mar 20, 2026)
 
