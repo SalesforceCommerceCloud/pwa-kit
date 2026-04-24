@@ -1426,8 +1426,9 @@ describe('createIntentFunction non-PayPal path (else branch of isPayPalPaymentMe
 
         expect(config.options.returnUrl).toContain('/checkout/payment-processing')
         expect(config.options.returnUrl).toContain('orderNo=' + encodeURIComponent(orderNo))
-        expect(config.options.returnUrl).toContain('zoneId=')
         expect(config.options.returnUrl).toContain('type=card')
+        // zoneId is omitted from the URL when paymentConfig.zoneId is not set
+        expect(config.options.returnUrl).not.toContain('zoneId=')
     })
 
     test('does not call prepareBasket at start of createIntent for non-PayPal (only onClick does)', async () => {

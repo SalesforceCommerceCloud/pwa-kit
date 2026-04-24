@@ -35,7 +35,8 @@ import {
     isPayPalPaymentMethodType,
     getClientSecret,
     getGatewayFromPaymentMethod,
-    getExpressPaymentMethodType
+    getExpressPaymentMethodType,
+    buildPaymentReturnUrl
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
@@ -273,16 +274,7 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        // Build the return URL (needed for updatePaymentInstrumentForOrder )
-        const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
-        paymentData.returnUrl =
-            baseReturnUrl +
-            '?orderNo=' +
-            encodeURIComponent(createdOrderNo) +
-            '&zoneId=' +
-            encodeURIComponent(zoneId) +
-            '&type=' +
-            encodeURIComponent(paymentType)
+        paymentData.returnUrl = buildPaymentReturnUrl({
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({
@@ -871,16 +863,7 @@ const SFPaymentsExpressButtons = ({
                             paymentData
                         )
                         orderRef.current = order
-                        // Update returnUrl with order details.
-                        const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
-                        config.options.returnUrl =
-                            baseReturnUrl +
-                            '?orderNo=' +
-                            encodeURIComponent(order.orderNo) +
-                            '&zoneId=' +
-                            encodeURIComponent(zoneId) +
-                            '&type=' +
-                            encodeURIComponent(paymentMethodType)
+                            zoneId,
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
@@ -998,7 +981,7 @@ const SFPaymentsExpressButtons = ({
                     maximumButtonCount,
                     // Base return URL for redirect-based payment methods.
                     // Updated with order details in createIntentFunction after order creation.
-                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+                    returnUrl: buildPaymentReturnUrl()
                 }
             }
 
