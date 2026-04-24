@@ -274,7 +274,12 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
+        // Build the return URL (needed for updatePaymentInstrumentForOrder)
         paymentData.returnUrl = buildPaymentReturnUrl({
+            orderNo: createdOrderNo,
+            zoneId,
+            type: paymentType
+        })
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({
@@ -863,7 +868,12 @@ const SFPaymentsExpressButtons = ({
                             paymentData
                         )
                         orderRef.current = order
+                        // Update returnUrl with order details for redirect-based payment methods.
+                        config.options.returnUrl = buildPaymentReturnUrl({
+                            orderNo: order.orderNo,
                             zoneId,
+                            type: paymentMethodType
+                        })
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
