@@ -871,6 +871,15 @@ const SFPaymentsExpressButtons = ({
                             paymentData
                         )
                         orderRef.current = order
+                        const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+                        config.options.returnUrl =
+                            baseReturnUrl +
+                            '?orderNo=' +
+                            encodeURIComponent(order.orderNo) +
+                            '&zoneId=' +
+                            encodeURIComponent(zoneId) +
+                            '&type=' +
+                            encodeURIComponent(paymentMethodType)
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
@@ -985,7 +994,8 @@ const SFPaymentsExpressButtons = ({
                     billingAddressRequired: true,
                     phoneNumberRequired: true,
                     useManualCapture: !cardCaptureAutomatic,
-                    maximumButtonCount
+                    maximumButtonCount,
+                    returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                 }
             }
 
