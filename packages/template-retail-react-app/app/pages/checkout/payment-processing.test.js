@@ -35,6 +35,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => ({
     useSFPayments: () => mockUseSFPayments(),
     useSFPaymentsEnabled: () => true,
+    useExpressCheckoutEnabled: () => ({pdp: true, miniCart: true, cart: true, checkout: true}),
     STATUS_SUCCESS: 0
 }))
 

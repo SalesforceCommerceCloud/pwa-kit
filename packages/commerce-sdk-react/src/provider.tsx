@@ -58,6 +58,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    cookieDomain?: string
     pageDesignerParams?: PageDesignerParams
     /** When true, proxy returns tokens in HttpOnly cookies. */
     enableHttpOnlySessionCookies?: boolean
@@ -160,6 +161,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         apiClients,
         disableAuthInit = false,
         hybridAuthEnabled = false,
+        cookieDomain,
         pageDesignerParams = {},
         enableHttpOnlySessionCookies = false
     } = props
@@ -236,6 +238,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         hybridAuthEnabled,
+        cookieDomain,
         enableHttpOnlySessionCookies
     ])
 

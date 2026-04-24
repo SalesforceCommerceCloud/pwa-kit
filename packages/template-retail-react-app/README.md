@@ -39,6 +39,23 @@ See the [Localization README.md](./translations/README.md) for important setup i
 
 The Retail React App's configuration files are located in the `app/config` folder. For more details, see [Configuration Files](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html) in the documentation.
 
+### MRT Data Store (local development)
+
+You can resolve **MRT Data Store** custom preferences during SSR without DynamoDB by using the in-memory provider from **`@salesforce/pwa-kit-dev`** (loaded by `@salesforce/pwa-kit-runtime` when you are **not** in a full Managed Runtime process).
+
+- **Turn the feature on:** set **`app.mrtDataStore.enabled`** in `config/default.js`, and/or **`PWAKIT_MRT_DATA_STORE_ENABLED=true`** (use `false` to force off without editing files).
+- **Use local defaults:** set **`PWAKIT_MRT_DATA_STORE_DEFAULTS`** to a JSON object whose keys are **full DAL keys** and values are plain objects. For example, site preferences use `<siteId>-custom-site-preferences` (such as `RefArch-custom-site-preferences`); global preferences use **`custom-global-preferences`**.
+- **Use the local provider, not DynamoDB:** in development, keep **`AWS_REGION`**, **`MOBIFY_PROPERTY_ID`**, and **`DEPLOY_TARGET`** unset for the dev server. If all three are set, the runtime uses the **real** Data Store instead of your defaults map.
+- **Optional:** **`PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING=false`** silences console warnings when a key is missing. Use **`PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL=true`** if you need the local provider while **`NODE_ENV=production`** locally.
+
+```bash
+export PWAKIT_MRT_DATA_STORE_ENABLED=true
+export PWAKIT_MRT_DATA_STORE_DEFAULTS='{"RefArch-custom-site-preferences":{},"custom-global-preferences":{}}'
+npm start
+```
+
+See the comments above **`mrtDataStore`** in `config/default.js` for related env vars.
+
 ## Documentation
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.

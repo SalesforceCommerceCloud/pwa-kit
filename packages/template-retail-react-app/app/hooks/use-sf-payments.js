@@ -132,3 +132,19 @@ export const useFutureUsageOffSession = () => {
     const futureUsageOffSession = useShopperConfiguration('futureUsageOffSession')
     return futureUsageOffSession ?? false
 }
+
+/**
+ * Custom hook to get the express checkout enablement flags per page.
+ * @returns {{pdp: boolean, miniCart: boolean, cart: boolean, checkout: boolean}} Per-page express checkout flags
+ */
+export const useExpressCheckoutEnabled = () => {
+    const sfPaymentsEnabled = useSFPaymentsEnabled()
+    const enabledPages = useShopperConfiguration('expressOnCheckoutPagesEnabled')
+    const pages = sfPaymentsEnabled && Array.isArray(enabledPages) ? enabledPages : []
+    return {
+        pdp: pages.includes('PDP'),
+        miniCart: pages.includes('MINICART'),
+        cart: pages.includes('CART'),
+        checkout: pages.includes('CHECKOUT')
+    }
+}

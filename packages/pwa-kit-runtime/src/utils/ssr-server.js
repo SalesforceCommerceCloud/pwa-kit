@@ -12,6 +12,9 @@
 // This file is kept for backwards compatibility / simpler imports.
 export * from './ssr-server/cached-response'
 export * from './ssr-server/configure-proxy'
+export * from './data-store/data-store-utils'
+export * from './data-store/ssr-global-preferences.server'
+export * from './data-store/ssr-site-preferences.server'
 export * from './ssr-server/data-store'
 export * from './ssr-server/metrics-sender'
 export * from './ssr-server/outgoing-request-hook'
