@@ -141,6 +141,7 @@ type AuthDataKeys =
     | 'idp_refresh_token'
     | 'dnt'
     | 'cc-at-expires'
+    | 'cc-at_dw_dnt'
     | 'cc-nx-exists'
 
 type AuthDataMap = Record<
@@ -260,6 +261,10 @@ const DATA_MAP: AuthDataMap = {
     'cc-at-expires': {
         storageType: 'cookie',
         key: 'cc-at-expires'
+    },
+    'cc-at_dw_dnt': {
+        storageType: 'cookie',
+        key: 'cc-at_dw_dnt'
     },
     'cc-nx-exists': {
         storageType: 'cookie',
@@ -443,11 +448,20 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        const accessToken = this.getAccessToken()
         let isInSync = true
-        if (accessToken) {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            isInSync = dnt === dntCookieVal
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            // Can't read the HttpOnly access token JWT on the client.
+            // Use the non-HttpOnly companion cookie set by the server instead.
+            const accessTokenDnt = this.get('cc-at_dw_dnt')
+            if (accessTokenDnt !== undefined && accessTokenDnt !== '') {
+                isInSync = accessTokenDnt === dntCookieVal
+            }
+        } else {
+            const accessToken = this.getAccessToken()
+            if (accessToken) {
+                const {dnt} = this.parseSlasJWT(accessToken)
+                isInSync = dnt === dntCookieVal
+            }
         }
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)

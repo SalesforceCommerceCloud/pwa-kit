@@ -54,7 +54,7 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │     - cc-at_RefArch              │
   │                                     │     - cc-nx-g_RefArch            │
   │                                     │     - cc-at-expires_RefArch      │
-  │                                     │     - cc-at-dnt_RefArch          │
+  │                                     │     - cc-at_dw_dnt_RefArch          │
   │                                     │     - uido_RefArch               │
   │                                     │  4. Strip tokens from body       │
   │                                     │                                  │

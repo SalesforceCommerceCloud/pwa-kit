@@ -16,7 +16,7 @@ describe('SESSION_COOKIE_CONFIG', () => {
     it('defines the correct key prefixes', () => {
         expect(SESSION_COOKIE_CONFIG.accessToken.key).toBe('cc-at')
         expect(SESSION_COOKIE_CONFIG.accessTokenExpires.key).toBe('cc-at-expires')
-        expect(SESSION_COOKIE_CONFIG.accessTokenDnt.key).toBe('cc-at-dnt')
+        expect(SESSION_COOKIE_CONFIG.accessTokenDnt.key).toBe('cc-at_dw_dnt')
         expect(SESSION_COOKIE_CONFIG.uido.key).toBe('uido')
         expect(SESSION_COOKIE_CONFIG.idpAccessToken.key).toBe('idp_access_token')
         expect(SESSION_COOKIE_CONFIG.refreshTokenGuest.key).toBe('cc-nx-g')
