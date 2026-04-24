@@ -197,6 +197,62 @@ export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
 }
 
 /**
+ * Handle all HttpOnly session cookie logic for the outgoing SLAS proxy request.
+ * Consolidates refresh token injection, logout token injection, session cookie
+ * stripping, and internal header cleanup.
+ * @throws {RefreshTokenNotFoundError} if the refresh token cookie is missing on a refresh_token grant request.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyReq = (proxyRequest, incomingRequest) => {
+    if (incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token') {
+        setRefreshTokenHeader(proxyRequest, incomingRequest)
+        proxyRequest.removeHeader(X_GRANT_TYPE)
+    }
+
+    if (incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        setTokensInLogoutRequest(proxyRequest, incomingRequest)
+    }
+
+    stripSessionCookies(proxyRequest, incomingRequest)
+    proxyRequest.removeHeader(X_SITE_ID)
+}
+
+/**
+ * Handle all HttpOnly session cookie logic for the SLAS proxy response.
+ * Sets HttpOnly cookies on token responses and expires them on logout.
+ * Throws if setHttpOnlySessionCookies fails — caller is responsible for error response.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyRes = (
+    workingBuffer,
+    proxyRes,
+    req,
+    res,
+    options,
+    logNamespace
+) => {
+    const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
+    if (proxyRes.statusCode === 200 && isTokenEndpoint) {
+        workingBuffer = setHttpOnlySessionCookies(workingBuffer, proxyRes, req, res, options)
+    }
+
+    if (req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        try {
+            expireHttpOnlySessionCookies(req, res)
+        } catch (error) {
+            logger.warn('Error expiring HttpOnly session cookies on logout', {
+                namespace: logNamespace,
+                additionalProperties: {
+                    error: error.message || error
+                }
+            })
+        }
+    }
+
+    return workingBuffer
+}
+
+/**
  * Environment variables that must be set for the Express app to run remotely.
  *
  * @private
@@ -1092,29 +1148,8 @@ export const RemoteServerFactory = {
                             }
                         }
 
-                        // When HttpOnly session cookies are enabled, inject the refresh token
-                        // from the HttpOnly cookie for refresh_token grant requests.
-                        if (
-                            httpOnlyCookiesEnabled &&
-                            incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token'
-                        ) {
-                            setRefreshTokenHeader(proxyRequest, incomingRequest)
-                            proxyRequest.removeHeader(X_GRANT_TYPE)
-                        }
-
-                        // Handle logout: inject tokens from HttpOnly cookies
-                        if (
-                            httpOnlyCookiesEnabled &&
-                            incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)
-                        ) {
-                            setTokensInLogoutRequest(proxyRequest, incomingRequest)
-                        }
-
-                        // Strip internal headers and session cookies that are only used
-                        // by our proxy, not by SLAS.
                         if (httpOnlyCookiesEnabled) {
-                            stripSessionCookies(proxyRequest, incomingRequest)
-                            proxyRequest.removeHeader(X_SITE_ID)
+                            handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
                         }
 
                         // Allow users to apply additional custom modifications
@@ -1169,19 +1204,15 @@ export const RemoteServerFactory = {
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
                     let workingBuffer = responseBuffer
                     try {
-                        const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
-                        if (
-                            httpOnlyCookiesEnabled &&
-                            proxyRes.statusCode === 200 &&
-                            isTokenEndpoint
-                        ) {
+                        if (httpOnlyCookiesEnabled) {
                             try {
-                                workingBuffer = setHttpOnlySessionCookies(
+                                workingBuffer = handleHttpOnlyCookiesOnProxyRes(
                                     workingBuffer,
                                     proxyRes,
                                     req,
                                     res,
-                                    options
+                                    options,
+                                    logNamespace
                                 )
                             } catch (error) {
                                 res.statusCode = 500
@@ -1201,21 +1232,6 @@ export const RemoteServerFactory = {
                                     }),
                                     'utf8'
                                 )
-                            }
-                        }
-
-                        // Expire all HttpOnly session cookies on logout, regardless
-                        // of whether SLAS returned success or failure.
-                        if (httpOnlyCookiesEnabled && req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
-                            try {
-                                expireHttpOnlySessionCookies(req, res)
-                            } catch (error) {
-                                logger.warn('Error expiring HttpOnly session cookies on logout', {
-                                    namespace: logNamespace,
-                                    additionalProperties: {
-                                        error: error.message || error
-                                    }
-                                })
                             }
                         }
 
