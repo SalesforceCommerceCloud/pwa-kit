@@ -871,6 +871,7 @@ const SFPaymentsExpressButtons = ({
                             paymentData
                         )
                         orderRef.current = order
+                        // Update returnUrl with order details.
                         const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                         config.options.returnUrl =
                             baseReturnUrl +
@@ -995,6 +996,8 @@ const SFPaymentsExpressButtons = ({
                     phoneNumberRequired: true,
                     useManualCapture: !cardCaptureAutomatic,
                     maximumButtonCount,
+                    // Base return URL for redirect-based payment methods.
+                    // Updated with order details in createIntentFunction after order creation.
                     returnUrl: `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
                 }
             }
