@@ -9773,6 +9773,20 @@
       "value": "]"
     }
   ],
+  "shopper_agent.error.session_init_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ şŧȧȧřŧ ŧħḗḗ şħǿǿƥƥīƞɠ ȧȧşşīşŧȧȧƞŧ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "signout_confirmation_dialog.button.cancel": [
     {
       "type": 0,
