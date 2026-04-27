@@ -115,6 +115,146 @@ describe('_normalizeSlasPath', () => {
     })
 })
 
+describe('_matchSlasAllowlistEntry', () => {
+    const ORG = 'f_ecom_zzrf_001'
+
+    test('matches a known endpoint and returns its injectAuth mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/token`,
+            'POST'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'token'])
+        expect(entry?.injectAuth).toBe('basic')
+    })
+
+    test('matches trusted-agent/token with sfdc-header mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/token`,
+            'POST'
+        )
+        expect(entry?.injectAuth).toBe('sfdc-header')
+    })
+
+    test('matches oauth2/login with no credential injection', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/login`,
+            'POST'
+        )
+        expect(entry?.injectAuth).toBe('none')
+    })
+
+    test('matches future API versions via structural prefix', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v2/organizations/${ORG}/oauth2/token`,
+            'POST'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'token'])
+    })
+
+    test('returns null for endpoints not on the allow-list', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/some-other-route`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null for paths outside /shopper/auth', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/customers/v1/organizations/${ORG}/customers`,
+                'GET'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null when the organizations segment is missing', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                '/shopper/auth/v1/oauth2/token',
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null when trailing segments do not match an entry', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token/extra`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null on substring-only matches', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token-extra`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null for null input', () => {
+        expect(RemoteServerFactory._matchSlasAllowlistEntry(null, 'POST')).toBeNull()
+    })
+
+    test.each([
+        ['GET', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['PUT', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['DELETE', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['PATCH', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/login`],
+        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/jwks`],
+        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/authorize`]
+    ])('returns null when method %s is not declared for the endpoint', (method, path) => {
+        expect(RemoteServerFactory._matchSlasAllowlistEntry(path, method)).toBeNull()
+    })
+
+    test.each([
+        ['/shopper/auth/v1\nx/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1\rx/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1\u0000x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1 x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1;x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1:x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1+x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org\ny/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org\u0000y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org%y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org*y/oauth2/token']
+    ])('returns null when version or orgId contains characters outside the allowed set: %s', (path) => {
+        expect(RemoteServerFactory._matchSlasAllowlistEntry(path, 'POST')).toBeNull()
+    })
+
+    test('accepts a custom allow-list passed by the project', () => {
+        const customList = [
+            {segments: ['oauth2', 'my-experiment'], methods: ['POST'], injectAuth: 'basic'}
+        ]
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/my-experiment`,
+            'POST',
+            customList
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'my-experiment'])
+        expect(entry?.injectAuth).toBe('basic')
+    })
+
+    test('a custom allow-list replaces, does not extend, the default', () => {
+        const customList = [
+            {segments: ['oauth2', 'my-experiment'], methods: ['POST'], injectAuth: 'basic'}
+        ]
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token`,
+                'POST',
+                customList
+            )
+        ).toBeNull()
+    })
+})
+
 describe('remote server factory test coverage', () => {
     test('getSlasEndpoint returns undefined if useSLASPrivateClient is false', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({})
