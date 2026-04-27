@@ -450,25 +450,27 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        let isInSync = true
         if (this.enableHttpOnlySessionCookies && onClient()) {
-            // Can't read the HttpOnly access token JWT on the client.
-            // Use the non-HttpOnly companion cookie set by the server instead.
-            const accessTokenDnt = this.get('cc-at_dw_dnt')
-            if (accessTokenDnt !== undefined && accessTokenDnt !== '') {
-                isInSync = accessTokenDnt === dntCookieVal
+            // HttpOnly: trust dw_dnt as the user's preference without deleting it.
+            // The dw_dnt cookie must survive because it is sent with SLAS requests
+            // so that SLAS can reflect the preference in the JWT. Deleting it here
+            // would prevent the JWT from ever being updated, creating a loop where
+            // dw_dnt and cc-at_dw_dnt never converge.
+            if (dntCookieVal === '1' || dntCookieVal === '0') {
+                dntCookieStatus = Boolean(Number(dntCookieVal))
             }
         } else {
+            let isInSync = true
             const accessToken = this.getAccessToken()
             if (accessToken) {
                 const {dnt} = this.parseSlasJWT(accessToken)
                 isInSync = dnt === dntCookieVal
             }
-        }
-        if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
-            this.delete(DNT_COOKIE_NAME)
-        } else {
-            dntCookieStatus = Boolean(Number(dntCookieVal))
+            if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
+                this.delete(DNT_COOKIE_NAME)
+            } else {
+                dntCookieStatus = Boolean(Number(dntCookieVal))
+            }
         }
 
         if (options?.includeDefaults) {
@@ -501,14 +503,26 @@ class Auth {
             ...getDefaultCookieAttributes(),
             secure: true
         })
-        const accessToken = this.getAccessToken()
-        if (accessToken !== '') {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            if (dnt !== dntCookieVal) {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            // Compare dw_dnt with cc-at_dw_dnt (the DNT value from the JWT, set
+            // by the server) to determine if a refresh is needed to update the
+            // access token. Normalize: dw_dnt uses '0'/'1', JWT may use 'true'/'false'.
+            const accessTokenDnt = this.get('cc-at_dw_dnt')
+            const tokenDntBool = accessTokenDnt === '1' || accessTokenDnt === 'true'
+            const prefBool = dntCookieVal === '1'
+            if (accessTokenDnt === '' || tokenDntBool !== prefBool) {
                 await this.refreshAccessToken()
             }
         } else {
-            await this.refreshAccessToken()
+            const accessToken = this.getAccessToken()
+            if (accessToken !== '') {
+                const {dnt} = this.parseSlasJWT(accessToken)
+                if (dnt !== dntCookieVal) {
+                    await this.refreshAccessToken()
+                }
+            } else {
+                await this.refreshAccessToken()
+            }
         }
         if (preference !== null) {
             const SECONDS_IN_DAY = 86400
@@ -524,6 +538,9 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
+            // dw_dnt is a user consent preference, not a session token.
+            // Preserve it across session resets so the user is not re-prompted.
+            if (keyName === DNT_COOKIE_NAME) return
             const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
             store.delete(key)

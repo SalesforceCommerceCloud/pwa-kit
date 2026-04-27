@@ -1384,22 +1384,22 @@ describe('Auth', () => {
         parseSlasJWTSpiedOn.mockRestore()
     })
 
-    test('getDnt() uses cc-at_dw_dnt cookie instead of JWT when HttpOnly cookies are enabled', () => {
+    test('getDnt() trusts dw_dnt with HttpOnly cookies enabled', () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
         auth.set('dw_dnt', '1')
-        // @ts-expect-error private method
-        auth.set('cc-at_dw_dnt', '1')
         expect(auth.getDnt()).toBe(true)
     })
 
-    test('getDnt() returns undefined when cc-at_dw_dnt and dw_dnt are out of sync with HttpOnly cookies', () => {
+    test('getDnt() does not delete dw_dnt when out of sync with cc-at_dw_dnt (HttpOnly)', () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
         auth.set('dw_dnt', '0')
         // @ts-expect-error private method
         auth.set('cc-at_dw_dnt', '1')
-        expect(auth.getDnt()).toBeUndefined()
+        // dw_dnt should be preserved even though it disagrees with cc-at_dw_dnt
+        expect(auth.getDnt()).toBe(false)
+        expect(auth.get('dw_dnt')).toBe('0')
     })
 
     test('token call clears SFRA auth token cookie and sets all token from the response', async () => {
