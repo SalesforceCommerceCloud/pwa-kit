@@ -1364,6 +1364,16 @@ describe('SLAS private client proxy', () => {
             })
     }, 15000)
 
+    test('returns 403 if path contains malformed percent encoding', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/%ZZbad/token')
+            .expect(403)
+    }, 15000)
+
     test('throws an error if /oauth2/trusted-system/* is included in applySLASPrivateClientToEndpoints', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
@@ -1466,6 +1476,72 @@ describe('SLAS private client proxy', () => {
             testProxyServer.close()
         }
     })
+
+    test('pathRewrite normalizes percent-encoded characters before forwarding to upstream', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const testProxyApp = express()
+        const testProxyPort = 12348
+
+        // Echo back the URL the mock upstream received
+        testProxyApp.use((req, res) => {
+            res.json({url: req.url})
+        })
+
+        const testProxyServer = testProxyApp.listen(testProxyPort)
+
+        try {
+            const testAppConfig = {
+                ...appConfig,
+                slasTarget: `http://localhost:${testProxyPort}`
+            }
+
+            const app = RemoteServerFactory._createApp(opts(testAppConfig))
+
+            // Send a path with %73 encoding for 's' in "somePath"
+            return await request(app)
+                .get('/mobify/slas/private/shopper/auth/v1/%73omePath')
+                .then((response) => {
+                    // The upstream should receive the decoded, normalized path
+                    expect(response.body.url).toBe('/shopper/auth/v1/somePath')
+                })
+        } finally {
+            testProxyServer.close()
+        }
+    }, 15000)
+
+    test('pathRewrite collapses dot-segments before forwarding to upstream', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const testProxyApp = express()
+        const testProxyPort = 12349
+
+        // Echo back the URL the mock upstream received
+        testProxyApp.use((req, res) => {
+            res.json({url: req.url})
+        })
+
+        const testProxyServer = testProxyApp.listen(testProxyPort)
+
+        try {
+            const testAppConfig = {
+                ...appConfig,
+                slasTarget: `http://localhost:${testProxyPort}`
+            }
+
+            const app = RemoteServerFactory._createApp(opts(testAppConfig))
+
+            // Send a path with encoded dot-segments
+            return await request(app)
+                .get('/mobify/slas/private/shopper/auth/v1/oauth2/other/%2E%2E/token')
+                .then((response) => {
+                    // The upstream should receive the collapsed path
+                    expect(response.body.url).toBe('/shopper/auth/v1/oauth2/token')
+                })
+        } finally {
+            testProxyServer.close()
+        }
+    }, 15000)
 })
 
 describe('Base path tests', () => {

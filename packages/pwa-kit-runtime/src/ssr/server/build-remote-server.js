@@ -889,13 +889,8 @@ export const RemoteServerFactory = {
      * so we decode and collapse dot-segments to ensure consistent path
      * evaluation.
      *
-     * Examples:
-     *   "/oauth2/trusted%2Dsystem/token"            → "/oauth2/trusted-system/token"
-     *   "/oauth2/token/%2E%2E/trusted-system/token" → "/oauth2/trusted-system/token"
-     *   "/oauth2/passwordless%2Flogin"              → "/oauth2/passwordless/login"
-     *
      * @param {string} rawPath - The raw, potentially percent-encoded path
-     * @returns {string} The decoded, normalized path
+     * @returns {(string | null)} The decoded/normalized path or `null` if decoding fails
      * @private
      */
     _normalizeSlasPath(rawPath) {
@@ -903,9 +898,10 @@ export const RemoteServerFactory = {
             const decoded = decodeURIComponent(rawPath)
             return posixPath.normalize(decoded)
         } catch {
-            // If decoding fails (e.g. malformed percent encoding), return the
-            // raw path so that the existing guards can still apply.
-            return rawPath
+            // If decoding fails (e.g. malformed percent encoding), we cannot determine what
+            // path the upstream would resolve. Return null to signal that the caller should
+            // reject the request.
+            return null
         }
     },
 
@@ -944,15 +940,17 @@ export const RemoteServerFactory = {
             (req, res, next) => {
                 // Normalize the path before applying security checks so that
                 // encoded equivalents of the same path are evaluated consistently
-                // (e.g. %2D → "-", %2E%2E → ".." which then collapses via normalize).
                 const normalizedPath = this._normalizeSlasPath(req.path)
 
-                // Check if the request should be blocked before it reaches the proxy
+                // Check if the request should be blocked before it reaches the proxy.
+                // If normalization fails (e.g. malformed percent encoding), we cannot determine
+                // what the upstream would resolve — block the request.
                 // We run this outside of the proxy middleware because modifying the response
                 // to send a 403 in the proxy causes issues with the response interceptor.
                 if (
-                    !normalizedPath?.match(options.slasApiPath) ||
-                    normalizedPath?.match(/\/oauth2\/trusted-system/)
+                    !normalizedPath ||
+                    !normalizedPath.match(options.slasApiPath) ||
+                    normalizedPath?.split('/').filter(Boolean).includes('trusted-system')
                 ) {
                     const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
                     logger.error(message)
@@ -973,7 +971,11 @@ export const RemoteServerFactory = {
                 pathRewrite: (path) => {
                     const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
-                    return path.replace(regex, '')
+                    const stripped = path.replace(regex, '')
+                    // Normalize the forwarded path so SLAS sees exactly what
+                    // our guards evaluated — no encoded traversals or
+                    // characters that could route differently upstream.
+                    return this._normalizeSlasPath(stripped)
                 },
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
@@ -989,7 +991,6 @@ export const RemoteServerFactory = {
                         // Normalize the path before making credential-injection
                         // decisions so that encoded equivalents are evaluated
                         // consistently with the pre-proxy guard
-                        // (e.g. %2D → "-", %2E%2E → ".." collapsed by normalize).
                         const normalizedReqPath = this._normalizeSlasPath(incomingRequest.path)
 
                         if (normalizedReqPath?.match(/\/oauth2\/trusted-agent\/token/)) {
@@ -1060,7 +1061,7 @@ export const RemoteServerFactory = {
                         // obvious that the user does not exist.
                         // We do this to prevent user enumeration.
                         // Normalize the path so that encoded equivalents are
-                        // matched consistently (e.g. passwordles%73 → passwordless).
+                        // matched consistently.
                         const normalizedResPath = this._normalizeSlasPath(req.path)
                         if (
                             normalizedResPath?.match(/\/oauth2\/passwordless\/login/) &&

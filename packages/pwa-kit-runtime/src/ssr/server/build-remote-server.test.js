@@ -81,9 +81,9 @@ describe('_normalizeSlasPath', () => {
         expect(result).toBe('/oauth2/trusted%2Dsystem/token')
     })
 
-    test('returns raw path on malformed percent encoding', () => {
+    test('returns null on malformed percent encoding', () => {
         const malformed = '/oauth2/%ZZbad/path'
-        expect(RemoteServerFactory._normalizeSlasPath(malformed)).toBe(malformed)
+        expect(RemoteServerFactory._normalizeSlasPath(malformed)).toBeNull()
     })
 
     test('passes through clean paths unchanged', () => {
