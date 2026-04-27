@@ -205,7 +205,7 @@ describe('_matchSlasAllowlistEntry', () => {
         ['PUT', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
         ['DELETE', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
         ['PATCH', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/login`],
-        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/jwks`],
+        ['GET', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/token`],
         ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/authorize`]
     ])('returns null when method %s is not declared for the endpoint', (method, path) => {
         expect(RemoteServerFactory._matchSlasAllowlistEntry(path, method)).toBeNull()

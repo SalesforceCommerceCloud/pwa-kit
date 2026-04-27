@@ -127,8 +127,7 @@ export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
     {segments: ['oauth2', 'password', 'reset'], methods: ['POST'], injectAuth: 'basic'},
     {segments: ['oauth2', 'password', 'action'], methods: ['POST'], injectAuth: 'basic'},
     {segments: ['oauth2', 'trusted-agent', 'authorize'], methods: ['GET'], injectAuth: 'none'},
-    {segments: ['oauth2', 'trusted-agent', 'token'], methods: ['POST'], injectAuth: 'sfdc-header'},
-    {segments: ['oauth2', 'jwks'], methods: ['GET'], injectAuth: 'none'}
+    {segments: ['oauth2', 'trusted-agent', 'token'], methods: ['POST'], injectAuth: 'sfdc-header'}
 ])
 
 /**
