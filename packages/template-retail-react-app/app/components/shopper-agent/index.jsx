@@ -383,42 +383,55 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             if (conversationId && lastConversationSessionInitRef.current === conversationId) return
             if (conversationId) lastConversationSessionInitRef.current = conversationId
 
-            postSessionInitMutateRef.current(
-                {
-                    parameters: {organizationId: orgId, siteId: sid},
-                    body: {
-                        sessionInitKey: 'test-session-init-key-on-ready'
-                    }
-                },
-                {
-                    onSuccess: (data) => {
-                        console.info(
-                            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
-                            {
-                                organizationId: orgId,
-                                siteId: sid,
-                                response: data
+            const getAuthLinkKey =
+                window.embeddedservice_bootstrap?.userVerificationAPI?.getAuthLinkKey
+            if (typeof getAuthLinkKey !== 'function') {
+                console.error('Shopper Agent: getAuthLinkKey is not available')
+                return
+            }
+
+            getAuthLinkKey()
+                .then((sessionInitKey) => {
+                    postSessionInitMutateRef.current(
+                        {
+                            parameters: {organizationId: orgId, siteId: sid},
+                            body: {
+                                sessionInitKey
                             }
-                        )
-                    },
-                    onError: (error) => {
-                        console.error(
-                            'postSessionInit failed onEmbeddedMessagingConversationStarted',
-                            {
-                                organizationId: orgId,
-                                siteId: sid,
-                                error
+                        },
+                        {
+                            onSuccess: (data) => {
+                                console.info(
+                                    'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+                                    {
+                                        organizationId: orgId,
+                                        siteId: sid,
+                                        response: data
+                                    }
+                                )
+                            },
+                            onError: (error) => {
+                                console.error(
+                                    'postSessionInit failed onEmbeddedMessagingConversationStarted',
+                                    {
+                                        organizationId: orgId,
+                                        siteId: sid,
+                                        error
+                                    }
+                                )
+                                // Close the chat if session initialization fails
+                                resetEmbeddedMessagingForCommerceSessionChange()
+                                toastRef.current({
+                                    title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                                    status: 'error'
+                                })
                             }
-                        )
-                        // Close the chat if session initialization fails
-                        resetEmbeddedMessagingForCommerceSessionChange()
-                        toastRef.current({
-                            title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                            status: 'error'
-                        })
-                    }
-                }
-            )
+                        }
+                    )
+                })
+                .catch((error) => {
+                    console.error('Shopper Agent: getAuthLinkKey failed', error)
+                })
         }
 
         const handleEmbeddedMessagingWindowMaximized = () => {

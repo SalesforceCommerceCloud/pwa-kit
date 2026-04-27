@@ -41,7 +41,8 @@ const mockEmbeddedService = {
         sendTextMessage: jest.fn()
     },
     userVerificationAPI: {
-        clearSession: jest.fn().mockResolvedValue(undefined)
+        clearSession: jest.fn().mockResolvedValue(undefined),
+        getAuthLinkKey: jest.fn().mockResolvedValue('test-session-init-key-on-ready')
     }
 }
 
@@ -519,7 +520,7 @@ describe('ShopperAgent Component', () => {
         errorSpy.mockRestore()
     })
 
-    test('should show error toast when postSessionInit fails and userVerificationAPI is unavailable', async () => {
+    test('should log error and not call postSessionInit when getAuthLinkKey is unavailable', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const bootstrapWithoutUv = {
             ...mockEmbeddedService,
@@ -533,14 +534,8 @@ describe('ShopperAgent Component', () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
-        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
-
-        await act(async () => {
-            callbacks.onError(new Error('session init failed'))
-        })
-
-        expect(mockShowToast).toHaveBeenCalledTimes(1)
-        expect(mockShowToast.mock.calls[0][0].status).toBe('error')
+        expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey is not available')
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
 
         errorSpy.mockRestore()
         global.window.embeddedservice_bootstrap = mockEmbeddedService
