@@ -35,7 +35,8 @@ import {
     isPayPalPaymentMethodType,
     getClientSecret,
     getGatewayFromPaymentMethod,
-    getExpressPaymentMethodType
+    getExpressPaymentMethodType,
+    buildPaymentReturnUrl
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
 import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
@@ -273,16 +274,12 @@ const SFPaymentsExpressButtons = ({
         // Find SF Payments payment instrument in created order
         const orderPaymentInstrument = getSFPaymentsInstrument(order)
 
-        // Build the return URL (needed for updatePaymentInstrumentForOrder )
-        const baseReturnUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
-        paymentData.returnUrl =
-            baseReturnUrl +
-            '?orderNo=' +
-            encodeURIComponent(createdOrderNo) +
-            '&zoneId=' +
-            encodeURIComponent(zoneId) +
-            '&type=' +
-            encodeURIComponent(paymentType)
+        // Build the return URL (needed for updatePaymentInstrumentForOrder)
+        paymentData.returnUrl = buildPaymentReturnUrl({
+            orderNo: createdOrderNo,
+            zoneId,
+            type: paymentType
+        })
 
         try {
             const paymentInstrumentBody = createPaymentInstrumentBody({
@@ -871,6 +868,12 @@ const SFPaymentsExpressButtons = ({
                             paymentData
                         )
                         orderRef.current = order
+                        // Update returnUrl with order details for redirect-based payment methods.
+                        config.options.returnUrl = buildPaymentReturnUrl({
+                            orderNo: order.orderNo,
+                            zoneId,
+                            type: paymentMethodType
+                        })
                         updatedPaymentInstrument = getSFPaymentsInstrument(order)
                     } catch (error) {
                         // If order was created but updatePaymentInstrumentForOrder failed,
@@ -985,7 +988,10 @@ const SFPaymentsExpressButtons = ({
                     billingAddressRequired: true,
                     phoneNumberRequired: true,
                     useManualCapture: !cardCaptureAutomatic,
-                    maximumButtonCount
+                    maximumButtonCount,
+                    // Base return URL for redirect-based payment methods.
+                    // Updated with order details in createIntentFunction after order creation.
+                    returnUrl: buildPaymentReturnUrl()
                 }
             }
 
