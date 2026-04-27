@@ -538,9 +538,6 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            // dw_dnt is a user consent preference, not a session token.
-            // Preserve it across session resets so the user is not re-prompted.
-            if (keyName === DNT_COOKIE_NAME) return
             const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
             store.delete(key)
