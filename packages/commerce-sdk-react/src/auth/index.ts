@@ -507,13 +507,10 @@ class Auth {
             secure: true
         })
         if (this.enableHttpOnlySessionCookies && onClient()) {
-            // Compare dw_dnt with cc-at_dw_dnt (the DNT value from the JWT, set
-            // by the server) to determine if a refresh is needed to update the
-            // access token. Normalize: dw_dnt uses '0'/'1', JWT may use 'true'/'false'.
+            // Compare dw_dnt with cc-at_dw_dnt (the DNT value extracted from the
+            // JWT by the server) to determine if a refresh is needed
             const accessTokenDnt = this.get('cc-at_dw_dnt')
-            const tokenDntBool = accessTokenDnt === '1' || accessTokenDnt === 'true'
-            const prefBool = dntCookieVal === '1'
-            if (accessTokenDnt === '' || tokenDntBool !== prefBool) {
+            if (accessTokenDnt === '' || accessTokenDnt !== dntCookieVal) {
                 await this.refreshAccessToken()
             }
         } else {
