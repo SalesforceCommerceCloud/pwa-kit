@@ -75,10 +75,32 @@ describe('_normalizeSlasPath', () => {
         ).toBe('/oauth2/passwordless/login')
     })
 
-    test('does not double-decode already-decoded paths', () => {
-        const doubleEncoded = '/oauth2/trusted%252Dsystem/token'
-        const result = RemoteServerFactory._normalizeSlasPath(doubleEncoded)
-        expect(result).toBe('/oauth2/trusted%2Dsystem/token')
+    test('fully decodes double-encoded paths', () => {
+        // %252D → first decode → %2D → second decode → -
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%252Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('fully decodes triple-encoded paths', () => {
+        // %25252D → %252D → %2D → -
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%25252Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('fully decodes double-encoded dot-segments', () => {
+        // %252E%252E → %2E%2E → ..  then normalize collapses
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%252E%252E/trusted-system/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('fully decodes double-encoded forward slash', () => {
+        // %252F → %2F → /
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/passwordless%252Flogin')).toBe(
+            '/oauth2/passwordless/login'
+        )
     })
 
     test('returns null on malformed percent encoding', () => {

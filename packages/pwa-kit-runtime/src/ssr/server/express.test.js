@@ -1374,6 +1374,41 @@ describe('SLAS private client proxy', () => {
             .expect(403)
     }, 15000)
 
+    test('returns 403 if trusted-system is reached via double-encoded hyphen', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        // %252D → %2D → "-" after iterative decode
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted%252Dsystem/token')
+            .expect(403)
+    }, 15000)
+
+    test('returns 403 if trusted-system is reached via triple-encoded hyphen', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        // %25252D → %252D → %2D → "-" after iterative decode
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted%25252Dsystem/token')
+            .expect(403)
+    }, 15000)
+
+    test('returns 403 if trusted-system is reached via double-encoded dot-segments', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        // %252E%252E → %2E%2E → ".." which normalize collapses
+        return await request(app)
+            .post(
+                '/mobify/slas/private/shopper/auth/v1/oauth2/token/%252E%252E/trusted-system/token'
+            )
+            .expect(403)
+    }, 15000)
+
     test('throws an error if /oauth2/trusted-system/* is included in applySLASPrivateClientToEndpoints', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 

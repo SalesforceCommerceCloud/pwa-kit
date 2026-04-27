@@ -886,8 +886,8 @@ export const RemoteServerFactory = {
      * Express exposes `req.path` in its raw, percent-encoded form while
      * upstream services decode and normalize before routing. Matching
      * against the raw value alone would miss equivalent encoded forms,
-     * so we decode and collapse dot-segments to ensure consistent path
-     * evaluation.
+     * so we decode until stable and collapse dot-segments to ensure
+     * consistent path evaluation regardless of encoding depth.
      *
      * @param {string} rawPath - The raw, potentially percent-encoded path
      * @returns {(string | null)} The decoded/normalized path or `null` if decoding fails
@@ -895,7 +895,14 @@ export const RemoteServerFactory = {
      */
     _normalizeSlasPath(rawPath) {
         try {
-            const decoded = decodeURIComponent(rawPath)
+            // Decode iteratively until the value stabilizes, so that double-encoded,
+            // triple-encoded, etc. sequences are fully resolved before security checks run.
+            let decoded = rawPath
+            let prev
+            do {
+                prev = decoded
+                decoded = decodeURIComponent(decoded)
+            } while (decoded !== prev)
             return posixPath.normalize(decoded)
         } catch {
             // If decoding fails (e.g. malformed percent encoding), we cannot determine what
@@ -950,12 +957,12 @@ export const RemoteServerFactory = {
                 if (
                     !normalizedPath ||
                     !normalizedPath.match(options.slasApiPath) ||
-                    normalizedPath?.split('/').filter(Boolean).includes('trusted-system')
+                    normalizedPath.split('/').filter(Boolean).includes('trusted-system')
                 ) {
                     const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
                     logger.error(message)
                     return res.status(403).json({
-                        message: message
+                        message
                     })
                 }
                 next()
@@ -1020,7 +1027,7 @@ export const RemoteServerFactory = {
                                 logger.error('Error in custom onSLASPrivateProxyReq callback', {
                                     namespace: '_setupSlasPrivateClientProxy',
                                     additionalProperties: {
-                                        error: error
+                                        error
                                     }
                                 })
                             }
@@ -1029,7 +1036,7 @@ export const RemoteServerFactory = {
                         logger.error('Error in SLAS private proxy request handling', {
                             namespace: '_setupSlasPrivateClientProxy',
                             additionalProperties: {
-                                error: error
+                                error
                             }
                         })
                         if (!res.headersSent) {
@@ -1043,7 +1050,7 @@ export const RemoteServerFactory = {
                     logger.error('Error in SLAS private proxy', {
                         namespace: '_setupSlasPrivateClientProxy',
                         additionalProperties: {
-                            error: error,
+                            error,
                             path: req?.url
                         }
                     })
@@ -1095,7 +1102,7 @@ export const RemoteServerFactory = {
                                     {
                                         namespace: '_setupSlasPrivateClientProxy',
                                         additionalProperties: {
-                                            error: error
+                                            error
                                         }
                                     }
                                 )
@@ -1109,7 +1116,7 @@ export const RemoteServerFactory = {
                             {
                                 namespace: '_setupSlasPrivateClientProxy',
                                 additionalProperties: {
-                                    error: error,
+                                    error,
                                     statusCode: proxyRes?.statusCode,
                                     path: req?.url
                                 }
