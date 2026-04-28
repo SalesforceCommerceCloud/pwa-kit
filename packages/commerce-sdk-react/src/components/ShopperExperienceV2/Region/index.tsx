@@ -17,6 +17,7 @@ import type {
     ComponentDesignMetadata,
     RegionDesignMetadata
 } from '@salesforce/storefront-next-runtime/design/react'
+import type {Region as ExtendedRegion} from '../types'
 
 export type {RegionDesignMetadata}
 
@@ -81,7 +82,7 @@ function getDesignMetadata(regionId: string, metadata?: RegionDesignMetadata) {
 
 // Helper: Render region wrapper with components
 function renderRegionContent(
-    region: ShopperExperience.schemas['Region'],
+    region: ExtendedRegion,
     regionId: string,
     metadata: RegionDesignMetadata | undefined,
     className: string,
@@ -95,7 +96,7 @@ function renderRegionContent(
             {...rest}
         >
             {region.components?.map((comp) => {
-                const key = (comp as any).contentLinkUuid || comp.id
+                const key = comp.contentLinkUuid || comp.id
                 return (
                     comp.id && (
                         <Component
