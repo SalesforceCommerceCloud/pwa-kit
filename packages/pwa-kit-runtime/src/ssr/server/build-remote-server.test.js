@@ -171,10 +171,7 @@ describe('_matchSlasAllowlistEntry', () => {
 
     test('returns null when the organizations segment is missing', () => {
         expect(
-            RemoteServerFactory._matchSlasAllowlistEntry(
-                '/shopper/auth/v1/oauth2/token',
-                'POST'
-            )
+            RemoteServerFactory._matchSlasAllowlistEntry('/shopper/auth/v1/oauth2/token', 'POST')
         ).toBeNull()
     })
 
@@ -224,9 +221,12 @@ describe('_matchSlasAllowlistEntry', () => {
         ['/shopper/auth/v1/organizations/org y/oauth2/token'],
         ['/shopper/auth/v1/organizations/org%y/oauth2/token'],
         ['/shopper/auth/v1/organizations/org*y/oauth2/token']
-    ])('returns null when version or orgId contains characters outside the allowed set: %s', (path) => {
-        expect(RemoteServerFactory._matchSlasAllowlistEntry(path, 'POST')).toBeNull()
-    })
+    ])(
+        'returns null when version or orgId contains characters outside the allowed set: %s',
+        (path) => {
+            expect(RemoteServerFactory._matchSlasAllowlistEntry(path, 'POST')).toBeNull()
+        }
+    )
 
     test('accepts a custom allow-list passed by the project', () => {
         const customList = [
