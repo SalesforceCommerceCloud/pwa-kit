@@ -562,13 +562,16 @@ describe('SLAS private proxy', () => {
     test('invokes onSLASPrivateProxyReq callback and onSLASPrivateProxyRes callback', async () => {
         // Create a mock SLAS endpoint for the http-proxy to consume
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            // Reflect the custom header back in the response to verify it was set
-            res.status(200).json({
-                access_token: 'mock-token',
-                reflected_header: req.headers['x-custom-request-header']
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                // Reflect the custom header back in the response to verify it was set
+                res.status(200).json({
+                    access_token: 'mock-token',
+                    reflected_header: req.headers['x-custom-request-header']
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -608,7 +611,7 @@ describe('SLAS private proxy', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             // Verify the request was successful
@@ -630,9 +633,12 @@ describe('SLAS private proxy', () => {
 
     test('returns 500 when onProxyReq logic throws', async () => {
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            res.status(200).json({access_token: 'mock-token'})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                res.status(200).json({access_token: 'mock-token'})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -664,7 +670,7 @@ describe('SLAS private proxy', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             expect(response.status).toBe(500)
@@ -705,7 +711,7 @@ describe('SLAS private proxy', () => {
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
         const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
         )
 
         expect(response.status).toBe(500)

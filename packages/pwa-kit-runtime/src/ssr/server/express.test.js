@@ -1235,13 +1235,14 @@ describe('SLAS private client proxy', () => {
         return request(app).get('/mobify/slas/private').expect(501)
     })
 
-    test('does not insert client secret if request not for /oauth2/token', async () => {
+    test('does not insert client secret for allow-listed non-token endpoints', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const app = RemoteServerFactory._createApp(opts(appConfig))
 
+        // /oauth2/logout is allow-listed with no credential injection.
         return await request(app)
-            .get('/mobify/slas/private/shopper/auth/v1/somePath')
+            .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
@@ -1257,7 +1258,7 @@ describe('SLAS private client proxy', () => {
         const app = RemoteServerFactory._createApp(opts(appConfig))
 
         return await request(app)
-            .get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+            .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
@@ -1301,7 +1302,9 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted-agent/token')
+            .post(
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/trusted-agent/token'
+            )
             .then((response) => {
                 expect(response.body['_sfdc_client_auth']).toBe(encodedCredentials)
                 expect(response.body.authorization).toBeUndefined()
@@ -1463,7 +1466,9 @@ describe('SLAS private client proxy', () => {
             const app = RemoteServerFactory._createApp(opts(testAppConfig))
 
             return await request(app)
-                .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/login')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordless/login'
+                )
                 .expect(200)
                 .then((response) => {
                     expect(response.text).toBe('')
@@ -1501,7 +1506,9 @@ describe('SLAS private client proxy', () => {
             const app = RemoteServerFactory._createApp(opts(testAppConfig))
 
             return await request(app)
-                .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordles%73/login')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordles%73/login'
+                )
                 .expect(200)
                 .then((response) => {
                     expect(response.text).toBe('')
@@ -1533,12 +1540,16 @@ describe('SLAS private client proxy', () => {
 
             const app = RemoteServerFactory._createApp(opts(testAppConfig))
 
-            // Send a path with %73 encoding for 's' in "somePath"
+            // Send an allow-listed path with %6F encoding for 'o' in "logout"
             return await request(app)
-                .get('/mobify/slas/private/shopper/auth/v1/%73omePath')
+                .get(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/l%6Fgout'
+                )
                 .then((response) => {
                     // The upstream should receive the decoded, normalized path
-                    expect(response.body.url).toBe('/shopper/auth/v1/somePath')
+                    expect(response.body.url).toBe(
+                        '/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout'
+                    )
                 })
         } finally {
             testProxyServer.close()
@@ -1566,12 +1577,17 @@ describe('SLAS private client proxy', () => {
 
             const app = RemoteServerFactory._createApp(opts(testAppConfig))
 
-            // Send a path with encoded dot-segments
+            // Send a path with encoded dot-segments that collapse to an
+            // allow-listed endpoint.
             return await request(app)
-                .get('/mobify/slas/private/shopper/auth/v1/oauth2/other/%2E%2E/token')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/other/%2E%2E/token'
+                )
                 .then((response) => {
                     // The upstream should receive the collapsed path
-                    expect(response.body.url).toBe('/shopper/auth/v1/oauth2/token')
+                    expect(response.body.url).toBe(
+                        '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
+                    )
                 })
         } finally {
             testProxyServer.close()
