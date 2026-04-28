@@ -1,3 +1,4 @@
+## v3.18.0-nightly-20260428084547 (Apr 28, 2026)
 ## v3.18.0-dev (Mar 20, 2026)
 - When the real Data Store is unavailable, SSR can use **`@salesforce/pwa-kit-dev`**’s in-memory local provider (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, etc.; see runtime `local-dev-provider-loader`).
 - MRT Data Store bootstrap is **opt-in** (`isMrtDataStoreEnabled` in `@salesforce/pwa-kit-runtime`): set `app.mrtDataStore.enabled` to `true` and/or `PWAKIT_MRT_DATA_STORE_ENABLED=true` (recognized falsey strings force off). When disabled, **`__MRT_DATA_STORE__` is omitted** from `#mobify-data` (not empty objects).
