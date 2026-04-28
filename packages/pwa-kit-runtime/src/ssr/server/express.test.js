@@ -1271,9 +1271,13 @@ describe('SLAS private client proxy', () => {
 
         const app = RemoteServerFactory._createApp(opts(appConfig))
 
+        // `oauth2/login` is allow-listed but must never receive the
+        // `_sfdc_client_auth` header (that header is only for
+        // `oauth2/trusted-agent/token`).
         return await request(app)
-            .get('/mobify/slas/private/shopper/auth/v1/oauth2/other-path')
+            .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/login')
             .then((response) => {
+                expect(response.status).toBe(200)
                 expect(response.body._sfdc_client_auth).toBeUndefined()
             })
     }, 15000)
