@@ -1391,13 +1391,13 @@ describe('Auth', () => {
         expect(auth.getDnt()).toBe(true)
     })
 
-    test('getDnt() does not delete dw_dnt when out of sync with cc-at_dw_dnt (HttpOnly)', () => {
+    test('getDnt() does not delete dw_dnt when out of sync with cc-at-dnt (HttpOnly)', () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         // @ts-expect-error private method
         auth.set('dw_dnt', '0')
         // @ts-expect-error private method
-        auth.set('cc-at_dw_dnt', '1')
-        // dw_dnt should be preserved even though it disagrees with cc-at_dw_dnt
+        auth.set('cc-at-dnt', '1')
+        // dw_dnt should be preserved even though it disagrees with cc-at-dnt
         expect(auth.getDnt()).toBe(false)
         expect(auth.get('dw_dnt')).toBe('0')
     })

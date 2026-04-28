@@ -13,7 +13,6 @@
 - Centralize HttpOnly session cookie config [#3792](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3792)
 - Expire HttpOnly session cookies on SLAS logout [#3794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3794)
 - Refactor: Consolidate HttpOnly session cookie proxy logic [#3799](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3799)
-- Handle DNT for HttpOnly cookies [#3801](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3801)
 
 ## v3.18.0-dev (Mar 20, 2026)
 - **`utils/ssr-server/data-store`** imports **`@salesforce/mrt-utilities/data-store`** (DataStore + error classes). **Requires** a published **`@salesforce/mrt-utilities`** release that declares **`exports["./data-store"]`** — pin **`package.json`** accordingly before shipping. Jest **`moduleNameMapper`** maps **`data-store`** (and legacy **`middleware`**) to the ESM Data Store slice for tests.

@@ -142,7 +142,7 @@ type AuthDataKeys =
     | 'idp_refresh_token'
     | 'dnt'
     | 'cc-at-expires'
-    | 'cc-at_dw_dnt'
+    | 'cc-at-dnt'
     | 'cc-nx-exists'
 
 type AuthDataMap = Record<
@@ -263,9 +263,9 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: 'cc-at-expires'
     },
-    'cc-at_dw_dnt': {
+    'cc-at-dnt': {
         storageType: 'cookie',
-        key: 'cc-at_dw_dnt'
+        key: 'cc-at-dnt'
     },
     'cc-nx-exists': {
         storageType: 'cookie',
@@ -435,6 +435,22 @@ class Auth {
     }
 
     /**
+     * Returns the DNT value from the current access token, or undefined if
+     * no access token is available. In HttpOnly mode, reads from the
+     * cc-at-dnt companion cookie; otherwise parses the JWT directly.
+     */
+    private getDntFromAccessToken(): string | undefined {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return this.get('cc-at-dnt') || undefined
+        }
+        const accessToken = this.getAccessToken()
+        if (accessToken) {
+            return this.parseSlasJWT(accessToken).dnt
+        }
+        return undefined
+    }
+
+    /**
      * Return the value of the DNT cookie or undefined if it is not set.
      * The DNT cookie being undefined means that there is a necessity to
      * get the user's input for consent tracking, but not that there is no
@@ -463,12 +479,9 @@ class Auth {
                 dntCookieStatus = Boolean(Number(dntCookieVal))
             }
         } else {
-            let isInSync = true
-            const accessToken = this.getAccessToken()
-            if (accessToken) {
-                const {dnt} = this.parseSlasJWT(accessToken)
-                isInSync = dnt === dntCookieVal
-            }
+            const accessTokenDnt = this.getDntFromAccessToken()
+            // When no access token is available, assume in sync (don't delete based on sync)
+            const isInSync = accessTokenDnt === undefined || accessTokenDnt === dntCookieVal
             if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
                 this.delete(DNT_COOKIE_NAME)
             } else {
@@ -506,23 +519,9 @@ class Auth {
             ...getDefaultCookieAttributes(),
             secure: true
         })
-        if (this.enableHttpOnlySessionCookies && onClient()) {
-            // Compare dw_dnt with cc-at_dw_dnt (the DNT value extracted from the
-            // JWT by the server) to determine if a refresh is needed
-            const accessTokenDnt = this.get('cc-at_dw_dnt')
-            if (accessTokenDnt === '' || accessTokenDnt !== dntCookieVal) {
-                await this.refreshAccessToken()
-            }
-        } else {
-            const accessToken = this.getAccessToken()
-            if (accessToken !== '') {
-                const {dnt} = this.parseSlasJWT(accessToken)
-                if (dnt !== dntCookieVal) {
-                    await this.refreshAccessToken()
-                }
-            } else {
-                await this.refreshAccessToken()
-            }
+        const accessTokenDnt = this.getDntFromAccessToken()
+        if (accessTokenDnt === undefined || accessTokenDnt !== dntCookieVal) {
+            await this.refreshAccessToken()
         }
         if (preference !== null) {
             const SECONDS_IN_DAY = 86400
@@ -538,6 +537,9 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
+            // dw_dnt is a user consent preference, not a session token.
+            // Preserve it across session resets so the user is not re-prompted.
+            if (keyName === DNT_COOKIE_NAME) return
             const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
             store.delete(key)

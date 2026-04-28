@@ -16,7 +16,7 @@ export const SESSION_COOKIE_CONFIG = {
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     },
     accessTokenDnt: {
-        key: 'cc-at_dw_dnt',
+        key: 'cc-at-dnt',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     },
     uido: {key: 'uido', attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}},

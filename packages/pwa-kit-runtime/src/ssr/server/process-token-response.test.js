@@ -170,8 +170,8 @@ describe('setHttpOnlySessionCookies', () => {
         expect(expCookie.value).toBe(String(2800))
         expect(expCookie.httpOnly).toBeUndefined()
 
-        // cc-at_dw_dnt: do-not-track from JWT (non-HttpOnly)
-        const dntCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_dw_dnt_testsite=')))
+        // cc-at-dnt: do-not-track from JWT (non-HttpOnly)
+        const dntCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at-dnt_testsite=')))
         expect(dntCookie.value).toBe('1')
         expect(dntCookie.httpOnly).toBeUndefined()
 
@@ -264,7 +264,7 @@ describe('setHttpOnlySessionCookies', () => {
         expect(staleGuestCookie.expires).toEqual(new Date(0))
 
         // No dnt cookie when dnt absent from JWT
-        expect(res.cookies.find((c) => c.includes('cc-at_dw_dnt_testsite'))).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('cc-at-dnt_testsite'))).toBeUndefined()
 
         // Tokens stripped from body
         const body = JSON.parse(result.toString('utf8'))
@@ -345,7 +345,7 @@ describe('expireHttpOnlySessionCookies', () => {
         const expectedCookieKeys = [
             'cc-at_testsite',
             'cc-at-expires_testsite',
-            'cc-at_dw_dnt_testsite',
+            'cc-at-dnt_testsite',
             'uido_testsite',
             'idp_access_token_testsite',
             'cc-nx-g_testsite',
