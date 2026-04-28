@@ -4,18 +4,30 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
-import {useLocation} from 'react-router-dom'
+import React, {useEffect, useRef} from 'react'
+import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useConfig,
+    useCustomerType,
+    useShopperAgentsMutation,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 const onClient = typeof window !== 'undefined'
+
+const SESSION_INIT_ERROR_MESSAGE = defineMessage({
+    id: 'shopper_agent.error.session_init_failed',
+    defaultMessage: 'We could not start the shopping assistant. Please try again.'
+})
 
 /**
  * Validates that a URL is from a trusted Salesforce domain.
@@ -123,9 +135,11 @@ const isEnabled = (enabled) => {
  * Key responsibilities:
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
- * - Sets up prechat fields with current locale, currency, and user context
+ * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
+ * - Calls postSessionInit when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
+ * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
  * - Cleans up resources on unmount
  *
  * @param {Object} props - Component props
@@ -156,8 +170,13 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     // Theme hook for z-index management
     const theme = useTheme()
 
+    const {formatMessage} = useIntl()
+    const toast = useToast()
+    const toastRef = useRef(toast)
+    toastRef.current = toast
+
     // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {locale} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
@@ -181,6 +200,52 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {customerType} = useCustomerType()
+    const {organizationId, siteId: configSiteId} = useConfig()
+    const postSessionInitMutation = useShopperAgentsMutation('postSessionInit')
+
+    const prevCommerceCustomerTypeRef = useRef(undefined)
+
+    /**
+     * Reset embedded messaging whenever customerType changes (login, logout, registration).
+     * This ensures the chat context is cleared when user authentication state changes.
+     */
+    useEffect(() => {
+        const prev = prevCommerceCustomerTypeRef.current
+        prevCommerceCustomerTypeRef.current = customerType
+
+        // Skip initial mount
+        if (prev === undefined) {
+            return
+        }
+
+        // Reset on any customerType change (login, logout, register)
+        if (prev !== customerType) {
+            resetEmbeddedMessagingForCommerceSessionChange()
+        }
+    }, [customerType])
+    const postSessionInitMutateRef = useRef(postSessionInitMutation.mutate)
+    postSessionInitMutateRef.current = postSessionInitMutation.mutate
+
+    const formatMessageRef = useRef(formatMessage)
+    formatMessageRef.current = formatMessage
+
+    /** Latest values for embedded messaging handlers (stable window listeners). */
+    const embeddedLifecycleRef = useRef({})
+    embeddedLifecycleRef.current = {
+        siteId,
+        localeId: locale.id,
+        preferredCurrency: locale.preferredCurrency,
+        commerceOrgId,
+        usid,
+        refreshToken,
+        sfLanguage,
+        domainUrl,
+        organizationId,
+        configSiteId
+    }
+
+    const lastConversationSessionInitRef = useRef(null)
 
     /**
      * Retrieves conversation context data based on configuration.
@@ -282,30 +347,93 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
     }, [])
 
+    /**
+     * Register embedded messaging window listeners once. Handlers read latest values from refs so we do not
+     * remove/re-add listeners when auth or config updates (which would fight the widget and loop loading).
+     */
     useEffect(() => {
-        /**
-         * Sets up hidden prechat fields when the embedded messaging service is ready.
-         * These fields provide context to the chat agent about the current user session,
-         * site configuration, and locale settings.
-         */
-        const handleEmbeddedMessagingReady = () => {
-            window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                SiteId: siteId,
-                Locale: locale.id,
-                OrganizationId: commerceOrgId,
-                UsId: usid,
+        const applyHiddenPrechatFields = () => {
+            const bootstrap = window.embeddedservice_bootstrap
+            if (!bootstrap?.prechatAPI?.setHiddenPrechatFields) {
+                return
+            }
+            const s = embeddedLifecycleRef.current
+            bootstrap.prechatAPI.setHiddenPrechatFields({
+                SiteId: s.siteId,
+                Locale: s.localeId,
+                OrganizationId: s.commerceOrgId,
+                UsId: s.usid,
                 IsCartMgmtSupported: 'true',
-                RefreshToken: refreshToken,
-                Currency: locale.preferredCurrency,
-                Language: sfLanguage,
-                DomainUrl: domainUrl
+                RefreshToken: s.refreshToken,
+                Currency: s.preferredCurrency,
+                Language: s.sfLanguage,
+                DomainUrl: s.domainUrl
             })
         }
 
-        /**
-         * Manages z-index for maximized chat windows to ensure proper layering
-         * above other page elements while maintaining accessibility.
-         */
+        const handleEmbeddedMessagingReady = () => {
+            applyHiddenPrechatFields()
+        }
+
+        const handleEmbeddedMessagingConversationStarted = (event) => {
+            const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
+            if (!orgId || !sid) return
+
+            const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
+            if (conversationId && lastConversationSessionInitRef.current === conversationId) return
+            if (conversationId) lastConversationSessionInitRef.current = conversationId
+
+            const getAuthLinkKey =
+                window.embeddedservice_bootstrap?.userVerificationAPI?.getAuthLinkKey
+            if (typeof getAuthLinkKey !== 'function') {
+                console.error('Shopper Agent: getAuthLinkKey is not available')
+                return
+            }
+
+            getAuthLinkKey()
+                .then((sessionInitKey) => {
+                    postSessionInitMutateRef.current(
+                        {
+                            parameters: {organizationId: orgId, siteId: sid},
+                            body: {
+                                sessionInitKey
+                            }
+                        },
+                        {
+                            onSuccess: (data) => {
+                                console.info(
+                                    'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+                                    {
+                                        organizationId: orgId,
+                                        siteId: sid,
+                                        response: data
+                                    }
+                                )
+                            },
+                            onError: (error) => {
+                                console.error(
+                                    'postSessionInit failed onEmbeddedMessagingConversationStarted',
+                                    {
+                                        organizationId: orgId,
+                                        siteId: sid,
+                                        error
+                                    }
+                                )
+                                // Close the chat if session initialization fails
+                                resetEmbeddedMessagingForCommerceSessionChange()
+                                toastRef.current({
+                                    title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                                    status: 'error'
+                                })
+                            }
+                        }
+                    )
+                })
+                .catch((error) => {
+                    console.error('Shopper Agent: getAuthLinkKey failed', error)
+                })
+        }
+
         const handleEmbeddedMessagingWindowMaximized = () => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(
@@ -316,16 +444,22 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             }
         }
 
-        // Set up event listeners for messaging lifecycle events
         window.addEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+        window.addEventListener(
+            'onEmbeddedMessagingConversationStarted',
+            handleEmbeddedMessagingConversationStarted
+        )
         window.addEventListener(
             'onEmbeddedMessagingWindowMaximized',
             handleEmbeddedMessagingWindowMaximized
         )
 
-        // Cleanup function to remove event listeners on unmount
         return () => {
             window.removeEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+            window.removeEventListener(
+                'onEmbeddedMessagingConversationStarted',
+                handleEmbeddedMessagingConversationStarted
+            )
             window.removeEventListener(
                 'onEmbeddedMessagingWindowMaximized',
                 handleEmbeddedMessagingWindowMaximized
@@ -339,7 +473,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         usid,
         theme.zIndices.sticky,
         refreshToken,
-        domainUrl
+        domainUrl,
+        organizationId,
+        configSiteId
     ])
 
     // Load the embedded messaging script asynchronously

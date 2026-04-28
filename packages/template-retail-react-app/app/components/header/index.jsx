@@ -54,6 +54,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -150,6 +151,8 @@ const Header = ({
 
     const onSignoutClick = async () => {
         setShowLoading(true)
+        // Reset embedded messaging before logout to close the chat
+        resetEmbeddedMessagingForCommerceSessionChange()
         await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)

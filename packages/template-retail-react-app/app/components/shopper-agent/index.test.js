@@ -9,18 +9,24 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
 
-// Mock useLocation hook
-const mockUseLocation = jest.fn()
-jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useLocation: () => mockUseLocation()
-}))
-
 // Mock useAppOrigin hook
 const mockUseAppOrigin = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
     __esModule: true,
     useAppOrigin: () => mockUseAppOrigin()
+}))
+
+const mockShowToast = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    __esModule: true,
+    useToast: jest.fn(() => mockShowToast)
+}))
+
+const mockFormatMessage = jest.fn((descriptor) => descriptor.defaultMessage ?? descriptor.id)
+jest.mock('react-intl', () => ({
+    __esModule: true,
+    ...jest.requireActual('react-intl'),
+    useIntl: jest.fn(() => ({formatMessage: mockFormatMessage}))
 }))
 
 // Import ShopperAgent after all mocks are set up
@@ -33,6 +39,10 @@ const mockEmbeddedService = {
     },
     utilAPI: {
         sendTextMessage: jest.fn()
+    },
+    userVerificationAPI: {
+        clearSession: jest.fn().mockResolvedValue(undefined),
+        getAuthLinkKey: jest.fn().mockResolvedValue('test-session-init-key-on-ready')
     }
 }
 
@@ -72,7 +82,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
 
 // Mock the useUsid hook
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useUsid: jest.fn()
+    useUsid: jest.fn(),
+    useConfig: jest.fn(),
+    useShopperAgentsMutation: jest.fn(),
+    useCustomerType: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -89,7 +102,12 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useConfig,
+    useCustomerType,
+    useShopperAgentsMutation,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -98,9 +116,13 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseUsid = useUsid
+const mockedUseConfig = useConfig
+const mockedUseCustomerType = useCustomerType
+const mockedUseShopperAgentsMutation = useShopperAgentsMutation
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
+const mockPostSessionInitMutate = jest.fn()
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -136,6 +158,25 @@ describe('ShopperAgent Component', () => {
         // Mock useUsid hook
         mockedUseUsid.mockReturnValue({usid: 'test-usid'})
 
+        // Mock useConfig hook
+        mockedUseConfig.mockReturnValue({
+            organizationId: '00DTEST00000001',
+            siteId: 'RefArchGlobal'
+        })
+
+        // Mock useShopperAgentsMutation hook
+        mockPostSessionInitMutate.mockReset()
+        mockedUseShopperAgentsMutation.mockReturnValue({
+            mutate: mockPostSessionInitMutate
+        })
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
+        })
+
         // Mock useMultiSite hook with proper structure
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'USD'},
@@ -149,18 +190,17 @@ describe('ShopperAgent Component', () => {
             }
         })
 
-        // Mock useLocation hook
-        mockUseLocation.mockReturnValue({
-            pathname: '/current-page',
-            search: '',
-            hash: ''
-        })
-
         // Mock useAppOrigin hook
         mockUseAppOrigin.mockReturnValue('https://example.com')
 
-        // Clear any existing scripts
-        delete global.window.embeddedservice_bootstrap
+        mockShowToast.mockClear()
+        mockFormatMessage.mockImplementation(
+            (descriptor) => descriptor.defaultMessage ?? descriptor.id
+        )
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+        mockEmbeddedService.userVerificationAPI.clearSession.mockResolvedValue(undefined)
+
+        global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
 
     afterEach(() => {
@@ -222,6 +262,123 @@ describe('ShopperAgent Component', () => {
         expect(() => render(<ShopperAgent {...defaultProps} />)).not.toThrow()
     })
 
+    test('should reset embedded messaging when customer type changes from guest to registered', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from registered to guest', async () => {
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from registered to null (logout)', async () => {
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'registered',
+            isGuest: false,
+            isRegistered: true,
+            isExternal: false
+        })
+
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: null,
+            isGuest: false,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should reset embedded messaging when customer type changes from guest to null', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        mockedUseCustomerType.mockReturnValue({
+            customerType: null,
+            isGuest: false,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalledWith(true)
+    })
+
+    test('should NOT reset embedded messaging on initial mount', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        // Initial mount should not trigger clearSession
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+    })
+
+    test('should NOT reset embedded messaging when customer type stays the same', async () => {
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
+
+        // Re-render with same customerType
+        mockedUseCustomerType.mockReturnValue({
+            customerType: 'guest',
+            isGuest: true,
+            isRegistered: false,
+            isExternal: false
+        })
+
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+    })
+
     test('should set up prechat fields when embedded messaging is ready', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
@@ -241,6 +398,162 @@ describe('ShopperAgent Component', () => {
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
         })
+    })
+
+    test('should not call postSessionInit mutation on embedded messaging ready', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+    })
+
+    test('should call postSessionInit mutation with expected payload when conversation starts', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockPostSessionInitMutate).toHaveBeenCalledWith(
+            {
+                parameters: {organizationId: '00DTEST00000001', siteId: 'RefArchGlobal'},
+                body: {
+                    sessionInitKey: 'test-session-init-key-on-ready'
+                }
+            },
+            expect.objectContaining({
+                onSuccess: expect.any(Function),
+                onError: expect.any(Function)
+            })
+        )
+    })
+
+    test('should dedupe postSessionInit for duplicate started events with same conversationId', async () => {
+        render(<ShopperAgent {...defaultProps} />)
+
+        const evt = new CustomEvent('onEmbeddedMessagingConversationStarted', {
+            detail: {conversationId: 'same-id'}
+        })
+
+        await act(async () => {
+            window.dispatchEvent(evt)
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'same-id'}
+                })
+            )
+        })
+
+        expect(mockPostSessionInitMutate).toHaveBeenCalledTimes(1)
+    })
+
+    test('should log session init success and error through mutation callbacks', async () => {
+        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
+        const successResponse = {status: 'ok'}
+        const mutationError = new Error('session init failed')
+
+        callbacks.onSuccess(successResponse)
+        callbacks.onError(mutationError)
+
+        expect(infoSpy).toHaveBeenCalledWith(
+            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
+            {
+                organizationId: '00DTEST00000001',
+                siteId: 'RefArchGlobal',
+                response: successResponse
+            }
+        )
+        expect(errorSpy).toHaveBeenCalledWith(
+            'postSessionInit failed onEmbeddedMessagingConversationStarted',
+            {
+                organizationId: '00DTEST00000001',
+                siteId: 'RefArchGlobal',
+                error: mutationError
+            }
+        )
+
+        infoSpy.mockRestore()
+        errorSpy.mockRestore()
+    })
+
+    test('should call userVerificationAPI.clearSession and show error toast when postSessionInit fails', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
+        const mutationError = new Error('session init failed')
+
+        await act(async () => {
+            callbacks.onError(mutationError)
+        })
+
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
+        expect(mockShowToast).toHaveBeenCalledTimes(1)
+        const toastPayload = mockShowToast.mock.calls[0][0]
+        expect(toastPayload.status).toBe('error')
+        const expectedTitle = 'We could not start the shopping assistant. Please try again.'
+        const titleText =
+            typeof toastPayload.title === 'string'
+                ? toastPayload.title
+                : Array.isArray(toastPayload.title)
+                ? toastPayload.title.map((chunk) => chunk?.value ?? '').join('')
+                : ''
+        expect(titleText).toBe(expectedTitle)
+
+        errorSpy.mockRestore()
+    })
+
+    test('should log error and not call postSessionInit when getAuthLinkKey is unavailable', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const bootstrapWithoutUv = {
+            ...mockEmbeddedService,
+            userVerificationAPI: undefined
+        }
+        global.window.embeddedservice_bootstrap = bootstrapWithoutUv
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey is not available')
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+
+        errorSpy.mockRestore()
+        global.window.embeddedservice_bootstrap = mockEmbeddedService
+    })
+
+    test('should not call postSessionInit mutation when organizationId or siteId is missing', async () => {
+        mockedUseConfig.mockReturnValue({
+            organizationId: '',
+            siteId: ''
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
     })
 
     test('should update prechat fields when refresh token changes', async () => {
@@ -479,15 +792,16 @@ describe('ShopperAgent Component', () => {
     test('should clean up event listeners on unmount', () => {
         const {unmount} = render(<ShopperAgent {...defaultProps} />)
 
-        // Spy on removeEventListener
         const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
 
-        // Unmount the component
         unmount()
 
-        // Verify that event listeners were removed
         expect(removeEventListenerSpy).toHaveBeenCalledWith(
             'onEmbeddedMessagingReady',
+            expect.any(Function)
+        )
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            'onEmbeddedMessagingConversationStarted',
             expect.any(Function)
         )
         expect(removeEventListenerSpy).toHaveBeenCalledWith(
@@ -495,7 +809,6 @@ describe('ShopperAgent Component', () => {
             expect.any(Function)
         )
 
-        // Clean up
         removeEventListenerSpy.mockRestore()
     })
 

@@ -258,6 +258,24 @@ describe('useMiaw hook', () => {
         expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(2)
     })
 
+    test('should not re-initialize when only refresh token changes', () => {
+        const {rerender} = renderHook(
+            ({refreshToken}) =>
+                useMiaw(mockScriptLoadStatus, ...Object.values({...mockParams, refreshToken})),
+            {
+                initialProps: {
+                    refreshToken: 'token-a'
+                }
+            }
+        )
+
+        expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(1)
+
+        rerender({refreshToken: 'token-b'})
+
+        expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(1)
+    })
+
     test('should handle initialization errors gracefully', () => {
         // Mock init to throw error
         window.embeddedservice_bootstrap.init.mockImplementation(() => {
