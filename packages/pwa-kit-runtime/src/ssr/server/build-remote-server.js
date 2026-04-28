@@ -245,11 +245,6 @@ export const RemoteServerFactory = {
             // Toggle for setting up the custom SLAS private client secret handler
             useSLASPrivateClient: false,
 
-            // Retained for backward compatibility with existing projects.
-            // The proxy now consults `slasPrivateClientAllowList` (see below).
-            applySLASPrivateClientToEndpoints:
-                /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
-
             // Allow-list of SLAS endpoints the private-client proxy will
             // forward. Each entry has `segments` (path segments after the
             // `/shopper/auth/{version}/organizations/{orgId}/` prefix),
@@ -269,6 +264,13 @@ export const RemoteServerFactory = {
             // the response buffer.
             // Signature: (responseBuffer, proxyRes, req, res) => Buffer
             onSLASPrivateProxyRes: undefined
+        }
+
+        if (options && 'applySLASPrivateClientToEndpoints' in options) {
+            logger.warn(
+                '`applySLASPrivateClientToEndpoints` is no longer used. The SLAS private-client proxy is gated by a built-in allow-list. Remove this option from your `ssr.js`',
+                {namespace: 'RemoteServerFactory._configure'}
+            )
         }
 
         options = Object.assign({}, defaults, options)
@@ -302,12 +304,6 @@ export const RemoteServerFactory = {
         // For test only – configure the SLAS private client secret proxy endpoint
         options.slasHostName = this._getSlasEndpoint(options)
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
-
-        // Add extra condition to regex to only allow SLAS endpoints
-        options.slasApiPath = /\/shopper\/auth\/.*/
-        options.applySLASPrivateClientToEndpoints = new RegExp(
-            `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
-        )
 
         return options
     },
@@ -1065,16 +1061,6 @@ export const RemoteServerFactory = {
             return
         }
 
-        // Retained as a startup check so projects setting the legacy
-        // `applySLASPrivateClientToEndpoints` regex get an explicit error
-        // rather than silently misconfiguring the proxy.
-        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
-        if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
-            throw new Error(
-                'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
-            )
-        }
-
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
@@ -1086,7 +1072,14 @@ export const RemoteServerFactory = {
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
-        const allowList = Array.isArray(options.slasPrivateClientAllowList)
+        const hasCustomAllowList = Array.isArray(options.slasPrivateClientAllowList)
+        if (hasCustomAllowList) {
+            logger.warn(
+                'A custom `slasPrivateClientAllowList` is in use. Overriding the built-in allow-list widens the surface of SLAS endpoints reachable through the private-client proxy and can re-introduce credential exposure to endpoints the platform does not intend the storefront to reach. Audit each entry carefully.',
+                {namespace: '_setupSlasPrivateClientProxy'}
+            )
+        }
+        const allowList = hasCustomAllowList
             ? options.slasPrivateClientAllowList
             : SLAS_PRIVATE_PROXY_ALLOWLIST
 
@@ -1630,8 +1623,6 @@ export const RemoteServerFactory = {
      * to 'false'.
      * @param {Boolean} [options.useSLASPrivateClient=false] - Enable the SLAS private client
      * proxy handler. Requires PWA_KIT_SLAS_CLIENT_SECRET environment variable.
-     * @param {RegExp} [options.applySLASPrivateClientToEndpoints] - A regex pattern to match
-     * SLAS endpoints where the Authorization header should be injected.
      * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
      * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
      * Use this to add custom headers or modify the proxy request.

@@ -265,6 +265,97 @@ describe('remote server factory test coverage', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({useSLASPrivateClient: true})
         expect(endpoint).toBeDefined()
     })
+
+    describe('_configure deprecation warnings', () => {
+        beforeEach(() => {
+            logger.warn.mockClear()
+        })
+
+        test('warns when applySLASPrivateClientToEndpoints is set', () => {
+            RemoteServerFactory._configure({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {clientId: 'c', shortCode: 's'}
+                        }
+                    }
+                },
+                applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is no longer used'),
+                expect.objectContaining({namespace: 'RemoteServerFactory._configure'})
+            )
+        })
+
+        test('does not warn when applySLASPrivateClientToEndpoints is not set', () => {
+            RemoteServerFactory._configure({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {clientId: 'c', shortCode: 's'}
+                        }
+                    }
+                }
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is no longer used'),
+                expect.anything()
+            )
+        })
+    })
+
+    describe('_setupSlasPrivateClientProxy override warning', () => {
+        let mockExpress
+        const baseOptions = () =>
+            RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'test-client-id',
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test'
+                            }
+                        }
+                    }
+                }
+            })
+
+        beforeEach(() => {
+            mockExpress = require('express')
+            logger.warn.mockClear()
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+        })
+
+        afterEach(() => {
+            delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        })
+
+        test('warns when slasPrivateClientAllowList is overridden', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                slasPrivateClientAllowList: [
+                    {segments: ['oauth2', 'token'], methods: ['POST'], injectAuth: 'basic'}
+                ]
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('custom `slasPrivateClientAllowList` is in use'),
+                expect.objectContaining({namespace: '_setupSlasPrivateClientProxy'})
+            )
+        })
+
+        test('does not warn when slasPrivateClientAllowList is not set', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, baseOptions())
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('custom `slasPrivateClientAllowList` is in use'),
+                expect.anything()
+            )
+        })
+    })
 })
 
 describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {

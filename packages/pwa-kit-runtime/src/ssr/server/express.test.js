@@ -1416,7 +1416,7 @@ describe('SLAS private client proxy', () => {
             .expect(403)
     }, 15000)
 
-    test('throws an error if /oauth2/trusted-system/* is included in applySLASPrivateClientToEndpoints', async () => {
+    test('boots without throwing when applySLASPrivateClientToEndpoints is set (deprecated, ignored)', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         expect(() => {
@@ -1437,9 +1437,7 @@ describe('SLAS private client proxy', () => {
                     applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
                 })
             )
-        }).toThrow(
-            'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
-        )
+        }).not.toThrow()
     }, 15000)
 
     test('proxy returns a 200 OK masking a user not found error', async () => {
@@ -1522,6 +1520,41 @@ describe('SLAS private client proxy', () => {
             testProxyServer.close()
         }
     })
+
+    test('proxy does NOT mask 404 for passwordless token (only login is masked)', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const testProxyApp = express()
+        const testProxyPort = 12350
+        const testSlasTarget = `http://localhost:${testProxyPort}/shopper/auth/responseHeaders`
+
+        // Mock upstream returns 404 for any passwordless endpoint.
+        testProxyApp.use('/shopper/auth/responseHeaders', (req, res) => {
+            res.status(404).send()
+        })
+
+        const testProxyServer = testProxyApp.listen(testProxyPort)
+
+        try {
+            const testAppConfig = {
+                ...appConfig,
+                slasTarget: testSlasTarget
+            }
+
+            const app = RemoteServerFactory._createApp(opts(testAppConfig))
+
+            // /oauth2/passwordless/token is allow-listed but is NOT the login
+            // endpoint, so the user-enumeration mask must not fire here — the
+            // raw 404 from SLAS must be passed through.
+            return await request(app)
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordless/token'
+                )
+                .expect(404)
+        } finally {
+            testProxyServer.close()
+        }
+    }, 15000)
 
     test('pathRewrite normalizes percent-encoded characters before forwarding to upstream', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
@@ -1742,4 +1775,115 @@ describe('Base path tests', () => {
                 expect(capturedPath).toBe('/basepath/__pwa-kit/refresh')
             })
     }, 15000)
+})
+
+describe('SLAS private client proxy — credential leak guard on blocked shapes', () => {
+    // For every shape the pre-proxy guard rejects, the upstream must never
+    // be contacted at all — and therefore neither the `Authorization` nor
+    // the `_sfdc_client_auth` header can have been set on a forwarded
+    // request. This block captures both invariants symmetrically.
+
+    const savedEnvironment = Object.assign({}, process.env)
+    const upstreamPort = 12351
+    const upstreamPath = '/shopper/auth/responseHeaders'
+    const slasTarget = `http://localhost:${upstreamPort}${upstreamPath}`
+    const appConfig = {
+        mobify: {
+            app: {
+                commerceAPI: {
+                    parameters: {
+                        clientId: 'clientId',
+                        shortCode: 'shortCode'
+                    }
+                }
+            }
+        },
+        useSLASPrivateClient: true,
+        slasTarget: slasTarget
+    }
+
+    let upstreamApp
+    let upstreamServer
+    let upstreamHandler
+
+    beforeEach(() => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+        upstreamHandler = jest.fn((req, res) => res.send(req.headers))
+        upstreamApp = express()
+        upstreamApp.use(upstreamPath, upstreamHandler)
+        upstreamServer = upstreamApp.listen(upstreamPort)
+    })
+
+    afterEach(async () => {
+        process.env = savedEnvironment
+        if (upstreamServer) {
+            await new Promise((resolve) => upstreamServer.close(resolve))
+            upstreamServer.unref?.()
+            upstreamServer.removeAllListeners?.()
+        }
+    })
+
+    const blockedShapes = [
+        [
+            'plain trusted-system path',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token'
+        ],
+        [
+            'percent-encoded hyphen in trusted-system',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%2Dsystem/token'
+        ],
+        [
+            'encoded dot-segment traversal to trusted-system',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted-system/token'
+        ],
+        [
+            'double-encoded hyphen in trusted-system',
+            'GET',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%252Dsystem/token'
+        ],
+        [
+            'triple-encoded hyphen in trusted-system',
+            'GET',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%25252Dsystem/token'
+        ],
+        [
+            'double-encoded dot-segment traversal',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token/%252E%252E/trusted-system/token'
+        ],
+        [
+            'wrong method on allow-listed token endpoint',
+            'GET',
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
+        ],
+        [
+            'missing /organizations/{orgId}/ structural prefix',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+        ],
+        [
+            'endpoint not on the allow-list',
+            'POST',
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/bogus'
+        ]
+    ]
+
+    test.each(blockedShapes)(
+        'never forwards credentials on blocked shape: %s',
+        async (_label, method, path) => {
+            const app = RemoteServerFactory._createApp(opts(appConfig))
+
+            const response = await request(app)[method.toLowerCase()](path)
+
+            expect(response.status).toBe(403)
+            // The upstream mock must not have been called at all — proving
+            // neither `Authorization: Basic …` nor `_sfdc_client_auth` could
+            // have leaked, because no request reached SLAS.
+            expect(upstreamHandler).not.toHaveBeenCalled()
+        },
+        15000
+    )
 })
