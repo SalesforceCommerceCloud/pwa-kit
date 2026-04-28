@@ -108,9 +108,9 @@ const METRIC_DIMENSIONS = {
 }
 
 /**
- * HTTP methods used by the SLAS private-client proxy allow-list.
+ * Uppercase HTTP method names.
  */
-export const SlasProxyMethod = Object.freeze({
+export const HttpMethod = Object.freeze({
     GET: 'GET',
     POST: 'POST'
 })
@@ -137,7 +137,7 @@ export const SlasProxyAuthType = Object.freeze({
  * from the SLAS OpenAPI spec.
  *
  * Projects can override this via `options.slasPrivateClientAllowList` in
- * `ssr.js`. Use `SlasProxyMethod` and `SlasProxyAuthType` for entries.
+ * `ssr.js`. Use `HttpMethod` and `SlasProxyAuthType` for entries.
  *
  * TODO: derive this list from the SLAS OpenAPI spec so it stays in sync
  *       automatically.
@@ -145,47 +145,47 @@ export const SlasProxyAuthType = Object.freeze({
 export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
     {
         segments: ['oauth2', 'token'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC
     },
     {
         segments: ['oauth2', 'logout'],
-        methods: [SlasProxyMethod.GET, SlasProxyMethod.POST],
+        methods: [HttpMethod.GET, HttpMethod.POST],
         injectAuth: SlasProxyAuthType.NONE
     },
     {
         segments: ['oauth2', 'login'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.NONE
     },
     {
         segments: ['oauth2', 'passwordless', 'login'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC
     },
     {
         segments: ['oauth2', 'passwordless', 'token'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC
     },
     {
         segments: ['oauth2', 'password', 'reset'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC
     },
     {
         segments: ['oauth2', 'password', 'action'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC
     },
     {
         segments: ['oauth2', 'trusted-agent', 'authorize'],
-        methods: [SlasProxyMethod.GET],
+        methods: [HttpMethod.GET],
         injectAuth: SlasProxyAuthType.NONE
     },
     {
         segments: ['oauth2', 'trusted-agent', 'token'],
-        methods: [SlasProxyMethod.POST],
+        methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.SFDC_HEADER
     }
 ])
@@ -253,7 +253,7 @@ export const RemoteServerFactory = {
             // Allow-list of SLAS endpoints the private-client proxy will
             // forward. Each entry has `segments` (path segments after the
             // `/shopper/auth/{version}/organizations/{orgId}/` prefix),
-            // `methods` (`SlasProxyMethod` values) and `injectAuth`
+            // `methods` (`HttpMethod` values) and `injectAuth`
             // (`SlasProxyAuthType` value). When undefined, the built-in
             // `SLAS_PRIVATE_PROXY_ALLOWLIST` is used.
             slasPrivateClientAllowList: undefined,
