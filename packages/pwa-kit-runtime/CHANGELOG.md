@@ -6,6 +6,7 @@
 - Add `DataStore` test hooks `_testDocumentClient` and `_testLogMRTError` aligned with `@salesforce/mrt-utilities`.
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
 - Add security checks to SLAS proxy path normalization [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
+- Route SLAS private-client proxy through an explicit endpoint allow-list [#3806](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3806)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

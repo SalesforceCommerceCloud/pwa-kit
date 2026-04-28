@@ -108,6 +108,97 @@ const METRIC_DIMENSIONS = {
 }
 
 /**
+ * Uppercase HTTP method names.
+ */
+export const HttpMethod = Object.freeze({
+    GET: 'GET',
+    POST: 'POST'
+})
+
+/**
+ * Credential injection modes used by the SLAS private-client proxy allow-list.
+ *
+ *  - `BASIC`       attaches `Authorization: Basic <private-client-creds>`
+ *  - `SFDC_HEADER` attaches `_sfdc_client_auth: <private-client-creds>`
+ *  - `NONE`        forwards the request without credential injection
+ */
+export const SlasProxyAuthType = Object.freeze({
+    BASIC: 'basic',
+    SFDC_HEADER: 'sfdc-header',
+    NONE: 'none'
+})
+
+/**
+ * Endpoints the SLAS private-client proxy will forward, and the credential
+ * header (if any) the proxy attaches.
+ *
+ * Each entry is matched as an exact suffix of decoded path segments after the
+ * `/shopper/auth/{version}/organizations/{orgId}/` prefix. Methods are taken
+ * from the SLAS OpenAPI spec.
+ *
+ * Projects can override this via `options.slasPrivateClientAllowList` in
+ * `ssr.js`. Use `HttpMethod` and `SlasProxyAuthType` for entries.
+ *
+ * TODO: derive this list from the SLAS OpenAPI spec so it stays in sync
+ *       automatically.
+ */
+export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
+    {
+        segments: ['oauth2', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'logout'],
+        methods: [HttpMethod.GET, HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'login'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'passwordless', 'login'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'passwordless', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'password', 'reset'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'password', 'action'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'trusted-agent', 'authorize'],
+        methods: [HttpMethod.GET],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'trusted-agent', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.SFDC_HEADER
+    }
+])
+
+/**
+ * Allowed character set for the `{version}` and `{orgId}` path slots.
+ * Matches the RFC 3986 unreserved set; legitimate SLAS org ids fit this shape.
+ *
+ * @private
+ */
+const SLAS_PATH_WILDCARD_SAFE = /^[A-Za-z0-9._~-]+$/
+
+/**
  * @private
  */
 export const RemoteServerFactory = {
@@ -154,12 +245,18 @@ export const RemoteServerFactory = {
             // Toggle for setting up the custom SLAS private client secret handler
             useSLASPrivateClient: false,
 
-            // A regex for identifying which SLAS endpoints the custom SLAS private
-            // client secret handler will inject an Authorization header.
-            // To allow additional SLAS endpoints, users can override this value in
-            // their project's ssr.js.
+            // Retained for backward compatibility with existing projects.
+            // The proxy now consults `slasPrivateClientAllowList` (see below).
             applySLASPrivateClientToEndpoints:
                 /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+
+            // Allow-list of SLAS endpoints the private-client proxy will
+            // forward. Each entry has `segments` (path segments after the
+            // `/shopper/auth/{version}/organizations/{orgId}/` prefix),
+            // `methods` (`HttpMethod` values) and `injectAuth`
+            // (`SlasProxyAuthType` value). When undefined, the built-in
+            // `SLAS_PRIVATE_PROXY_ALLOWLIST` is used.
+            slasPrivateClientAllowList: undefined,
 
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
@@ -913,6 +1010,54 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Match a normalized path + method against the configured allow-list.
+     *
+     * Returns the matched entry or `null`. The path must start with
+     * `/shopper/auth/{version}/organizations/{orgId}/` and its trailing
+     * segments must equal one of the entries' `segments`. The `{version}` and
+     * `{orgId}` slots are constrained to `SLAS_PATH_WILDCARD_SAFE`.
+     *
+     * @param {string|null} normalizedPath - Output of `_normalizeSlasPath`
+     * @param {string} method - HTTP method on the incoming request
+     * @param {Array<{segments: string[], methods: string[], injectAuth: string}>} [allowList]
+     * @returns {{segments: string[], methods: string[], injectAuth: string}|null}
+     * @private
+     */
+    _matchSlasAllowlistEntry(normalizedPath, method, allowList) {
+        if (!normalizedPath) {
+            return null
+        }
+        const list = Array.isArray(allowList) ? allowList : SLAS_PRIVATE_PROXY_ALLOWLIST
+        const segments = normalizedPath.split('/').filter(Boolean)
+        if (
+            segments.length < 6 ||
+            segments[0] !== 'shopper' ||
+            segments[1] !== 'auth' ||
+            segments[3] !== 'organizations'
+        ) {
+            return null
+        }
+        if (
+            !SLAS_PATH_WILDCARD_SAFE.test(segments[2]) ||
+            !SLAS_PATH_WILDCARD_SAFE.test(segments[4])
+        ) {
+            return null
+        }
+        const upperMethod = String(method || '').toUpperCase()
+        const tail = segments.slice(5)
+        return (
+            list.find(
+                (entry) =>
+                    Array.isArray(entry?.segments) &&
+                    Array.isArray(entry?.methods) &&
+                    entry.methods.includes(upperMethod) &&
+                    entry.segments.length === tail.length &&
+                    entry.segments.every((seg, i) => seg === tail[i])
+            ) ?? null
+        )
+    },
+
+    /**
      * @private
      */
     _setupSlasPrivateClientProxy(app, options) {
@@ -920,10 +1065,9 @@ export const RemoteServerFactory = {
             return
         }
 
-        // This is the full path to the SLAS trusted-system endpoint
-        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
-        // matches this path as an early warning to developers that they should update their regex
-        // in ssr.js to exclude this path.
+        // Retained as a startup check so projects setting the legacy
+        // `applySLASPrivateClientToEndpoints` regex get an explicit error
+        // rather than silently misconfiguring the proxy.
         const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
         if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
             throw new Error(
@@ -942,29 +1086,30 @@ export const RemoteServerFactory = {
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
+        const allowList = Array.isArray(options.slasPrivateClientAllowList)
+            ? options.slasPrivateClientAllowList
+            : SLAS_PRIVATE_PROXY_ALLOWLIST
+
         app.use(
             slasPrivateProxyPath,
             (req, res, next) => {
-                // Normalize the path before applying security checks so that
-                // encoded equivalents of the same path are evaluated consistently
                 const normalizedPath = this._normalizeSlasPath(req.path)
+                const allowedEntry = this._matchSlasAllowlistEntry(
+                    normalizedPath,
+                    req.method,
+                    allowList
+                )
 
-                // Check if the request should be blocked before it reaches the proxy.
-                // If normalization fails (e.g. malformed percent encoding), we cannot determine
-                // what the upstream would resolve — block the request.
-                // We run this outside of the proxy middleware because modifying the response
-                // to send a 403 in the proxy causes issues with the response interceptor.
-                if (
-                    !normalizedPath ||
-                    !normalizedPath.match(options.slasApiPath) ||
-                    normalizedPath.split('/').filter(Boolean).includes('trusted-system')
-                ) {
+                if (!allowedEntry) {
                     const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
                     logger.error(message)
                     return res.status(403).json({
                         message
                     })
                 }
+
+                req._normalizedSlasPath = normalizedPath
+                req._slasAllowlistEntry = allowedEntry
                 next()
             },
             createProxyMiddleware({
@@ -995,24 +1140,14 @@ export const RemoteServerFactory = {
                             targetProtocol: 'https'
                         })
 
-                        // Normalize the path before making credential-injection
-                        // decisions so that encoded equivalents are evaluated
-                        // consistently with the pre-proxy guard
-                        const normalizedReqPath = this._normalizeSlasPath(incomingRequest.path)
+                        // Credential mode is taken from the allow-list entry
+                        // attached by the pre-proxy guard.
+                        const {injectAuth = SlasProxyAuthType.NONE} =
+                            incomingRequest._slasAllowlistEntry ?? {}
 
-                        if (normalizedReqPath?.match(/\/oauth2\/trusted-agent\/token/)) {
-                            // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
-                            // so the SLAS private client is sent via this special header
+                        if (injectAuth === SlasProxyAuthType.SFDC_HEADER) {
                             proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                        } else if (
-                            normalizedReqPath?.match(options.applySLASPrivateClientToEndpoints)
-                        ) {
-                            // We pattern match and add client secrets only to endpoints that
-                            // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                            //
-                            // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                            // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                            // purpose so we don't want to overwrite the header for those calls.
+                        } else if (injectAuth === SlasProxyAuthType.BASIC) {
                             proxyRequest.setHeader(
                                 'Authorization',
                                 `Basic ${encodedSlasCredentials}`
