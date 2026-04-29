@@ -466,27 +466,13 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        if (this.enableHttpOnlySessionCookies && onClient()) {
-            // HttpOnly: trust dw_dnt as the user's preference without deleting it.
-            // Unlike the non-HttpOnly path, we cannot compare dw_dnt against the
-            // JWT (the access token is HttpOnly). More importantly, getDnt() is
-            // called on every React render via useDNT() — if we deleted dw_dnt
-            // here, the next render would read an empty cookie, return undefined,
-            // and re-show the tracking consent modal. The cookie must also persist
-            // across the async refresh lifecycle, where getDnt() is called multiple
-            // times (e.g. _refreshAccessToken → loginGuestUser).
-            if (dntCookieVal === '1' || dntCookieVal === '0') {
-                dntCookieStatus = Boolean(Number(dntCookieVal))
-            }
+
+        const accessTokenDnt = this.getDntFromAccessToken()
+        const isInSync = accessTokenDnt === undefined || accessTokenDnt === dntCookieVal
+        if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
+            this.delete(DNT_COOKIE_NAME)
         } else {
-            const accessTokenDnt = this.getDntFromAccessToken()
-            // When no access token is available, assume in sync (don't delete based on sync)
-            const isInSync = accessTokenDnt === undefined || accessTokenDnt === dntCookieVal
-            if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
-                this.delete(DNT_COOKIE_NAME)
-            } else {
-                dntCookieStatus = Boolean(Number(dntCookieVal))
-            }
+            dntCookieStatus = Boolean(Number(dntCookieVal))
         }
 
         if (options?.includeDefaults) {
