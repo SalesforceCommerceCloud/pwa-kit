@@ -5,6 +5,7 @@
 - Add **`getCustomGlobalPreferences`** / **`getCustomSitePreferences`** from **`utils/data-store/ssr-global-preferences`** / **`ssr-site-preferences`** (conditional: server async Data Store fetch, client reads `window.__MRT_DATA_STORE__`) and shared DAL helpers under **`utils/data-store/`** (`constants`, `data-store-utils` with `getPlainObjectForDataStoreKey`). Data Store keys: `custom-global-preferences` and `<siteId>-custom-site-preferences` (confirm with MRT).
 - Add `DataStore` test hooks `_testDocumentClient` and `_testLogMRTError` aligned with `@salesforce/mrt-utilities`.
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
+- Fix SSR QueryClient memory retention across warm Lambda invocations [#3795](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3795)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
