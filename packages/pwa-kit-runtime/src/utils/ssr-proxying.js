@@ -24,7 +24,6 @@ const HOST = 'host'
 const LOCATION = 'location'
 const ORIGIN = 'origin'
 const SET_COOKIE = 'set-cookie'
-const USER_AGENT = 'user-agent'
 
 const HEADER_FORMATS = ['http', 'aws']
 export const X_PROXY_REQUEST_URL = 'x-proxy-request-url'
@@ -787,8 +786,7 @@ export const ALLOWED_CACHING_PROXY_REQUEST_HEADERS = {
     'if-modified-since': true,
     'if-none-match': true,
     'if-range': true,
-    'if-unmodified-since': true,
-    'user-agent': true
+    'if-unmodified-since': true
 }
 
 /**

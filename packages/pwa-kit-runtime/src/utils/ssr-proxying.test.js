@@ -616,7 +616,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 date: undefined,
                 host: 'www.customer.com',
                 origin: 'https://www.customer.com',
-                'user-agent': 'chrome'
+                'user-agent': undefined
             }
         },
         {
