@@ -817,7 +817,8 @@ export const rewriteProxyRequestHeaders = ({
     headerFormat = 'http',
     targetProtocol,
     targetHost,
-    logging = false
+    logging = false,
+    preserveUserAgent = false
 }) => {
     if (!headers) {
         return {}
@@ -835,8 +836,8 @@ export const rewriteProxyRequestHeaders = ({
                 workingHeaders.deleteHeader(key)
             }
         })
-        // Set user-agent to Amazon CloudFront so origin servers treat
-        // the request as coming from CloudFront rather than the browser.
+
+        // Override user-agent - mimic the behaviour of CloudFront
         workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
 
@@ -881,6 +882,12 @@ export const rewriteProxyRequestHeaders = ({
             )
         }
         workingHeaders.setHeader(ORIGIN, targetOrigin)
+    }
+
+    // Replace some headers with hardwired values
+    if (workingHeaders.getHeader(USER_AGENT) && !preserveUserAgent) {
+        // Mimic the behaviour of CloudFront
+        workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
 
     // Add some specific X-headers
