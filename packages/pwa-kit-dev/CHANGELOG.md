@@ -1,3 +1,6 @@
+## 3.19.0 (Apr 27, 2026)
+- Keep original User Agent header in proxy requests
+
 ## v3.18.0-dev (Mar 20, 2026)
 - Add **`createLocalMrtDataStoreProvider`** in **`src/utils/mrt-data-store-local-provider.js`** for local MRT Data Store defaults (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, `PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING`), loaded dynamically from **`@salesforce/pwa-kit-runtime`** when DynamoDB is not configured.
 

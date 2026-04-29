@@ -1,4 +1,4 @@
-## 3.19.0
+## 3.19.0 (Apr 27, 2026)
 - Keep original User Agent header in proxy requests
 
 ## v3.18.0-dev (Mar 20, 2026)
