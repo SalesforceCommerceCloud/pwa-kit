@@ -6,6 +6,7 @@
  */
 
 import {
+    buildPaymentReturnUrl,
     buildTheme,
     getSFPaymentsInstrument,
     transformAddressDetails,
@@ -23,6 +24,72 @@ import {
 import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
 describe('sf-payments-utils', () => {
+    describe('buildPaymentReturnUrl', () => {
+        const baseUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+
+        test('returns base URL when called with no arguments', () => {
+            const result = buildPaymentReturnUrl()
+
+            expect(result).toBe(baseUrl)
+        })
+
+        test('returns base URL when called with empty object', () => {
+            const result = buildPaymentReturnUrl({})
+
+            expect(result).toBe(baseUrl)
+        })
+
+        test('returns URL with all query params when all provided', () => {
+            const result = buildPaymentReturnUrl({
+                orderNo: 'ord-123',
+                zoneId: 'us-west-1',
+                type: 'card'
+            })
+
+            expect(result).toBe(`${baseUrl}?orderNo=ord-123&zoneId=us-west-1&type=card`)
+        })
+
+        test('encodes special characters in query params', () => {
+            const result = buildPaymentReturnUrl({
+                orderNo: 'ord 123&foo=bar',
+                zoneId: 'zone/1',
+                type: 'amazon_pay'
+            })
+
+            expect(result).toContain('orderNo=ord+123%26foo%3Dbar')
+            expect(result).toContain('zoneId=zone%2F1')
+            expect(result).toContain('type=amazon_pay')
+        })
+
+        test('omits undefined params but includes provided ones', () => {
+            const result = buildPaymentReturnUrl({
+                orderNo: 'ord-456',
+                type: 'card'
+            })
+
+            expect(result).toContain('orderNo=ord-456')
+            expect(result).toContain('type=card')
+            expect(result).not.toContain('zoneId')
+        })
+
+        test('includes param when value is an empty string', () => {
+            const result = buildPaymentReturnUrl({
+                orderNo: '',
+                zoneId: 'zone-1',
+                type: 'card'
+            })
+
+            expect(result).toContain('orderNo=')
+            expect(result).toContain('zoneId=zone-1')
+        })
+
+        test('includes only orderNo when others are undefined', () => {
+            const result = buildPaymentReturnUrl({orderNo: 'ord-789'})
+
+            expect(result).toBe(`${baseUrl}?orderNo=ord-789`)
+        })
+    })
+
     describe('getSFPaymentsInstrument', () => {
         test('returns undefined when basketOrOrder is undefined', () => {
             const result = getSFPaymentsInstrument(undefined)
