@@ -24,6 +24,7 @@ const HOST = 'host'
 const LOCATION = 'location'
 const ORIGIN = 'origin'
 const SET_COOKIE = 'set-cookie'
+const USER_AGENT = 'user-agent'
 
 const HEADER_FORMATS = ['http', 'aws']
 export const X_PROXY_REQUEST_URL = 'x-proxy-request-url'
@@ -834,6 +835,9 @@ export const rewriteProxyRequestHeaders = ({
                 workingHeaders.deleteHeader(key)
             }
         })
+        // Set user-agent to Amazon CloudFront so origin servers treat
+        // the request as coming from CloudFront rather than the browser.
+        workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
 
     // Fix up any Host header. We ignore any current value and

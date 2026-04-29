@@ -616,7 +616,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 date: undefined,
                 host: 'www.customer.com',
                 origin: 'https://www.customer.com',
-                'user-agent': undefined
+                'user-agent': 'Amazon CloudFront'
             }
         },
         {
@@ -637,7 +637,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
             method: 'GET',
             input: {},
             expected: {
-                'user-agent': undefined
+                'user-agent': 'Amazon CloudFront'
             }
         },
         {
