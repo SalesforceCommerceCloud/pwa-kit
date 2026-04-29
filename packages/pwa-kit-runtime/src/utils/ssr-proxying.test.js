@@ -641,6 +641,19 @@ describe('rewriteProxyRequestHeaders tests', () => {
             }
         },
         {
+            name: 'non-caching proxy preserves user-agent',
+            caching: false,
+            targetHost: 'www.customer.com',
+            input: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Mozilla/5.0'
+            },
+            expected: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Mozilla/5.0'
+            }
+        },
+        {
             name: 'add in x-headers',
             targetHost: 'www.customer.com',
             input: {

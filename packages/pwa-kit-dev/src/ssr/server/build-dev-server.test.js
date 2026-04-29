@@ -467,8 +467,8 @@ describe('DevServer proxying', () => {
 
                 expect(headers['accept-encoding']).toBe('gzip')
 
-                // The client's user-agent is now passed through unchanged
-                expect(headers['user-agent']).toBe('test-agent')
+                // This value is fixed
+                expect(headers['user-agent']).toBe('Amazon Cloudfront')
 
                 return 'Success'
             })
