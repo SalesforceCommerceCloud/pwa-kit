@@ -221,6 +221,33 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │ ───────────────────────────────────►│  (new guest token flow)          │
 ```
 
+## Client-Side Token Access
+
+When HttpOnly session cookies are enabled, access tokens are not available to client-side JavaScript.
+
+### `useAccessToken` returns an empty string
+
+The `useAccessToken` hook returns `""` on the client because the access token is stored in an
+HttpOnly cookie that JavaScript cannot read. This is expected behavior.
+
+### You do not need to set the Authorization header when HttpOnly cookies are enabled
+
+All SCAPI requests through `/mobify/proxy` have the Authorization header injected automatically by
+the proxy from the HttpOnly cookie. You do not need to set it yourself on the client.
+
+- **Commerce-sdk-react hooks** (e.g., `useShopperBasketsMutation`, `useShopperOrdersMutation`) already
+  handle this — the `useAuthorizationHeader` wrapper skips setting the header on the client and lets
+  the proxy inject it.
+
+```
+                  HttpOnly disabled                    HttpOnly enabled
+                  ─────────────────                    ────────────────
+useAccessToken()     → "eyJhbGciOi..."                → ""
+Request header       → Authorization: Bearer eyJ...    → Authorization: Bearer
+Proxy behavior       → No cookie, passes header through → Cookie found, overwrites header
+SCAPI receives       → Bearer eyJhbGciOi...            → Bearer eyJhbGciOi...
+```
+
 ## Configuration
 
 This diagram shows how the configuration setting flows from the app to MRT and the API provider.
