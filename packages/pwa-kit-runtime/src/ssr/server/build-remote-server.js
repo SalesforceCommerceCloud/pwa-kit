@@ -1191,17 +1191,16 @@ export const RemoteServerFactory = {
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
                     let workingBuffer = responseBuffer
                     try {
-                        // If the passwordless login endpoint returns a 404, which corresponds to a user
-                        // email not being found, we mask it with a 200 OK response so that it is not
-                        // obvious that the user does not exist.
-                        // We do this to prevent user enumeration.
-                        // Normalize the path so that encoded equivalents are
-                        // matched consistently.
-                        const normalizedResPath = this._normalizeSlasPath(req.path)
-                        if (
-                            normalizedResPath?.match(/\/oauth2\/passwordless\/login/) &&
-                            proxyRes.statusCode === 404
-                        ) {
+                        // Mask a 404 on /oauth2/passwordless/login with a 200 to prevent
+                        // user enumeration. Match against the allow-list entry stashed by
+                        // the pre-proxy guard.
+                        const entrySegments = req._slasAllowlistEntry?.segments
+                        const isPasswordlessLogin =
+                            entrySegments?.length === 3 &&
+                            entrySegments[0] === 'oauth2' &&
+                            entrySegments[1] === 'passwordless' &&
+                            entrySegments[2] === 'login'
+                        if (isPasswordlessLogin && proxyRes.statusCode === 404) {
                             res.statusCode = 200
                             res.statusMessage = 'OK'
 
