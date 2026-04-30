@@ -817,7 +817,8 @@ export const rewriteProxyRequestHeaders = ({
     headerFormat = 'http',
     targetProtocol,
     targetHost,
-    logging = false
+    logging = false,
+    preserveUserAgent = false
 }) => {
     if (!headers) {
         return {}
@@ -884,7 +885,7 @@ export const rewriteProxyRequestHeaders = ({
     }
 
     // Replace some headers with hardwired values
-    if (workingHeaders.getHeader(USER_AGENT)) {
+    if (workingHeaders.getHeader(USER_AGENT) && !preserveUserAgent) {
         // Mimic the behaviour of CloudFront
         workingHeaders.setHeader(USER_AGENT, 'Amazon CloudFront')
     }
