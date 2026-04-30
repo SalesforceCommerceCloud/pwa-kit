@@ -283,8 +283,12 @@ describe('remote server factory test coverage', () => {
                 applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
             })
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining('`applySLASPrivateClientToEndpoints` is no longer used'),
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is deprecated'),
                 expect.objectContaining({namespace: 'RemoteServerFactory._configure'})
+            )
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('narrowing-only filter'),
+                expect.anything()
             )
         })
 
@@ -299,7 +303,7 @@ describe('remote server factory test coverage', () => {
                 }
             })
             expect(logger.warn).not.toHaveBeenCalledWith(
-                expect.stringContaining('`applySLASPrivateClientToEndpoints` is no longer used'),
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is deprecated'),
                 expect.anything()
             )
         })
@@ -352,6 +356,71 @@ describe('remote server factory test coverage', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, baseOptions())
             expect(logger.warn).not.toHaveBeenCalledWith(
                 expect.stringContaining('custom `slasPrivateClientAllowList` is in use'),
+                expect.anything()
+            )
+        })
+    })
+
+    describe('applySLASPrivateClientToEndpoints narrowing-only fallback', () => {
+        let mockExpress
+        const baseOptions = () =>
+            RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'test-client-id',
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test'
+                            }
+                        }
+                    }
+                }
+            })
+
+        beforeEach(() => {
+            mockExpress = require('express')
+            logger.warn.mockClear()
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+        })
+
+        afterEach(() => {
+            delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        })
+
+        test('does not emit the "removed every entry" warning when the regex matches at least one entry', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
+                expect.anything()
+            )
+        })
+
+        test('emits "removed every entry" warning when the regex matches nothing', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: /\/nothing-matches-this/
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
+                expect.objectContaining({namespace: '_setupSlasPrivateClientProxy'})
+            )
+        })
+
+        test('a non-RegExp value for applySLASPrivateClientToEndpoints is ignored by the filter', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: 'not a regex'
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
                 expect.anything()
             )
         })

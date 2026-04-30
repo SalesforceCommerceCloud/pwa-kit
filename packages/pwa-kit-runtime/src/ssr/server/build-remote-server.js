@@ -246,11 +246,9 @@ export const RemoteServerFactory = {
             useSLASPrivateClient: false,
 
             // Allow-list of SLAS endpoints the private-client proxy will
-            // forward. Each entry has `segments` (path segments after the
-            // `/shopper/auth/{version}/organizations/{orgId}/` prefix),
-            // `methods` (`HttpMethod` values) and `injectAuth`
-            // (`SlasProxyAuthType` value). When undefined, the built-in
-            // `SLAS_PRIVATE_PROXY_ALLOWLIST` is used.
+            // forward. When undefined, the built-in
+            // `SLAS_PRIVATE_PROXY_ALLOWLIST` is used. Supplying a custom list
+            // is security-sensitive and logs a startup warning.
             slasPrivateClientAllowList: undefined,
 
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
@@ -268,7 +266,7 @@ export const RemoteServerFactory = {
 
         if (options && 'applySLASPrivateClientToEndpoints' in options) {
             logger.warn(
-                '`applySLASPrivateClientToEndpoints` is no longer used. The SLAS private-client proxy is gated by a built-in allow-list. Remove this option from your `ssr.js`',
+                '`applySLASPrivateClientToEndpoints` is deprecated. The SLAS private-client proxy is now gated by a built-in allow-list; when the legacy option is supplied, it is applied as a narrowing-only filter for backwards compatibility (it can remove entries from the allow-list, never add). Remove this option from your `ssr.js` and, if you need to widen the set of proxied endpoints, use `slasPrivateClientAllowList` instead.',
                 {namespace: 'RemoteServerFactory._configure'}
             )
         }
@@ -1091,9 +1089,27 @@ export const RemoteServerFactory = {
                 {namespace: '_setupSlasPrivateClientProxy'}
             )
         }
-        const allowList = hasCustomAllowList
+        let allowList = hasCustomAllowList
             ? options.slasPrivateClientAllowList
             : SLAS_PRIVATE_PROXY_ALLOWLIST
+
+        // Backwards-compat: the deprecated `applySLASPrivateClientToEndpoints`
+        // regex is applied as a narrowing-only filter on the allow-list. It can
+        // remove entries but never add. Customers who need to widen the allow
+        // list should migrate to `slasPrivateClientAllowList`. The deprecation
+        // warning is emitted by `_configure`.
+        const legacyRegex = options.applySLASPrivateClientToEndpoints
+        if (legacyRegex instanceof RegExp) {
+            allowList = allowList.filter((entry) =>
+                legacyRegex.test(`/${entry.segments.join('/')}`)
+            )
+            if (allowList.length === 0) {
+                logger.warn(
+                    '`applySLASPrivateClientToEndpoints` removed every entry from the SLAS private-client allow-list. The proxy will reject all requests. Remove the legacy option or update it to match at least one allow-list entry.',
+                    {namespace: '_setupSlasPrivateClientProxy'}
+                )
+            }
+        }
 
         app.use(
             slasPrivateProxyPath,

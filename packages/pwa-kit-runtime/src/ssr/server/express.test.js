@@ -1416,7 +1416,7 @@ describe('SLAS private client proxy', () => {
             .expect(403)
     }, 15000)
 
-    test('boots without throwing when applySLASPrivateClientToEndpoints is set (deprecated, ignored)', async () => {
+    test('boots without throwing when applySLASPrivateClientToEndpoints is set (deprecated, now a narrowing-only filter)', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         expect(() => {
@@ -1438,6 +1438,62 @@ describe('SLAS private client proxy', () => {
                 })
             )
         }).not.toThrow()
+    }, 15000)
+
+    test('applySLASPrivateClientToEndpoints narrows the built-in allow-list: non-matching allow-listed endpoints are blocked', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                ...appConfig,
+                // Only permit /oauth2/token; everything else in the built-in
+                // list must be filtered out and therefore blocked by the guard.
+                applySLASPrivateClientToEndpoints: /^\/oauth2\/token$/
+            })
+        )
+
+        await request(app)
+            .post(
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordless/login'
+            )
+            .expect(403)
+    }, 15000)
+
+    test('applySLASPrivateClientToEndpoints narrows the built-in allow-list: matching endpoints are still forwarded', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                ...appConfig,
+                applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            })
+        )
+
+        // The mock upstream echoes headers (see beforeEach), any non-403 means
+        // the guard forwarded the request to the upstream rather than blocking it.
+        const res = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
+        )
+        expect(res.status).not.toBe(403)
+    }, 15000)
+
+    test('applySLASPrivateClientToEndpoints cannot widen the allow-list: a regex matching a non-allow-listed endpoint does not grant access', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                ...appConfig,
+                applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
+            })
+        )
+
+        // trusted-system is intentionally NOT on the allow-list; the legacy
+        // regex must never be able to add it back.
+        await request(app)
+            .post(
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/trusted-system/token'
+            )
+            .expect(403)
     }, 15000)
 
     test('proxy returns a 200 OK masking a user not found error', async () => {
