@@ -746,7 +746,9 @@ describe('SLAS private proxy', () => {
 
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options, false)
 
-        const response = await request(app).get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+        const response = await request(app).get(
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
+        )
 
         expect(response.status).toBe(501)
     })
@@ -799,7 +801,7 @@ describe('SLAS private proxy', () => {
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options, false)
 
         const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token'
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/trusted-system/token'
         )
 
         expect(response.status).toBe(403)
@@ -827,7 +829,7 @@ describe('SLAS private proxy', () => {
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
         const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%2Dsystem/token'
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/trusted%2Dsystem/token'
         )
 
         expect(response.status).toBe(403)
@@ -855,7 +857,7 @@ describe('SLAS private proxy', () => {
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
         const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted%2Dsystem/token'
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token/%2E%2E/trusted%2Dsystem/token'
         )
 
         expect(response.status).toBe(403)
@@ -977,10 +979,10 @@ describe('SLAS private proxy', () => {
 
             expect(response.status).toBe(500)
             expect(response.body).toEqual({
-                message: 'Error preparing SLAS proxy request'
+                message: 'Error preparing SLAS private proxy request'
             })
             expect(logger.error).toHaveBeenCalledWith(
-                'Error in SLAS proxy request handling',
+                'Error in SLAS private proxy request handling',
                 expect.objectContaining({
                     namespace: '_setupSlasPrivateClientProxy'
                 })
@@ -1018,10 +1020,10 @@ describe('SLAS private proxy', () => {
 
         expect(response.status).toBe(500)
         expect(response.body).toEqual({
-            message: 'Error in SLAS proxy request'
+            message: 'Error in SLAS private proxy request'
         })
         expect(logger.error).toHaveBeenCalledWith(
-            'Error in SLAS proxy',
+            'Error in SLAS private proxy',
             expect.objectContaining({
                 namespace: '_setupSlasPrivateClientProxy'
             })
@@ -1047,13 +1049,16 @@ describe('HttpOnly session cookies', () => {
         delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            res.status(200).json({
-                access_token: 'mock-token',
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                res.status(200).json({
+                    access_token: 'mock-token',
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1082,7 +1087,7 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, false)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             // Should return original response with tokens (no HttpOnly processing)
@@ -1099,13 +1104,16 @@ describe('HttpOnly session cookies', () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            res.status(200).json({
-                access_token: 'mock-token',
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                res.status(200).json({
+                    access_token: 'mock-token',
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1134,7 +1142,7 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             expect(response.status).toBe(500)
@@ -1152,12 +1160,15 @@ describe('HttpOnly session cookies', () => {
         let capturedRefreshToken
         let capturedCookieHeader
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
-            capturedAuthHeader = req.headers.authorization
-            capturedRefreshToken = req.query.refresh_token
-            capturedCookieHeader = req.headers.cookie
-            res.status(200).json({success: true})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout',
+            (req, res) => {
+                capturedAuthHeader = req.headers.authorization
+                capturedRefreshToken = req.query.refresh_token
+                capturedCookieHeader = req.headers.cookie
+                res.status(200).json({success: true})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1186,7 +1197,9 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout'
+                )
                 .set(
                     'Cookie',
                     'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token'
@@ -1214,11 +1227,14 @@ describe('HttpOnly session cookies', () => {
         let capturedAuthHeader
         let capturedRefreshToken
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
-            capturedAuthHeader = req.headers.authorization
-            capturedRefreshToken = req.query.refresh_token
-            res.status(200).json({success: true})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout',
+            (req, res) => {
+                capturedAuthHeader = req.headers.authorization
+                capturedRefreshToken = req.query.refresh_token
+                res.status(200).json({success: true})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1249,7 +1265,9 @@ describe('HttpOnly session cookies', () => {
 
             // Cookies are keyed to 'othersite', and x-site-id header says 'othersite'
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout'
+                )
                 .set(
                     'Cookie',
                     'cc-at_othersite=other-access-token; cc-nx_othersite=other-refresh-token'
@@ -1268,17 +1286,20 @@ describe('HttpOnly session cookies', () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1307,7 +1328,7 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(200)
@@ -1328,13 +1349,16 @@ describe('HttpOnly session cookies', () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            res.status(200).json({
-                access_token: 'invalid-jwt-not-base64',
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                res.status(200).json({
+                    access_token: 'invalid-jwt-not-base64',
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1363,7 +1387,7 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(500)
@@ -1378,17 +1402,20 @@ describe('HttpOnly session cookies', () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/passwordless/token', (req, res) => {
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:user@example.com::uidn:User::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordless/token',
+            (req, res) => {
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:user@example.com::uidn:User::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1417,7 +1444,9 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/token')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/passwordless/token'
+                )
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(200)
@@ -1438,18 +1467,21 @@ describe('HttpOnly session cookies', () => {
 
         let capturedHeaders
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            capturedHeaders = req.headers
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'new-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                capturedHeaders = req.headers
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'new-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1478,7 +1510,7 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set('Cookie', 'cc-nx-g_testsite=mock-guest-refresh-token')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
@@ -1509,10 +1541,13 @@ describe('HttpOnly session cookies', () => {
         const mockSlasServer = mockExpress()
         // The mock server should NOT be hit — the proxy should short-circuit with 401
         const slasHit = jest.fn()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            slasHit()
-            res.status(200).json({access_token: 'should-not-reach'})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                slasHit()
+                res.status(200).json({access_token: 'should-not-reach'})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1542,7 +1577,7 @@ describe('HttpOnly session cookies', () => {
 
             // Send refresh_token request with NO cookies at all
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
 
@@ -1560,10 +1595,13 @@ describe('HttpOnly session cookies', () => {
 
         const mockSlasServer = mockExpress()
         const slasHit = jest.fn()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            slasHit()
-            res.status(200).json({access_token: 'should-not-reach'})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                slasHit()
+                res.status(200).json({access_token: 'should-not-reach'})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1593,7 +1631,7 @@ describe('HttpOnly session cookies', () => {
 
             // Has cookies but NOT the refresh token cookie
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set('Cookie', 'cc-at-expires_testsite=12345')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
@@ -1611,18 +1649,21 @@ describe('HttpOnly session cookies', () => {
 
         let capturedHeaders
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            capturedHeaders = req.headers
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                capturedHeaders = req.headers
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1652,7 +1693,7 @@ describe('HttpOnly session cookies', () => {
 
             // Regular token request (e.g. guest login) — no x-grant-type header
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set('Cookie', 'cc-nx-g_testsite=mock-guest-refresh-token')
                 .set(X_SITE_ID, 'testsite')
 
@@ -1673,10 +1714,13 @@ describe('HttpOnly session cookies', () => {
 
         let capturedHeaders
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/logout', (req, res) => {
-            capturedHeaders = req.headers
-            res.status(200).json({success: true})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout',
+            (req, res) => {
+                capturedHeaders = req.headers
+                res.status(200).json({success: true})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1705,7 +1749,9 @@ describe('HttpOnly session cookies', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/private/shopper/auth/v1/oauth2/logout')
+                .post(
+                    '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/logout'
+                )
                 .set(
                     'Cookie',
                     'cc-at_testsite=mock-access-token; cc-nx_testsite=mock-refresh-token'
@@ -1766,17 +1812,20 @@ describe('SLAS public proxy', () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1803,7 +1852,7 @@ describe('SLAS public proxy', () => {
             RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/public/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(200)
@@ -1828,18 +1877,21 @@ describe('SLAS public proxy', () => {
 
         let capturedHeaders
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            capturedHeaders = req.headers
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'mock-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                capturedHeaders = req.headers
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1866,7 +1918,7 @@ describe('SLAS public proxy', () => {
             RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/public/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
 
             expect(response.status).toBe(200)
@@ -1883,18 +1935,21 @@ describe('SLAS public proxy', () => {
 
         let capturedHeaders
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            capturedHeaders = req.headers
-            const accessToken = makeJWT({
-                iat: 1000,
-                isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
-            })
-            res.status(200).json({
-                access_token: accessToken,
-                expires_in: 1800,
-                refresh_token: 'new-refresh-token'
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                capturedHeaders = req.headers
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'new-refresh-token'
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1921,7 +1976,7 @@ describe('SLAS public proxy', () => {
             RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/public/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set('Cookie', 'cc-nx-g_testsite=mock-guest-refresh-token')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
@@ -1944,10 +1999,13 @@ describe('SLAS public proxy', () => {
 
         const mockSlasServer = mockExpress()
         const slasHit = jest.fn()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            slasHit()
-            res.status(200).json({access_token: 'should-not-reach'})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                slasHit()
+                res.status(200).json({access_token: 'should-not-reach'})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -1974,7 +2032,7 @@ describe('SLAS public proxy', () => {
             RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
 
             const response = await request(app)
-                .post('/mobify/slas/public/shopper/auth/v1/oauth2/token')
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
                 .set(X_SITE_ID, 'testsite')
                 .set(X_GRANT_TYPE, 'refresh_token')
 

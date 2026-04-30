@@ -1192,7 +1192,7 @@ describe('SLAS private client proxy', () => {
         // by setting slasTarget, rather than forwarding the request to SLAS,
         // we send the proxy request here so we can return the request headers
         proxyApp = express()
-        proxyApp.use(proxyPath, (req, res) => {
+        proxyApp.use((req, res) => {
             res.send(req.headers)
         })
         proxyServer = proxyApp.listen(proxyPort)

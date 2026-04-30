@@ -1262,12 +1262,29 @@ export const RemoteServerFactory = {
      * @private
      */
     _rewriteSlasProxyPath(rawPath, proxyPath) {
+        // Example input:
+        //   rawPath   = "/mobify/slas/private/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
+        //   proxyPath = "/mobify/slas/private"
+
+        // Strip the proxy prefix (and optional base path).
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
         const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
         const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
         const stripped = rawPath.replace(regex, '')
+
+        // Split path from query string BEFORE normalizing.
+        // posixPath.normalize would collapse "://" in redirect_uri=http://... to ":/".
+        //   pathname   = "/shopper/auth/.../authorize"
+        //   queryParts = ["redirect_uri=http://localhost:3000/callback"]
         const [pathname, ...queryParts] = stripped.split('?')
+
+        // Normalize only the path (decode percent-encoding, resolve dot-segments).
+        //   → "/shopper/auth/v1/organizations/org1/oauth2/authorize"
         const normalizedPath = this._normalizeSlasPath(pathname)
         if (normalizedPath === null) return null
+
+        // Re-attach the query string unchanged.
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
         return queryParts.length ? `${normalizedPath}?${queryParts.join('?')}` : normalizedPath
     },
 
