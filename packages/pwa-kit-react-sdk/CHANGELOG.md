@@ -2,6 +2,7 @@
 - When the real Data Store is unavailable, SSR can use **`@salesforce/pwa-kit-dev`**’s in-memory local provider (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, etc.; see runtime `local-dev-provider-loader`).
 - MRT Data Store bootstrap is **opt-in** (`isMrtDataStoreEnabled` in `@salesforce/pwa-kit-runtime`): set `app.mrtDataStore.enabled` to `true` and/or `PWAKIT_MRT_DATA_STORE_ENABLED=true` (recognized falsey strings force off). When disabled, **`__MRT_DATA_STORE__` is omitted** from `#mobify-data` (not empty objects).
 - When enabled, serialize custom site and global preferences into `#mobify-data` under `__MRT_DATA_STORE__` (nested `customSitePreferences` / `customGlobalPreferences`) during SSR.
+- Fix SSR QueryClient memory retention across warm Lambda invocations [#3795](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3795)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

@@ -1112,12 +1112,49 @@ describe('Additional branch coverage for react-rendering', () => {
         expect(res.statusCode).toBe(302)
         expect(res.headers.location).toBeDefined()
     })
+})
 
-    test('handles unrecoverable error in render (duplicate)', async () => {
+describe('QueryClient cleanup after SSR response', () => {
+    test('cleans up QueryClient after response finishes', async () => {
         const app = RemoteServerFactory._createApp(opts())
+        let capturedLocals
+
+        // Middleware to capture res.locals before cleanup runs
+        app.get('/*', (req, res, next) => {
+            const originalSend = res.send.bind(res)
+            res.send = function (...args) {
+                capturedLocals = res.locals
+                return originalSend(...args)
+            }
+            next()
+        })
         app.get('/*', render)
-        const res = await request(app).get('/unrecoverable-error/')
-        expect(res.statusCode).toBe(500)
+
+        const res = await request(app).get('/use-query-resolves-object/')
+        expect(res.statusCode).toBe(200)
+
+        // After the response is fully finished, the QueryClient should be cleaned up
+        expect(capturedLocals.__queryClient).toBeNull()
+    })
+
+    test('cleans up QueryClient after redirect response', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        let capturedLocals
+
+        app.get('/*', (req, res, next) => {
+            const originalRedirect = res.redirect.bind(res)
+            res.redirect = function (...args) {
+                capturedLocals = res.locals
+                return originalRedirect(...args)
+            }
+            next()
+        })
+        app.get('/*', render)
+
+        await request(app).get('/redirect/')
+
+        // After the redirect response finishes, the QueryClient should be cleaned up
+        expect(capturedLocals.__queryClient).toBeNull()
     })
 })
 
