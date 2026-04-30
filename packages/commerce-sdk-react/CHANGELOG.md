@@ -1,19 +1,6 @@
-## [Unreleased]
-- Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
-- use nightly release of isomorphic sdk that supports httponly cookies [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
-- Handle refresh token flow for HttpOnly session cookies [#3759](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3759)
-- Handle missing refresh token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3771)
-- Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
-- Ensure client-side refresh token requests are deduped [#3786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3786/)
-- Handle missing access token for HttpOnly session cookies [#3771](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3790)
-- Add USID support to StorefrontPreview for HttpOnly cookies [#3785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3785)
-- Expire HttpOnly session cookies on SLAS logout [#3794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3794)
-- Handle DNT for HttpOnly cookies [#3801](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3801)
-- Upgrade to commerce-sdk-isomorphic v5.2.0 [#3810](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3810)
-
-
 ## v5.2.0-dev (Mar 20, 2026)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
+- Add support for HttpOnly session cookies [3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
 
 ## v5.1.1 (Mar 20, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

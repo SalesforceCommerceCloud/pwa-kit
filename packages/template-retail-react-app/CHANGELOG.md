@@ -1,11 +1,3 @@
-## [Unreleased]
-- Add HttpOnly session cookies for SLAS private client proxy [#3680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3680)
-- Add `x-site-id` request header to read HttpOnly cookies on the server [#3700](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3700)
-- Rename the configuration flag `disableHttpOnlySessionCookies` to `enableHttpOnlySessionCookies` [#3723](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3723)
-- Increase msxSize for vendor.js [#3754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3754)
-- Add HttpOnly session cookies for SLAS public client [#3774](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3774)
-
-
 ## v9.2.0-dev (Mar 20, 2026)
 - Update MRT Data Store configuration comments to use new environment variable names (`MRT_DATA_STORE_DEFAULTS` instead of `PWAKIT_MRT_DATA_STORE_DEFAULTS`). Local data store now provided by `@salesforce/mrt-utilities` via conditional exports. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 - Add opt-in `app.mrtDataStore.enabled` to `config/default.js` (default `false`). Set to `true` or use `PWAKIT_MRT_DATA_STORE_ENABLED=true` to resolve MRT Data Store custom preferences during SSR. Local defaults without DynamoDB: `PWAKIT_MRT_DATA_STORE_DEFAULTS` and related env vars (see `config/default.js` comments).
@@ -14,6 +6,7 @@
 - [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
 - [Bugfix] Add `return_url` for express checkout payment confirmation, required by redirect-based payment methods like Amazon Pay [#3803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3803)
 - Update `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
+- Add support for HttpOnly session cookies [3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
 
 ## v9.1.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

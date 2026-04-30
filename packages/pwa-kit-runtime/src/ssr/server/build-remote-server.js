@@ -1628,7 +1628,12 @@ export const RemoteServerFactory = {
                         if (httpOnlyCookiesEnabled) {
                             try {
                                 workingBuffer = handleHttpOnlyCookiesOnProxyRes(
-                                    workingBuffer, proxyRes, req, res, options, logNamespace
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options,
+                                    logNamespace
                                 )
                             } catch (error) {
                                 res.statusCode = 500
@@ -1640,7 +1645,9 @@ export const RemoteServerFactory = {
                                 return Buffer.from(
                                     JSON.stringify({
                                         error: 'Internal server error',
-                                        message: error.message || 'An error occurred processing the authentication response'
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
                                     }),
                                     'utf8'
                                 )
@@ -1650,7 +1657,10 @@ export const RemoteServerFactory = {
                         if (typeof options.onSLASPublicProxyRes === 'function') {
                             try {
                                 const customBuffer = options.onSLASPublicProxyRes(
-                                    workingBuffer, proxyRes, req, res
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res
                                 )
                                 if (customBuffer !== undefined) {
                                     workingBuffer = customBuffer
@@ -1670,7 +1680,9 @@ export const RemoteServerFactory = {
                             {
                                 namespace: logNamespace,
                                 additionalProperties: {
-                                    error, statusCode: proxyRes?.statusCode, path: req?.url
+                                    error,
+                                    statusCode: proxyRes?.statusCode,
+                                    path: req?.url
                                 }
                             }
                         )
