@@ -4,6 +4,7 @@
 - [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
 - [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
 - [Bugfix] Add `return_url` for express checkout payment confirmation, required by redirect-based payment methods like Amazon Pay [#3803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3803)
+- Update `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
 
 ## v9.1.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
