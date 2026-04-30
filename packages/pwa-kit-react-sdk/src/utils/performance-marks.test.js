@@ -14,7 +14,6 @@ describe('PERFORMANCE_MARKS', () => {
             renderToString: 'ssr.render-to-string',
             routeMatching: 'ssr.route-matching',
             loadComponent: 'ssr.load-component',
-            dataStoreInitialize: 'ssr.data-store.initialize',
             dataStoreFetch: 'ssr.data-store.fetch',
             fetchStrategies: 'ssr.fetch-strategies',
             reactQueryPrerender: 'ssr.fetch-strategies.react-query.pre-render',
