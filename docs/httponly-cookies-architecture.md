@@ -269,7 +269,7 @@ const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPubl
 
 - `publicClientProxyEndpoint`—This variable is for the SLAS public client. It routes SLAS calls
   through `/mobify/slas/public` so the server can handle HttpOnly cookies.
-- **`x-site-id` header** — This is needed for the proxy to namespace HttpOnly cookies per site.
+- `x-site-id` header—This header is for the proxy to namespace HttpOnly cookies per site.
 
 ### 2. Enable cookies in MRT
 
