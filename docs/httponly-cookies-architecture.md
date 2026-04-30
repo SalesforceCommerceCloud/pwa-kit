@@ -280,7 +280,7 @@ Enable cookies on your MRT environment. HttpOnly session cookies require MRT to 
 For hybrid deployments, enable HttpOnly cookies in Business Manager:
 
 1. Navigate to **Merchant Tools > Site Preferences > Hybrid Authentication**.
-2. Check the **HttpOnly True** checkbox.
+2. Turn on **HttpOnly True**.
 
 To disable the feature, set `enableHttpOnlySessionCookies` to `false` in `config/default.js` and
 (for hybrid sites) uncheck the **HttpOnly True** checkbox in Business Manager.
