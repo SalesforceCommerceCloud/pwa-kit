@@ -1076,6 +1076,7 @@ export const RemoteServerFactory = {
         const stripped = rawPath.replace(regex, '')
         const [pathname, ...queryParts] = stripped.split('?')
         const normalizedPath = this._normalizeSlasPath(pathname)
+        if (normalizedPath === null) return null
         return queryParts.length ? `${normalizedPath}?${queryParts.join('?')}` : normalizedPath
     },
 
