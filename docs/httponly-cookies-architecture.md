@@ -223,56 +223,64 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 ## Client-Side Token Access
 
-When HttpOnly session cookies are enabled, access tokens are not available to client-side JavaScript.
-
-### `useAccessToken` returns an empty string
-
-The `useAccessToken` hook returns `""` on the client because the access token is stored in an
-HttpOnly cookie that JavaScript cannot read. This is expected behavior.
-
-### You do not need to set the Authorization header when HttpOnly cookies are enabled
-
-All SCAPI requests through `/mobify/proxy` have the Authorization header injected automatically by
-the proxy from the HttpOnly cookie. You do not need to set it yourself on the client.
-
-- **Commerce-sdk-react hooks** (e.g., `useShopperBasketsMutation`, `useShopperOrdersMutation`) already
-  handle this — the `useAuthorizationHeader` wrapper skips setting the header on the client and lets
-  the proxy inject it.
-
-```
-                  HttpOnly disabled                    HttpOnly enabled
-                  ─────────────────                    ────────────────
-useAccessToken()     → "eyJhbGciOi..."                → ""
-Request header       → Authorization: Bearer eyJ...    → Authorization: Bearer
-Proxy behavior       → No cookie, passes header through → Cookie found, overwrites header
-SCAPI receives       → Bearer eyJhbGciOi...            → Bearer eyJhbGciOi...
-```
+When HttpOnly session cookies are enabled, the `useAccessToken` hook returns `""` on the client
+because the access token is stored in an HttpOnly cookie that JavaScript cannot read. This is
+expected behavior — the proxy injects the real token from the cookie on every SCAPI request. All SCAPI calls include `credentials: 'same-origin'` so the browser sends HttpOnly cookies with
+every proxy request.
 
 ## Configuration
 
-This diagram shows how the configuration setting flows from the app to MRT and the API provider.
+### 1. Enable in your app config
 
+Set `enableHttpOnlySessionCookies` to `true` under `ssrParameters` in `config/default.js`:
+
+```js
+ssrParameters: {
+    enableHttpOnlySessionCookies: true
+}
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  config/default.js                                              │
-│  ssrParameters: { enableHttpOnlySessionCookies: true }          │
-│                        │                                        │
-│  pwa-kit-dev reads config, sets env var:                        │
-│  MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true                       │
-│                        │                                        │
-│  (MRT sets the same env var in production)                      │
-└────────────────────────┼────────────────────────────────────────┘
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  _app-config/index.jsx                                          │
-│                                                                 │
-│  <CommerceApiProvider                                           │
-│    headers={{ 'x-site-id': locals.site?.id }}                   │
-│    enableHttpOnlySessionCookies={                               │
-│      MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'             │
-│    }                                                            │
-│    privateClientProxyEndpoint={slasPrivateProxyPath}            │
-│    publicClientProxyEndpoint={slasPublicProxyPath}              │
-│  />                                                             │
-└─────────────────────────────────────────────────────────────────┘
+
+During local development, `pwa-kit-dev` reads this value and sets the environment variable
+`MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true`. MRT sets the same environment variable in production.
+
+The default template already passes this flag to `CommerceApiProvider` in `_app-config/index.jsx`:
+
+```jsx
+import {
+    getEnvBasePath,
+    slasPrivateProxyPath,
+    slasPublicProxyPath
+} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
+const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
+const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPublicProxyPath}`
+
+<CommerceApiProvider
+    headers={{'x-site-id': locals.site?.id}}
+    enableHttpOnlySessionCookies={
+        typeof window !== 'undefined'
+            ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+            : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+    }
+    privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
+    publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
+/>
 ```
+
+- **`publicClientProxyEndpoint`** — This is needed for the SLAS public client. It routes SLAS calls
+  through `/mobify/slas/public` so the server can handle HttpOnly cookies.
+- **`x-site-id` header** — This is needed for the proxy to namespace HttpOnly cookies per site.
+
+### 2. Enable cookies in MRT
+
+Enable cookies on your MRT environment. HttpOnly session cookies require MRT to have cookies enabled.
+
+### 3. Hybrid sites: enable HttpOnly in Business Manager
+
+For hybrid deployments, enable HttpOnly cookies in Business Manager:
+
+1. Navigate to **Merchant Tools > Site Preferences > Hybrid Authentication**.
+2. Check the **HttpOnly True** checkbox.
+
+To disable the feature, set `enableHttpOnlySessionCookies` to `false` in `config/default.js` and
+(for hybrid sites) uncheck the **HttpOnly True** checkbox in Business Manager.
