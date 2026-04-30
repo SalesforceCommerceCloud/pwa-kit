@@ -115,6 +115,56 @@ describe('_normalizeSlasPath', () => {
     })
 })
 
+describe('_rewriteSlasProxyPath', () => {
+    const proxyPath = '/mobify/slas/private'
+
+    test('strips proxy prefix and normalizes the path', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/token',
+            proxyPath
+        )
+        expect(result).toBe('/shopper/auth/v1/organizations/org1/oauth2/token')
+    })
+
+    test('preserves query strings containing URLs', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://localhost:3000/callback&response_type=code',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://localhost:3000/callback&response_type=code'
+        )
+    })
+
+    test('preserves query strings with multiple question marks', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://example.com/cb?foo=bar&code=abc',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://example.com/cb?foo=bar&code=abc'
+        )
+    })
+
+    test('handles paths without query strings', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/logout',
+            proxyPath
+        )
+        expect(result).toBe('/shopper/auth/v1/organizations/org1/oauth2/logout')
+    })
+
+    test('normalizes encoded path traversals but preserves query string', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/token/%2E%2E/passwordless/login?client_id=abc',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/passwordless/login?client_id=abc'
+        )
+    })
+})
+
 describe('_matchSlasAllowlistEntry', () => {
     const ORG = 'f_ecom_zzrf_001'
 
