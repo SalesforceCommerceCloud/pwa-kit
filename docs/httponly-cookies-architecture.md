@@ -267,7 +267,7 @@ const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPubl
 />
 ```
 
-- **`publicClientProxyEndpoint`** — This is needed for the SLAS public client. It routes SLAS calls
+- `publicClientProxyEndpoint`—This variable is for the SLAS public client. It routes SLAS calls
   through `/mobify/slas/public` so the server can handle HttpOnly cookies.
 - **`x-site-id` header** — This is needed for the proxy to namespace HttpOnly cookies per site.
 
