@@ -283,4 +283,4 @@ For hybrid deployments, enable HttpOnly cookies in Business Manager:
 2. Turn on **HttpOnly True**.
 
 To disable the feature, set `enableHttpOnlySessionCookies` to `false` in `config/default.js` and
-(for hybrid sites) uncheck the **HttpOnly True** checkbox in Business Manager.
+, for hybrid sites, turn off **HttpOnly True** in Business Manager.
