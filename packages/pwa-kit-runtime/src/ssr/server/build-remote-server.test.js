@@ -50,6 +50,211 @@ describe('the once function', () => {
     })
 })
 
+describe('_normalizeSlasPath', () => {
+    test('decodes percent-encoded characters', () => {
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%2Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('resolves dot-segment path traversals', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/trusted-system/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('handles combined encoding and traversal', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/trusted%2Dsystem/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('normalizes encoded forward slash in path segment', () => {
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%2E%2E/passwordless%2Flogin')
+        ).toBe('/oauth2/passwordless/login')
+    })
+
+    test('fully decodes double-encoded paths', () => {
+        // %252D → first decode → %2D → second decode → -
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%252Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('fully decodes triple-encoded paths', () => {
+        // %25252D → %252D → %2D → -
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/trusted%25252Dsystem/token')).toBe(
+            '/oauth2/trusted-system/token'
+        )
+    })
+
+    test('fully decodes double-encoded dot-segments', () => {
+        // %252E%252E → %2E%2E → ..  then normalize collapses
+        expect(
+            RemoteServerFactory._normalizeSlasPath('/oauth2/token/%252E%252E/trusted-system/token')
+        ).toBe('/oauth2/trusted-system/token')
+    })
+
+    test('fully decodes double-encoded forward slash', () => {
+        // %252F → %2F → /
+        expect(RemoteServerFactory._normalizeSlasPath('/oauth2/passwordless%252Flogin')).toBe(
+            '/oauth2/passwordless/login'
+        )
+    })
+
+    test('returns null on malformed percent encoding', () => {
+        const malformed = '/oauth2/%ZZbad/path'
+        expect(RemoteServerFactory._normalizeSlasPath(malformed)).toBeNull()
+    })
+
+    test('passes through clean paths unchanged', () => {
+        expect(RemoteServerFactory._normalizeSlasPath('/shopper/auth/v1/oauth2/token')).toBe(
+            '/shopper/auth/v1/oauth2/token'
+        )
+    })
+})
+
+describe('_matchSlasAllowlistEntry', () => {
+    const ORG = 'f_ecom_zzrf_001'
+
+    test('matches a known endpoint and returns its injectAuth mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/token`,
+            'POST'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'token'])
+        expect(entry?.injectAuth).toBe('basic')
+    })
+
+    test('matches trusted-agent/token with sfdc-header mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/token`,
+            'POST'
+        )
+        expect(entry?.injectAuth).toBe('sfdc-header')
+    })
+
+    test('matches oauth2/login with no credential injection', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/login`,
+            'POST'
+        )
+        expect(entry?.injectAuth).toBe('none')
+    })
+
+    test('matches future API versions via structural prefix', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v2/organizations/${ORG}/oauth2/token`,
+            'POST'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'token'])
+    })
+
+    test('returns null for endpoints not on the allow-list', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/some-other-route`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null for paths outside /shopper/auth', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/customers/v1/organizations/${ORG}/customers`,
+                'GET'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null when the organizations segment is missing', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry('/shopper/auth/v1/oauth2/token', 'POST')
+        ).toBeNull()
+    })
+
+    test('returns null when trailing segments do not match an entry', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token/extra`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null on substring-only matches', () => {
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token-extra`,
+                'POST'
+            )
+        ).toBeNull()
+    })
+
+    test('returns null for null input', () => {
+        expect(RemoteServerFactory._matchSlasAllowlistEntry(null, 'POST')).toBeNull()
+    })
+
+    test.each([
+        ['GET', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['PUT', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['DELETE', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
+        ['PATCH', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/login`],
+        ['GET', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/token`],
+        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/authorize`]
+    ])('returns null when method %s is not declared for the endpoint', (method, path) => {
+        expect(RemoteServerFactory._matchSlasAllowlistEntry(path, method)).toBeNull()
+    })
+
+    test.each([
+        ['/shopper/auth/v1\nx/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1\rx/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1\u0000x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1 x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1;x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1:x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1+x/organizations/org1/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org\ny/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org\u0000y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org%y/oauth2/token'],
+        ['/shopper/auth/v1/organizations/org*y/oauth2/token']
+    ])(
+        'returns null when version or orgId contains characters outside the allowed set: %s',
+        (path) => {
+            expect(RemoteServerFactory._matchSlasAllowlistEntry(path, 'POST')).toBeNull()
+        }
+    )
+
+    test('accepts a custom allow-list passed by the project', () => {
+        const customList = [
+            {segments: ['oauth2', 'my-experiment'], methods: ['POST'], injectAuth: 'basic'}
+        ]
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/my-experiment`,
+            'POST',
+            customList
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'my-experiment'])
+        expect(entry?.injectAuth).toBe('basic')
+    })
+
+    test('a custom allow-list replaces, does not extend, the default', () => {
+        const customList = [
+            {segments: ['oauth2', 'my-experiment'], methods: ['POST'], injectAuth: 'basic'}
+        ]
+        expect(
+            RemoteServerFactory._matchSlasAllowlistEntry(
+                `/shopper/auth/v1/organizations/${ORG}/oauth2/token`,
+                'POST',
+                customList
+            )
+        ).toBeNull()
+    })
+})
+
 describe('remote server factory test coverage', () => {
     test('getSlasEndpoint returns undefined if useSLASPrivateClient is false', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({})
@@ -59,6 +264,166 @@ describe('remote server factory test coverage', () => {
     test('getSlasEndpoint returns endpoint if useSLASPrivateClient is true', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({useSLASPrivateClient: true})
         expect(endpoint).toBeDefined()
+    })
+
+    describe('_configure deprecation warnings', () => {
+        beforeEach(() => {
+            logger.warn.mockClear()
+        })
+
+        test('warns when applySLASPrivateClientToEndpoints is set', () => {
+            RemoteServerFactory._configure({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {clientId: 'c', shortCode: 's'}
+                        }
+                    }
+                },
+                applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is deprecated'),
+                expect.objectContaining({namespace: 'RemoteServerFactory._configure'})
+            )
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('narrowing-only filter'),
+                expect.anything()
+            )
+        })
+
+        test('does not warn when applySLASPrivateClientToEndpoints is not set', () => {
+            RemoteServerFactory._configure({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {clientId: 'c', shortCode: 's'}
+                        }
+                    }
+                }
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('`applySLASPrivateClientToEndpoints` is deprecated'),
+                expect.anything()
+            )
+        })
+    })
+
+    describe('_setupSlasPrivateClientProxy override warning', () => {
+        let mockExpress
+        const baseOptions = () =>
+            RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'test-client-id',
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test'
+                            }
+                        }
+                    }
+                }
+            })
+
+        beforeEach(() => {
+            mockExpress = require('express')
+            logger.warn.mockClear()
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+        })
+
+        afterEach(() => {
+            delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        })
+
+        test('warns when slasPrivateClientAllowList is overridden', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                slasPrivateClientAllowList: [
+                    {segments: ['oauth2', 'token'], methods: ['POST'], injectAuth: 'basic'}
+                ]
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('custom `slasPrivateClientAllowList` is in use'),
+                expect.objectContaining({namespace: '_setupSlasPrivateClientProxy'})
+            )
+        })
+
+        test('does not warn when slasPrivateClientAllowList is not set', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, baseOptions())
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('custom `slasPrivateClientAllowList` is in use'),
+                expect.anything()
+            )
+        })
+    })
+
+    describe('applySLASPrivateClientToEndpoints narrowing-only fallback', () => {
+        let mockExpress
+        const baseOptions = () =>
+            RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'test-client-id',
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test'
+                            }
+                        }
+                    }
+                }
+            })
+
+        beforeEach(() => {
+            mockExpress = require('express')
+            logger.warn.mockClear()
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+        })
+
+        afterEach(() => {
+            delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        })
+
+        test('does not emit the "removed every entry" warning when the regex matches at least one entry', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
+                expect.anything()
+            )
+        })
+
+        test('emits "removed every entry" warning when the regex matches nothing', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: /\/nothing-matches-this/
+            })
+            expect(logger.warn).toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
+                expect.objectContaining({namespace: '_setupSlasPrivateClientProxy'})
+            )
+        })
+
+        test('a non-RegExp value for applySLASPrivateClientToEndpoints is ignored by the filter', () => {
+            const app = mockExpress()
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, {
+                ...baseOptions(),
+                applySLASPrivateClientToEndpoints: 'not a regex'
+            })
+            expect(logger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('removed every entry'),
+                expect.anything()
+            )
+        })
     })
 })
 
@@ -298,16 +663,75 @@ describe('SLAS private proxy', () => {
         expect(response.status).toBe(403)
     })
 
+    test('returns 403 for trusted-system paths with percent-encoded hyphen', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/trusted%2Dsystem/token'
+        )
+
+        expect(response.status).toBe(403)
+    })
+
+    test('returns 403 for trusted-system paths reached via encoded dot-segments', async () => {
+        const app = mockExpress()
+        const options = RemoteServerFactory._configure({
+            useSLASPrivateClient: true,
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test',
+                            organizationId: 'f_ecom_test',
+                            clientId: 'test-client-id'
+                        }
+                    }
+                }
+            }
+        })
+
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+        RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
+
+        const response = await request(app).post(
+            '/mobify/slas/private/shopper/auth/v1/oauth2/token/%2E%2E/trusted%2Dsystem/token'
+        )
+
+        expect(response.status).toBe(403)
+    })
+
     test('invokes onSLASPrivateProxyReq callback and onSLASPrivateProxyRes callback', async () => {
         // Create a mock SLAS endpoint for the http-proxy to consume
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            // Reflect the custom header back in the response to verify it was set
-            res.status(200).json({
-                access_token: 'mock-token',
-                reflected_header: req.headers['x-custom-request-header']
-            })
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                // Reflect the custom header back in the response to verify it was set
+                res.status(200).json({
+                    access_token: 'mock-token',
+                    reflected_header: req.headers['x-custom-request-header']
+                })
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -347,7 +771,7 @@ describe('SLAS private proxy', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             // Verify the request was successful
@@ -369,9 +793,12 @@ describe('SLAS private proxy', () => {
 
     test('returns 500 when onProxyReq logic throws', async () => {
         const mockSlasServer = mockExpress()
-        mockSlasServer.post('/shopper/auth/v1/oauth2/token', (req, res) => {
-            res.status(200).json({access_token: 'mock-token'})
-        })
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                res.status(200).json({access_token: 'mock-token'})
+            }
+        )
 
         const mockSlasServerInstance = mockSlasServer.listen(0)
         const mockSlasPort = mockSlasServerInstance.address().port
@@ -403,7 +830,7 @@ describe('SLAS private proxy', () => {
             RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
             const response = await request(app).post(
-                '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
             )
 
             expect(response.status).toBe(500)
@@ -444,7 +871,7 @@ describe('SLAS private proxy', () => {
         RemoteServerFactory._setupSlasPrivateClientProxy(app, options)
 
         const response = await request(app).post(
-            '/mobify/slas/private/shopper/auth/v1/oauth2/token'
+            '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token'
         )
 
         expect(response.status).toBe(500)

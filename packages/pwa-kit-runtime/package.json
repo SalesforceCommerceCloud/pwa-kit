@@ -32,7 +32,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.962.0",
     "@h4ad/serverless-adapter": "4.4.0",
-    "@salesforce/mrt-utilities": "^0.1.3",
+    "@salesforce/mrt-utilities": "^0.1.6",
     "@loadable/babel-plugin": "^5.15.3",
     "cosmiconfig": "8.1.3",
     "cross-env": "^5.2.1",
@@ -57,14 +57,6 @@
     "sinon": "^13.0.2",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
-  },
-  "peerDependencies": {
-    "@salesforce/pwa-kit-dev": "3.18.0-dev"
-  },
-  "peerDependenciesMeta": {
-    "@salesforce/pwa-kit-dev": {
-      "optional": true
-    }
   },
   "engines": {
     "node": "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0",

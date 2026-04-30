@@ -11,18 +11,15 @@ module.exports = {
     ...base,
     // Jest otherwise resolves "development" → package src/*.ts and pulls in untransformed deps.
     // Map only for tests; runtime uses normal package exports.
+    // Use production data-store for tests that mock DynamoDB (most tests)
     moduleNameMapper: {
         ...base.moduleNameMapper,
         '^@h4ad/serverless-adapter/lib/(.*)$':
             '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/$1/index.cjs',
         '^@salesforce/mrt-utilities/data-store$':
-            '<rootDir>/node_modules/@salesforce/mrt-utilities/dist/esm/middleware/data-store.js',
+            '<rootDir>/node_modules/@salesforce/mrt-utilities/dist/esm/data-store/production.js',
         '^@salesforce/mrt-utilities/middleware$':
-            '<rootDir>/node_modules/@salesforce/mrt-utilities/dist/esm/middleware/data-store.js',
-        '^@salesforce/pwa-kit-dev/dist/utils/mrt-data-store-local-provider\\.js$':
-            '<rootDir>/../pwa-kit-dev/src/utils/mrt-data-store-local-provider.js',
-        '^@salesforce/pwa-kit-dev/utils/mrt-data-store-local-provider\\.js$':
-            '<rootDir>/../pwa-kit-dev/src/utils/mrt-data-store-local-provider.js'
+            '<rootDir>/node_modules/@salesforce/mrt-utilities/dist/esm/middleware/data-store.js'
     },
     // @salesforce/mrt-utilities dist is ESM; compile it under Jest.
     transformIgnorePatterns: [
