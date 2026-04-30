@@ -142,6 +142,7 @@ type AuthDataKeys =
     | 'idp_refresh_token'
     | 'dnt'
     | 'cc-at-expires'
+    | 'cc-at-dnt'
     | 'cc-nx-exists'
 
 type AuthDataMap = Record<
@@ -261,6 +262,10 @@ const DATA_MAP: AuthDataMap = {
     'cc-at-expires': {
         storageType: 'cookie',
         key: 'cc-at-expires'
+    },
+    'cc-at-dnt': {
+        storageType: 'cookie',
+        key: 'cc-at-dnt'
     },
     'cc-nx-exists': {
         storageType: 'cookie',
@@ -430,6 +435,22 @@ class Auth {
     }
 
     /**
+     * Returns the DNT value from the current access token, or undefined if
+     * no access token is available. In HttpOnly mode, reads from the
+     * cc-at-dnt companion cookie; otherwise parses the JWT directly.
+     */
+    private getDntFromAccessToken(): string | undefined {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return this.get('cc-at-dnt') || undefined
+        }
+        const accessToken = this.getAccessToken()
+        if (accessToken) {
+            return this.parseSlasJWT(accessToken).dnt
+        }
+        return undefined
+    }
+
+    /**
      * Return the value of the DNT cookie or undefined if it is not set.
      * The DNT cookie being undefined means that there is a necessity to
      * get the user's input for consent tracking, but not that there is no
@@ -445,12 +466,9 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        const accessToken = this.getAccessToken()
-        let isInSync = true
-        if (accessToken) {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            isInSync = dnt === dntCookieVal
-        }
+
+        const accessTokenDnt = this.getDntFromAccessToken()
+        const isInSync = accessTokenDnt === undefined || accessTokenDnt === dntCookieVal
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)
         } else {
@@ -487,13 +505,8 @@ class Auth {
             ...getDefaultCookieAttributes(),
             secure: true
         })
-        const accessToken = this.getAccessToken()
-        if (accessToken !== '') {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            if (dnt !== dntCookieVal) {
-                await this.refreshAccessToken()
-            }
-        } else {
+        const accessTokenDnt = this.getDntFromAccessToken()
+        if (accessTokenDnt === undefined || accessTokenDnt !== dntCookieVal) {
             await this.refreshAccessToken()
         }
         if (preference !== null) {

@@ -1384,6 +1384,25 @@ describe('Auth', () => {
         parseSlasJWTSpiedOn.mockRestore()
     })
 
+    test('getDnt() trusts dw_dnt with HttpOnly cookies enabled when no access token dnt', () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('dw_dnt', '1')
+        // No cc-at-dnt set, so getDntFromAccessToken returns undefined → assumed in sync
+        expect(auth.getDnt()).toBe(true)
+    })
+
+    test('getDnt() deletes dw_dnt when out of sync with cc-at-dnt (HttpOnly)', () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('dw_dnt', '0')
+        // @ts-expect-error private method
+        auth.set('cc-at-dnt', '1')
+        // dw_dnt should be deleted because it disagrees with cc-at-dnt
+        expect(auth.getDnt()).toBeUndefined()
+        expect(auth.get('dw_dnt')).toBeFalsy()
+    })
+
     test('token call clears SFRA auth token cookie and sets all token from the response', async () => {
         const getDntSpy = jest.spyOn(Auth.prototype, 'getDnt')
         getDntSpy.mockImplementation((options?: {includeDefaults: boolean}) => {

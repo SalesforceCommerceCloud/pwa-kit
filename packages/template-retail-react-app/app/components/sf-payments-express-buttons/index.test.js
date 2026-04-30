@@ -1406,6 +1406,31 @@ describe('createIntentFunction non-PayPal path (else branch of isPayPalPaymentMe
         expect(mockAttemptFailOrderMocks.updatePaymentInstrumentForOrder).toHaveBeenCalled()
     })
 
+    test('includes returnUrl in initial config options', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(mockBasket)
+        })
+
+        expect(config.options.returnUrl).toContain('/checkout/payment-processing')
+    })
+
+    test('updates returnUrl with order details after createIntent succeeds', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(mockBasket)
+        })
+
+        await config.actions.onClick('card')
+        await flush()
+
+        await config.actions.createIntent()
+
+        expect(config.options.returnUrl).toContain('/checkout/payment-processing')
+        expect(config.options.returnUrl).toContain('orderNo=' + encodeURIComponent(orderNo))
+        expect(config.options.returnUrl).toContain('type=card')
+        // zoneId is omitted from the URL when paymentConfig.zoneId is not set
+        expect(config.options.returnUrl).not.toContain('zoneId=')
+    })
+
     test('does not call prepareBasket at start of createIntent for non-PayPal (only onClick does)', async () => {
         const {config, prepareBasket} = await renderAndGetConfig({
             prepareBasket: jest.fn().mockResolvedValue(mockBasket)
