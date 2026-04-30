@@ -115,6 +115,164 @@ describe('_normalizeSlasPath', () => {
     })
 })
 
+describe('_rewriteSlasProxyPath', () => {
+    const proxyPath = '/mobify/slas/private'
+
+    test('strips proxy prefix and normalizes the path', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/token',
+            proxyPath
+        )
+        expect(result).toBe('/shopper/auth/v1/organizations/org1/oauth2/token')
+    })
+
+    test('preserves query strings containing URLs', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://localhost:3000/callback&response_type=code',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://localhost:3000/callback&response_type=code'
+        )
+    })
+
+    test('preserves query strings with multiple question marks', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://example.com/cb?foo=bar&code=abc',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/authorize?redirect_uri=http://example.com/cb?foo=bar&code=abc'
+        )
+    })
+
+    test('handles paths without query strings', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/logout',
+            proxyPath
+        )
+        expect(result).toBe('/shopper/auth/v1/organizations/org1/oauth2/logout')
+    })
+
+    test('returns null when path contains malformed encoding', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/%E0%A4%A/oauth2/token?x=1',
+            proxyPath
+        )
+        expect(result).toBeNull()
+    })
+
+    test('normalizes encoded path traversals but preserves query string', () => {
+        const result = RemoteServerFactory._rewriteSlasProxyPath(
+            '/mobify/slas/private/shopper/auth/v1/organizations/org1/oauth2/token/%2E%2E/passwordless/login?client_id=abc',
+            proxyPath
+        )
+        expect(result).toBe(
+            '/shopper/auth/v1/organizations/org1/oauth2/passwordless/login?client_id=abc'
+        )
+    })
+})
+
+describe('_createSlasAllowlistGuard', () => {
+    const allowList = [
+        {segments: ['oauth2', 'token'], methods: ['POST']},
+        {segments: ['oauth2', 'authorize'], methods: ['GET']},
+        {segments: ['oauth2', 'logout'], methods: ['GET', 'POST']}
+    ]
+
+    const mockRes = () => {
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn().mockReturnThis()
+        }
+        return res
+    }
+
+    test('calls next for an allowed endpoint', () => {
+        const guard = RemoteServerFactory._createSlasAllowlistGuard(allowList, 'Private')
+        const req = {
+            path: '/shopper/auth/v1/organizations/org1/oauth2/token',
+            method: 'POST'
+        }
+        const res = mockRes()
+        const next = jest.fn()
+
+        guard(req, res, next)
+
+        expect(next).toHaveBeenCalled()
+        expect(res.status).not.toHaveBeenCalled()
+        expect(req._slasAllowlistEntry).toEqual({
+            segments: ['oauth2', 'token'],
+            methods: ['POST']
+        })
+        expect(req._normalizedSlasPath).toBe('/shopper/auth/v1/organizations/org1/oauth2/token')
+    })
+
+    test('returns 403 for a disallowed endpoint', () => {
+        const guard = RemoteServerFactory._createSlasAllowlistGuard(allowList, 'Public')
+        const req = {
+            path: '/shopper/auth/v1/organizations/org1/oauth2/trusted-system/token',
+            method: 'POST'
+        }
+        const res = mockRes()
+        const next = jest.fn()
+
+        guard(req, res, next)
+
+        expect(next).not.toHaveBeenCalled()
+        expect(res.status).toHaveBeenCalledWith(403)
+        expect(res.json).toHaveBeenCalledWith({
+            message: expect.stringContaining('SLAS Public Client Proxy')
+        })
+    })
+
+    test('returns 403 when method does not match', () => {
+        const guard = RemoteServerFactory._createSlasAllowlistGuard(allowList, 'Private')
+        const req = {
+            path: '/shopper/auth/v1/organizations/org1/oauth2/token',
+            method: 'GET'
+        }
+        const res = mockRes()
+        const next = jest.fn()
+
+        guard(req, res, next)
+
+        expect(next).not.toHaveBeenCalled()
+        expect(res.status).toHaveBeenCalledWith(403)
+    })
+
+    test('returns 403 for malformed percent-encoded paths', () => {
+        const guard = RemoteServerFactory._createSlasAllowlistGuard(allowList, 'Private')
+        const req = {
+            path: '/shopper/auth/%E0%A4%A/organizations/org1/oauth2/token',
+            method: 'POST'
+        }
+        const res = mockRes()
+        const next = jest.fn()
+
+        guard(req, res, next)
+
+        expect(next).not.toHaveBeenCalled()
+        expect(res.status).toHaveBeenCalledWith(403)
+    })
+
+    test('includes proxyLabel in the 403 error message', () => {
+        const guard = RemoteServerFactory._createSlasAllowlistGuard(allowList, 'MyLabel')
+        const req = {
+            path: '/shopper/auth/v1/organizations/org1/oauth2/unknown',
+            method: 'POST'
+        }
+        const res = mockRes()
+        const next = jest.fn()
+
+        guard(req, res, next)
+
+        expect(res.json).toHaveBeenCalledWith({
+            message: expect.stringContaining('SLAS MyLabel Client Proxy')
+        })
+    })
+})
+
 describe('_matchSlasAllowlistEntry', () => {
     const ORG = 'f_ecom_zzrf_001'
 
