@@ -13,9 +13,9 @@ module.exports = {
         // MRT Data Store (opt-in): when true, SSR resolves prefs and serializes `__MRT_DATA_STORE__` in
         // `#mobify-data`; when false, that key is omitted. See `isMrtDataStoreEnabled` in pwa-kit-runtime.
         // Set `PWAKIT_MRT_DATA_STORE_ENABLED=true|false` to override without editing files.
-        // Local dev without DynamoDB: use `PWAKIT_MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects),
-        // `PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL=true` in production-like NODE_ENV, and optional
-        // `PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING=false`.
+        // Local dev without DynamoDB: use `MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects)
+        // and optional `MRT_DATA_STORE_WARN_ON_MISSING=false`. Local data store provided by
+        // @salesforce/mrt-utilities via conditional exports (automatic in development mode).
         // Demo page + scripted env: `npm run start:mrt-data-store-demo` in this package, route `/demo/mrt-data-store`.
         mrtDataStore: {
             enabled: false

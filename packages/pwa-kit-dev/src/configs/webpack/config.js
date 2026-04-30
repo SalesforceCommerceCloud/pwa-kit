@@ -203,6 +203,7 @@ const baseConfig = (target) => {
                           }
                         : {}),
                     conditionNames: [
+                        ...(mode === 'development' ? ['dev-data-store'] : []),
                         'import',
                         'require',
                         'module',

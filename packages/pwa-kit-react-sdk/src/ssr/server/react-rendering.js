@@ -28,7 +28,6 @@ import {
 import {
     getCustomGlobalPreferences,
     getCustomSitePreferences,
-    initializeDataStore,
     isMrtDataStoreEnabled
 } from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -149,14 +148,11 @@ const performRender = async (req, res, next) => {
 
     // MRT Data Store (opt-in): when disabled, skip preference resolution and omit `__MRT_DATA_STORE__` from
     // `#mobify-data`. Enable via `app.mrtDataStore.enabled` or `PWAKIT_MRT_DATA_STORE_ENABLED=true`.
-    // When enabled, `initializeDataStore` from runtime mirrors the storefront-next flow (provider once, then keys).
+    // When enabled, resolve both MRT Data Store preference keys.
     const mrtDataStoreEnabled = isMrtDataStoreEnabled(config)
     let customSitePreferences = {}
     let customGlobalPreferences = {}
     if (mrtDataStoreEnabled) {
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'start')
-        await initializeDataStore()
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'end')
         res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'start')
         ;[customSitePreferences, customGlobalPreferences] = await Promise.all([
             getCustomSitePreferences({

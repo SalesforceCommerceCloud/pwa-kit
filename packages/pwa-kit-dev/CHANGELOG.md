@@ -1,5 +1,6 @@
 ## v3.18.0-dev (Mar 20, 2026)
-- Add **`createLocalMrtDataStoreProvider`** in **`src/utils/mrt-data-store-local-provider.js`** for local MRT Data Store defaults (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, `PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING`), loaded dynamically from **`@salesforce/pwa-kit-runtime`** when DynamoDB is not configured.
+- **Removed Data Store Code**: Removed `mrt-data-store-local-provider.js` and related code. Local data store implementation now lives in `@salesforce/mrt-utilities@0.1.6+` and is loaded via conditional exports. This package is now purely focused on build and development tooling. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
+- **Webpack Configuration**: Added `dev-data-store` to webpack's `conditionNames` in development mode to enable mrt-utilities conditional export resolution. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

@@ -11,7 +11,6 @@ import {
     getDataStore,
     getPlainObjectForDataStoreKey,
     hasMrtEnvironment,
-    initializeDataStore,
     isMrtDataStoreEnabled,
     resetDataStoreProviderCacheForTests,
     warnIfMrtDataStoreBootstrapMissing
@@ -106,7 +105,7 @@ describe('data-store-utils', () => {
         })
     })
 
-    describe('getDataStore / initializeDataStore', () => {
+    describe('getDataStore', () => {
         const originalEnv = {...process.env}
 
         beforeEach(() => {
@@ -128,14 +127,14 @@ describe('data-store-utils', () => {
             expect(first).toBe(second)
         })
 
-        it('initializeDataStore warms the same cached provider', async () => {
+        it('warms and returns the same cached provider instance', async () => {
             delete process.env.AWS_REGION
             delete process.env.MOBIFY_PROPERTY_ID
             delete process.env.DEPLOY_TARGET
             process.env.NODE_ENV = 'test'
-            await initializeDataStore()
-            const afterInit = await getDataStore()
-            expect(afterInit).toBe(await getDataStore())
+            const warmed = getDataStore()
+            const afterWarm = await getDataStore()
+            expect(afterWarm).toBe(await warmed)
         })
     })
 
@@ -173,72 +172,23 @@ describe('data-store-utils', () => {
             ).resolves.toEqual({})
         })
 
-        test('returns {} for a missing key when MRT env is incomplete (local path, no defaults)', async () => {
+        // These tests use production DataStore which requires MRT env vars
+        test('returns {} when MRT env is incomplete (production DataStore unavailable)', async () => {
             delete process.env.AWS_REGION
             delete process.env.MOBIFY_PROPERTY_ID
             delete process.env.DEPLOY_TARGET
-            delete process.env.PWAKIT_MRT_DATA_STORE_DEFAULTS
-            process.env.NODE_ENV = 'test'
+            // With mrt-utilities, DataStoreUnavailableError is caught and returns {}
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'any-key'})
             ).resolves.toEqual({})
         })
 
-        test('returns local defaults when MRT env is incomplete and NODE_ENV is not production', async () => {
-            delete process.env.AWS_REGION
-            delete process.env.MOBIFY_PROPERTY_ID
-            delete process.env.DEPLOY_TARGET
-            process.env.NODE_ENV = 'test'
-            process.env.PWAKIT_MRT_DATA_STORE_DEFAULTS = JSON.stringify({
-                'my-dal-key': {fromLocal: true}
-            })
-            await expect(
-                getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-dal-key'})
-            ).resolves.toEqual({fromLocal: true})
-        })
-
-        test('returns local defaults in production when PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL=true', async () => {
-            delete process.env.AWS_REGION
-            delete process.env.MOBIFY_PROPERTY_ID
-            delete process.env.DEPLOY_TARGET
-            process.env.NODE_ENV = 'production'
-            process.env.PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL = 'true'
-            process.env.PWAKIT_MRT_DATA_STORE_DEFAULTS = JSON.stringify({
-                'my-dal-key': {fromLocal: true}
-            })
-            await expect(
-                getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-dal-key'})
-            ).resolves.toEqual({fromLocal: true})
-        })
-
-        test('returns {} when MRT env is incomplete, production, and local provider is not allowed', async () => {
-            delete process.env.AWS_REGION
-            delete process.env.MOBIFY_PROPERTY_ID
-            delete process.env.DEPLOY_TARGET
-            process.env.NODE_ENV = 'production'
-            delete process.env.CI
-            delete process.env.PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL
-            process.env.PWAKIT_MRT_DATA_STORE_DEFAULTS = JSON.stringify({
-                'my-dal-key': {fromLocal: true}
-            })
-            await expect(
-                getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-dal-key'})
-            ).resolves.toEqual({})
-        })
-
         test('returns {} when MRT env is complete but Data Store is not available', async () => {
-            const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
             const store = DataStore.getDataStore()
             jest.spyOn(store, 'isDataStoreAvailable').mockReturnValue(false)
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-key'})
             ).resolves.toEqual({})
-            expect(warn).toHaveBeenCalledWith(
-                expect.stringMatching(
-                    /data-store-provider WARN.*MRT Data Store client is not available/
-                )
-            )
-            warn.mockRestore()
             store.isDataStoreAvailable.mockRestore()
         })
 
@@ -250,16 +200,10 @@ describe('data-store-utils', () => {
         })
 
         test('returns {} when entry is not found', async () => {
-            const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
             mockSend.mockResolvedValue({})
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'missing'})
             ).resolves.toEqual({})
-            expect(warn).toHaveBeenCalledTimes(1)
-            expect(String(warn.mock.calls[0][0])).toMatch(
-                /data-store-provider WARN.*MRT Data Store (entry not found|has no usable plain-object value)/
-            )
-            warn.mockRestore()
         })
 
         test('returns {} on DataStoreServiceError (e.g. DynamoDB failure)', async () => {
@@ -270,7 +214,6 @@ describe('data-store-utils', () => {
         })
 
         test('returns {} when stored value is not a plain object', async () => {
-            const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
             mockSend.mockResolvedValue({Item: {value: [1, 2]}})
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-key'})
@@ -279,25 +222,14 @@ describe('data-store-utils', () => {
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-key'})
             ).resolves.toEqual({})
-            expect(
-                warn.mock.calls.filter((call) =>
-                    String(call[0]).includes('MRT Data Store has no usable plain-object value')
-                )
-            ).toHaveLength(2)
-            warn.mockRestore()
         })
 
         test('returns {} when getEntry throws DataStoreNotFoundError', async () => {
-            const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
             const store = DataStore.getDataStore()
             jest.spyOn(store, 'getEntry').mockRejectedValue(new DataStoreNotFoundError('gone'))
             await expect(
                 getPlainObjectForDataStoreKey({...baseOptions(), dataStoreKey: 'my-key'})
             ).resolves.toEqual({})
-            expect(warn).toHaveBeenCalledWith(
-                expect.stringMatching(/data-store-provider WARN.*MRT Data Store entry not found/)
-            )
-            warn.mockRestore()
             store.getEntry.mockRestore()
         })
 
