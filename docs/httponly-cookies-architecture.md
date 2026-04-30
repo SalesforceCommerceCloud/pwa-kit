@@ -224,8 +224,8 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 ## Client-Side Token Access
 
 When HttpOnly session cookies are enabled, the `useAccessToken` hook returns `""` on the client
-because the access token is stored in an HttpOnly cookie that JavaScript cannot read. This is
-expected behavior — the proxy injects the real token from the cookie on every SCAPI request. All SCAPI calls include `credentials: 'same-origin'` so the browser sends HttpOnly cookies with
+because the access token is stored in an HttpOnly cookie that JavaScript can't read. This behavior is
+expected—the proxy injects the real token from the cookie on every SCAPI request. All SCAPI calls include `credentials: 'same-origin'` so that the browser sends HttpOnly cookies with
 every proxy request.
 
 ## Configuration
