@@ -205,9 +205,7 @@ describe('_createSlasAllowlistGuard', () => {
             segments: ['oauth2', 'token'],
             methods: ['POST']
         })
-        expect(req._normalizedSlasPath).toBe(
-            '/shopper/auth/v1/organizations/org1/oauth2/token'
-        )
+        expect(req._normalizedSlasPath).toBe('/shopper/auth/v1/organizations/org1/oauth2/token')
     })
 
     test('returns 403 for a disallowed endpoint', () => {
