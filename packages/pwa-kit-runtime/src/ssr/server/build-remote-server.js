@@ -1064,6 +1064,50 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Strip the proxy base path and normalize the SLAS path for forwarding.
+     * Normalizes only the path portion so that URLs in query parameters
+     * (e.g. redirect_uri=http://localhost:3000/callback) are not mangled
+     * by posixPath.normalize collapsing `://` to `:/`.
+     * @private
+     */
+    _rewriteSlasProxyPath(rawPath, proxyPath) {
+        const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+        const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
+        const stripped = rawPath.replace(regex, '')
+        const [pathname, ...queryParts] = stripped.split('?')
+        const normalizedPath = this._normalizeSlasPath(pathname)
+        if (normalizedPath === null) return null
+        return queryParts.length ? `${normalizedPath}?${queryParts.join('?')}` : normalizedPath
+    },
+
+    /**
+     * Express middleware that gates requests against the SLAS allowlist.
+     * Normalizes the path, matches it against the allowlist, and returns 403
+     * for unmatched requests. Stashes the match on `req` for downstream use.
+     * @private
+     */
+    _createSlasAllowlistGuard(allowList, proxyLabel) {
+        return (req, res, next) => {
+            const normalizedPath = this._normalizeSlasPath(req.path)
+            const allowedEntry = this._matchSlasAllowlistEntry(
+                normalizedPath,
+                req.method,
+                allowList
+            )
+
+            if (!allowedEntry) {
+                const message = `Request to ${req.path} is not allowed through the SLAS ${proxyLabel} Client Proxy`
+                logger.error(message)
+                return res.status(403).json({message})
+            }
+
+            req._normalizedSlasPath = normalizedPath
+            req._slasAllowlistEntry = allowedEntry
+            next()
+        }
+    },
+
+    /**
      * @private
      */
     _setupSlasPrivateClientProxy(app, options) {
@@ -1113,26 +1157,7 @@ export const RemoteServerFactory = {
 
         app.use(
             slasPrivateProxyPath,
-            (req, res, next) => {
-                const normalizedPath = this._normalizeSlasPath(req.path)
-                const allowedEntry = this._matchSlasAllowlistEntry(
-                    normalizedPath,
-                    req.method,
-                    allowList
-                )
-
-                if (!allowedEntry) {
-                    const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
-                    logger.error(message)
-                    return res.status(403).json({
-                        message
-                    })
-                }
-
-                req._normalizedSlasPath = normalizedPath
-                req._slasAllowlistEntry = allowedEntry
-                next()
-            },
+            this._createSlasAllowlistGuard(allowList, 'Private'),
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
@@ -1141,15 +1166,7 @@ export const RemoteServerFactory = {
                 // both proxyRequest and incomingRequest paths.
                 // This cannot be modified by any express middleware
                 // So we need to use the built in pathRewrite to remove the base path
-                pathRewrite: (path) => {
-                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
-                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
-                    const stripped = path.replace(regex, '')
-                    // Normalize the forwarded path so SLAS sees exactly what
-                    // our guards evaluated — no encoded traversals or
-                    // characters that could route differently upstream.
-                    return this._normalizeSlasPath(stripped)
-                },
+                pathRewrite: (path) => this._rewriteSlasProxyPath(path, slasPrivateProxyPath),
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     try {

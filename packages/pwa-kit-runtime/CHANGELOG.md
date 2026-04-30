@@ -7,6 +7,7 @@
 - Add additional logging and error handling for SLAS error handling [#3750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3750)
 - Harden the SLAS private-client proxy with a path-and-method allow-list and path normalization. The legacy `applySLASPrivateClientToEndpoints` option is no longer used; the allow-list can be overridden via `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802) [#3806](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3806)
 - Fix SSR QueryClient memory retention across warm Lambda invocations [#3795](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3795)
+- Refactor: Extract reusable SLAS proxy helpers [#3812](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3812)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
