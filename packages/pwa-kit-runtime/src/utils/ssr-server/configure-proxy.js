@@ -5,12 +5,31 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {createProxyMiddleware} from 'http-proxy-middleware'
+import cookie from 'cookie'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-proxying'
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
-import {isRemote, localDevLog, verboseProxyLogging} from './utils'
+import {isRemote, localDevLog, verboseProxyLogging, isScapiDomain} from './utils'
 import logger from '../logger-instance'
 import {getEnvBasePath} from '../ssr-namespace-paths'
+import {X_SITE_ID, DWSID_COOKIE_NAME} from '../../ssr/server/constants'
+import {
+    SESSION_COOKIE_CONFIG,
+    getCookieName,
+    getCookieNamesToStripFromProxy,
+    getSiteId
+} from '../../ssr/server/httponly-cookie-config'
+
+/**
+ * Error thrown when the access token HttpOnly cookie is not found on an SCAPI proxy request.
+ * Handled in onProxyReq to return a 400 instead of forwarding an unauthenticated request to SCAPI.
+ */
+export class AccessTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'AccessTokenNotFoundError'
+    }
+}
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -23,6 +42,121 @@ export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
  * @type {RegExp}
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
+
+/**
+ * Apply the Authorization header with the shopper's access token (Bearer token) to a proxy request.
+ *
+ * This function is intended to be called from within a proxy's onProxyReq method.
+ * It reads the access token from HttpOnly cookies and sets it as the Authorization header
+ * for applicable SCAPI endpoints.
+ *
+ * Logic for determining if Bearer token should be applied:
+ * 1. Caching proxies never use auth (skip)
+ * 2. x-site-id header must be present (skip if not)
+ * 3. Target must be SCAPI domain (skip if not)
+ *
+ * @private
+ * @function
+ * @param proxyRequest {http.ClientRequest} the request that will be sent to the target host
+ * @param incomingRequest {http.IncomingMessage} the request made to this Express app
+ * @param caching {Boolean} true for a caching proxy, false for a standard proxy
+ * @param targetHost {String} the target hostname (host+port)
+ */
+/**
+ * @throws {AccessTokenNotFoundError} If this is an SCAPI request and the access token cookie is missing.
+ */
+export const setScapiAuthRequestHeaders = ({
+    proxyRequest,
+    incomingRequest,
+    caching,
+    targetHost
+}) => {
+    const url = incomingRequest.url
+    const resolvedSiteId = getSiteId(incomingRequest)
+
+    // Skip if: caching proxy, not SCAPI domain, or no URL
+    if (caching || !isScapiDomain(targetHost) || !url) {
+        return
+    }
+
+    if (!resolvedSiteId) {
+        logger.warn(
+            'x-site-id header is missing on SCAPI proxy request. Bearer token injection skipped.',
+            {namespace: 'configureProxy.setScapiAuthRequestHeaders'}
+        )
+        return
+    }
+
+    // Get access token from HttpOnly cookie
+    const cookieHeader = incomingRequest.headers.cookie
+    const cookies = cookieHeader ? cookie.parse(cookieHeader) : {}
+    const tokenKey = getCookieName(SESSION_COOKIE_CONFIG.accessToken, resolvedSiteId)
+    const accessToken = cookies[tokenKey]
+
+    if (!accessToken) {
+        // During SSR, the SDK sets the Authorization header directly (onClient() is false),
+        // so the cookie won't be present on the server-side loopback request. Only throw
+        // when there is no existing Authorization header — meaning the client relied on
+        // the proxy to inject it from the cookie, but the cookie is missing.
+        const hasExistingAuth = incomingRequest.headers.authorization
+        if (!hasExistingAuth) {
+            throw new AccessTokenNotFoundError(
+                'Access token cookie not found. Cannot proceed with SCAPI request.'
+            )
+        }
+    } else {
+        // Cookie-based auth takes precedence over any existing header
+        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+    }
+
+    // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
+    if (cookies[DWSID_COOKIE_NAME]) {
+        proxyRequest.setHeader('sfdc_dwsid', cookies[DWSID_COOKIE_NAME])
+    }
+
+    // Strip session cookies — the proxy has already extracted the tokens
+    // it needs. These cookies should not be forwarded to SCAPI.
+    stripSessionCookies(proxyRequest, incomingRequest)
+    // Strip internal header — only used by our proxy, not by SCAPI.
+    proxyRequest.removeHeader(X_SITE_ID)
+}
+
+/**
+ * Strip HttpOnly session cookies from a proxy request after the proxy has already
+ * extracted the tokens it needs (e.g., to set Authorization headers).
+ *
+ * This mirrors the MRT CloudFront Lambda@Edge logic in transformHttpOnlyCookies
+ * (cloudfront-proxy-origin-rewriter.js), using exact cookie names based on siteId
+ * rather than prefix matching.
+ *
+ * Removes: cc-at_{siteId}, cc-nx-g_{siteId}, cc-nx_{siteId}, and dwsid.
+ * Any remaining cookies are preserved and forwarded.
+ *
+ * @private
+ * @param proxyRequest {http.ClientRequest} the outgoing proxy request
+ * @param incomingRequest {http.IncomingMessage} the original incoming request
+ */
+export const stripSessionCookies = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = getSiteId(incomingRequest)
+
+    // Build the exact list of cookies to delete, matching MRT's approach
+    const cookiesToDelete = new Set(getCookieNamesToStripFromProxy(siteId))
+
+    const filtered = Object.entries(cookies).filter(([name]) => !cookiesToDelete.has(name))
+
+    if (filtered.length === 0) {
+        proxyRequest.removeHeader('cookie')
+    } else {
+        proxyRequest.setHeader(
+            'cookie',
+            filtered.map(([name, value]) => cookie.serialize(name, value)).join('; ')
+        )
+    }
+}
 
 /**
  * Apply proxy headers to a request that is being proxied.
@@ -172,10 +306,12 @@ export const configureProxy = ({
                 })
             }
 
-            res.writeHead(500, {
-                'Content-Type': 'text/plain'
-            })
-            res.end(`Error in proxy request to ${req.url}: ${err}`)
+            if (!res.headersSent) {
+                res.writeHead(500, {
+                    'Content-Type': 'text/plain'
+                })
+                res.end(`Error in proxy request to ${req.url}: ${err}`)
+            }
         },
 
         /**
@@ -193,7 +329,8 @@ export const configureProxy = ({
          * @param incomingRequest {http.IncomingMessage} the request made to
          * this Express app that prompted the proxying
          */
-        onProxyReq: (proxyRequest, incomingRequest) => {
+        onProxyReq: (proxyRequest, incomingRequest, res) => {
+            // First, apply standard proxy headers (Host, Origin, etc.)
             applyProxyRequestHeaders({
                 proxyRequest,
                 incomingRequest,
@@ -202,6 +339,34 @@ export const configureProxy = ({
                 targetHost,
                 targetProtocol
             })
+
+            // For SCAPI proxy requests with HttpOnly cookies enabled:
+            // inject auth headers from cookies, strip session cookies, and
+            // remove internal headers. Non-SCAPI proxies are left untouched.
+            if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
+                try {
+                    setScapiAuthRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
+                        caching,
+                        targetHost
+                    })
+                } catch (error) {
+                    if (error instanceof AccessTokenNotFoundError) {
+                        logger.warn(error.message, {
+                            namespace: 'configureProxy.setScapiAuthRequestHeaders'
+                        })
+                        if (!res.headersSent) {
+                            proxyRequest.destroy()
+                            res.status(400).json({
+                                message: 'access_token_cookie_missing'
+                            })
+                        }
+                        return
+                    }
+                    throw error
+                }
+            }
         },
 
         onProxyRes: (proxyResponse, req) => {

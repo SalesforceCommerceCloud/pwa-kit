@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@salesforce/storefront-next-runtime": "0.1.1",
-    "commerce-sdk-isomorphic": "5.1.0",
+    "commerce-sdk-isomorphic": "5.2.0",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },

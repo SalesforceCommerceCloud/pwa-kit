@@ -7,13 +7,19 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {helpers, ShopperCustomersTypes, ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperCustomersTypes,
+    ShopperCustomers,
+    ShopperLogin
+} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-import {SLAS_SECRET_PLACEHOLDER} from '../constant'
+import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
-    DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+    DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL,
+    pendingRefreshTokens
 } from './index'
 import {RequireKeys} from '../hooks/types'
 
@@ -62,6 +68,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     clientId: 'clientId',
                     siteId: 'siteId'
                 },
+                headers: config?.headers || {},
                 fetchOptions: {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
@@ -72,19 +79,17 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
-jest.mock('../utils', () => {
-    const originalModule = jest.requireActual('../utils')
+jest.mock('../utils', () => ({
+    ...jest.requireActual('../utils'),
+    __esModule: true,
+    onClient: jest.fn().mockReturnValue(true),
+    getParentOrigin: jest.fn().mockResolvedValue(''),
+    isOriginTrusted: () => false,
+    getDefaultCookieAttributes: () => {},
+    isAbsoluteUrl: () => true
+}))
 
-    return {
-        ...originalModule,
-        __esModule: true,
-        onClient: () => true,
-        getParentOrigin: jest.fn().mockResolvedValue(''),
-        isOriginTrusted: () => false,
-        getDefaultCookieAttributes: () => {},
-        isAbsoluteUrl: () => true
-    }
-})
+const onClientMock = utils.onClient as jest.Mock
 
 /** The auth data we store has a slightly different shape than what we use. */
 type StoredAuthData = Omit<AuthData, 'refresh_token'> & {refresh_token_guest?: string}
@@ -142,6 +147,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
 describe('Auth', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        pendingRefreshTokens.clear()
     })
     test('get/set storage value', () => {
         const auth = new Auth(config)
@@ -275,24 +281,31 @@ describe('Auth', () => {
         expect(newAuth.get('access_token')).not.toBe('123')
         expect(newAuth.get('refresh_token_guest')).not.toBe('456')
     })
-    test('ready - re-use pendingToken', async () => {
+    test('ready - re-use pending refresh from module-level map', async () => {
         const auth = new Auth(config)
-        const data = {
-            refresh_token: 'refresh_token_guest',
+        const data: Record<string, string> = {
+            refresh_token_guest: 'refresh_token_guest',
             access_token: 'access_token',
             customer_id: 'customer_id',
             enc_user_id: 'enc_user_id',
-            expires_in: 1800,
+            expires_in: '1800',
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest'
         }
-        // @ts-expect-error private method
-        auth.pendingToken = Promise.resolve(data)
+        // Populate storage to simulate tokens stored by a previous Auth instance
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+        // Simulate an in-flight refresh from another Auth instance
+        pendingRefreshTokens.set('refresh:siteId:clientId', Promise.resolve(data as any))
 
-        await expect(auth.ready()).resolves.toEqual(data)
+        const result = await auth.ready()
+        expect(result.access_token).toBe('access_token')
+        expect(result.customer_id).toBe('customer_id')
     })
     test('ready - re-use valid access token', async () => {
         const auth = new Auth(config)
@@ -320,8 +333,6 @@ describe('Auth', () => {
         })
 
         await expect(auth.ready()).resolves.toEqual(result)
-        // @ts-expect-error private method
-        expect(auth.pendingToken).toBeUndefined()
     })
     test('ready - use `fetchedToken` and short circuit network request', async () => {
         const fetchedToken = jwt.sign(
@@ -332,13 +343,9 @@ describe('Auth', () => {
             'secret'
         )
         const auth = new Auth({...config, fetchedToken})
-        jest.spyOn(auth, 'queueRequest')
         await auth.ready()
-        // The "unbound method" isn't being called, so the rule isn't applicable
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(auth.queueRequest).not.toHaveBeenCalled()
-        // @ts-expect-error private method
-        expect(auth.pendingToken).toBeUndefined()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+        expect(helpers.loginGuestUser).not.toHaveBeenCalled()
     })
     test('ready - use `fetchedToken` and auth data is populated for registered user', async () => {
         const usid = 'usidddddd'
@@ -1197,6 +1204,61 @@ describe('Auth', () => {
         expect(helpers.logout).not.toHaveBeenCalled()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+    test('logout with enableHttpOnlySessionCookies awaits the logout call', async () => {
+        const logoutMock = helpers.logout as jest.Mock
+        let resolveLogout: (value: unknown) => void
+        logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('customer_type', 'registered')
+
+        let logoutDone = false
+        const logoutPromise = auth.logout().then(() => (logoutDone = true))
+
+        // logout() should not resolve until the helpers.logout promise resolves
+        await new Promise((r) => setTimeout(r, 10))
+        expect(logoutDone).toBe(false)
+
+        resolveLogout!('')
+        await logoutPromise
+        expect(logoutDone).toBe(true)
+        expect(logoutMock).toHaveBeenCalled()
+    })
+    test('logout with enableHttpOnlySessionCookies swallows SLAS errors and logs warning', async () => {
+        const logoutMock = helpers.logout as jest.Mock
+        logoutMock.mockRejectedValue(new Error('SLAS error'))
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation()
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('customer_type', 'registered')
+
+        // Should not throw
+        await auth.logout()
+        expect(logoutMock).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+        expect(warnSpy).toHaveBeenCalledWith(
+            expect.stringContaining(
+                'SLAS logout failed: SLAS error. The error is ignored and session cookies are still cleared by the proxy.'
+            )
+        )
+        warnSpy.mockRestore()
+    })
+    test('logout without enableHttpOnlySessionCookies does not await the logout call', async () => {
+        const logoutMock = helpers.logout as jest.Mock
+        let resolveLogout: (value: unknown) => void
+        logoutMock.mockImplementation(() => new Promise((resolve) => (resolveLogout = resolve)))
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('customer_type', 'registered')
+
+        // logout() should resolve immediately (fire-and-forget) without waiting for helpers.logout
+        await auth.logout()
+        expect(logoutMock).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+
+        // Clean up the dangling promise
+        resolveLogout!('')
+    })
     test('updateCustomerPassword calls registered login', async () => {
         jest.spyOn(ShopperCustomers.prototype, 'updateCustomerPassword').mockImplementation()
         const auth = new Auth(config)
@@ -1231,8 +1293,7 @@ describe('Auth', () => {
         const refreshTokenGuest = 'guest'
 
         // Mock running on the server so shared context storage is used.
-        // @ts-expect-error read-only property
-        utils.onClient = () => false
+        onClientMock.mockReturnValue(false)
 
         // Create a new auth instance and set its guest token.
         const authA = new Auth({...config, siteId: 'siteA'})
@@ -1251,8 +1312,7 @@ describe('Auth', () => {
         expect([...authB.stores['memory'].map.keys()]).toEqual([`cc-nx-g_siteA`, `cc-nx-g_siteB`])
 
         // Set mock value back to expected.
-        // @ts-expect-error read-only property
-        utils.onClient = () => true
+        onClientMock.mockReturnValue(true)
     })
 
     test.each([
@@ -1322,6 +1382,25 @@ describe('Auth', () => {
         })
         getSpiedOn.mockRestore()
         parseSlasJWTSpiedOn.mockRestore()
+    })
+
+    test('getDnt() trusts dw_dnt with HttpOnly cookies enabled when no access token dnt', () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('dw_dnt', '1')
+        // No cc-at-dnt set, so getDntFromAccessToken returns undefined → assumed in sync
+        expect(auth.getDnt()).toBe(true)
+    })
+
+    test('getDnt() deletes dw_dnt when out of sync with cc-at-dnt (HttpOnly)', () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('dw_dnt', '0')
+        // @ts-expect-error private method
+        auth.set('cc-at-dnt', '1')
+        // dw_dnt should be deleted because it disagrees with cc-at-dnt
+        expect(auth.getDnt()).toBeUndefined()
+        expect(auth.get('dw_dnt')).toBeFalsy()
     })
 
     test('token call clears SFRA auth token cookie and sets all token from the response', async () => {
@@ -1500,5 +1579,278 @@ describe('hybridAuthEnabled property toggles clearECOMSession', () => {
 
         // Verify the cookie was NOT cleared
         expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+})
+
+describe('HttpOnly Session Cookies', () => {
+    const expiresAtFuture = Math.floor(Date.now() / 1000) + 3600
+
+    const httpOnlyTokenResponse: ShopperLoginTypes.TokenResponse = {
+        ...TOKEN_RESPONSE
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('routes SLAS calls through publicClientProxyEndpoint when httpOnly enabled and private client disabled', () => {
+        const ShopperLoginMock = ShopperLogin as unknown as jest.Mock
+        ShopperLoginMock.mockClear()
+        new Auth({
+            ...config,
+            enableHttpOnlySessionCookies: true,
+            enablePWAKitPrivateClient: false,
+            publicClientProxyEndpoint: '/mobify/slas/public'
+        })
+        expect(ShopperLoginMock).toHaveBeenCalledWith(
+            expect.objectContaining({proxy: '/mobify/slas/public'})
+        )
+    })
+
+    test('routes SLAS calls through standard proxy when httpOnly disabled', () => {
+        const ShopperLoginMock = ShopperLogin as unknown as jest.Mock
+        ShopperLoginMock.mockClear()
+        new Auth({
+            ...config,
+            enableHttpOnlySessionCookies: false,
+            enablePWAKitPrivateClient: false,
+            publicClientProxyEndpoint: '/mobify/slas/public'
+        })
+        expect(ShopperLoginMock).toHaveBeenCalledWith(expect.objectContaining({proxy: 'proxy'}))
+    })
+
+    test('loginGuestUser does not store tokens when HttpOnly cookies are enabled', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // Set cc-at-expires cookie (as server would via Set-Cookie header)
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiresAtFuture))
+
+        await auth.loginGuestUser()
+
+        // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
+        expect(auth.get('access_token')).toBeFalsy()
+        expect(auth.get('refresh_token_guest')).toBeFalsy()
+        // Common fields should still be stored
+        expect(auth.get('customer_id')).toBe(TOKEN_RESPONSE.customer_id)
+        expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
+        // enableHttpOnlySessionCookies should be forwarded to the helper
+        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+            expect.objectContaining({enableHttpOnlySessionCookies: true})
+        )
+    })
+
+    test('ready re-uses data when cc-at-expires cookie is still valid', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // With HttpOnly cookies enabled, the first ready() attempts a refresh (since JS
+        // can't read the HttpOnly refresh token cookie). On a fresh session there's no
+        // refresh token cookie, so SLAS rejects — then it falls through to loginGuestUser.
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockRejectedValueOnce(new Error('no refresh token'))
+
+        // First call: refresh fails, falls through to loginGuestUser
+        await auth.ready()
+
+        // Set cc-at-expires cookie (as server would via Set-Cookie header)
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiresAtFuture))
+
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Second call: cc-at-expires is in the future, so it should re-use data
+        await auth.ready()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1) // Not called again
+        // enableHttpOnlySessionCookies should be forwarded to the helper
+        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+            expect.objectContaining({enableHttpOnlySessionCookies: true})
+        )
+    })
+
+    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-exists)', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        // First visit: no cc-nx-exists cookie, no refresh token, no cc-at-expires
+        // Should NOT attempt refresh — should go straight to loginGuestUser
+        await auth.ready()
+
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+    })
+
+    test('ready attempts refresh when cc-nx-exists is set (returning visitor)', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // Simulate a returning visitor: expired access token + cc-nx-exists indicator
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('cc-nx-exists', '1')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        await auth.ready()
+
+        // Should attempt refresh because cc-nx-exists indicates an HttpOnly refresh token exists
+        expect(helpers.refreshAccessToken).toHaveBeenCalledTimes(1)
+        expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
+            expect.objectContaining({enableHttpOnlySessionCookies: true})
+        )
+    })
+
+    test('ready triggers refresh when cc-at-expires cookie is expired', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // Simulate a previous login that left behind stored data with an expired token
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // Set a valid JWT so parseSlasJWT works during the refresh flow
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+        // enableHttpOnlySessionCookies should be forwarded to the helper
+        expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
+            expect.objectContaining({enableHttpOnlySessionCookies: true})
+        )
+    })
+
+    test('on server, isAccessTokenExpired falls back to JWT decoding even with httpOnly enabled', () => {
+        onClientMock.mockReturnValue(false)
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // Set cc-at-expires to a future time — on client this would mean "not expired"
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(Math.floor(Date.now() / 1000) + 3600))
+        // Set an expired JWT — the server path should use this instead of cc-at-expires
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        // @ts-expect-error private method
+        expect(auth.isAccessTokenExpired()).toBe(true)
+
+        onClientMock.mockReturnValue(true)
+    })
+
+    test('on server, handleTokenResponse stores tokens normally even with httpOnly enabled', async () => {
+        onClientMock.mockReturnValue(false)
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce({...TOKEN_RESPONSE})
+
+        await auth.loginGuestUser()
+
+        // On server with httpOnly enabled, tokens should still be stored normally
+        expect(auth.get('access_token')).toBe(TOKEN_RESPONSE.access_token)
+        expect(auth.get('refresh_token_guest')).toBe(TOKEN_RESPONSE.refresh_token)
+        onClientMock.mockReturnValue(true)
+    })
+
+    test('refreshAccessToken sets x-grant-type header during the call and cleans it up after', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // Simulate an expired access token with a valid refresh token
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        // Capture the header value during the refresh call
+        let headerDuringCall: string | undefined
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
+
+        await auth.ready()
+
+        // x-grant-type was set to 'refresh_token' during the call
+        expect(headerDuringCall).toBe('refresh_token')
+        // x-grant-type is cleaned up after the call
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+    })
+
+    test('refreshAccessToken cleans up x-grant-type header even when the call fails', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        const expiredTime = Math.floor(Date.now() / 1000) - 100
+        // @ts-expect-error private method
+        auth.set('cc-at-expires', String(expiredTime))
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        // Mock a failure with an 'invalid refresh_token' response
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockRejectedValueOnce(
+            Object.assign(new Error('invalid refresh_token'), {
+                response: {json: () => Promise.resolve({message: 'invalid refresh_token'})}
+            })
+        )
+        // After refresh fails, it falls through to loginGuestUser
+        const loginGuestMock = helpers.loginGuestUser as jest.Mock
+        loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
+
+        await auth.ready()
+
+        // x-grant-type is cleaned up despite the failure
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+        expect(refreshMock).toHaveBeenCalled()
+    })
+
+    test('refreshAccessToken does not set x-grant-type header when httpOnly cookies are disabled', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: false})
+
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+
+        let headerDuringCall: string | undefined
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockImplementationOnce(
+            (options: {slasClient: {clientConfig: {headers: Record<string, string>}}}) => {
+                headerDuringCall = options.slasClient.clientConfig.headers[X_GRANT_TYPE]
+                return Promise.resolve(TOKEN_RESPONSE)
+            }
+        )
+
+        await auth.ready()
+
+        expect(headerDuringCall).toBeUndefined()
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
     })
 })

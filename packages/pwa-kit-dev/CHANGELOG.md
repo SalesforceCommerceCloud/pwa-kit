@@ -1,5 +1,6 @@
 ## v3.18.0 (Apr 27, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
+- Add support for HttpOnly session cookies [3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
 
 ## v3.18.0-dev (Mar 20, 2026)
 - **Removed Data Store Code**: Removed `mrt-data-store-local-provider.js` and related code. Local data store implementation now lives in `@salesforce/mrt-utilities@0.1.6+` and is loaded via conditional exports. This package is now purely focused on build and development tooling. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)

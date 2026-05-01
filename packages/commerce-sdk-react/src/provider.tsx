@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {ReactElement, useEffect, useMemo} from 'react'
+import React, {ReactElement, useEffect, useMemo, useRef} from 'react'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients, SDKClientTransformer} from './hooks/types'
 import {Logger} from './types'
@@ -47,6 +47,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
     privateClientProxyEndpoint?: string
+    publicClientProxyEndpoint?: string
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
@@ -59,6 +60,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     hybridAuthEnabled?: boolean
     cookieDomain?: string
     pageDesignerParams?: PageDesignerParams
+    /** When true, proxy returns tokens in HttpOnly cookies. */
+    enableHttpOnlySessionCookies?: boolean
 }
 
 /**
@@ -147,6 +150,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         logger,
@@ -158,11 +162,35 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         disableAuthInit = false,
         hybridAuthEnabled = false,
         cookieDomain,
-        pageDesignerParams = {}
+        pageDesignerParams = {},
+        enableHttpOnlySessionCookies = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
     const configLogger = logger || console
+
+    // Stabilize object references that may be recreated on every render (e.g. inline
+    // `headers={{...}}` or `logger={createLogger(...)}` in the parent component).
+    // Without this, the Auth useMemo would recreate the Auth instance on every render,
+    // causing unnecessary useEffect re-runs, context re-renders, and breaking
+    // request deduplication.
+    const headersKey = JSON.stringify(headers)
+
+    const stableHeaders = useMemo(() => headers, [headersKey])
+
+    const loggerRef = useRef(configLogger)
+    loggerRef.current = configLogger
+    // Logger identity is not meaningful — keep the first instance for reference stability.
+    // The ref ensures the Auth instance always calls the latest logger.
+    const stableLogger = useMemo(() => loggerRef.current, [])
+
+    // When HttpOnly cookies are enabled, ensure fetch credentials allow cookies to be sent.
+    const effectiveFetchOptions = useMemo(() => {
+        return enableHttpOnlySessionCookies &&
+            (!fetchOptions?.credentials || fetchOptions.credentials === 'omit')
+            ? {...fetchOptions, credentials: 'same-origin' as RequestCredentials}
+            : fetchOptions
+    }, [enableHttpOnlySessionCookies, fetchOptions])
 
     const auth = useMemo(() => {
         return new Auth({
@@ -172,20 +200,21 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
             proxy,
             redirectURI,
-            headers,
-            fetchOptions,
+            headers: stableHeaders,
+            fetchOptions: effectiveFetchOptions,
             fetchedToken,
             enablePWAKitPrivateClient,
             privateClientProxyEndpoint,
+            publicClientProxyEndpoint,
             clientSecret,
             silenceWarnings,
-            logger: configLogger,
+            logger: stableLogger,
             defaultDnt,
             passwordlessLoginCallbackURI,
             refreshTokenRegisteredCookieTTL,
             refreshTokenGuestCookieTTL,
             hybridAuthEnabled,
-            cookieDomain
+            enableHttpOnlySessionCookies
         })
     }, [
         clientId,
@@ -194,21 +223,23 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        headers,
-        fetchOptions,
+        stableHeaders,
+        effectiveFetchOptions,
         fetchedToken,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
-        configLogger,
+        stableLogger,
         defaultDnt,
         passwordlessLoginCallbackURI,
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
         apiClients,
         hybridAuthEnabled,
-        cookieDomain
+        cookieDomain,
+        enableHttpOnlySessionCookies
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -227,7 +258,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             throwOnBadResponse: true,
             fetchOptions: {
                 ...options.fetchOptions,
-                ...fetchOptions
+                ...effectiveFetchOptions
             }
         }
     }
@@ -267,8 +298,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency
             },
             throwOnBadResponse: true,
-            fetchOptions
+            fetchOptions: effectiveFetchOptions
         }
+
+        // Determine the proxy endpoint for ShopperLogin based on the client mode:
+        // - Private client mode uses a dedicated private proxy endpoint
+        // - HttpOnly session cookies mode uses a public proxy endpoint
+        // - Otherwise, fall back to the default proxy
+        const shopperLoginProxy = enablePWAKitPrivateClient
+            ? privateClientProxyEndpoint
+            : enableHttpOnlySessionCookies
+            ? publicClientProxyEndpoint
+            : config.proxy
 
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -281,7 +322,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
+                proxy: shopperLoginProxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperPayments: new ShopperPayments(config),
@@ -297,11 +338,15 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         siteId,
         proxy,
-        fetchOptions,
+        effectiveFetchOptions,
         locale,
         currency,
         headers?.['correlation-id'],
-        apiClients
+        apiClients,
+        enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
+        publicClientProxyEndpoint,
+        enableHttpOnlySessionCookies
     ])
 
     // Initialize the session
@@ -330,7 +375,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 passwordlessLoginCallbackURI,
                 refreshTokenRegisteredCookieTTL,
                 refreshTokenGuestCookieTTL,
-                pageDesignerParams
+                pageDesignerParams,
+                enableHttpOnlySessionCookies
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

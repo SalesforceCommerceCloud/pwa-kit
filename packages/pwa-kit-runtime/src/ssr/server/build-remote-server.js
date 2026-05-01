@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path, {posix as posixPath} from 'path'
+import cookie from 'cookie'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -13,8 +14,18 @@ import {
     CACHE_CONTROL,
     NO_CACHE,
     X_ENCODED_HEADERS,
-    CONTENT_SECURITY_POLICY
+    CONTENT_SECURITY_POLICY,
+    SLAS_TOKEN_RESPONSE_ENDPOINTS,
+    SLAS_LOGOUT_ENDPOINT,
+    X_SITE_ID,
+    X_GRANT_TYPE
 } from './constants'
+import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+const {
+    refreshTokenRegistered,
+    refreshTokenGuest,
+    accessToken: accessTokenConfig
+} = SESSION_COOKIE_CONFIG
 import {
     catchAndLog,
     getHashForString,
@@ -46,9 +57,10 @@ import {
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
-    slasPrivateProxyPath
+    slasPrivateProxyPath,
+    slasPublicProxyPath
 } from '../../utils/ssr-namespace-paths'
-import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
+import {applyProxyRequestHeaders, stripSessionCookies} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
@@ -61,6 +73,7 @@ import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
+import {setHttpOnlySessionCookies, expireHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -88,6 +101,155 @@ export const isContentTypeBinary = (headers) => {
 
 export const isBinary = (headers) => {
     return isContentTypeBinary(headers)
+}
+
+/**
+ * Error thrown when the refresh token HttpOnly cookie is not found on the incoming request.
+ * Handled specifically in the SLAS proxy to return a 401 instead of forwarding to SLAS.
+ */
+export class RefreshTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'RefreshTokenNotFoundError'
+    }
+}
+
+/**
+ * Inject the refresh token from HttpOnly cookies as the sfdc_refresh_token header.
+ * SLAS uses sfdc_refresh_token as a fallback when the refresh_token body parameter is
+ * missing or empty (which is the case when HttpOnly session cookies are enabled, because
+ * client-side JavaScript cannot read the HttpOnly refresh token cookie).
+ * @throws {RefreshTokenNotFoundError} If the refresh token cookie is missing.
+ * @private
+ */
+export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) {
+        throw new RefreshTokenNotFoundError(
+            'No cookies present on request. Cannot inject refresh token.'
+        )
+    }
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = getSiteId(incomingRequest)
+    if (!siteId) {
+        throw new RefreshTokenNotFoundError(
+            'x-site-id header is missing on SLAS token request. ' +
+                'Cannot inject refresh token. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.'
+        )
+    }
+
+    // Try registered refresh token first, then guest
+    const refreshToken =
+        cookies[getCookieName(refreshTokenRegistered, siteId)] ||
+        cookies[getCookieName(refreshTokenGuest, siteId)]
+    if (!refreshToken) {
+        throw new RefreshTokenNotFoundError(
+            'Refresh token cookie not found. Cannot proceed with refresh token flow.'
+        )
+    }
+    proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
+}
+
+/**
+ * Inject Bearer token and refresh token from HttpOnly cookies for the SLAS logout endpoint.
+ * Reads the access token and refresh token from cookies keyed by siteId (from the x-site-id header),
+ * sets the Authorization header, and appends refresh_token to the query string.
+ * @private
+ */
+export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = getSiteId(incomingRequest)
+    if (!siteId) {
+        logger.warn(
+            'x-site-id header is missing on SLAS logout request. ' +
+                'Token injection skipped. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.',
+            {namespace: 'setTokensInLogoutRequest'}
+        )
+        return
+    }
+
+    // Inject Bearer token from access token cookie
+    const accessToken = cookies[getCookieName(accessTokenConfig, siteId)]
+    if (accessToken) {
+        proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
+    }
+
+    // Inject refresh_token into query string from HttpOnly cookie
+    const refreshToken = cookies[getCookieName(refreshTokenRegistered, siteId)]
+    if (refreshToken) {
+        const separator = proxyRequest.path.includes('?') ? '&' : '?'
+        proxyRequest.path += `${separator}refresh_token=${encodeURIComponent(refreshToken)}`
+    } else {
+        logger.warn(
+            `Refresh token cookie (${getCookieName(
+                refreshTokenRegistered,
+                siteId
+            )}) not found for ${incomingRequest.path}. The logout request may fail.`,
+            {namespace: 'setTokensInLogoutRequest'}
+        )
+    }
+}
+
+/**
+ * Handle all HttpOnly session cookie logic for the outgoing SLAS proxy request.
+ * Consolidates refresh token injection, logout token injection, session cookie
+ * stripping, and internal header cleanup.
+ * @throws {RefreshTokenNotFoundError} if the refresh token cookie is missing on a refresh_token grant request.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyReq = (proxyRequest, incomingRequest) => {
+    if (incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token') {
+        setRefreshTokenHeader(proxyRequest, incomingRequest)
+        proxyRequest.removeHeader(X_GRANT_TYPE)
+    }
+
+    if (incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        setTokensInLogoutRequest(proxyRequest, incomingRequest)
+    }
+
+    stripSessionCookies(proxyRequest, incomingRequest)
+    proxyRequest.removeHeader(X_SITE_ID)
+}
+
+/**
+ * Handle all HttpOnly session cookie logic for the SLAS proxy response.
+ * Sets HttpOnly cookies on token responses and expires them on logout.
+ * Throws if setHttpOnlySessionCookies fails — caller is responsible for error response.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyRes = (
+    workingBuffer,
+    proxyRes,
+    req,
+    res,
+    options,
+    logNamespace
+) => {
+    const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
+    if (proxyRes.statusCode === 200 && isTokenEndpoint) {
+        workingBuffer = setHttpOnlySessionCookies(workingBuffer, proxyRes, req, res, options)
+    }
+
+    if (req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        try {
+            expireHttpOnlySessionCookies(req, res)
+        } catch (error) {
+            logger.warn('Error expiring HttpOnly session cookies on logout', {
+                namespace: logNamespace,
+                additionalProperties: {
+                    error: error.message || error
+                }
+            })
+        }
+    }
+
+    return workingBuffer
 }
 
 /**
@@ -251,6 +413,11 @@ export const RemoteServerFactory = {
             // is security-sensitive and logs a startup warning.
             slasPrivateClientAllowList: undefined,
 
+            // A regex for identifying which SLAS endpoints return tokens (access_token, refresh_token)
+            // in the response body. Used to determine which responses should have HttpOnly session
+            // cookies applied when that feature is enabled. Users can override this in ssr.js.
+            tokenResponseEndpoints: SLAS_TOKEN_RESPONSE_ENDPOINTS,
+
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
             // request modifications (e.g., custom headers).
@@ -258,10 +425,24 @@ export const RemoteServerFactory = {
             onSLASPrivateProxyReq: undefined,
 
             // Custom callback to modify the SLAS private client proxy response. This callback is invoked
-            // after the built-in proxy response handling. Users can modify or replace
-            // the response buffer.
+            // after the built-in proxy response handling (including HttpOnly session cookie handling when enabled).
+            // When HttpOnly session cookies are enabled (MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true), the callback
+            // receives the response with tokens already moved to HttpOnly cookies and stripped from the body.
+            // Custom callbacks must not rely on token fields in the response body in that case; read from
+            // response headers (e.g. Set-Cookie) if needed.
             // Signature: (responseBuffer, proxyRes, req, res) => Buffer
-            onSLASPrivateProxyRes: undefined
+            onSLASPrivateProxyRes: undefined,
+
+            // Custom callback to modify the SLAS public client proxy request. This callback is invoked
+            // after the built-in proxy request handling. Users can provide additional
+            // request modifications (e.g., custom headers).
+            // Signature: (proxyRequest, incomingRequest, res) => void
+            onSLASPublicProxyReq: undefined,
+
+            // Custom callback to modify the SLAS public client proxy response. This callback is invoked
+            // after the built-in proxy response handling (including HttpOnly session cookie handling).
+            // Signature: (responseBuffer, proxyRes, req, res) => Buffer
+            onSLASPublicProxyRes: undefined
         }
 
         if (options && 'applySLASPrivateClientToEndpoints' in options) {
@@ -356,7 +537,12 @@ export const RemoteServerFactory = {
      * @private
      */
     _getSlasEndpoint(options) {
-        if (!options.useSLASPrivateClient) return undefined
+        if (
+            !options.useSLASPrivateClient &&
+            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES !== 'true'
+        ) {
+            return undefined
+        }
         const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
         return `${shortCode}.api.commercecloud.salesforce.com`
     },
@@ -509,7 +695,12 @@ export const RemoteServerFactory = {
         this._setupHealthcheck(app)
         this._setupProxying(app, options)
 
-        this._setupSlasPrivateClientProxy(app, options)
+        const httpOnlyCookiesEnabled = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+        if (options.useSLASPrivateClient) {
+            this._setupSlasPrivateClientProxy(app, options, httpOnlyCookiesEnabled)
+        } else if (httpOnlyCookiesEnabled) {
+            this._setupSlasPublicClientProxy(app, options, httpOnlyCookiesEnabled)
+        }
         this._setupHybridProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
@@ -1071,12 +1262,29 @@ export const RemoteServerFactory = {
      * @private
      */
     _rewriteSlasProxyPath(rawPath, proxyPath) {
+        // Example input:
+        //   rawPath   = "/mobify/slas/private/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
+        //   proxyPath = "/mobify/slas/private"
+
+        // Strip the proxy prefix (and optional base path).
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
         const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
         const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
         const stripped = rawPath.replace(regex, '')
+
+        // Split path from query string BEFORE normalizing.
+        // posixPath.normalize would collapse "://" in redirect_uri=http://... to ":/".
+        //   pathname   = "/shopper/auth/.../authorize"
+        //   queryParts = ["redirect_uri=http://localhost:3000/callback"]
         const [pathname, ...queryParts] = stripped.split('?')
+
+        // Normalize only the path (decode percent-encoding, resolve dot-segments).
+        //   → "/shopper/auth/v1/organizations/org1/oauth2/authorize"
         const normalizedPath = this._normalizeSlasPath(pathname)
         if (normalizedPath === null) return null
+
+        // Re-attach the query string unchanged.
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
         return queryParts.length ? `${normalizedPath}?${queryParts.join('?')}` : normalizedPath
     },
 
@@ -1110,7 +1318,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _setupSlasPrivateClientProxy(app, options) {
+    _setupSlasPrivateClientProxy(app, options, httpOnlyCookiesEnabled) {
         if (!options.useSLASPrivateClient) {
             return
         }
@@ -1192,6 +1400,10 @@ export const RemoteServerFactory = {
                             )
                         }
 
+                        if (httpOnlyCookiesEnabled) {
+                            handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
+                        }
+
                         // Allow users to apply additional custom modifications to the proxy request
                         if (typeof options.onSLASPrivateProxyReq === 'function') {
                             try {
@@ -1206,6 +1418,18 @@ export const RemoteServerFactory = {
                             }
                         }
                     } catch (error) {
+                        if (error instanceof RefreshTokenNotFoundError) {
+                            logger.warn(error.message, {
+                                namespace: 'setRefreshTokenHeader'
+                            })
+                            if (!res.headersSent) {
+                                proxyRequest.destroy()
+                                res.status(401).json({
+                                    message: 'invalid refresh_token'
+                                })
+                            }
+                            return
+                        }
                         logger.error('Error in SLAS private proxy request handling', {
                             namespace: '_setupSlasPrivateClientProxy',
                             additionalProperties: {
@@ -1236,6 +1460,37 @@ export const RemoteServerFactory = {
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
                     let workingBuffer = responseBuffer
                     try {
+                        if (httpOnlyCookiesEnabled) {
+                            try {
+                                workingBuffer = handleHttpOnlyCookiesOnProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options,
+                                    '_setupSlasPrivateClientProxy'
+                                )
+                            } catch (error) {
+                                res.statusCode = 500
+                                res.statusMessage = 'Internal Server Error'
+                                logger.error('Error applying HttpOnly session cookies', {
+                                    namespace: '_setupSlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        error: error.message || error
+                                    }
+                                })
+                                return Buffer.from(
+                                    JSON.stringify({
+                                        error: 'Internal server error',
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
+                                    }),
+                                    'utf8'
+                                )
+                            }
+                        }
+
                         // Mask a 404 on /oauth2/passwordless/login with a 200 to prevent
                         // user enumeration. Match against the allow-list entry stashed by
                         // the pre-proxy guard.
@@ -1287,6 +1542,160 @@ export const RemoteServerFactory = {
                             'There is an error processing the response from SLAS. Returning original response.',
                             {
                                 namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    error,
+                                    statusCode: proxyRes?.statusCode,
+                                    path: req?.url
+                                }
+                            }
+                        )
+                        return workingBuffer
+                    }
+                })
+            })
+        )
+    },
+
+    /**
+     * @private
+     */
+    _setupSlasPublicClientProxy(app, options, httpOnlyCookiesEnabled) {
+        const logNamespace = '_setupSlasPublicClientProxy'
+
+        localDevLog(`Proxying ${slasPublicProxyPath} to ${options.slasTarget}`)
+
+        app.use(
+            slasPublicProxyPath,
+            // Lightweight guard: normalize the path and reject anything outside /shopper/auth/.
+            // No per-endpoint allowlist — the public proxy does not inject credentials,
+            // so there is no credential-leakage risk. SLAS rejects unauthorized calls itself.
+            (req, res, next) => {
+                const normalizedPath = this._normalizeSlasPath(req.path)
+                if (!normalizedPath || !normalizedPath.startsWith('/shopper/auth/')) {
+                    const message = `Request to ${req.path} is not allowed through the SLAS Public Client Proxy`
+                    logger.error(message)
+                    return res.status(403).json({message})
+                }
+                req._normalizedSlasPath = normalizedPath
+                next()
+            },
+            createProxyMiddleware({
+                target: options.slasTarget,
+                changeOrigin: true,
+                pathRewrite: (path) => this._rewriteSlasProxyPath(path, slasPublicProxyPath),
+                selfHandleResponse: true,
+                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                    try {
+                        applyProxyRequestHeaders({
+                            proxyRequest,
+                            incomingRequest,
+                            proxyPath: slasPublicProxyPath,
+                            targetHost: options.slasHostName,
+                            targetProtocol: 'https'
+                        })
+
+                        if (httpOnlyCookiesEnabled) {
+                            handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
+                        }
+
+                        if (typeof options.onSLASPublicProxyReq === 'function') {
+                            try {
+                                options.onSLASPublicProxyReq(proxyRequest, incomingRequest, res)
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPublicProxyReq callback', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error}
+                                })
+                            }
+                        }
+                    } catch (error) {
+                        if (error instanceof RefreshTokenNotFoundError) {
+                            logger.warn(error.message, {
+                                namespace: 'setRefreshTokenHeader'
+                            })
+                            if (!res.headersSent) {
+                                proxyRequest.destroy()
+                                res.status(401).json({message: 'invalid refresh_token'})
+                            }
+                            return
+                        }
+                        logger.error('Error in SLAS public proxy request handling', {
+                            namespace: logNamespace,
+                            additionalProperties: {error}
+                        })
+                        if (!res.headersSent) {
+                            res.status(500).json({
+                                message: 'Error preparing SLAS Public proxy request'
+                            })
+                        }
+                    }
+                },
+                onError: (error, req, res) => {
+                    logger.error('Error in SLAS public proxy', {
+                        namespace: logNamespace,
+                        additionalProperties: {error, path: req?.url}
+                    })
+                    if (!res.headersSent) {
+                        res.status(500).json({message: 'Error in SLAS public proxy request'})
+                    }
+                },
+                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
+                    let workingBuffer = responseBuffer
+                    try {
+                        if (httpOnlyCookiesEnabled) {
+                            try {
+                                workingBuffer = handleHttpOnlyCookiesOnProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options,
+                                    logNamespace
+                                )
+                            } catch (error) {
+                                res.statusCode = 500
+                                res.statusMessage = 'Internal Server Error'
+                                logger.error('Error applying HttpOnly session cookies', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error: error.message || error}
+                                })
+                                return Buffer.from(
+                                    JSON.stringify({
+                                        error: 'Internal server error',
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
+                                    }),
+                                    'utf8'
+                                )
+                            }
+                        }
+
+                        if (typeof options.onSLASPublicProxyRes === 'function') {
+                            try {
+                                const customBuffer = options.onSLASPublicProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res
+                                )
+                                if (customBuffer !== undefined) {
+                                    workingBuffer = customBuffer
+                                }
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPublicProxyRes callback', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error}
+                                })
+                            }
+                        }
+
+                        return workingBuffer
+                    } catch (error) {
+                        logger.error(
+                            'There is an error processing the response from SLAS. Returning original response.',
+                            {
+                                namespace: logNamespace,
                                 additionalProperties: {
                                     error,
                                     statusCode: proxyRes?.statusCode,

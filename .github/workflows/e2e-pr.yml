@@ -137,6 +137,7 @@ jobs:
             - name: Create .env with settings to be updated on the MRT target
               run: |-
                   echo "MRT_TARGET_SSR_PROXY_CONFIGS=${{ vars.PWA_KIT_E2E_TARGET_PROXY_CONFIGS }}" > ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
+                  echo "MRT_TARGET_ALLOW_COOKIES=true" >> ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
 
               # Environment variables you'd like to set on the MRT target must be in MRT_ENV_VARS_E2E_BASE_FILENAME file.
               # See: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/mrt-admin?meta=projects_target_env_var_partial_update

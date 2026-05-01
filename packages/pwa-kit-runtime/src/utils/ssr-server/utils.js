@@ -168,6 +168,23 @@ export const forEachIn = (iterable, functionRef) => {
 }
 
 /**
+ * Check if the target host is a Salesforce Commerce API domain
+ * @param {string} targetHost - The target host (may include port, e.g., "host.com:443")
+ * @returns {boolean} True if it's an SCAPI domain
+ */
+export const isScapiDomain = (targetHost) => {
+    if (!targetHost) return false
+
+    // Remove port if present (handle both IPv4 and domain formats)
+    // Example: "abc-001.api.commercecloud.salesforce.com:443" -> "abc-001.api.commercecloud.salesforce.com"
+    const hostname = targetHost.split(':')[0]
+
+    // Check if it matches *.api.commercecloud.salesforce.com pattern
+    // SCAPI domains always have an instance identifier subdomain (e.g., abc-001, kv7kzm78)
+    return hostname.endsWith('.api.commercecloud.salesforce.com')
+}
+
+/**
  * Log an internal MRT error.
  *
  * @param namespace Namespace for the error (e.g. data_store, redirect) to facilitate searching

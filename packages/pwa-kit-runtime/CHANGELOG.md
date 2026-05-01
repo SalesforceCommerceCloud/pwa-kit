@@ -1,5 +1,6 @@
 ## v3.18.0 (Apr 27, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
+- Add support for HttpOnly session cookies [3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
 
 ## v3.18.0-dev (Mar 20, 2026)
 - **Data Store Simplified**: Removed internal provider pattern and dynamic loading. Now imports data store directly from `@salesforce/mrt-utilities@0.1.6+`, which uses conditional exports (`dev-data-store`) to provide local in-memory implementation in development and DynamoDB in production. Removed ~250 lines of complex provider code (`data-store-provider.js`, `local-dev-provider-loader.js`). Removed optional peer dependency on `@salesforce/pwa-kit-dev`.  **Environment Variables**: Local data store uses `MRT_DATA_STORE_DEFAULTS` and `MRT_DATA_STORE_WARN_ON_MISSING` (legacy `PWAKIT_MRT_DATA_STORE_ENABLED` still supported). **Breaking for internal imports only**: Use public API at `utils/data-store/data-store-utils` instead of internal paths. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)

@@ -52,7 +52,6 @@ describe('provider', () => {
         expect(Auth).toHaveBeenCalledTimes(1)
         const authInstance = (Auth as jest.Mock).mock.instances[0]
         expect(authInstance.ready).toHaveBeenCalledTimes(1)
-        expect(authInstance.queueRequest).toHaveBeenCalledTimes(0)
     })
 
     test('shopper login api client uses private proxy when enabled', () => {
@@ -88,5 +87,65 @@ describe('provider', () => {
         expect(Auth).toHaveBeenCalledTimes(1)
         const authInstance = (Auth as jest.Mock).mock.instances[0]
         expect(authInstance.ready).toHaveBeenCalledTimes(1)
+    })
+
+    test('passes enableHttpOnlySessionCookies to Auth constructor', () => {
+        renderWithProviders(<h1>HttpOnly cookies enabled!</h1>, {
+            enableHttpOnlySessionCookies: true
+        })
+        expect(screen.getByText('HttpOnly cookies enabled!')).toBeInTheDocument()
+        expect(Auth).toHaveBeenCalledTimes(1)
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                enableHttpOnlySessionCookies: true
+            })
+        )
+    })
+
+    test('defaults fetchOptions.credentials to same-origin when enableHttpOnlySessionCookies is true', () => {
+        renderWithProviders(<h1>test</h1>, {
+            enableHttpOnlySessionCookies: true
+        })
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                fetchOptions: expect.objectContaining({credentials: 'same-origin'})
+            })
+        )
+    })
+
+    test('overrides fetchOptions.credentials from omit to same-origin when enableHttpOnlySessionCookies is true', () => {
+        renderWithProviders(<h1>test</h1>, {
+            enableHttpOnlySessionCookies: true,
+            fetchOptions: {credentials: 'omit'}
+        })
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                fetchOptions: expect.objectContaining({credentials: 'same-origin'})
+            })
+        )
+    })
+
+    test('keeps fetchOptions.credentials as include when enableHttpOnlySessionCookies is true', () => {
+        renderWithProviders(<h1>test</h1>, {
+            enableHttpOnlySessionCookies: true,
+            fetchOptions: {credentials: 'include'}
+        })
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                fetchOptions: expect.objectContaining({credentials: 'include'})
+            })
+        )
+    })
+
+    test('does not modify fetchOptions.credentials when enableHttpOnlySessionCookies is false', () => {
+        renderWithProviders(<h1>test</h1>, {
+            enableHttpOnlySessionCookies: false,
+            fetchOptions: {credentials: 'omit'}
+        })
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                fetchOptions: expect.objectContaining({credentials: 'omit'})
+            })
+        )
     })
 })
