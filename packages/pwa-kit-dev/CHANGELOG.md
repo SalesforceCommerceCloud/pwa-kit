@@ -1,3 +1,4 @@
+## v3.18.0-nightly-20260501083602 (May 01, 2026)
 ## v3.18.0 (Apr 27, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
 
