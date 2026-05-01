@@ -47,12 +47,14 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │  Process token response:         │
   │                                     │  1. Read x-site-id → "RefArch"   │
   │                                     │  2. Decode JWT (access_token)    │
-  │                                     │  3. Set HttpOnly cookies:        │
-  │                                     │     - cc-at_RefArch              │
-  │                                     │     - cc-nx-g_RefArch            │
-  │                                     │     - cc-at-expires_RefArch      │
-  │                                     │     - cc-at-dnt_RefArch          │
-  │                                     │     - uido_RefArch               │
+  │                                     │  3. Set cookies:                 │
+  │                                     │     HttpOnly:                    │
+  │                                     │       - cc-at_RefArch            │
+  │                                     │       - cc-nx-g_RefArch          │
+  │                                     │     Non-HttpOnly:                │
+  │                                     │       - cc-at-expires_RefArch    │
+  │                                     │       - cc-at-dnt_RefArch        │
+  │                                     │       - uido_RefArch             │
   │                                     │  4. Strip tokens from body       │
   │                                     │                                  │
   │◄─────────────────────────────────── │                                  │
@@ -144,16 +146,18 @@ Browser                       Express App (SLAS Proxy)                    SLAS
   │                                     │                                  │
   │  POST /mobify/slas/{private|public}/.../token                          │
   │  Headers: x-site-id: RefArch        │                                  │
+  │           x-grant-type: refresh_token                                  │
   │  Body: grant_type=refresh_token     │                                  │
   │        &refresh_token=              │                                  │
   │  Cookies:                           │                                  │
   │    cc-nx-g_RefArch=<refresh>        │                                  │
   │ ───────────────────────────────────►│                                  │
   │                                     │  Inject refresh token:           │
-  │                                     │  1. Read x-site-id → "RefArch"   │
-  │                                     │  2. Read cc-nx_RefArch or        │
+  │                                     │  1. Read x-grant-type header     │
+  │                                     │  2. Read x-site-id → "RefArch"   │
+  │                                     │  3. Read cc-nx_RefArch or        │
   │                                     │     cc-nx-g_RefArch from cookies │
-  │                                     │  3. Set sfdc_refresh_token hdr   │
+  │                                     │  4. Set sfdc_refresh_token hdr   │
   │                                     │                                  │
   │                                     │  Strip session cookies:          │
   │                                     │  Remove cc-at_RefArch,           │
