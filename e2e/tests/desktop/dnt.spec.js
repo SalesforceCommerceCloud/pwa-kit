@@ -66,6 +66,7 @@ test('Shopper can use the consent tracking form', async ({page}) => {
             break
         }
     }
+    await page.waitForURL(/\/login/i)
     var cookies = await page.context().cookies()
     if (cookies.some((item) => item.name === 'dw_dnt')) {
         throw new Error('dw_dnt still exists in the cookies')
