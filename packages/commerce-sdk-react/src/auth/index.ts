@@ -803,6 +803,11 @@ class Auth {
         // Dedup uses a module-level map (not an instance field) because React may recreate
         // the Auth instance on re-renders, giving each instance its own state. The map is
         // keyed by siteId+clientId so different sites/clients remain independent.
+        // On the server (SSR), each request is isolated — skip dedup entirely.
+        if (!onClient()) {
+            return await this._refreshAccessToken()
+        }
+
         const key = this.refreshDedupKey
         const existing = pendingRefreshTokens.get(key)
         if (existing) {
@@ -991,10 +996,12 @@ class Auth {
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
-        const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
-        if (pendingRefresh) {
-            await pendingRefresh
-            return this.data
+        if (onClient()) {
+            const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
+            if (pendingRefresh) {
+                await pendingRefresh
+                return this.data
+            }
         }
 
         if (!this.isAccessTokenExpired()) {
