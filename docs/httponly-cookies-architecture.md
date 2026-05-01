@@ -9,9 +9,9 @@ When you turn on `enableHttpOnlySessionCookies`, SLAS access and refresh tokens 
 PWA Kit supports HttpOnly session cookies with **two** SLAS client modes:
 
 | Mode | Proxy Path | Client Secret Required | Config |
-|------|-----------|----------------------|--------|
-| **Private Client** | `/mobify/slas/private` | Yes (`PWA_KIT_SLAS_CLIENT_SECRET` env var) | `useSLASPrivateClient: true` |
-| **Public Client** | `/mobify/slas/public` | No | `useSLASPrivateClient: false` (default) + `enableHttpOnlySessionCookies: true` |
+|------|-----------|---------------------|--------|
+| **Private Client** | `/mobify/slas/private` | Yes | `useSLASPrivateClient: true` + `enableHttpOnlySessionCookies: true` |
+| **Public Client** | `/mobify/slas/public` | No | `useSLASPrivateClient: false` + `enableHttpOnlySessionCookies: true` |
 
 #### How the proxy is selected
 
@@ -19,9 +19,6 @@ PWA Kit supports HttpOnly session cookies with **two** SLAS client modes:
 enableHttpOnlySessionCookies=true?
   ├── useSLASPrivateClient=true  → /mobify/slas/private (injects client_secret)
   └── useSLASPrivateClient=false → /mobify/slas/public  (no client_secret)
-
-enableHttpOnlySessionCookies=false?
-  └── Standard proxy (/mobify/proxy/...) — no HttpOnly cookies
 ```
 
 ## Request Flow Diagrams
@@ -225,8 +222,9 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 When HttpOnly session cookies are enabled, the `useAccessToken` hook returns `""` on the client
 because the access token is stored in an HttpOnly cookie that JavaScript can't read. This behavior is
-expected—the proxy injects the real token from the cookie on every SCAPI request. All SCAPI calls include `credentials: 'same-origin'` so that the browser sends HttpOnly cookies with
-every proxy request.
+expected—the real token is injected from the cookie on every SCAPI request: by the Express dev
+server proxy during local development, and by CloudFront Lambda@Edge on MRT. All SCAPI calls include
+`credentials: 'same-origin'` so that the browser sends HttpOnly cookies with every proxy request.
 
 ## Configuration
 
