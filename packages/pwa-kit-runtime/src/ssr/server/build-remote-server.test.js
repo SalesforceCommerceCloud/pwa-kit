@@ -2043,6 +2043,130 @@ describe('SLAS public proxy', () => {
             mockSlasServerInstance.close()
         }
     })
+
+    test('invokes onSLASPublicProxyReq and onSLASPublicProxyRes callbacks', async () => {
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
+
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const onSLASPublicProxyReq = jest.fn()
+            const onSLASPublicProxyRes = jest.fn((buffer) => buffer)
+
+            const app = mockExpress()
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: false,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id',
+                                siteId: 'testsite'
+                            }
+                        }
+                    }
+                },
+                onSLASPublicProxyReq,
+                onSLASPublicProxyRes
+            })
+
+            RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
+
+            const response = await request(app)
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
+                .set('Cookie', 'cc-at_testsite=mock-access-token')
+                .set(X_SITE_ID, 'testsite')
+
+            expect(response.status).toBe(200)
+            expect(onSLASPublicProxyReq).toHaveBeenCalled()
+            expect(onSLASPublicProxyRes).toHaveBeenCalled()
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
+
+    test('logs error when onSLASPublicProxyReq callback throws', async () => {
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
+
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                const accessToken = makeJWT({
+                    iat: 1000,
+                    isb: 'uido:ecom::upn:Guest::uidn:Guest::gcid:g1::rcid:r1::chid:testsite'
+                })
+                res.status(200).json({
+                    access_token: accessToken,
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const app = mockExpress()
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: false,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id',
+                                siteId: 'testsite'
+                            }
+                        }
+                    }
+                },
+                onSLASPublicProxyReq: () => {
+                    throw new Error('custom callback error')
+                }
+            })
+
+            RemoteServerFactory._setupSlasPublicClientProxy(app, options, true)
+
+            const response = await request(app)
+                .post('/mobify/slas/public/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
+                .set('Cookie', 'cc-at_testsite=mock-access-token')
+                .set(X_SITE_ID, 'testsite')
+
+            expect(response.status).toBe(200)
+            expect(logger.error).toHaveBeenCalledWith(
+                'Error in custom onSLASPublicProxyReq callback',
+                expect.objectContaining({
+                    namespace: '_setupSlasPublicClientProxy'
+                })
+            )
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
 })
 
 describe('errorHandlerMiddleware logic', () => {
