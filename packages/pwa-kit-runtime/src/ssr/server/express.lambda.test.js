@@ -403,7 +403,8 @@ describe('SSRServer Lambda integration', () => {
             headers: {
                 'x-api-key': '1234567890',
                 'x-apigateway-event': '{}',
-                'x-apigateway-context': '{}'
+                'x-apigateway-context': '{}',
+                'x-sfdc-access-control': 'test-value'
             }
         })
 
@@ -423,6 +424,7 @@ describe('SSRServer Lambda integration', () => {
             const decodedBody = response.isBase64Encoded ? atob(response.body) : response.body
             const reqHeaders = JSON.parse(decodedBody)
             X_HEADERS_TO_REMOVE_ORIGIN.forEach((key) => expect(reqHeaders[key]).toBeUndefined())
+            expect(reqHeaders['x-sfdc-access-control']).toBe('test-value')
         })
     })
 

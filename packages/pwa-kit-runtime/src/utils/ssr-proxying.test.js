@@ -594,7 +594,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 'x-mobify-access-key': undefined,
                 'x-apigateway-event': '{}',
                 'x-apigateway-context': '{}',
-                'x-sfdc-access-control': undefined
+                'x-sfdc-access-control': '123456789'
             }
         },
         {
