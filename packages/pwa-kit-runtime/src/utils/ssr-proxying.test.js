@@ -585,7 +585,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 'x-mobify-access-key': 'abcdefghijk',
                 'x-apigateway-event': '{}',
                 'x-apigateway-context': '{}',
-                'x-sfdc-access-control': '123456789'
+                'x-sfdc-access-control': undefined
             },
             expected: {
                 'accept-encoding': 'deflate, gzip',
@@ -594,7 +594,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 'x-mobify-access-key': undefined,
                 'x-apigateway-event': '{}',
                 'x-apigateway-context': '{}',
-                'x-sfdc-access-control': '123456789'
+                'x-sfdc-access-control': undefined
             }
         },
         {

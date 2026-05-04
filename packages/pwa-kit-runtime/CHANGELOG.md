@@ -1,5 +1,5 @@
 ## v3.19.0 
-- Keep access control header in origin and proxy requests [#3813](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3813)
+- Keep access control header in origin requests [#3813](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3813)
 
 ## v3.18.0 (Apr 27, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
