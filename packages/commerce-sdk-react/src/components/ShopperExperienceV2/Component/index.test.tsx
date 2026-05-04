@@ -128,4 +128,44 @@ describe('Component', () => {
 
         expect((receivedProps.designMetadata as {name: string | undefined}).name).toBeUndefined()
     })
+
+    test('includes contentLinkUuid in designMetadata when present', () => {
+        const componentWithUuid = {
+            ...mockComponent,
+            contentLinkUuid: '0e1f329d4ac66ff2c3bbf70301'
+        } as unknown as ComponentProps['component']
+        const receivedProps: Record<string, unknown> = {}
+        const MockDynamicComponent = (props: Record<string, unknown>) => {
+            Object.assign(receivedProps, props)
+            return <div data-testid="dynamic-component">Test</div>
+        }
+        mockRegistry.getComponent.mockReturnValue(MockDynamicComponent)
+        mockRegistry.getFallback.mockReturnValue(null)
+
+        render(<Component component={componentWithUuid} regionId="test-region" />)
+
+        expect(receivedProps.designMetadata).toEqual({
+            name: 'Test Component',
+            isFragment: false,
+            isVisible: true,
+            isLocalized: false,
+            id: 'test-component-id',
+            contentLinkUuid: '0e1f329d4ac66ff2c3bbf70301'
+        })
+    })
+
+    test('omits contentLinkUuid from designMetadata when not present', () => {
+        const receivedProps: Record<string, unknown> = {}
+        const MockDynamicComponent = (props: Record<string, unknown>) => {
+            Object.assign(receivedProps, props)
+            return <div data-testid="dynamic-component">Test</div>
+        }
+        mockRegistry.getComponent.mockReturnValue(MockDynamicComponent)
+        mockRegistry.getFallback.mockReturnValue(null)
+
+        render(<Component component={mockComponent} regionId="test-region" />)
+
+        const designMetadata = receivedProps.designMetadata as Record<string, unknown>
+        expect(designMetadata).not.toHaveProperty('contentLinkUuid')
+    })
 })

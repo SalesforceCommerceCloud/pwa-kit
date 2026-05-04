@@ -65,7 +65,8 @@ export function RegionWrapper({
     const fullDesignMetadata = React.useMemo(
         () => ({
             id: region.id,
-            componentIds: region?.components?.map((cmp: any) => cmp.id) || [],
+            componentIds:
+                region?.components?.map((cmp: any) => cmp.contentLinkUuid || cmp.id) || [],
             componentTypeExclusions: designMetadata?.componentTypeExclusions || [],
             componentTypeInclusions: designMetadata?.componentTypeInclusions || []
         }),
