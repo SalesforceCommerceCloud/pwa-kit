@@ -86,7 +86,7 @@ test('Guest shopper can checkout product bundle', async ({page}) => {
 
     const addedToCartModal = page.getByText(/1 item added to cart/i)
     await addedToCartModal.waitFor()
-    await page.getByLabel('Close').click()
+    await page.getByLabel('Close', {exact: true}).click()
 
     await page.getByLabel(/My cart/i).click()
     await page.waitForLoadState()
