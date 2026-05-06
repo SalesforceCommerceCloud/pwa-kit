@@ -1,5 +1,7 @@
 # HttpOnly Session Cookies — Architecture
 
+> **WIP: This feature is in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
+
 ## Overview
 
 When you turn on `enableHttpOnlySessionCookies`, SLAS access and refresh tokens are stored as HttpOnly cookies to improve security. The server-side SLAS proxy layer handles token injection transparently.
