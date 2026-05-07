@@ -1,3 +1,6 @@
+## v5.2.0-preview.2 (May 07, 2026)
+## v5.2.0-preview.1 (May 07, 2026)
+## v3.18.0-preview.2 (May 07, 2026)
 ## v5.2.0-preview.1 (May 04, 2026)
 ## v5.2.0-preview.0 (May 01, 2026)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)

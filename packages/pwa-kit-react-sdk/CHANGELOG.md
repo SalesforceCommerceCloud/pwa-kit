@@ -1,3 +1,4 @@
+## v3.18.0-preview.2 (May 07, 2026)
 ## v3.18.0-preview.1 (May 04, 2026)
 ## v3.18.0-preview.0 (May 01, 2026)
 - Update `@salesforce/pwa-kit-runtime` dependency which simplified data store implementation [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
