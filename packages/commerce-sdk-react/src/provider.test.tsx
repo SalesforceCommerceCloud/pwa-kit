@@ -89,6 +89,18 @@ describe('provider', () => {
         expect(authInstance.ready).toHaveBeenCalledTimes(1)
     })
 
+    test('passes cookieDomain to Auth constructor', () => {
+        renderWithProviders(<h1>test</h1>, {
+            cookieDomain: '.example.com'
+        })
+        expect(Auth).toHaveBeenCalledTimes(1)
+        expect(Auth).toHaveBeenCalledWith(
+            expect.objectContaining({
+                cookieDomain: '.example.com'
+            })
+        )
+    })
+
     test('passes enableHttpOnlySessionCookies to Auth constructor', () => {
         renderWithProviders(<h1>HttpOnly cookies enabled!</h1>, {
             enableHttpOnlySessionCookies: true
