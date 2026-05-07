@@ -214,6 +214,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             refreshTokenRegisteredCookieTTL,
             refreshTokenGuestCookieTTL,
             hybridAuthEnabled,
+            cookieDomain,
             enableHttpOnlySessionCookies
         })
     }, [
