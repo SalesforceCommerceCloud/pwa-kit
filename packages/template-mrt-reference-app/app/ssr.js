@@ -241,6 +241,13 @@ const ssrShared = async (req, res) => {
 }
 
 /**
+ * Express handler that returns a simple greeting.
+ */
+const claude = (req, res) => {
+    res.status(200).send('hi')
+}
+
+/**
  * Express handler that returns a non-streaming response.
  */
 const streamingLarge = (req, res) => {
@@ -457,6 +464,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/set-response-headers', responseHeadersTest)
     app.get('/ssr-shared', ssrShared)
     app.get('/streaming-large', streamingLarge)
+    app.get('/claude', claude)
     app.get('/data-store/:key', dataStoreTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
