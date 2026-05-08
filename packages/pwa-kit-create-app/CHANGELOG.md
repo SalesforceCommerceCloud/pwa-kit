@@ -1,8 +1,9 @@
-## v3.18.0-dev (Mar 20, 2026)
-- Add opt-in `app.mrtDataStore.enabled` to generated `config/default.js` templates (default `false`; enable MRT Data Store bootstrap with `true` or `PWAKIT_MRT_DATA_STORE_ENABLED`; when false, `__MRT_DATA_STORE__` is omitted from `#mobify-data`). Comments reference `isMrtDataStoreEnabled`. Document local defaults env vars (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, etc.) for `@salesforce/pwa-kit-dev` in-memory provider.
+## v3.18.0 (May 07, 2026)
+- Add opt-in `app.mrtDataStore.enabled` to generated `config/default.js` templates (default `false`; enable MRT Data Store bootstrap with `true` or `PWAKIT_MRT_DATA_STORE_ENABLED`; when false, `__MRT_DATA_STORE__` is omitted from `#mobify-data`). Comments reference `isMrtDataStoreEnabled`. Document local defaults env vars (`MRT_DATA_STORE_DEFAULTS`, etc.) for the in-memory local provider from `@salesforce/mrt-utilities`. [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787) [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
 - Update generated `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
 - WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+- Add Node 24 support to the extensible app template's generated `package.json`. Aligns the template with the rest of the monorepo. [#3821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3821)
 
 ## v3.17.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

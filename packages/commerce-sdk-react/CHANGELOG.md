@@ -1,6 +1,9 @@
-## v5.2.0-dev (Mar 20, 2026)
+## v5.3.0-dev (May 07, 2026)
+
+## v5.2.0 (May 07, 2026)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
 - WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+- Re-add `cookieDomain` parameter to the `Auth` constructor; previously dropped during a merge. [#3822](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3822)
 
 ## v5.1.1 (Mar 20, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

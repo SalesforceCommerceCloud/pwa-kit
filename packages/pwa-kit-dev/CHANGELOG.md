@@ -1,8 +1,8 @@
-## v3.18.0 (Apr 27, 2026)
+## v3.19.0-dev (May 07, 2026)
+## v3.18.0 (May 07, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
 - WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
-
-## v3.18.0-dev (Mar 20, 2026)
+- Add `createLocalMrtDataStoreProvider` in `src/utils/mrt-data-store-local-provider.js` for local MRT Data Store defaults (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, `PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING`), loaded dynamically from `@salesforce/pwa-kit-runtime` when DynamoDB is not configured. [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787)
 - **Removed Data Store Code**: Removed `mrt-data-store-local-provider.js` and related code. Local data store implementation now lives in `@salesforce/mrt-utilities@0.1.6+` and is loaded via conditional exports. This package is now purely focused on build and development tooling. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 - **Webpack Configuration**: Added `dev-data-store` to webpack's `conditionNames` in development mode to enable mrt-utilities conditional export resolution. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 
