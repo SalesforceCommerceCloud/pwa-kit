@@ -8,9 +8,9 @@ import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
+    useAccessToken,
     useConfig,
     useCustomerType,
-    useShopperAgentsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -21,6 +21,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
 const onClient = typeof window !== 'undefined'
 
@@ -136,7 +137,7 @@ const isEnabled = (enabled) => {
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
  * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
- * - Calls postSessionInit when a conversation starts (`onEmbeddedMessagingConversationStarted`)
+ * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
  * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
@@ -202,7 +203,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {usid} = useUsid()
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
-    const postSessionInitMutation = useShopperAgentsMutation('postSessionInit')
+
+    // SLAS access token — needed to call Core's Token Bridge directly.
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
 
     const prevCommerceCustomerTypeRef = useRef(undefined)
 
@@ -224,8 +229,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             resetEmbeddedMessagingForCommerceSessionChange()
         }
     }, [customerType])
-    const postSessionInitMutateRef = useRef(postSessionInitMutation.mutate)
-    postSessionInitMutateRef.current = postSessionInitMutation.mutate
 
     const formatMessageRef = useRef(formatMessage)
     formatMessageRef.current = formatMessage
@@ -391,43 +394,42 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             }
 
             getAuthLinkKey()
-                .then((sessionInitKey) => {
-                    postSessionInitMutateRef.current(
-                        {
-                            parameters: {organizationId: orgId, siteId: sid},
-                            body: {
-                                sessionInitKey
-                            }
-                        },
-                        {
-                            onSuccess: (data) => {
-                                console.info(
-                                    'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
-                                    {
-                                        organizationId: orgId,
-                                        siteId: sid,
-                                        response: data
-                                    }
-                                )
-                            },
-                            onError: (error) => {
-                                console.error(
-                                    'postSessionInit failed onEmbeddedMessagingConversationStarted',
-                                    {
-                                        organizationId: orgId,
-                                        siteId: sid,
-                                        error
-                                    }
-                                )
-                                // Close the chat if session initialization fails
-                                resetEmbeddedMessagingForCommerceSessionChange()
-                                toastRef.current({
-                                    title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                                    status: 'error'
-                                })
-                            }
+                .then(async (authLinkKey) => {
+                    // Direct callout to Core's Token Bridge via the same-origin
+                    // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
+                    try {
+                        const slasAccessToken = await getTokenWhenReadyRef.current()
+                        // useRefreshToken() resolves the refresh token from the
+                        // SDK's auth context. Send it through the request body
+                        // so the proxy doesn't need to read SLAS cookies (which
+                        // pwa-kit-runtime strips when localAllowCookies=false).
+                        const slasRefreshToken = embeddedLifecycleRef.current.refreshToken
+                        const result = await callTokenBridge({
+                            authLinkKey,
+                            slasAccessToken,
+                            slasRefreshToken
+                        })
+
+                        if (result.status !== 200) {
+                            const errorCode = result.body?.error || `HTTP_${result.status}`
+                            console.error('Token Bridge failed', {
+                                status: result.status,
+                                error: errorCode
+                            })
+                            resetEmbeddedMessagingForCommerceSessionChange()
+                            toastRef.current({
+                                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                                status: 'error'
+                            })
                         }
-                    )
+                    } catch (error) {
+                        console.error('Token Bridge threw', error)
+                        resetEmbeddedMessagingForCommerceSessionChange()
+                        toastRef.current({
+                            title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                            status: 'error'
+                        })
+                    }
                 })
                 .catch((error) => {
                     console.error('Shopper Agent: getAuthLinkKey failed', error)

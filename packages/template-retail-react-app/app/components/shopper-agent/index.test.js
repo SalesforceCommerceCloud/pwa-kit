@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
 
 // Mock useAppOrigin hook
@@ -29,6 +29,14 @@ jest.mock('react-intl', () => ({
     useIntl: jest.fn(() => ({formatMessage: mockFormatMessage}))
 }))
 
+// Mock the Token Bridge browser helper. The ShopperAgent calls this when a
+// conversation starts, replacing the previous postSessionInit SCAPI mutation.
+const mockCallTokenBridge = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridge', () => ({
+    __esModule: true,
+    callTokenBridge: (...args) => mockCallTokenBridge(...args)
+}))
+
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 
@@ -42,7 +50,7 @@ const mockEmbeddedService = {
     },
     userVerificationAPI: {
         clearSession: jest.fn().mockResolvedValue(undefined),
-        getAuthLinkKey: jest.fn().mockResolvedValue('test-session-init-key-on-ready')
+        getAuthLinkKey: jest.fn().mockResolvedValue('test-auth-link-key')
     }
 }
 
@@ -80,11 +88,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
     default: jest.fn()
 }))
 
-// Mock the useUsid hook
+// Mock commerce-sdk-react hooks. useAccessToken returns a stable object so the
+// component can read getTokenWhenReady() during the conversation-started flow.
 jest.mock('@salesforce/commerce-sdk-react', () => ({
+    useAccessToken: jest.fn(),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
-    useShopperAgentsMutation: jest.fn(),
     useCustomerType: jest.fn()
 }))
 
@@ -103,9 +112,9 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import {
+    useAccessToken,
     useConfig,
     useCustomerType,
-    useShopperAgentsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
@@ -115,14 +124,15 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 // Get mocked functions
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
+const mockedUseAccessToken = useAccessToken
 const mockedUseUsid = useUsid
 const mockedUseConfig = useConfig
 const mockedUseCustomerType = useCustomerType
-const mockedUseShopperAgentsMutation = useShopperAgentsMutation
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
-const mockPostSessionInitMutate = jest.fn()
+
+const mockGetTokenWhenReady = jest.fn()
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -158,16 +168,15 @@ describe('ShopperAgent Component', () => {
         // Mock useUsid hook
         mockedUseUsid.mockReturnValue({usid: 'test-usid'})
 
+        // Mock useAccessToken hook
+        mockGetTokenWhenReady.mockReset()
+        mockGetTokenWhenReady.mockResolvedValue('test-slas-access-token')
+        mockedUseAccessToken.mockReturnValue({getTokenWhenReady: mockGetTokenWhenReady})
+
         // Mock useConfig hook
         mockedUseConfig.mockReturnValue({
             organizationId: '00DTEST00000001',
             siteId: 'RefArchGlobal'
-        })
-
-        // Mock useShopperAgentsMutation hook
-        mockPostSessionInitMutate.mockReset()
-        mockedUseShopperAgentsMutation.mockReturnValue({
-            mutate: mockPostSessionInitMutate
         })
 
         mockedUseCustomerType.mockReturnValue({
@@ -193,12 +202,20 @@ describe('ShopperAgent Component', () => {
         // Mock useAppOrigin hook
         mockUseAppOrigin.mockReturnValue('https://example.com')
 
+        // Default Token Bridge response: success
+        mockCallTokenBridge.mockReset()
+        mockCallTokenBridge.mockResolvedValue({status: 200, body: {ok: true}})
+
         mockShowToast.mockClear()
         mockFormatMessage.mockImplementation(
             (descriptor) => descriptor.defaultMessage ?? descriptor.id
         )
         mockEmbeddedService.userVerificationAPI.clearSession.mockClear()
         mockEmbeddedService.userVerificationAPI.clearSession.mockResolvedValue(undefined)
+        mockEmbeddedService.userVerificationAPI.getAuthLinkKey.mockClear()
+        mockEmbeddedService.userVerificationAPI.getAuthLinkKey.mockResolvedValue(
+            'test-auth-link-key'
+        )
 
         global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
@@ -400,46 +417,40 @@ describe('ShopperAgent Component', () => {
         })
     })
 
-    test('should not call postSessionInit mutation on embedded messaging ready', async () => {
+    test('should NOT call Token Bridge on embedded messaging ready', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
         })
 
-        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should call postSessionInit mutation with expected payload when conversation starts', async () => {
+    test('should call Token Bridge with auth link key, access token, and refresh token when conversation starts', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
-        expect(mockPostSessionInitMutate).toHaveBeenCalledWith(
-            {
-                parameters: {organizationId: '00DTEST00000001', siteId: 'RefArchGlobal'},
-                body: {
-                    sessionInitKey: 'test-session-init-key-on-ready'
-                }
-            },
-            expect.objectContaining({
-                onSuccess: expect.any(Function),
-                onError: expect.any(Function)
-            })
-        )
+        await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+        expect(mockCallTokenBridge).toHaveBeenCalledWith({
+            authLinkKey: 'test-auth-link-key',
+            slasAccessToken: 'test-slas-access-token',
+            slasRefreshToken: 'test-refresh-token'
+        })
     })
 
-    test('should dedupe postSessionInit for duplicate started events with same conversationId', async () => {
+    test('should dedupe Token Bridge calls for duplicate started events with same conversationId', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
-        const evt = new CustomEvent('onEmbeddedMessagingConversationStarted', {
-            detail: {conversationId: 'same-id'}
-        })
-
         await act(async () => {
-            window.dispatchEvent(evt)
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'same-id'}
+                })
+            )
             window.dispatchEvent(
                 new CustomEvent('onEmbeddedMessagingConversationStarted', {
                     detail: {conversationId: 'same-id'}
@@ -447,12 +458,15 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        expect(mockPostSessionInitMutate).toHaveBeenCalledTimes(1)
+        await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
     })
 
-    test('should log session init success and error through mutation callbacks', async () => {
-        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+    test('should reset session and toast error when Token Bridge returns non-200 status', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        mockCallTokenBridge.mockResolvedValueOnce({
+            status: 401,
+            body: {error: 'INVALID_SLAS_TOKEN'}
+        })
 
         render(<ShopperAgent {...defaultProps} />)
 
@@ -460,67 +474,59 @@ describe('ShopperAgent Component', () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
-        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
-        const successResponse = {status: 'ok'}
-        const mutationError = new Error('session init failed')
-
-        callbacks.onSuccess(successResponse)
-        callbacks.onError(mutationError)
-
-        expect(infoSpy).toHaveBeenCalledWith(
-            'postSessionInit succeeded onEmbeddedMessagingConversationStarted',
-            {
-                organizationId: '00DTEST00000001',
-                siteId: 'RefArchGlobal',
-                response: successResponse
-            }
+        await waitFor(() =>
+            expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
         )
-        expect(errorSpy).toHaveBeenCalledWith(
-            'postSessionInit failed onEmbeddedMessagingConversationStarted',
-            {
-                organizationId: '00DTEST00000001',
-                siteId: 'RefArchGlobal',
-                error: mutationError
-            }
-        )
-
-        infoSpy.mockRestore()
-        errorSpy.mockRestore()
-    })
-
-    test('should call userVerificationAPI.clearSession and show error toast when postSessionInit fails', async () => {
-        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        expect(errorSpy).toHaveBeenCalledWith('Token Bridge failed', {
+            status: 401,
+            error: 'INVALID_SLAS_TOKEN'
         })
-
-        const [, callbacks] = mockPostSessionInitMutate.mock.calls[0]
-        const mutationError = new Error('session init failed')
-
-        await act(async () => {
-            callbacks.onError(mutationError)
-        })
-
-        expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
         expect(mockShowToast).toHaveBeenCalledTimes(1)
         const toastPayload = mockShowToast.mock.calls[0][0]
         expect(toastPayload.status).toBe('error')
-        const expectedTitle = 'We could not start the shopping assistant. Please try again.'
-        const titleText =
-            typeof toastPayload.title === 'string'
-                ? toastPayload.title
-                : Array.isArray(toastPayload.title)
-                ? toastPayload.title.map((chunk) => chunk?.value ?? '').join('')
-                : ''
-        expect(titleText).toBe(expectedTitle)
 
         errorSpy.mockRestore()
     })
 
-    test('should log error and not call postSessionInit when getAuthLinkKey is unavailable', async () => {
+    test('should reset session and toast error when Token Bridge throws', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        mockCallTokenBridge.mockRejectedValueOnce(new Error('network down'))
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        await waitFor(() =>
+            expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
+        )
+        expect(errorSpy).toHaveBeenCalledWith('Token Bridge threw', expect.any(Error))
+        expect(mockShowToast).toHaveBeenCalledTimes(1)
+
+        errorSpy.mockRestore()
+    })
+
+    test('should fall back to HTTP_<status> when Token Bridge body has no error code', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        mockCallTokenBridge.mockResolvedValueOnce({status: 503, body: null})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        await waitFor(() => expect(errorSpy).toHaveBeenCalled())
+        expect(errorSpy).toHaveBeenCalledWith('Token Bridge failed', {
+            status: 503,
+            error: 'HTTP_503'
+        })
+
+        errorSpy.mockRestore()
+    })
+
+    test('should log error and not call Token Bridge when getAuthLinkKey is unavailable', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const bootstrapWithoutUv = {
             ...mockEmbeddedService,
@@ -535,13 +541,32 @@ describe('ShopperAgent Component', () => {
         })
 
         expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey is not available')
-        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
 
         errorSpy.mockRestore()
         global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
 
-    test('should not call postSessionInit mutation when organizationId or siteId is missing', async () => {
+    test('should log error when getAuthLinkKey rejects and not call Token Bridge', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const rejection = new Error('auth link key rejected')
+        mockEmbeddedService.userVerificationAPI.getAuthLinkKey.mockRejectedValueOnce(rejection)
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        await waitFor(() =>
+            expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey failed', rejection)
+        )
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+
+        errorSpy.mockRestore()
+    })
+
+    test('should not call Token Bridge when organizationId or siteId is missing', async () => {
         mockedUseConfig.mockReturnValue({
             organizationId: '',
             siteId: ''
@@ -553,7 +578,7 @@ describe('ShopperAgent Component', () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
-        expect(mockPostSessionInitMutate).not.toHaveBeenCalled()
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
     test('should update prechat fields when refresh token changes', async () => {
@@ -624,6 +649,23 @@ describe('ShopperAgent Component', () => {
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
+        })
+    })
+
+    test('should omit slasRefreshToken in Token Bridge call when refresh token is null', async () => {
+        mockedUseRefreshToken.mockReturnValue(null)
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+        expect(mockCallTokenBridge).toHaveBeenCalledWith({
+            authLinkKey: 'test-auth-link-key',
+            slasAccessToken: 'test-slas-access-token',
+            slasRefreshToken: null
         })
     })
 
