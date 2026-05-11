@@ -6,6 +6,7 @@
  */
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
+import useCookie from './useCookie'
 import useConfig from './useConfig'
 import {onClient} from '../utils'
 
@@ -36,11 +37,19 @@ const useCustomerType = (): useCustomerType => {
     const config = useConfig()
     const auth = useAuthContext()
 
+    const customerTypeKey = `customer_type_${config.siteId}`
+    // When httpOnly session cookies are enabled, the SLAS proxy mirrors
+    // customer_type as a cookie and the local-storage write is skipped, so we
+    // read from cookies instead. (uido is not mirrored to a cookie and remains
+    // in local storage.)
     let customerType: string | null = onClient()
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useLocalStorage(`customer_type_${config.siteId}`)
+          config.enableHttpOnlySessionCookies
+            ? // eslint-disable-next-line react-hooks/rules-of-hooks
+              useCookie(customerTypeKey)
+            : // eslint-disable-next-line react-hooks/rules-of-hooks
+              useLocalStorage(customerTypeKey)
         : auth.get('customer_type')
 
     const isGuest = customerType === 'guest'

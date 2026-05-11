@@ -6,6 +6,7 @@
  */
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
+import useCookie from './useCookie'
 import useConfig from './useConfig'
 import {onClient} from '../utils'
 
@@ -29,12 +30,19 @@ interface EncUserId {
 const useEncUserId = (): EncUserId => {
     const config = useConfig()
     const auth = useAuthContext()
+    const key = `enc_user_id_${config.siteId}`
 
+    // When httpOnly session cookies are enabled, the SLAS proxy mirrors
+    // enc_user_id as a cookie and the local-storage write is skipped, so we
+    // read from cookies instead.
     const encUserId = onClient()
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useLocalStorage(`enc_user_id_${config.siteId}`)
+          config.enableHttpOnlySessionCookies
+            ? // eslint-disable-next-line react-hooks/rules-of-hooks
+              useCookie(key)
+            : // eslint-disable-next-line react-hooks/rules-of-hooks
+              useLocalStorage(key)
         : auth.get('enc_user_id')
 
     const getEncUserIdWhenReady = () => auth.ready().then(({enc_user_id}) => enc_user_id)

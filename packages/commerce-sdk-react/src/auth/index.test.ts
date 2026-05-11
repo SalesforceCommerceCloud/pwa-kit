@@ -1633,8 +1633,11 @@ describe('HttpOnly Session Cookies', () => {
         // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
         expect(auth.get('access_token')).toBeFalsy()
         expect(auth.get('refresh_token_guest')).toBeFalsy()
-        // Common fields should still be stored
-        expect(auth.get('customer_id')).toBe(TOKEN_RESPONSE.customer_id)
+        // customer_id is mirrored as a cookie by the proxy in httpOnly mode, so the
+        // client must not write a duplicate localStorage entry. Confirm there's no
+        // localStorage entry left behind.
+        expect(window.localStorage.getItem(`customer_id_${config.siteId}`)).toBeNull()
+        // usid is still set client-side as a cookie (with explicit expiry)
         expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
         // enableHttpOnlySessionCookies should be forwarded to the helper
         expect(helpers.loginGuestUser).toHaveBeenCalledWith(

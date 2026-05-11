@@ -6,6 +6,7 @@
  */
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
+import useCookie from './useCookie'
 import useConfig from './useConfig'
 import {onClient} from '../utils'
 
@@ -21,8 +22,12 @@ const useCustomerId = (): string | null => {
         // despite technically being inside a conditional.
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const config = useConfig()
+        const key = `customer_id_${config.siteId}`
+        // When httpOnly session cookies are enabled, the SLAS proxy mirrors
+        // customer_id as a cookie and the local-storage write is skipped, so
+        // we read from cookies instead.
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useLocalStorage(`customer_id_${config.siteId}`)
+        return config.enableHttpOnlySessionCookies ? useCookie(key) : useLocalStorage(key)
     }
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const auth = useAuthContext()

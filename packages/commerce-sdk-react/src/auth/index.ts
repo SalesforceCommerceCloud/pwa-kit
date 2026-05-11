@@ -277,6 +277,26 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 
 /**
+ * SLAS metadata fields that the proxy mirrors as cookies when
+ * `enableHttpOnlySessionCookies` is on. In that mode we treat the cookies as
+ * the single source of truth and skip the local-storage writes that would
+ * otherwise duplicate them.
+ *
+ * @internal
+ */
+export const HTTPONLY_COOKIE_REDIRECTED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
+    'customer_id',
+    'enc_user_id',
+    'customer_type',
+    'refresh_token_expires_in',
+    'expires_in',
+    'id_token',
+    'token_type',
+    'idp_access_token',
+    'idp_refresh_token'
+])
+
+/**
  * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
  * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
  * so instance-level dedup via `this.pendingToken` is insufficient. This map ensures only one
@@ -415,22 +435,41 @@ class Auth {
         this.enableHttpOnlySessionCookies = config.enableHttpOnlySessionCookies ?? false
     }
 
+    /**
+     * Returns the storage type to use for a given key. When
+     * `enableHttpOnlySessionCookies` is on (and we're on the client), the SLAS
+     * proxy writes cookies for the metadata keys in
+     * `HTTPONLY_COOKIE_REDIRECTED_KEYS`, so reads/writes for those keys are
+     * routed to the cookie store instead of local storage.
+     */
+    private resolveStorageType(name: AuthDataKeys): StorageType {
+        const {storageType} = DATA_MAP[name]
+        if (
+            this.enableHttpOnlySessionCookies &&
+            onClient() &&
+            HTTPONLY_COOKIE_REDIRECTED_KEYS.has(name)
+        ) {
+            return 'cookie'
+        }
+        return storageType
+    }
+
     get(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
     }
 
     private delete(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.delete(key)
     }
 
@@ -523,8 +562,8 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
-            const store = this.stores[storageType]
+            const {key} = DATA_MAP[keyName]
+            const store = this.stores[this.resolveStorageType(keyName)]
             store.delete(key)
         })
     }
@@ -647,7 +686,9 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
-            this.set('customer_id', customerId)
+            // In httpOnly mode customer_id/customer_type are routed to cookies; pass
+            // expires so we don't overwrite the proxy-set cookie with a session cookie.
+            this.set('customer_id', customerId, {expires: expiresDate})
 
             /**
              * The usid cookie always set when session bridging in a hybrid setup. This makes resetting the usid
@@ -661,7 +702,7 @@ class Auth {
                 })
             }
 
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
+            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -762,18 +803,26 @@ class Auth {
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
 
-        this.set('customer_id', res.customer_id)
-        this.set('enc_user_id', res.enc_user_id)
-        this.set('expires_in', `${res.expires_in}`)
-        this.set('id_token', res.id_token)
-        this.set('token_type', res.token_type)
-        this.set('customer_type', isGuest ? 'guest' : 'registered')
+        // In httpOnly mode on the client, the SLAS proxy mirrors these fields as
+        // cookies with proper TTL via Set-Cookie. Skip the client-side writes so
+        // we don't downgrade those cookies to session cookies (no expires).
+        const skipMetadataWrites = this.enableHttpOnlySessionCookies && onClient()
+        if (!skipMetadataWrites) {
+            this.set('customer_id', res.customer_id)
+            this.set('enc_user_id', res.enc_user_id)
+            this.set('expires_in', `${res.expires_in}`)
+            this.set('id_token', res.id_token)
+            this.set('token_type', res.token_type)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
+        }
 
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
             isGuest
         )
-        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        if (!skipMetadataWrites) {
+            this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
@@ -980,7 +1029,9 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
-            this.set('customer_id', customerId)
+            // In httpOnly mode customer_id/customer_type are routed to cookies; pass
+            // expires so we don't overwrite the proxy-set cookie with a session cookie.
+            this.set('customer_id', customerId, {expires: expiresDate})
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
@@ -993,7 +1044,7 @@ class Auth {
                     expires: expiresDate
                 })
             }
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
+            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
             return this.data
         }
         if (onClient()) {
