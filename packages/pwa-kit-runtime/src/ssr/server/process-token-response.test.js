@@ -150,9 +150,14 @@ describe('setHttpOnlySessionCookies', () => {
         const buf = makeResponseBuffer({
             access_token: accessToken,
             idp_access_token: 'idp-token-value',
+            idp_refresh_token: 'idp-refresh-value',
             refresh_token: 'refresh-value',
+            refresh_token_expires_in: 7776000,
             expires_in: 1800,
-            customer_id: 'cust123'
+            customer_id: 'cust123',
+            enc_user_id: 'enc-user-456',
+            id_token: 'id-token-789',
+            token_type: 'Bearer'
         })
         const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
 
@@ -207,11 +212,78 @@ describe('setHttpOnlySessionCookies', () => {
         expect(staleRegisteredCookie.value).toBe('')
         expect(staleRegisteredCookie.expires).toEqual(new Date(0))
 
+        // customer_id (non-HttpOnly, refresh TTL)
+        const custIdCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_id_testsite='))
+        )
+        expect(custIdCookie.value).toBe('cust123')
+        expect(custIdCookie.httpOnly).toBeUndefined()
+        expect(custIdCookie.secure).toBe(true)
+        expect(custIdCookie.path).toBe('/')
+
+        // enc_user_id (non-HttpOnly, refresh TTL)
+        const encUserIdCookie = parseCookie(
+            res.cookies.find((c) => c.includes('enc_user_id_testsite='))
+        )
+        expect(encUserIdCookie.value).toBe('enc-user-456')
+        expect(encUserIdCookie.httpOnly).toBeUndefined()
+
+        // customer_type derived from JWT isb claim — guest
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.value).toBe('guest')
+        expect(custTypeCookie.httpOnly).toBeUndefined()
+
+        // refresh_token_expires_in (non-HttpOnly, refresh TTL)
+        const refreshExpInCookie = parseCookie(
+            res.cookies.find((c) => c.includes('refresh_token_expires_in_testsite='))
+        )
+        expect(refreshExpInCookie.value).toBe('7776000')
+        expect(refreshExpInCookie.httpOnly).toBeUndefined()
+
+        // expires_in (non-HttpOnly, refresh TTL); startsWith to disambiguate from
+        // refresh_token_expires_in_testsite= which contains the same suffix.
+        const expiresInCookie = parseCookie(
+            res.cookies.find((c) => c.startsWith('expires_in_testsite='))
+        )
+        expect(expiresInCookie.value).toBe('1800')
+        expect(expiresInCookie.httpOnly).toBeUndefined()
+
+        // id_token (non-HttpOnly, expiry tied to access JWT exp = 2800)
+        const idTokenCookie = parseCookie(
+            res.cookies.find((c) => c.includes('id_token_testsite='))
+        )
+        expect(idTokenCookie.value).toBe('id-token-789')
+        expect(idTokenCookie.httpOnly).toBeUndefined()
+        expect(idTokenCookie.expires).toEqual(new Date(2800 * 1000))
+
+        // idp_refresh_token (HttpOnly, refresh TTL)
+        const idpRefreshCookie = parseCookie(
+            res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))
+        )
+        expect(idpRefreshCookie.value).toBe('idp-refresh-value')
+        expect(idpRefreshCookie.httpOnly).toBe(true)
+        expect(idpRefreshCookie.secure).toBe(true)
+
+        // token_type (non-HttpOnly, refresh TTL)
+        const tokenTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('token_type_testsite='))
+        )
+        expect(tokenTypeCookie.value).toBe('Bearer')
+        expect(tokenTypeCookie.httpOnly).toBeUndefined()
+
+        // Confirms id_token (access exp) uses an earlier expiry than refresh-TTL cookies
+        expect(idTokenCookie.expires.getTime()).toBeLessThan(
+            idpRefreshCookie.expires.getTime()
+        )
+
         // Tokens stripped from body, other fields preserved
         const body = JSON.parse(result.toString('utf8'))
         expect(body).not.toHaveProperty('access_token')
         expect(body).not.toHaveProperty('idp_access_token')
         expect(body).not.toHaveProperty('refresh_token')
+        expect(body).not.toHaveProperty('idp_refresh_token')
         expect(body.expires_in).toBe(1800)
         expect(body.customer_id).toBe('cust123')
     })
@@ -249,6 +321,13 @@ describe('setHttpOnlySessionCookies', () => {
         const uidoCookie = parseCookie(res.cookies.find((c) => c.includes('uido_testsite=')))
         expect(uidoCookie.value).toBe('ecom')
 
+        // customer_type derived from JWT isb claim — registered
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.value).toBe('registered')
+        expect(custTypeCookie.httpOnly).toBeUndefined()
+
         // cc-nx-exists: non-HttpOnly indicator that a refresh token cookie exists
         const nxExistsCookie = parseCookie(
             res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))
@@ -270,6 +349,36 @@ describe('setHttpOnlySessionCookies', () => {
         const body = JSON.parse(result.toString('utf8'))
         expect(body).not.toHaveProperty('access_token')
         expect(body).not.toHaveProperty('refresh_token')
+    })
+
+    test('omits optional metadata cookies when SLAS response fields are absent', () => {
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            refresh_token: 'refresh-value'
+            // no customer_id, enc_user_id, id_token, expires_in,
+            // refresh_token_expires_in, token_type, idp_refresh_token
+        })
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        expect(res.cookies.find((c) => c.includes('customer_id_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('enc_user_id_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('id_token_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.startsWith('expires_in_testsite='))).toBeUndefined()
+        expect(
+            res.cookies.find((c) => c.includes('refresh_token_expires_in_testsite='))
+        ).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('token_type_testsite='))).toBeUndefined()
+        expect(
+            res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))
+        ).toBeUndefined()
+
+        // customer_type is still set because it is always derivable from the JWT isb claim
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.value).toBe('guest')
     })
 
     test('omits uido cookie when uido is absent from JWT', () => {
@@ -350,7 +459,15 @@ describe('expireHttpOnlySessionCookies', () => {
             'idp_access_token_testsite',
             'cc-nx-g_testsite',
             'cc-nx_testsite',
-            'cc-nx-exists_testsite'
+            'cc-nx-exists_testsite',
+            'customer_id_testsite',
+            'enc_user_id_testsite',
+            'customer_type_testsite',
+            'refresh_token_expires_in_testsite',
+            'expires_in_testsite',
+            'id_token_testsite',
+            'idp_refresh_token_testsite',
+            'token_type_testsite'
         ]
 
         expect(res.cookies).toHaveLength(expectedCookieKeys.length)
@@ -388,5 +505,19 @@ describe('expireHttpOnlySessionCookies', () => {
         )
         expect(expCookie.httpOnly).toBeUndefined()
         expect(expCookie.secure).toBe(true)
+
+        // idp_refresh_token should be HttpOnly + Secure on logout expiry
+        const idpRefreshCookie = parseCookie(
+            res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))
+        )
+        expect(idpRefreshCookie.httpOnly).toBe(true)
+        expect(idpRefreshCookie.secure).toBe(true)
+
+        // customer_type should NOT be HttpOnly (SFRA needs to read it)
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.httpOnly).toBeUndefined()
+        expect(custTypeCookie.secure).toBe(true)
     })
 })

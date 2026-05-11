@@ -35,6 +35,38 @@ export const SESSION_COOKIE_CONFIG = {
     refreshTokenExists: {
         key: 'cc-nx-exists',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    customerId: {
+        key: 'customer_id',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    encUserId: {
+        key: 'enc_user_id',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    customerType: {
+        key: 'customer_type',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    refreshTokenExpiresIn: {
+        key: 'refresh_token_expires_in',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    expiresIn: {
+        key: 'expires_in',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    idToken: {
+        key: 'id_token',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
+    },
+    idpRefreshToken: {
+        key: 'idp_refresh_token',
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+    },
+    tokenType: {
+        key: 'token_type',
+        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     }
 }
 
@@ -48,5 +80,6 @@ export const getCookieNamesToStripFromProxy = (siteId) => [
     getCookieName(SESSION_COOKIE_CONFIG.accessToken, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenGuest, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenRegistered, siteId),
+    getCookieName(SESSION_COOKIE_CONFIG.idpRefreshToken, siteId),
     DWSID_COOKIE_NAME
 ]

@@ -98,7 +98,15 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         idpAccessToken,
         refreshTokenGuest,
         refreshTokenRegistered,
-        refreshTokenExists
+        refreshTokenExists,
+        customerId,
+        encUserId,
+        customerType,
+        refreshTokenExpiresIn,
+        expiresIn,
+        idToken,
+        idpRefreshToken,
+        tokenType
     } = SESSION_COOKIE_CONFIG
 
     // Decode JWT and extract claims
@@ -167,6 +175,19 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 })
             )
         }
+
+        // id_token (non-HttpOnly): expiry tied to access token JWT exp.
+        if (parsed.id_token) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(idToken, site),
+                    value: parsed.id_token,
+                    expires: tokenClaims.accessExpires,
+                    ...idToken.attributes
+                })
+            )
+        }
     }
 
     // Refresh token (HttpOnly) — uses its own TTL, independent of access token expiry
@@ -215,6 +236,91 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 ...staleRefreshConfig.attributes
             })
         )
+
+        // Hybrid SFRA + PWA: mirror SLAS metadata as siteId-suffixed cookies so SFRA
+        // can read the same session state. Expiry aligned with refresh token TTL.
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: getCookieName(customerType, site),
+                value: isGuest ? 'guest' : 'registered',
+                expires: refreshExpires,
+                ...customerType.attributes
+            })
+        )
+
+        if (parsed.customer_id) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(customerId, site),
+                    value: parsed.customer_id,
+                    expires: refreshExpires,
+                    ...customerId.attributes
+                })
+            )
+        }
+
+        if (parsed.enc_user_id) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(encUserId, site),
+                    value: parsed.enc_user_id,
+                    expires: refreshExpires,
+                    ...encUserId.attributes
+                })
+            )
+        }
+
+        if (parsed.refresh_token_expires_in !== undefined) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(refreshTokenExpiresIn, site),
+                    value: String(parsed.refresh_token_expires_in),
+                    expires: refreshExpires,
+                    ...refreshTokenExpiresIn.attributes
+                })
+            )
+        }
+
+        if (parsed.expires_in !== undefined) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(expiresIn, site),
+                    value: String(parsed.expires_in),
+                    expires: refreshExpires,
+                    ...expiresIn.attributes
+                })
+            )
+        }
+
+        if (parsed.token_type) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(tokenType, site),
+                    value: parsed.token_type,
+                    expires: refreshExpires,
+                    ...tokenType.attributes
+                })
+            )
+        }
+
+        // idp_refresh_token (HttpOnly): refresh-TTL-aligned, only when present.
+        if (parsed.idp_refresh_token) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(idpRefreshToken, site),
+                    value: parsed.idp_refresh_token,
+                    expires: refreshExpires,
+                    ...idpRefreshToken.attributes
+                })
+            )
+        }
     }
 
     // Strip token fields from body so they are not exposed to the client
@@ -222,6 +328,7 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
     delete stripped.access_token
     delete stripped.idp_access_token
     delete stripped.refresh_token
+    delete stripped.idp_refresh_token
     return Buffer.from(JSON.stringify(stripped), 'utf8')
 }
 
