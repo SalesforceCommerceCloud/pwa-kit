@@ -406,7 +406,7 @@
             {
                 "id": "retail-react-app-bug-bounty",
                 "name": "Retail React App Bug Bounty Project",
-                "description": "",
+                "description": "Internal preset used by CI to build the PWA Kit bundle deployed to the bug-bounty test environment. Connects to the staging-001 instance, uses the bug-bounty private SLAS client, and reads the JWKS fetch User-Agent from the PWA_KIT_JWKS_USER_AGENT env variable (set at the MRT environment level) so SLAS access-token validation passes the WAF allowlist. Not for customer use.",
                 "templateId": "retail-react-app",
                 "answers": {
                     "project.extend": true,
@@ -422,7 +422,8 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.privateFeatures.jwksUserAgentEnabled": true
                 },
                 "private": true
             },

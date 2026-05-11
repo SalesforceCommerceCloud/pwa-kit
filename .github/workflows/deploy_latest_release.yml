@@ -100,6 +100,6 @@ jobs:
           CWD: ${{ steps.generate_app.outputs.project_path }}
           TARGET: ${{ matrix.environment.target }}
           PROJECT: ${{ matrix.environment.project }}
-          MESSAGE: ${{ env.BUNDLE_NAME }})
+          MESSAGE: ${{ env.BUNDLE_NAME }}
           CLOUD_ORIGIN: ${{ matrix.environment.cloud_origin }}
           FLAGS: ${{ matrix.environment.flags }}
