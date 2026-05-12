@@ -32,10 +32,6 @@ export const SESSION_COOKIE_CONFIG = {
         key: 'cc-nx',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
     },
-    refreshTokenExists: {
-        key: 'cc-nx-exists',
-        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
-    },
     customerId: {
         key: 'customer_id',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}

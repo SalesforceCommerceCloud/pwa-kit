@@ -143,7 +143,6 @@ type AuthDataKeys =
     | 'dnt'
     | 'cc-at-expires'
     | 'cc-at-dnt'
-    | 'cc-nx-exists'
     | 'cc-nx-expires'
 
 type AuthDataMap = Record<
@@ -267,10 +266,6 @@ const DATA_MAP: AuthDataMap = {
     'cc-at-dnt': {
         storageType: 'cookie',
         key: 'cc-at-dnt'
-    },
-    'cc-nx-exists': {
-        storageType: 'cookie',
-        key: 'cc-nx-exists'
     },
     'cc-nx-expires': {
         storageType: 'cookie',
@@ -635,12 +630,16 @@ class Auth {
     }
 
     /**
-     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript cannot
-     * read HttpOnly cookies, we check the non-HttpOnly indicator cookie (cc-nx-exists) that
-     * is set alongside the refresh token with the same expiry.
+     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript
+     * cannot read HttpOnly cookies, we check `cc-nx-expires` — a non-HttpOnly cookie
+     * the proxy sets with the same expiry as the refresh token. A non-empty read
+     * means the browser hasn't yet evicted the cookie, so the refresh token is
+     * still alive.
      */
     private hasHttpOnlyRefreshToken(): boolean {
-        return this.enableHttpOnlySessionCookies && onClient() && this.get('cc-nx-exists') === '1'
+        return (
+            this.enableHttpOnlySessionCookies && onClient() && Boolean(this.get('cc-nx-expires'))
+        )
     }
 
     /**
@@ -928,10 +927,11 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
 
         // When HttpOnly session cookies are enabled on the client, the refresh token is in an
-        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly indicator
-        // cookie (cc-nx-exists) to avoid a wasted round-trip when the refresh token is absent.
-        // If cc-nx-exists is also missing (e.g. cleared by the user), the proxy layer will
-        // catch the missing refresh token and return a 401, falling through to guest login.
+        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly `cc-nx-expires`
+        // cookie (set with the same expiry as the refresh token) to avoid a wasted round-trip
+        // when the refresh token is absent. If `cc-nx-expires` is also missing (e.g. cleared by
+        // the user), the proxy layer will catch the missing refresh token and return a 401,
+        // falling through to guest login.
         if (refreshToken || (!refreshToken && this.hasHttpOnlyRefreshToken())) {
             try {
                 const isGuest = this.get('customer_type') !== 'registered'

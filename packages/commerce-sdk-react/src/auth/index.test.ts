@@ -1674,12 +1674,12 @@ describe('HttpOnly Session Cookies', () => {
         )
     })
 
-    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-exists)', async () => {
+    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-expires)', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         const loginGuestMock = helpers.loginGuestUser as jest.Mock
         loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
 
-        // First visit: no cc-nx-exists cookie, no refresh token, no cc-at-expires
+        // First visit: no cc-nx-expires cookie, no refresh token, no cc-at-expires
         // Should NOT attempt refresh — should go straight to loginGuestUser
         await auth.ready()
 
@@ -1687,15 +1687,16 @@ describe('HttpOnly Session Cookies', () => {
         expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
     })
 
-    test('ready attempts refresh when cc-nx-exists is set (returning visitor)', async () => {
+    test('ready attempts refresh when cc-nx-expires is set (returning visitor)', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
 
-        // Simulate a returning visitor: expired access token + cc-nx-exists indicator
+        // Simulate a returning visitor: expired access token + cc-nx-expires indicator
         const expiredTime = Math.floor(Date.now() / 1000) - 100
+        const refreshExpiresEpoch = Math.floor(Date.now() / 1000) + 7776000
         // @ts-expect-error private method
         auth.set('cc-at-expires', String(expiredTime))
         // @ts-expect-error private method
-        auth.set('cc-nx-exists', '1')
+        auth.set('cc-nx-expires', String(refreshExpiresEpoch))
         // @ts-expect-error private method
         auth.set('customer_type', 'guest')
         // @ts-expect-error private method
@@ -1706,7 +1707,7 @@ describe('HttpOnly Session Cookies', () => {
 
         await auth.ready()
 
-        // Should attempt refresh because cc-nx-exists indicates an HttpOnly refresh token exists
+        // Should attempt refresh because cc-nx-expires indicates an HttpOnly refresh token exists
         expect(helpers.refreshAccessToken).toHaveBeenCalledTimes(1)
         expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
             expect.objectContaining({enableHttpOnlySessionCookies: true})

@@ -98,7 +98,6 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         idpAccessToken,
         refreshTokenGuest,
         refreshTokenRegistered,
-        refreshTokenExists,
         customerId,
         encUserId,
         customerType,
@@ -206,18 +205,6 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 value: parsed.refresh_token,
                 expires: refreshExpires,
                 ...refreshConfig.attributes
-            })
-        )
-
-        // Non-HttpOnly indicator so the client can check if a refresh token cookie exists
-        // (JavaScript cannot read HttpOnly cookies). Shares the same expiry as the refresh token.
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(refreshTokenExists, site),
-                value: '1',
-                expires: refreshExpires,
-                ...refreshTokenExists.attributes
             })
         )
 

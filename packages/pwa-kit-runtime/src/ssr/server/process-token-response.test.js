@@ -199,13 +199,9 @@ describe('setHttpOnlySessionCookies', () => {
         expect(uidoCookie.value).toBe('ecom')
         expect(uidoCookie.httpOnly).toBeUndefined()
 
-        // cc-nx-exists: non-HttpOnly indicator that a refresh token cookie exists
-        const nxExistsCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))
-        )
-        expect(nxExistsCookie.value).toBe('1')
-        expect(nxExistsCookie.httpOnly).toBeUndefined()
-        expect(nxExistsCookie.secure).toBe(true)
+        // cc-nx-exists has been removed; cc-nx-expires now serves as the
+        // non-HttpOnly indicator that a refresh token cookie exists.
+        expect(res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))).toBeUndefined()
 
         // Registered refresh cookie should be expired (deleted)
         const staleRegisteredCookie = parseCookie(
@@ -321,12 +317,9 @@ describe('setHttpOnlySessionCookies', () => {
         expect(custTypeCookie.value).toBe('registered')
         expect(custTypeCookie.httpOnly).toBeUndefined()
 
-        // cc-nx-exists: non-HttpOnly indicator that a refresh token cookie exists
-        const nxExistsCookie = parseCookie(
-            res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))
-        )
-        expect(nxExistsCookie.value).toBe('1')
-        expect(nxExistsCookie.httpOnly).toBeUndefined()
+        // cc-nx-exists has been removed; cc-nx-expires now serves as the
+        // non-HttpOnly indicator that a refresh token cookie exists.
+        expect(res.cookies.find((c) => c.includes('cc-nx-exists_testsite='))).toBeUndefined()
 
         // Guest refresh cookie should be expired (deleted)
         const staleGuestCookie = parseCookie(
@@ -412,8 +405,6 @@ describe('setHttpOnlySessionCookies', () => {
         const body = JSON.parse(result.toString('utf8'))
 
         expect(res.cookies).toHaveLength(0)
-        // cc-nx-exists should NOT be set when there is no refresh token
-        expect(res.cookies.find((c) => c.includes('cc-nx-exists'))).toBeUndefined()
         expect(body.other_field).toBe('value')
     })
 
@@ -451,7 +442,6 @@ describe('expireHttpOnlySessionCookies', () => {
             'idp_access_token_testsite',
             'cc-nx-g_testsite',
             'cc-nx_testsite',
-            'cc-nx-exists_testsite',
             'customer_id_testsite',
             'enc_user_id_testsite',
             'customer_type_testsite',
