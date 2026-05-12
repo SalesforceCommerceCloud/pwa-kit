@@ -26,6 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
+import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge'
 
 const config = getConfig()
 
@@ -505,6 +506,11 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+    // Shopper Agent — Token Bridge proxy.
+    // Browser POSTs an auth_link_key + SLAS access token here + Refresh token; 
+    // Forwards to Core's `/agent/identity/bridge` endpoint on
+    // the configured ANC MyDomain (env: ANC_MYDOMAIN).
+    registerTokenBridgeRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
