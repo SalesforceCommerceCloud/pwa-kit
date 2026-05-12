@@ -25,7 +25,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge'
+import {registerTokenBridgeRoute} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
 const config = getConfig()
 
