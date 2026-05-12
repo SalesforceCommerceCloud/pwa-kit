@@ -59,16 +59,12 @@ describe('resolveAncMyDomain', () => {
 
     test('prepends https:// when scheme is missing', () => {
         process.env.ANC_MYDOMAIN = 'orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        expect(resolveAncMyDomain()).toBe(
-            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        )
+        expect(resolveAncMyDomain()).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
     })
 
     test('preserves https:// when already present', () => {
         process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        expect(resolveAncMyDomain()).toBe(
-            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        )
+        expect(resolveAncMyDomain()).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
     })
 
     test('preserves http:// when already present (for local testing)', () => {
@@ -78,9 +74,7 @@ describe('resolveAncMyDomain', () => {
 
     test('strips trailing slashes', () => {
         process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///'
-        expect(resolveAncMyDomain()).toBe(
-            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        )
+        expect(resolveAncMyDomain()).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
     })
 })
 
@@ -233,10 +227,7 @@ describe('handleTokenBridge', () => {
             error: 'SLAS_INTERNAL_ERROR',
             details: 'connection refused'
         })
-        expect(errorSpy).toHaveBeenCalledWith(
-            '[token-bridge] Unexpected error:',
-            expect.any(Error)
-        )
+        expect(errorSpy).toHaveBeenCalledWith('[token-bridge] Unexpected error:', expect.any(Error))
     })
 
     test('handles missing req.body without throwing', async () => {
