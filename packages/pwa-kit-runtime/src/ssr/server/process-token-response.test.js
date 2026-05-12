@@ -244,14 +244,10 @@ describe('setHttpOnlySessionCookies', () => {
 
         // expires_in is intentionally not mirrored as a cookie — cc-at-expires
         // already encodes the access-token expiry as an absolute epoch.
-        expect(
-            res.cookies.find((c) => c.startsWith('expires_in_testsite='))
-        ).toBeUndefined()
+        expect(res.cookies.find((c) => c.startsWith('expires_in_testsite='))).toBeUndefined()
 
         // id_token (non-HttpOnly, expiry tied to access JWT exp = 2800)
-        const idTokenCookie = parseCookie(
-            res.cookies.find((c) => c.includes('id_token_testsite='))
-        )
+        const idTokenCookie = parseCookie(res.cookies.find((c) => c.includes('id_token_testsite=')))
         expect(idTokenCookie.value).toBe('id-token-789')
         expect(idTokenCookie.httpOnly).toBeUndefined()
         expect(idTokenCookie.expires).toEqual(new Date(2800 * 1000))
@@ -266,14 +262,10 @@ describe('setHttpOnlySessionCookies', () => {
 
         // token_type is intentionally not mirrored as a cookie — it is unused
         // inside PWA Kit and always 'Bearer' per OAuth2.
-        expect(
-            res.cookies.find((c) => c.includes('token_type_testsite='))
-        ).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('token_type_testsite='))).toBeUndefined()
 
         // Confirms id_token (access exp) uses an earlier expiry than refresh-TTL cookies
-        expect(idTokenCookie.expires.getTime()).toBeLessThan(
-            idpRefreshCookie.expires.getTime()
-        )
+        expect(idTokenCookie.expires.getTime()).toBeLessThan(idpRefreshCookie.expires.getTime())
 
         // Tokens stripped from body, other fields preserved
         const body = JSON.parse(result.toString('utf8'))
@@ -367,9 +359,7 @@ describe('setHttpOnlySessionCookies', () => {
             res.cookies.find((c) => c.includes('refresh_token_expires_in_testsite='))
         ).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('token_type_testsite='))).toBeUndefined()
-        expect(
-            res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))
-        ).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))).toBeUndefined()
 
         // customer_type is still set because it is always derivable from the JWT isb claim
         const custTypeCookie = parseCookie(

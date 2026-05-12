@@ -40,9 +40,7 @@ function useAuthDataValue(key: AuthDataKey): string | null {
     // the lifetime of the process, so the conditional hook calls below cannot
     // violate the rules of hooks.
     /* eslint-disable react-hooks/rules-of-hooks */
-    return config.enableHttpOnlySessionCookies
-        ? useCookie(storageKey)
-        : useLocalStorage(storageKey)
+    return config.enableHttpOnlySessionCookies ? useCookie(storageKey) : useLocalStorage(storageKey)
     /* eslint-enable react-hooks/rules-of-hooks */
 }
 
