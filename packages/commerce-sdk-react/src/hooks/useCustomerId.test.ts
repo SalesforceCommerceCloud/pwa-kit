@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {renderHook} from '@testing-library/react'
+import {act, renderHook} from '@testing-library/react'
 import Cookies from 'js-cookie'
+import {CookieStorage} from '../auth/storage'
 import useCustomerId from './useCustomerId'
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
@@ -131,6 +132,19 @@ describe('useCustomerId', () => {
             const {result} = renderHook(() => useCustomerId())
 
             expect(result.current).toBeNull()
+        })
+
+        it('re-renders synchronously when CookieStorage writes the cookie', () => {
+            const {result} = renderHook(() => useCustomerId())
+            expect(result.current).toBeNull()
+
+            // CookieStorage.set dispatches COOKIE_CHANGE_EVENT, which useCookie listens for.
+            const storage = new CookieStorage({keySuffix: mockSiteId})
+            act(() => {
+                storage.set('customer_id', mockCustomerId)
+            })
+
+            expect(result.current).toBe(mockCustomerId)
         })
     })
 })

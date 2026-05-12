@@ -14,6 +14,27 @@ export interface CookieStorageOptions extends BaseStorageOptions {
 }
 
 /**
+ * Custom event dispatched from `CookieStorage.set`/`.delete` so that
+ * `useCookie` subscribers re-render synchronously on in-tab writes — the
+ * cookie equivalent of the `StorageEvent` browsers fire for localStorage.
+ */
+export const COOKIE_CHANGE_EVENT = 'commerce-sdk-react:cookie-change'
+
+export interface CookieChangeDetail {
+    key: string
+    value: string | null
+}
+
+const dispatchCookieChange = (key: string, value: string | null) => {
+    if (typeof window === 'undefined') return
+    window.dispatchEvent(
+        new CustomEvent<CookieChangeDetail>(COOKIE_CHANGE_EVENT, {
+            detail: {key, value}
+        })
+    )
+}
+
+/**
  * A normalized implementation for Cookie store. It implements the BaseStorage interface
  * which allows developers to easily switch between Cookie, LocalStorage, Memory store
  * or a customized storage. This class is mainly used for commerce-sdk-react library
@@ -84,6 +105,7 @@ export class CookieStorage extends BaseStorage {
             this.removeHostAndDomainCookie(suffixedKey, options)
         }
         Cookies.set(suffixedKey, value, this.getAttributes(options))
+        dispatchCookieChange(suffixedKey, value)
     }
     get(key: string) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
@@ -118,5 +140,6 @@ export class CookieStorage extends BaseStorage {
             chunk++
             additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
         }
+        dispatchCookieChange(suffixedKey, null)
     }
 }
