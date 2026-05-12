@@ -277,18 +277,23 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 
 /**
- * SLAS metadata fields that the proxy mirrors as cookies when
- * `enableHttpOnlySessionCookies` is on. In that mode we treat the cookies as
- * the single source of truth and skip the local-storage writes that would
- * otherwise duplicate them.
+ * Auth-data keys whose storage is backed by a proxy-set cookie when
+ * `enableHttpOnlySessionCookies` is on. In that mode reads and writes for
+ * these keys go to the cookie store instead of localStorage, with the cookie
+ * as the single source of truth.
+ *
+ * Some entries here (`idp_access_token`, `idp_refresh_token`) are HttpOnly
+ * and unreadable from JavaScript — they're included for routing symmetry so
+ * the storage type is consistent in httpOnly mode; reads of those keys
+ * return '' from the cookie store either way.
  *
  * `expires_in` is intentionally absent: the access token expiry is already
  * covered by the `cc-at-expires` cookie, so we derive it from there in the
- * `data` getter instead of mirroring a redundant cookie.
+ * `data` getter instead of backing a redundant cookie.
  *
  * @internal
  */
-const HTTPONLY_COOKIE_MIRRORED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
+const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
     'customer_id',
     'enc_user_id',
     'customer_type',
@@ -442,7 +447,7 @@ class Auth {
      * Returns the storage type to use for a given key. When
      * `enableHttpOnlySessionCookies` is on (and we're on the client), the SLAS
      * proxy writes cookies for the metadata keys in
-     * `HTTPONLY_COOKIE_MIRRORED_KEYS`, so reads/writes for those keys are
+     * `HTTPONLY_COOKIE_BACKED_KEYS`, so reads/writes for those keys are
      * routed to the cookie store instead of local storage.
      */
     private resolveStorageType(name: AuthDataKeys): StorageType {
@@ -450,7 +455,7 @@ class Auth {
         if (
             this.enableHttpOnlySessionCookies &&
             onClient() &&
-            HTTPONLY_COOKIE_MIRRORED_KEYS.has(name)
+            HTTPONLY_COOKIE_BACKED_KEYS.has(name)
         ) {
             return 'cookie'
         }
