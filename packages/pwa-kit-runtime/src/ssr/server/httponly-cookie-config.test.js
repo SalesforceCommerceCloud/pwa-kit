@@ -25,7 +25,7 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.customerId.key).toBe('customer_id')
         expect(SESSION_COOKIE_CONFIG.encUserId.key).toBe('enc_user_id')
         expect(SESSION_COOKIE_CONFIG.customerType.key).toBe('customer_type')
-        expect(SESSION_COOKIE_CONFIG.refreshTokenExpiresIn.key).toBe('refresh_token_expires_in')
+        expect(SESSION_COOKIE_CONFIG.refreshTokenExpires.key).toBe('cc-nx-expires')
         expect(SESSION_COOKIE_CONFIG.idToken.key).toBe('id_token')
         expect(SESSION_COOKIE_CONFIG.idpRefreshToken.key).toBe('idp_refresh_token')
     })
@@ -46,7 +46,7 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.customerId.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.encUserId.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.customerType.attributes.httpOnly).toBe(false)
-        expect(SESSION_COOKIE_CONFIG.refreshTokenExpiresIn.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.refreshTokenExpires.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(false)
     })
 

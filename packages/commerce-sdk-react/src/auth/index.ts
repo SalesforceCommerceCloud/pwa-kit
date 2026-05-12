@@ -144,6 +144,7 @@ type AuthDataKeys =
     | 'cc-at-expires'
     | 'cc-at-dnt'
     | 'cc-nx-exists'
+    | 'cc-nx-expires'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -270,6 +271,10 @@ const DATA_MAP: AuthDataMap = {
     'cc-nx-exists': {
         storageType: 'cookie',
         key: 'cc-nx-exists'
+    },
+    'cc-nx-expires': {
+        storageType: 'cookie',
+        key: 'cc-nx-expires'
     }
 }
 
@@ -297,7 +302,6 @@ const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
     'customer_id',
     'enc_user_id',
     'customer_type',
-    'refresh_token_expires_in',
     'id_token',
     'idp_access_token',
     'idp_refresh_token',
@@ -557,11 +561,19 @@ class Auth {
             await this.refreshAccessToken()
         }
         if (preference !== null) {
+            // Tie the DNT cookie's expiry to the refresh token's. In httpOnly
+            // mode the proxy publishes the absolute expiry as `cc-nx-expires`
+            // (epoch seconds), which we pass straight to js-cookie as a Date.
+            // In non-httpOnly mode we fall back to the localStorage TTL.
             const SECONDS_IN_DAY = 86400
+            const useCookieExpiry = this.enableHttpOnlySessionCookies && onClient()
+            const expires = useCookieExpiry
+                ? new Date(Number(this.get('cc-nx-expires')) * 1000)
+                : Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
+                expires
             })
         }
     }
@@ -853,9 +865,11 @@ class Auth {
             res.refresh_token_expires_in,
             isGuest
         )
-        if (!skipMetadataWrites) {
-            this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        }
+        // refresh_token_expires_in is server-mirrored as the `cc-nx-expires`
+        // cookie (absolute epoch, different shape) — but consumers like setDnt
+        // and the data getter still want the TTL-in-seconds value, so we
+        // continue to write the duration to localStorage in both modes.
+        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 

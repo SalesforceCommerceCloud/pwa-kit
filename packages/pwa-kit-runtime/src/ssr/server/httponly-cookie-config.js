@@ -48,8 +48,11 @@ export const SESSION_COOKIE_CONFIG = {
         key: 'customer_type',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     },
-    refreshTokenExpiresIn: {
-        key: 'refresh_token_expires_in',
+    // Absolute epoch (seconds) when the refresh token expires. Mirrors the
+    // shape of `cc-at-expires` (which carries the access token expiry) so SFRA
+    // can read it without parsing or doing arithmetic.
+    refreshTokenExpires: {
+        key: 'cc-nx-expires',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     },
     idToken: {

@@ -159,7 +159,9 @@ describe('setHttpOnlySessionCookies', () => {
             id_token: 'id-token-789',
             token_type: 'Bearer'
         })
+        const beforeNowSec = Math.floor(Date.now() / 1000)
         const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+        const afterNowSec = Math.floor(Date.now() / 1000)
 
         // cc-at: access token (HttpOnly)
         const atCookie = parseCookie(res.cookies.find((c) => c.includes('cc-at_testsite=')))
@@ -235,12 +237,14 @@ describe('setHttpOnlySessionCookies', () => {
         expect(custTypeCookie.value).toBe('guest')
         expect(custTypeCookie.httpOnly).toBeUndefined()
 
-        // refresh_token_expires_in (non-HttpOnly, refresh TTL)
-        const refreshExpInCookie = parseCookie(
-            res.cookies.find((c) => c.includes('refresh_token_expires_in_testsite='))
+        // cc-nx-expires (non-HttpOnly, absolute epoch when refresh token expires)
+        const refreshExpiresCookie = parseCookie(
+            res.cookies.find((c) => c.includes('cc-nx-expires_testsite='))
         )
-        expect(refreshExpInCookie.value).toBe('7776000')
-        expect(refreshExpInCookie.httpOnly).toBeUndefined()
+        const refreshExpiresEpoch = Number(refreshExpiresCookie.value)
+        expect(refreshExpiresEpoch).toBeGreaterThanOrEqual(beforeNowSec + 7776000)
+        expect(refreshExpiresEpoch).toBeLessThanOrEqual(afterNowSec + 7776000)
+        expect(refreshExpiresCookie.httpOnly).toBeUndefined()
 
         // expires_in is intentionally not mirrored as a cookie — cc-at-expires
         // already encodes the access-token expiry as an absolute epoch.
@@ -355,9 +359,6 @@ describe('setHttpOnlySessionCookies', () => {
         expect(res.cookies.find((c) => c.includes('enc_user_id_testsite='))).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('id_token_testsite='))).toBeUndefined()
         expect(res.cookies.find((c) => c.startsWith('expires_in_testsite='))).toBeUndefined()
-        expect(
-            res.cookies.find((c) => c.includes('refresh_token_expires_in_testsite='))
-        ).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('token_type_testsite='))).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))).toBeUndefined()
 
@@ -366,6 +367,10 @@ describe('setHttpOnlySessionCookies', () => {
             res.cookies.find((c) => c.includes('customer_type_testsite='))
         )
         expect(custTypeCookie.value).toBe('guest')
+
+        // cc-nx-expires is always set when a refresh_token is present — the proxy
+        // falls back to the default guest TTL when SLAS doesn't return one.
+        expect(res.cookies.find((c) => c.includes('cc-nx-expires_testsite='))).toBeDefined()
     })
 
     test('omits uido cookie when uido is absent from JWT', () => {
@@ -450,7 +455,7 @@ describe('expireHttpOnlySessionCookies', () => {
             'customer_id_testsite',
             'enc_user_id_testsite',
             'customer_type_testsite',
-            'refresh_token_expires_in_testsite',
+            'cc-nx-expires_testsite',
             'id_token_testsite',
             'idp_refresh_token_testsite'
         ]

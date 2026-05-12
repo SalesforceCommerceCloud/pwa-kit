@@ -102,7 +102,7 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         customerId,
         encUserId,
         customerType,
-        refreshTokenExpiresIn,
+        refreshTokenExpires,
         idToken,
         idpRefreshToken
     } = SESSION_COOKIE_CONFIG
@@ -278,17 +278,18 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             )
         }
 
-        if (parsed.refresh_token_expires_in !== undefined) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(refreshTokenExpiresIn, site),
-                    value: String(parsed.refresh_token_expires_in),
-                    expires: refreshExpires,
-                    ...refreshTokenExpiresIn.attributes
-                })
-            )
-        }
+        // cc-nx-expires: absolute epoch (seconds) when the refresh token cookie
+        // expires. Mirrors cc-at-expires for the access token. Cookie expiry
+        // attribute aligned to the same instant.
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: getCookieName(refreshTokenExpires, site),
+                value: String(Math.floor(refreshExpires.getTime() / 1000)),
+                expires: refreshExpires,
+                ...refreshTokenExpires.attributes
+            })
+        )
 
         // idp_refresh_token (HttpOnly): refresh-TTL-aligned, only when present.
         if (parsed.idp_refresh_token) {
