@@ -299,6 +299,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency
             },
             throwOnBadResponse: true,
+            throwOnMaintenanceHeader: true,
             fetchOptions: effectiveFetchOptions
         }
 

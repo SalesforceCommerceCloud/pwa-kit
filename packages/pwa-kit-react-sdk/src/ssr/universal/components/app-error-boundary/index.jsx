@@ -50,11 +50,20 @@ class AppErrorBoundary extends React.Component {
     // React's client side error boundaries
     static getDerivedStateFromError(err) {
         // Update state so the next render will show the fallback UI
-        return {error: {message: err.toString(), stack: err.stack}}
+        return {
+            error: {
+                message: err.toString(),
+                stack: err.stack,
+                status: err?.name === 'MaintenanceError' ? 503 : undefined
+                // ^ avoid importing the commerce SDK
+            }
+        }
     }
 
     onGetPropsError(err) {
-        if (err instanceof HTTPError) {
+        if (err?.name === 'MaintenanceError') {
+            this.setState({error: {message: err.message, status: 503, stack: err.stack}})
+        } else if (err instanceof HTTPError) {
             this.setState({error: {message: err.message, status: err.status, stack: err.stack}})
         } else {
             this.setState({
