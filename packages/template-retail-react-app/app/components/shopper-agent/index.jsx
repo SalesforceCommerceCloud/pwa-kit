@@ -7,12 +7,7 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {
-    useAccessToken,
-    useConfig,
-    useCustomerType,
-    useUsid
-} from '@salesforce/commerce-sdk-react'
+import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
