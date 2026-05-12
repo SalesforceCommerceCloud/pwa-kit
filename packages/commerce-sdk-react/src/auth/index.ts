@@ -637,9 +637,7 @@ class Auth {
      * still alive.
      */
     private hasHttpOnlyRefreshToken(): boolean {
-        return (
-            this.enableHttpOnlySessionCookies && onClient() && Boolean(this.get('cc-nx-expires'))
-        )
+        return this.enableHttpOnlySessionCookies && onClient() && Boolean(this.get('cc-nx-expires'))
     }
 
     /**
@@ -864,11 +862,12 @@ class Auth {
             res.refresh_token_expires_in,
             isGuest
         )
-        // refresh_token_expires_in is server-mirrored as the `cc-nx-expires`
-        // cookie (absolute epoch, different shape) — but consumers like setDnt
-        // and the data getter still want the TTL-in-seconds value, so we
-        // continue to write the duration to localStorage in both modes.
-        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        if (!skipMetadataWrites) {
+            // In httpOnly mode `cc-nx-expires` is the source of truth for the
+            // refresh token expiry; keep localStorage out of it to avoid two
+            // copies that can drift.
+            this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
