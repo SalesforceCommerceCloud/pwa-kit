@@ -461,6 +461,24 @@ describe('ShopperAgent Component', () => {
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
     })
 
+    test('should log success info when Token Bridge returns 200', async () => {
+        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        await waitFor(() =>
+            expect(infoSpy).toHaveBeenCalledWith('Token Bridge succeeded', {status: 200})
+        )
+        expect(mockShowToast).not.toHaveBeenCalled()
+        expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+
+        infoSpy.mockRestore()
+    })
+
     test('should reset session and toast error when Token Bridge returns non-200 status', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         mockCallTokenBridge.mockResolvedValueOnce({
@@ -547,7 +565,7 @@ describe('ShopperAgent Component', () => {
         global.window.embeddedservice_bootstrap = mockEmbeddedService
     })
 
-    test('should log error when getAuthLinkKey rejects and not call Token Bridge', async () => {
+    test('should reset session, toast error, and not call Token Bridge when getAuthLinkKey rejects', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const rejection = new Error('auth link key rejected')
         mockEmbeddedService.userVerificationAPI.getAuthLinkKey.mockRejectedValueOnce(rejection)
@@ -562,11 +580,16 @@ describe('ShopperAgent Component', () => {
             expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey failed', rejection)
         )
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
+        await waitFor(() =>
+            expect(mockEmbeddedService.userVerificationAPI.clearSession).toHaveBeenCalled()
+        )
+        expect(mockShowToast).toHaveBeenCalledTimes(1)
+        expect(mockShowToast.mock.calls[0][0].status).toBe('error')
 
         errorSpy.mockRestore()
     })
 
-    test('should not call Token Bridge when organizationId or siteId is missing', async () => {
+    test('should NOT call Token Bridge when organizationId or siteId is missing', async () => {
         mockedUseConfig.mockReturnValue({
             organizationId: '',
             siteId: ''
