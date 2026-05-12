@@ -25,6 +25,8 @@ import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopp
 
 const onClient = typeof window !== 'undefined'
 
+const HTTP_OK = 200
+
 const SESSION_INIT_ERROR_MESSAGE = defineMessage({
     id: 'shopper_agent.error.session_init_failed',
     defaultMessage: 'We could not start the shopping assistant. Please try again.'
@@ -378,6 +380,18 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             applyHiddenPrechatFields()
         }
 
+        // Reset the embedded messaging session and surface a localized error
+        // toast. Called from every failure branch of the conversation-started
+        // flow so the shopper sees consistent feedback and the next attempt
+        // starts from a clean state.
+        const failSessionInit = () => {
+            resetEmbeddedMessagingForCommerceSessionChange()
+            toastRef.current({
+                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+
         const handleEmbeddedMessagingConversationStarted = (event) => {
             const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
             if (!orgId || !sid) return
@@ -399,10 +413,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                     // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
                     try {
                         const slasAccessToken = await getTokenWhenReadyRef.current()
-                        // useRefreshToken() resolves the refresh token from the
-                        // SDK's auth context. Send it through the request body
-                        // so the proxy doesn't need to read SLAS cookies (which
-                        // pwa-kit-runtime strips when localAllowCookies=false).
+                        // useRefreshToken() resolves the refresh token from
+                        // the SDK's auth context. Send it through the
+                        // request body so the proxy can forward it to Core.
                         const slasRefreshToken = embeddedLifecycleRef.current.refreshToken
                         const result = await callTokenBridge({
                             authLinkKey,
@@ -410,29 +423,24 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                             slasRefreshToken
                         })
 
-                        if (result.status !== 200) {
+                        if (result.status !== HTTP_OK) {
                             const errorCode = result.body?.error || `HTTP_${result.status}`
                             console.error('Token Bridge failed', {
                                 status: result.status,
                                 error: errorCode
                             })
-                            resetEmbeddedMessagingForCommerceSessionChange()
-                            toastRef.current({
-                                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                                status: 'error'
-                            })
+                            failSessionInit()
+                        } else {
+                            console.info('Token Bridge succeeded', {status: result.status})
                         }
                     } catch (error) {
                         console.error('Token Bridge threw', error)
-                        resetEmbeddedMessagingForCommerceSessionChange()
-                        toastRef.current({
-                            title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                            status: 'error'
-                        })
+                        failSessionInit()
                     }
                 })
                 .catch((error) => {
                     console.error('Shopper Agent: getAuthLinkKey failed', error)
+                    failSessionInit()
                 })
         }
 

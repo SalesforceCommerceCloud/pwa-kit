@@ -22,10 +22,6 @@
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js)
  *      resolves the ANC MyDomain and forwards to Core with
  *      `Authorization: SLAS <access_token>` and `refresh_token` in the body.
- *      We deliberately do NOT read the SLAS cookies (cc-nx / cc-nx-g) here:
- *      pwa-kit-runtime strips the Cookie header when localAllowCookies is
- *      false, so the cookie path is unreliable. The body path works in all
- *      configurations.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
