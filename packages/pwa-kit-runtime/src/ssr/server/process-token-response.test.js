@@ -242,13 +242,11 @@ describe('setHttpOnlySessionCookies', () => {
         expect(refreshExpInCookie.value).toBe('7776000')
         expect(refreshExpInCookie.httpOnly).toBeUndefined()
 
-        // expires_in (non-HttpOnly, refresh TTL); startsWith to disambiguate from
-        // refresh_token_expires_in_testsite= which contains the same suffix.
-        const expiresInCookie = parseCookie(
+        // expires_in is intentionally not mirrored as a cookie — cc-at-expires
+        // already encodes the access-token expiry as an absolute epoch.
+        expect(
             res.cookies.find((c) => c.startsWith('expires_in_testsite='))
-        )
-        expect(expiresInCookie.value).toBe('1800')
-        expect(expiresInCookie.httpOnly).toBeUndefined()
+        ).toBeUndefined()
 
         // id_token (non-HttpOnly, expiry tied to access JWT exp = 2800)
         const idTokenCookie = parseCookie(
@@ -266,12 +264,11 @@ describe('setHttpOnlySessionCookies', () => {
         expect(idpRefreshCookie.httpOnly).toBe(true)
         expect(idpRefreshCookie.secure).toBe(true)
 
-        // token_type (non-HttpOnly, refresh TTL)
-        const tokenTypeCookie = parseCookie(
+        // token_type is intentionally not mirrored as a cookie — it is unused
+        // inside PWA Kit and always 'Bearer' per OAuth2.
+        expect(
             res.cookies.find((c) => c.includes('token_type_testsite='))
-        )
-        expect(tokenTypeCookie.value).toBe('Bearer')
-        expect(tokenTypeCookie.httpOnly).toBeUndefined()
+        ).toBeUndefined()
 
         // Confirms id_token (access exp) uses an earlier expiry than refresh-TTL cookies
         expect(idTokenCookie.expires.getTime()).toBeLessThan(
@@ -464,10 +461,8 @@ describe('expireHttpOnlySessionCookies', () => {
             'enc_user_id_testsite',
             'customer_type_testsite',
             'refresh_token_expires_in_testsite',
-            'expires_in_testsite',
             'id_token_testsite',
-            'idp_refresh_token_testsite',
-            'token_type_testsite'
+            'idp_refresh_token_testsite'
         ]
 
         expect(res.cookies).toHaveLength(expectedCookieKeys.length)

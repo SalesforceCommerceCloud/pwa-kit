@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {renderHook} from '@testing-library/react'
+import Cookies from 'js-cookie'
 import useEncUserId from './useEncUserId'
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
@@ -96,6 +98,43 @@ describe('useEncUserId', () => {
             const {encUserId} = useEncUserId()
 
             expect(encUserId).toBeNull()
+        })
+    })
+
+    /**
+     * Integration tests for the httpOnly mode: simulate the SLAS proxy setting
+     * the enc_user_id cookie and verify useEncUserId reads it via the real
+     * useCookie hook (not mocked).
+     */
+    describe('httpOnly mode (real cookie integration)', () => {
+        const cookieKey = `enc_user_id_${mockSiteId}`
+
+        beforeEach(() => {
+            mockedOnClient.mockReturnValue(true)
+            mockedUseConfig.mockReturnValue({
+                siteId: mockSiteId,
+                enableHttpOnlySessionCookies: true
+            } as any)
+            Cookies.remove(cookieKey)
+        })
+
+        afterEach(() => {
+            Cookies.remove(cookieKey)
+        })
+
+        it('reads enc_user_id from the cookie set by the proxy', () => {
+            Cookies.set(cookieKey, mockEncUserId)
+
+            const {result} = renderHook(() => useEncUserId())
+
+            expect(result.current.encUserId).toBe(mockEncUserId)
+            expect(mockedUseLocalStorage).not.toHaveBeenCalled()
+        })
+
+        it('returns null when the cookie is absent', () => {
+            const {result} = renderHook(() => useEncUserId())
+
+            expect(result.current.encUserId).toBeNull()
         })
     })
 

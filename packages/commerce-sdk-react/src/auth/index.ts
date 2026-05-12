@@ -282,18 +282,21 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
  * the single source of truth and skip the local-storage writes that would
  * otherwise duplicate them.
  *
+ * `expires_in` is intentionally absent: the access token expiry is already
+ * covered by the `cc-at-expires` cookie, so we derive it from there in the
+ * `data` getter instead of mirroring a redundant cookie.
+ *
  * @internal
  */
-export const HTTPONLY_COOKIE_REDIRECTED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
+const HTTPONLY_COOKIE_MIRRORED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
     'customer_id',
     'enc_user_id',
     'customer_type',
     'refresh_token_expires_in',
-    'expires_in',
     'id_token',
-    'token_type',
     'idp_access_token',
-    'idp_refresh_token'
+    'idp_refresh_token',
+    'uido'
 ])
 
 /**
@@ -439,7 +442,7 @@ class Auth {
      * Returns the storage type to use for a given key. When
      * `enableHttpOnlySessionCookies` is on (and we're on the client), the SLAS
      * proxy writes cookies for the metadata keys in
-     * `HTTPONLY_COOKIE_REDIRECTED_KEYS`, so reads/writes for those keys are
+     * `HTTPONLY_COOKIE_MIRRORED_KEYS`, so reads/writes for those keys are
      * routed to the cookie store instead of local storage.
      */
     private resolveStorageType(name: AuthDataKeys): StorageType {
@@ -447,7 +450,7 @@ class Auth {
         if (
             this.enableHttpOnlySessionCookies &&
             onClient() &&
-            HTTPONLY_COOKIE_REDIRECTED_KEYS.has(name)
+            HTTPONLY_COOKIE_MIRRORED_KEYS.has(name)
         ) {
             return 'cookie'
         }
@@ -576,7 +579,7 @@ class Auth {
             access_token: this.get('access_token'),
             customer_id: this.get('customer_id'),
             enc_user_id: this.get('enc_user_id'),
-            expires_in: parseInt(this.get('expires_in')),
+            expires_in: this.getExpiresIn(),
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
@@ -585,6 +588,23 @@ class Auth {
             customer_type: this.get('customer_type') as CustomerType,
             refresh_token_expires_in: Number(this.get('refresh_token_expires_in'))
         }
+    }
+
+    /**
+     * Returns the access token's remaining lifetime in seconds. In httpOnly mode
+     * we derive it from the `cc-at-expires` cookie (the access-token JWT `exp`
+     * claim, in epoch seconds) instead of storing a redundant `expires_in`
+     * cookie. Falls back to the local-storage value otherwise.
+     */
+    private getExpiresIn(): number {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            const expiresAt = this.get('cc-at-expires')
+            if (!expiresAt) return NaN
+            const expiresAtSec = Number(expiresAt)
+            if (Number.isNaN(expiresAtSec)) return NaN
+            return Math.max(0, Math.floor(expiresAtSec - Date.now() / 1000))
+        }
+        return parseInt(this.get('expires_in'))
     }
 
     /**
@@ -686,8 +706,13 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
-            // In httpOnly mode customer_id/customer_type are routed to cookies; pass
-            // expires so we don't overwrite the proxy-set cookie with a session cookie.
+            // SFRA handoff only writes the fields it can derive from the cc-at JWT
+            // (customer_id, usid, customer_type). The other mirrored metadata cookies
+            // (enc_user_id, id_token, refresh_token_expires_in, idp_*) were last set by
+            // the SLAS proxy and remain valid for the existing session — there is no
+            // newer source for them here. In httpOnly mode customer_id/customer_type
+            // are routed to cookies; pass expires so we don't overwrite the proxy-set
+            // cookie with a session cookie.
             this.set('customer_id', customerId, {expires: expiresDate})
 
             /**
@@ -812,9 +837,12 @@ class Auth {
             this.set('enc_user_id', res.enc_user_id)
             this.set('expires_in', `${res.expires_in}`)
             this.set('id_token', res.id_token)
-            this.set('token_type', res.token_type)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
         }
+        // TODO: token_type is unused inside PWA Kit (always 'Bearer') and isn't
+        // mirrored as a cookie. Remove the localStorage entry and DATA_MAP entry
+        // in a follow-up so we stop carrying it in `data` entirely.
+        this.set('token_type', res.token_type)
 
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
@@ -826,12 +854,11 @@ class Auth {
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
-        if (this.enableHttpOnlySessionCookies && onClient()) {
-            // Browser: skip token storage, httpOnly cookies handle it
-            const uidoFromCookie = this.stores['cookie'].get('uido')
-            if (uidoFromCookie) this.set('uido', uidoFromCookie)
-        } else {
-            // Server (SSR) or httpOnly disabled: store tokens normally
+        // In httpOnly mode on the client, tokens (access/refresh) live in HttpOnly
+        // cookies set by the proxy and uido is mirrored as a non-HttpOnly cookie —
+        // there is nothing to write client-side. In SSR or non-httpOnly mode we
+        // populate the in-memory / localStorage stores so subsequent reads work.
+        if (!skipMetadataWrites) {
             this.set('access_token', res.access_token)
             this.set('idp_access_token', res.idp_access_token)
             if (res.access_token) {

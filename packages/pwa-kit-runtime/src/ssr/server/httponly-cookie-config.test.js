@@ -26,10 +26,8 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.encUserId.key).toBe('enc_user_id')
         expect(SESSION_COOKIE_CONFIG.customerType.key).toBe('customer_type')
         expect(SESSION_COOKIE_CONFIG.refreshTokenExpiresIn.key).toBe('refresh_token_expires_in')
-        expect(SESSION_COOKIE_CONFIG.expiresIn.key).toBe('expires_in')
         expect(SESSION_COOKIE_CONFIG.idToken.key).toBe('id_token')
         expect(SESSION_COOKIE_CONFIG.idpRefreshToken.key).toBe('idp_refresh_token')
-        expect(SESSION_COOKIE_CONFIG.tokenType.key).toBe('token_type')
     })
 
     it('marks sensitive token cookies as httpOnly', () => {
@@ -49,9 +47,7 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.encUserId.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.customerType.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.refreshTokenExpiresIn.attributes.httpOnly).toBe(false)
-        expect(SESSION_COOKIE_CONFIG.expiresIn.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(false)
-        expect(SESSION_COOKIE_CONFIG.tokenType.attributes.httpOnly).toBe(false)
     })
 
     it('sets secure, sameSite lax, and path / on all cookies', () => {

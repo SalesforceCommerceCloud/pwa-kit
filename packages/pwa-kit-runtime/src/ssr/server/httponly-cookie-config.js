@@ -52,10 +52,6 @@ export const SESSION_COOKIE_CONFIG = {
         key: 'refresh_token_expires_in',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     },
-    expiresIn: {
-        key: 'expires_in',
-        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
-    },
     idToken: {
         key: 'id_token',
         attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
@@ -63,10 +59,6 @@ export const SESSION_COOKIE_CONFIG = {
     idpRefreshToken: {
         key: 'idp_refresh_token',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
-    },
-    tokenType: {
-        key: 'token_type',
-        attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}
     }
 }
 

@@ -103,10 +103,8 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         encUserId,
         customerType,
         refreshTokenExpiresIn,
-        expiresIn,
         idToken,
-        idpRefreshToken,
-        tokenType
+        idpRefreshToken
     } = SESSION_COOKIE_CONFIG
 
     // Decode JWT and extract claims
@@ -239,6 +237,13 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
 
         // Hybrid SFRA + PWA: mirror SLAS metadata as siteId-suffixed cookies so SFRA
         // can read the same session state. Expiry aligned with refresh token TTL.
+        //
+        // These writes live inside `if (parsed.refresh_token)` because we need a fresh
+        // refresh-token TTL to choose `refreshExpires`. SLAS responses that include
+        // these metadata fields always also include a refresh_token (login flows and
+        // refresh-with-rotation), so in practice this is the same condition. If a
+        // future flow returns metadata without a refresh_token, the existing cookies
+        // remain valid until they expire on their own schedule.
         res.append(
             SET_COOKIE,
             cookieAsString({
@@ -281,30 +286,6 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                     value: String(parsed.refresh_token_expires_in),
                     expires: refreshExpires,
                     ...refreshTokenExpiresIn.attributes
-                })
-            )
-        }
-
-        if (parsed.expires_in !== undefined) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(expiresIn, site),
-                    value: String(parsed.expires_in),
-                    expires: refreshExpires,
-                    ...expiresIn.attributes
-                })
-            )
-        }
-
-        if (parsed.token_type) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(tokenType, site),
-                    value: parsed.token_type,
-                    expires: refreshExpires,
-                    ...tokenType.attributes
                 })
             )
         }
