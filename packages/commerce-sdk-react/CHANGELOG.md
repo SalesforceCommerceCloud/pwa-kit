@@ -1,3 +1,6 @@
+## v5.3.0-nightly-20260513085648 (May 13, 2026)
+## v5.3.0-dev (May 13, 2026)
+## v3.19.0-nightly-20260513085648 (May 13, 2026)
 ## v5.3.0-dev (May 07, 2026)
 - [Feature] Enable `throwOnMaintenanceHeader: true` by default in the SDK client config so that `MaintenanceError` is thrown automatically when the `sfdc_maintenance` response header is detected. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
 
