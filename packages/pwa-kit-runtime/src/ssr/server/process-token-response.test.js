@@ -157,7 +157,8 @@ describe('setHttpOnlySessionCookies', () => {
             customer_id: 'cust123',
             enc_user_id: 'enc-user-456',
             id_token: 'id-token-789',
-            token_type: 'Bearer'
+            token_type: 'Bearer',
+            usid: 'usid-abc'
         })
         const beforeNowSec = Math.floor(Date.now() / 1000)
         const result = setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
@@ -232,6 +233,11 @@ describe('setHttpOnlySessionCookies', () => {
         )
         expect(custTypeCookie.value).toBe('guest')
         expect(custTypeCookie.httpOnly).toBeUndefined()
+
+        // usid (non-HttpOnly, refresh-TTL-aligned)
+        const usidCookie = parseCookie(res.cookies.find((c) => c.includes('usid_testsite=')))
+        expect(usidCookie.value).toBe('usid-abc')
+        expect(usidCookie.httpOnly).toBeUndefined()
 
         // cc-nx-expires (non-HttpOnly, absolute epoch when refresh token expires)
         const refreshExpiresCookie = parseCookie(
@@ -354,6 +360,7 @@ describe('setHttpOnlySessionCookies', () => {
         expect(res.cookies.find((c) => c.startsWith('expires_in_testsite='))).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('token_type_testsite='))).toBeUndefined()
         expect(res.cookies.find((c) => c.includes('idp_refresh_token_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.includes('usid_testsite='))).toBeUndefined()
 
         // customer_type is still set because it is always derivable from the JWT isb claim
         const custTypeCookie = parseCookie(
@@ -445,6 +452,7 @@ describe('expireHttpOnlySessionCookies', () => {
             'customer_id_testsite',
             'enc_user_id_testsite',
             'customer_type_testsite',
+            'usid_testsite',
             'cc-nx-expires_testsite',
             'id_token_testsite',
             'idp_refresh_token_testsite'

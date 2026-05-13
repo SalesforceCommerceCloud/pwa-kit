@@ -689,6 +689,10 @@ class Auth {
         let accessToken = this.get('access_token')
         const sfraAuthToken = this.get('access_token_sfra')
 
+        // This code block only executes in plugin_slas hybrid setup when the cc-at cookie is set
+        // This code block does not run when httpOnly mode is enabled because the access token
+        // will be in an HttpOnly cookie.
+        // When httpOnly mode is enabled, session handoff is handled as part of hybrid auth
         if (sfraAuthToken) {
             /*
              * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
@@ -720,14 +724,14 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
-            // SFRA handoff only writes the fields it can derive from the cc-at JWT
-            // (customer_id, usid, customer_type). The other mirrored metadata cookies
-            // (enc_user_id, id_token, refresh_token_expires_in, idp_*) were last set by
-            // the SLAS proxy and remain valid for the existing session — there is no
-            // newer source for them here. In httpOnly mode customer_id/customer_type
-            // are routed to cookies; pass expires so we don't overwrite the proxy-set
-            // cookie with a session cookie.
-            this.set('customer_id', customerId, {expires: expiresDate})
+            // SFRA handoff writes the fields it can derive from the cc-at JWT.
+            // In httpOnly mode eCOM sets `customer_id` and `customer_type` cookies
+            // alongside the access token, so the client doesn't need to mirror
+            // them. We still update local storage in non-httpOnly mode.
+            const skipMirroredWrites = this.enableHttpOnlySessionCookies && onClient()
+            if (!skipMirroredWrites) {
+                this.set('customer_id', customerId, {expires: expiresDate})
+            }
 
             /**
              * The usid cookie always set when session bridging in a hybrid setup. This makes resetting the usid
@@ -741,7 +745,9 @@ class Auth {
                 })
             }
 
-            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
+            if (!skipMirroredWrites) {
+                this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
+            }
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -839,52 +845,43 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
+        // In httpOnly mode on the client, every value we'd otherwise persist
+        // here is already set as a cookie by the SLAS proxy / eCOM (access
+        // token, refresh token, customer_id, customer_type, usid, uido,
+        // id_token, enc_user_id, etc.). There is nothing left for the client
+        // to write, so short-circuit. SSR and non-httpOnly mode still need to
+        // populate the in-memory / localStorage stores so subsequent reads
+        // work, so the rest of the function continues for those cases.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return
+        }
+
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
 
-        // In httpOnly mode on the client, the SLAS proxy mirrors these fields as
-        // cookies with proper TTL via Set-Cookie. Skip the client-side writes so
-        // we don't downgrade those cookies to session cookies (no expires).
-        const skipMetadataWrites = this.enableHttpOnlySessionCookies && onClient()
-        if (!skipMetadataWrites) {
-            this.set('customer_id', res.customer_id)
-            this.set('enc_user_id', res.enc_user_id)
-            this.set('expires_in', `${res.expires_in}`)
-            this.set('id_token', res.id_token)
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
-        }
-        // TODO: token_type is unused inside PWA Kit (always 'Bearer') and isn't
-        // mirrored as a cookie. Remove the localStorage entry and DATA_MAP entry
-        // in a follow-up so we stop carrying it in `data` entirely.
+        this.set('customer_id', res.customer_id)
+        this.set('enc_user_id', res.enc_user_id)
+        this.set('expires_in', `${res.expires_in}`)
+        this.set('id_token', res.id_token)
+        this.set('customer_type', isGuest ? 'guest' : 'registered')
         this.set('token_type', res.token_type)
 
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
             isGuest
         )
-        if (!skipMetadataWrites) {
-            // In httpOnly mode `cc-nx-expires` is the source of truth for the
-            // refresh token expiry; keep localStorage out of it to avoid two
-            // copies that can drift.
-            this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        }
+        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
-        // In httpOnly mode on the client, tokens (access/refresh) live in HttpOnly
-        // cookies set by the proxy and uido is mirrored as a non-HttpOnly cookie —
-        // there is nothing to write client-side. In SSR or non-httpOnly mode we
-        // populate the in-memory / localStorage stores so subsequent reads work.
-        if (!skipMetadataWrites) {
-            this.set('access_token', res.access_token)
-            this.set('idp_access_token', res.idp_access_token)
-            if (res.access_token) {
-                const {uido} = this.parseSlasJWT(res.access_token)
-                this.set('uido', uido)
-            }
-            const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-            this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
+        this.set('access_token', res.access_token)
+        this.set('idp_access_token', res.idp_access_token)
+        if (res.access_token) {
+            const {uido} = this.parseSlasJWT(res.access_token)
+            this.set('uido', uido)
         }
+        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
     }
 
     private get refreshDedupKey(): string {
@@ -1074,9 +1071,12 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
-            // In httpOnly mode customer_id/customer_type are routed to cookies; pass
-            // expires so we don't overwrite the proxy-set cookie with a session cookie.
-            this.set('customer_id', customerId, {expires: expiresDate})
+            // In httpOnly mode eCOM sets `customer_id` and `customer_type` cookies
+            // alongside the access token, so the client doesn't mirror them.
+            const skipMirroredWrites = this.enableHttpOnlySessionCookies && onClient()
+            if (!skipMirroredWrites) {
+                this.set('customer_id', customerId, {expires: expiresDate})
+            }
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
@@ -1089,7 +1089,9 @@ class Auth {
                     expires: expiresDate
                 })
             }
-            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
+            if (!skipMirroredWrites) {
+                this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
+            }
             return this.data
         }
         if (onClient()) {

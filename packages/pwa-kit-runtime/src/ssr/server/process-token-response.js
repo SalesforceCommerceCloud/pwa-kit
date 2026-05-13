@@ -101,6 +101,7 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         customerId,
         encUserId,
         customerType,
+        usid,
         refreshTokenExpires,
         idToken,
         idpRefreshToken
@@ -261,6 +262,21 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                     value: parsed.enc_user_id,
                     expires: refreshExpires,
                     ...encUserId.attributes
+                })
+            )
+        }
+
+        // usid: SLAS session id, non-HttpOnly so client/SFRA/Einstein can read
+        // it. Aligned to refresh-token TTL to persist across access-token
+        // refreshes within a single shopper session.
+        if (parsed.usid) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(usid, site),
+                    value: parsed.usid,
+                    expires: refreshExpires,
+                    ...usid.attributes
                 })
             )
         }

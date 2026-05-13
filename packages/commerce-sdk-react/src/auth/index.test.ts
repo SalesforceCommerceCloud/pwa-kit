@@ -1630,15 +1630,14 @@ describe('HttpOnly Session Cookies', () => {
 
         await auth.loginGuestUser()
 
-        // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
+        // In httpOnly mode handleTokenResponse is a no-op on the client; nothing
+        // here writes to localStorage. The proxy / eCOM is solely responsible
+        // for setting all session cookies (access token, refresh token,
+        // customer_id, customer_type, usid, etc.) via Set-Cookie headers.
         expect(auth.get('access_token')).toBeFalsy()
         expect(auth.get('refresh_token_guest')).toBeFalsy()
-        // customer_id is mirrored as a cookie by the proxy in httpOnly mode, so the
-        // client must not write a duplicate localStorage entry. Confirm there's no
-        // localStorage entry left behind.
         expect(window.localStorage.getItem(`customer_id_${config.siteId}`)).toBeNull()
-        // usid is still set client-side as a cookie (with explicit expiry)
-        expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
+        expect(window.localStorage.getItem(`enc_user_id_${config.siteId}`)).toBeNull()
         // enableHttpOnlySessionCookies should be forwarded to the helper
         expect(helpers.loginGuestUser).toHaveBeenCalledWith(
             expect.objectContaining({enableHttpOnlySessionCookies: true})
