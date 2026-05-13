@@ -51,6 +51,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
+const UcpContinue = loadable(() => import('./pages/continue'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
@@ -136,6 +137,9 @@ export default () => {
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+    const ucpConfig = config?.app?.ucp
+    const ucpEnabled = ucpConfig?.enabled
+    const ucpContinuePath = ucpConfig?.continuePath
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -154,6 +158,12 @@ export default () => {
             socialRedirectURI && {
                 path: socialRedirectURI,
                 component: SocialLoginRedirect,
+                exact: true
+            },
+        ucpEnabled &&
+            ucpContinuePath && {
+                path: ucpContinuePath,
+                component: UcpContinue,
                 exact: true
             }
     ].filter(Boolean)

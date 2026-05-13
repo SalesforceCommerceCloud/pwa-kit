@@ -2081,6 +2081,18 @@
   "toggle_card.action.editShippingOptions": {
     "defaultMessage": "Edit Shipping Options"
   },
+  "ucp_continue.error.basket_not_found": {
+    "defaultMessage": "The basket was not found or is no longer available."
+  },
+  "ucp_continue.error.conflict": {
+    "defaultMessage": "A basket already exists for this session. Please specify how to resolve the conflict."
+  },
+  "ucp_continue.error.missing_params": {
+    "defaultMessage": "Missing required parameters. A valid basket ID and shopper ID are required."
+  },
+  "ucp_continue.message.loading": {
+    "defaultMessage": "Preparing your checkout..."
+  },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot Password?"
   },

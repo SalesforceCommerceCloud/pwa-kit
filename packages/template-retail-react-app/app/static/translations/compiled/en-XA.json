@@ -10497,6 +10497,62 @@
       "value": "]"
     }
   ],
+  "ucp_continue.error.basket_not_found": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħḗḗ ƀȧȧşķḗḗŧ ẇȧȧş ƞǿǿŧ ƒǿǿŭŭƞḓ ǿǿř īş ƞǿǿ ŀǿǿƞɠḗḗř ȧȧṽȧȧīŀȧȧƀŀḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "ucp_continue.error.conflict": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧ ƀȧȧşķḗḗŧ ȧȧŀřḗḗȧȧḓẏ ḗḗẋīşŧş ƒǿǿř ŧħīş şḗḗşşīǿǿƞ. Ƥŀḗḗȧȧşḗḗ şƥḗḗƈīƒẏ ħǿǿẇ ŧǿǿ řḗḗşǿǿŀṽḗḗ ŧħḗḗ ƈǿǿƞƒŀīƈŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "ucp_continue.error.missing_params": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿīşşīƞɠ řḗḗɋŭŭīřḗḗḓ ƥȧȧřȧȧḿḗḗŧḗḗřş. Ȧ ṽȧȧŀīḓ ƀȧȧşķḗḗŧ ĪḒ ȧȧƞḓ şħǿǿƥƥḗḗř ĪḒ ȧȧřḗḗ řḗḗɋŭŭīřḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "ucp_continue.message.loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥřḗḗƥȧȧřīƞɠ ẏǿǿŭŭř ƈħḗḗƈķǿǿŭŭŧ..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "update_password_fields.button.forgot_password": [
     {
       "type": 0,

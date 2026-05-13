@@ -118,6 +118,10 @@ module.exports = {
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
+        },
+        ucp: {
+            enabled: false,
+            continuePath: '/continue'
         }
     },
     externals: [],
