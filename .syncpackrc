@@ -1,0 +1,10 @@
+{
+    "versionGroups": [
+        {
+            "label": "Allow storefront-next-runtime version mismatch across packages",
+            "dependencies": ["@salesforce/storefront-next-runtime"],
+            "packages": ["**"],
+            "isIgnored": true
+        }
+    ]
+}
