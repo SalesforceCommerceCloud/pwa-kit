@@ -189,6 +189,7 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 10 * 1000,
+                useErrorBoundary: (err) => err?.name === 'MaintenanceError', // prevent ReactQuery from swallowing this exception
                 ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {

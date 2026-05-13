@@ -19,6 +19,7 @@ import {
 
 import {BrandLogo, FileIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import MaintenanceError from '@salesforce/retail-react-app/app/components/maintenance-error'
 
 // <Error> is rendered when:
 //
@@ -29,7 +30,11 @@ import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/uti
 // It must not throw an error. Keep it as simple as possible.
 
 const Error = (props) => {
-    const {message, stack} = props
+    const {message, stack, status} = props
+
+    if (status === 503) {
+        return <MaintenanceError />
+    }
 
     const title = "This page isn't working"
     return (

@@ -82,6 +82,9 @@ const logAndFormatError = (err) => {
     if (err instanceof errors.HTTPError) {
         // These are safe to display – we expect end-users to throw them
         return {message: err.message, status: err.status, stack: err.stack}
+    } else if (err?.name === 'MaintenanceError') {
+        // ^ avoid importing the commerce SDK
+        return {message: err.message, status: 503, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
         logger.error(cause, {namespace: 'react-rendering.render'})

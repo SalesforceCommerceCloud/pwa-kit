@@ -175,6 +175,13 @@ module.exports = {
         pages: {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
+            },
+            maintenancePage: {
+                // When true (default), the maintenance page is fetched from the CDN URL below
+                // and rendered as-is. Set to false to display the built-in maintenance message.
+                sharedMaintenancePage: true,
+                cdnUrl: 'https://prd.cmp.cdn.commercecloud.salesforce.com',
+                forwardedHost: ''
             }
         },
         // Salesforce Payments configuration

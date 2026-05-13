@@ -1,3 +1,6 @@
+## v3.18.1-dev
+- Add maintenance mode page configuration to generated `config/default.js` templates. Configure `app.pages.maintenancePage.sharedMaintenancePage` (default `true`) to fetch and display a CDN-hosted maintenance page, or set to `false` for the built-in fallback message. Supports CDN URL and forwarded host customization. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
 ## v3.18.0 (May 07, 2026)
 - Add opt-in `app.mrtDataStore.enabled` to generated `config/default.js` templates (default `false`; enable MRT Data Store bootstrap with `true` or `PWAKIT_MRT_DATA_STORE_ENABLED`; when false, `__MRT_DATA_STORE__` is omitted from `#mobify-data`). Comments reference `isMrtDataStoreEnabled`. Document local defaults env vars (`MRT_DATA_STORE_DEFAULTS`, etc.) for the in-memory local provider from `@salesforce/mrt-utilities`. [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787) [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)

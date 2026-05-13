@@ -1,4 +1,6 @@
 ## v3.19.0-dev (May 07, 2026)
+- [Feature] Propagate `MaintenanceError` (status 503) through SSR and client-side error pipelines: rethrow in `doInitAppState`, handle in `logAndFormatError`, and detect in `AppErrorBoundary` using duck-typing on `err.name`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
 ## v3.18.0 (May 07, 2026)
 - Update `@salesforce/pwa-kit-runtime` dependency which simplified data store implementation [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 - When the real Data Store is unavailable, SSR can use `@salesforce/pwa-kit-dev`’s in-memory local provider (`PWAKIT_MRT_DATA_STORE_DEFAULTS`, etc.; see runtime `local-dev-provider-loader`). [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787)
