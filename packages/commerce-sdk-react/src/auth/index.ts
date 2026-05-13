@@ -1052,6 +1052,17 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
+            // In httpOnly mode on the client, the SLAS proxy / eCOM has already
+            // set every session cookie (access token, refresh token, customer_id,
+            // customer_type, usid, …) on the response that produced this token.
+            // There is nothing left for the client to write — and writing here
+            // would risk overwriting the proxy's cookies with default attributes
+            // (TTL drift, etc.) and leaking the JWT into localStorage. Just
+            // return the data assembled from the proxy-set cookies.
+            if (this.enableHttpOnlySessionCookies && onClient()) {
+                return this.data
+            }
+
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
 
             /**
@@ -1071,12 +1082,7 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
-            // In httpOnly mode eCOM sets `customer_id` and `customer_type` cookies
-            // alongside the access token, so the client doesn't mirror them.
-            const skipMirroredWrites = this.enableHttpOnlySessionCookies && onClient()
-            if (!skipMirroredWrites) {
-                this.set('customer_id', customerId, {expires: expiresDate})
-            }
+            this.set('customer_id', customerId, {expires: expiresDate})
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
@@ -1089,9 +1095,7 @@ class Auth {
                     expires: expiresDate
                 })
             }
-            if (!skipMirroredWrites) {
-                this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
-            }
+            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
             return this.data
         }
         if (onClient()) {
