@@ -11,6 +11,7 @@ import {
     SESSION_COOKIE_CONFIG,
     getAllCookieConfigs,
     getCookieName,
+    getResponseBodyFieldsToStrip,
     getSiteId
 } from './httponly-cookie-config'
 import logger from '../../utils/logger-instance'
@@ -308,12 +309,14 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         }
     }
 
-    // Strip token fields from body so they are not exposed to the client
+    // Strip HttpOnly token fields from the response body so they are only
+    // readable via the corresponding cookies. The list of fields is derived
+    // from `bodyField` markers on SESSION_COOKIE_CONFIG so this stays aligned
+    // with the cookies being set above.
     const stripped = {...parsed}
-    delete stripped.access_token
-    delete stripped.idp_access_token
-    delete stripped.refresh_token
-    delete stripped.idp_refresh_token
+    for (const field of getResponseBodyFieldsToStrip()) {
+        delete stripped[field]
+    }
     return Buffer.from(JSON.stringify(stripped), 'utf8')
 }
 

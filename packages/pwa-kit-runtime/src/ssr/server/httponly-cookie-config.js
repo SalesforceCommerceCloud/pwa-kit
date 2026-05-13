@@ -6,10 +6,17 @@
  */
 import {X_SITE_ID, DWSID_COOKIE_NAME} from './constants'
 
+/**
+ * `bodyField` (optional): the SLAS response field name this cookie shadows.
+ * `getResponseBodyFieldsToStrip()` reads these to know which JSON fields to
+ * delete from the response body before forwarding to the client, keeping the
+ * "what is HttpOnly" definition in one place.
+ */
 export const SESSION_COOKIE_CONFIG = {
     accessToken: {
         key: 'cc-at',
-        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
+        bodyField: 'access_token'
     },
     accessTokenExpires: {
         key: 'cc-at-expires',
@@ -22,15 +29,18 @@ export const SESSION_COOKIE_CONFIG = {
     uido: {key: 'uido', attributes: {httpOnly: false, secure: true, sameSite: 'lax', path: '/'}},
     idpAccessToken: {
         key: 'idp_access_token',
-        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
+        bodyField: 'idp_access_token'
     },
     refreshTokenGuest: {
         key: 'cc-nx-g',
-        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
+        bodyField: 'refresh_token'
     },
     refreshTokenRegistered: {
         key: 'cc-nx',
-        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
+        bodyField: 'refresh_token'
     },
     customerId: {
         key: 'customer_id',
@@ -61,7 +71,8 @@ export const SESSION_COOKIE_CONFIG = {
     },
     idpRefreshToken: {
         key: 'idp_refresh_token',
-        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'}
+        attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
+        bodyField: 'idp_refresh_token'
     }
 }
 
@@ -77,4 +88,17 @@ export const getCookieNamesToStripFromProxy = (siteId) => [
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenRegistered, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.idpRefreshToken, siteId),
     DWSID_COOKIE_NAME
+]
+
+/**
+ * Returns the unique SLAS response body fields that correspond to HttpOnly
+ * cookies. These fields are deleted from the JSON body before the response
+ * is forwarded to the client, so the tokens are only readable via cookies.
+ */
+export const getResponseBodyFieldsToStrip = () => [
+    ...new Set(
+        Object.values(SESSION_COOKIE_CONFIG)
+            .map((c) => c.bodyField)
+            .filter(Boolean)
+    )
 ]
