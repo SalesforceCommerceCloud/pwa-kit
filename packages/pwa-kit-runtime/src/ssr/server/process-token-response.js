@@ -311,7 +311,7 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
 
     // Strip HttpOnly token fields from the response body so they are only
     // readable via the corresponding cookies. The list of fields is derived
-    // from `bodyField` markers on SESSION_COOKIE_CONFIG so this stays aligned
+    // from `slasKey` markers on SESSION_COOKIE_CONFIG so this stays aligned
     // with the cookies being set above.
     const stripped = {...parsed}
     for (const field of getResponseBodyFieldsToStrip()) {

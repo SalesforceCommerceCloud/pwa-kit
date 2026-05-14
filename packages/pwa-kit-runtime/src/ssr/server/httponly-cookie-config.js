@@ -7,7 +7,7 @@
 import {X_SITE_ID, DWSID_COOKIE_NAME} from './constants'
 
 /**
- * `bodyField` (optional): the SLAS response field name this cookie shadows.
+ * `slasKey` (optional): the SLAS response field name this cookie shadows.
  * `getResponseBodyFieldsToStrip()` reads these to know which JSON fields to
  * delete from the response body before forwarding to the client, keeping the
  * "what is HttpOnly" definition in one place.
@@ -16,7 +16,7 @@ export const SESSION_COOKIE_CONFIG = {
     accessToken: {
         key: 'cc-at',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
-        bodyField: 'access_token'
+        slasKey: 'access_token'
     },
     accessTokenExpires: {
         key: 'cc-at-expires',
@@ -30,17 +30,17 @@ export const SESSION_COOKIE_CONFIG = {
     idpAccessToken: {
         key: 'idp_access_token',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
-        bodyField: 'idp_access_token'
+        slasKey: 'idp_access_token'
     },
     refreshTokenGuest: {
         key: 'cc-nx-g',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
-        bodyField: 'refresh_token'
+        slasKey: 'refresh_token'
     },
     refreshTokenRegistered: {
         key: 'cc-nx',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
-        bodyField: 'refresh_token'
+        slasKey: 'refresh_token'
     },
     customerId: {
         key: 'customer_id',
@@ -72,7 +72,7 @@ export const SESSION_COOKIE_CONFIG = {
     idpRefreshToken: {
         key: 'idp_refresh_token',
         attributes: {httpOnly: true, secure: true, sameSite: 'lax', path: '/'},
-        bodyField: 'idp_refresh_token'
+        slasKey: 'idp_refresh_token'
     }
 }
 
@@ -98,7 +98,7 @@ export const getCookieNamesToStripFromProxy = (siteId) => [
 export const getResponseBodyFieldsToStrip = () => [
     ...new Set(
         Object.values(SESSION_COOKIE_CONFIG)
-            .map((c) => c.bodyField)
+            .map((c) => c.slasKey)
             .filter(Boolean)
     )
 ]
