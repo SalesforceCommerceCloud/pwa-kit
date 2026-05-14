@@ -686,13 +686,20 @@ class Auth {
      * @returns {string} access token
      */
     private getAccessToken() {
+        // In httpOnly mode on the client, the access token lives in an HttpOnly
+        // cookie that JS can't read, and the SFRA cc-at handoff isn't used in
+        // this mode (eCOM owns the session cookies directly). Return an empty
+        // string — callers that try to decode it (e.g., the TAOB flow in
+        // `_refreshAccessToken`) already handle the invalid-JWT case and fall
+        // through to a refresh / guest login.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return ''
+        }
+
         let accessToken = this.get('access_token')
         const sfraAuthToken = this.get('access_token_sfra')
 
-        // This code block only executes in plugin_slas hybrid setup when the cc-at cookie is set
-        // This code block does not run when httpOnly mode is enabled because the access token
-        // will be in an HttpOnly cookie.
-        // When httpOnly mode is enabled, session handoff is handled as part of hybrid auth
+        // This code block only executes in plugin_slas hybrid setup when the cc-at cookie is set.
         if (sfraAuthToken) {
             /*
              * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
@@ -724,14 +731,7 @@ class Auth {
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
-            // SFRA handoff writes the fields it can derive from the cc-at JWT.
-            // In httpOnly mode eCOM sets `customer_id` and `customer_type` cookies
-            // alongside the access token, so the client doesn't need to mirror
-            // them. We still update local storage in non-httpOnly mode.
-            const skipMirroredWrites = this.enableHttpOnlySessionCookies && onClient()
-            if (!skipMirroredWrites) {
-                this.set('customer_id', customerId, {expires: expiresDate})
-            }
+            this.set('customer_id', customerId)
 
             /**
              * The usid cookie always set when session bridging in a hybrid setup. This makes resetting the usid
@@ -745,9 +745,7 @@ class Auth {
                 })
             }
 
-            if (!skipMirroredWrites) {
-                this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
-            }
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -1051,18 +1049,22 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
-        if (this.fetchedToken && this.fetchedToken !== '') {
-            // In httpOnly mode on the client, the SLAS proxy / eCOM has already
-            // set every session cookie (access token, refresh token, customer_id,
-            // customer_type, usid, …) on the response that produced this token.
-            // There is nothing left for the client to write — and writing here
-            // would risk overwriting the proxy's cookies with default attributes
-            // (TTL drift, etc.) and leaking the JWT into localStorage. Just
-            // return the data assembled from the proxy-set cookies.
-            if (this.enableHttpOnlySessionCookies && onClient()) {
-                return this.data
+        // In httpOnly mode on the client, every session value is backed by a
+        // cookie set by the SLAS proxy / eCOM. We never hydrate state from a
+        // fetchedToken (the JWT is HttpOnly so SSR can't capture it) and we
+        // don't write anything to localStorage. Just check the access token
+        // expiry via `cc-at-expires` and refresh if needed; otherwise return
+        // the data assembled from the proxy-set cookies.
+        // `refreshAccessToken()` has its own pendingRefreshTokens dedup, so
+        // we don't need the dedup check that the non-httpOnly path uses.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            if (this.isAccessTokenExpired()) {
+                return await this.refreshAccessToken()
             }
+            return this.data
+        }
 
+        if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
 
             // Write to localStorage in non-httpOnly mode
