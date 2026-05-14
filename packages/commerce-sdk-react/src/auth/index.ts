@@ -1065,6 +1065,11 @@ class Auth {
 
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
 
+            // Write to localStorage in non-httpOnly mode
+            this.set('access_token', this.fetchedToken)
+            this.set('customer_id', customerId)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
+
             /**
              * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
              * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
@@ -1080,22 +1085,19 @@ class Auth {
                 refreshTokenExpiresIn,
                 isGuest
             )
-            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            this.set('access_token', this.fetchedToken)
-            this.set('customer_id', customerId, {expires: expiresDate})
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
              * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
              * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
              */
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             const usidCookieValue = this.get('usid')
             if (!usidCookieValue || usidCookieValue !== usid) {
                 this.set('usid', usid, {
                     expires: expiresDate
                 })
             }
-            this.set('customer_type', isGuest ? 'guest' : 'registered', {expires: expiresDate})
             return this.data
         }
         if (onClient()) {
