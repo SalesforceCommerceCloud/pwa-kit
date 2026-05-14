@@ -92,6 +92,7 @@
     "@salesforce/storefront-next-runtime": {
       "react": "^18.2.0",
       "react-dom": "^18.2.0",
+      "react-router": "^5.3.4",
       "@react-router/dev": "7.0.0",
       "@react-router/fs-routes": "7.0.0"
     }
