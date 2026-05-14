@@ -107,7 +107,8 @@ describe('Component', () => {
             isFragment: false,
             isVisible: true,
             isLocalized: false,
-            id: 'test-component-id'
+            id: 'test-component-id',
+            contentLinkUuid: undefined
         })
     })
 
@@ -154,7 +155,7 @@ describe('Component', () => {
         })
     })
 
-    test('omits contentLinkUuid from designMetadata when not present', () => {
+    test('contentLinkUuid is undefined when not present on component', () => {
         const receivedProps: Record<string, unknown> = {}
         const MockDynamicComponent = (props: Record<string, unknown>) => {
             Object.assign(receivedProps, props)
@@ -166,6 +167,6 @@ describe('Component', () => {
         render(<Component component={mockComponent} regionId="test-region" />)
 
         const designMetadata = receivedProps.designMetadata as Record<string, unknown>
-        expect(designMetadata).not.toHaveProperty('contentLinkUuid')
+        expect(designMetadata.contentLinkUuid).toBeUndefined()
     })
 })
