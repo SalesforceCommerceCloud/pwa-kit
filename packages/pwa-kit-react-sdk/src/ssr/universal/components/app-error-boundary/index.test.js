@@ -90,6 +90,53 @@ describe('AppErrorBoundary', () => {
         expect(result.error.message).toEqual(error.toString())
     })
 
+    test(`getDerivedStateFromError sets status 503 for MaintenanceError`, () => {
+        const err = new Error('Under maintenance')
+        err.name = 'MaintenanceError'
+        const result = AppErrorBoundary.getDerivedStateFromError(err)
+        expect(result.error.status).toBe(503)
+        expect(result.error.message).toEqual(err.toString())
+    })
+
+    test(`onGetPropsError handles MaintenanceError with status 503`, () => {
+        const ref = React.createRef()
+        render(
+            <AppErrorBoundary ref={ref}>
+                <span>content</span>
+            </AppErrorBoundary>
+        )
+        const err = new Error('Under maintenance')
+        err.name = 'MaintenanceError'
+        act(() => {
+            ref.current.onGetPropsError(err)
+        })
+        expect(screen.getByText('Error Status: 503')).toBeInTheDocument()
+    })
+
+    test(`history listener clears error state on location change`, () => {
+        let historyCallback
+        const history = {
+            listen: jest.fn().mockImplementation((cb) => {
+                historyCallback = cb
+                return jest.fn()
+            })
+        }
+        const ref = React.createRef()
+        render(
+            <AppErrorBoundary ref={ref} history={history}>
+                <span>content</span>
+            </AppErrorBoundary>
+        )
+        act(() => {
+            ref.current.onGetPropsError(new Error('test error'))
+        })
+        expect(screen.queryByText('content')).toBeNull()
+        act(() => {
+            historyCallback()
+        })
+        expect(screen.getByText('content')).toBeInTheDocument()
+    })
+
     test(`componentWillUnmount unlistens to history`, () => {
         const unlisten = jest.fn()
         const history = {listen: jest.fn().mockReturnValue(unlisten)}

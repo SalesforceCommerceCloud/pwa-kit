@@ -20,6 +20,7 @@ const BUNDLE_PATH_BASE = `${MOBIFY_PATH}/bundle`
 const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
+const SLAS_PUBLIC_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/public`
 
 /*
  * Returns the base path. This is prepended to a /mobify path.
@@ -69,6 +70,7 @@ export const bundleBasePath = BUNDLE_PATH_BASE
 export const cachingBasePath = CACHING_PATH_BASE
 export const healthCheckPath = HEALTHCHECK_PATH
 export const slasPrivateProxyPath = SLAS_PRIVATE_CLIENT_PROXY_PATH
+export const slasPublicProxyPath = SLAS_PUBLIC_CLIENT_PROXY_PATH
 
 /**
  * @deprecated This variable is no longer used. This variable has always been an empty string.

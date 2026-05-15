@@ -25,57 +25,22 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
  */
 export const answerConsentTrackingForm = async (page, dnt = false) => {
     try {
-        const consentFormVisible = await page
-            .locator('text=Tracking Consent')
-            .isVisible()
-            .catch(() => false)
-        if (!consentFormVisible) {
-            return
-        }
+        const consentForm = page.locator('text=Tracking Consent')
 
-        const buttonText = dnt ? 'Decline' : 'Accept'
-        await page
-            .getByRole('button', {name: new RegExp(buttonText, 'i')})
-            .first()
-            .waitFor({timeout: 3000})
+        // Wait for the consent form to appear. With httpOnly cookies, auth initialization
+        // may be slower so the form can take longer to render after page.goto resolves.
+        await consentForm.waitFor({state: 'visible', timeout: 10000})
 
-        // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
-        const clickSuccess = await page.evaluate((targetText) => {
-            // Try aria-label first, then fallback to text content
-            let buttons = Array.from(
-                document.querySelectorAll(`button[aria-label="${targetText} tracking"]`)
-            )
+        const ariaLabel = dnt ? 'Decline tracking' : 'Accept tracking'
+        const button = page
+            .locator(`button[aria-label="${ariaLabel}"]`)
+            .and(page.locator(':visible'))
+        await button.first().click()
 
-            if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll('button')).filter(
-                    (btn) =>
-                        btn.textContent &&
-                        btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
-                )
-            }
-
-            let clickedCount = 0
-            buttons.forEach((button) => {
-                // Only click visible buttons
-                if (button.offsetParent !== null) {
-                    button.click()
-                    clickedCount++
-                }
-            })
-
-            return clickedCount
-        }, buttonText)
-
-        // after clicking an answering button, the tracking consent should not stay in the DOM
-        if (clickSuccess > 0) {
-            await page.waitForTimeout(2000)
-            await page
-                .locator('text=Tracking Consent')
-                .isHidden({timeout: 5000})
-                .catch(() => {})
-        }
+        // Wait for the consent form to fully disappear from the DOM
+        await consentForm.waitFor({state: 'hidden', timeout: 5000})
     } catch (error) {
-        // Silently continue - consent form handling should not break tests
+        // Consent form may not appear (e.g. preference already set) — continue silently
     }
 }
 
@@ -239,7 +204,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
 
     await addedToCartModal.waitFor()
 
-    await page.getByLabel('Close').click()
+    await page.getByLabel('Close', {exact: true}).click()
 }
 
 /**

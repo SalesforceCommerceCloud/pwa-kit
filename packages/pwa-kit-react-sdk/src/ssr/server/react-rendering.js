@@ -28,7 +28,6 @@ import {
 import {
     getCustomGlobalPreferences,
     getCustomSitePreferences,
-    initializeDataStore,
     isMrtDataStoreEnabled
 } from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -83,6 +82,9 @@ const logAndFormatError = (err) => {
     if (err instanceof errors.HTTPError) {
         // These are safe to display – we expect end-users to throw them
         return {message: err.message, status: err.status, stack: err.stack}
+    } else if (err?.name === 'MaintenanceError') {
+        // ^ avoid importing the commerce SDK
+        return {message: err.message, status: 503, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
         logger.error(cause, {namespace: 'react-rendering.render'})
@@ -149,14 +151,11 @@ const performRender = async (req, res, next) => {
 
     // MRT Data Store (opt-in): when disabled, skip preference resolution and omit `__MRT_DATA_STORE__` from
     // `#mobify-data`. Enable via `app.mrtDataStore.enabled` or `PWAKIT_MRT_DATA_STORE_ENABLED=true`.
-    // When enabled, `initializeDataStore` from runtime mirrors the storefront-next flow (provider once, then keys).
+    // When enabled, resolve both MRT Data Store preference keys.
     const mrtDataStoreEnabled = isMrtDataStoreEnabled(config)
     let customSitePreferences = {}
     let customGlobalPreferences = {}
     if (mrtDataStoreEnabled) {
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'start')
-        await initializeDataStore()
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreInitialize, 'end')
         res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'start')
         ;[customSitePreferences, customGlobalPreferences] = await Promise.all([
             getCustomSitePreferences({
@@ -414,6 +413,7 @@ const renderApp = (args) => {
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         __MRT_ENV_BASE_PATH__: process.env.MRT_ENV_BASE_PATH || '',
+        __MRT_ENABLE_HTTPONLY_SESSION_COOKIES__: process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

@@ -641,6 +641,33 @@ describe('rewriteProxyRequestHeaders tests', () => {
             }
         },
         {
+            name: 'non-caching proxy rewrites user-agent to Amazon CloudFront by default',
+            caching: false,
+            targetHost: 'www.customer.com',
+            input: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Mozilla/5.0'
+            },
+            expected: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Amazon CloudFront'
+            }
+        },
+        {
+            name: 'non-caching proxy preserves user-agent when preserveUserAgent is true',
+            caching: false,
+            preserveUserAgent: true,
+            targetHost: 'www.customer.com',
+            input: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Mozilla/5.0'
+            },
+            expected: {
+                'accept-encoding': 'deflate, gzip',
+                'user-agent': 'Mozilla/5.0'
+            }
+        },
+        {
             name: 'add in x-headers',
             targetHost: 'www.customer.com',
             input: {
@@ -677,7 +704,8 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 method: testCase.method || 'GET',
                 targetProtocol: testCase.targetProtocol || 'https',
                 targetHost: testCase.targetHost,
-                logging: true
+                logging: true,
+                preserveUserAgent: testCase.preserveUserAgent || false
             })
 
             const expectedKeys = Object.keys(testCase.expected)

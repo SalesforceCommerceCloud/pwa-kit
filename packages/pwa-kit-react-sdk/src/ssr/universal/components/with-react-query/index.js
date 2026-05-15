@@ -85,6 +85,10 @@ export const withReactQuery = (Wrapped, options = {}) => {
                         const result = await q.fetch()
                         return result
                     } catch (err) {
+                        if (err?.name === 'MaintenanceError') {
+                            // ^ avoid importing the commerce SDK
+                            throw err
+                        }
                         logger.error('Query during SSR results in an error', {
                             namespace: 'with-react-query.doInitAppState',
                             additionalProperties: {queryHash: q.queryHash, error: err}

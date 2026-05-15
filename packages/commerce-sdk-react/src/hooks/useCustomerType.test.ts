@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {renderHook} from '@testing-library/react'
+import Cookies from 'js-cookie'
 import useCustomerType from './useCustomerType'
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
@@ -193,6 +195,70 @@ describe('useCustomerType', () => {
             expect(result.customerType).toBe('registered')
             expect(result.isRegistered).toBe(true)
             expect(result.isExternal).toBe(true)
+        })
+    })
+
+    /**
+     * Integration tests for httpOnly mode: simulate the SLAS proxy setting the
+     * customer_type and uido cookies and verify useCustomerType reads them via
+     * the real useCookie hook.
+     */
+    describe('httpOnly mode (real cookie integration)', () => {
+        const customerTypeCookieKey = `customer_type_${mockSiteId}`
+        const uidoCookieKey = `uido_${mockSiteId}`
+
+        beforeEach(() => {
+            mockedOnClient.mockReturnValue(true)
+            mockedUseConfig.mockReturnValue({
+                siteId: mockSiteId,
+                enableHttpOnlySessionCookies: true
+            } as any)
+            Cookies.remove(customerTypeCookieKey)
+            Cookies.remove(uidoCookieKey)
+        })
+
+        afterEach(() => {
+            Cookies.remove(customerTypeCookieKey)
+            Cookies.remove(uidoCookieKey)
+        })
+
+        it('reads customer_type=registered from the cookie set by the proxy', () => {
+            Cookies.set(customerTypeCookieKey, 'registered')
+            Cookies.set(uidoCookieKey, 'slas')
+
+            const {result} = renderHook(() => useCustomerType())
+
+            expect(result.current.customerType).toBe('registered')
+            expect(result.current.isRegistered).toBe(true)
+            expect(result.current.isGuest).toBe(false)
+            expect(result.current.isExternal).toBe(false)
+        })
+
+        it('reads customer_type=guest from the cookie set by the proxy', () => {
+            Cookies.set(customerTypeCookieKey, 'guest')
+
+            const {result} = renderHook(() => useCustomerType())
+
+            expect(result.current.customerType).toBe('guest')
+            expect(result.current.isGuest).toBe(true)
+            expect(result.current.isRegistered).toBe(false)
+        })
+
+        it('flags external users when registered + non-slas/ecom uido', () => {
+            Cookies.set(customerTypeCookieKey, 'registered')
+            Cookies.set(uidoCookieKey, 'external-idp')
+
+            const {result} = renderHook(() => useCustomerType())
+
+            expect(result.current.isExternal).toBe(true)
+        })
+
+        it('returns null customerType when cookie is absent', () => {
+            const {result} = renderHook(() => useCustomerType())
+
+            expect(result.current.customerType).toBeNull()
+            expect(result.current.isGuest).toBe(false)
+            expect(result.current.isRegistered).toBe(false)
         })
     })
 })

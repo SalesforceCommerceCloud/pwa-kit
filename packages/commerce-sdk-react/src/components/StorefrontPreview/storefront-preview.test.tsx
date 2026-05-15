@@ -16,6 +16,7 @@ declare global {
     interface Window {
         STOREFRONT_PREVIEW?: {
             getToken?: () => string | undefined | Promise<string | undefined>
+            getUsid?: () => Promise<string>
             onContextChange?: () => void | Promise<void>
             siteId?: string
             experimentalUnsafeNavigate?: (
@@ -34,7 +35,12 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
-jest.mock('../../auth/index.ts')
+jest.mock('../../hooks/useUsid', () =>
+    jest.fn(() => ({
+        getUsidWhenReady: jest.fn(() => Promise.resolve('mock-usid')),
+        getUsidForPreview: jest.fn(() => Promise.resolve('mock-usid'))
+    }))
+)
 jest.mock('../../hooks/useConfig', () => jest.fn())
 
 const mockPush = jest.fn()
@@ -126,6 +132,7 @@ describe('Storefront Preview Component', function () {
             />
         )
         expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.getUsid).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.siteId).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
@@ -217,11 +224,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Runtime Admin sends /test/__pwa-kit/refresh but React Router has no basename
@@ -236,11 +239,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate?.(
@@ -278,11 +277,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Path already starts with /__pwa-kit/ — no prefix to strip
@@ -297,11 +292,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(
-            <StorefrontPreview
-                enabled={true}
-                getToken={() => 'my-token'}
-                getBasePath={() => ''}
-            />
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'} getBasePath={() => ''} />
         )
 
         // Regular navigation paths should pass through untouched
@@ -328,12 +319,16 @@ describe('Storefront Preview Component', function () {
             )
         }
 
-        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />)
+        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />, {
+            disableAuthInit: true
+        })
         expect(getBasketSpy).toHaveBeenCalledWith({
             parameters: {...parameters, c_cache_breaker: 1000}
         })
 
-        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />)
+        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />, {
+            disableAuthInit: true
+        })
         expect(getBasketSpy).toHaveBeenCalledWith({
             parameters
         })

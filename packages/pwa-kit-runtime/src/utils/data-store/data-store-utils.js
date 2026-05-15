@@ -6,22 +6,50 @@
  */
 
 import createLogger from '../logger-factory'
-import {DataStoreNotFoundError, DataStoreServiceError} from '../ssr-server/data-store'
-import {getDataStore} from './data-store-provider'
+import {
+    DataStore,
+    DataStoreNotFoundError,
+    DataStoreServiceError,
+    DataStoreUnavailableError
+} from '@salesforce/mrt-utilities/data-store'
 
 // Implementation in `logging-utils.js` (logger + constants; no `DataStore`) so client bundles stay small.
 // Client preference modules import `./logging-utils` directly; server code may import from here.
 export {warnIfMrtDataStoreBootstrapMissing} from './logging-utils'
 
-export {
-    getDataStore,
-    hasMrtEnvironment,
-    initializeDataStore,
-    resetDataStoreProviderCacheForTests
-} from './data-store-provider'
+/**
+ * Get the DataStore singleton instance from mrt-utilities.
+ * Uses conditional exports: dev-data-store in development, production in builds.
+ *
+ * @returns {DataStore} The DataStore instance
+ */
+export function getDataStore() {
+    return DataStore.getDataStore()
+}
 
 /**
- * Parse PWAKIT_MRT_DATA_STORE_ENABLED when set; invalid values are ignored (fall through to config).
+ * Whether the Managed Runtime env trio is present (AWS_REGION, MOBIFY_PROPERTY_ID, DEPLOY_TARGET).
+ *
+ * @returns {boolean}
+ */
+export function hasMrtEnvironment() {
+    return Boolean(
+        process.env.AWS_REGION && process.env.MOBIFY_PROPERTY_ID && process.env.DEPLOY_TARGET
+    )
+}
+
+/**
+ * Reset cached provider (for tests).
+ * Resets the DataStore singleton so tests can configure environment variables.
+ */
+export function resetDataStoreProviderCacheForTests() {
+    // Reset the DataStore singleton from mrt-utilities
+    // This allows tests to reconfigure env vars and get a fresh instance
+    DataStore._instance = null
+}
+
+/**
+ * Parse PWAKIT_MRT_DATA_STORE_ENABLED when set; invalid values are ignored (fall through to config). (cspell:disable-line)
  * @param {string | undefined} raw
  * @returns {boolean | null} true/false when explicit, null when unset or invalid
  */
@@ -52,7 +80,7 @@ function parseMrtDataStoreEnabledFromEnv(raw) {
  * provider — see **`data-store-provider.js`**.
  *
  * **Opt-in:** off unless `config.app.mrtDataStore.enabled === true` or
- * `PWAKIT_MRT_DATA_STORE_ENABLED` is a recognized truthy/falsey string (`true`, `1`, `yes`, `on` / `false`, `0`, …).
+ * `PWAKIT_MRT_DATA_STORE_ENABLED` is a recognized truthy/falsey string (`true`, `1`, `yes`, `on` / `false`, `0`, …). (cspell:disable-line)
  *
  * Env takes precedence when set to a recognized value so ops can force on/off without a rebuild
  * (when env is injected at runtime).
@@ -61,7 +89,7 @@ function parseMrtDataStoreEnabledFromEnv(raw) {
  * @returns {boolean}
  */
 export function isMrtDataStoreEnabled(config) {
-    const fromEnv = parseMrtDataStoreEnabledFromEnv(process.env.PWAKIT_MRT_DATA_STORE_ENABLED)
+    const fromEnv = parseMrtDataStoreEnabledFromEnv(process.env.PWAKIT_MRT_DATA_STORE_ENABLED) // cspell:disable-line
     if (fromEnv !== null) {
         return fromEnv
     }
@@ -75,8 +103,8 @@ const logger = createLogger({packageName: 'pwa-kit-runtime'})
  * Use for entries that should surface as `Record<string, unknown>` in apps
  * (custom site/global preferences and similar keys).
  *
- * Uses the cached **`getDataStore()`** so multiple keys in one request share one
- * resolved source (MRT vs local vs no-op) and one **`getEntry`** shape.
+ * Uses the DataStore singleton from mrt-utilities. The conditional export ensures
+ * the correct implementation loads (dev-data-store in development, DynamoDB in production).
  *
  * @param {{
  *   dataStoreKey: string | null,
@@ -94,16 +122,21 @@ export async function getPlainObjectForDataStoreKey({
         return {}
     }
 
-    const provider = await getDataStore()
+    const store = getDataStore()
 
     try {
-        const entry = await provider.getEntry(dataStoreKey)
+        const entry = await store.getEntry(dataStoreKey)
+        // mrt-utilities returns { key, value } or throws DataStoreNotFoundError
         const value = entry?.value
         if (value && typeof value === 'object' && !Array.isArray(value)) {
             return value
         }
         return {}
     } catch (error) {
+        if (error instanceof DataStoreUnavailableError) {
+            // Data store not available (missing MRT env vars or mocked to be unavailable)
+            return {}
+        }
         if (error instanceof DataStoreNotFoundError) {
             return {}
         }

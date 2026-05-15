@@ -1,6 +1,12 @@
-## v5.2.0-dev (Mar 20, 2026)
-- Add contentLinkUuid support to Page Designer components to fix duplicate React key issues with Content Blocks [#3791] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3791)
+## v5.3.0-dev (May 07, 2026)
+- Add contentLinkUuid support to Page Designer components to fix duplicate React key issues with Content Blocks [#3791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3791)
+- Move SLAS metadata (customer_id, customer_type, enc_user_id, id_token, idp_refresh_token) from localStorage to proxy-set cookies in HttpOnly mode; replace `cc-nx-exists` and `refresh_token_expires_in` with a single `cc-nx-expires` cookie carrying the absolute refresh-token expiry; add `useCookie` hook backed by a custom cookie-change event [#3830](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3830)
+- [Feature] Enable `throwOnMaintenanceHeader: true` by default in the SDK client config so that `MaintenanceError` is thrown automatically when the `sfdc_maintenance` response header is detected. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
+## v5.2.0 (May 07, 2026)
 - Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
+- WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+- Re-add `cookieDomain` parameter to the `Auth` constructor; previously dropped during a merge. [#3822](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3822)
 
 ## v5.1.1 (Mar 20, 2026)
 - Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)

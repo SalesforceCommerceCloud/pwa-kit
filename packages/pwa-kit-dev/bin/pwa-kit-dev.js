@@ -258,12 +258,14 @@ const main = async () => {
             // This mimics how MRT sets the MRT_ENV_BASE_PATH system environment variable
             const config = getConfig() || {}
             const envBasePath = config.ssrParameters?.envBasePath || ''
-
+            const enableHttpOnlySessionCookies =
+                config.ssrParameters?.enableHttpOnlySessionCookies ?? false
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {}),
-                    ...(envBasePath ? {MRT_ENV_BASE_PATH: envBasePath} : {})
+                    ...(envBasePath ? {MRT_ENV_BASE_PATH: envBasePath} : {}),
+                    MRT_ENABLE_HTTPONLY_SESSION_COOKIES: String(enableHttpOnlySessionCookies)
                 }
             })
         })

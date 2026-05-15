@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import path from 'path'
+import path, {posix as posixPath} from 'path'
+import cookie from 'cookie'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -13,8 +14,18 @@ import {
     CACHE_CONTROL,
     NO_CACHE,
     X_ENCODED_HEADERS,
-    CONTENT_SECURITY_POLICY
+    CONTENT_SECURITY_POLICY,
+    SLAS_TOKEN_RESPONSE_ENDPOINTS,
+    SLAS_LOGOUT_ENDPOINT,
+    X_SITE_ID,
+    X_GRANT_TYPE
 } from './constants'
+import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+const {
+    refreshTokenRegistered,
+    refreshTokenGuest,
+    accessToken: accessTokenConfig
+} = SESSION_COOKIE_CONFIG
 import {
     catchAndLog,
     getHashForString,
@@ -46,9 +57,10 @@ import {
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
-    slasPrivateProxyPath
+    slasPrivateProxyPath,
+    slasPublicProxyPath
 } from '../../utils/ssr-namespace-paths'
-import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
+import {applyProxyRequestHeaders, stripSessionCookies} from '../../utils/ssr-server/configure-proxy'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
@@ -61,6 +73,7 @@ import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {is as typeis} from 'type-is'
+import {setHttpOnlySessionCookies, expireHttpOnlySessionCookies} from './process-token-response'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -91,6 +104,155 @@ export const isBinary = (headers) => {
 }
 
 /**
+ * Error thrown when the refresh token HttpOnly cookie is not found on the incoming request.
+ * Handled specifically in the SLAS proxy to return a 401 instead of forwarding to SLAS.
+ */
+export class RefreshTokenNotFoundError extends Error {
+    constructor(message) {
+        super(message)
+        this.name = 'RefreshTokenNotFoundError'
+    }
+}
+
+/**
+ * Inject the refresh token from HttpOnly cookies as the sfdc_refresh_token header.
+ * SLAS uses sfdc_refresh_token as a fallback when the refresh_token body parameter is
+ * missing or empty (which is the case when HttpOnly session cookies are enabled, because
+ * client-side JavaScript cannot read the HttpOnly refresh token cookie).
+ * @throws {RefreshTokenNotFoundError} If the refresh token cookie is missing.
+ * @private
+ */
+export const setRefreshTokenHeader = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) {
+        throw new RefreshTokenNotFoundError(
+            'No cookies present on request. Cannot inject refresh token.'
+        )
+    }
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = getSiteId(incomingRequest)
+    if (!siteId) {
+        throw new RefreshTokenNotFoundError(
+            'x-site-id header is missing on SLAS token request. ' +
+                'Cannot inject refresh token. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.'
+        )
+    }
+
+    // Try registered refresh token first, then guest
+    const refreshToken =
+        cookies[getCookieName(refreshTokenRegistered, siteId)] ||
+        cookies[getCookieName(refreshTokenGuest, siteId)]
+    if (!refreshToken) {
+        throw new RefreshTokenNotFoundError(
+            'Refresh token cookie not found. Cannot proceed with refresh token flow.'
+        )
+    }
+    proxyRequest.setHeader('sfdc_refresh_token', refreshToken)
+}
+
+/**
+ * Inject Bearer token and refresh token from HttpOnly cookies for the SLAS logout endpoint.
+ * Reads the access token and refresh token from cookies keyed by siteId (from the x-site-id header),
+ * sets the Authorization header, and appends refresh_token to the query string.
+ * @private
+ */
+export const setTokensInLogoutRequest = (proxyRequest, incomingRequest) => {
+    const cookieHeader = incomingRequest.headers.cookie
+    if (!cookieHeader) return
+
+    const cookies = cookie.parse(cookieHeader)
+    const siteId = getSiteId(incomingRequest)
+    if (!siteId) {
+        logger.warn(
+            'x-site-id header is missing on SLAS logout request. ' +
+                'Token injection skipped. ' +
+                'Ensure the x-site-id header is set in CommerceApiProvider headers.',
+            {namespace: 'setTokensInLogoutRequest'}
+        )
+        return
+    }
+
+    // Inject Bearer token from access token cookie
+    const accessToken = cookies[getCookieName(accessTokenConfig, siteId)]
+    if (accessToken) {
+        proxyRequest.setHeader('Authorization', `Bearer ${accessToken}`)
+    }
+
+    // Inject refresh_token into query string from HttpOnly cookie
+    const refreshToken = cookies[getCookieName(refreshTokenRegistered, siteId)]
+    if (refreshToken) {
+        const separator = proxyRequest.path.includes('?') ? '&' : '?'
+        proxyRequest.path += `${separator}refresh_token=${encodeURIComponent(refreshToken)}`
+    } else {
+        logger.warn(
+            `Refresh token cookie (${getCookieName(
+                refreshTokenRegistered,
+                siteId
+            )}) not found for ${incomingRequest.path}. The logout request may fail.`,
+            {namespace: 'setTokensInLogoutRequest'}
+        )
+    }
+}
+
+/**
+ * Handle all HttpOnly session cookie logic for the outgoing SLAS proxy request.
+ * Consolidates refresh token injection, logout token injection, session cookie
+ * stripping, and internal header cleanup.
+ * @throws {RefreshTokenNotFoundError} if the refresh token cookie is missing on a refresh_token grant request.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyReq = (proxyRequest, incomingRequest) => {
+    if (incomingRequest.headers[X_GRANT_TYPE] === 'refresh_token') {
+        setRefreshTokenHeader(proxyRequest, incomingRequest)
+        proxyRequest.removeHeader(X_GRANT_TYPE)
+    }
+
+    if (incomingRequest.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        setTokensInLogoutRequest(proxyRequest, incomingRequest)
+    }
+
+    stripSessionCookies(proxyRequest, incomingRequest)
+    proxyRequest.removeHeader(X_SITE_ID)
+}
+
+/**
+ * Handle all HttpOnly session cookie logic for the SLAS proxy response.
+ * Sets HttpOnly cookies on token responses and expires them on logout.
+ * Throws if setHttpOnlySessionCookies fails — caller is responsible for error response.
+ * @private
+ */
+const handleHttpOnlyCookiesOnProxyRes = (
+    workingBuffer,
+    proxyRes,
+    req,
+    res,
+    options,
+    logNamespace
+) => {
+    const isTokenEndpoint = req.path?.match(options.tokenResponseEndpoints)
+    if (proxyRes.statusCode === 200 && isTokenEndpoint) {
+        workingBuffer = setHttpOnlySessionCookies(workingBuffer, proxyRes, req, res, options)
+    }
+
+    if (req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
+        try {
+            expireHttpOnlySessionCookies(req, res)
+        } catch (error) {
+            logger.warn('Error expiring HttpOnly session cookies on logout', {
+                namespace: logNamespace,
+                additionalProperties: {
+                    error: error.message || error
+                }
+            })
+        }
+    }
+
+    return workingBuffer
+}
+
+/**
  * Environment variables that must be set for the Express app to run remotely.
  *
  * @private
@@ -106,6 +268,97 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
+
+/**
+ * Uppercase HTTP method names.
+ */
+export const HttpMethod = Object.freeze({
+    GET: 'GET',
+    POST: 'POST'
+})
+
+/**
+ * Credential injection modes used by the SLAS private-client proxy allow-list.
+ *
+ *  - `BASIC`       attaches `Authorization: Basic <private-client-creds>`
+ *  - `SFDC_HEADER` attaches `_sfdc_client_auth: <private-client-creds>`
+ *  - `NONE`        forwards the request without credential injection
+ */
+export const SlasProxyAuthType = Object.freeze({
+    BASIC: 'basic',
+    SFDC_HEADER: 'sfdc-header',
+    NONE: 'none'
+})
+
+/**
+ * Endpoints the SLAS private-client proxy will forward, and the credential
+ * header (if any) the proxy attaches.
+ *
+ * Each entry is matched as an exact suffix of decoded path segments after the
+ * `/shopper/auth/{version}/organizations/{orgId}/` prefix. Methods are taken
+ * from the SLAS OpenAPI spec.
+ *
+ * Projects can override this via `options.slasPrivateClientAllowList` in
+ * `ssr.js`. Use `HttpMethod` and `SlasProxyAuthType` for entries.
+ *
+ * TODO: derive this list from the SLAS OpenAPI spec so it stays in sync
+ *       automatically.
+ */
+export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
+    {
+        segments: ['oauth2', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'logout'],
+        methods: [HttpMethod.GET, HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'login'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'passwordless', 'login'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'passwordless', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'password', 'reset'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'password', 'action'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.BASIC
+    },
+    {
+        segments: ['oauth2', 'trusted-agent', 'authorize'],
+        methods: [HttpMethod.GET],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
+        segments: ['oauth2', 'trusted-agent', 'token'],
+        methods: [HttpMethod.POST],
+        injectAuth: SlasProxyAuthType.SFDC_HEADER
+    }
+])
+
+/**
+ * Allowed character set for the `{version}` and `{orgId}` path slots.
+ * Matches the RFC 3986 unreserved set; legitimate SLAS org ids fit this shape.
+ *
+ * @private
+ */
+const SLAS_PATH_WILDCARD_SAFE = /^[A-Za-z0-9._~-]+$/
 
 /**
  * @private
@@ -154,12 +407,16 @@ export const RemoteServerFactory = {
             // Toggle for setting up the custom SLAS private client secret handler
             useSLASPrivateClient: false,
 
-            // A regex for identifying which SLAS endpoints the custom SLAS private
-            // client secret handler will inject an Authorization header.
-            // To allow additional SLAS endpoints, users can override this value in
-            // their project's ssr.js.
-            applySLASPrivateClientToEndpoints:
-                /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+            // Allow-list of SLAS endpoints the private-client proxy will
+            // forward. When undefined, the built-in
+            // `SLAS_PRIVATE_PROXY_ALLOWLIST` is used. Supplying a custom list
+            // is security-sensitive and logs a startup warning.
+            slasPrivateClientAllowList: undefined,
+
+            // A regex for identifying which SLAS endpoints return tokens (access_token, refresh_token)
+            // in the response body. Used to determine which responses should have HttpOnly session
+            // cookies applied when that feature is enabled. Users can override this in ssr.js.
+            tokenResponseEndpoints: SLAS_TOKEN_RESPONSE_ENDPOINTS,
 
             // Custom callback to modify the SLAS private client proxy request. This callback is invoked
             // after the built-in proxy request handling. Users can provide additional
@@ -168,10 +425,31 @@ export const RemoteServerFactory = {
             onSLASPrivateProxyReq: undefined,
 
             // Custom callback to modify the SLAS private client proxy response. This callback is invoked
-            // after the built-in proxy response handling. Users can modify or replace
-            // the response buffer.
+            // after the built-in proxy response handling (including HttpOnly session cookie handling when enabled).
+            // When HttpOnly session cookies are enabled (MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true), the callback
+            // receives the response with tokens already moved to HttpOnly cookies and stripped from the body.
+            // Custom callbacks must not rely on token fields in the response body in that case; read from
+            // response headers (e.g. Set-Cookie) if needed.
             // Signature: (responseBuffer, proxyRes, req, res) => Buffer
-            onSLASPrivateProxyRes: undefined
+            onSLASPrivateProxyRes: undefined,
+
+            // Custom callback to modify the SLAS public client proxy request. This callback is invoked
+            // after the built-in proxy request handling. Users can provide additional
+            // request modifications (e.g., custom headers).
+            // Signature: (proxyRequest, incomingRequest, res) => void
+            onSLASPublicProxyReq: undefined,
+
+            // Custom callback to modify the SLAS public client proxy response. This callback is invoked
+            // after the built-in proxy response handling (including HttpOnly session cookie handling).
+            // Signature: (responseBuffer, proxyRes, req, res) => Buffer
+            onSLASPublicProxyRes: undefined
+        }
+
+        if (options && 'applySLASPrivateClientToEndpoints' in options) {
+            logger.warn(
+                '`applySLASPrivateClientToEndpoints` is deprecated. The SLAS private-client proxy is now gated by a built-in allow-list; when the legacy option is supplied, it is applied as a narrowing-only filter for backwards compatibility (it can remove entries from the allow-list, never add). Remove this option from your `ssr.js` and, if you need to widen the set of proxied endpoints, use `slasPrivateClientAllowList` instead.',
+                {namespace: 'RemoteServerFactory._configure'}
+            )
         }
 
         options = Object.assign({}, defaults, options)
@@ -205,12 +483,6 @@ export const RemoteServerFactory = {
         // For test only – configure the SLAS private client secret proxy endpoint
         options.slasHostName = this._getSlasEndpoint(options)
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
-
-        // Add extra condition to regex to only allow SLAS endpoints
-        options.slasApiPath = /\/shopper\/auth\/.*/
-        options.applySLASPrivateClientToEndpoints = new RegExp(
-            `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
-        )
 
         return options
     },
@@ -265,7 +537,12 @@ export const RemoteServerFactory = {
      * @private
      */
     _getSlasEndpoint(options) {
-        if (!options.useSLASPrivateClient) return undefined
+        if (
+            !options.useSLASPrivateClient &&
+            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES !== 'true'
+        ) {
+            return undefined
+        }
         const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
         return `${shortCode}.api.commercecloud.salesforce.com`
     },
@@ -418,7 +695,12 @@ export const RemoteServerFactory = {
         this._setupHealthcheck(app)
         this._setupProxying(app, options)
 
-        this._setupSlasPrivateClientProxy(app, options)
+        const httpOnlyCookiesEnabled = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+        if (options.useSLASPrivateClient) {
+            this._setupSlasPrivateClientProxy(app, options, httpOnlyCookiesEnabled)
+        } else if (httpOnlyCookiesEnabled) {
+            this._setupSlasPublicClientProxy(app, options, httpOnlyCookiesEnabled)
+        }
         this._setupHybridProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
@@ -893,22 +1175,152 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * URL-decode and normalize a request path for consistent security checks.
+     *
+     * Express exposes `req.path` in its raw, percent-encoded form while
+     * upstream services decode and normalize before routing. Matching
+     * against the raw value alone would miss equivalent encoded forms,
+     * so we decode until stable and collapse dot-segments to ensure
+     * consistent path evaluation regardless of encoding depth.
+     *
+     * @param {string} rawPath - The raw, potentially percent-encoded path
+     * @returns {(string | null)} The decoded/normalized path or `null` if decoding fails
      * @private
      */
-    _setupSlasPrivateClientProxy(app, options) {
+    _normalizeSlasPath(rawPath) {
+        try {
+            // Decode iteratively until the value stabilizes, so that double-encoded,
+            // triple-encoded, etc. sequences are fully resolved before security checks run.
+            let decoded = rawPath
+            let prev
+            do {
+                prev = decoded
+                decoded = decodeURIComponent(decoded)
+            } while (decoded !== prev)
+            return posixPath.normalize(decoded)
+        } catch {
+            // If decoding fails (e.g. malformed percent encoding), we cannot determine what
+            // path the upstream would resolve. Return null to signal that the caller should
+            // reject the request.
+            return null
+        }
+    },
+
+    /**
+     * Match a normalized path + method against the configured allow-list.
+     *
+     * Returns the matched entry or `null`. The path must start with
+     * `/shopper/auth/{version}/organizations/{orgId}/` and its trailing
+     * segments must equal one of the entries' `segments`. The `{version}` and
+     * `{orgId}` slots are constrained to `SLAS_PATH_WILDCARD_SAFE`.
+     *
+     * @param {string|null} normalizedPath - Output of `_normalizeSlasPath`
+     * @param {string} method - HTTP method on the incoming request
+     * @param {Array<{segments: string[], methods: string[], injectAuth: string}>} [allowList]
+     * @returns {{segments: string[], methods: string[], injectAuth: string}|null}
+     * @private
+     */
+    _matchSlasAllowlistEntry(normalizedPath, method, allowList) {
+        if (!normalizedPath) {
+            return null
+        }
+        const list = Array.isArray(allowList) ? allowList : SLAS_PRIVATE_PROXY_ALLOWLIST
+        const segments = normalizedPath.split('/').filter(Boolean)
+        if (
+            segments.length < 6 ||
+            segments[0] !== 'shopper' ||
+            segments[1] !== 'auth' ||
+            segments[3] !== 'organizations'
+        ) {
+            return null
+        }
+        if (
+            !SLAS_PATH_WILDCARD_SAFE.test(segments[2]) ||
+            !SLAS_PATH_WILDCARD_SAFE.test(segments[4])
+        ) {
+            return null
+        }
+        const upperMethod = String(method || '').toUpperCase()
+        const tail = segments.slice(5)
+        return (
+            list.find(
+                (entry) =>
+                    Array.isArray(entry?.segments) &&
+                    Array.isArray(entry?.methods) &&
+                    entry.methods.includes(upperMethod) &&
+                    entry.segments.length === tail.length &&
+                    entry.segments.every((seg, i) => seg === tail[i])
+            ) ?? null
+        )
+    },
+
+    /**
+     * Strip the proxy base path and normalize the SLAS path for forwarding.
+     * Normalizes only the path portion so that URLs in query parameters
+     * (e.g. redirect_uri=http://localhost:3000/callback) are not mangled
+     * by posixPath.normalize collapsing `://` to `:/`.
+     * @private
+     */
+    _rewriteSlasProxyPath(rawPath, proxyPath) {
+        // Example input:
+        //   rawPath   = "/mobify/slas/private/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
+        //   proxyPath = "/mobify/slas/private"
+
+        // Strip the proxy prefix (and optional base path).
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
+        const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+        const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
+        const stripped = rawPath.replace(regex, '')
+
+        // Split path from query string BEFORE normalizing.
+        // posixPath.normalize would collapse "://" in redirect_uri=http://... to ":/".
+        //   pathname   = "/shopper/auth/.../authorize"
+        //   queryParts = ["redirect_uri=http://localhost:3000/callback"]
+        const [pathname, ...queryParts] = stripped.split('?')
+
+        // Normalize only the path (decode percent-encoding, resolve dot-segments).
+        //   → "/shopper/auth/v1/organizations/org1/oauth2/authorize"
+        const normalizedPath = this._normalizeSlasPath(pathname)
+        if (normalizedPath === null) return null
+
+        // Re-attach the query string unchanged.
+        //   → "/shopper/auth/.../authorize?redirect_uri=http://localhost:3000/callback"
+        return queryParts.length ? `${normalizedPath}?${queryParts.join('?')}` : normalizedPath
+    },
+
+    /**
+     * Express middleware that gates requests against the SLAS allowlist.
+     * Normalizes the path, matches it against the allowlist, and returns 403
+     * for unmatched requests. Stashes the match on `req` for downstream use.
+     * @private
+     */
+    _createSlasAllowlistGuard(allowList, proxyLabel) {
+        return (req, res, next) => {
+            const normalizedPath = this._normalizeSlasPath(req.path)
+            const allowedEntry = this._matchSlasAllowlistEntry(
+                normalizedPath,
+                req.method,
+                allowList
+            )
+
+            if (!allowedEntry) {
+                const message = `Request to ${req.path} is not allowed through the SLAS ${proxyLabel} Client Proxy`
+                logger.error(message)
+                return res.status(403).json({message})
+            }
+
+            req._normalizedSlasPath = normalizedPath
+            req._slasAllowlistEntry = allowedEntry
+            next()
+        }
+    },
+
+    /**
+     * @private
+     */
+    _setupSlasPrivateClientProxy(app, options, httpOnlyCookiesEnabled) {
         if (!options.useSLASPrivateClient) {
             return
-        }
-
-        // This is the full path to the SLAS trusted-system endpoint
-        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
-        // matches this path as an early warning to developers that they should update their regex
-        // in ssr.js to exclude this path.
-        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
-        if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
-            throw new Error(
-                'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
-            )
         }
 
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
@@ -922,24 +1334,38 @@ export const RemoteServerFactory = {
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
+        const hasCustomAllowList = Array.isArray(options.slasPrivateClientAllowList)
+        if (hasCustomAllowList) {
+            logger.warn(
+                'A custom `slasPrivateClientAllowList` is in use. Overriding the built-in allow-list widens the surface of SLAS endpoints reachable through the private-client proxy and can re-introduce credential exposure to endpoints the platform does not intend the storefront to reach. Audit each entry carefully.',
+                {namespace: '_setupSlasPrivateClientProxy'}
+            )
+        }
+        let allowList = hasCustomAllowList
+            ? options.slasPrivateClientAllowList
+            : SLAS_PRIVATE_PROXY_ALLOWLIST
+
+        // Backwards-compat: the deprecated `applySLASPrivateClientToEndpoints`
+        // regex is applied as a narrowing-only filter on the allow-list. It can
+        // remove entries but never add. Customers who need to widen the allow
+        // list should migrate to `slasPrivateClientAllowList`. The deprecation
+        // warning is emitted by `_configure`.
+        const legacyRegex = options.applySLASPrivateClientToEndpoints
+        if (legacyRegex instanceof RegExp) {
+            allowList = allowList.filter((entry) =>
+                legacyRegex.test(`/${entry.segments.join('/')}`)
+            )
+            if (allowList.length === 0) {
+                logger.warn(
+                    '`applySLASPrivateClientToEndpoints` removed every entry from the SLAS private-client allow-list. The proxy will reject all requests. Remove the legacy option or update it to match at least one allow-list entry.',
+                    {namespace: '_setupSlasPrivateClientProxy'}
+                )
+            }
+        }
+
         app.use(
             slasPrivateProxyPath,
-            (req, res, next) => {
-                // Check if the request should be blocked before it reaches the proxy
-                // We run this outside of the proxy middleware because modifying the response
-                // to send a 403 in the proxy causes issues with the response interceptor.
-                if (
-                    !req.path?.match(options.slasApiPath) ||
-                    req.path?.match(/\/oauth2\/trusted-system/)
-                ) {
-                    const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
-                    logger.error(message)
-                    return res.status(403).json({
-                        message: message
-                    })
-                }
-                next()
-            },
+            this._createSlasAllowlistGuard(allowList, 'Private'),
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
@@ -948,11 +1374,7 @@ export const RemoteServerFactory = {
                 // both proxyRequest and incomingRequest paths.
                 // This cannot be modified by any express middleware
                 // So we need to use the built in pathRewrite to remove the base path
-                pathRewrite: (path) => {
-                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
-                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
-                    return path.replace(regex, '')
-                },
+                pathRewrite: (path) => this._rewriteSlasProxyPath(path, slasPrivateProxyPath),
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     try {
@@ -964,23 +1386,22 @@ export const RemoteServerFactory = {
                             targetProtocol: 'https'
                         })
 
-                        if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
-                            // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
-                            // so the SLAS private client is sent via this special header
+                        // Credential mode is taken from the allow-list entry
+                        // attached by the pre-proxy guard.
+                        const {injectAuth = SlasProxyAuthType.NONE} =
+                            incomingRequest._slasAllowlistEntry ?? {}
+
+                        if (injectAuth === SlasProxyAuthType.SFDC_HEADER) {
                             proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                        } else if (
-                            incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
-                        ) {
-                            // We pattern match and add client secrets only to endpoints that
-                            // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                            //
-                            // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                            // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                            // purpose so we don't want to overwrite the header for those calls.
+                        } else if (injectAuth === SlasProxyAuthType.BASIC) {
                             proxyRequest.setHeader(
                                 'Authorization',
                                 `Basic ${encodedSlasCredentials}`
                             )
+                        }
+
+                        if (httpOnlyCookiesEnabled) {
+                            handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
                         }
 
                         // Allow users to apply additional custom modifications to the proxy request
@@ -991,16 +1412,28 @@ export const RemoteServerFactory = {
                                 logger.error('Error in custom onSLASPrivateProxyReq callback', {
                                     namespace: '_setupSlasPrivateClientProxy',
                                     additionalProperties: {
-                                        error: error
+                                        error
                                     }
                                 })
                             }
                         }
                     } catch (error) {
+                        if (error instanceof RefreshTokenNotFoundError) {
+                            logger.warn(error.message, {
+                                namespace: 'setRefreshTokenHeader'
+                            })
+                            if (!res.headersSent) {
+                                proxyRequest.destroy()
+                                res.status(401).json({
+                                    message: 'invalid refresh_token'
+                                })
+                            }
+                            return
+                        }
                         logger.error('Error in SLAS private proxy request handling', {
                             namespace: '_setupSlasPrivateClientProxy',
                             additionalProperties: {
-                                error: error
+                                error
                             }
                         })
                         if (!res.headersSent) {
@@ -1014,7 +1447,7 @@ export const RemoteServerFactory = {
                     logger.error('Error in SLAS private proxy', {
                         namespace: '_setupSlasPrivateClientProxy',
                         additionalProperties: {
-                            error: error,
+                            error,
                             path: req?.url
                         }
                     })
@@ -1027,14 +1460,47 @@ export const RemoteServerFactory = {
                 onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
                     let workingBuffer = responseBuffer
                     try {
-                        // If the passwordless login endpoint returns a 404, which corresponds to a user
-                        // email not being found, we mask it with a 200 OK response so that it is not
-                        // obvious that the user does not exist.
-                        // We do this to prevent user enumeration.
-                        if (
-                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
-                            proxyRes.statusCode === 404
-                        ) {
+                        if (httpOnlyCookiesEnabled) {
+                            try {
+                                workingBuffer = handleHttpOnlyCookiesOnProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options,
+                                    '_setupSlasPrivateClientProxy'
+                                )
+                            } catch (error) {
+                                res.statusCode = 500
+                                res.statusMessage = 'Internal Server Error'
+                                logger.error('Error applying HttpOnly session cookies', {
+                                    namespace: '_setupSlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        error: error.message || error
+                                    }
+                                })
+                                return Buffer.from(
+                                    JSON.stringify({
+                                        error: 'Internal server error',
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
+                                    }),
+                                    'utf8'
+                                )
+                            }
+                        }
+
+                        // Mask a 404 on /oauth2/passwordless/login with a 200 to prevent
+                        // user enumeration. Match against the allow-list entry stashed by
+                        // the pre-proxy guard.
+                        const entrySegments = req._slasAllowlistEntry?.segments
+                        const isPasswordlessLogin =
+                            entrySegments?.length === 3 &&
+                            entrySegments[0] === 'oauth2' &&
+                            entrySegments[1] === 'passwordless' &&
+                            entrySegments[2] === 'login'
+                        if (isPasswordlessLogin && proxyRes.statusCode === 404) {
                             res.statusCode = 200
                             res.statusMessage = 'OK'
 
@@ -1063,7 +1529,7 @@ export const RemoteServerFactory = {
                                     {
                                         namespace: '_setupSlasPrivateClientProxy',
                                         additionalProperties: {
-                                            error: error
+                                            error
                                         }
                                     }
                                 )
@@ -1077,7 +1543,161 @@ export const RemoteServerFactory = {
                             {
                                 namespace: '_setupSlasPrivateClientProxy',
                                 additionalProperties: {
-                                    error: error,
+                                    error,
+                                    statusCode: proxyRes?.statusCode,
+                                    path: req?.url
+                                }
+                            }
+                        )
+                        return workingBuffer
+                    }
+                })
+            })
+        )
+    },
+
+    /**
+     * @private
+     */
+    _setupSlasPublicClientProxy(app, options, httpOnlyCookiesEnabled) {
+        const logNamespace = '_setupSlasPublicClientProxy'
+
+        localDevLog(`Proxying ${slasPublicProxyPath} to ${options.slasTarget}`)
+
+        app.use(
+            slasPublicProxyPath,
+            // Lightweight guard: normalize the path and reject anything outside /shopper/auth/.
+            // No per-endpoint allowlist — the public proxy does not inject credentials,
+            // so there is no credential-leakage risk. SLAS rejects unauthorized calls itself.
+            (req, res, next) => {
+                const normalizedPath = this._normalizeSlasPath(req.path)
+                if (!normalizedPath || !normalizedPath.startsWith('/shopper/auth/')) {
+                    const message = `Request to ${req.path} is not allowed through the SLAS Public Client Proxy`
+                    logger.error(message)
+                    return res.status(403).json({message})
+                }
+                req._normalizedSlasPath = normalizedPath
+                next()
+            },
+            createProxyMiddleware({
+                target: options.slasTarget,
+                changeOrigin: true,
+                pathRewrite: (path) => this._rewriteSlasProxyPath(path, slasPublicProxyPath),
+                selfHandleResponse: true,
+                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                    try {
+                        applyProxyRequestHeaders({
+                            proxyRequest,
+                            incomingRequest,
+                            proxyPath: slasPublicProxyPath,
+                            targetHost: options.slasHostName,
+                            targetProtocol: 'https'
+                        })
+
+                        if (httpOnlyCookiesEnabled) {
+                            handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
+                        }
+
+                        if (typeof options.onSLASPublicProxyReq === 'function') {
+                            try {
+                                options.onSLASPublicProxyReq(proxyRequest, incomingRequest, res)
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPublicProxyReq callback', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error}
+                                })
+                            }
+                        }
+                    } catch (error) {
+                        if (error instanceof RefreshTokenNotFoundError) {
+                            logger.warn(error.message, {
+                                namespace: 'setRefreshTokenHeader'
+                            })
+                            if (!res.headersSent) {
+                                proxyRequest.destroy()
+                                res.status(401).json({message: 'invalid refresh_token'})
+                            }
+                            return
+                        }
+                        logger.error('Error in SLAS public proxy request handling', {
+                            namespace: logNamespace,
+                            additionalProperties: {error}
+                        })
+                        if (!res.headersSent) {
+                            res.status(500).json({
+                                message: 'Error preparing SLAS Public proxy request'
+                            })
+                        }
+                    }
+                },
+                onError: (error, req, res) => {
+                    logger.error('Error in SLAS public proxy', {
+                        namespace: logNamespace,
+                        additionalProperties: {error, path: req?.url}
+                    })
+                    if (!res.headersSent) {
+                        res.status(500).json({message: 'Error in SLAS public proxy request'})
+                    }
+                },
+                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
+                    let workingBuffer = responseBuffer
+                    try {
+                        if (httpOnlyCookiesEnabled) {
+                            try {
+                                workingBuffer = handleHttpOnlyCookiesOnProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res,
+                                    options,
+                                    logNamespace
+                                )
+                            } catch (error) {
+                                res.statusCode = 500
+                                res.statusMessage = 'Internal Server Error'
+                                logger.error('Error applying HttpOnly session cookies', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error: error.message || error}
+                                })
+                                return Buffer.from(
+                                    JSON.stringify({
+                                        error: 'Internal server error',
+                                        message:
+                                            error.message ||
+                                            'An error occurred processing the authentication response'
+                                    }),
+                                    'utf8'
+                                )
+                            }
+                        }
+
+                        if (typeof options.onSLASPublicProxyRes === 'function') {
+                            try {
+                                const customBuffer = options.onSLASPublicProxyRes(
+                                    workingBuffer,
+                                    proxyRes,
+                                    req,
+                                    res
+                                )
+                                if (customBuffer !== undefined) {
+                                    workingBuffer = customBuffer
+                                }
+                            } catch (error) {
+                                logger.error('Error in custom onSLASPublicProxyRes callback', {
+                                    namespace: logNamespace,
+                                    additionalProperties: {error}
+                                })
+                            }
+                        }
+
+                        return workingBuffer
+                    } catch (error) {
+                        logger.error(
+                            'There is an error processing the response from SLAS. Returning original response.',
+                            {
+                                namespace: logNamespace,
+                                additionalProperties: {
+                                    error,
                                     statusCode: proxyRes?.statusCode,
                                     path: req?.url
                                 }
@@ -1456,8 +2076,6 @@ export const RemoteServerFactory = {
      * to 'false'.
      * @param {Boolean} [options.useSLASPrivateClient=false] - Enable the SLAS private client
      * proxy handler. Requires PWA_KIT_SLAS_CLIENT_SECRET environment variable.
-     * @param {RegExp} [options.applySLASPrivateClientToEndpoints] - A regex pattern to match
-     * SLAS endpoints where the Authorization header should be injected.
      * @param {function} [options.onSLASPrivateProxyReq] - Custom callback to modify SLAS private client
      * proxy requests. Called after built-in request handling. Signature: (proxyRequest, incomingRequest, res) => void.
      * Use this to add custom headers or modify the proxy request.
