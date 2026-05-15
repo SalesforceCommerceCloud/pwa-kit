@@ -143,7 +143,7 @@ type AuthDataKeys =
     | 'dnt'
     | 'cc-at-expires'
     | 'cc-at-dnt'
-    | 'cc-nx-exists'
+    | 'cc-nx-expires'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -267,14 +267,41 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: 'cc-at-dnt'
     },
-    'cc-nx-exists': {
+    'cc-nx-expires': {
         storageType: 'cookie',
-        key: 'cc-nx-exists'
+        key: 'cc-nx-expires'
     }
 }
 
 export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
+
+/**
+ * Auth-data keys whose storage is backed by a proxy-set cookie when
+ * `enableHttpOnlySessionCookies` is on. In that mode reads and writes for
+ * these keys go to the cookie store instead of localStorage, with the cookie
+ * as the single source of truth.
+ *
+ * Some entries here (`idp_access_token`, `idp_refresh_token`) are HttpOnly
+ * and unreadable from JavaScript — they're included for routing symmetry so
+ * the storage type is consistent in httpOnly mode; reads of those keys
+ * return '' from the cookie store either way.
+ *
+ * `expires_in` is intentionally absent: the access token expiry is already
+ * covered by the `cc-at-expires` cookie, so we derive it from there in the
+ * `data` getter instead of backing a redundant cookie.
+ *
+ * @internal
+ */
+const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
+    'customer_id',
+    'enc_user_id',
+    'customer_type',
+    'id_token',
+    'idp_access_token',
+    'idp_refresh_token',
+    'uido'
+])
 
 /**
  * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
@@ -415,22 +442,41 @@ class Auth {
         this.enableHttpOnlySessionCookies = config.enableHttpOnlySessionCookies ?? false
     }
 
+    /**
+     * Returns the storage type to use for a given key. When
+     * `enableHttpOnlySessionCookies` is on (and we're on the client), the SLAS
+     * proxy writes cookies for the metadata keys in
+     * `HTTPONLY_COOKIE_BACKED_KEYS`, so reads/writes for those keys are
+     * routed to the cookie store instead of local storage.
+     */
+    private resolveStorageType(name: AuthDataKeys): StorageType {
+        const {storageType} = DATA_MAP[name]
+        if (
+            this.enableHttpOnlySessionCookies &&
+            onClient() &&
+            HTTPONLY_COOKIE_BACKED_KEYS.has(name)
+        ) {
+            return 'cookie'
+        }
+        return storageType
+    }
+
     get(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
     }
 
     private delete(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.delete(key)
     }
 
@@ -510,11 +556,19 @@ class Auth {
             await this.refreshAccessToken()
         }
         if (preference !== null) {
+            // Tie the DNT cookie's expiry to the refresh token's. In httpOnly
+            // mode the proxy publishes the absolute expiry as `cc-nx-expires`
+            // (epoch seconds), which we pass straight to js-cookie as a Date.
+            // In non-httpOnly mode we fall back to the localStorage TTL.
             const SECONDS_IN_DAY = 86400
+            const useCookieExpiry = this.enableHttpOnlySessionCookies && onClient()
+            const expires = useCookieExpiry
+                ? new Date(Number(this.get('cc-nx-expires')) * 1000)
+                : Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
+                expires
             })
         }
     }
@@ -523,8 +577,8 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
-            const store = this.stores[storageType]
+            const {key} = DATA_MAP[keyName]
+            const store = this.stores[this.resolveStorageType(keyName)]
             store.delete(key)
         })
     }
@@ -537,7 +591,7 @@ class Auth {
             access_token: this.get('access_token'),
             customer_id: this.get('customer_id'),
             enc_user_id: this.get('enc_user_id'),
-            expires_in: parseInt(this.get('expires_in')),
+            expires_in: this.getExpiresIn(),
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
@@ -546,6 +600,23 @@ class Auth {
             customer_type: this.get('customer_type') as CustomerType,
             refresh_token_expires_in: Number(this.get('refresh_token_expires_in'))
         }
+    }
+
+    /**
+     * Returns the access token's remaining lifetime in seconds. In httpOnly mode
+     * we derive it from the `cc-at-expires` cookie (the access-token JWT `exp`
+     * claim, in epoch seconds) instead of storing a redundant `expires_in`
+     * cookie. Falls back to the local-storage value otherwise.
+     */
+    private getExpiresIn(): number {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            const expiresAt = this.get('cc-at-expires')
+            if (!expiresAt) return NaN
+            const expiresAtSec = Number(expiresAt)
+            if (Number.isNaN(expiresAtSec)) return NaN
+            return Math.max(0, Math.floor(expiresAtSec - Date.now() / 1000))
+        }
+        return parseInt(this.get('expires_in'))
     }
 
     /**
@@ -559,12 +630,14 @@ class Auth {
     }
 
     /**
-     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript cannot
-     * read HttpOnly cookies, we check the non-HttpOnly indicator cookie (cc-nx-exists) that
-     * is set alongside the refresh token with the same expiry.
+     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript
+     * cannot read HttpOnly cookies, we check `cc-nx-expires` — a non-HttpOnly cookie
+     * the proxy sets with the same expiry as the refresh token. A non-empty read
+     * means the browser hasn't yet evicted the cookie, so the refresh token is
+     * still alive.
      */
     private hasHttpOnlyRefreshToken(): boolean {
-        return this.enableHttpOnlySessionCookies && onClient() && this.get('cc-nx-exists') === '1'
+        return this.enableHttpOnlySessionCookies && onClient() && Boolean(this.get('cc-nx-expires'))
     }
 
     /**
@@ -613,9 +686,20 @@ class Auth {
      * @returns {string} access token
      */
     private getAccessToken() {
+        // In httpOnly mode on the client, the access token lives in an HttpOnly
+        // cookie that JS can't read, and the SFRA cc-at handoff isn't used in
+        // this mode (eCOM owns the session cookies directly). Return an empty
+        // string — callers that try to decode it (e.g., the TAOB flow in
+        // `_refreshAccessToken`) already handle the invalid-JWT case and fall
+        // through to a refresh / guest login.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return ''
+        }
+
         let accessToken = this.get('access_token')
         const sfraAuthToken = this.get('access_token_sfra')
 
+        // This code block only executes in plugin_slas hybrid setup when the cc-at cookie is set.
         if (sfraAuthToken) {
             /*
              * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
@@ -759,6 +843,17 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
+        // In httpOnly mode on the client, every value we'd otherwise persist
+        // here is already set as a cookie by the SLAS proxy / eCOM (access
+        // token, refresh token, customer_id, customer_type, usid, uido,
+        // id_token, enc_user_id, etc.). There is nothing left for the client
+        // to write, so short-circuit. SSR and non-httpOnly mode still need to
+        // populate the in-memory / localStorage stores so subsequent reads
+        // work, so the rest of the function continues for those cases.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return
+        }
+
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
 
@@ -766,8 +861,8 @@ class Auth {
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
         this.set('id_token', res.id_token)
-        this.set('token_type', res.token_type)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
+        this.set('token_type', res.token_type)
 
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
@@ -777,21 +872,14 @@ class Auth {
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
-        if (this.enableHttpOnlySessionCookies && onClient()) {
-            // Browser: skip token storage, httpOnly cookies handle it
-            const uidoFromCookie = this.stores['cookie'].get('uido')
-            if (uidoFromCookie) this.set('uido', uidoFromCookie)
-        } else {
-            // Server (SSR) or httpOnly disabled: store tokens normally
-            this.set('access_token', res.access_token)
-            this.set('idp_access_token', res.idp_access_token)
-            if (res.access_token) {
-                const {uido} = this.parseSlasJWT(res.access_token)
-                this.set('uido', uido)
-            }
-            const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-            this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
+        this.set('access_token', res.access_token)
+        this.set('idp_access_token', res.idp_access_token)
+        if (res.access_token) {
+            const {uido} = this.parseSlasJWT(res.access_token)
+            this.set('uido', uido)
         }
+        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
     }
 
     private get refreshDedupKey(): string {
@@ -833,10 +921,11 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
 
         // When HttpOnly session cookies are enabled on the client, the refresh token is in an
-        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly indicator
-        // cookie (cc-nx-exists) to avoid a wasted round-trip when the refresh token is absent.
-        // If cc-nx-exists is also missing (e.g. cleared by the user), the proxy layer will
-        // catch the missing refresh token and return a 401, falling through to guest login.
+        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly `cc-nx-expires`
+        // cookie (set with the same expiry as the refresh token) to avoid a wasted round-trip
+        // when the refresh token is absent. If `cc-nx-expires` is also missing (e.g. cleared by
+        // the user), the proxy layer will catch the missing refresh token and return a 401,
+        // falling through to guest login.
         if (refreshToken || (!refreshToken && this.hasHttpOnlyRefreshToken())) {
             try {
                 const isGuest = this.get('customer_type') !== 'registered'
@@ -960,8 +1049,28 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
+        // In httpOnly mode on the client, every session value is backed by a
+        // cookie set by the SLAS proxy / eCOM. We never hydrate state from a
+        // fetchedToken (the JWT is HttpOnly so SSR can't capture it) and we
+        // don't write anything to localStorage. Just check the access token
+        // expiry via `cc-at-expires` and refresh if needed; otherwise return
+        // the data assembled from the proxy-set cookies.
+        // `refreshAccessToken()` has its own pendingRefreshTokens dedup, so
+        // we don't need the dedup check that the non-httpOnly path uses.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            if (this.isAccessTokenExpired()) {
+                return await this.refreshAccessToken()
+            }
+            return this.data
+        }
+
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+
+            // Write to localStorage in non-httpOnly mode
+            this.set('access_token', this.fetchedToken)
+            this.set('customer_id', customerId)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             /**
              * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
@@ -978,22 +1087,19 @@ class Auth {
                 refreshTokenExpiresIn,
                 isGuest
             )
-            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            this.set('access_token', this.fetchedToken)
-            this.set('customer_id', customerId)
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
              * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
              * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
              */
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             const usidCookieValue = this.get('usid')
             if (!usidCookieValue || usidCookieValue !== usid) {
                 this.set('usid', usid, {
                     expires: expiresDate
                 })
             }
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
         if (onClient()) {

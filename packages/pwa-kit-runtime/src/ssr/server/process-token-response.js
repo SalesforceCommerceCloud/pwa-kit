@@ -11,6 +11,7 @@ import {
     SESSION_COOKIE_CONFIG,
     getAllCookieConfigs,
     getCookieName,
+    getResponseBodyFieldsToStrip,
     getSiteId
 } from './httponly-cookie-config'
 import logger from '../../utils/logger-instance'
@@ -98,7 +99,13 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         idpAccessToken,
         refreshTokenGuest,
         refreshTokenRegistered,
-        refreshTokenExists
+        customerId,
+        encUserId,
+        customerType,
+        usid,
+        refreshTokenExpires,
+        idToken,
+        idpRefreshToken
     } = SESSION_COOKIE_CONFIG
 
     // Decode JWT and extract claims
@@ -167,6 +174,19 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 })
             )
         }
+
+        // id_token (non-HttpOnly): expiry tied to access token JWT exp.
+        if (parsed.id_token) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(idToken, site),
+                    value: parsed.id_token,
+                    expires: tokenClaims.accessExpires,
+                    ...idToken.attributes
+                })
+            )
+        }
     }
 
     // Refresh token (HttpOnly) — uses its own TTL, independent of access token expiry
@@ -190,18 +210,6 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             })
         )
 
-        // Non-HttpOnly indicator so the client can check if a refresh token cookie exists
-        // (JavaScript cannot read HttpOnly cookies). Shares the same expiry as the refresh token.
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(refreshTokenExists, site),
-                value: '1',
-                expires: refreshExpires,
-                ...refreshTokenExists.attributes
-            })
-        )
-
         // Delete the opposite refresh token cookie to mirror client-side behavior:
         // Login (guest → registered): delete guest cookie cc-nx-g
         // Logout (registered → guest): delete registered cookie cc-nx
@@ -215,13 +223,100 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 ...staleRefreshConfig.attributes
             })
         )
+
+        // Hybrid SFRA + PWA: mirror SLAS metadata as siteId-suffixed cookies so SFRA
+        // can read the same session state. Expiry aligned with refresh token TTL.
+        //
+        // These writes live inside `if (parsed.refresh_token)` because we need a fresh
+        // refresh-token TTL to choose `refreshExpires`. SLAS responses that include
+        // these metadata fields always also include a refresh_token (login flows and
+        // refresh-with-rotation), so in practice this is the same condition. If a
+        // future flow returns metadata without a refresh_token, the existing cookies
+        // remain valid until they expire on their own schedule.
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: getCookieName(customerType, site),
+                value: isGuest ? 'guest' : 'registered',
+                expires: refreshExpires,
+                ...customerType.attributes
+            })
+        )
+
+        if (parsed.customer_id) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(customerId, site),
+                    value: parsed.customer_id,
+                    expires: refreshExpires,
+                    ...customerId.attributes
+                })
+            )
+        }
+
+        if (parsed.enc_user_id) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(encUserId, site),
+                    value: parsed.enc_user_id,
+                    expires: refreshExpires,
+                    ...encUserId.attributes
+                })
+            )
+        }
+
+        // usid: SLAS session id, non-HttpOnly so client/SFRA/Einstein can read
+        // it. Aligned to refresh-token TTL to persist across access-token
+        // refreshes within a single shopper session.
+        if (parsed.usid) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(usid, site),
+                    value: parsed.usid,
+                    expires: refreshExpires,
+                    ...usid.attributes
+                })
+            )
+        }
+
+        // cc-nx-expires: absolute epoch (seconds) when the refresh token cookie
+        // expires. Mirrors cc-at-expires for the access token. Cookie expiry
+        // attribute aligned to the same instant.
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: getCookieName(refreshTokenExpires, site),
+                value: String(Math.floor(refreshExpires.getTime() / 1000)),
+                expires: refreshExpires,
+                ...refreshTokenExpires.attributes
+            })
+        )
+
+        // idp_refresh_token (HttpOnly): refresh-TTL-aligned, only when present.
+        if (parsed.idp_refresh_token) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name: getCookieName(idpRefreshToken, site),
+                    value: parsed.idp_refresh_token,
+                    expires: refreshExpires,
+                    ...idpRefreshToken.attributes
+                })
+            )
+        }
     }
 
-    // Strip token fields from body so they are not exposed to the client
+    // Strip HttpOnly token fields from the response body so they are only
+    // readable via the corresponding cookies. The list of fields is derived
+    // from `slasKey` markers on SESSION_COOKIE_CONFIG so this stays aligned
+    // with the cookies being set above.
     const stripped = {...parsed}
-    delete stripped.access_token
-    delete stripped.idp_access_token
-    delete stripped.refresh_token
+    for (const field of getResponseBodyFieldsToStrip()) {
+        delete stripped[field]
+    }
     return Buffer.from(JSON.stringify(stripped), 'utf8')
 }
 

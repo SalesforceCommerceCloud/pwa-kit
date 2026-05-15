@@ -1630,12 +1630,14 @@ describe('HttpOnly Session Cookies', () => {
 
         await auth.loginGuestUser()
 
-        // Tokens should NOT be stored in localStorage (they're in HttpOnly cookies)
+        // In httpOnly mode handleTokenResponse is a no-op on the client; nothing
+        // here writes to localStorage. The proxy / eCOM is solely responsible
+        // for setting all session cookies (access token, refresh token,
+        // customer_id, customer_type, usid, etc.) via Set-Cookie headers.
         expect(auth.get('access_token')).toBeFalsy()
         expect(auth.get('refresh_token_guest')).toBeFalsy()
-        // Common fields should still be stored
-        expect(auth.get('customer_id')).toBe(TOKEN_RESPONSE.customer_id)
-        expect(auth.get('usid')).toBe(TOKEN_RESPONSE.usid)
+        expect(window.localStorage.getItem(`customer_id_${config.siteId}`)).toBeNull()
+        expect(window.localStorage.getItem(`enc_user_id_${config.siteId}`)).toBeNull()
         // enableHttpOnlySessionCookies should be forwarded to the helper
         expect(helpers.loginGuestUser).toHaveBeenCalledWith(
             expect.objectContaining({enableHttpOnlySessionCookies: true})
@@ -1671,12 +1673,12 @@ describe('HttpOnly Session Cookies', () => {
         )
     })
 
-    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-exists)', async () => {
+    test('ready skips refresh and goes straight to guest login on first visit (no cc-nx-expires)', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
         const loginGuestMock = helpers.loginGuestUser as jest.Mock
         loginGuestMock.mockResolvedValueOnce(httpOnlyTokenResponse)
 
-        // First visit: no cc-nx-exists cookie, no refresh token, no cc-at-expires
+        // First visit: no cc-nx-expires cookie, no refresh token, no cc-at-expires
         // Should NOT attempt refresh — should go straight to loginGuestUser
         await auth.ready()
 
@@ -1684,15 +1686,16 @@ describe('HttpOnly Session Cookies', () => {
         expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
     })
 
-    test('ready attempts refresh when cc-nx-exists is set (returning visitor)', async () => {
+    test('ready attempts refresh when cc-nx-expires is set (returning visitor)', async () => {
         const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
 
-        // Simulate a returning visitor: expired access token + cc-nx-exists indicator
+        // Simulate a returning visitor: expired access token + cc-nx-expires indicator
         const expiredTime = Math.floor(Date.now() / 1000) - 100
+        const refreshExpiresEpoch = Math.floor(Date.now() / 1000) + 7776000
         // @ts-expect-error private method
         auth.set('cc-at-expires', String(expiredTime))
         // @ts-expect-error private method
-        auth.set('cc-nx-exists', '1')
+        auth.set('cc-nx-expires', String(refreshExpiresEpoch))
         // @ts-expect-error private method
         auth.set('customer_type', 'guest')
         // @ts-expect-error private method
@@ -1703,7 +1706,7 @@ describe('HttpOnly Session Cookies', () => {
 
         await auth.ready()
 
-        // Should attempt refresh because cc-nx-exists indicates an HttpOnly refresh token exists
+        // Should attempt refresh because cc-nx-expires indicates an HttpOnly refresh token exists
         expect(helpers.refreshAccessToken).toHaveBeenCalledTimes(1)
         expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
             expect.objectContaining({enableHttpOnlySessionCookies: true})

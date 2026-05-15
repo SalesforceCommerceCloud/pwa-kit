@@ -1528,8 +1528,9 @@ describe('HttpOnly session cookies', () => {
             const cookies = response.headers['set-cookie']
             expect(cookies.some((c) => c.includes('cc-at_testsite'))).toBe(true)
             expect(cookies.some((c) => c.includes('cc-nx-g_testsite'))).toBe(true)
-            // cc-nx-exists indicator cookie is set (non-HttpOnly)
-            expect(cookies.some((c) => c.includes('cc-nx-exists_testsite=1'))).toBe(true)
+            // cc-nx-expires indicator cookie is set (non-HttpOnly) — JS reads
+            // this to know the HttpOnly refresh token cookie still exists.
+            expect(cookies.some((c) => c.includes('cc-nx-expires_testsite='))).toBe(true)
         } finally {
             mockSlasServerInstance.close()
         }
@@ -1866,7 +1867,7 @@ describe('SLAS public proxy', () => {
             expect(cookies.some((c) => c.includes('cc-at_testsite'))).toBe(true)
             expect(cookies.some((c) => c.includes('cc-at-expires_testsite'))).toBe(true)
             expect(cookies.some((c) => c.includes('cc-nx-g_testsite'))).toBe(true)
-            expect(cookies.some((c) => c.includes('cc-nx-exists_testsite=1'))).toBe(true)
+            expect(cookies.some((c) => c.includes('cc-nx-expires_testsite='))).toBe(true)
         } finally {
             mockSlasServerInstance.close()
         }

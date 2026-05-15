@@ -21,7 +21,13 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.idpAccessToken.key).toBe('idp_access_token')
         expect(SESSION_COOKIE_CONFIG.refreshTokenGuest.key).toBe('cc-nx-g')
         expect(SESSION_COOKIE_CONFIG.refreshTokenRegistered.key).toBe('cc-nx')
-        expect(SESSION_COOKIE_CONFIG.refreshTokenExists.key).toBe('cc-nx-exists')
+        expect(SESSION_COOKIE_CONFIG.customerId.key).toBe('customer_id')
+        expect(SESSION_COOKIE_CONFIG.encUserId.key).toBe('enc_user_id')
+        expect(SESSION_COOKIE_CONFIG.customerType.key).toBe('customer_type')
+        expect(SESSION_COOKIE_CONFIG.usid.key).toBe('usid')
+        expect(SESSION_COOKIE_CONFIG.refreshTokenExpires.key).toBe('cc-nx-expires')
+        expect(SESSION_COOKIE_CONFIG.idToken.key).toBe('id_token')
+        expect(SESSION_COOKIE_CONFIG.idpRefreshToken.key).toBe('idp_refresh_token')
     })
 
     it('marks sensitive token cookies as httpOnly', () => {
@@ -29,13 +35,19 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.idpAccessToken.attributes.httpOnly).toBe(true)
         expect(SESSION_COOKIE_CONFIG.refreshTokenGuest.attributes.httpOnly).toBe(true)
         expect(SESSION_COOKIE_CONFIG.refreshTokenRegistered.attributes.httpOnly).toBe(true)
+        expect(SESSION_COOKIE_CONFIG.idpRefreshToken.attributes.httpOnly).toBe(true)
     })
 
     it('marks client-readable cookies as non-httpOnly', () => {
         expect(SESSION_COOKIE_CONFIG.accessTokenExpires.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.accessTokenDnt.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.uido.attributes.httpOnly).toBe(false)
-        expect(SESSION_COOKIE_CONFIG.refreshTokenExists.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.customerId.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.encUserId.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.customerType.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.usid.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.refreshTokenExpires.attributes.httpOnly).toBe(false)
+        expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(false)
     })
 
     it('sets secure, sameSite lax, and path / on all cookies', () => {
@@ -74,9 +86,15 @@ describe('getCookieName', () => {
 })
 
 describe('getCookieNamesToStripFromProxy', () => {
-    it('returns access token, both refresh tokens, and dwsid', () => {
+    it('returns access token, both refresh tokens, idp refresh token, and dwsid', () => {
         const names = getCookieNamesToStripFromProxy('RefArch')
-        expect(names).toEqual(['cc-at_RefArch', 'cc-nx-g_RefArch', 'cc-nx_RefArch', 'dwsid'])
+        expect(names).toEqual([
+            'cc-at_RefArch',
+            'cc-nx-g_RefArch',
+            'cc-nx_RefArch',
+            'idp_refresh_token_RefArch',
+            'dwsid'
+        ])
     })
 
     it('always includes dwsid regardless of siteId', () => {
