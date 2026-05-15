@@ -50,7 +50,7 @@
     "@salesforce/pwa-kit-dev": "3.19.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.19.0-dev",
     "@salesforce/pwa-kit-runtime": "3.19.0-dev",
-    "@salesforce/storefront-next-runtime": "0.1.1",
+    "@salesforce/storefront-next-runtime": "0.4.0",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -95,8 +95,8 @@
       "path-to-regexp": "^1.9.0"
     },
     "@salesforce/storefront-next-runtime": {
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0"
+      "react": "$react",
+      "react-dom": "$react-dom"
     }
   },
   "engines": {

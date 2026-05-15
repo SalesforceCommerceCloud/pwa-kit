@@ -40,7 +40,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "@salesforce/storefront-next-runtime": "0.1.1",
+    "@salesforce/storefront-next-runtime": "0.4.0",
     "commerce-sdk-isomorphic": "5.2.1",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"

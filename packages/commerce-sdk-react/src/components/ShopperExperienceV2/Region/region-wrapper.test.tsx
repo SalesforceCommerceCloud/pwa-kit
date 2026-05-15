@@ -10,14 +10,11 @@ import {RegionWrapper, RegionRendererProps} from './region-wrapper'
 
 const mockUsePageDesignerMode = jest.fn(() => ({isDesignMode: false}))
 
-jest.mock('@salesforce/storefront-next-runtime/design/react/core', () => ({
-    usePageDesignerMode: () => mockUsePageDesignerMode()
-}))
-
-jest.mock('@salesforce/storefront-next-runtime/design/react', () => {
+jest.mock('@salesforce/storefront-next-runtime/design/react/core', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mockReact = require('react')
     return {
+        usePageDesignerMode: () => mockUsePageDesignerMode(),
         createReactRegionDesignDecorator: (Component: typeof mockReact.ComponentType) => {
             return function DecoratedComponent(props: Record<string, unknown>) {
                 return mockReact.createElement(
@@ -155,14 +152,14 @@ describe('RegionWrapper', () => {
             mockUsePageDesignerMode.mockReturnValue({isDesignMode: true})
         })
 
-        test('computes componentIds from region components', () => {
+        test('computes contentLinkUuids from region components', () => {
             render(
                 <RegionWrapper region={mockRegion}>
                     <div>Content</div>
                 </RegionWrapper>
             )
 
-            // The component should compute componentIds: ['comp-1', 'comp-2']
+            // The component should compute contentLinkUuids: ['comp-1', 'comp-2']
             expect(screen.getByTestId('decorated-region')).toBeInTheDocument()
         })
 
@@ -206,7 +203,7 @@ describe('RegionWrapper', () => {
             expect(screen.getByTestId('child-content')).toBeInTheDocument()
         })
 
-        test('uses contentLinkUuid for componentIds when present', () => {
+        test('uses contentLinkUuid for contentLinkUuids when present', () => {
             const regionWithUuids = {
                 id: 'test-region',
                 components: [

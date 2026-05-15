@@ -107,7 +107,8 @@ describe('Component', () => {
             isFragment: false,
             isVisible: true,
             isLocalized: false,
-            id: 'test-component-id'
+            id: 'test-component-id',
+            contentLinkUuid: undefined
         })
     })
 
@@ -154,7 +155,33 @@ describe('Component', () => {
         })
     })
 
-    test('omits contentLinkUuid from designMetadata when not present', () => {
+    test('sets isFragment to true when component is a fragment', () => {
+        const fragmentComponent = {
+            ...mockComponent,
+            fragment: true,
+            contentLinkUuid: 'uuid-fragment-001'
+        } as unknown as ComponentProps['component']
+        const receivedProps: Record<string, unknown> = {}
+        const MockDynamicComponent = (props: Record<string, unknown>) => {
+            Object.assign(receivedProps, props)
+            return <div data-testid="dynamic-component">Test</div>
+        }
+        mockRegistry.getComponent.mockReturnValue(MockDynamicComponent)
+        mockRegistry.getFallback.mockReturnValue(null)
+
+        render(<Component component={fragmentComponent} regionId="test-region" />)
+
+        expect(receivedProps.designMetadata).toEqual({
+            name: 'Test Component',
+            isFragment: true,
+            isVisible: true,
+            isLocalized: false,
+            id: 'test-component-id',
+            contentLinkUuid: 'uuid-fragment-001'
+        })
+    })
+
+    test('contentLinkUuid is undefined when not present on component', () => {
         const receivedProps: Record<string, unknown> = {}
         const MockDynamicComponent = (props: Record<string, unknown>) => {
             Object.assign(receivedProps, props)
@@ -166,6 +193,6 @@ describe('Component', () => {
         render(<Component component={mockComponent} regionId="test-region" />)
 
         const designMetadata = receivedProps.designMetadata as Record<string, unknown>
-        expect(designMetadata).not.toHaveProperty('contentLinkUuid')
+        expect(designMetadata.contentLinkUuid).toBeUndefined()
     })
 })
