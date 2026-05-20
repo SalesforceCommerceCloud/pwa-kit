@@ -614,11 +614,7 @@ describe('cookieDomain support', () => {
 
     test('expireHttpOnlySessionCookies expires both domain-scoped and host-scoped versions', () => {
         const res = makeRes()
-        expireHttpOnlySessionCookies(
-            makeReq(),
-            res,
-            makeOptionsWithCookieDomain('.example.com')
-        )
+        expireHttpOnlySessionCookies(makeReq(), res, makeOptionsWithCookieDomain('.example.com'))
 
         const allCookieNames = [
             'cc-at_testsite',
