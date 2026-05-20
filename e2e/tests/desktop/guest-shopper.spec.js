@@ -8,8 +8,13 @@
 const {test, expect} = require('@playwright/test')
 const {generateUserCredentials} = require('../../scripts/utils.js')
 const {addProductToCart, searchProduct, checkoutProduct} = require('../../scripts/pageHelpers.js')
+const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
+
+test.afterEach(async ({page}) => {
+    await clearCartAndWishlist(page)
+})
 
 /**
  * Test that guest shoppers can add a product to cart and go through the entire checkout process,
