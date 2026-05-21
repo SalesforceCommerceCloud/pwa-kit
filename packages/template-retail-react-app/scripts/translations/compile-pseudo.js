@@ -6,7 +6,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint @typescript-eslint/no-var-requires: "off" */
-const {exec} = require('child_process')
+const {execSync} = require('child_process')
 const {getOutputFolder} = require('./utils')
 
 const main = () => {
@@ -16,12 +16,7 @@ const main = () => {
     const command = `formatjs compile --ast ${inputFile} --out-file ${outputFile} --pseudo-locale ${locale}`
 
     console.log('Compiling pseudo translation into the file:', outputFile)
-    exec(command, (err) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-    })
+    execSync(command, {stdio: 'inherit'})
 }
 
 main()
