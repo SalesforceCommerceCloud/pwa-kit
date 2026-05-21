@@ -1,3 +1,4 @@
+## v3.19.0-nightly-20260521090238 (May 21, 2026)
 ## v3.19.0-dev (May 07, 2026)
 - [Feature] Propagate `MaintenanceError` (status 503) through SSR and client-side error pipelines: rethrow in `doInitAppState`, handle in `logAndFormatError`, and detect in `AppErrorBoundary` using duck-typing on `err.name`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
 
