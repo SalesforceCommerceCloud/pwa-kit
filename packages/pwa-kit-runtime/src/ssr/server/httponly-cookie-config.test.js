@@ -86,12 +86,13 @@ describe('getCookieName', () => {
 })
 
 describe('getCookieNamesToStripFromProxy', () => {
-    it('returns access token, both refresh tokens, idp refresh token, and dwsid', () => {
+    it('returns access token, both refresh tokens, idp access token, idp refresh token, and dwsid', () => {
         const names = getCookieNamesToStripFromProxy('RefArch')
         expect(names).toEqual([
             'cc-at_RefArch',
             'cc-nx-g_RefArch',
             'cc-nx_RefArch',
+            'idp_access_token_RefArch',
             'idp_refresh_token_RefArch',
             'dwsid'
         ])
