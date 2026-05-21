@@ -238,7 +238,7 @@ const handleHttpOnlyCookiesOnProxyRes = (
 
     if (req.path?.match(SLAS_LOGOUT_ENDPOINT)) {
         try {
-            expireHttpOnlySessionCookies(req, res)
+            expireHttpOnlySessionCookies(req, res, options)
         } catch (error) {
             logger.warn('Error expiring HttpOnly session cookies on logout', {
                 namespace: logNamespace,
