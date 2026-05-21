@@ -20,6 +20,66 @@ import logger from '../../utils/logger-instance'
 const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 
+// Matches the same regex used client-side in commerce-sdk-react CookieStorage so
+// support tickets surface the same warning text on both sides.
+const INVALID_COOKIE_DOMAIN_PATTERN = /[*,;=\s]/
+
+/**
+ * Reads `commerceAPI.cookieDomain` from the runtime options. Returns the value
+ * when present and well-formed, or `undefined` (with a warning) when it
+ * contains characters the browser will reject. Mirrors the validation in
+ * commerce-sdk-react/src/auth/storage/cookie.ts.
+ * @private
+ */
+function getValidatedCookieDomain(options) {
+    const cookieDomain = options?.mobify?.app?.commerceAPI?.cookieDomain
+    if (!cookieDomain) return undefined
+    if (INVALID_COOKIE_DOMAIN_PATTERN.test(cookieDomain)) {
+        logger.warn(
+            `Invalid cookieDomain "${cookieDomain}". ` +
+                'Cookie domains must not contain wildcards or special characters. ' +
+                'Example: ".example.com"'
+        )
+        return undefined
+    }
+    return cookieDomain
+}
+
+/**
+ * Returns a function that appends a Set-Cookie header to `res`. When
+ * `cookieDomain` is configured, every write also emits a second expiring
+ * Set-Cookie for the same name without a Domain attribute, expiring any
+ * pre-existing host-scoped cookie. This mirrors
+ * `CookieStorage.removeHostAndDomainCookie` in commerce-sdk-react and prevents
+ * stale duplicates when a merchant first enables the cookieDomain config.
+ * @private
+ */
+function makeAppendCookie(res, cookieDomain) {
+    return ({name, value, expires, attributes}) => {
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name,
+                value,
+                expires,
+                ...attributes,
+                ...(cookieDomain && {domain: cookieDomain})
+            })
+        )
+        if (cookieDomain) {
+            res.append(
+                SET_COOKIE,
+                cookieAsString({
+                    name,
+                    value: '',
+                    expires: new Date(0),
+                    ...attributes
+                })
+            )
+        }
+    }
+}
+
 /**
  * Computes refresh token cookie TTL in seconds. Same logic as Auth.getRefreshTokenCookieTTLValue in commerce-sdk-react:
  * 1. Override value (if valid), 2. SLAS response value, 3. Default (guest or registered).
@@ -91,6 +151,8 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
     }
 
     const site = siteId
+    const cookieDomain = getValidatedCookieDomain(options)
+    const appendCookie = makeAppendCookie(res, cookieDomain)
     const {
         accessToken,
         accessTokenExpires,
@@ -115,77 +177,59 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         isGuest = tokenClaims.isGuest
 
         // Access token (HttpOnly)
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(accessToken, site),
-                value: parsed.access_token,
-                expires: tokenClaims.accessExpires,
-                ...accessToken.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(accessToken, site),
+            value: parsed.access_token,
+            expires: tokenClaims.accessExpires,
+            attributes: accessToken.attributes
+        })
 
         // Expiry timestamp from JWT exp claim (non-HttpOnly so client can check expiry)
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(accessTokenExpires, site),
-                value: String(tokenClaims.expiresAt),
-                expires: tokenClaims.accessExpires,
-                ...accessTokenExpires.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(accessTokenExpires, site),
+            value: String(tokenClaims.expiresAt),
+            expires: tokenClaims.accessExpires,
+            attributes: accessTokenExpires.attributes
+        })
 
         // Do-not-track flag from JWT (non-HttpOnly so client can read it)
         if (tokenClaims.dnt !== undefined) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(accessTokenDnt, site),
-                    value: String(tokenClaims.dnt),
-                    expires: tokenClaims.accessExpires,
-                    ...accessTokenDnt.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(accessTokenDnt, site),
+                value: String(tokenClaims.dnt),
+                expires: tokenClaims.accessExpires,
+                attributes: accessTokenDnt.attributes
+            })
         }
 
         // uido: IDP origin (e.g. "slas", "ecom"); non-HttpOnly so client can read for useCustomerType/isExternal
         if (tokenClaims.uido) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(uido, site),
-                    value: tokenClaims.uido,
-                    expires: tokenClaims.accessExpires,
-                    ...uido.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(uido, site),
+                value: tokenClaims.uido,
+                expires: tokenClaims.accessExpires,
+                attributes: uido.attributes
+            })
         }
 
         // IDP access token (HttpOnly)
         if (parsed.idp_access_token) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(idpAccessToken, site),
-                    value: parsed.idp_access_token,
-                    expires: tokenClaims.accessExpires,
-                    ...idpAccessToken.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(idpAccessToken, site),
+                value: parsed.idp_access_token,
+                expires: tokenClaims.accessExpires,
+                attributes: idpAccessToken.attributes
+            })
         }
 
         // id_token (non-HttpOnly): expiry tied to access token JWT exp.
         if (parsed.id_token) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(idToken, site),
-                    value: parsed.id_token,
-                    expires: tokenClaims.accessExpires,
-                    ...idToken.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(idToken, site),
+                value: parsed.id_token,
+                expires: tokenClaims.accessExpires,
+                attributes: idToken.attributes
+            })
         }
     }
 
@@ -200,29 +244,23 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
         const refreshConfig = isGuest ? refreshTokenGuest : refreshTokenRegistered
 
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(refreshConfig, site),
-                value: parsed.refresh_token,
-                expires: refreshExpires,
-                ...refreshConfig.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(refreshConfig, site),
+            value: parsed.refresh_token,
+            expires: refreshExpires,
+            attributes: refreshConfig.attributes
+        })
 
         // Delete the opposite refresh token cookie to mirror client-side behavior:
         // Login (guest → registered): delete guest cookie cc-nx-g
         // Logout (registered → guest): delete registered cookie cc-nx
         const staleRefreshConfig = isGuest ? refreshTokenRegistered : refreshTokenGuest
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(staleRefreshConfig, site),
-                value: '',
-                expires: new Date(0),
-                ...staleRefreshConfig.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(staleRefreshConfig, site),
+            value: '',
+            expires: new Date(0),
+            attributes: staleRefreshConfig.attributes
+        })
 
         // Hybrid SFRA + PWA: mirror SLAS metadata as siteId-suffixed cookies so SFRA
         // can read the same session state. Expiry aligned with refresh token TTL.
@@ -233,79 +271,61 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         // refresh-with-rotation), so in practice this is the same condition. If a
         // future flow returns metadata without a refresh_token, the existing cookies
         // remain valid until they expire on their own schedule.
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(customerType, site),
-                value: isGuest ? 'guest' : 'registered',
-                expires: refreshExpires,
-                ...customerType.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(customerType, site),
+            value: isGuest ? 'guest' : 'registered',
+            expires: refreshExpires,
+            attributes: customerType.attributes
+        })
 
         if (parsed.customer_id) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(customerId, site),
-                    value: parsed.customer_id,
-                    expires: refreshExpires,
-                    ...customerId.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(customerId, site),
+                value: parsed.customer_id,
+                expires: refreshExpires,
+                attributes: customerId.attributes
+            })
         }
 
         if (parsed.enc_user_id) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(encUserId, site),
-                    value: parsed.enc_user_id,
-                    expires: refreshExpires,
-                    ...encUserId.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(encUserId, site),
+                value: parsed.enc_user_id,
+                expires: refreshExpires,
+                attributes: encUserId.attributes
+            })
         }
 
         // usid: SLAS session id, non-HttpOnly so client/SFRA/Einstein can read
         // it. Aligned to refresh-token TTL to persist across access-token
         // refreshes within a single shopper session.
         if (parsed.usid) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(usid, site),
-                    value: parsed.usid,
-                    expires: refreshExpires,
-                    ...usid.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(usid, site),
+                value: parsed.usid,
+                expires: refreshExpires,
+                attributes: usid.attributes
+            })
         }
 
         // cc-nx-expires: absolute epoch (seconds) when the refresh token cookie
         // expires. Mirrors cc-at-expires for the access token. Cookie expiry
         // attribute aligned to the same instant.
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(refreshTokenExpires, site),
-                value: String(Math.floor(refreshExpires.getTime() / 1000)),
-                expires: refreshExpires,
-                ...refreshTokenExpires.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(refreshTokenExpires, site),
+            value: String(Math.floor(refreshExpires.getTime() / 1000)),
+            expires: refreshExpires,
+            attributes: refreshTokenExpires.attributes
+        })
 
         // idp_refresh_token (HttpOnly): refresh-TTL-aligned, only when present.
         if (parsed.idp_refresh_token) {
-            res.append(
-                SET_COOKIE,
-                cookieAsString({
-                    name: getCookieName(idpRefreshToken, site),
-                    value: parsed.idp_refresh_token,
-                    expires: refreshExpires,
-                    ...idpRefreshToken.attributes
-                })
-            )
+            appendCookie({
+                name: getCookieName(idpRefreshToken, site),
+                value: parsed.idp_refresh_token,
+                expires: refreshExpires,
+                attributes: idpRefreshToken.attributes
+            })
         }
     }
 
@@ -322,10 +342,12 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
 
 /**
  * When a SLAS logout response is received, expire all HttpOnly session cookies so that
- * stale tokens are not sent with subsequent requests.
+ * stale tokens are not sent with subsequent requests. When `cookieDomain` is configured,
+ * also expires the host-scoped versions so cookies set before the flag was enabled are
+ * cleaned up too.
  * @private
  */
-export function expireHttpOnlySessionCookies(req, res) {
+export function expireHttpOnlySessionCookies(req, res, options) {
     const siteId = getSiteId(req)
     if (!siteId) {
         throw new Error(
@@ -336,16 +358,15 @@ export function expireHttpOnlySessionCookies(req, res) {
 
     const site = siteId
     const expired = new Date(0)
+    const cookieDomain = getValidatedCookieDomain(options)
+    const appendCookie = makeAppendCookie(res, cookieDomain)
 
     for (const config of getAllCookieConfigs()) {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: getCookieName(config, site),
-                value: '',
-                expires: expired,
-                ...config.attributes
-            })
-        )
+        appendCookie({
+            name: getCookieName(config, site),
+            value: '',
+            expires: expired,
+            attributes: config.attributes
+        })
     }
 }
