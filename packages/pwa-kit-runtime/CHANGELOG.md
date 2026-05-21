@@ -1,5 +1,6 @@
 ## v3.19.0-dev (May 07, 2026)
 - HttpOnly session cookies: SLAS proxy now mirrors `customer_id`, `customer_type`, `enc_user_id`, `id_token` (non-HttpOnly) and `idp_refresh_token` (HttpOnly) as siteId-suffixed cookies; replaces `cc-nx-exists` with `cc-nx-expires` (absolute epoch seconds, mirroring `cc-at-expires`); strips `idp_refresh_token` from the response body and upstream proxy requests [#3830](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3830)
+- HttpOnly session cookies: also strip `idp_access_token_{siteId}` from upstream proxy requests to SLAS
 
 ## v3.18.0 (May 07, 2026)
 - Add option to keep original User Agent header in proxy requests [#3798](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3798)
