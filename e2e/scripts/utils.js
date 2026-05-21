@@ -108,21 +108,6 @@ function sanitizeHtml(html) {
 async function runAccessibilityTest(page, snapshotName, options = {}) {
     const {exclude = []} = options
 
-    // Wait for in-progress CSS animations/transitions to settle before scanning.
-    // axe-core's color-contrast rule composites translucent ancestor layers to
-    // compute an effective background; if a portaled overlay (e.g. the Chakra
-    // toast manager or the DNT modal portal) is mid-fade when axe samples,
-    // the resulting hex drifts run-to-run (#f3f3f3 / #f4f4f4 / #f5f5f5) and
-    // the snapshot flakes. Cap the wait so a stuck animation can't hang the
-    // suite — better to scan a not-quite-settled page than to time out.
-    await page
-        .waitForFunction(
-            () => !document.getAnimations().some((a) => a.playState === 'running'),
-            null,
-            {timeout: 5000}
-        )
-        .catch(() => {})
-
     // Create AxeBuilder instance
     let axeBuilder = new AxeBuilder({page})
 
