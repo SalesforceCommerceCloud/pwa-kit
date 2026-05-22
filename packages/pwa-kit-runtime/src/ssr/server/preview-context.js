@@ -121,3 +121,47 @@ export function readStorefrontPreviewMarker(req) {
     if (!value || !isAllowedParentOrigin(value)) return undefined
     return value
 }
+
+/**
+ * Append Set-Cookie header(s) to expire the storefront-preview marker
+ * cookie. Used on logout (called from `expireHttpOnlySessionCookies`) so
+ * the marker doesn't outlive the session it was associated with.
+ *
+ * Mirrors the attributes the writer used (Path, Secure, HttpOnly,
+ * SameSite=None, Partitioned, Domain) so browsers recognize the deletion
+ * — for Partitioned cookies, deletion is partition-specific and must
+ * carry Partitioned to match. When `cookieDomain` is configured, also
+ * emits a host-scoped deletion to clean up any pre-cookieDomain marker.
+ */
+export function clearStorefrontPreviewMarker(res, options) {
+    const cookieDomain = getValidatedCookieDomain(options)
+    const expired = new Date(0)
+    const baseAttrs = {
+        path: '/',
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none',
+        partitioned: true
+    }
+    res.append(
+        SET_COOKIE,
+        cookieAsString({
+            name: STOREFRONT_PREVIEW_CTX_COOKIE,
+            value: '',
+            expires: expired,
+            ...baseAttrs,
+            ...(cookieDomain && {domain: cookieDomain})
+        })
+    )
+    if (cookieDomain) {
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: STOREFRONT_PREVIEW_CTX_COOKIE,
+                value: '',
+                expires: expired,
+                ...baseAttrs
+            })
+        )
+    }
+}
