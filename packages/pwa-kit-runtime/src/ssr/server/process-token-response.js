@@ -7,6 +7,7 @@
 import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
 import {SET_COOKIE} from './constants'
+import {getValidatedCookieDomain} from './cookie-domain'
 import {
     SESSION_COOKIE_CONFIG,
     getAllCookieConfigs,
@@ -19,31 +20,6 @@ import logger from '../../utils/logger-instance'
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
 const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
-
-// Matches the same regex used client-side in commerce-sdk-react CookieStorage so
-// support tickets surface the same warning text on both sides.
-const INVALID_COOKIE_DOMAIN_PATTERN = /[*,;=\s]/
-
-/**
- * Reads `commerceAPI.cookieDomain` from the runtime options. Returns the value
- * when present and well-formed, or `undefined` (with a warning) when it
- * contains characters the browser will reject. Mirrors the validation in
- * commerce-sdk-react/src/auth/storage/cookie.ts.
- * @private
- */
-function getValidatedCookieDomain(options) {
-    const cookieDomain = options?.mobify?.app?.commerceAPI?.cookieDomain
-    if (!cookieDomain) return undefined
-    if (INVALID_COOKIE_DOMAIN_PATTERN.test(cookieDomain)) {
-        logger.warn(
-            `Invalid cookieDomain "${cookieDomain}". ` +
-                'Cookie domains must not contain wildcards or special characters. ' +
-                'Example: ".example.com"'
-        )
-        return undefined
-    }
-    return cookieDomain
-}
 
 /**
  * Returns a function that appends a Set-Cookie header to `res`. When

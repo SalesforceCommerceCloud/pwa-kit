@@ -41,3 +41,18 @@ export const SLAS_LOGOUT_ENDPOINT = /\/oauth2\/logout/
 export const DWSID_COOKIE_NAME = 'dwsid'
 export const X_SITE_ID = 'x-site-id'
 export const X_GRANT_TYPE = 'x-grant-type'
+
+// Server-only marker cookie set when the storefront is loaded inside a
+// trusted Storefront Preview iframe (parent origin attested by Sec-Fetch-*
+// + Referer on the iframe document load). Read on later SLAS proxy
+// responses to choose SameSite=None; Partitioned over SameSite=Lax for
+// session cookies.
+export const STOREFRONT_PREVIEW_CTX_COOKIE = '__pwakit_preview_ctx'
+
+// Mirrors IFRAME_HOST_ALLOW_LIST in commerce-sdk-react/src/constant.ts.
+// Kept in sync via a parity test.
+export const STOREFRONT_PREVIEW_PARENT_ALLOW_LIST = Object.freeze([
+    'https://runtime.commercecloud.com',
+    'https://runtime-admin-staging.mobify-storefront.com',
+    'https://runtime-admin-preview.mobify-storefront.com'
+])

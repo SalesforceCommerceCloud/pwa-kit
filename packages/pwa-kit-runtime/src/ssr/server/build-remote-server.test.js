@@ -679,6 +679,48 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         res.setHeader(regularHeaderKey, regularHeaderValue)
         expect(res.getHeader(regularHeaderKey)).toEqual(regularHeaderValue)
     })
+
+    describe('storefront-preview marker middleware', () => {
+        afterEach(() => {
+            delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+        })
+
+        test('is mounted right after prepNonProxyRequest when MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true', () => {
+            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
+            const mockApp = {use: jest.fn()}
+            RemoteServerFactory._setupCommonMiddleware(mockApp, {})
+
+            const middleware = mockApp.use.mock.calls[1][0]
+            const req = {
+                method: 'GET',
+                headers: {
+                    'sec-fetch-dest': 'iframe',
+                    'sec-fetch-site': 'cross-site',
+                    referer: 'https://runtime-admin-preview.mobify-storefront.com/x'
+                }
+            }
+            const res = {append: jest.fn()}
+            const next = jest.fn()
+
+            middleware(req, res, next)
+
+            expect(next).toHaveBeenCalled()
+            expect(res.append).toHaveBeenCalledWith(
+                'set-cookie',
+                expect.stringContaining('__pwakit_preview_ctx=')
+            )
+        })
+
+        test('is not mounted when MRT_ENABLE_HTTPONLY_SESSION_COOKIES is unset', () => {
+            delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+            const mockApp = {use: jest.fn()}
+            RemoteServerFactory._setupCommonMiddleware(mockApp, {})
+
+            // calls: [0]=prepNonProxyRequest, [1]=ssrMiddleware, [2]=errorHandlerMiddleware
+            // No marker middleware between prepNonProxyRequest and ssrMiddleware.
+            expect(mockApp.use).toHaveBeenCalledTimes(3)
+        })
+    })
 })
 
 describe('isBinary function', () => {
