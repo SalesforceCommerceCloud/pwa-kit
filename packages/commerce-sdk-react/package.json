@@ -40,8 +40,8 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "@salesforce/storefront-next-runtime": "0.1.1",
-    "commerce-sdk-isomorphic": "5.2.1",
+    "@salesforce/storefront-next-runtime": "0.4.2",
+    "commerce-sdk-isomorphic": "5.2.0",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
   },
@@ -91,7 +91,8 @@
   "overrides": {
     "@salesforce/storefront-next-runtime": {
       "react": "^18.2.0",
-      "react-dom": "^18.2.0"
+      "react-dom": "^18.2.0",
+      "react-router": "^5.3.4"
     }
   },
   "publishConfig": {

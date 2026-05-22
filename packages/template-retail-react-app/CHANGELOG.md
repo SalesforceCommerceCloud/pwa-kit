@@ -1,5 +1,9 @@
-## v10.1.0-dev (May 07, 2026)
+## v10.1.0-dev
 - [Feature] Add maintenance mode page: when the Commerce API returns an `sfdc_maintenance` response header, a 503 error is detected and a dedicated maintenance page is displayed instead of the generic error page. The maintenance page can render a shared page fetched from a configurable CDN URL (default) or fall back to a built-in message. Configure via `app.pages.maintenancePage` in `config/default.js`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
+## v10.0.1 (May 21, 2026)
+- Upgrade @salesforce/storefront-next-runtime to 0.4.2 [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
+- [Bugfix] Pin `@formatjs/cli` to 6.9.0 to fix pseudo-locale compilation in generated projects [#3842](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3842)
 
 ## v10.0.0 (May 07, 2026)
 - Update MRT Data Store configuration comments and README to use the unprefixed environment variable names actually consumed by `@salesforce/mrt-utilities` (`MRT_DATA_STORE_DEFAULTS`, `MRT_DATA_STORE_WARN_ON_MISSING`). [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
