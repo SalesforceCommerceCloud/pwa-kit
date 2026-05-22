@@ -60,18 +60,27 @@ The cookie-domain setting accepts a numeric level that controls how broadly ECOM
 
 > **Do not set the value to `1`.** Level `1` would scope the cookie to the top-level domain (e.g. `.com`) and is rejected for security reasons — a cookie scoped that broadly would leak across unrelated sites. No values other than `0` and `2` are accepted.
 
-While you're in **Hybrid Auth Settings**, also turn on **HttpOnly True** if you've enabled `enableHttpOnlySessionCookies` on the PWA Kit side, so SFRA participates in the same HttpOnly session model. See the [HttpOnly Session Cookies — Architecture](./httponly-cookies-architecture.md#3-hybrid-sites-enable-httponly-in-business-manager) doc for the broader hybrid setup.
+The **HttpOnly True** toggle on the same Hybrid Auth Settings page should be left at its default (disabled) value. For broader Hybrid Auth setup see <!-- TODO: link to Hybrid Auth documentation --> [Hybrid Auth documentation (TBD)]().
 
 ### Matching the two sides
 
-For PWA Kit and SFRA to share a session, the two settings must agree:
+For PWA Kit and SFRA to share a session, the two settings must agree.
 
-| PWA Kit `commerceAPI.cookieDomain` | ECOM Hybrid Auth cookie domain | Result |
+#### ✓ Valid configurations
+
+| PWA Kit `commerceAPI.cookieDomain` | ECOM Hybrid Auth cookie domain | When to use |
 | --- | --- | --- |
-| unset (or matches the host exactly) | `0` | Single-host hybrid; only works when both sides serve from the same hostname. |
-| `.example.com` | `2` | Cross-subdomain hybrid; works for any subdomain of `example.com`. |
-| `.example.com` | `0` | **Mismatch** — `dwsid` is host-scoped, PWA Kit cookies are domain-scoped. Cross-subdomain navigation breaks. |
-| unset | `2` | **Mismatch** — `dwsid` is domain-scoped, PWA Kit cookies are host-scoped. Cross-subdomain navigation breaks. |
+| unset (or matches the host exactly) | `0` | Single-host hybrid: PWA Kit and SFRA both serve from the exact same hostname. |
+| `.example.com` | `2` | Cross-subdomain hybrid: any subdomain of `example.com` (e.g. `siteA.example.com`, `siteB.example.com`) can share the session. |
+
+#### ✗ Invalid configurations
+
+These combinations leave one side host-scoped and the other domain-scoped, so cross-subdomain navigation breaks:
+
+| PWA Kit `commerceAPI.cookieDomain` | ECOM Hybrid Auth cookie domain | What goes wrong |
+| --- | --- | --- |
+| `.example.com` | `0` | `dwsid` is host-scoped while PWA Kit cookies are domain-scoped. SFRA's session cookie doesn't follow the shopper across subdomains. |
+| unset | `2` | `dwsid` is domain-scoped while PWA Kit cookies are host-scoped. PWA Kit's auth cookies don't follow the shopper across subdomains. |
 
 If your site is configured by an SI or by Salesforce, file a request with the team that manages your Business Manager.
 
@@ -90,6 +99,7 @@ Run through this list once both PWA Kit and ECOM are configured. You can do most
 
 ## See also
 
+- <!-- TODO: link to Hybrid Auth documentation --> [Hybrid Auth documentation (TBD)]() — overview of the hybrid PWA Kit + SFRA auth model. The reciprocal link from that doc back to this one is the dual-linkage referenced when both docs are published.
 - [HttpOnly Mode — SLAS Property Storage Mapping](./httponly-storage-mapping.md) — the canonical list of cookies affected by `cookieDomain`.
 - [HttpOnly Session Cookies — Architecture](./httponly-cookies-architecture.md) — request-flow diagrams and the broader configuration guide.
 - [`packages/commerce-sdk-react/src/auth/storage/cookie.ts`](../packages/commerce-sdk-react/src/auth/storage/cookie.ts) — client-side cookie store that consumes `cookieDomain` and runs the host-vs-domain cleanup pattern.
