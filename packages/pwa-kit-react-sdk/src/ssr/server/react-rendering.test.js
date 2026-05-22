@@ -18,9 +18,9 @@ import {initializeServerTracing, shutdownServerTracing} from './opentelemetry-se
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {
-    DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY,
-    DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY,
-    DATA_STORE_WINDOW_GLOBAL
+    DATA_STORE_WINDOW_GLOBAL,
+    DATA_STORE_BOOTSTRAP_SITE_ID_KEY,
+    CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY
 } from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
 import {getAppConfig} from '../universal/compatibility'
 import {randomUUID} from 'crypto'
@@ -842,9 +842,11 @@ describe('Additional branch coverage for react-rendering', () => {
             expect(res.statusCode).toBe(200)
             const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
             expect(data).toHaveProperty(DATA_STORE_WINDOW_GLOBAL)
+            // Expect DAL keys: custom-global-preferences and __siteId
+            // No site key since res.locals.site is undefined in test fixtures
             expect(data[DATA_STORE_WINDOW_GLOBAL]).toEqual({
-                [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: {},
-                [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: {}
+                [DATA_STORE_BOOTSTRAP_SITE_ID_KEY]: undefined,
+                [CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY]: {}
             })
         } finally {
             if (prevEnabled === undefined) {

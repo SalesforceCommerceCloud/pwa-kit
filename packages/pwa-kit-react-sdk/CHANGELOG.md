@@ -1,5 +1,6 @@
 ## v3.19.0-dev
 - [Feature] Propagate `MaintenanceError` (status 503) through SSR and client-side error pipelines: rethrow in `doInitAppState`, handle in `logAndFormatError`, and detect in `AppErrorBoundary` using duck-typing on `err.name`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+- Add `MrtDataStoreProvider` context and `useCustomSitePreferences`/`useCustomGlobalPreferences` hooks for accessing MRT Data Store preferences. Provider automatically integrated into SSR rendering pipeline, fetching preferences on server and reading from `window.__MRT_DATA_STORE__` on client. Hooks exported from `@salesforce/pwa-kit-react-sdk/ssr/universal/hooks`. [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811)
 
 ## v3.18.1 (May 21, 2026)
 

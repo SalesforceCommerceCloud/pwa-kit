@@ -1,4 +1,5 @@
 ## v10.1.0-dev
+- Bump `vendor.js` bundle-size budget from 395 kB to 397 kB to accommodate the new `MrtDataStoreProvider` context and `useCustomSitePreferences` / `useCustomGlobalPreferences` hooks shipped in `@salesforce/pwa-kit-react-sdk`. [#3834](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3834)
 - [Feature] Add maintenance mode page: when the Commerce API returns an `sfdc_maintenance` response header, a 503 error is detected and a dedicated maintenance page is displayed instead of the generic error page. The maintenance page can render a shared page fetched from a configurable CDN URL (default) or fall back to a built-in message. Configure via `app.pages.maintenancePage` in `config/default.js`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
 
 ## v10.0.1 (May 21, 2026)
