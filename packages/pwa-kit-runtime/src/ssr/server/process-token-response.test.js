@@ -9,6 +9,7 @@ import {
     setHttpOnlySessionCookies,
     expireHttpOnlySessionCookies
 } from './process-token-response'
+import {_resetWarnedDomainsForTesting} from './cookie-domain'
 import {X_SITE_ID} from './constants'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
@@ -521,6 +522,7 @@ describe('expireHttpOnlySessionCookies', () => {
 describe('cookieDomain support', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        _resetWarnedDomainsForTesting()
     })
 
     test('setHttpOnlySessionCookies omits Domain attribute when cookieDomain is unset', () => {

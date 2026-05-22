@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import * as fs from 'fs'
+import * as path from 'path'
 import {tryWriteStorefrontPreviewMarker, readStorefrontPreviewMarker} from './preview-context'
+import {_resetWarnedDomainsForTesting} from './cookie-domain'
 import {STOREFRONT_PREVIEW_CTX_COOKIE, STOREFRONT_PREVIEW_PARENT_ALLOW_LIST} from './constants'
 
 const TRUSTED_PARENT = 'https://runtime-admin-preview.mobify-storefront.com'
@@ -32,6 +35,10 @@ const makeRes = () => {
 }
 
 describe('tryWriteStorefrontPreviewMarker', () => {
+    beforeEach(() => {
+        _resetWarnedDomainsForTesting()
+    })
+
     test('emits the marker when GET + iframe + cross-site + Referer is on the allow-list', () => {
         const req = makeReq()
         const res = makeRes()
@@ -160,5 +167,44 @@ describe('readStorefrontPreviewMarker', () => {
     test('returns undefined when the marker cookie is absent but other cookies present', () => {
         const req = {headers: {cookie: 'foo=bar; baz=qux'}}
         expect(readStorefrontPreviewMarker(req)).toBeUndefined()
+    })
+})
+
+describe('STOREFRONT_PREVIEW_PARENT_ALLOW_LIST parity', () => {
+    // The server-side allow-list (constants.js) MUST mirror IFRAME_HOST_ALLOW_LIST
+    // in commerce-sdk-react/src/constant.ts. Drift would cause client and server
+    // to disagree about which iframe parents are trusted: the client could decide
+    // it is in a trusted iframe (and emit different cookie attributes / cookie
+    // names) while the server falls back to Lax, or vice versa. This test reads
+    // the canonical client file from disk so the check is robust against
+    // refactors that move the constant or rename related symbols, without
+    // requiring a runtime dependency from pwa-kit-runtime → commerce-sdk-react.
+    //
+    // SCOPE: this is a monorepo-only test. It runs in CI/local dev when both
+    // packages are present in the workspace, and never ships to consumers —
+    // *.test.js files are excluded from the npm package, and even if one
+    // somehow leaked, the relative path back to commerce-sdk-react/src does
+    // not exist in an installed pwa-kit-runtime tree. If pwa-kit-runtime is
+    // ever extracted to its own repo, delete this test (or replace with a
+    // copy of the canonical list checked in against a hash).
+    test('matches IFRAME_HOST_ALLOW_LIST in commerce-sdk-react', () => {
+        const clientConstantPath = path.resolve(
+            __dirname,
+            '../../../../commerce-sdk-react/src/constant.ts'
+        )
+        const source = fs.readFileSync(clientConstantPath, 'utf8')
+
+        // Structural check — fails loudly if the constant moves or the
+        // surrounding `Object.freeze([...])` shape changes.
+        const match = source.match(/IFRAME_HOST_ALLOW_LIST\s*=\s*Object\.freeze\(\[([\s\S]*?)\]\)/)
+        expect(match).not.toBeNull()
+        const clientList = [...match[1].matchAll(/'([^']+)'/g)].map((m) => m[1])
+
+        // Catches the silent "regex matched but parsed zero entries" edge
+        // case (e.g. a refactor switching to double quotes or template
+        // strings would match the outer shape but extract nothing).
+        expect(clientList.length).toBeGreaterThan(0)
+
+        expect([...STOREFRONT_PREVIEW_PARENT_ALLOW_LIST].sort()).toEqual([...clientList].sort())
     })
 })

@@ -17,7 +17,7 @@ const SEC_FETCH_DEST = 'sec-fetch-dest'
 const SEC_FETCH_SITE = 'sec-fetch-site'
 const REFERER = 'referer'
 
-const ALLOW_LIST = new Set(STOREFRONT_PREVIEW_PARENT_ALLOW_LIST)
+const isAllowedParentOrigin = (origin) => STOREFRONT_PREVIEW_PARENT_ALLOW_LIST.includes(origin)
 
 /**
  * Parses the Referer header and returns its origin, or undefined when the
@@ -51,6 +51,10 @@ function getRefererOrigin(req) {
  * `Sec-Fetch-*` headers are in the browser's forbidden-header list, so they
  * cannot be set from cross-origin JS. An attacker cannot trigger this gate.
  *
+ * Only GET is accepted: iframe document loads are GETs (Storefront Preview
+ * does not HEAD-prefetch). HEAD/POST iframe loads also exist in theory but
+ * are not part of the Storefront Preview flow.
+ *
  * @private
  */
 function detectTrustedPreviewParent(req) {
@@ -58,7 +62,7 @@ function detectTrustedPreviewParent(req) {
     if (req.headers?.[SEC_FETCH_DEST] !== 'iframe') return undefined
     if (req.headers?.[SEC_FETCH_SITE] !== 'cross-site') return undefined
     const origin = getRefererOrigin(req)
-    if (!origin || !ALLOW_LIST.has(origin)) return undefined
+    if (!origin || !isAllowedParentOrigin(origin)) return undefined
     return origin
 }
 
@@ -81,6 +85,12 @@ export function tryWriteStorefrontPreviewMarker(req, res, options) {
     if (!parentOrigin) return
 
     const cookieDomain = getValidatedCookieDomain(options)
+    // The parent origin is written as the cookie value as-is (e.g.
+    // `https://runtime.commercecloud.com`). Browsers and the `cookie`
+    // package round-trip `:` and `/` cleanly without URL-encoding for
+    // every entry currently on STOREFRONT_PREVIEW_PARENT_ALLOW_LIST. If a
+    // future allow-list entry contains characters that need encoding,
+    // wrap this in encodeURIComponent (and decodeURIComponent on read).
     res.append(
         SET_COOKIE,
         cookieAsString({
@@ -108,6 +118,6 @@ export function readStorefrontPreviewMarker(req) {
     if (!cookieHeader) return undefined
     const cookies = cookie.parse(cookieHeader)
     const value = cookies[STOREFRONT_PREVIEW_CTX_COOKIE]
-    if (!value || !ALLOW_LIST.has(value)) return undefined
+    if (!value || !isAllowedParentOrigin(value)) return undefined
     return value
 }

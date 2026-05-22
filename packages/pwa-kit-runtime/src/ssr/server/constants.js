@@ -47,10 +47,17 @@ export const X_GRANT_TYPE = 'x-grant-type'
 // + Referer on the iframe document load). Read on later SLAS proxy
 // responses to choose SameSite=None; Partitioned over SameSite=Lax for
 // session cookies.
-export const STOREFRONT_PREVIEW_CTX_COOKIE = '__pwakit_preview_ctx'
+//
+// The `__Secure-` prefix is browser-enforced: cookies with this prefix are
+// rejected unless they carry the Secure attribute and originate from a
+// secure context. We always set Secure on this cookie, so the prefix adds
+// defense in depth at zero cost. (`__Host-` won't work because the cookie
+// can carry Domain= when commerceAPI.cookieDomain is configured.)
+export const STOREFRONT_PREVIEW_CTX_COOKIE = '__Secure-pwakit_preview_ctx'
 
 // Mirrors IFRAME_HOST_ALLOW_LIST in commerce-sdk-react/src/constant.ts.
-// Kept in sync via a parity test.
+// Kept in sync by a parity test in preview-context.test.js — drift will
+// fail the test.
 export const STOREFRONT_PREVIEW_PARENT_ALLOW_LIST = Object.freeze([
     'https://runtime.commercecloud.com',
     'https://runtime-admin-staging.mobify-storefront.com',
