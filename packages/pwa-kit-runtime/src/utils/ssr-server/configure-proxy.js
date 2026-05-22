@@ -129,7 +129,7 @@ export const setScapiAuthRequestHeaders = ({
  * (cloudfront-proxy-origin-rewriter.js), using exact cookie names based on siteId
  * rather than prefix matching.
  *
- * Removes: cc-at_{siteId}, cc-nx-g_{siteId}, cc-nx_{siteId}, idp_refresh_token_{siteId}, and dwsid.
+ * Removes: cc-at_{siteId}, cc-nx-g_{siteId}, cc-nx_{siteId}, idp_access_token_{siteId}, idp_refresh_token_{siteId}, and dwsid.
  * Any remaining cookies are preserved and forwarded.
  *
  * @private

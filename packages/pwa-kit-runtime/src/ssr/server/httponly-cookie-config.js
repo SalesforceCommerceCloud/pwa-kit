@@ -86,6 +86,7 @@ export const getCookieNamesToStripFromProxy = (siteId) => [
     getCookieName(SESSION_COOKIE_CONFIG.accessToken, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenGuest, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.refreshTokenRegistered, siteId),
+    getCookieName(SESSION_COOKIE_CONFIG.idpAccessToken, siteId),
     getCookieName(SESSION_COOKIE_CONFIG.idpRefreshToken, siteId),
     DWSID_COOKIE_NAME
 ]
