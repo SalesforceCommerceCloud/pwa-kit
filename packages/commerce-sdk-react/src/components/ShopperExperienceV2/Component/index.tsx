@@ -49,13 +49,16 @@ export const Component = memo(function Component({
     const componentWithRuntimeProps = component as ComponentType & {
         visible?: boolean
         localized?: boolean
+        contentLinkUuid?: string
+        fragment?: boolean
     }
     const designMetadata: ComponentDesignMetadata = {
         name: component.designMetadata?.name,
-        isFragment: false,
+        isFragment: Boolean(componentWithRuntimeProps.fragment),
         isVisible: Boolean(componentWithRuntimeProps.visible),
         isLocalized: Boolean(componentWithRuntimeProps.localized),
-        id: component.id
+        id: component.id,
+        contentLinkUuid: componentWithRuntimeProps.contentLinkUuid
     }
 
     // Cast DynamicComponent to accept our props since registry returns unknown type

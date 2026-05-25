@@ -18,13 +18,11 @@
 export const DATA_STORE_WINDOW_GLOBAL = '__MRT_DATA_STORE__'
 
 /**
- * Property under `window[DATA_STORE_WINDOW_GLOBAL]` for resolved site-scoped preferences.
- * (DAL key is still `<siteId>-custom-site-preferences`; this is only the bootstrap object shape.)
+ * Sentinel property under `window[DATA_STORE_WINDOW_GLOBAL]` carrying the resolved site id, so the
+ * client can construct the site DAL key (`<siteId>${CUSTOM_SITE_PREFERENCES_KEY_SUFFIX}`) without
+ * re-deriving it from app state.
  */
-export const DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY = 'customSitePreferences'
-
-/** Property under `window[DATA_STORE_WINDOW_GLOBAL]` for resolved global preferences. */
-export const DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY = 'customGlobalPreferences'
+export const DATA_STORE_BOOTSTRAP_SITE_ID_KEY = '__siteId'
 
 /**
  * DAL / Data Store key suffix; full key is `<siteId>${CUSTOM_SITE_PREFERENCES_KEY_SUFFIX}`.
