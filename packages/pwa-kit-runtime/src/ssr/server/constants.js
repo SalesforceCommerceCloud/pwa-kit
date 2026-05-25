@@ -48,12 +48,14 @@ export const X_GRANT_TYPE = 'x-grant-type'
 // responses to choose SameSite=None; Partitioned over SameSite=Lax for
 // session cookies.
 //
-// The `__Secure-` prefix is browser-enforced: cookies with this prefix are
-// rejected unless they carry the Secure attribute and originate from a
-// secure context. We always set Secure on this cookie, so the prefix adds
-// defense in depth at zero cost. (`__Host-` won't work because the cookie
-// can carry Domain= when commerceAPI.cookieDomain is configured.)
-export const STOREFRONT_PREVIEW_CTX_COOKIE = '__Secure-pwakit_preview_ctx'
+// The `__Host-` prefix is browser-enforced: cookies with this prefix are
+// rejected unless they carry `Secure`, `Path=/`, and *no* `Domain`
+// attribute. The marker is only ever read by the storefront BFF on the
+// same host that issued it, so host-scoping is the right shape — and
+// `__Host-` makes that invariant impossible to subvert later (no Domain
+// branch to maintain, no migration cleanup needed when `cookieDomain`
+// configuration changes).
+export const STOREFRONT_PREVIEW_CTX_COOKIE = '__Host-pwakit_preview_ctx'
 
 // Mirrors IFRAME_HOST_ALLOW_LIST in commerce-sdk-react/src/constant.ts.
 // Kept in sync by a parity test in preview-context.test.js — drift will
