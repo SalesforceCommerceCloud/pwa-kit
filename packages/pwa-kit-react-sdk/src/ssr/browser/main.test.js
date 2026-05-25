@@ -32,6 +32,30 @@ describe('main', function () {
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
+    test('OuterApp reads siteId from window.__MRT_DATA_STORE__ when present', () => {
+        uuidv4.mockReturnValueOnce('7f21aea5-6962-4162-8204-9da85c802023')
+        const oldPreloadedState = window.__PRELOADED_STATE__
+        const oldDataStore = window.__MRT_DATA_STORE__
+        window.__PRELOADED_STATE__ = {appProps: {}}
+        window.__MRT_DATA_STORE__ = {__siteId: 'RefArch'}
+        const App = () => <div>App</div>
+        const locals = {}
+        const props = {
+            error: undefined,
+            locals,
+            routes: getRoutes(locals),
+            WrappedApp: routeComponent(App, false, locals)
+        }
+        render(<OuterApp {...props} />)
+        expect(screen.getByText('App')).toBeInTheDocument()
+        window.__PRELOADED_STATE__ = oldPreloadedState
+        if (oldDataStore === undefined) {
+            delete window.__MRT_DATA_STORE__
+        } else {
+            window.__MRT_DATA_STORE__ = oldDataStore
+        }
+    })
+
     test('OuterApp triggers the error page when there is an error', () => {
         const oldWindowError = window.__ERROR__
         window.__ERROR__ = new errors.HTTPNotFound('Not found')

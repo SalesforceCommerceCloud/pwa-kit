@@ -7,11 +7,7 @@
 
 import {DataStore} from '../ssr-server/data-store'
 import {resetDataStoreProviderCacheForTests} from './data-store-utils'
-import {
-    DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY,
-    DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY,
-    DATA_STORE_WINDOW_GLOBAL
-} from './constants'
+import {DATA_STORE_WINDOW_GLOBAL} from './constants'
 import {getCustomSitePreferences} from './ssr-site-preferences.client'
 import {
     buildCustomSitePreferencesDataStoreKey,
@@ -24,29 +20,39 @@ describe('ssr-site-preferences', () => {
             delete window[DATA_STORE_WINDOW_GLOBAL]
         })
 
-        test('getCustomSitePreferences reads nested site payload', () => {
+        test('getCustomSitePreferences reads using DAL key', async () => {
+            const siteId = 'RefArch'
             window[DATA_STORE_WINDOW_GLOBAL] = {
-                [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: {flag: true},
-                [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: {}
+                'RefArch-custom-site-preferences': {flag: true},
+                'custom-global-preferences': {}
             }
-            expect(getCustomSitePreferences()).toEqual({flag: true})
+            expect(await getCustomSitePreferences({siteId})).toEqual({flag: true})
         })
 
-        test('returns {} when __MRT_DATA_STORE__ missing', () => {
-            expect(getCustomSitePreferences()).toEqual({})
+        test('returns {} when __MRT_DATA_STORE__ missing', async () => {
+            expect(await getCustomSitePreferences({siteId: 'RefArch'})).toEqual({})
         })
 
-        test('returns {} when nested site value is not a plain object', () => {
+        test('returns {} when siteId is missing', async () => {
             window[DATA_STORE_WINDOW_GLOBAL] = {
-                [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: [1, 2],
-                [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: {}
+                'RefArch-custom-site-preferences': {flag: true}
             }
-            expect(getCustomSitePreferences()).toEqual({})
+            expect(await getCustomSitePreferences({})).toEqual({})
+            expect(await getCustomSitePreferences({siteId: null})).toEqual({})
+            expect(await getCustomSitePreferences({siteId: ''})).toEqual({})
         })
 
-        test('returns {} when __MRT_DATA_STORE__ is not an object', () => {
+        test('returns {} when nested site value is not a plain object', async () => {
+            window[DATA_STORE_WINDOW_GLOBAL] = {
+                'RefArch-custom-site-preferences': [1, 2],
+                'custom-global-preferences': {}
+            }
+            expect(await getCustomSitePreferences({siteId: 'RefArch'})).toEqual({})
+        })
+
+        test('returns {} when __MRT_DATA_STORE__ is not an object', async () => {
             window[DATA_STORE_WINDOW_GLOBAL] = 'bad'
-            expect(getCustomSitePreferences()).toEqual({})
+            expect(await getCustomSitePreferences({siteId: 'RefArch'})).toEqual({})
         })
     })
 

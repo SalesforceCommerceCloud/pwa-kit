@@ -15,7 +15,22 @@ uplinks:
     cache: false
 
 # Allow anybody to publish any package, with no auth.
+# Monorepo packages must not proxy to npmjs so that locally published
+# versions always take precedence (lerna skips publish if the version
+# already exists on the upstream registry).
 packages:
+  '@salesforce/pwa-kit-*':
+    access: $all
+    publish: $all
+
+  '@salesforce/retail-react-app':
+    access: $all
+    publish: $all
+
+  '@salesforce/commerce-sdk-react':
+    access: $all
+    publish: $all
+
   '@*/*':
     access: $all
     publish: $all

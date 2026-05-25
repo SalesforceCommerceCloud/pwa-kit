@@ -21,9 +21,10 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {
-    DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY,
-    DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY,
-    DATA_STORE_WINDOW_GLOBAL
+    DATA_STORE_WINDOW_GLOBAL,
+    DATA_STORE_BOOTSTRAP_SITE_ID_KEY,
+    CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY,
+    CUSTOM_SITE_PREFERENCES_KEY_SUFFIX
 } from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
 import {
     getCustomGlobalPreferences,
@@ -35,7 +36,7 @@ import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
 import {shutdownServerTracing, tracePerformance} from './opentelemetry-server'
 
 import {getAssetUrl} from '../universal/utils'
-import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
+import {ServerContext, CorrelationIdProvider, MrtDataStoreProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -207,7 +208,9 @@ const performRender = async (req, res, next) => {
         res,
         App: WrappedApp,
         routes,
-        location
+        location,
+        customSitePreferences,
+        customGlobalPreferences
     }
     let appJSX = <OuterApp {...props} />
 
@@ -303,7 +306,18 @@ export const render = (req, res, next) => {
     }
 }
 
-const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
+const OuterApp = ({
+    req,
+    res,
+    error,
+    App,
+    appState,
+    routes,
+    routerContext,
+    location,
+    customSitePreferences,
+    customGlobalPreferences
+}) => {
     const AppConfig = getAppConfig()
     const routerBasename = getRouterBasePath() || undefined
 
@@ -314,9 +328,15 @@ const OuterApp = ({req, res, error, App, appState, routes, routerContext, locati
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
                 >
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
+                    <MrtDataStoreProvider
+                        siteId={res.locals.site?.id}
+                        customSitePreferences={customSitePreferences}
+                        customGlobalPreferences={customGlobalPreferences}
+                    >
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </MrtDataStoreProvider>
                 </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>
@@ -331,7 +351,9 @@ OuterApp.propTypes = {
     appState: PropTypes.object,
     routes: PropTypes.array,
     routerContext: PropTypes.object,
-    location: PropTypes.object
+    location: PropTypes.object,
+    customSitePreferences: PropTypes.object,
+    customGlobalPreferences: PropTypes.object
 }
 
 const renderToString = (jsx, extractor) =>
@@ -420,9 +442,16 @@ const renderApp = (args) => {
     }
 
     if (mrtDataStoreEnabled) {
+        const siteId = res.locals.site?.id
+        // Serialize using DAL keys for consistency with backend storage
         windowGlobals[DATA_STORE_WINDOW_GLOBAL] = {
-            [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: customSitePreferences ?? {},
-            [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: customGlobalPreferences ?? {}
+            [DATA_STORE_BOOTSTRAP_SITE_ID_KEY]: siteId, // Include siteId so client can construct keys
+            [CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY]: customGlobalPreferences ?? {}
+        }
+        // Add site preferences only if we have a siteId
+        if (siteId) {
+            const siteKey = `${siteId}${CUSTOM_SITE_PREFERENCES_KEY_SUFFIX}`
+            windowGlobals[DATA_STORE_WINDOW_GLOBAL][siteKey] = customSitePreferences ?? {}
         }
     }
 
