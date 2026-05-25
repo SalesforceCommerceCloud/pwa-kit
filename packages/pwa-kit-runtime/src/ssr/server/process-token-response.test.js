@@ -466,7 +466,7 @@ describe('expireHttpOnlySessionCookies', () => {
             'id_token_testsite',
             'idp_refresh_token_testsite',
             // Storefront-preview marker — cleared on logout so it doesn't outlive the session.
-            '__Secure-pwakit_preview_ctx'
+            '__Host-pwakit_preview_ctx'
         ]
 
         expect(res.cookies).toHaveLength(expectedCookieKeys.length)
@@ -634,12 +634,14 @@ describe('cookieDomain support', () => {
             'usid_testsite',
             'cc-nx-expires_testsite',
             'id_token_testsite',
-            'idp_refresh_token_testsite',
-            // Storefront-preview marker — also expired here, with both
-            // domain-scoped and host-scoped cleanup writes.
-            '__Secure-pwakit_preview_ctx'
+            'idp_refresh_token_testsite'
         ]
-        expect(res.cookies).toHaveLength(allCookieNames.length * 2)
+        // Each session cookie is expired with both a domain-scoped and a
+        // host-scoped Set-Cookie (host-scoped is the migration cleanup for
+        // pre-cookieDomain deploys). The marker cookie uses the `__Host-`
+        // prefix and is always host-scoped — exactly one deletion, never a
+        // domain-scoped duplicate.
+        expect(res.cookies).toHaveLength(allCookieNames.length * 2 + 1)
 
         for (const name of allCookieNames) {
             const matches = findCookies(res.cookies, name)
@@ -653,12 +655,17 @@ describe('cookieDomain support', () => {
             expect(domainScoped.expires).toEqual(new Date(0))
             expect(hostScoped.expires).toEqual(new Date(0))
         }
+
+        // Marker: exactly one deletion, host-scoped (no Domain).
+        const markerDeletions = findCookies(res.cookies, '__Host-pwakit_preview_ctx')
+        expect(markerDeletions).toHaveLength(1)
+        expect(markerDeletions[0].domain).toBeUndefined()
     })
 })
 
 describe('trusted Storefront Preview iframe', () => {
     const TRUSTED_PARENT = 'https://runtime-admin-preview.mobify-storefront.com'
-    const MARKER = '__Secure-pwakit_preview_ctx'
+    const MARKER = '__Host-pwakit_preview_ctx'
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -773,9 +780,13 @@ describe('trusted Storefront Preview iframe', () => {
         expect(markerDeletion).toMatch(/HttpOnly/i)
         expect(markerDeletion).toMatch(/Secure/i)
         expect(markerDeletion).toMatch(/Path=\//i)
+        // The marker uses the `__Host-` prefix so it never carries a Domain
+        // attribute — even when commerceAPI.cookieDomain is configured for
+        // session cookies.
+        expect(markerDeletion).not.toMatch(/Domain=/i)
     })
 
-    test('expireHttpOnlySessionCookies clears both domain-scoped and host-scoped marker cookies when cookieDomain is set', () => {
+    test('marker deletion never carries a Domain attribute, even when cookieDomain is configured', () => {
         const res = makeRes()
         expireHttpOnlySessionCookies(
             makeReqWithMarker(TRUSTED_PARENT),
@@ -784,8 +795,9 @@ describe('trusted Storefront Preview iframe', () => {
         )
 
         const markerDeletions = res.cookies.filter((c) => c.startsWith(`${MARKER}=`))
-        expect(markerDeletions).toHaveLength(2)
-        expect(markerDeletions.some((c) => /Domain=\.example\.com/i.test(c))).toBe(true)
-        expect(markerDeletions.some((c) => !/Domain=/i.test(c))).toBe(true)
+        // Exactly one deletion — the `__Host-` prefix forbids Domain, so
+        // there is no domain-scoped duplicate to emit.
+        expect(markerDeletions).toHaveLength(1)
+        expect(markerDeletions[0]).not.toMatch(/Domain=/i)
     })
 })

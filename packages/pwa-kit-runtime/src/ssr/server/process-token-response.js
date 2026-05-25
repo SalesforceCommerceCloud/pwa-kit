@@ -380,5 +380,5 @@ export function expireHttpOnlySessionCookies(req, res, options) {
     // Also expire the marker cookie itself, so the iframe-context state
     // doesn't outlive the SLAS session it was associated with. The marker
     // re-issues on the next qualifying iframe document load.
-    clearStorefrontPreviewMarker(res, options)
+    clearStorefrontPreviewMarker(res)
 }
