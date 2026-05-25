@@ -133,12 +133,41 @@ describe('tryWriteStorefrontPreviewMarker', () => {
         expect(res.setCookies[0]).toContain('Domain=.example.com')
     })
 
-    test('omits Domain when cookieDomain is malformed', () => {
+    test('emits a host-scoped cleanup deletion when cookieDomain is configured (migration from pre-cookieDomain markers)', () => {
+        const req = makeReq()
+        const res = makeRes()
+        tryWriteStorefrontPreviewMarker(req, res, {
+            mobify: {app: {commerceAPI: {cookieDomain: '.example.com'}}}
+        })
+
+        expect(res.setCookies).toHaveLength(2)
+
+        const [primary, cleanup] = res.setCookies
+
+        // Primary write: domain-scoped, carries the validated parent origin.
+        expect(primary).toContain(`${STOREFRONT_PREVIEW_CTX_COOKIE}=${TRUSTED_PARENT}`)
+        expect(primary).toContain('Domain=.example.com')
+
+        // Cleanup write: host-scoped (no Domain), expired, mirroring all
+        // attributes of the original so browsers recognize the deletion.
+        expect(cleanup).toContain(`${STOREFRONT_PREVIEW_CTX_COOKIE}=;`)
+        expect(cleanup).not.toContain('Domain=')
+        expect(cleanup).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT')
+        expect(cleanup).toContain('SameSite=none')
+        expect(cleanup).toContain('Partitioned')
+        expect(cleanup).toContain('Secure')
+        expect(cleanup).toContain('HttpOnly')
+        expect(cleanup).toContain('Path=/')
+    })
+
+    test('omits Domain and emits only one cookie when cookieDomain is malformed', () => {
         const req = makeReq()
         const res = makeRes()
         tryWriteStorefrontPreviewMarker(req, res, {
             mobify: {app: {commerceAPI: {cookieDomain: 'bad domain'}}}
         })
+
+        expect(res.setCookies).toHaveLength(1)
         expect(res.setCookies[0]).not.toContain('Domain=')
     })
 })

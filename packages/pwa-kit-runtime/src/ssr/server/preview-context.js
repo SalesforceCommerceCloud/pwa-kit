@@ -85,6 +85,13 @@ export function tryWriteStorefrontPreviewMarker(req, res, options) {
     if (!parentOrigin) return
 
     const cookieDomain = getValidatedCookieDomain(options)
+    const baseAttrs = {
+        path: '/',
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none',
+        partitioned: true
+    }
     // The parent origin is written as the cookie value as-is (e.g.
     // `https://runtime.commercecloud.com`). Browsers and the `cookie`
     // package round-trip `:` and `/` cleanly without URL-encoding for
@@ -96,14 +103,27 @@ export function tryWriteStorefrontPreviewMarker(req, res, options) {
         cookieAsString({
             name: STOREFRONT_PREVIEW_CTX_COOKIE,
             value: parentOrigin,
-            path: '/',
-            secure: true,
-            httpOnly: true,
-            sameSite: 'none',
-            partitioned: true,
+            ...baseAttrs,
             ...(cookieDomain && {domain: cookieDomain})
         })
     )
+    // When `cookieDomain` is configured, also expire any pre-existing
+    // host-scoped marker so a deploy that turns on `cookieDomain`
+    // mid-flight doesn't leave a duplicate marker behind. Mirrors the
+    // host-vs-domain cleanup pattern in `makeAppendCookie`. Same
+    // attributes as the original write (Partitioned-cookie deletion is
+    // partition-keyed and must match SameSite/Partitioned).
+    if (cookieDomain) {
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name: STOREFRONT_PREVIEW_CTX_COOKIE,
+                value: '',
+                expires: new Date(0),
+                ...baseAttrs
+            })
+        )
+    }
 }
 
 /**
