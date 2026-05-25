@@ -7,7 +7,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {tryWriteStorefrontPreviewMarker, readStorefrontPreviewMarker} from './preview-context'
-import {_resetWarnedDomainsForTesting} from './cookie-domain'
 import {STOREFRONT_PREVIEW_CTX_COOKIE, STOREFRONT_PREVIEW_PARENT_ALLOW_LIST} from './constants'
 
 const TRUSTED_PARENT = 'https://runtime-admin-preview.mobify-storefront.com'
@@ -35,15 +34,11 @@ const makeRes = () => {
 }
 
 describe('tryWriteStorefrontPreviewMarker', () => {
-    beforeEach(() => {
-        _resetWarnedDomainsForTesting()
-    })
-
     test('emits the marker when GET + iframe + cross-site + Referer is on the allow-list', () => {
         const req = makeReq()
         const res = makeRes()
 
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
 
         expect(res.setCookies).toHaveLength(1)
         const c = res.setCookies[0]
@@ -53,9 +48,23 @@ describe('tryWriteStorefrontPreviewMarker', () => {
         expect(c).toContain('HttpOnly')
         expect(c).toContain('SameSite=none')
         expect(c).toContain('Partitioned')
+        // The cookie name carries the `__Host-` prefix, which the browser
+        // refuses to set with a Domain attribute. Defense in depth: assert
+        // we never emit one.
+        expect(c).not.toMatch(/Domain=/i)
         // No Expires/Max-Age — session cookie.
         expect(c).not.toMatch(/Expires=/)
         expect(c).not.toMatch(/Max-Age=/)
+    })
+
+    test('emits the marker when Sec-Fetch-Site is same-site (non-prod RA testing where parent and storefront share an eTLD+1)', () => {
+        const req = makeReq({headers: {'sec-fetch-site': 'same-site'}})
+        const res = makeRes()
+
+        tryWriteStorefrontPreviewMarker(req, res)
+
+        expect(res.setCookies).toHaveLength(1)
+        expect(res.setCookies[0]).toContain(`${STOREFRONT_PREVIEW_CTX_COOKIE}=${TRUSTED_PARENT}`)
     })
 
     test.each(STOREFRONT_PREVIEW_PARENT_ALLOW_LIST)(
@@ -64,7 +73,7 @@ describe('tryWriteStorefrontPreviewMarker', () => {
             const req = makeReq({headers: {referer: `${origin}/x`}})
             const res = makeRes()
 
-            tryWriteStorefrontPreviewMarker(req, res, {})
+            tryWriteStorefrontPreviewMarker(req, res)
 
             expect(res.setCookies).toHaveLength(1)
             expect(res.setCookies[0]).toContain(`=${origin}`)
@@ -74,28 +83,35 @@ describe('tryWriteStorefrontPreviewMarker', () => {
     test('does nothing for POST', () => {
         const req = makeReq({method: 'POST'})
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
     test('does nothing when Sec-Fetch-Dest is not iframe', () => {
         const req = makeReq({headers: {'sec-fetch-dest': 'document'}})
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
     test('does nothing when Sec-Fetch-Site is same-origin', () => {
         const req = makeReq({headers: {'sec-fetch-site': 'same-origin'}})
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
+        expect(res.setCookies).toHaveLength(0)
+    })
+
+    test('does nothing when Sec-Fetch-Site is none (top-level navigation)', () => {
+        const req = makeReq({headers: {'sec-fetch-site': 'none'}})
+        const res = makeRes()
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
     test('does nothing when Referer origin is not on the allow-list', () => {
         const req = makeReq({headers: {referer: 'https://evil.example.com/x'}})
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
@@ -103,14 +119,14 @@ describe('tryWriteStorefrontPreviewMarker', () => {
         const req = makeReq()
         delete req.headers.referer
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
     test('does nothing when Referer is unparseable', () => {
         const req = makeReq({headers: {referer: 'not-a-url'}})
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
     })
 
@@ -120,55 +136,8 @@ describe('tryWriteStorefrontPreviewMarker', () => {
             headers: {referer: `${TRUSTED_PARENT}/x`}
         }
         const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {})
+        tryWriteStorefrontPreviewMarker(req, res)
         expect(res.setCookies).toHaveLength(0)
-    })
-
-    test('includes Domain when commerceAPI.cookieDomain is configured', () => {
-        const req = makeReq()
-        const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {
-            mobify: {app: {commerceAPI: {cookieDomain: '.example.com'}}}
-        })
-        expect(res.setCookies[0]).toContain('Domain=.example.com')
-    })
-
-    test('emits a host-scoped cleanup deletion when cookieDomain is configured (migration from pre-cookieDomain markers)', () => {
-        const req = makeReq()
-        const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {
-            mobify: {app: {commerceAPI: {cookieDomain: '.example.com'}}}
-        })
-
-        expect(res.setCookies).toHaveLength(2)
-
-        const [primary, cleanup] = res.setCookies
-
-        // Primary write: domain-scoped, carries the validated parent origin.
-        expect(primary).toContain(`${STOREFRONT_PREVIEW_CTX_COOKIE}=${TRUSTED_PARENT}`)
-        expect(primary).toContain('Domain=.example.com')
-
-        // Cleanup write: host-scoped (no Domain), expired, mirroring all
-        // attributes of the original so browsers recognize the deletion.
-        expect(cleanup).toContain(`${STOREFRONT_PREVIEW_CTX_COOKIE}=;`)
-        expect(cleanup).not.toContain('Domain=')
-        expect(cleanup).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT')
-        expect(cleanup).toContain('SameSite=none')
-        expect(cleanup).toContain('Partitioned')
-        expect(cleanup).toContain('Secure')
-        expect(cleanup).toContain('HttpOnly')
-        expect(cleanup).toContain('Path=/')
-    })
-
-    test('omits Domain and emits only one cookie when cookieDomain is malformed', () => {
-        const req = makeReq()
-        const res = makeRes()
-        tryWriteStorefrontPreviewMarker(req, res, {
-            mobify: {app: {commerceAPI: {cookieDomain: 'bad domain'}}}
-        })
-
-        expect(res.setCookies).toHaveLength(1)
-        expect(res.setCookies[0]).not.toContain('Domain=')
     })
 })
 

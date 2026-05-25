@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import cookie from 'cookie'
 import {cookieAsString} from '../../utils/ssr-proxying'
-import {getValidatedCookieDomain} from './cookie-domain'
 import {
     SET_COOKIE,
     STOREFRONT_PREVIEW_CTX_COOKIE,
@@ -18,6 +16,40 @@ const SEC_FETCH_SITE = 'sec-fetch-site'
 const REFERER = 'referer'
 
 const isAllowedParentOrigin = (origin) => STOREFRONT_PREVIEW_PARENT_ALLOW_LIST.includes(origin)
+
+// Browser-enforced attributes for the `__Host-` prefixed marker cookie.
+// `__Host-` rejects the cookie unless it carries Secure + Path=/ and has
+// no Domain attribute. Used by both the writer (set on iframe doc load)
+// and the clearer (deletion on logout) so the deletion's attributes match
+// the original write — Partitioned-cookie deletion is partition-keyed and
+// the SameSite/Partitioned attributes must match for the browser to
+// honor the deletion.
+const MARKER_BASE_ATTRS = Object.freeze({
+    path: '/',
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+    partitioned: true
+})
+
+/**
+ * Reads a single cookie value from a `Cookie` header. Inline so we don't
+ * pull in the `cookie` package as a direct dependency. Marker values are
+ * known origin strings (no URL-encoded characters), so split-and-prefix
+ * is sufficient — does not handle the full RFC 6265 cookie grammar.
+ * @private
+ */
+function getCookieValue(cookieHeader, name) {
+    if (!cookieHeader) return undefined
+    const target = `${name}=`
+    for (const pair of cookieHeader.split(';')) {
+        const trimmed = pair.trimStart()
+        if (trimmed.startsWith(target)) {
+            return trimmed.slice(target.length)
+        }
+    }
+    return undefined
+}
 
 /**
  * Parses the Referer header and returns its origin, or undefined when the
@@ -40,13 +72,19 @@ function getRefererOrigin(req) {
  * Storefront Preview iframe. Otherwise returns undefined.
  *
  * Detection relies entirely on browser-attested headers:
- *  - Sec-Fetch-Dest: iframe       — only set on iframe document loads
- *  - Sec-Fetch-Site: cross-site   — set when the navigating frame's parent
- *                                    is on a different site
- *  - Referer origin               — preserved on cross-origin navigations
- *                                    when the parent uses a referrer policy
- *                                    that exposes the origin (Runtime Admin
- *                                    uses strict-origin-when-cross-origin)
+ *  - Sec-Fetch-Dest: iframe                — only set on iframe document loads
+ *  - Sec-Fetch-Site: cross-site|same-site  — set when the navigating frame's
+ *                                             parent is on a different origin.
+ *                                             `cross-site` covers production
+ *                                             (RA on commercecloud.com,
+ *                                             storefront on mobify-storefront.com).
+ *                                             `same-site` covers non-prod
+ *                                             scenarios where both share an
+ *                                             eTLD+1 (e.g. *.mobify-storefront.com).
+ *  - Referer origin                        — preserved on cross-origin navigations
+ *                                             when the parent uses a referrer policy
+ *                                             that exposes the origin (Runtime Admin
+ *                                             uses strict-origin-when-cross-origin).
  *
  * `Sec-Fetch-*` headers are in the browser's forbidden-header list, so they
  * cannot be set from cross-origin JS. An attacker cannot trigger this gate.
@@ -60,7 +98,8 @@ function getRefererOrigin(req) {
 function detectTrustedPreviewParent(req) {
     if (req.method !== 'GET') return undefined
     if (req.headers?.[SEC_FETCH_DEST] !== 'iframe') return undefined
-    if (req.headers?.[SEC_FETCH_SITE] !== 'cross-site') return undefined
+    const fetchSite = req.headers?.[SEC_FETCH_SITE]
+    if (fetchSite !== 'cross-site' && fetchSite !== 'same-site') return undefined
     const origin = getRefererOrigin(req)
     if (!origin || !isAllowedParentOrigin(origin)) return undefined
     return origin
@@ -73,28 +112,38 @@ function detectTrustedPreviewParent(req) {
  * read on later SLAS proxy responses to switch session cookies to
  * SameSite=None; Partitioned. No-ops on every other request shape.
  *
- * Cookie attributes:
+ * Cookie attributes (browser-enforced via the `__Host-` prefix):
  *   Path=/; Secure; HttpOnly; SameSite=None; Partitioned
- *   plus Domain=... when commerceAPI.cookieDomain is configured.
+ *   No `Domain` attribute — the marker is host-scoped on purpose, since it
+ *   is only ever read by the storefront BFF on the same host that issued
+ *   it. `__Host-` rejects the cookie at the browser if any of these
+ *   invariants are violated.
  *
  * Session cookie (no Expires/Max-Age) — the marker is re-issued on every
  * qualifying request, and clears when the preview window closes.
+ *
+ * Trade-off (host-scope vs. cross-subdomain in-iframe navigation):
+ *   The marker does not travel across subdomains. If a preview iframe ever
+ *   navigates from `app.example.com` to `checkout.example.com` (both are
+ *   storefront BFF hosts under the same eTLD+1), the BFF on the new host
+ *   won't see the marker and will fall back to SameSite=Lax for any
+ *   session cookies it issues — which the browser strips in the cross-site
+ *   iframe context, breaking the iframe on the second host. Storefront
+ *   Preview's actual flow doesn't exercise this case (Runtime Admin sets
+ *   `iframe.src` once and uses postMessage `locationChange` for in-iframe
+ *   nav, which stays on the same host), but it's worth knowing if a
+ *   merchant's PWA spans subdomains via direct in-iframe navigation. The
+ *   intentional cost of `__Host-`: a stronger browser-enforced contract
+ *   (no Domain branch, no host-vs-domain migration cleanup) at the price
+ *   of this niche scenario.
  */
-export function tryWriteStorefrontPreviewMarker(req, res, options) {
+export function tryWriteStorefrontPreviewMarker(req, res) {
     const parentOrigin = detectTrustedPreviewParent(req)
     if (!parentOrigin) return
 
-    const cookieDomain = getValidatedCookieDomain(options)
-    const baseAttrs = {
-        path: '/',
-        secure: true,
-        httpOnly: true,
-        sameSite: 'none',
-        partitioned: true
-    }
     // The parent origin is written as the cookie value as-is (e.g.
-    // `https://runtime.commercecloud.com`). Browsers and the `cookie`
-    // package round-trip `:` and `/` cleanly without URL-encoding for
+    // `https://runtime.commercecloud.com`). Browsers and our inline
+    // parser round-trip `:` and `/` cleanly without URL-encoding for
     // every entry currently on STOREFRONT_PREVIEW_PARENT_ALLOW_LIST. If a
     // future allow-list entry contains characters that need encoding,
     // wrap this in encodeURIComponent (and decodeURIComponent on read).
@@ -103,27 +152,9 @@ export function tryWriteStorefrontPreviewMarker(req, res, options) {
         cookieAsString({
             name: STOREFRONT_PREVIEW_CTX_COOKIE,
             value: parentOrigin,
-            ...baseAttrs,
-            ...(cookieDomain && {domain: cookieDomain})
+            ...MARKER_BASE_ATTRS
         })
     )
-    // When `cookieDomain` is configured, also expire any pre-existing
-    // host-scoped marker so a deploy that turns on `cookieDomain`
-    // mid-flight doesn't leave a duplicate marker behind. Mirrors the
-    // host-vs-domain cleanup pattern in `makeAppendCookie`. Same
-    // attributes as the original write (Partitioned-cookie deletion is
-    // partition-keyed and must match SameSite/Partitioned).
-    if (cookieDomain) {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: STOREFRONT_PREVIEW_CTX_COOKIE,
-                value: '',
-                expires: new Date(0),
-                ...baseAttrs
-            })
-        )
-    }
 }
 
 /**
@@ -134,54 +165,30 @@ export function tryWriteStorefrontPreviewMarker(req, res, options) {
  * been impossible to set legitimately.
  */
 export function readStorefrontPreviewMarker(req) {
-    const cookieHeader = req.headers?.cookie
-    if (!cookieHeader) return undefined
-    const cookies = cookie.parse(cookieHeader)
-    const value = cookies[STOREFRONT_PREVIEW_CTX_COOKIE]
+    const value = getCookieValue(req.headers?.cookie, STOREFRONT_PREVIEW_CTX_COOKIE)
     if (!value || !isAllowedParentOrigin(value)) return undefined
     return value
 }
 
 /**
- * Append Set-Cookie header(s) to expire the storefront-preview marker
+ * Append a Set-Cookie header to expire the storefront-preview marker
  * cookie. Used on logout (called from `expireHttpOnlySessionCookies`) so
  * the marker doesn't outlive the session it was associated with.
  *
- * Mirrors the attributes the writer used (Path, Secure, HttpOnly,
- * SameSite=None, Partitioned, Domain) so browsers recognize the deletion
- * — for Partitioned cookies, deletion is partition-specific and must
- * carry Partitioned to match. When `cookieDomain` is configured, also
- * emits a host-scoped deletion to clean up any pre-cookieDomain marker.
+ * Mirrors `MARKER_BASE_ATTRS` exactly — Partitioned-cookie deletion is
+ * partition-keyed, and the deletion's SameSite/Partitioned/Path/Secure
+ * attributes must match the original write or the browser ignores the
+ * deletion. No `Domain` work needed: `__Host-` ensures the marker has
+ * always been host-scoped.
  */
-export function clearStorefrontPreviewMarker(res, options) {
-    const cookieDomain = getValidatedCookieDomain(options)
-    const expired = new Date(0)
-    const baseAttrs = {
-        path: '/',
-        secure: true,
-        httpOnly: true,
-        sameSite: 'none',
-        partitioned: true
-    }
+export function clearStorefrontPreviewMarker(res) {
     res.append(
         SET_COOKIE,
         cookieAsString({
             name: STOREFRONT_PREVIEW_CTX_COOKIE,
             value: '',
-            expires: expired,
-            ...baseAttrs,
-            ...(cookieDomain && {domain: cookieDomain})
+            expires: new Date(0),
+            ...MARKER_BASE_ATTRS
         })
     )
-    if (cookieDomain) {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name: STOREFRONT_PREVIEW_CTX_COOKIE,
-                value: '',
-                expires: expired,
-                ...baseAttrs
-            })
-        )
-    }
 }

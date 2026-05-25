@@ -1733,7 +1733,7 @@ export const RemoteServerFactory = {
         // SameSite=None; Partitioned (CHIPS) instead of SameSite=Lax.
         if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
             app.use((req, res, next) => {
-                tryWriteStorefrontPreviewMarker(req, res, options)
+                tryWriteStorefrontPreviewMarker(req, res)
                 next()
             })
         }
