@@ -8,7 +8,7 @@
 import React, {useRef} from 'react'
 import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
+import {ServerContext, CorrelationIdProvider, MrtDataStoreProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
@@ -18,6 +18,10 @@ import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
 import {getRouterBasePath} from '../universal/utils'
+import {
+    DATA_STORE_WINDOW_GLOBAL,
+    DATA_STORE_BOOTSTRAP_SITE_ID_KEY
+} from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -47,6 +51,10 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const isInitialPageRef = useRef(true)
     const routerBasename = getRouterBasePath() || undefined
 
+    // Get siteId from the MRT Data Store bootstrap if available
+    const dataStore = typeof window !== 'undefined' ? window[DATA_STORE_WINDOW_GLOBAL] : undefined
+    const siteId = dataStore ? dataStore[DATA_STORE_BOOTSTRAP_SITE_ID_KEY] : undefined
+
     return (
         <ServerContext.Provider value={{}}>
             <Router ref={onHydrate} basename={routerBasename}>
@@ -60,14 +68,16 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
                         return uuidv4()
                     }}
                 >
-                    <AppConfig locals={locals}>
-                        <Switch
-                            error={error}
-                            appState={window.__PRELOADED_STATE__}
-                            routes={routes}
-                            App={WrappedApp}
-                        />
-                    </AppConfig>
+                    <MrtDataStoreProvider siteId={siteId}>
+                        <AppConfig locals={locals}>
+                            <Switch
+                                error={error}
+                                appState={window.__PRELOADED_STATE__}
+                                routes={routes}
+                                App={WrappedApp}
+                            />
+                        </AppConfig>
+                    </MrtDataStoreProvider>
                 </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>

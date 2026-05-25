@@ -18,9 +18,16 @@ type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 export type Page = DataType<Client['getPage']>
 
-export type Region = ArrayElement<NonNullable<Page['regions']>>
+type BaseRegion = ArrayElement<NonNullable<Page['regions']>>
+type BaseComponent = ArrayElement<NonNullable<BaseRegion['components']>>
 
-export type Component = ArrayElement<NonNullable<Region['components']>>
+export type Component = BaseComponent & {
+    contentLinkUuid?: string
+}
+
+export type Region = Omit<BaseRegion, 'components'> & {
+    components?: Component[]
+}
 
 /**
  * Extended Page type with design metadata and component data

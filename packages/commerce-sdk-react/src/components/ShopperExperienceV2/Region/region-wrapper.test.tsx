@@ -10,14 +10,11 @@ import {RegionWrapper, RegionRendererProps} from './region-wrapper'
 
 const mockUsePageDesignerMode = jest.fn(() => ({isDesignMode: false}))
 
-jest.mock('@salesforce/storefront-next-runtime/design/react/core', () => ({
-    usePageDesignerMode: () => mockUsePageDesignerMode()
-}))
-
-jest.mock('@salesforce/storefront-next-runtime/design/react', () => {
+jest.mock('@salesforce/storefront-next-runtime/design/react/core', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mockReact = require('react')
     return {
+        usePageDesignerMode: () => mockUsePageDesignerMode(),
         createReactRegionDesignDecorator: (Component: typeof mockReact.ComponentType) => {
             return function DecoratedComponent(props: Record<string, unknown>) {
                 return mockReact.createElement(
@@ -155,14 +152,14 @@ describe('RegionWrapper', () => {
             mockUsePageDesignerMode.mockReturnValue({isDesignMode: true})
         })
 
-        test('computes componentIds from region components', () => {
+        test('computes contentLinkUuids from region components', () => {
             render(
                 <RegionWrapper region={mockRegion}>
                     <div>Content</div>
                 </RegionWrapper>
             )
 
-            // The component should compute componentIds: ['comp-1', 'comp-2']
+            // The component should compute contentLinkUuids: ['comp-1', 'comp-2']
             expect(screen.getByTestId('decorated-region')).toBeInTheDocument()
         })
 
@@ -199,6 +196,57 @@ describe('RegionWrapper', () => {
         test('uses default empty arrays when designMetadata is not provided', () => {
             render(
                 <RegionWrapper region={mockRegion}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
+
+        test('uses contentLinkUuid for contentLinkUuids when present', () => {
+            const regionWithUuids = {
+                id: 'test-region',
+                components: [
+                    {id: 'comp-1', typeId: 'banner', contentLinkUuid: 'uuid-001'},
+                    {id: 'comp-2', typeId: 'carousel', contentLinkUuid: 'uuid-002'}
+                ]
+            }
+
+            render(
+                <RegionWrapper region={regionWithUuids}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
+
+        test('falls back to id when contentLinkUuid is not present', () => {
+            const regionWithoutUuids = {
+                id: 'test-region',
+                components: [{id: 'comp-1', typeId: 'banner'}]
+            }
+
+            render(
+                <RegionWrapper region={regionWithoutUuids}>
+                    <div data-testid="child-content">Content</div>
+                </RegionWrapper>
+            )
+
+            expect(screen.getByTestId('child-content')).toBeInTheDocument()
+        })
+
+        test('handles mixed components with and without contentLinkUuid', () => {
+            const regionMixed = {
+                id: 'test-region',
+                components: [
+                    {id: 'comp-1', typeId: 'banner', contentLinkUuid: 'uuid-001'},
+                    {id: 'comp-2', typeId: 'carousel'} // No UUID
+                ]
+            }
+
+            render(
+                <RegionWrapper region={regionMixed}>
                     <div data-testid="child-content">Content</div>
                 </RegionWrapper>
             )

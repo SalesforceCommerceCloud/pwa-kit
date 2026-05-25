@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY, DATA_STORE_WINDOW_GLOBAL} from './constants'
+import {DATA_STORE_WINDOW_GLOBAL, CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY} from './constants'
 import {warnIfMrtDataStoreBootstrapMissing} from './logging-utils'
 
 /**
@@ -17,17 +17,23 @@ import {warnIfMrtDataStoreBootstrapMissing} from './logging-utils'
  *
  * **Note:** Not called by the PWA Kit framework or template apps today; intended for customer code.
  *
- * @returns {Record<string, unknown>}
+ * **Client-side behavior:** Uses the DAL key `custom-global-preferences` to read from
+ * `window.__MRT_DATA_STORE__`, matching the server-side storage format.
+ *
+ * @returns {Promise<Record<string, unknown>>}
  */
-export function getCustomGlobalPreferences() {
+export async function getCustomGlobalPreferences() {
     if (typeof window === 'undefined') {
         return {}
     }
     warnIfMrtDataStoreBootstrapMissing()
     const root = window[DATA_STORE_WINDOW_GLOBAL]
+
+    // Use DAL key: custom-global-preferences
     const value =
         root && typeof root === 'object' && !Array.isArray(root)
-            ? root[DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]
+            ? root[CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY]
             : undefined
+
     return value && typeof value === 'object' && !Array.isArray(value) ? value : {}
 }
