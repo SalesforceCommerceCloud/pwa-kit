@@ -7,12 +7,7 @@
 
 import {DataStore} from '../ssr-server/data-store'
 import {resetDataStoreProviderCacheForTests} from './data-store-utils'
-import {
-    CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY,
-    DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY,
-    DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY,
-    DATA_STORE_WINDOW_GLOBAL
-} from './constants'
+import {CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY, DATA_STORE_WINDOW_GLOBAL} from './constants'
 import {getCustomGlobalPreferences} from './ssr-global-preferences.client'
 import {
     buildCustomGlobalPreferencesDataStoreKey,
@@ -25,29 +20,29 @@ describe('ssr-global-preferences', () => {
             delete window[DATA_STORE_WINDOW_GLOBAL]
         })
 
-        test('getCustomGlobalPreferences reads nested global payload', () => {
+        test('getCustomGlobalPreferences reads using DAL key', async () => {
             window[DATA_STORE_WINDOW_GLOBAL] = {
-                [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: {},
-                [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: {org: 1}
+                'RefArch-custom-site-preferences': {},
+                'custom-global-preferences': {org: 1}
             }
-            expect(getCustomGlobalPreferences()).toEqual({org: 1})
+            expect(await getCustomGlobalPreferences()).toEqual({org: 1})
         })
 
-        test('returns {} when __MRT_DATA_STORE__ missing', () => {
-            expect(getCustomGlobalPreferences()).toEqual({})
+        test('returns {} when __MRT_DATA_STORE__ missing', async () => {
+            expect(await getCustomGlobalPreferences()).toEqual({})
         })
 
-        test('returns {} when nested global value is not a plain object', () => {
+        test('returns {} when nested global value is not a plain object', async () => {
             window[DATA_STORE_WINDOW_GLOBAL] = {
-                [DATA_STORE_BOOTSTRAP_SITE_PREFERENCES_KEY]: {},
-                [DATA_STORE_BOOTSTRAP_GLOBAL_PREFERENCES_KEY]: 'x'
+                'RefArch-custom-site-preferences': {},
+                'custom-global-preferences': 'x'
             }
-            expect(getCustomGlobalPreferences()).toEqual({})
+            expect(await getCustomGlobalPreferences()).toEqual({})
         })
 
-        test('returns {} when __MRT_DATA_STORE__ is not an object', () => {
+        test('returns {} when __MRT_DATA_STORE__ is not an object', async () => {
             window[DATA_STORE_WINDOW_GLOBAL] = 'bad'
-            expect(getCustomGlobalPreferences()).toEqual({})
+            expect(await getCustomGlobalPreferences()).toEqual({})
         })
     })
 
