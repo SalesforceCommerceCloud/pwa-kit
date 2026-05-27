@@ -60,11 +60,13 @@ describe('Content-Security-Policy enforcement', () => {
         defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         // The runtime-admin host list mirrors STOREFRONT_PREVIEW_PARENT_ALLOW_LIST
-        // so Storefront Preview from prod, staging, and preview RA all work.
+        // so Storefront Preview from every trusted RA environment works.
         const ra =
             'https://runtime.commercecloud.com ' +
             'https://runtime-admin-staging.mobify-storefront.com ' +
-            'https://runtime-admin-preview.mobify-storefront.com'
+            'https://runtime-admin-preview.mobify-storefront.com ' +
+            'https://runtime-admin-soak.mobify-storefront.com ' +
+            'https://runtime-admin-testing.mobify-storefront-staging.com'
         expectDirectives([
             `connect-src 'self' ${ra} *.salesforce-scrt.com`,
             `frame-ancestors ${ra}`,

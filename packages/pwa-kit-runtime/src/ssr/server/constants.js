@@ -63,5 +63,7 @@ export const STOREFRONT_PREVIEW_CTX_COOKIE = '__Host-pwakit_preview_ctx'
 export const STOREFRONT_PREVIEW_PARENT_ALLOW_LIST = Object.freeze([
     'https://runtime.commercecloud.com',
     'https://runtime-admin-staging.mobify-storefront.com',
-    'https://runtime-admin-preview.mobify-storefront.com'
+    'https://runtime-admin-preview.mobify-storefront.com',
+    'https://runtime-admin-soak.mobify-storefront.com',
+    'https://runtime-admin-testing.mobify-storefront-staging.com'
 ])
