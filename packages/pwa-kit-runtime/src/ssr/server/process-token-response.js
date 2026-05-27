@@ -8,6 +8,7 @@ import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
 import {SET_COOKIE} from './constants'
 import {getValidatedCookieDomain} from './cookie-domain'
+import {clearStorefrontPreviewMarker, readStorefrontPreviewMarker} from './preview-context'
 import {
     SESSION_COOKIE_CONFIG,
     getAllCookieConfigs,
@@ -16,6 +17,26 @@ import {
     getSiteId
 } from './httponly-cookie-config'
 import logger from '../../utils/logger-instance'
+
+// SameSite/Partitioned attributes for top-level (non-preview) traffic.
+const DEFAULT_SITE_ATTRS = Object.freeze({sameSite: 'lax'})
+
+// SameSite/Partitioned attributes for traffic from a trusted Storefront
+// Preview iframe (CHIPS — partitioned by the parent's top-level site).
+const PREVIEW_IFRAME_SITE_ATTRS = Object.freeze({sameSite: 'none', partitioned: true})
+
+/**
+ * Resolves the SameSite/Partitioned attributes to apply to all session
+ * cookies on this response. When the request carries a validated
+ * Storefront-Preview marker (set under server-attested conditions on the
+ * iframe document load), returns `{sameSite: 'none', partitioned: true}`
+ * so cookies attach inside the cross-site iframe. Otherwise returns
+ * `{sameSite: 'lax'}` (the existing top-level behavior).
+ * @private
+ */
+function getSiteAttrsForRequest(req) {
+    return readStorefrontPreviewMarker(req) ? PREVIEW_IFRAME_SITE_ATTRS : DEFAULT_SITE_ATTRS
+}
 
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
 const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
@@ -28,9 +49,15 @@ const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
  * pre-existing host-scoped cookie. This mirrors
  * `CookieStorage.removeHostAndDomainCookie` in commerce-sdk-react and prevents
  * stale duplicates when a merchant first enables the cookieDomain config.
+ *
+ * `siteAttrs` (sameSite/partitioned) is decided per-request by
+ * `getSiteAttrsForRequest` and applied uniformly to every cookie this
+ * helper emits — including the host-scoped cleanup writes, so deletions
+ * match the partition of the original write (Partitioned-cookie deletion
+ * is partition-keyed).
  * @private
  */
-function makeAppendCookie(res, cookieDomain) {
+function makeAppendCookie(res, cookieDomain, siteAttrs) {
     return ({name, value, expires, attributes}) => {
         res.append(
             SET_COOKIE,
@@ -39,6 +66,7 @@ function makeAppendCookie(res, cookieDomain) {
                 value,
                 expires,
                 ...attributes,
+                ...siteAttrs,
                 ...(cookieDomain && {domain: cookieDomain})
             })
         )
@@ -49,7 +77,8 @@ function makeAppendCookie(res, cookieDomain) {
                     name,
                     value: '',
                     expires: new Date(0),
-                    ...attributes
+                    ...attributes,
+                    ...siteAttrs
                 })
             )
         }
@@ -128,7 +157,8 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
 
     const site = siteId
     const cookieDomain = getValidatedCookieDomain(options)
-    const appendCookie = makeAppendCookie(res, cookieDomain)
+    const siteAttrs = getSiteAttrsForRequest(req)
+    const appendCookie = makeAppendCookie(res, cookieDomain, siteAttrs)
     const {
         accessToken,
         accessTokenExpires,
@@ -335,7 +365,8 @@ export function expireHttpOnlySessionCookies(req, res, options) {
     const site = siteId
     const expired = new Date(0)
     const cookieDomain = getValidatedCookieDomain(options)
-    const appendCookie = makeAppendCookie(res, cookieDomain)
+    const siteAttrs = getSiteAttrsForRequest(req)
+    const appendCookie = makeAppendCookie(res, cookieDomain, siteAttrs)
 
     for (const config of getAllCookieConfigs()) {
         appendCookie({
@@ -345,4 +376,9 @@ export function expireHttpOnlySessionCookies(req, res, options) {
             attributes: config.attributes
         })
     }
+
+    // Also expire the marker cookie itself, so the iframe-context state
+    // doesn't outlive the SLAS session it was associated with. The marker
+    // re-issues on the next qualifying iframe document load.
+    clearStorefrontPreviewMarker(res)
 }

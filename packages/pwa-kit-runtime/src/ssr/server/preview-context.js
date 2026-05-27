@@ -17,6 +17,21 @@ const REFERER = 'referer'
 
 const isAllowedParentOrigin = (origin) => STOREFRONT_PREVIEW_PARENT_ALLOW_LIST.includes(origin)
 
+// Browser-enforced attributes for the `__Host-` prefixed marker cookie.
+// `__Host-` rejects the cookie unless it carries Secure + Path=/ and has
+// no Domain attribute. Used by both the writer (set on iframe doc load)
+// and the clearer (deletion on logout) so the deletion's attributes match
+// the original write — Partitioned-cookie deletion is partition-keyed and
+// the SameSite/Partitioned attributes must match for the browser to
+// honor the deletion.
+const MARKER_BASE_ATTRS = Object.freeze({
+    path: '/',
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+    partitioned: true
+})
+
 /**
  * Reads a single cookie value from a `Cookie` header. Inline so we don't
  * pull in the `cookie` package as a direct dependency. Marker values are
@@ -137,11 +152,7 @@ export function tryWriteStorefrontPreviewMarker(req, res) {
         cookieAsString({
             name: STOREFRONT_PREVIEW_CTX_COOKIE,
             value: parentOrigin,
-            path: '/',
-            secure: true,
-            httpOnly: true,
-            sameSite: 'none',
-            partitioned: true
+            ...MARKER_BASE_ATTRS
         })
     )
 }
@@ -157,4 +168,27 @@ export function readStorefrontPreviewMarker(req) {
     const value = getCookieValue(req.headers?.cookie, STOREFRONT_PREVIEW_CTX_COOKIE)
     if (!value || !isAllowedParentOrigin(value)) return undefined
     return value
+}
+
+/**
+ * Append a Set-Cookie header to expire the storefront-preview marker
+ * cookie. Used on logout (called from `expireHttpOnlySessionCookies`) so
+ * the marker doesn't outlive the session it was associated with.
+ *
+ * Mirrors `MARKER_BASE_ATTRS` exactly — Partitioned-cookie deletion is
+ * partition-keyed, and the deletion's SameSite/Partitioned/Path/Secure
+ * attributes must match the original write or the browser ignores the
+ * deletion. No `Domain` work needed: `__Host-` ensures the marker has
+ * always been host-scoped.
+ */
+export function clearStorefrontPreviewMarker(res) {
+    res.append(
+        SET_COOKIE,
+        cookieAsString({
+            name: STOREFRONT_PREVIEW_CTX_COOKIE,
+            value: '',
+            expires: new Date(0),
+            ...MARKER_BASE_ATTRS
+        })
+    )
 }

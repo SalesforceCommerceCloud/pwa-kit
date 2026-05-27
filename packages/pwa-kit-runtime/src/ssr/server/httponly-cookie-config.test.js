@@ -50,11 +50,16 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(false)
     })
 
-    it('sets secure, sameSite lax, and path / on all cookies', () => {
+    it('sets secure and path / on all cookies', () => {
         Object.values(SESSION_COOKIE_CONFIG).forEach((config) => {
             expect(config.attributes.secure).toBe(true)
-            expect(config.attributes.sameSite).toBe('lax')
             expect(config.attributes.path).toBe('/')
+        })
+    })
+
+    it('does not declare a static sameSite — resolved per-request based on preview-context marker', () => {
+        Object.values(SESSION_COOKIE_CONFIG).forEach((config) => {
+            expect(config.attributes.sameSite).toBeUndefined()
         })
     })
 })

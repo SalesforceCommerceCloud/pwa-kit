@@ -446,7 +446,7 @@ describe('expireHttpOnlySessionCookies', () => {
         expect(() => expireHttpOnlySessionCookies(req, res)).toThrow(/siteId is missing/)
     })
 
-    test('expires all session cookies for the given site', () => {
+    test('expires all session cookies for the given site (plus the storefront-preview marker)', () => {
         const res = makeRes()
         expireHttpOnlySessionCookies(makeReq(), res)
 
@@ -464,7 +464,9 @@ describe('expireHttpOnlySessionCookies', () => {
             'usid_testsite',
             'cc-nx-expires_testsite',
             'id_token_testsite',
-            'idp_refresh_token_testsite'
+            'idp_refresh_token_testsite',
+            // Storefront-preview marker — cleared on logout so it doesn't outlive the session.
+            '__Host-pwakit_preview_ctx'
         ]
 
         expect(res.cookies).toHaveLength(expectedCookieKeys.length)
@@ -634,7 +636,12 @@ describe('cookieDomain support', () => {
             'id_token_testsite',
             'idp_refresh_token_testsite'
         ]
-        expect(res.cookies).toHaveLength(allCookieNames.length * 2)
+        // Each session cookie is expired with both a domain-scoped and a
+        // host-scoped Set-Cookie (host-scoped is the migration cleanup for
+        // pre-cookieDomain deploys). The marker cookie uses the `__Host-`
+        // prefix and is always host-scoped — exactly one deletion, never a
+        // domain-scoped duplicate.
+        expect(res.cookies).toHaveLength(allCookieNames.length * 2 + 1)
 
         for (const name of allCookieNames) {
             const matches = findCookies(res.cookies, name)
@@ -648,5 +655,149 @@ describe('cookieDomain support', () => {
             expect(domainScoped.expires).toEqual(new Date(0))
             expect(hostScoped.expires).toEqual(new Date(0))
         }
+
+        // Marker: exactly one deletion, host-scoped (no Domain).
+        const markerDeletions = findCookies(res.cookies, '__Host-pwakit_preview_ctx')
+        expect(markerDeletions).toHaveLength(1)
+        expect(markerDeletions[0].domain).toBeUndefined()
+    })
+})
+
+describe('trusted Storefront Preview iframe', () => {
+    const TRUSTED_PARENT = 'https://runtime-admin-preview.mobify-storefront.com'
+    const MARKER = '__Host-pwakit_preview_ctx'
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        _resetWarnedDomainsForTesting()
+    })
+
+    function makeReqWithMarker(value, siteId = 'testsite') {
+        return {headers: {[X_SITE_ID]: siteId, cookie: `${MARKER}=${value}`}}
+    }
+
+    function makeFullSlasResponse() {
+        const accessToken = makeJWT({
+            iat: 1000,
+            exp: 2800,
+            isb: 'uido:ecom::upn:Guest',
+            dnt: '0'
+        })
+        return {
+            buf: makeResponseBuffer({
+                access_token: accessToken,
+                idp_access_token: 'idp-at',
+                idp_refresh_token: 'idp-rt',
+                refresh_token: 'r',
+                customer_id: 'c1',
+                enc_user_id: 'eu1',
+                id_token: 'id1',
+                usid: 'u1'
+            }),
+            accessToken
+        }
+    }
+
+    test('every session cookie carries SameSite=none; Partitioned when marker is on the allow-list', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(buf, {}, makeReqWithMarker(TRUSTED_PARENT), res, {})
+
+        expect(res.cookies.length).toBeGreaterThan(0)
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=none/i)
+            expect(cookieStr).toMatch(/Partitioned/i)
+            expect(cookieStr).not.toMatch(/SameSite=lax/i)
+        }
+    })
+
+    test('preserves Secure, HttpOnly (where applicable), Path, and Expires under the iframe path', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(buf, {}, makeReqWithMarker(TRUSTED_PARENT), res, {})
+
+        const accessTokenCookie = parseCookie(res.cookies.find((c) => c.startsWith('cc-at_')))
+        expect(accessTokenCookie.secure).toBe(true)
+        expect(accessTokenCookie.httpOnly).toBe(true)
+        expect(accessTokenCookie.path).toBe('/')
+        expect(accessTokenCookie.expires).toBeInstanceOf(Date)
+
+        const usidCookie = parseCookie(res.cookies.find((c) => c.startsWith('usid_')))
+        expect(usidCookie.secure).toBe(true)
+        expect(usidCookie.httpOnly).toBeUndefined()
+        expect(usidCookie.path).toBe('/')
+    })
+
+    test('falls back to SameSite=Lax when the marker value is not on the allow-list', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(
+            buf,
+            {},
+            makeReqWithMarker('https://attacker.example.com'),
+            res,
+            {}
+        )
+
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=lax/i)
+            expect(cookieStr).not.toMatch(/Partitioned/i)
+        }
+    })
+
+    test('falls back to SameSite=Lax when no marker cookie is present (common path)', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=lax/i)
+            expect(cookieStr).not.toMatch(/Partitioned/i)
+        }
+    })
+
+    test('expireHttpOnlySessionCookies under the iframe path emits SameSite=none; Partitioned on every deletion (so partitioned cookies actually clear)', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReqWithMarker(TRUSTED_PARENT), res, {})
+
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=none/i)
+            expect(cookieStr).toMatch(/Partitioned/i)
+        }
+    })
+
+    test('expireHttpOnlySessionCookies clears the marker cookie itself', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReqWithMarker(TRUSTED_PARENT), res, {})
+
+        const markerDeletion = res.cookies.find((c) => c.startsWith(`${MARKER}=`))
+        expect(markerDeletion).toBeDefined()
+        const parsed = parseCookie(markerDeletion)
+        expect(parsed.value).toBe('')
+        expect(parsed.expires).toEqual(new Date(0))
+        expect(markerDeletion).toMatch(/SameSite=none/i)
+        expect(markerDeletion).toMatch(/Partitioned/i)
+        expect(markerDeletion).toMatch(/HttpOnly/i)
+        expect(markerDeletion).toMatch(/Secure/i)
+        expect(markerDeletion).toMatch(/Path=\//i)
+        // The marker uses the `__Host-` prefix so it never carries a Domain
+        // attribute — even when commerceAPI.cookieDomain is configured for
+        // session cookies.
+        expect(markerDeletion).not.toMatch(/Domain=/i)
+    })
+
+    test('marker deletion never carries a Domain attribute, even when cookieDomain is configured', () => {
+        const res = makeRes()
+        expireHttpOnlySessionCookies(
+            makeReqWithMarker(TRUSTED_PARENT),
+            res,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+
+        const markerDeletions = res.cookies.filter((c) => c.startsWith(`${MARKER}=`))
+        // Exactly one deletion — the `__Host-` prefix forbids Domain, so
+        // there is no domain-scoped duplicate to emit.
+        expect(markerDeletions).toHaveLength(1)
+        expect(markerDeletions[0]).not.toMatch(/Domain=/i)
     })
 })
