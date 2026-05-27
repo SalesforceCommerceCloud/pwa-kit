@@ -5,7 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {isBinary, once, RemoteServerFactory} from './build-remote-server'
-import {X_ENCODED_HEADERS, X_SITE_ID, X_GRANT_TYPE} from './constants'
+import {
+    X_ENCODED_HEADERS,
+    X_SITE_ID,
+    X_GRANT_TYPE,
+    STOREFRONT_PREVIEW_CTX_COOKIE
+} from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
 import logger from '../../utils/logger-instance'
 import {catchAndLog, parseRequestUrl} from '../../utils/ssr-server'
@@ -678,6 +683,69 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         // confirm ASCII headers are not modified
         res.setHeader(regularHeaderKey, regularHeaderValue)
         expect(res.getHeader(regularHeaderKey)).toEqual(regularHeaderValue)
+    })
+
+    describe('storefront-preview marker middleware', () => {
+        afterEach(() => {
+            delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+        })
+
+        // Behavior-based detection: feed an iframe-shaped request to every
+        // registered middleware and look for one that emits the marker
+        // cookie. This is robust against unrelated middleware additions
+        // changing the index of the marker writer.
+        //
+        // Other middlewares (prepNonProxyRequest, ssrMiddleware, ...) may
+        // throw on the minimal mock request — that's expected and we
+        // collect the throws into `errors` so a debugging engineer can see
+        // them on assertion failure (the `expect` below prints the full
+        // shape of the returned object). If the marker middleware itself
+        // ever throws, this surfaces in the same place.
+        const iframeReq = () => ({
+            method: 'GET',
+            headers: {
+                'sec-fetch-dest': 'iframe',
+                'sec-fetch-site': 'cross-site',
+                referer: 'https://runtime-admin-preview.mobify-storefront.com/x'
+            }
+        })
+
+        const probeMarkerWriter = (mockApp) => {
+            const errors = []
+            const wrote = mockApp.use.mock.calls.some(([fn]) => {
+                if (typeof fn !== 'function') return false
+                const res = {append: jest.fn()}
+                try {
+                    fn(iframeReq(), res, () => {})
+                } catch (err) {
+                    errors.push(err.message || String(err))
+                    return false
+                }
+                return res.append.mock.calls.some(
+                    ([header, value]) =>
+                        header === 'set-cookie' &&
+                        typeof value === 'string' &&
+                        value.includes(`${STOREFRONT_PREVIEW_CTX_COOKIE}=`)
+                )
+            })
+            return {wrote, errors}
+        }
+
+        test('writes marker cookie when MRT_ENABLE_HTTPONLY_SESSION_COOKIES=true', () => {
+            process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
+            const mockApp = {use: jest.fn()}
+            RemoteServerFactory._setupCommonMiddleware(mockApp, {})
+
+            expect(probeMarkerWriter(mockApp)).toMatchObject({wrote: true})
+        })
+
+        test('does not write marker cookie when MRT_ENABLE_HTTPONLY_SESSION_COOKIES is unset', () => {
+            delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+            const mockApp = {use: jest.fn()}
+            RemoteServerFactory._setupCommonMiddleware(mockApp, {})
+
+            expect(probeMarkerWriter(mockApp)).toMatchObject({wrote: false})
+        })
     })
 })
 

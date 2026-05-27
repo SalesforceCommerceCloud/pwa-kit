@@ -187,6 +187,28 @@ describe('cookieAsString tests', () => {
                 expires: new Date('2018-10-24T10:09:08Z')
             },
             expected: 'abc=123; Expires=Wed, 24 Oct 2018 10:09:08 GMT'
+        },
+        {
+            cookie: {
+                name: 'ctx',
+                value: 'parent',
+                path: '/',
+                secure: true,
+                httpOnly: true,
+                sameSite: 'none',
+                partitioned: true
+            },
+            expected: 'ctx=parent; Path=/; Secure; HttpOnly; SameSite=none; Partitioned'
+        },
+        {
+            cookie: {
+                name: 'ctx',
+                value: 'parent',
+                secure: true,
+                sameSite: 'none',
+                partitioned: false
+            },
+            expected: 'ctx=parent; Secure; SameSite=none'
         }
     ]
 

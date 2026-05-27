@@ -41,3 +41,29 @@ export const SLAS_LOGOUT_ENDPOINT = /\/oauth2\/logout/
 export const DWSID_COOKIE_NAME = 'dwsid'
 export const X_SITE_ID = 'x-site-id'
 export const X_GRANT_TYPE = 'x-grant-type'
+
+// Server-only marker cookie set when the storefront is loaded inside a
+// trusted Storefront Preview iframe (parent origin attested by Sec-Fetch-*
+// + Referer on the iframe document load). Read on later SLAS proxy
+// responses to choose SameSite=None; Partitioned over SameSite=Lax for
+// session cookies.
+//
+// The `__Host-` prefix is browser-enforced: cookies with this prefix are
+// rejected unless they carry `Secure`, `Path=/`, and *no* `Domain`
+// attribute. The marker is only ever read by the storefront BFF on the
+// same host that issued it, so host-scoping is the right shape — and
+// `__Host-` makes that invariant impossible to subvert later (no Domain
+// branch to maintain, no migration cleanup needed when `cookieDomain`
+// configuration changes).
+export const STOREFRONT_PREVIEW_CTX_COOKIE = '__Host-pwakit_preview_ctx'
+
+// Mirrors IFRAME_HOST_ALLOW_LIST in commerce-sdk-react/src/constant.ts.
+// Kept in sync by a parity test in preview-context.test.js — drift will
+// fail the test.
+export const STOREFRONT_PREVIEW_PARENT_ALLOW_LIST = Object.freeze([
+    'https://runtime.commercecloud.com',
+    'https://runtime-admin-staging.mobify-storefront.com',
+    'https://runtime-admin-preview.mobify-storefront.com',
+    'https://runtime-admin-soak.mobify-storefront.com',
+    'https://runtime-admin-testing.mobify-storefront-staging.com'
+])

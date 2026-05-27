@@ -21,6 +21,7 @@ import {
     X_GRANT_TYPE
 } from './constants'
 import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
+import {tryWriteStorefrontPreviewMarker} from './preview-context'
 const {
     refreshTokenRegistered,
     refreshTokenGuest,
@@ -1724,6 +1725,18 @@ export const RemoteServerFactory = {
      */
     _setupCommonMiddleware(app, options) {
         app.use(prepNonProxyRequest)
+
+        // Storefront Preview marker — when HttpOnly session cookies are
+        // enabled and the incoming request looks like an iframe document
+        // load from a trusted parent, set a marker cookie so later SLAS
+        // proxy responses know to issue session cookies as
+        // SameSite=None; Partitioned (CHIPS) instead of SameSite=Lax.
+        if (process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true') {
+            app.use((req, res, next) => {
+                tryWriteStorefrontPreviewMarker(req, res)
+                next()
+            })
+        }
 
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.

@@ -328,6 +328,9 @@ export const cookieAsString = (cookie) => {
     if (cookie.sameSite) {
         elements.push(`SameSite=${cookie.sameSite}`)
     }
+    if (cookie.partitioned) {
+        elements.push('Partitioned')
+    }
     return elements.join('; ')
 }
 
