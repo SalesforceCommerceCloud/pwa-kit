@@ -36,6 +36,7 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.refreshTokenGuest.attributes.httpOnly).toBe(true)
         expect(SESSION_COOKIE_CONFIG.refreshTokenRegistered.attributes.httpOnly).toBe(true)
         expect(SESSION_COOKIE_CONFIG.idpRefreshToken.attributes.httpOnly).toBe(true)
+        expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(true)
     })
 
     it('marks client-readable cookies as non-httpOnly', () => {
@@ -47,7 +48,6 @@ describe('SESSION_COOKIE_CONFIG', () => {
         expect(SESSION_COOKIE_CONFIG.customerType.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.usid.attributes.httpOnly).toBe(false)
         expect(SESSION_COOKIE_CONFIG.refreshTokenExpires.attributes.httpOnly).toBe(false)
-        expect(SESSION_COOKIE_CONFIG.idToken.attributes.httpOnly).toBe(false)
     })
 
     it('sets secure and path / on all cookies', () => {

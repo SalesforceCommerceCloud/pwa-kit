@@ -228,7 +228,7 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             })
         }
 
-        // id_token (non-HttpOnly): expiry tied to access token JWT exp.
+        // id_token (HttpOnly): expiry tied to access token JWT exp.
         if (parsed.id_token) {
             appendCookie({
                 name: getCookieName(idToken, site),

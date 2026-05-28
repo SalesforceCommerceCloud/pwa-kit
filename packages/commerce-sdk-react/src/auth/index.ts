@@ -282,10 +282,10 @@ export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
  * these keys go to the cookie store instead of localStorage, with the cookie
  * as the single source of truth.
  *
- * Some entries here (`idp_access_token`, `idp_refresh_token`) are HttpOnly
- * and unreadable from JavaScript — they're included for routing symmetry so
- * the storage type is consistent in httpOnly mode; reads of those keys
- * return '' from the cookie store either way.
+ * Some entries here (`id_token`, `idp_access_token`, `idp_refresh_token`) are
+ * HttpOnly and unreadable from JavaScript — they're included for routing
+ * symmetry so the storage type is consistent in httpOnly mode; reads of those
+ * keys return '' from the cookie store either way.
  *
  * `expires_in` is intentionally absent: the access token expiry is already
  * covered by the `cc-at-expires` cookie, so we derive it from there in the

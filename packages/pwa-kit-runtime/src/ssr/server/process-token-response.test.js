@@ -261,10 +261,10 @@ describe('setHttpOnlySessionCookies', () => {
         // already encodes the access-token expiry as an absolute epoch.
         expect(res.cookies.find((c) => c.startsWith('expires_in_testsite='))).toBeUndefined()
 
-        // id_token (non-HttpOnly, expiry tied to access JWT exp = 2800)
+        // id_token (HttpOnly, expiry tied to access JWT exp = 2800)
         const idTokenCookie = parseCookie(res.cookies.find((c) => c.includes('id_token_testsite=')))
         expect(idTokenCookie.value).toBe('id-token-789')
-        expect(idTokenCookie.httpOnly).toBeUndefined()
+        expect(idTokenCookie.httpOnly).toBe(true)
         expect(idTokenCookie.expires).toEqual(new Date(2800 * 1000))
 
         // idp_refresh_token (HttpOnly, refresh TTL)
@@ -288,6 +288,7 @@ describe('setHttpOnlySessionCookies', () => {
         expect(body).not.toHaveProperty('idp_access_token')
         expect(body).not.toHaveProperty('refresh_token')
         expect(body).not.toHaveProperty('idp_refresh_token')
+        expect(body).not.toHaveProperty('id_token')
         expect(body.expires_in).toBe(1800)
         expect(body.customer_id).toBe('cust123')
     })

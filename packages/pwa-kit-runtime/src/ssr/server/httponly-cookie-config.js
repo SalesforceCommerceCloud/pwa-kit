@@ -74,7 +74,8 @@ export const SESSION_COOKIE_CONFIG = {
     },
     idToken: {
         key: 'id_token',
-        attributes: {httpOnly: false, secure: true, path: '/'}
+        attributes: {httpOnly: true, secure: true, path: '/'},
+        slasKey: 'id_token'
     },
     idpRefreshToken: {
         key: 'idp_refresh_token',
