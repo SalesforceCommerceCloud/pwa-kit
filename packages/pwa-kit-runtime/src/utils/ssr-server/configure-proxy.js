@@ -120,21 +120,21 @@ export const setScapiAuthRequestHeaders = ({
     // authenticated. An empty `Bearer ` falls through to the cookie path.
     const isBearerWithValue = /^bearer\s+\S/i.test(existingAuth || '')
 
-    if (isBearerWithValue) {
-        // The caller — typically the SDK during SSR after obtaining a fresh
-        // token from SLAS — has already set a valid Bearer. Pass it through
-        // to SCAPI unchanged.
-    } else if (accessToken) {
-        // No incoming Authorization, an empty `Bearer `, or `Basic <…>` (the
-        // Protected Storefronts pattern). Inject the cookie-derived JWT.
-        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
-    } else if (!existingAuth) {
-        // No cookie and no incoming auth — nothing to forward.
-        throw new AccessTokenNotFoundError(
-            'Access token cookie not found. Cannot proceed with SCAPI request.'
-        )
+    // The caller — typically the SDK during SSR after obtaining a fresh
+    // token from SLAS — has already set a valid Bearer. Pass it through
+    // to SCAPI unchanged. If not, we need to inject the cookie-derived JWT.
+    if (!isBearerWithValue) {
+        if (accessToken) {
+            // No incoming Authorization, an empty `Bearer `, or `Basic <…>` (the
+            // Protected Storefronts pattern). Inject the cookie-derived JWT.
+            proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+        } else if (!existingAuth) {
+            // No cookie and no incoming auth — nothing to forward.
+            throw new AccessTokenNotFoundError(
+                'Access token cookie not found. Cannot proceed with SCAPI request.'
+            )
+        }
     }
-    // else: non-Bearer existing auth + no cookie — pass through unchanged.
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
     if (cookies[DWSID_COOKIE_NAME]) {
