@@ -72,12 +72,16 @@ jobs:
               uses: actions/checkout@v4
 
               # The Playwright container ships Node 24, git, and the browsers,
-              # but not jq. Several steps below (and composite actions under
-              # .github/actions/) shell out to jq, so install it once here.
-            - name: Install jq
+              # but not jq or GNU time. jq is used by several steps below
+              # and by composite actions under .github/actions/. GNU time
+              # (/usr/bin/time) is required by scripts/gtime.js which wraps
+              # npm ci for Datadog telemetry; without it gtime.js crashes
+              # at stderr.toString() because spawnSync returns stderr=undefined
+              # when the binary is missing.
+            - name: Install jq and GNU time
               run: |-
                   apt-get update
-                  apt-get install -y --no-install-recommends jq
+                  apt-get install -y --no-install-recommends jq time
                   rm -rf /var/lib/apt/lists/*
 
             - name: Check PWA Kit Version
