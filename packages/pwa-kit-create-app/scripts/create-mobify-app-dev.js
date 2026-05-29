@@ -74,31 +74,64 @@ const withLocalNPMRepo = (func) => {
     return Promise.resolve()
         .then(
             () =>
-                new Promise((resolve) => {
+                new Promise((resolve, reject) => {
                     console.log('Starting up local NPM repository')
 
-                    // Use spawn (not exec) so Verdaccio's stdout/stderr aren't subject
-                    // to exec's 1 MB maxBuffer cap — once exceeded, Node SIGTERMs the
-                    // child and Lerna's next publish gets ECONNREFUSED on :4873.
-                    verdaccioServerProcess = cp.spawn(verdaccioBinary, ['--config', 'config.yaml'], {
-                        cwd: verdaccioConfigDir,
-                        env: {
-                            ...process.env,
-                            OPENCOLLECTIVE_HIDE: 'true',
-                            DISABLE_OPENCOLLECTIVE: 'true',
-                            OPEN_SOURCE_CONTRIBUTOR: 'true'
+                    // Use spawn with stdio inherited so Verdaccio's output goes
+                    // straight to our parent stdout/stderr. If we pipe its output
+                    // and rely on a `data` listener to drain, the synchronous
+                    // `lerna publish` exec below blocks the event loop for the
+                    // entire prepare phase (~30s); the OS pipe buffer (~64KB)
+                    // fills up, Verdaccio's writes block, and Lerna's next
+                    // request lands on a hung/dead server (ECONNREFUSED).
+                    verdaccioServerProcess = cp.spawn(
+                        verdaccioBinary,
+                        ['--config', 'config.yaml'],
+                        {
+                            cwd: verdaccioConfigDir,
+                            stdio: ['ignore', 'inherit', 'inherit'],
+                            env: {
+                                ...process.env,
+                                OPENCOLLECTIVE_HIDE: 'true',
+                                DISABLE_OPENCOLLECTIVE: 'true',
+                                OPEN_SOURCE_CONTRIBUTOR: 'true'
+                            }
                         }
-                    })
+                    )
 
-                    verdaccioServerProcess.stdout.on('data', (data) => {
-                        // we know verdaccio server is up when
-                        // 'http address' is in log output
-                        if (data.includes('http address')) {
-                            console.log('local NPM repository is up')
-                            process.env['npm_config_registry'] = 'http://localhost:4873/'
-                            resolve()
+                    // Poll the HTTP endpoint instead of parsing stdout for
+                    // 'http address', since stdio is inherited.
+                    const startTime = Date.now()
+                    const timeoutMs = 60_000
+                    const intervalMs = 250
+                    const poll = async () => {
+                        try {
+                            const controller = new AbortController()
+                            const timer = setTimeout(() => controller.abort(), 1_000)
+                            const res = await fetch('http://localhost:4873/-/ping', {
+                                signal: controller.signal
+                            })
+                            clearTimeout(timer)
+                            if (res.ok) {
+                                console.log('local NPM repository is up')
+                                process.env['npm_config_registry'] = 'http://localhost:4873/'
+                                resolve()
+                                return
+                            }
+                        } catch {
+                            // not ready yet
                         }
-                    })
+                        if (Date.now() - startTime > timeoutMs) {
+                            reject(
+                                new Error(
+                                    `Verdaccio did not become ready within ${timeoutMs}ms`
+                                )
+                            )
+                            return
+                        }
+                        setTimeout(poll, intervalMs)
+                    }
+                    poll()
                 })
         )
         .then(() => {
