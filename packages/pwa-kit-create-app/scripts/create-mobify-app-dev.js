@@ -129,9 +129,7 @@ const withLocalNPMRepo = (func) => {
                         }
                         if (Date.now() - startTime > timeoutMs) {
                             reject(
-                                new Error(
-                                    `Verdaccio did not become ready within ${timeoutMs}ms`
-                                )
+                                new Error(`Verdaccio did not become ready within ${timeoutMs}ms`)
                             )
                             return
                         }
