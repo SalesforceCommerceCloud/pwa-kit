@@ -78,19 +78,17 @@ const withLocalNPMRepo = (func) => {
                 new Promise((resolve, reject) => {
                     console.log('Starting up local NPM repository')
 
-                    // Use spawn with stdio inherited so Verdaccio's output goes
-                    // straight to our parent stdout/stderr. If we pipe its output
-                    // and rely on a `data` listener to drain, the synchronous
-                    // `lerna publish` exec below blocks the event loop for the
-                    // entire prepare phase (~30s); the OS pipe buffer (~64KB)
-                    // fills up, Verdaccio's writes block, and Lerna's next
-                    // request lands on a hung/dead server (ECONNREFUSED).
+                    // Use spawn with stdio fully ignored. We don't need Verdaccio's
+                    // output (we poll TCP for readiness below), and inheriting it
+                    // would (a) flood CI logs with per-request info/http lines and
+                    // (b) push that output through the outer wrapper pipe whose
+                    // `cp.exec` maxBuffer would eventually trigger SIGTERM.
                     verdaccioServerProcess = cp.spawn(
                         verdaccioBinary,
                         ['--config', 'config.yaml'],
                         {
                             cwd: verdaccioConfigDir,
-                            stdio: ['ignore', 'inherit', 'inherit'],
+                            stdio: 'ignore',
                             env: {
                                 ...process.env,
                                 OPENCOLLECTIVE_HIDE: 'true',
@@ -101,7 +99,7 @@ const withLocalNPMRepo = (func) => {
                     )
 
                     // Probe the listening port directly with a raw TCP connect.
-                    // We can't sniff stdout (stdio is inherited above), and Node's
+                    // We can't sniff stdout (stdio is ignored above), and Node's
                     // global `fetch` against `localhost` may try ::1 first while
                     // Verdaccio binds 127.0.0.1 only — connect on the IPv4 loopback
                     // sidesteps both layers.
