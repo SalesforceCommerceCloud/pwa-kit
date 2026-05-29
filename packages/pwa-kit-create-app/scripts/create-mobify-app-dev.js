@@ -45,6 +45,7 @@
 const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
+const net = require('net')
 const semver = require('semver')
 
 sh.set('-e')
@@ -99,27 +100,32 @@ const withLocalNPMRepo = (func) => {
                         }
                     )
 
-                    // Poll the HTTP endpoint instead of parsing stdout for
-                    // 'http address', since stdio is inherited.
+                    // Probe the listening port directly with a raw TCP connect.
+                    // We can't sniff stdout (stdio is inherited above), and Node's
+                    // global `fetch` against `localhost` may try ::1 first while
+                    // Verdaccio binds 127.0.0.1 only — connect on the IPv4 loopback
+                    // sidesteps both layers.
                     const startTime = Date.now()
                     const timeoutMs = 60_000
                     const intervalMs = 250
-                    const poll = async () => {
-                        try {
-                            const controller = new AbortController()
-                            const timer = setTimeout(() => controller.abort(), 1_000)
-                            const res = await fetch('http://localhost:4873/-/ping', {
-                                signal: controller.signal
-                            })
-                            clearTimeout(timer)
-                            if (res.ok) {
-                                console.log('local NPM repository is up')
-                                process.env['npm_config_registry'] = 'http://localhost:4873/'
-                                resolve()
-                                return
+                    const probe = () =>
+                        new Promise((isUp) => {
+                            const socket = net.connect(4873, '127.0.0.1')
+                            socket.setTimeout(1_000)
+                            const done = (up) => {
+                                socket.destroy()
+                                isUp(up)
                             }
-                        } catch {
-                            // not ready yet
+                            socket.once('connect', () => done(true))
+                            socket.once('error', () => done(false))
+                            socket.once('timeout', () => done(false))
+                        })
+                    const poll = async () => {
+                        if (await probe()) {
+                            console.log('local NPM repository is up')
+                            process.env['npm_config_registry'] = 'http://localhost:4873/'
+                            resolve()
+                            return
                         }
                         if (Date.now() - startTime > timeoutMs) {
                             reject(
