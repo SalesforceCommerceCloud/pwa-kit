@@ -57,7 +57,16 @@ const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
  */
 const withLocalNPMRepo = (func) => {
     const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
-    const verdaccioBinary = p.join(__dirname, '..', 'node_modules', '.bin', 'verdaccio')
+    // On Windows, npm bin shims are `.cmd`; cp.spawn (unlike the previous
+    // shell-mediated cp.exec) does not auto-resolve that extension.
+    const binExtension = process.platform === 'win32' ? '.cmd' : ''
+    const verdaccioBinary = p.join(
+        __dirname,
+        '..',
+        'node_modules',
+        '.bin',
+        `verdaccio${binExtension}`
+    )
     const verdaccioConfigDir = p.join(__dirname, '..', 'local-npm-repo')
 
     // Clear any cached packages from a previous run.
