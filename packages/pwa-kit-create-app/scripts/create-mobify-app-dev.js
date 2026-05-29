@@ -143,11 +143,28 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
-            sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
-                cwd: monorepoRoot,
-                fatal: true,
-                silent: false
-            }).toEnd(logFileName)
+            // We don't use `fatal: true` here because lerna 6.6.1 has been
+            // observed to exit non-zero (e.g. 128) after the publish has
+            // already succeeded and "Successfully published:" has printed —
+            // likely a tail-end lifecycle quirk. Treat the run as successful
+            // iff that marker appears in the captured output.
+            const result = sh.exec(
+                'npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn',
+                {cwd: monorepoRoot, fatal: false, silent: false}
+            )
+            result.toEnd(logFileName)
+            if (!result.stdout.includes('Successfully published:')) {
+                const err = new Error(
+                    `lerna publish failed (exit ${result.code}); marker "Successfully published:" not found in output`
+                )
+                err.code = result.code
+                throw err
+            }
+            if (result.code !== 0) {
+                console.warn(
+                    `lerna publish exited ${result.code} but reported "Successfully published:"; treating as success`
+                )
+            }
             console.log('Published successfully')
         })
         .then(() => func())
