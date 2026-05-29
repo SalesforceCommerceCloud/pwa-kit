@@ -4,6 +4,10 @@
 
 storage: ./storage
 
+# Bind explicitly to IPv4 loopback so probes/clients don't have to disambiguate
+# `localhost` (which Node 18+ may resolve to ::1 first under verbatim DNS).
+listen: 127.0.0.1:4873
+
 auth:
   htpasswd:
     file: ./htpasswd

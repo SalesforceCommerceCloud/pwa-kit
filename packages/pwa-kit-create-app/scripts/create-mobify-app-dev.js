@@ -193,7 +193,10 @@ const main = () => {
     return Promise.resolve()
         .then(() => withLocalNPMRepo(runGenerator))
         .then(() => process.exit(0))
-        .catch(() => process.exit(1))
+        .catch((err) => {
+            console.error(err)
+            process.exit(1)
+        })
 }
 
 if (require.main === module) {
