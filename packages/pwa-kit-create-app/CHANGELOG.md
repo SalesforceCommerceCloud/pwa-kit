@@ -1,5 +1,6 @@
 ## v3.19.0-dev
 - Add maintenance mode page configuration to generated `config/default.js` templates. Configure `app.pages.maintenancePage.sharedMaintenancePage` (default `true`) to fetch and display a CDN-hosted maintenance page, or set to `false` for the built-in fallback message. Supports CDN URL and forwarded host customization. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+- [Bugfix] Spawn Verdaccio with `cp.spawn` instead of `cp.exec` in `create-mobify-app-dev.js` so the local NPM repo isn't killed when its stdout exceeds exec's 1 MB `maxBuffer`, which caused `lerna publish` to fail with `ECONNREFUSED 127.0.0.1:4873` mid-publish in CI.
 
 ## v3.18.1 (May 21, 2026)
 - Add react-router override for @salesforce/storefront-next-runtime in generated project template [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
