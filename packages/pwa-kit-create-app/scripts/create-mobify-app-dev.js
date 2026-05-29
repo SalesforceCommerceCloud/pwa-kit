@@ -78,7 +78,11 @@ const withLocalNPMRepo = (func) => {
     const cleanup = () => {
         console.log('Shutting down local NPM repository')
         delete process.env['npm_config_registry']
-        verdaccioServerProcess.kill()
+        // verdaccioServerProcess may be undefined if the spawn call itself
+        // threw synchronously (e.g. early Windows shell errors).
+        if (verdaccioServerProcess) {
+            verdaccioServerProcess.kill()
+        }
     }
 
     return Promise.resolve()
@@ -98,6 +102,10 @@ const withLocalNPMRepo = (func) => {
                         {
                             cwd: verdaccioConfigDir,
                             stdio: 'ignore',
+                            // Node 20+ requires shell:true to spawn .cmd/.bat
+                            // files (CVE-2024-27980); Verdaccio's npm bin shim
+                            // on Windows is verdaccio.cmd.
+                            shell: process.platform === 'win32',
                             env: {
                                 ...process.env,
                                 OPENCOLLECTIVE_HIDE: 'true',
