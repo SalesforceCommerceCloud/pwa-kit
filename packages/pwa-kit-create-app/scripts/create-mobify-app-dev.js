@@ -77,9 +77,11 @@ const withLocalNPMRepo = (func) => {
                 new Promise((resolve) => {
                     console.log('Starting up local NPM repository')
 
-                    verdaccioServerProcess = cp.exec(`${verdaccioBinary} --config config.yaml`, {
+                    // Use spawn (not exec) so Verdaccio's stdout/stderr aren't subject
+                    // to exec's 1 MB maxBuffer cap — once exceeded, Node SIGTERMs the
+                    // child and Lerna's next publish gets ECONNREFUSED on :4873.
+                    verdaccioServerProcess = cp.spawn(verdaccioBinary, ['--config', 'config.yaml'], {
                         cwd: verdaccioConfigDir,
-                        stdio: 'inherit',
                         env: {
                             ...process.env,
                             OPENCOLLECTIVE_HIDE: 'true',

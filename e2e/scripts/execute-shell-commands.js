@@ -35,7 +35,11 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
         })
 
         child.on('close', (code) => {
-            resolve(`Child process exited with code ${code}.`)
+            if (code === 0) {
+                resolve(`Child process exited with code ${code}.`)
+            } else {
+                reject(new Error(`Child process exited with non-zero code ${code}.`))
+            }
         })
     })
 }
