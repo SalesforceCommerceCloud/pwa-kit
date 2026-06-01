@@ -17,10 +17,11 @@
  * Flow:
  *   1. Browser reads the SLAS access token (useAccessToken) and SLAS refresh
  *      token (useRefreshToken) from the commerce-sdk-react auth context.
- *      Both are sent in the request body to the same-origin proxy
+ *      All three — access token, refresh token, and my_domain (from the Shopper
+ *      Configurations API) — are sent in the request body to the same-origin proxy
  *      (POST /api/agent/identity/bridge), along with the auth_link_key.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js)
- *      resolves the ANC MyDomain and forwards to Core with
+ *      resolves the ANC MyDomain from the request body and forwards to Core with
  *      `Authorization: SLAS <access_token>` and `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
@@ -41,7 +42,7 @@ const CORE_TOKEN_BRIDGE_PATH = '/agent/identity/bridge'
  * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
  */
 export function resolveAncMyDomain(myDomain) {
-    if (!myDomain) return null
+    if (!myDomain || typeof myDomain !== 'string') return null
     const trimmed = myDomain.trim().replace(/\/+$/, '')
     if (!trimmed) return null
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
@@ -67,7 +68,8 @@ export async function handleTokenBridge(req, res) {
         const myDomain = resolveAncMyDomain(myDomainFromConfig)
         if (!myDomain) {
             console.error(
-                '[token-bridge] ANC MyDomain is not configured. Set ANC_MYDOMAIN env var.'
+                '[token-bridge] ANC MyDomain is not configured. ' +
+                    'Provide my_domain via the Shopper Configurations API.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
         }

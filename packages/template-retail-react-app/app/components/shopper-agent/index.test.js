@@ -621,6 +621,43 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
+    test('should call Token Bridge after my_domain becomes available even with same conversationId', async () => {
+        // First render without my_domain — event with conversationId should be ignored
+        const propsWithoutMyDomain = {
+            ...defaultProps,
+            commerceAgentConfiguration: {
+                ...commerceAgentSettings,
+                my_domain: undefined
+            }
+        }
+        const {rerender} = render(<ShopperAgent {...propsWithoutMyDomain} />)
+
+        await act(async () => {
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-123'}
+                })
+            )
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+
+        // Re-render with my_domain now present — same conversationId should fire Token Bridge
+        await act(async () => {
+            rerender(<ShopperAgent {...defaultProps} />)
+        })
+
+        await act(async () => {
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-123'}
+                })
+            )
+        })
+
+        await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+    })
+
     test('should update prechat fields when refresh token changes', async () => {
         // Initial refresh token
         mockedUseRefreshToken.mockReturnValue('initial-token')

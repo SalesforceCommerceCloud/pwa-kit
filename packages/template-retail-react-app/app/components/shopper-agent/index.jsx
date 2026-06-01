@@ -134,7 +134,8 @@ const isEnabled = (enabled) => {
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
  * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
- * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
+ * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`),
+ *   only when `my_domain` is present in the configuration
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
  * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
@@ -149,6 +150,7 @@ const isEnabled = (enabled) => {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
+ * @param {string} [props.commerceAgentConfiguration.my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
  * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
  * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @param {string} props.domainUrl - The domain URL of the current page
@@ -201,6 +203,16 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {usid} = useUsid()
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
+
+    // Warn once at mount if my_domain is missing — Token Bridge calls will be silently skipped.
+    useEffect(() => {
+        if (!myDomain) {
+            console.warn(
+                '[ShopperAgent] my_domain is not set in the commerce agent configuration. ' +
+                    'Token Bridge calls will be skipped until it is provided.'
+            )
+        }
+    }, [])
 
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
@@ -526,6 +538,7 @@ ShopperAgentWindow.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
+     * @property {string} [my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
      * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
      * @property {string[]} [conversationContext] - Conversation context data array
      */
@@ -563,6 +576,7 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
+ * @param {string} [props.commerceAgentConfiguration.my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
  * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
  * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @param {boolean} props.basketDoneLoading - Whether the basket has finished loading
@@ -622,6 +636,7 @@ ShopperAgent.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
+     * @property {string} [my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
      * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
      * @property {string[]} [conversationContext] - Conversation context data array
      *

@@ -55,6 +55,14 @@ describe('resolveAncMyDomain', () => {
         expect(resolveAncMyDomain('   ')).toBeNull()
     })
 
+    test('returns null when argument is a non-string (number)', () => {
+        expect(resolveAncMyDomain(123)).toBeNull()
+    })
+
+    test('returns null when argument is a non-string (object)', () => {
+        expect(resolveAncMyDomain({})).toBeNull()
+    })
+
     test('prepends https:// when scheme is missing', () => {
         expect(resolveAncMyDomain('orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
             'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
@@ -108,6 +116,18 @@ describe('handleTokenBridge', () => {
     test('returns 500 MYDOMAIN_NOT_CONFIGURED when my_domain is absent', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const req = {body: {auth_link_key: 'k', slas_access_token: 'a'}}
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(500)
+        expect(res.body).toEqual({error: 'MYDOMAIN_NOT_CONFIGURED'})
+        expect(errorSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Provide my_domain via the Shopper Configurations API')
+        )
+    })
+
+    test('returns 500 MYDOMAIN_NOT_CONFIGURED when my_domain is a non-string', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = {body: {auth_link_key: 'k', slas_access_token: 'a', my_domain: 12345}}
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(500)
