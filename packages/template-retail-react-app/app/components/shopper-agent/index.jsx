@@ -191,6 +191,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         salesforceOrgId,
         commerceOrgId,
         siteId,
+        my_domain: myDomain,
         enableConversationContext = 'false',
         conversationContext = [],
         enableAgentFromFloatingButton = 'true'
@@ -242,7 +243,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         sfLanguage,
         domainUrl,
         organizationId,
-        configSiteId
+        configSiteId,
+        myDomain
     }
 
     const lastConversationSessionInitRef = useRef(null)
@@ -388,8 +390,13 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
 
         const handleEmbeddedMessagingConversationStarted = (event) => {
-            const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
+            const {
+                organizationId: orgId,
+                configSiteId: sid,
+                myDomain: myDomainValue
+            } = embeddedLifecycleRef.current
             if (!orgId || !sid) return
+            if (!myDomainValue) return
 
             const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
             if (conversationId && lastConversationSessionInitRef.current === conversationId) return
@@ -415,7 +422,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                         const result = await callTokenBridge({
                             authLinkKey,
                             slasAccessToken,
-                            slasRefreshToken
+                            slasRefreshToken,
+                            myDomain: myDomainValue
                         })
 
                         if (result.status !== HTTP_OK) {
@@ -480,7 +488,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         refreshToken,
         domainUrl,
         organizationId,
-        configSiteId
+        configSiteId,
+        myDomain
     ])
 
     // Load the embedded messaging script asynchronously

@@ -129,6 +129,8 @@ const mockedUseTheme = useTheme
 
 const mockGetTokenWhenReady = jest.fn()
 
+const TEST_MY_DOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+
 const commerceAgentSettings = {
     enabled: 'true',
     askAgentOnSearch: 'true',
@@ -138,7 +140,8 @@ const commerceAgentSettings = {
     scrt2Url: 'https://test.salesforce.com/scrt2.js',
     salesforceOrgId: 'test-org-id',
     commerceOrgId: 'test-commerce-org-id',
-    siteId: 'RefArchGlobal'
+    siteId: 'RefArchGlobal',
+    my_domain: TEST_MY_DOMAIN
 }
 
 const defaultProps = {
@@ -422,7 +425,7 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should call Token Bridge with auth link key, access token, and refresh token when conversation starts', async () => {
+    test('should call Token Bridge with auth link key, access token, refresh token, and myDomain when conversation starts', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
@@ -433,7 +436,8 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            slasRefreshToken: 'test-refresh-token'
+            slasRefreshToken: 'test-refresh-token',
+            myDomain: TEST_MY_DOMAIN
         })
     })
 
@@ -599,6 +603,24 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
+    test('should NOT call Token Bridge when my_domain is absent from configuration', async () => {
+        const propsWithoutMyDomain = {
+            ...defaultProps,
+            commerceAgentConfiguration: {
+                ...commerceAgentSettings,
+                my_domain: undefined
+            }
+        }
+
+        render(<ShopperAgent {...propsWithoutMyDomain} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
+
     test('should update prechat fields when refresh token changes', async () => {
         // Initial refresh token
         mockedUseRefreshToken.mockReturnValue('initial-token')
@@ -683,7 +705,8 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            slasRefreshToken: null
+            slasRefreshToken: null,
+            myDomain: TEST_MY_DOMAIN
         })
     })
 
