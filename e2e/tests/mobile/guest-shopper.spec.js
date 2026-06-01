@@ -6,10 +6,20 @@
  */
 
 const {test, expect} = require('@playwright/test')
-const {addProductToCart, searchProduct, checkoutProduct} = require('../../scripts/pageHelpers')
+const {
+    addProductToCart,
+    answerConsentTrackingForm,
+    searchProduct,
+    checkoutProduct
+} = require('../../scripts/pageHelpers')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
+const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
+
+test.afterEach(async ({page}) => {
+    await clearCartAndWishlist(page)
+})
 
 /**
  * Test that guest shoppers can add a product to cart and go through the entire checkout process,
@@ -124,6 +134,10 @@ test('Guest shopper can edit product item in cart', async ({page}) => {
  * Test that guest shoppers can add product bundle to cart and successfully checkout
  */
 test('Guest shopper can checkout product bundle', async ({page}) => {
+    // PLP/PDP and bundle render are noticeably slower on mobile-chrome and
+    // the default 60s test budget is regularly insufficient.
+    test.setTimeout(120000)
+
     await searchProduct({page, query: 'bundle', isMobile: true})
 
     await page
@@ -134,13 +148,23 @@ test('Guest shopper can checkout product bundle', async ({page}) => {
 
     await page.waitForLoadState()
 
-    await expect(page.getByRole('heading', {name: /Turquoise Jewelry Bundle/i})).toBeVisible()
+    // The DNT consent modal can re-appear after navigations on mobile when
+    // the dnt cookie isn't yet set, and it intercepts clicks on the bottom
+    // of the viewport (where Add Bundle to Cart sits).
+    await answerConsentTrackingForm(page)
 
-    await page.getByRole('button', {name: /Add Bundle to Cart/i}).click()
+    await expect(page.getByRole('heading', {name: /Turquoise Jewelry Bundle/i})).toBeVisible({
+        timeout: 30000
+    })
+
+    const addBundleToCart = page.getByRole('button', {name: /Add Bundle to Cart/i})
+    await expect(addBundleToCart).toBeEnabled({timeout: 30000})
+    await expect(page.locator('text=Tracking Consent')).toBeHidden({timeout: 10000})
+    await addBundleToCart.click()
 
     const addedToCartModal = page.getByText(/1 item added to cart/i)
     await addedToCartModal.waitFor()
-    await page.getByLabel('Close').click()
+    await page.getByLabel('Close', {exact: true}).click()
 
     await page.getByLabel(/My cart/i).click()
     await page.waitForLoadState()

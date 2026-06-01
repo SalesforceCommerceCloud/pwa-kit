@@ -771,7 +771,7 @@ describe('SFPaymentsSheet', () => {
                                 adyen: {
                                     adyenPaymentIntent: {
                                         id: 'PI123',
-                                        resultCode: 'AUTHORISED',
+                                        resultCode: 'Authorised',
                                         adyenPaymentAction: 'action'
                                     }
                                 }
@@ -1310,7 +1310,7 @@ describe('SFPaymentsSheet', () => {
                                 adyen: {
                                     adyenPaymentIntent: {
                                         id: 'PI123',
-                                        resultCode: 'AUTHORISED',
+                                        resultCode: 'Authorised',
                                         adyenPaymentAction: 'action'
                                     }
                                 }
@@ -1417,7 +1417,7 @@ describe('SFPaymentsSheet', () => {
                                 adyen: {
                                     adyenPaymentIntent: {
                                         id: 'PI123',
-                                        resultCode: 'AUTHORISED',
+                                        resultCode: 'Authorised',
                                         adyenPaymentAction: 'action'
                                     }
                                 }
@@ -1521,7 +1521,7 @@ describe('SFPaymentsSheet', () => {
                                 adyen: {
                                     adyenPaymentIntent: {
                                         id: 'PI123',
-                                        resultCode: 'AUTHORISED',
+                                        resultCode: 'Authorised',
                                         adyenPaymentAction: 'action'
                                     }
                                 }

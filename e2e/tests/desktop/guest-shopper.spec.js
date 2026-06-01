@@ -8,8 +8,13 @@
 const {test, expect} = require('@playwright/test')
 const {generateUserCredentials} = require('../../scripts/utils.js')
 const {addProductToCart, searchProduct, checkoutProduct} = require('../../scripts/pageHelpers.js')
+const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
+
+test.afterEach(async ({page}) => {
+    await clearCartAndWishlist(page)
+})
 
 /**
  * Test that guest shoppers can add a product to cart and go through the entire checkout process,
@@ -86,7 +91,7 @@ test('Guest shopper can checkout product bundle', async ({page}) => {
 
     const addedToCartModal = page.getByText(/1 item added to cart/i)
     await addedToCartModal.waitFor()
-    await page.getByLabel('Close').click()
+    await page.getByLabel('Close', {exact: true}).click()
 
     await page.getByLabel(/My cart/i).click()
     await page.waitForLoadState()

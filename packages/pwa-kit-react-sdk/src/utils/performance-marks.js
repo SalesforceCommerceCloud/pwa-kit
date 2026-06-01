@@ -14,6 +14,7 @@ export const PERFORMANCE_MARKS = {
     renderToString: 'ssr.render-to-string',
     routeMatching: 'ssr.route-matching',
     loadComponent: 'ssr.load-component',
+    dataStoreFetch: 'ssr.data-store.fetch',
     fetchStrategies: 'ssr.fetch-strategies',
     reactQueryPrerender: 'ssr.fetch-strategies.react-query.pre-render',
     reactQueryUseQuery: 'ssr.fetch-strategies.react-query.use-query',

@@ -39,13 +39,30 @@ describe('Region', () => {
                 {
                     id: 'main-region',
                     components: [
-                        {id: 'comp-1', typeId: 'commerce_assets.banner', data: {}},
-                        {id: 'comp-2', typeId: 'commerce_assets.carousel', data: {}}
+                        {
+                            id: 'comp-1',
+                            typeId: 'commerce_assets.banner',
+                            data: {},
+                            contentLinkUuid: '0e1f329d4ac66ff2c3bbf70301'
+                        },
+                        {
+                            id: 'comp-2',
+                            typeId: 'commerce_assets.carousel',
+                            data: {},
+                            contentLinkUuid: '1f2g430e5bd77gg3d4ccg80402'
+                        }
                     ]
                 },
                 {
                     id: 'sidebar-region',
-                    components: [{id: 'comp-3', typeId: 'commerce_assets.promo', data: {}}]
+                    components: [
+                        {
+                            id: 'comp-3',
+                            typeId: 'commerce_assets.promo',
+                            data: {},
+                            contentLinkUuid: '2g3h541f6ce88hh4e5ddh91503'
+                        }
+                    ]
                 },
                 {
                     id: 'empty-region',
@@ -126,8 +143,18 @@ describe('Region', () => {
                 {
                     id: 'nested-region',
                     components: [
-                        {id: 'nested-comp-1', typeId: 'commerce_assets.text', data: {}},
-                        {id: 'nested-comp-2', typeId: 'commerce_assets.image', data: {}}
+                        {
+                            id: 'nested-comp-1',
+                            typeId: 'commerce_assets.text',
+                            data: {},
+                            contentLinkUuid: '3h4i652g7df99ii5f6eei02604'
+                        },
+                        {
+                            id: 'nested-comp-2',
+                            typeId: 'commerce_assets.image',
+                            data: {},
+                            contentLinkUuid: '4i5j763h8eg00jj6g7ffj13705'
+                        }
                     ]
                 }
             ],
@@ -181,6 +208,61 @@ describe('Region', () => {
             )
 
             expect(container.firstChild).toBeNull()
+        })
+    })
+
+    describe('Content Link UUID', () => {
+        test('handles duplicate fragments with same id but different contentLinkUuid', () => {
+            const mockPageWithDuplicates = {
+                id: 'test-page',
+                regions: [
+                    {
+                        id: 'main-region',
+                        components: [
+                            {
+                                id: 'hero-fragment', // Same ID
+                                typeId: 'commerce_assets.hero',
+                                data: {},
+                                contentLinkUuid: 'uuid-first-instance-001'
+                            },
+                            {
+                                id: 'hero-fragment', // Same ID (reused fragment)
+                                typeId: 'commerce_assets.hero',
+                                data: {},
+                                contentLinkUuid: 'uuid-second-instance-002'
+                            },
+                            {
+                                id: 'hero-fragment', // Same ID (reused fragment)
+                                typeId: 'commerce_assets.hero',
+                                data: {},
+                                contentLinkUuid: 'uuid-third-instance-003'
+                            }
+                        ]
+                    }
+                ]
+            } as unknown as PageWithDesignMetadata
+
+            render(<Region page={mockPageWithDuplicates} regionId="main-region" />)
+
+            const components = screen.getAllByTestId(/^component-hero-fragment$/)
+            expect(components).toHaveLength(3)
+        })
+
+        test('falls back to id when contentLinkUuid is not present', () => {
+            // Test backward compatibility
+            const mockPageWithoutUuid = {
+                id: 'test-page',
+                regions: [
+                    {
+                        id: 'main-region',
+                        components: [{id: 'comp-1', typeId: 'commerce_assets.banner', data: {}}]
+                    }
+                ]
+            } as unknown as PageWithDesignMetadata
+
+            render(<Region page={mockPageWithoutUuid} regionId="main-region" />)
+
+            expect(screen.getByTestId('component-comp-1')).toBeInTheDocument()
         })
     })
 

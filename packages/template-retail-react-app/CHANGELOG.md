@@ -1,7 +1,25 @@
-## v9.2.0-dev
+## v10.1.0-dev
+- Bump `vendor.js` bundle-size budget from 395 kB to 397 kB to accommodate the new `MrtDataStoreProvider` context and `useCustomSitePreferences` / `useCustomGlobalPreferences` hooks shipped in `@salesforce/pwa-kit-react-sdk`. [#3834](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3834)
+- [Feature] Add maintenance mode page: when the Commerce API returns an `sfdc_maintenance` response header, a 503 error is detected and a dedicated maintenance page is displayed instead of the generic error page. The maintenance page can render a shared page fetched from a configurable CDN URL (default) or fall back to a built-in message. Configure via `app.pages.maintenancePage` in `config/default.js`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
+## v10.0.1 (May 21, 2026)
+- Upgrade @salesforce/storefront-next-runtime to 0.4.2 [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
+- [Bugfix] Pin `@formatjs/cli` to 6.9.0 to fix pseudo-locale compilation in generated projects [#3842](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3842)
+
+## v10.0.0 (May 07, 2026)
+- Update MRT Data Store configuration comments and README to use the unprefixed environment variable names actually consumed by `@salesforce/mrt-utilities` (`MRT_DATA_STORE_DEFAULTS`, `MRT_DATA_STORE_WARN_ON_MISSING`). [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
+- Add opt-in `app.mrtDataStore.enabled` to `config/default.js` (default `false`). Set to `true` or use `PWAKIT_MRT_DATA_STORE_ENABLED=true` to resolve MRT Data Store custom preferences during SSR. Local defaults without DynamoDB: `MRT_DATA_STORE_DEFAULTS` (see `config/default.js` comments). [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787)
+- Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
+- [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
+- [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
+- [Bugfix] Add `return_url` for express checkout payment confirmation, required by redirect-based payment methods like Amazon Pay [#3803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3803)
+- Update `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
+- WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+
+## v9.1.1 (Mar 20, 2026)
 - Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
-## v9.1.0-dev
+## v9.1.0 (Mar 12, 2026)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
 - One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
@@ -11,6 +29,10 @@
 - [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 - [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
 - [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
+- [Bugfix] Fix lost custom billing address after OTP registration [#3741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3741)
+- [Bugfix] Fix edirect payment methods status value to pascal [#3734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3734)
+- [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
+- [Bugfix] Fix adding to cart from a master product in the wishlist [#3732](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3732)
 
 ## v9.0.0 (Feb 12, 2026)
 - [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)

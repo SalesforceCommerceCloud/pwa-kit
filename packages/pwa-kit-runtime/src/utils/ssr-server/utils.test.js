@@ -230,6 +230,25 @@ describe('Type checking utility functions', () => {
     })
 })
 
+describe('isScapiDomain', () => {
+    test('should return true for valid SCAPI domains with instance identifier', () => {
+        expect(utils.isScapiDomain('abc-001.api.commercecloud.salesforce.com')).toBe(true)
+        expect(utils.isScapiDomain('kv7kzm78.api.commercecloud.salesforce.com:8080')).toBe(true)
+    })
+
+    test('should return false for non-SCAPI domains', () => {
+        expect(utils.isScapiDomain('example.com')).toBe(false)
+        expect(utils.isScapiDomain('commercecloud.salesforce.com')).toBe(false)
+        expect(utils.isScapiDomain('localhost:3000')).toBe(false)
+    })
+
+    test('should return false for null, undefined, or empty string', () => {
+        expect(utils.isScapiDomain(null)).toBe(false)
+        expect(utils.isScapiDomain(undefined)).toBe(false)
+        expect(utils.isScapiDomain('')).toBe(false)
+    })
+})
+
 describe('logMRTError', () => {
     let consoleErrorSpy
 

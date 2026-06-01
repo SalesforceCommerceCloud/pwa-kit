@@ -12,6 +12,26 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 /**
+ * Builds the return URL for redirect-based payment methods.
+ * Returns the base payment-processing URL when called without params,
+ * or appends order details as query params when provided.
+ * @param {Object} [params] - Optional order details to include as query params
+ * @param {string} [params.orderNo] - Order number
+ * @param {string} [params.zoneId] - Payment zone ID
+ * @param {string} [params.type] - Payment method type
+ * @returns {string} The payment-processing return URL
+ */
+export const buildPaymentReturnUrl = ({orderNo, zoneId, type} = {}) => {
+    const baseUrl = `${window.location.protocol}//${window.location.host}/checkout/payment-processing`
+    if (orderNo === undefined && zoneId === undefined && type === undefined) return baseUrl
+    const searchParams = new URLSearchParams()
+    if (orderNo !== undefined) searchParams.set('orderNo', orderNo)
+    if (zoneId !== undefined) searchParams.set('zoneId', zoneId)
+    if (type !== undefined) searchParams.set('type', type)
+    return `${baseUrl}?${searchParams.toString()}`
+}
+
+/**
  * Returns the first Salesforce Payments instrument found in a basket or order.
  * @param {Object} basketOrOrder - A basket or order object containing paymentInstruments
  * @returns {Object|undefined} First Salesforce Payments payment instrument found, or undefined if none exist

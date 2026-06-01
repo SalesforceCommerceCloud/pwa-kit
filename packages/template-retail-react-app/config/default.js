@@ -10,6 +10,16 @@ const {parseSettings, validateOtpTokenLength} = require('./utils.js')
 
 module.exports = {
     app: {
+        // MRT Data Store (opt-in): when true, SSR resolves prefs and serializes `__MRT_DATA_STORE__` in
+        // `#mobify-data`; when false, that key is omitted. See `isMrtDataStoreEnabled` in pwa-kit-runtime.
+        // Set `PWAKIT_MRT_DATA_STORE_ENABLED=true|false` to override without editing files.
+        // Local dev without DynamoDB: use `MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects)
+        // and optional `MRT_DATA_STORE_WARN_ON_MISSING=false`. Local data store provided by
+        // @salesforce/mrt-utilities via conditional exports (automatic in development mode).
+        // Demo page + scripted env: `npm run start:mrt-data-store-demo` in this package, route `/demo/mrt-data-store`.
+        mrtDataStore: {
+            enabled: false
+        },
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
             enabled: 'false',
             askAgentOnSearch: 'false',
@@ -63,6 +73,9 @@ module.exports = {
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
             }
+            // Optional: Set the domain for auth cookies to share them across subdomains.
+            // If not set, cookies default to the current host.
+            // cookieDomain: '.example.com'
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
@@ -88,6 +101,13 @@ module.exports = {
         pages: {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
+            },
+            maintenancePage: {
+                // When true (default), the maintenance page is fetched from the CDN URL below
+                // and rendered as-is. Set to false to display the built-in maintenance message.
+                sharedMaintenancePage: true,
+                cdnUrl: 'https://prd.cmp.cdn.commercecloud.salesforce.com',
+                forwardedHost: ''
             }
         },
         storeLocatorEnabled: true,
@@ -120,6 +140,9 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
+        // Store the session cookies as HttpOnly for enhanced security.
+        // WIP: Do not enable. This feature is in-progress.
+        enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',

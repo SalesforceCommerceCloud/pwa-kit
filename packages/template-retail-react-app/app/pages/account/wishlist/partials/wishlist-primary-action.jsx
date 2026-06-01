@@ -181,7 +181,10 @@ const WishlistPrimaryAction = () => {
                             onOpen={onOpen}
                             onClose={onClose}
                             product={variant}
-                            addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
+                            addToCart={(items) => {
+                                const {product, variant, quantity} = items[0]
+                                return handleAddToCart(variant || product, quantity)
+                            }}
                         />
                     )}
                 </>

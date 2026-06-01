@@ -7,10 +7,8 @@
 
 import React, {type ReactNode} from 'react'
 import {usePageDesignerMode} from '@salesforce/storefront-next-runtime/design/react/core'
-import {
-    createReactRegionDesignDecorator,
-    type RegionDesignMetadata
-} from '@salesforce/storefront-next-runtime/design/react'
+import {createReactRegionDesignDecorator} from '@salesforce/storefront-next-runtime/design/react/core'
+import {type RegionDesignMetadata} from '@salesforce/storefront-next-runtime/design/react'
 
 /**
  * Props for the base region renderer
@@ -18,7 +16,7 @@ import {
 export interface RegionRendererProps extends React.HTMLAttributes<HTMLDivElement> {
     region: any
     children: ReactNode
-    designMetadata?: Omit<RegionDesignMetadata, 'componentIds'>
+    designMetadata?: Omit<RegionDesignMetadata, 'contentLinkUuids'>
 }
 
 /**
@@ -65,7 +63,8 @@ export function RegionWrapper({
     const fullDesignMetadata = React.useMemo(
         () => ({
             id: region.id,
-            componentIds: region?.components?.map((cmp: any) => cmp.id) || [],
+            contentLinkUuids:
+                region?.components?.map((cmp: any) => cmp.contentLinkUuid || cmp.id) || [],
             componentTypeExclusions: designMetadata?.componentTypeExclusions || [],
             componentTypeInclusions: designMetadata?.componentTypeInclusions || []
         }),

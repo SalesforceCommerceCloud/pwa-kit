@@ -17,6 +17,11 @@ import {parse} from 'node-html-parser'
 import {initializeServerTracing, shutdownServerTracing} from './opentelemetry-server'
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {
+    DATA_STORE_WINDOW_GLOBAL,
+    DATA_STORE_BOOTSTRAP_SITE_ID_KEY,
+    CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY
+} from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
 import {getAppConfig} from '../universal/compatibility'
 import {randomUUID} from 'crypto'
 import {getLocationSearch} from './react-rendering'
@@ -825,6 +830,53 @@ describe('Additional branch coverage for react-rendering', () => {
         expect(typeof data.__ERROR__.stack).toBe('string')
     })
 
+    test('includes serialized custom site and global preferences in #mobify-data', async () => {
+        // Test fixtures do not set `config.app.mrtDataStore.enabled`; opt in via env so SSR
+        // serializes `__MRT_DATA_STORE__` (empty prefs without a real Data Store in this harness).
+        const prevEnabled = process.env.PWAKIT_MRT_DATA_STORE_ENABLED
+        process.env.PWAKIT_MRT_DATA_STORE_ENABLED = 'true'
+        try {
+            const app = RemoteServerFactory._createApp(opts())
+            app.get('/*', render)
+            const res = await request(app).get('/pwa/')
+            expect(res.statusCode).toBe(200)
+            const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
+            expect(data).toHaveProperty(DATA_STORE_WINDOW_GLOBAL)
+            // Expect DAL keys: custom-global-preferences and __siteId
+            // No site key since res.locals.site is undefined in test fixtures
+            expect(data[DATA_STORE_WINDOW_GLOBAL]).toEqual({
+                [DATA_STORE_BOOTSTRAP_SITE_ID_KEY]: undefined,
+                [CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY]: {}
+            })
+        } finally {
+            if (prevEnabled === undefined) {
+                delete process.env.PWAKIT_MRT_DATA_STORE_ENABLED
+            } else {
+                process.env.PWAKIT_MRT_DATA_STORE_ENABLED = prevEnabled
+            }
+        }
+    })
+
+    test('does not include DATA_STORE_WINDOW_GLOBAL in #mobify-data when MRT Data Store bootstrap is disabled (default)', async () => {
+        const prevEnabled = process.env.PWAKIT_MRT_DATA_STORE_ENABLED
+        // Default harness config has no `app.mrtDataStore.enabled`; ensure env does not force it on.
+        delete process.env.PWAKIT_MRT_DATA_STORE_ENABLED
+        try {
+            const app = RemoteServerFactory._createApp(opts())
+            app.get('/*', render)
+            const res = await request(app).get('/pwa/')
+            expect(res.statusCode).toBe(200)
+            const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
+            expect(data).not.toHaveProperty(DATA_STORE_WINDOW_GLOBAL)
+        } finally {
+            if (prevEnabled === undefined) {
+                delete process.env.PWAKIT_MRT_DATA_STORE_ENABLED
+            } else {
+                process.env.PWAKIT_MRT_DATA_STORE_ENABLED = prevEnabled
+            }
+        }
+    })
+
     test('handles pretty print mode with mobify_pretty', async () => {
         const app = RemoteServerFactory._createApp(opts())
         app.get('/*', render)
@@ -1062,12 +1114,49 @@ describe('Additional branch coverage for react-rendering', () => {
         expect(res.statusCode).toBe(302)
         expect(res.headers.location).toBeDefined()
     })
+})
 
-    test('handles unrecoverable error in render (duplicate)', async () => {
+describe('QueryClient cleanup after SSR response', () => {
+    test('cleans up QueryClient after response finishes', async () => {
         const app = RemoteServerFactory._createApp(opts())
+        let capturedLocals
+
+        // Middleware to capture res.locals before cleanup runs
+        app.get('/*', (req, res, next) => {
+            const originalSend = res.send.bind(res)
+            res.send = function (...args) {
+                capturedLocals = res.locals
+                return originalSend(...args)
+            }
+            next()
+        })
         app.get('/*', render)
-        const res = await request(app).get('/unrecoverable-error/')
-        expect(res.statusCode).toBe(500)
+
+        const res = await request(app).get('/use-query-resolves-object/')
+        expect(res.statusCode).toBe(200)
+
+        // After the response is fully finished, the QueryClient should be cleaned up
+        expect(capturedLocals.__queryClient).toBeNull()
+    })
+
+    test('cleans up QueryClient after redirect response', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        let capturedLocals
+
+        app.get('/*', (req, res, next) => {
+            const originalRedirect = res.redirect.bind(res)
+            res.redirect = function (...args) {
+                capturedLocals = res.locals
+                return originalRedirect(...args)
+            }
+            next()
+        })
+        app.get('/*', render)
+
+        await request(app).get('/redirect/')
+
+        // After the redirect response finishes, the QueryClient should be cleaned up
+        expect(capturedLocals.__queryClient).toBeNull()
     })
 })
 

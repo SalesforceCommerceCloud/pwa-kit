@@ -23,7 +23,11 @@ jest.mock('cross-fetch', () => {
         }
 
         const locale = matched[1]
-        const json = await import(`../static/translations/compiled/${locale}.json`)
+        const imported = await import(`../static/translations/compiled/${locale}.json`)
+        // Dynamic JSON import returns a namespace ({default}) under Node 24 ESM
+        // semantics but the bare object under babel's CJS interop. Unwrap so the
+        // mock returns the same shape as a real fetch().json() in either case.
+        const json = imported.default ?? imported
 
         return {
             ok: true,

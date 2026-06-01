@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {wishlistFlow} from '../../scripts/pageHelpers'
+import {wishlistFlow, wishlistMasterProductAddToCartFlow} from '../../scripts/pageHelpers'
 
 const {test, expect} = require('@playwright/test')
 const {
@@ -14,11 +14,16 @@ const {
     registeredUserHappyPath
 } = require('../../scripts/pageHelpers')
 const {generateUserCredentials} = require('../../scripts/utils.js')
+const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 let registeredUserCredentials = {}
 
 test.beforeAll(async () => {
     // Generate credentials once and use throughout tests to avoid creating a new account
     registeredUserCredentials = generateUserCredentials()
+})
+
+test.afterEach(async ({page}) => {
+    await clearCartAndWishlist(page)
 })
 
 /**
@@ -38,6 +43,14 @@ test.skip('Registered shopper can checkout items', async ({page}) => {
  */
 test('Registered shopper can add item to wishlist', async ({page}) => {
     await wishlistFlow({page, registeredUserCredentials})
+})
+
+/**
+ * Test that a master product in the wishlist can be added to cart
+ * via the "View Options" modal with correct quantity
+ */
+test('Registered shopper can add master product from wishlist to cart', async ({page}) => {
+    await wishlistMasterProductAddToCartFlow({page, registeredUserCredentials})
 })
 
 /**

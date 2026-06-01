@@ -22,19 +22,12 @@ import {getSFPaymentsInstrument} from '@salesforce/retail-react-app/app/utils/sf
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
-// const ADYEN_SUCCESS_RESULT_CODES = [
-//     'Authorised',
-//     'PartiallyAuthorised',
-//     'Received',
-//     'Pending',
-//     'PresentToShopper'
-// ]
 const ADYEN_SUCCESS_RESULT_CODES = [
-    'AUTHORISED',
-    'PARTIALLYAUTHORISED',
-    'RECEIVED',
-    'PENDING',
-    'PRESENTTOSHOPPER'
+    'authorised',
+    'partiallyauthorised',
+    'received',
+    'pending',
+    'presenttoshopper'
 ]
 
 const PaymentProcessing = () => {
@@ -114,8 +107,7 @@ const PaymentProcessing = () => {
 
         // Check if Adyen result code indicates redirect payment was successful
         return ADYEN_SUCCESS_RESULT_CODES.includes(
-            updatedOrderPaymentInstrument?.paymentReference?.gatewayProperties?.adyen
-                ?.adyenPaymentIntent?.resultCode
+            updatedOrderPaymentInstrument?.paymentReference?.gatewayProperties?.adyen?.adyenPaymentIntent?.resultCode?.toLowerCase()
         )
     }
 

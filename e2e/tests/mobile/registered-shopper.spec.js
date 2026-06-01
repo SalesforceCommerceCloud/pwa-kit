@@ -16,12 +16,17 @@ const {
     answerConsentTrackingForm
 } = require('../../scripts/pageHelpers')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
+const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
 let registeredUserCredentials = {}
 
 test.beforeAll(async () => {
     // Generate credentials once and use throughout tests to avoid creating a new account
     registeredUserCredentials = generateUserCredentials()
+})
+
+test.afterEach(async ({page}) => {
+    await clearCartAndWishlist(page)
 })
 
 /**

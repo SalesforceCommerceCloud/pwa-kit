@@ -12,6 +12,8 @@ module.exports = {
         process.env.RETAIL_APP_HOME ||
         'https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com',
     RETAIL_APP_HOME_SITE: 'RefArch',
+    RETAIL_APP_HOME_ORGANIZATION_ID:
+        process.env.RETAIL_APP_HOME_ORGANIZATION_ID || 'f_ecom_zzrf_002',
     /**
      * We need to write the environment details and status to a file so that other steps in the workflow can use it.
      * Propagating outputs from node to composite actions to workflow is not robust enough.

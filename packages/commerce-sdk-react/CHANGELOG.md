@@ -1,10 +1,24 @@
-## v5.2.0-dev
-- Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+## v5.3.0-dev
+- Move SLAS metadata (customer_id, customer_type, enc_user_id, id_token, idp_refresh_token) from localStorage to proxy-set cookies in HttpOnly mode; replace `cc-nx-exists` and `refresh_token_expires_in` with a single `cc-nx-expires` cookie carrying the absolute refresh-token expiry; add `useCookie` hook backed by a custom cookie-change event [#3830](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3830)
+- [Feature] Enable `throwOnMaintenanceHeader: true` by default in the SDK client config so that `MaintenanceError` is thrown automatically when the `sfdc_maintenance` response header is detected. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+- Storefront Preview iframe trust list: extend `IFRAME_HOST_ALLOW_LIST` to include the soak (`https://runtime-admin-soak.mobify-storefront.com`) and testing (`https://runtime-admin-testing.mobify-storefront-staging.com`) Runtime Admin environments alongside the existing prod/staging/preview hosts. The client-side `isOriginTrusted` check, `getCookieSameSiteAttribute`, and the `pwa-kit-runtime` server-side mirror (`STOREFRONT_PREVIEW_PARENT_ALLOW_LIST`) all use this list, so client-set cookies and the server-issued preview marker now treat both environments as trusted iframe parents. [#3850](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3850)
 
-## v5.1.0-dev
+## v5.2.1 (May 21, 2026)
+- Add contentLinkUuid support to fix Page Designer integration [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
+
+## v5.2.0 (May 07, 2026)
+- Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
+- WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+- Re-add `cookieDomain` parameter to the `Auth` constructor; previously dropped during a merge. [#3822](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3822)
+
+## v5.1.1 (Mar 20, 2026)
+- Update storefront preview to support base paths [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+- Remove base path from /__pwa-kit route requests when showBasePath is false [#3758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3758)
+
+## v5.1.0 (Mar 12, 2026)
 - Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
 - Bump commerce-sdk-isomorphic to 5.1.0 [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
-- Update ShopperBasketsV2 hooks documentation and query keys
+- Update ShopperBasketsV2 hooks documentation and query keys [#3728](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3728)
 - Add Node 24 support. Drop Node 16 support. [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Add Shopper Consents API support [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
 

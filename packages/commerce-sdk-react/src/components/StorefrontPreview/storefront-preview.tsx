@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyRequests} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
-import {useCommerceApi, useConfig} from '../../hooks'
+import {useCommerceApi, useConfig, useUsid} from '../../hooks'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
 type ContextChangeHandler = () => void | Promise<void>
@@ -22,9 +22,30 @@ type OptionalWhenDisabled<T> = ({enabled?: true} & T) | ({enabled: false} & Part
  * Only strips when path equals basePath or path starts with basePath + '/'.
  */
 function removeBasePathFromPath(path: string, basePath: string): string {
-    const matches =
-        path.startsWith(basePath + '/') || path === basePath
+    const matches = path.startsWith(basePath + '/') || path === basePath
     return matches ? path.slice(basePath.length) || '/' : path
+}
+
+const PWA_KIT_PATH_PREFIX = '/__pwa-kit/'
+
+/**
+ * Runtime Admin always prepends envBasePath to /__pwa-kit/ paths (e.g. /test/__pwa-kit/refresh),
+ * but when showBasePath is false, React Router has no basename and expects /__pwa-kit/refresh.
+ *
+ * This ensures that regardless of the showBasePath setting, these paths are normalized to
+ * remove the base path.
+ */
+function normalizePwaKitPath<T>(pathOrLocation: LocationDescriptor<T>): LocationDescriptor<T> {
+    if (typeof pathOrLocation === 'string') {
+        const idx = pathOrLocation.indexOf(PWA_KIT_PATH_PREFIX)
+        return idx > 0 ? pathOrLocation.slice(idx) : pathOrLocation
+    }
+    const pathname = pathOrLocation.pathname ?? '/'
+    const idx = pathname.indexOf(PWA_KIT_PATH_PREFIX)
+    if (idx > 0) {
+        return {...pathOrLocation, pathname: pathname.slice(idx)}
+    }
+    return pathOrLocation
 }
 
 /**
@@ -53,8 +74,8 @@ function removeBasePathFromLocation<T>(
  * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
  * This flag only applies if storefront is running in a Runtime Admin iframe.
  * @param getToken - A method that returns the access token for the current user
- * @param getBasePath - A method that returns the router base path of the app. Requird if using
- * base path for router routes (showBasePath is true in url config).
+ * @param getBasePath - A method that returns the router base path of the app.
+ * Required if using a base path for router routes (showBasePath is true in url config).
  */
 export const StorefrontPreview = ({
     children,
@@ -74,12 +95,14 @@ export const StorefrontPreview = ({
     const isHostTrusted = detectStorefrontPreview()
     const apiClients = useCommerceApi()
     const {siteId} = useConfig()
+    const {getUsidForPreview} = useUsid()
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
+                getUsid: getUsidForPreview,
                 onContextChange,
                 siteId,
                 experimentalUnsafeNavigate: (
@@ -88,12 +111,13 @@ export const StorefrontPreview = ({
                     ...args: unknown[]
                 ) => {
                     const basePath = getBasePath?.() ?? ''
-                    const pathWithoutBase = removeBasePathFromLocation(path, basePath)
+                    const normalizedPath = normalizePwaKitPath(path)
+                    const pathWithoutBase = removeBasePathFromLocation(normalizedPath, basePath)
                     history[action](pathWithoutBase, ...args)
                 }
             }
         }
-    }, [enabled, getToken, onContextChange, siteId, getBasePath])
+    }, [enabled, getToken, getUsidForPreview, onContextChange, siteId, getBasePath])
 
     useEffect(() => {
         if (enabled && isHostTrusted) {

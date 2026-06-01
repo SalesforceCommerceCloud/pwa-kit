@@ -485,7 +485,8 @@ describe('DevServer proxying', () => {
                 cookie: 'abc=123',
                 // These headers are allowed
                 'accept-encoding': 'gzip',
-                'accept-language': 'en'
+                'accept-language': 'en',
+                'user-agent': 'test-agent'
             })
             .then((response) => {
                 // Expected that proxy request would be fetched

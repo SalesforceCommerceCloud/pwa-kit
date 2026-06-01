@@ -25,6 +25,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 
 const config = getConfig()
 
@@ -58,12 +59,10 @@ const options = {
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: false,
 
-    // If you wish to use additional SLAS endpoints that require private clients,
-    // customize this regex to include the additional endpoints the custom SLAS
-    // private client secret handler will inject an Authorization header.
-    // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //    /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+    // To extend the SLAS private-client proxy allow-list, supply
+    // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
+    // for the entry shape. A startup warning is logged whenever a custom list
+    // is in use.
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -469,6 +468,42 @@ const {handler} = runtime.createHandler(options, (app) => {
                 process.env.MARKETING_CLOUD_RESET_PASSWORD_TEMPLATE
             )
         })
+    })
+
+    // Proxy endpoint for the shared maintenance page — fetches CDN content server-side
+    // to avoid CORS restrictions on the client.
+    app.get('/api/maintenance-page', async (_req, res) => {
+        const {app: appConfig} = config
+        const {sharedMaintenancePage, cdnUrl, forwardedHost} =
+            appConfig?.pages?.maintenancePage || {}
+
+        if (!sharedMaintenancePage || !cdnUrl) {
+            return res.status(404).end()
+        }
+
+        try {
+            const cdnRes = await fetch(cdnUrl, {
+                headers: {'x-dw-forwarded-host': forwardedHost}
+            })
+            if (!cdnRes.ok && cdnRes.status !== 503) {
+                return res.status(cdnRes.status).end()
+            }
+            let html = await cdnRes.text()
+            html = html.replace(/<\/?html[^>]*>/gi, '')
+            html = html.replace(/<\/?head[^>]*>/gi, '')
+            html = html.replace(/<\/?body[^>]*>/gi, '')
+            res.setHeader('Content-Type', 'text/html')
+            res.send(html)
+        } catch (error) {
+            logger.error('Failed to fetch maintenance page', {
+                namespace: 'maintenance-page',
+                additionalProperties: {error}
+            })
+            res.status(502).json({
+                error: 'Failed to fetch maintenance page',
+                details: error.message
+            })
+        }
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

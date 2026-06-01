@@ -24,58 +24,36 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
  * @param {Boolean} dnt - Do Not Track value to answer the form. False to enable tracking, True to disable tracking.
  */
 export const answerConsentTrackingForm = async (page, dnt = false) => {
+    const consentForm = page.locator('text=Tracking Consent')
+
+    // Probe for the form: if it doesn't appear, assume the preference is
+    // already set and return. With httpOnly cookies, auth initialization
+    // can be slow so we allow up to 10s for it to render.
     try {
-        const consentFormVisible = await page
-            .locator('text=Tracking Consent')
-            .isVisible()
-            .catch(() => false)
-        if (!consentFormVisible) {
+        await consentForm.waitFor({state: 'visible', timeout: 10000})
+    } catch {
+        return
+    }
+
+    const ariaLabel = dnt ? 'Decline tracking' : 'Accept tracking'
+    const button = page.locator(`button[aria-label="${ariaLabel}"]`).and(page.locator(':visible'))
+
+    // The consent modal is rendered into a chakra-portal anchored to the
+    // bottom of the viewport. While it is visible, its inner Stack of
+    // buttons intercepts pointer events on any element that overlaps it
+    // (e.g. Sign In, Add Bundle to Cart). If the first dismissal click
+    // doesn't make the modal disappear within 5s, retry once before giving
+    // up — this is more robust than a single click + long wait, and avoids
+    // the misleading 60s waitForResponse timeouts we see when a stale modal
+    // intercepts a later click in the test.
+    for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+            await button.first().click()
+            await consentForm.waitFor({state: 'hidden', timeout: 5000})
             return
+        } catch {
+            // fall through and retry
         }
-
-        const buttonText = dnt ? 'Decline' : 'Accept'
-        await page
-            .getByRole('button', {name: new RegExp(buttonText, 'i')})
-            .first()
-            .waitFor({timeout: 3000})
-
-        // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
-        const clickSuccess = await page.evaluate((targetText) => {
-            // Try aria-label first, then fallback to text content
-            let buttons = Array.from(
-                document.querySelectorAll(`button[aria-label="${targetText} tracking"]`)
-            )
-
-            if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll('button')).filter(
-                    (btn) =>
-                        btn.textContent &&
-                        btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
-                )
-            }
-
-            let clickedCount = 0
-            buttons.forEach((button) => {
-                // Only click visible buttons
-                if (button.offsetParent !== null) {
-                    button.click()
-                    clickedCount++
-                }
-            })
-
-            return clickedCount
-        }, buttonText)
-
-        // after clicking an answering button, the tracking consent should not stay in the DOM
-        if (clickSuccess > 0) {
-            await page.waitForTimeout(2000)
-            await page
-                .locator('text=Tracking Consent')
-                .isHidden({timeout: 5000})
-                .catch(() => {})
-        }
-    } catch (error) {
-        // Silently continue - consent form handling should not break tests
     }
 }
 
@@ -239,7 +217,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
 
     await addedToCartModal.waitFor()
 
-    await page.getByLabel('Close').click()
+    await page.getByLabel('Close', {exact: true}).click()
 }
 
 /**
@@ -354,12 +332,21 @@ export const validateWishlist = async ({page, a11y = {}}) => {
  * @return {Boolean} - denotes whether or not login was successful
  */
 export const loginShopper = async ({page, userCredentials}) => {
+    let loginResponse
+    let tokenResponse
     try {
         await page.goto(config.RETAIL_APP_HOME + '/login')
         await answerConsentTrackingForm(page)
 
         await page.locator('input#email').fill(userCredentials.email)
         await page.locator('input#password').fill(userCredentials.password)
+
+        // The DNT consent modal is portaled to the bottom of the viewport.
+        // If it is still visible when we click Sign In, its container
+        // intercepts the click — the form never submits and waitForResponse
+        // below times out at 60s with a misleading message. Make the failure
+        // explicit instead.
+        await expect(page.locator('text=Tracking Consent')).toBeHidden({timeout: 10000})
 
         const loginResponsePromise = page.waitForResponse(
             '**/shopper/auth/v1/organizations/**/oauth2/login'
@@ -369,10 +356,10 @@ export const loginShopper = async ({page, userCredentials}) => {
         )
         await page.getByRole('button', {name: /Sign In/i}).click()
 
-        const loginResponse = await loginResponsePromise
+        loginResponse = await loginResponsePromise
         expect(loginResponse.status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
 
-        const tokenResponse = await tokenResponsePromise
+        tokenResponse = await tokenResponsePromise
         expect(tokenResponse.status()).toBe(200)
 
         await page.waitForURL(/.*\/account.*/, {timeout: 10000})
@@ -380,6 +367,11 @@ export const loginShopper = async ({page, userCredentials}) => {
         await expect(page.getByText(userCredentials.email)).toBeVisible()
         return true
     } catch (error) {
+        const lastResponse = tokenResponse || loginResponse
+        const responseContext = lastResponse
+            ? ` (last SLAS response: ${lastResponse.status()} ${lastResponse.url()})`
+            : ''
+        console.error(`[e2e] loginShopper failed${responseContext}:`, error.message)
         return false
     }
 }
@@ -790,4 +782,78 @@ export const selectStoreFromPLP = async ({page}) => {
         // Close the modal
         await page.getByRole('button', {name: 'Close'}).click()
     }
+}
+
+/**
+ * Tests that a master product in the wishlist can be added to cart via the "View Options" modal.
+ *
+ * Flow:
+ * 1. Log in or register a shopper
+ * 2. Navigate to PDP and add a product to wishlist without selecting all variants (master product)
+ * 3. Go to wishlist page
+ * 4. Click "View Options" to open the product modal
+ * 5. Select variant attributes in the modal
+ * 6. Click "Add to Cart"
+ * 7. Verify the item was added successfully
+ */
+export const wishlistMasterProductAddToCartFlow = async ({page, registeredUserCredentials}) => {
+    const isLoggedIn = await loginShopper({
+        page,
+        userCredentials: registeredUserCredentials
+    })
+
+    if (!isLoggedIn) {
+        try {
+            await registerShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+        } catch (error) {
+            const secondLoginAttempt = await loginShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+            if (!secondLoginAttempt) {
+                throw new Error('Authentication failed: Both login and registration unsuccessful')
+            }
+        }
+    }
+
+    await answerConsentTrackingForm(page)
+    await page.waitForLoadState()
+
+    // Navigate to PDP without selecting all variants so the master product is added to wishlist
+    await navigateToPDPDesktop({page})
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+
+    // Do NOT select a size — this ensures the master product ID is used for the wishlist item
+    await page.getByRole('button', {name: /Add to Wishlist/i}).click()
+    await expect(page.getByText(/1 item added to wishlist/i)).toBeVisible()
+
+    // Navigate to wishlist page
+    await page.goto(config.RETAIL_APP_HOME + '/account/wishlist')
+    await answerConsentTrackingForm(page)
+
+    await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+
+    // Master product should show "View Options" button instead of "Add to Cart"
+    const viewOptionsButton = page.getByRole('button', {name: /View Options/i})
+    await expect(viewOptionsButton).toBeVisible()
+    await viewOptionsButton.click()
+
+    // Wait for the product view modal to appear
+    const modal = page.getByTestId('product-view-modal')
+    await expect(modal).toBeVisible({timeout: 10000})
+
+    // Select variant attributes in the modal
+    await modal.getByRole('radio', {name: 'L', exact: true}).click()
+
+    // Click "Add to Cart" in the modal
+    const addToCartButton = modal.getByRole('button', {name: /Add to Cart/i})
+    await expect(addToCartButton).toBeEnabled({timeout: 5000})
+    await addToCartButton.click()
+
+    // Verify item was added to cart successfully (no API error)
+    await expect(page.getByText(/1 item added to cart/i)).toBeVisible({timeout: 10000})
 }

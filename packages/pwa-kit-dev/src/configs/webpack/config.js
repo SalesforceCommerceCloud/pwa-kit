@@ -23,6 +23,7 @@ import {getEnvBasePath, bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+import {buildBabelExcludeRegex} from './babel-exclude'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -203,6 +204,7 @@ const baseConfig = (target) => {
                           }
                         : {}),
                     conditionNames: [
+                        ...(mode === 'development' ? ['dev-data-store'] : []),
                         'import',
                         'require',
                         'module',
@@ -276,6 +278,8 @@ const baseConfig = (target) => {
                         {
                             test: /\.js$/,
                             enforce: 'pre',
+                            // Published @salesforce/mrt-utilities maps reference unpublished src/*.ts → ENOENT noise.
+                            exclude: /node_modules[\\/]@salesforce[\\/]mrt-utilities/,
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
@@ -324,6 +328,7 @@ const withChunking = (config) => {
                         // 3. If extending another template, don't include the
                         //    baseline route files in vendor.js
                         test: (module) => {
+                            // String.includes — literal match, so unescaped backslashes are correct here
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
@@ -374,11 +379,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
               {
-                  exclude: new RegExp(
-                      `${path.sep}node_modules(?!${path.sep}${
-                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                      })`
-                  )
+                  exclude: buildBabelExcludeRegex(path.sep, EXT_EXTENDS)
               }
             : {exclude: /node_modules/}),
         use: [

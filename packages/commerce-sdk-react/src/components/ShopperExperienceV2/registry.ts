@@ -7,7 +7,7 @@
 import {
     createReactAdapter,
     type ReactDesignComponentType
-} from '@salesforce/storefront-next-runtime/design/react'
+} from '@salesforce/storefront-next-runtime/design/react/core'
 import {ComponentRegistry} from '@salesforce/storefront-next-runtime/design'
 
 /**

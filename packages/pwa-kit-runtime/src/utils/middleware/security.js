@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {CONTENT_SECURITY_POLICY, STRICT_TRANSPORT_SECURITY} from '../../ssr/server/constants'
+import {
+    CONTENT_SECURITY_POLICY,
+    STOREFRONT_PREVIEW_PARENT_ALLOW_LIST,
+    STRICT_TRANSPORT_SECURITY
+} from '../../ssr/server/constants'
 import {isRemote} from '../ssr-server'
 
 /**
@@ -17,9 +21,20 @@ import {isRemote} from '../ssr-server'
  * @param {express.NextFunction} next Express next callback
  */
 export const defaultPwaKitSecurityHeaders = (req, res, next) => {
-    /** CSP-compatible origin for Runtime Admin. */
-    // localhost doesn't include a protocol because different browsers behave differently :\
-    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+    /**
+     * CSP-compatible origins for Runtime Admin. In production this includes
+     * the prod RA host plus the staging and preview RA hosts so Storefront
+     * Preview against non-prod environments works (frame-ancestors must
+     * permit those parents, and connect-src/script-src must permit RA's
+     * preview-client script). The full list is the canonical
+     * `STOREFRONT_PREVIEW_PARENT_ALLOW_LIST` so client-side iframe-trust
+     * checks (`commerce-sdk-react`'s `isOriginTrusted`) and the BFF's
+     * frame-ancestors stay aligned. On local dev we use `localhost:*`
+     * since different browsers handle the localhost protocol differently.
+     */
+    const runtimeAdminOrigins = isRemote()
+        ? [...STOREFRONT_PREVIEW_PARENT_ALLOW_LIST]
+        : ['localhost:*']
     const siteDotCom = '*.site.com'
     /**
      * Map of directive names/values that are required for PWA Kit to work. Array values will be
@@ -27,11 +42,11 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
      * @type Object.<string, string[] | boolean>
      */
     const directives = {
-        'connect-src': ["'self'", runtimeAdmin, '*.salesforce-scrt.com'],
+        'connect-src': ["'self'", ...runtimeAdminOrigins, '*.salesforce-scrt.com'],
         'frame-src': [siteDotCom],
-        'frame-ancestors': [runtimeAdmin],
+        'frame-ancestors': runtimeAdminOrigins,
         'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin, siteDotCom],
+        'script-src': ["'self'", "'unsafe-eval'", ...runtimeAdminOrigins, siteDotCom],
         // Always upgrade insecure requests when deployed, never upgrade on local dev server
         'upgrade-insecure-requests': isRemote()
     }

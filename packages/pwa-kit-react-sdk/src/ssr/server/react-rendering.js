@@ -20,12 +20,23 @@ import PropTypes from 'prop-types'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {
+    DATA_STORE_WINDOW_GLOBAL,
+    DATA_STORE_BOOTSTRAP_SITE_ID_KEY,
+    CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY,
+    CUSTOM_SITE_PREFERENCES_KEY_SUFFIX
+} from '@salesforce/pwa-kit-runtime/utils/data-store/constants'
+import {
+    getCustomGlobalPreferences,
+    getCustomSitePreferences,
+    isMrtDataStoreEnabled
+} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
 import {shutdownServerTracing, tracePerformance} from './opentelemetry-server'
 
 import {getAssetUrl} from '../universal/utils'
-import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
+import {ServerContext, CorrelationIdProvider, MrtDataStoreProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
@@ -72,6 +83,9 @@ const logAndFormatError = (err) => {
     if (err instanceof errors.HTTPError) {
         // These are safe to display – we expect end-users to throw them
         return {message: err.message, status: err.status, stack: err.stack}
+    } else if (err?.name === 'MaintenanceError') {
+        // ^ avoid importing the commerce SDK
+        return {message: err.message, status: 503, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
         logger.error(cause, {namespace: 'react-rendering.render'})
@@ -136,6 +150,23 @@ const performRender = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
+    // MRT Data Store (opt-in): when disabled, skip preference resolution and omit `__MRT_DATA_STORE__` from
+    // `#mobify-data`. Enable via `app.mrtDataStore.enabled` or `PWAKIT_MRT_DATA_STORE_ENABLED=true`.
+    // When enabled, resolve both MRT Data Store preference keys.
+    const mrtDataStoreEnabled = isMrtDataStoreEnabled(config)
+    let customSitePreferences = {}
+    let customGlobalPreferences = {}
+    if (mrtDataStoreEnabled) {
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'start')
+        ;[customSitePreferences, customGlobalPreferences] = await Promise.all([
+            getCustomSitePreferences({
+                siteId: res.locals.site?.id
+            }),
+            getCustomGlobalPreferences()
+        ])
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.dataStoreFetch, 'end')
+    }
+
     const routes = getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
@@ -177,7 +208,9 @@ const performRender = async (req, res, next) => {
         res,
         App: WrappedApp,
         routes,
-        location
+        location,
+        customSitePreferences,
+        customGlobalPreferences
     }
     let appJSX = <OuterApp {...props} />
 
@@ -220,7 +253,10 @@ const performRender = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX
+            appJSX,
+            customSitePreferences,
+            customGlobalPreferences,
+            mrtDataStoreEnabled
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -270,7 +306,18 @@ export const render = (req, res, next) => {
     }
 }
 
-const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
+const OuterApp = ({
+    req,
+    res,
+    error,
+    App,
+    appState,
+    routes,
+    routerContext,
+    location,
+    customSitePreferences,
+    customGlobalPreferences
+}) => {
     const AppConfig = getAppConfig()
     const routerBasename = getRouterBasePath() || undefined
 
@@ -281,9 +328,15 @@ const OuterApp = ({req, res, error, App, appState, routes, routerContext, locati
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
                 >
-                    <AppConfig locals={res.locals}>
-                        <Switch error={error} appState={appState} routes={routes} App={App} />
-                    </AppConfig>
+                    <MrtDataStoreProvider
+                        siteId={res.locals.site?.id}
+                        customSitePreferences={customSitePreferences}
+                        customGlobalPreferences={customGlobalPreferences}
+                    >
+                        <AppConfig locals={res.locals}>
+                            <Switch error={error} appState={appState} routes={routes} App={App} />
+                        </AppConfig>
+                    </MrtDataStoreProvider>
                 </CorrelationIdProvider>
             </Router>
         </ServerContext.Provider>
@@ -298,14 +351,26 @@ OuterApp.propTypes = {
     appState: PropTypes.object,
     routes: PropTypes.array,
     routerContext: PropTypes.object,
-    location: PropTypes.object
+    location: PropTypes.object,
+    customSitePreferences: PropTypes.object,
+    customGlobalPreferences: PropTypes.object
 }
 
 const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config} = args
+    const {
+        req,
+        res,
+        appStateError,
+        appJSX,
+        appState,
+        config,
+        customSitePreferences,
+        customGlobalPreferences,
+        mrtDataStoreEnabled = false
+    } = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -370,9 +435,24 @@ const renderApp = (args) => {
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
         __MRT_ENV_BASE_PATH__: process.env.MRT_ENV_BASE_PATH || '',
+        __MRT_ENABLE_HTTPONLY_SESSION_COOKIES__: process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
+    }
+
+    if (mrtDataStoreEnabled) {
+        const siteId = res.locals.site?.id
+        // Serialize using DAL keys for consistency with backend storage
+        windowGlobals[DATA_STORE_WINDOW_GLOBAL] = {
+            [DATA_STORE_BOOTSTRAP_SITE_ID_KEY]: siteId, // Include siteId so client can construct keys
+            [CUSTOM_GLOBAL_PREFERENCES_DATA_STORE_KEY]: customGlobalPreferences ?? {}
+        }
+        // Add site preferences only if we have a siteId
+        if (siteId) {
+            const siteKey = `${siteId}${CUSTOM_SITE_PREFERENCES_KEY_SUFFIX}`
+            windowGlobals[DATA_STORE_WINDOW_GLOBAL][siteKey] = customSitePreferences ?? {}
+        }
     }
 
     const scripts = [

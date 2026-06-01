@@ -130,7 +130,7 @@ test('should validate performance marks in Server-Timing header have numeric dur
             // Handle various suffixes by extracting the base mark name
             // Remove any suffix after the base mark name (e.g., .1, .useCategory-0, .useProductSearch-2)
             const baseMarkName = markName
-                .replace(/\.(useCategory|useProductSearch|useQuery)-\d+$/, '')
+                .replace(/\.(useCategory|useProductSearch|useQuery|useConfigurations)-\d+$/, '')
                 .replace(/\.\d+$/, '')
             const expectedMarks = [
                 'ssr.total',

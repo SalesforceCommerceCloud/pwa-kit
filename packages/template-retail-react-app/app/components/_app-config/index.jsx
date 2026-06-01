@@ -31,7 +31,8 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     getEnvBasePath,
-    slasPrivateProxyPath
+    slasPrivateProxyPath,
+    slasPublicProxyPath
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
@@ -67,7 +68,8 @@ const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId,
-        sfdc_user_agent: sfdcUserAgent
+        sfdc_user_agent: sfdcUserAgent,
+        'x-site-id': locals.site?.id
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
@@ -92,6 +94,7 @@ const AppConfig = ({children, locals = {}}) => {
     const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
+    const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPublicProxyPath}`
 
     const pageDesignerParams = locals.pageDesignerParams || {}
 
@@ -112,10 +115,17 @@ const AppConfig = ({children, locals = {}}) => {
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
+            publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
+            cookieDomain={commerceApiConfig.cookieDomain}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
             pageDesignerParams={pageDesignerParams}
+            enableHttpOnlySessionCookies={
+                typeof window !== 'undefined'
+                    ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                    : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+            }
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
@@ -179,6 +189,7 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 10 * 1000,
+                useErrorBoundary: (err) => err?.name === 'MaintenanceError', // prevent ReactQuery from swallowing this exception
                 ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {

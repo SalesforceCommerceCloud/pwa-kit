@@ -11,7 +11,9 @@
 export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime.commercecloud.com',
     'https://runtime-admin-staging.mobify-storefront.com',
-    'https://runtime-admin-preview.mobify-storefront.com'
+    'https://runtime-admin-preview.mobify-storefront.com',
+    'https://runtime-admin-soak.mobify-storefront.com',
+    'https://runtime-admin-testing.mobify-storefront-staging.com'
 ])
 
 export const SLAS_SECRET_WARNING_MSG =
@@ -43,6 +45,9 @@ export const EXCLUDE_COOKIE_SUFFIX = [DWSID_COOKIE_NAME, DNT_COOKIE_NAME]
  * Use the header key below to send dwsid value with SCAPI/OCAPI requests.
  */
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
+
+// Custom header sent by the SDK to signal a refresh token request to the proxy.
+export const X_GRANT_TYPE = 'x-grant-type'
 
 export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',

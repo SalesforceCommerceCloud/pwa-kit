@@ -30,7 +30,8 @@ import {
     SLAS_SECRET_OVERRIDE_MSG,
     DNT_COOKIE_NAME,
     DWSID_COOKIE_NAME,
-    SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG
+    SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
+    X_GRANT_TYPE
 } from '../constant'
 
 import {Logger} from '../types'
@@ -43,6 +44,7 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     headers?: Record<string, string>
     privateClientProxyEndpoint?: string
+    publicClientProxyEndpoint?: string
     fetchOptions?: FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -54,6 +56,9 @@ interface AuthConfig extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     hybridAuthEnabled?: boolean
+    cookieDomain?: string
+    /** When true, session tokens are set as HttpOnly cookies */
+    enableHttpOnlySessionCookies?: boolean
 }
 
 interface JWTHeaders {
@@ -136,6 +141,9 @@ type AuthDataKeys =
     | 'uido'
     | 'idp_refresh_token'
     | 'dnt'
+    | 'cc-at-expires'
+    | 'cc-at-dnt'
+    | 'cc-nx-expires'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -250,11 +258,59 @@ const DATA_MAP: AuthDataMap = {
     uido: {
         storageType: 'local',
         key: 'uido'
+    },
+    'cc-at-expires': {
+        storageType: 'cookie',
+        key: 'cc-at-expires'
+    },
+    'cc-at-dnt': {
+        storageType: 'cookie',
+        key: 'cc-at-dnt'
+    },
+    'cc-nx-expires': {
+        storageType: 'cookie',
+        key: 'cc-nx-expires'
     }
 }
 
 export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
+
+/**
+ * Auth-data keys whose storage is backed by a proxy-set cookie when
+ * `enableHttpOnlySessionCookies` is on. In that mode reads and writes for
+ * these keys go to the cookie store instead of localStorage, with the cookie
+ * as the single source of truth.
+ *
+ * Some entries here (`idp_access_token`, `idp_refresh_token`) are HttpOnly
+ * and unreadable from JavaScript — they're included for routing symmetry so
+ * the storage type is consistent in httpOnly mode; reads of those keys
+ * return '' from the cookie store either way.
+ *
+ * `expires_in` is intentionally absent: the access token expiry is already
+ * covered by the `cc-at-expires` cookie, so we derive it from there in the
+ * `data` getter instead of backing a redundant cookie.
+ *
+ * @internal
+ */
+const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
+    'customer_id',
+    'enc_user_id',
+    'customer_type',
+    'id_token',
+    'idp_access_token',
+    'idp_refresh_token',
+    'uido'
+])
+
+/**
+ * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
+ * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
+ * so instance-level dedup via `this.pendingToken` is insufficient. This map ensures only one
+ * in-flight refresh request exists per siteId+clientId combination.
+ * @internal — exported for test access only
+ */
+export const pendingRefreshTokens = new Map<string, Promise<AuthData>>()
 
 /**
  * This class is used to handle shopper authentication.
@@ -268,7 +324,6 @@ class Auth {
     private client: ShopperLogin<ApiClientConfigParams>
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
-    private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private clientSecret: string
@@ -284,6 +339,7 @@ class Auth {
         | undefined
 
     private hybridAuthEnabled: boolean
+    private enableHttpOnlySessionCookies: boolean
 
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
@@ -291,6 +347,8 @@ class Auth {
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
+                : config.enableHttpOnlySessionCookies
+                ? config.publicClientProxyEndpoint
                 : config.proxy,
             headers: config.headers || {},
             parameters: {
@@ -321,16 +379,17 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        const options = {
-            keySuffix: config.siteId,
-            // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
-            sharedContext: !onClient()
-        }
+        const baseOptions = {keySuffix: config.siteId}
+        // Setting sharedContext to true on the server allows us to reuse guest auth tokens across lambda runs
+        const memoryOptions = {...baseOptions, sharedContext: !onClient()}
+        const cookieOptions = {...baseOptions, cookieDomain: config.cookieDomain}
 
         this.stores = {
-            cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
-            local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
-            memory: new MemoryStorage(options)
+            cookie: onClient()
+                ? new CookieStorage(cookieOptions)
+                : new MemoryStorage(memoryOptions),
+            local: onClient() ? new LocalStorage(baseOptions) : new MemoryStorage(memoryOptions),
+            memory: new MemoryStorage(memoryOptions)
         }
 
         this.redirectURI = config.redirectURI
@@ -380,25 +439,61 @@ class Auth {
         this.passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
+        this.enableHttpOnlySessionCookies = config.enableHttpOnlySessionCookies ?? false
+    }
+
+    /**
+     * Returns the storage type to use for a given key. When
+     * `enableHttpOnlySessionCookies` is on (and we're on the client), the SLAS
+     * proxy writes cookies for the metadata keys in
+     * `HTTPONLY_COOKIE_BACKED_KEYS`, so reads/writes for those keys are
+     * routed to the cookie store instead of local storage.
+     */
+    private resolveStorageType(name: AuthDataKeys): StorageType {
+        const {storageType} = DATA_MAP[name]
+        if (
+            this.enableHttpOnlySessionCookies &&
+            onClient() &&
+            HTTPONLY_COOKIE_BACKED_KEYS.has(name)
+        ) {
+            return 'cookie'
+        }
+        return storageType
     }
 
     get(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
     }
 
     private delete(name: AuthDataKeys) {
-        const {key, storageType} = DATA_MAP[name]
-        const storage = this.stores[storageType]
+        const {key} = DATA_MAP[name]
+        const storage = this.stores[this.resolveStorageType(name)]
         storage.delete(key)
+    }
+
+    /**
+     * Returns the DNT value from the current access token, or undefined if
+     * no access token is available. In HttpOnly mode, reads from the
+     * cc-at-dnt companion cookie; otherwise parses the JWT directly.
+     */
+    private getDntFromAccessToken(): string | undefined {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return this.get('cc-at-dnt') || undefined
+        }
+        const accessToken = this.getAccessToken()
+        if (accessToken) {
+            return this.parseSlasJWT(accessToken).dnt
+        }
+        return undefined
     }
 
     /**
@@ -417,12 +512,9 @@ class Auth {
     getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         let dntCookieStatus = undefined
-        const accessToken = this.getAccessToken()
-        let isInSync = true
-        if (accessToken) {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            isInSync = dnt === dntCookieVal
-        }
+
+        const accessTokenDnt = this.getDntFromAccessToken()
+        const isInSync = accessTokenDnt === undefined || accessTokenDnt === dntCookieVal
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)
         } else {
@@ -459,21 +551,24 @@ class Auth {
             ...getDefaultCookieAttributes(),
             secure: true
         })
-        const accessToken = this.getAccessToken()
-        if (accessToken !== '') {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            if (dnt !== dntCookieVal) {
-                await this.refreshAccessToken()
-            }
-        } else {
+        const accessTokenDnt = this.getDntFromAccessToken()
+        if (accessTokenDnt === undefined || accessTokenDnt !== dntCookieVal) {
             await this.refreshAccessToken()
         }
         if (preference !== null) {
+            // Tie the DNT cookie's expiry to the refresh token's. In httpOnly
+            // mode the proxy publishes the absolute expiry as `cc-nx-expires`
+            // (epoch seconds), which we pass straight to js-cookie as a Date.
+            // In non-httpOnly mode we fall back to the localStorage TTL.
             const SECONDS_IN_DAY = 86400
+            const useCookieExpiry = this.enableHttpOnlySessionCookies && onClient()
+            const expires = useCookieExpiry
+                ? new Date(Number(this.get('cc-nx-expires')) * 1000)
+                : Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
+                expires
             })
         }
     }
@@ -482,8 +577,8 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
-            const store = this.stores[storageType]
+            const {key} = DATA_MAP[keyName]
+            const store = this.stores[this.resolveStorageType(keyName)]
             store.delete(key)
         })
     }
@@ -496,7 +591,7 @@ class Auth {
             access_token: this.get('access_token'),
             customer_id: this.get('customer_id'),
             enc_user_id: this.get('enc_user_id'),
-            expires_in: parseInt(this.get('expires_in')),
+            expires_in: this.getExpiresIn(),
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
@@ -508,6 +603,23 @@ class Auth {
     }
 
     /**
+     * Returns the access token's remaining lifetime in seconds. In httpOnly mode
+     * we derive it from the `cc-at-expires` cookie (the access-token JWT `exp`
+     * claim, in epoch seconds) instead of storing a redundant `expires_in`
+     * cookie. Falls back to the local-storage value otherwise.
+     */
+    private getExpiresIn(): number {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            const expiresAt = this.get('cc-at-expires')
+            if (!expiresAt) return NaN
+            const expiresAtSec = Number(expiresAt)
+            if (Number.isNaN(expiresAtSec)) return NaN
+            return Math.max(0, Math.floor(expiresAtSec - Date.now() / 1000))
+        }
+        return parseInt(this.get('expires_in'))
+    }
+
+    /**
      * Used to validate JWT token expiration.
      */
     private isTokenExpired(token: string) {
@@ -515,6 +627,48 @@ class Auth {
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
         return validTimeSeconds <= tokenAgeSeconds
+    }
+
+    /**
+     * Returns whether a refresh token exists in an HttpOnly cookie. Since JavaScript
+     * cannot read HttpOnly cookies, we check `cc-nx-expires` — a non-HttpOnly cookie
+     * the proxy sets with the same expiry as the refresh token. A non-empty read
+     * means the browser hasn't yet evicted the cookie, so the refresh token is
+     * still alive.
+     */
+    private hasHttpOnlyRefreshToken(): boolean {
+        return this.enableHttpOnlySessionCookies && onClient() && Boolean(this.get('cc-nx-expires'))
+    }
+
+    /**
+     * Clears the non-HttpOnly access token expiry cookie (cc-at-expires).
+     *
+     * This is needed when SCAPI returns a 401 because the HttpOnly access token cookie
+     * (cc-at_{siteId}) was deleted externally while the expiry cookie remained valid.
+     * Clearing the expiry cookie ensures isAccessTokenExpired() returns true, so
+     * subsequent calls to ready() will trigger a refresh instead of assuming the token
+     * is still valid.
+     */
+    clearAccessTokenExpiry(): void {
+        this.delete('cc-at-expires')
+    }
+
+    /**
+     * Returns whether the access token is expired. When enableHttpOnlySessionCookies is true,
+     * uses cc-at-expires cookie from store; otherwise decodes the JWT from getAccessToken().
+     */
+    private isAccessTokenExpired(): boolean {
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            const expiresAt = this.get('cc-at-expires')
+            if (expiresAt == null || expiresAt === '') return true
+            const expiresAtSec = Number(expiresAt)
+            if (Number.isNaN(expiresAtSec)) return true
+            const bufferSeconds = 60
+            return Date.now() / 1000 >= expiresAtSec - bufferSeconds
+        }
+        // Server (SSR) or httpOnly disabled: decode JWT from stored token
+        const token = this.getAccessToken()
+        return !token || this.isTokenExpired(token)
     }
 
     /**
@@ -532,9 +686,20 @@ class Auth {
      * @returns {string} access token
      */
     private getAccessToken() {
+        // In httpOnly mode on the client, the access token lives in an HttpOnly
+        // cookie that JS can't read, and the SFRA cc-at handoff isn't used in
+        // this mode (eCOM owns the session cookies directly). Return an empty
+        // string — callers that try to decode it (e.g., the TAOB flow in
+        // `_refreshAccessToken`) already handle the invalid-JWT case and fall
+        // through to a refresh / guest login.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return ''
+        }
+
         let accessToken = this.get('access_token')
         const sfraAuthToken = this.get('access_token_sfra')
 
+        // This code block only executes in plugin_slas hybrid setup when the cc-at cookie is set.
         if (sfraAuthToken) {
             /*
              * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
@@ -678,83 +843,143 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
+        // In httpOnly mode on the client, every value we'd otherwise persist
+        // here is already set as a cookie by the SLAS proxy / eCOM (access
+        // token, refresh token, customer_id, customer_type, usid, uido,
+        // id_token, enc_user_id, etc.). There is nothing left for the client
+        // to write, so short-circuit. SSR and non-httpOnly mode still need to
+        // populate the in-memory / localStorage stores so subsequent reads
+        // work, so the rest of the function continues for those cases.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            return
+        }
+
         // Delete the SFRA auth token cookie if it exists
         this.clearSFRAAuthToken()
-        this.set('access_token', res.access_token)
+
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
         this.set('id_token', res.id_token)
-        this.set('idp_access_token', res.idp_access_token)
-        this.set('token_type', res.token_type)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
+        this.set('token_type', res.token_type)
 
-        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
             res.refresh_token_expires_in,
             isGuest
         )
+        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+        this.set('usid', res.usid ?? '', {expires: expiresDate})
+
+        this.set('access_token', res.access_token)
+        this.set('idp_access_token', res.idp_access_token)
         if (res.access_token) {
             const {uido} = this.parseSlasJWT(res.access_token)
             this.set('uido', uido)
         }
-        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        this.set(refreshTokenKey, res.refresh_token, {
-            expires: expiresDate
-        })
+        const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
+    }
 
-        this.set('usid', res.usid, {
-            expires: expiresDate
-        })
+    private get refreshDedupKey(): string {
+        const params = this.client.clientConfig.parameters
+        return `refresh:${params.siteId}:${params.clientId}`
     }
 
     async refreshAccessToken() {
+        // Dedup uses a module-level map (not an instance field) because React may recreate
+        // the Auth instance on re-renders, giving each instance its own state. The map is
+        // keyed by siteId+clientId so different sites/clients remain independent.
+        // On the server (SSR), each request is isolated — skip dedup entirely.
+        if (!onClient()) {
+            return await this._refreshAccessToken()
+        }
+
+        const key = this.refreshDedupKey
+        const existing = pendingRefreshTokens.get(key)
+        if (existing) {
+            await existing
+            return this.data
+        }
+
+        const promise = this._refreshAccessToken().finally(() => {
+            pendingRefreshTokens.delete(key)
+        })
+        pendingRefreshTokens.set(key, promise)
+        return await promise
+    }
+
+    /**
+     * Internal implementation of the refresh flow. Called only via refreshAccessToken()
+     * which wraps it in the module-level pendingRefreshTokens map for deduplication.
+     */
+    private async _refreshAccessToken() {
         const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
-        if (refreshToken) {
+
+        // When HttpOnly session cookies are enabled on the client, the refresh token is in an
+        // HttpOnly cookie that JavaScript cannot read. We check the non-HttpOnly `cc-nx-expires`
+        // cookie (set with the same expiry as the refresh token) to avoid a wasted round-trip
+        // when the refresh token is absent. If `cc-nx-expires` is also missing (e.g. cleared by
+        // the user), the proxy layer will catch the missing refresh token and return a 401,
+        // falling through to guest login.
+        if (refreshToken || (!refreshToken && this.hasHttpOnlyRefreshToken())) {
             try {
-                return await this.queueRequest(
-                    () =>
-                        helpers.refreshAccessToken({
-                            slasClient: this.client,
-                            parameters: {
-                                refreshToken,
-                                dnt: dntPref
-                            },
-                            credentials: {
-                                clientSecret: this.clientSecret
-                            }
-                        }),
-                    !!refreshTokenGuest
-                )
+                const isGuest = this.get('customer_type') !== 'registered'
+                // Signal the proxy that this is a refresh token request so it can
+                // inject the HttpOnly refresh token cookie as the sfdc_refresh_token header.
+                if (this.enableHttpOnlySessionCookies) {
+                    this.client.clientConfig.headers[X_GRANT_TYPE] = 'refresh_token'
+                }
+                const token = await helpers.refreshAccessToken({
+                    slasClient: this.client,
+                    parameters: {
+                        refreshToken: refreshToken || '',
+                        dnt: dntPref
+                    },
+                    credentials: {
+                        clientSecret: this.clientSecret
+                    },
+                    enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
+                })
+                this.handleTokenResponse(token, isGuest)
+                return this.data
             } catch (error) {
-                // If the refresh token is invalid, we need to re-login the user
+                // If the refresh token is invalid, we need to re-login the user.
                 if (error instanceof Error && 'response' in error) {
                     // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
                     // We can't use `instanceof`, so instead we just check for the `response` property
                     // and assume it is a fetch Response.
                     const json = await (error['response'] as Response).json()
                     if (json.message === 'invalid refresh_token') {
-                        // clean up storage and restart the login flow
+                        // In a multi-tab scenario, another tab may have already consumed the
+                        // one-time-use refresh token and stored fresh tokens. Re-check storage
+                        // before clearing — if a valid access token exists, use it instead of
+                        // wiping the other tab's work and falling back to guest login.
+                        if (!this.isAccessTokenExpired()) {
+                            return this.data
+                        }
+                        // No valid token found — clean up storage and restart the login flow.
                         this.clearStorage()
                     }
                 }
+            } finally {
+                delete this.client.clientConfig.headers[X_GRANT_TYPE]
             }
         }
 
         // refresh flow for TAOB
         const accessToken = this.getAccessToken()
-        if (accessToken && this.isTokenExpired(accessToken)) {
+        if (this.isAccessTokenExpired()) {
             try {
                 const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
                 if (isAgent) {
-                    return await this.queueRequest(
-                        () => this.refreshTrustedAgent(loginId, usid),
-                        isGuest
-                    )
+                    const token = await this.refreshTrustedAgent(loginId, usid)
+                    this.handleTokenResponse(token, isGuest)
+                    return this.data
                 }
             } catch (e) {
                 /* catch invalid jwt */
@@ -771,30 +996,6 @@ class Auth {
             token = await this.loginGuestUser()
         }
         return token
-    }
-
-    /**
-     * This method queues the requests and handles the SLAS token response.
-     *
-     * It returns the queue.
-     *
-     * @Internal
-     */
-    async queueRequest(fn: () => Promise<TokenResponse>, isGuest: boolean) {
-        const queue = this.pendingToken ?? Promise.resolve()
-        this.pendingToken = queue
-            .then(async () => {
-                const token = await fn()
-                this.handleTokenResponse(token, isGuest)
-                // Q: Why don't we just return token? Why re-construct the same object again?
-                // A: because a user could open multiple tabs and the data in memory could be out-dated
-                // We must always grab the data from the storage (cookie/localstorage) directly
-                return this.data
-            })
-            .finally(() => {
-                this.pendingToken = undefined
-            })
-        return await this.pendingToken
     }
 
     logWarning = (msg: string) => {
@@ -848,8 +1049,28 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
+        // In httpOnly mode on the client, every session value is backed by a
+        // cookie set by the SLAS proxy / eCOM. We never hydrate state from a
+        // fetchedToken (the JWT is HttpOnly so SSR can't capture it) and we
+        // don't write anything to localStorage. Just check the access token
+        // expiry via `cc-at-expires` and refresh if needed; otherwise return
+        // the data assembled from the proxy-set cookies.
+        // `refreshAccessToken()` has its own pendingRefreshTokens dedup, so
+        // we don't need the dedup check that the non-httpOnly path uses.
+        if (this.enableHttpOnlySessionCookies && onClient()) {
+            if (this.isAccessTokenExpired()) {
+                return await this.refreshAccessToken()
+            }
+            return this.data
+        }
+
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+
+            // Write to localStorage in non-httpOnly mode
+            this.set('access_token', this.fetchedToken)
+            this.set('customer_id', customerId)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             /**
              * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
@@ -866,30 +1087,30 @@ class Auth {
                 refreshTokenExpiresIn,
                 isGuest
             )
-            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            this.set('access_token', this.fetchedToken)
-            this.set('customer_id', customerId)
 
             /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
              * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
              * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
              */
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             const usidCookieValue = this.get('usid')
             if (!usidCookieValue || usidCookieValue !== usid) {
                 this.set('usid', usid, {
                     expires: expiresDate
                 })
             }
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
-        if (this.pendingToken) {
-            return await this.pendingToken
+        if (onClient()) {
+            const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
+            if (pendingRefresh) {
+                await pendingRefresh
+                return this.data
+            }
         }
 
-        const accessToken = this.getAccessToken()
-        if (accessToken && !this.isTokenExpired(accessToken)) {
+        if (!this.isAccessTokenExpired()) {
             return this.data
         }
 
@@ -939,12 +1160,16 @@ class Auth {
                 ...parameters
             }
         } as const
+        const enableHttpOnlySessionCookies = this.enableHttpOnlySessionCookies
         const callback = this.clientSecret
-            ? () => helpers.loginGuestUserPrivate({...guestPrivateArgs})
-            : () => helpers.loginGuestUser({...guestPublicArgs})
+            ? () =>
+                  helpers.loginGuestUserPrivate({...guestPrivateArgs, enableHttpOnlySessionCookies})
+            : () => helpers.loginGuestUser({...guestPublicArgs, enableHttpOnlySessionCookies})
 
         try {
-            return await this.queueRequest(callback, isGuest)
+            const token = await callback()
+            this.handleTokenResponse(token, isGuest)
+            return this.data
         } catch (error) {
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.
@@ -1021,7 +1246,8 @@ class Auth {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            body: customParameters
+            body: customParameters,
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         }
 
         const token = await helpers.loginRegisteredUserB2C(loginParams)
@@ -1145,14 +1371,27 @@ class Auth {
      */
     async logout() {
         if (this.get('customer_type') === 'registered') {
-            // Not awaiting on purpose because there isn't much we can do if this fails.
-            void helpers.logout({
+            const logoutPromise = helpers.logout({
                 slasClient: this.client,
                 parameters: {
                     accessToken: this.get('access_token'),
                     refreshToken: this.get('refresh_token_registered')
                 }
             })
+            if (this.enableHttpOnlySessionCookies) {
+                // When HttpOnly cookies are enabled, the proxy expires session cookies
+                // on the logout response. We must await so the browser processes the
+                // Set-Cookie headers before guest login sets new cookies.
+                try {
+                    await logoutPromise
+                } catch (error) {
+                    this.logger.warn(
+                        `SLAS logout failed: ${
+                            error instanceof Error ? error.message : String(error)
+                        }. The error is ignored and session cookies are still cleared by the proxy.`
+                    )
+                }
+            }
         }
         this.clearStorage()
         return await this.ready()
@@ -1262,7 +1501,8 @@ class Auth {
                 code: parameters.code,
                 dnt: dntPref,
                 ...(usid && {usid})
-            }
+            },
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
@@ -1338,7 +1578,8 @@ class Auth {
                             ? String(parameters.register_customer)
                             : parameters.register_customer
                 })
-            }
+            },
+            enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
@@ -1422,6 +1663,26 @@ class Auth {
         }
         const res = await this.client.resetPassword(options)
         return res
+    }
+
+    /**
+     * Get the current USID for Storefront Preview by forcing a SLAS refresh.
+     *
+     * Works for both guest and registered shoppers: when an existing refresh
+     * token is present (guest or registered, legacy or HttpOnly), the SLAS
+     * response provides a fresh USID. When no refresh token is present,
+     * `refreshAccessToken()` falls through to a guest login, which also yields
+     * a fresh USID. Preview can therefore always obtain a USID without
+     * requiring the shopper to sign in.
+     */
+    async getUsidForPreview(): Promise<string> {
+        await this.refreshAccessToken()
+
+        const usid = this.get('usid')
+        if (!usid) {
+            throw new Error('SLAS refresh did not return a USID')
+        }
+        return usid
     }
 
     /**

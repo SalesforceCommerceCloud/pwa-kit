@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "See license in LICENSE",
   "engines": {
-    "node": "^18.0.0 || ^20.0.0 || ^22.0.0",
+    "node": "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0",
     "npm": "^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "ccExtensibility": {
@@ -17,6 +17,16 @@
     {{#each answers.general.packageJSON.scripts}}
     "{{@key}}": "{{{script this}}}"{{#unless @last}},{{/unless}}
     {{/each}}
+  },
+  "overrides": {
+    "react-router": {
+      "path-to-regexp": "^1.9.0"
+    },
+    "@salesforce/storefront-next-runtime": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-router": "^5.3.4"
+    }
   },
   "bundlesize": [
     {

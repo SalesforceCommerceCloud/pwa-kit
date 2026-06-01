@@ -20,6 +20,14 @@ module.exports = {
         {{else}}
         partialHydrationEnabled: false,
         {{/if}}
+        // MRT Data Store (opt-in): when true, SSR resolves prefs and serializes `__MRT_DATA_STORE__` in
+        // `#mobify-data`; when false, that key is omitted. See `isMrtDataStoreEnabled` in pwa-kit-runtime.
+        // Set `PWAKIT_MRT_DATA_STORE_ENABLED=true|false` to override without editing files.
+        // Local dev without DynamoDB: `MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects),
+        // optional `MRT_DATA_STORE_WARN_ON_MISSING=false` to silence missing-key warnings.
+        mrtDataStore: {
+            enabled: false
+        },
         // Commerce shopping agent configuration for embedded messaging service
         // This enables an agentic shopping experience in the application
         // This property accepts either a JSON string or a plain JavaScript object.
@@ -135,6 +143,9 @@ module.exports = {
                 shortCode: '{{answers.project.commerce.shortCode}}',
                 siteId: '{{answers.project.commerce.siteId}}'
             }
+            // Optional: Set the domain for auth cookies to share them across subdomains.
+            // If not set, cookies default to the current host.
+            // cookieDomain: '.example.com'
         },
         // Einstein api config
         einsteinAPI: {
@@ -164,6 +175,13 @@ module.exports = {
         pages: {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
+            },
+            maintenancePage: {
+                // When true (default), the maintenance page is fetched from the CDN URL below
+                // and rendered as-is. Set to false to display the built-in maintenance message.
+                sharedMaintenancePage: true,
+                cdnUrl: 'https://prd.cmp.cdn.commercecloud.salesforce.com',
+                forwardedHost: ''
             }
         },
         // Salesforce Payments configuration
@@ -203,6 +221,9 @@ module.exports = {
     // Additional parameters that configure Express app behavior.
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
+        // Store the session cookies as HttpOnly for enhanced security.
+        // WIP: Do not enable. This feature is in-progress.
+        enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
