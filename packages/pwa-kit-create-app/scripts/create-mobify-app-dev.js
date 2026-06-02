@@ -45,6 +45,7 @@
 const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
+const net = require('net')
 const semver = require('semver')
 
 sh.set('-e')
@@ -56,7 +57,16 @@ const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
  */
 const withLocalNPMRepo = (func) => {
     const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
-    const verdaccioBinary = p.join(__dirname, '..', 'node_modules', '.bin', 'verdaccio')
+    // On Windows, npm bin shims are `.cmd`; cp.spawn (unlike the previous
+    // shell-mediated cp.exec) does not auto-resolve that extension.
+    const binExtension = process.platform === 'win32' ? '.cmd' : ''
+    const verdaccioBinary = p.join(
+        __dirname,
+        '..',
+        'node_modules',
+        '.bin',
+        `verdaccio${binExtension}`
+    )
     const verdaccioConfigDir = p.join(__dirname, '..', 'local-npm-repo')
 
     // Clear any cached packages from a previous run.
@@ -68,35 +78,79 @@ const withLocalNPMRepo = (func) => {
     const cleanup = () => {
         console.log('Shutting down local NPM repository')
         delete process.env['npm_config_registry']
-        verdaccioServerProcess.kill()
+        // verdaccioServerProcess may be undefined if the spawn call itself
+        // threw synchronously (e.g. early Windows shell errors).
+        if (verdaccioServerProcess) {
+            verdaccioServerProcess.kill()
+        }
     }
 
     return Promise.resolve()
         .then(
             () =>
-                new Promise((resolve) => {
+                new Promise((resolve, reject) => {
                     console.log('Starting up local NPM repository')
 
-                    verdaccioServerProcess = cp.exec(`${verdaccioBinary} --config config.yaml`, {
-                        cwd: verdaccioConfigDir,
-                        stdio: 'inherit',
-                        env: {
-                            ...process.env,
-                            OPENCOLLECTIVE_HIDE: 'true',
-                            DISABLE_OPENCOLLECTIVE: 'true',
-                            OPEN_SOURCE_CONTRIBUTOR: 'true'
+                    // Use spawn with stdio fully ignored. We don't need Verdaccio's
+                    // output (we poll TCP for readiness below), and inheriting it
+                    // would (a) flood CI logs with per-request info/http lines and
+                    // (b) push that output through the outer wrapper pipe whose
+                    // `cp.exec` maxBuffer would eventually trigger SIGTERM.
+                    verdaccioServerProcess = cp.spawn(
+                        verdaccioBinary,
+                        ['--config', 'config.yaml'],
+                        {
+                            cwd: verdaccioConfigDir,
+                            stdio: 'ignore',
+                            // Node 20+ requires shell:true to spawn .cmd/.bat
+                            // files (CVE-2024-27980); Verdaccio's npm bin shim
+                            // on Windows is verdaccio.cmd.
+                            shell: process.platform === 'win32',
+                            env: {
+                                ...process.env,
+                                OPENCOLLECTIVE_HIDE: 'true',
+                                DISABLE_OPENCOLLECTIVE: 'true',
+                                OPEN_SOURCE_CONTRIBUTOR: 'true'
+                            }
                         }
-                    })
+                    )
 
-                    verdaccioServerProcess.stdout.on('data', (data) => {
-                        // we know verdaccio server is up when
-                        // 'http address' is in log output
-                        if (data.includes('http address')) {
+                    // Probe the listening port directly with a raw TCP connect.
+                    // We can't sniff stdout (stdio is ignored above), and Node's
+                    // global `fetch` against `localhost` may try ::1 first while
+                    // Verdaccio binds 127.0.0.1 only — connect on the IPv4 loopback
+                    // sidesteps both layers.
+                    const startTime = Date.now()
+                    const timeoutMs = 60_000
+                    const intervalMs = 250
+                    const probe = () =>
+                        new Promise((isUp) => {
+                            const socket = net.connect(4873, '127.0.0.1')
+                            socket.setTimeout(1_000)
+                            const done = (up) => {
+                                socket.destroy()
+                                isUp(up)
+                            }
+                            socket.once('connect', () => done(true))
+                            socket.once('error', () => done(false))
+                            socket.once('timeout', () => done(false))
+                        })
+                    const poll = async () => {
+                        if (await probe()) {
                             console.log('local NPM repository is up')
                             process.env['npm_config_registry'] = 'http://localhost:4873/'
                             resolve()
+                            return
                         }
-                    })
+                        if (Date.now() - startTime > timeoutMs) {
+                            reject(
+                                new Error(`Verdaccio did not become ready within ${timeoutMs}ms`)
+                            )
+                            return
+                        }
+                        setTimeout(poll, intervalMs)
+                    }
+                    poll()
                 })
         )
         .then(() => {
@@ -104,11 +158,28 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
-            sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
-                cwd: monorepoRoot,
-                fatal: true,
-                silent: false
-            }).toEnd(logFileName)
+            // We don't use `fatal: true` here because lerna 6.6.1 has been
+            // observed to exit non-zero (e.g. 128) after the publish has
+            // already succeeded and "Successfully published:" has printed —
+            // likely a tail-end lifecycle quirk. Treat the run as successful
+            // iff that marker appears in the captured output.
+            const result = sh.exec(
+                'npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn',
+                {cwd: monorepoRoot, fatal: false, silent: false}
+            )
+            result.toEnd(logFileName)
+            if (!result.stdout.includes('Successfully published:')) {
+                const err = new Error(
+                    `lerna publish failed (exit ${result.code}); marker "Successfully published:" not found in output`
+                )
+                err.code = result.code
+                throw err
+            }
+            if (result.code !== 0) {
+                console.warn(
+                    `lerna publish exited ${result.code} but reported "Successfully published:"; treating as success`
+                )
+            }
             console.log('Published successfully')
         })
         .then(() => func())
@@ -152,7 +223,10 @@ const main = () => {
     return Promise.resolve()
         .then(() => withLocalNPMRepo(runGenerator))
         .then(() => process.exit(0))
-        .catch(() => process.exit(1))
+        .catch((err) => {
+            console.error(err)
+            process.exit(1)
+        })
 }
 
 if (require.main === module) {

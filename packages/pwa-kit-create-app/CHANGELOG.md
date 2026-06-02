@@ -1,5 +1,6 @@
 ## v3.19.0-dev
 - Add maintenance mode page configuration to generated `config/default.js` templates. Configure `app.pages.maintenancePage.sharedMaintenancePage` (default `true`) to fetch and display a CDN-hosted maintenance page, or set to `false` for the built-in fallback message. Supports CDN URL and forwarded host customization. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+- [Bugfix] Make `create-mobify-app-dev.js` resilient under Node 24 + Docker. Discard Verdaccio's stdio (instead of piping through a `data` listener that the synchronous `lerna publish` can't drain, and instead of inheriting which floods CI logs and the outer wrapper's pipe), pin Verdaccio to `127.0.0.1:4873` in `local-npm-repo/config.yaml`, and probe readiness via a raw TCP connect (Node 24's `fetch` may resolve `localhost` to `::1` first). Also tolerate spurious non-zero exits from `npm run lerna -- publish from-package` when the captured output contains `Successfully published:`. Surfaced after the e2e-pr workflow moved into the Playwright Docker container.
 
 ## v3.18.1 (May 21, 2026)
 - Add react-router override for @salesforce/storefront-next-runtime in generated project template [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)

@@ -44,16 +44,39 @@ export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
 /**
- * Apply the Authorization header with the shopper's access token (Bearer token) to a proxy request.
+ * Apply the Authorization header for an SCAPI proxy request.
  *
- * This function is intended to be called from within a proxy's onProxyReq method.
- * It reads the access token from HttpOnly cookies and sets it as the Authorization header
- * for applicable SCAPI endpoints.
+ * Intended to be called from within a proxy's onProxyReq method. Decides
+ * what Authorization to forward to SCAPI based on the incoming header and
+ * the HttpOnly access-token cookie.
  *
- * Logic for determining if Bearer token should be applied:
- * 1. Caching proxies never use auth (skip)
- * 2. x-site-id header must be present (skip if not)
- * 3. Target must be SCAPI domain (skip if not)
+ * Skipped entirely when:
+ * 1. caching is true (caching proxies never use auth);
+ * 2. the target is not an SCAPI domain;
+ * 3. the x-site-id header is missing (logged as a warning).
+ *
+ * Otherwise the Authorization precedence is:
+ *
+ * 1. Incoming `Authorization: Bearer <jwt>` — passed through unchanged.
+ *    The caller (typically the SDK during SSR after a fresh SLAS token
+ *    fetch) is trusted to have set a valid bearer. Scheme match is
+ *    case-insensitive and requires at least one non-whitespace character
+ *    after the scheme.
+ *
+ * 2. Access-token cookie present — set `Authorization: Bearer <cookie>`,
+ *    overwriting whatever was there. Covers:
+ *      - no incoming Authorization (client-side navigation in HttpOnly
+ *        mode, where JS can't read the cookie);
+ *      - empty `Bearer ` (no value);
+ *      - `Basic <…>` (the Protected Storefronts pattern — swap Basic
+ *        page-level credentials for the JWT bearer SCAPI expects).
+ *
+ * 3. No cookie and no incoming Authorization — throw
+ *    {@link AccessTokenNotFoundError}.
+ *
+ * 4. No cookie but a non-valid Bearer incoming Authorization (Basic, custom,
+ *    etc.) — pass through unchanged. SCAPI will reject it; we don't
+ *    actively rewrite it.
  *
  * @private
  * @function
@@ -61,9 +84,7 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * @param incomingRequest {http.IncomingMessage} the request made to this Express app
  * @param caching {Boolean} true for a caching proxy, false for a standard proxy
  * @param targetHost {String} the target hostname (host+port)
- */
-/**
- * @throws {AccessTokenNotFoundError} If this is an SCAPI request and the access token cookie is missing.
+ * @throws {AccessTokenNotFoundError} when this is an SCAPI request with no access-token cookie and no incoming Authorization.
  */
 export const setScapiAuthRequestHeaders = ({
     proxyRequest,
@@ -93,20 +114,26 @@ export const setScapiAuthRequestHeaders = ({
     const tokenKey = getCookieName(SESSION_COOKIE_CONFIG.accessToken, resolvedSiteId)
     const accessToken = cookies[tokenKey]
 
-    if (!accessToken) {
-        // During SSR, the SDK sets the Authorization header directly (onClient() is false),
-        // so the cookie won't be present on the server-side loopback request. Only throw
-        // when there is no existing Authorization header — meaning the client relied on
-        // the proxy to inject it from the cookie, but the cookie is missing.
-        const hasExistingAuth = incomingRequest.headers.authorization
-        if (!hasExistingAuth) {
+    const existingAuth = incomingRequest.headers.authorization
+    // A `Bearer <token>` header (case-insensitive scheme, requires at least
+    // one non-whitespace character after the space) is treated as already
+    // authenticated. An empty `Bearer ` falls through to the cookie path.
+    const isBearerWithValue = /^bearer\s+\S/i.test(existingAuth || '')
+
+    // The caller — typically the SDK during SSR after obtaining a fresh
+    // token from SLAS — has already set a valid Bearer. Pass it through
+    // to SCAPI unchanged. If not, we need to inject the cookie-derived JWT.
+    if (!isBearerWithValue) {
+        if (accessToken) {
+            // No incoming Authorization, an empty `Bearer `, or `Basic <…>` (the
+            // Protected Storefronts pattern). Inject the cookie-derived JWT.
+            proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+        } else if (!existingAuth) {
+            // No cookie and no incoming auth — nothing to forward.
             throw new AccessTokenNotFoundError(
                 'Access token cookie not found. Cannot proceed with SCAPI request.'
             )
         }
-    } else {
-        // Cookie-based auth takes precedence over any existing header
-        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
     }
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
