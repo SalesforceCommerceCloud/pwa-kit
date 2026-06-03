@@ -65,7 +65,6 @@ const Refinements = ({
     const effectiveFilterIndexes = useMemo(() => {
         if (!isServer) {
             // Use saved state for accordions
-            // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
             const filterAccordionState = window.localStorage?.getItem?.(FILTER_ACCORDION_SATE)
             const savedExpandedAccordionIndexes =
                 filterAccordionState && JSON.parse(filterAccordionState)
@@ -92,7 +91,6 @@ const Refinements = ({
             .filter((filter, index) => expandedIndexes.includes(index))
             .map((filter) => filter.attributeId)
 
-        // TODO: Update when localStorage detection is more robust? useLocalStorage is only a getter
         window.localStorage?.setItem?.(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
     }
 
