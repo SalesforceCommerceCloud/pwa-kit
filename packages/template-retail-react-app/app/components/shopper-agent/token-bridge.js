@@ -17,31 +17,33 @@
  * Flow:
  *   1. Browser reads the SLAS access token (useAccessToken) and SLAS refresh
  *      token (useRefreshToken) from the commerce-sdk-react auth context.
- *      Both are sent in the request body to the same-origin proxy
+ *      All three — access token, refresh token, and my_domain (from the Shopper
+ *      Configurations API) — are sent in the request body to the same-origin proxy
  *      (POST /api/agent/identity/bridge), along with the auth_link_key.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js)
- *      resolves the ANC MyDomain and forwards to Core with
+ *      resolves the ANC MyDomain from the request body and forwards to Core with
  *      `Authorization: SLAS <access_token>` and `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
- * MyDomain resolution: process.env.ANC_MYDOMAIN (PoC fallback). Once the
- * Shopper Configurations API exposes ancMyDomain, swap the body of
- * resolveAncMyDomain() to call SCAPI server-side and cache it.
+ * MyDomain resolution: sourced from the Shopper Configurations API (`my_domain`),
+ * forwarded from the browser through the request body to the server-side handler.
  * ------------------------------------------------------------------------- */
 
 export const TOKEN_BRIDGE_PROXY_PATH = '/api/agent/identity/bridge'
 const CORE_TOKEN_BRIDGE_PATH = '/agent/identity/bridge'
 
 /**
- * Resolve the ANC MyDomain origin to call. PoC: env var only.
+ * Resolve the ANC MyDomain origin to call.
+ * Expects the value supplied by the Shopper Configurations API.
  * Accepts values with or without a scheme; always returns an absolute URL
  * origin (or null) so `fetch()` can parse it.
+ *
+ * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
  */
-export function resolveAncMyDomain() {
-    const fromEnv = process.env.ANC_MYDOMAIN
-    if (!fromEnv) return null
-    const trimmed = fromEnv.trim().replace(/\/+$/, '')
+export function resolveAncMyDomain(myDomain) {
+    if (!myDomain || typeof myDomain !== 'string') return null
+    const trimmed = myDomain.trim().replace(/\/+$/, '')
     if (!trimmed) return null
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
@@ -52,7 +54,8 @@ export async function handleTokenBridge(req, res) {
         const {
             auth_link_key: authLinkKey,
             slas_access_token: slasAccessToken,
-            slas_refresh_token: refreshToken
+            slas_refresh_token: refreshToken,
+            my_domain: myDomainFromConfig
         } = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
@@ -62,10 +65,11 @@ export async function handleTokenBridge(req, res) {
             return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
         }
 
-        const myDomain = resolveAncMyDomain()
+        const myDomain = resolveAncMyDomain(myDomainFromConfig)
         if (!myDomain) {
             console.error(
-                '[token-bridge] ANC MyDomain is not configured. Set ANC_MYDOMAIN env var.'
+                '[token-bridge] ANC MyDomain is not configured. ' +
+                    'Provide my_domain via the Shopper Configurations API.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
         }
@@ -116,15 +120,26 @@ export function registerTokenBridgeRoute(app) {
  * Both the SLAS access token and refresh token are read on the client via the
  * commerce-sdk-react auth context (see useAccessToken / useRefreshToken) and
  * passed through the body. The proxy forwards them to Core.
+ *
+ * @param {string} authLinkKey - Auth link key from the embedded messaging API
+ * @param {string} slasAccessToken - SLAS access token
+ * @param {string} [slasRefreshToken] - SLAS refresh token
+ * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
  */
-export const callTokenBridge = async ({authLinkKey, slasAccessToken, slasRefreshToken}) => {
+export const callTokenBridge = async ({
+    authLinkKey,
+    slasAccessToken,
+    slasRefreshToken,
+    myDomain
+}) => {
     const res = await fetch(TOKEN_BRIDGE_PROXY_PATH, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             auth_link_key: authLinkKey,
             slas_access_token: slasAccessToken,
-            ...(slasRefreshToken ? {slas_refresh_token: slasRefreshToken} : {})
+            ...(slasRefreshToken ? {slas_refresh_token: slasRefreshToken} : {}),
+            ...(myDomain ? {my_domain: myDomain} : {})
         })
     })
 
