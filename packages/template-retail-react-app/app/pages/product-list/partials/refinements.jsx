@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {
     Heading,
     Stack,
@@ -41,57 +41,74 @@ const Refinements = ({
     selectedFilters,
     isLoading
 }) => {
-    // Exclude filters in the exclude list.
-    if (excludedFilters) {
-        filters = filters.filter(({attributeId}) => !excludedFilters.includes(attributeId))
-    }
+    // Derive the effective (non-excluded) filters and a stable comma-joined key of their
+    // attribute IDs. The parent rebuilds the `filters` array on every render, so without
+    // memoizing on its contents the accordion's default-open indexes would recompute each
+    // time and churn the panel. Keying on the joined-IDs string makes the index memo below
+    // recompute only when the filter set actually changes.
+    const {effectiveFilters, effectiveFilterIdsString} = useMemo(() => {
+        const hasExcludes = Array.isArray(excludedFilters) && excludedFilters.length > 0
+        const [filtered, attributeIds] = (Array.isArray(filters) ? filters : []).reduce(
+            (acc, filter) => {
+                if (!hasExcludes || !excludedFilters.includes(filter.attributeId)) {
+                    acc[0].push(filter)
+                    acc[1].push(filter.attributeId)
+                }
+                return acc
+            },
+            [[], []]
+        )
+        return {effectiveFilters: filtered, effectiveFilterIdsString: attributeIds.join(',')}
+    }, [filters])
 
-    // Getting the indices of filters to open accordions by default
-    let filtersIndexes = filters?.map((filter, idx) => idx)
-
-    // Use saved state for accordions
-    if (!isServer) {
-        // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
-        const filterAccordionState = window.localStorage.getItem(FILTER_ACCORDION_SATE)
-        const savedExpandedAccordionIndexes =
-            filterAccordionState && JSON.parse(filterAccordionState)
-
-        if (savedExpandedAccordionIndexes) {
-            filtersIndexes = filters
-                ?.map((filter, index) => {
+    // The indices of the accordion items to open by default.
+    const effectiveFilterIndexes = useMemo(() => {
+        if (!isServer) {
+            // Use saved state for accordions
+            const filterAccordionState = window.localStorage?.getItem?.(FILTER_ACCORDION_SATE)
+            const savedExpandedAccordionIndexes =
+                filterAccordionState && JSON.parse(filterAccordionState)
+            if (
+                Array.isArray(savedExpandedAccordionIndexes) &&
+                savedExpandedAccordionIndexes.length
+            ) {
+                return effectiveFilters.reduce((acc, filter, idx) => {
                     if (savedExpandedAccordionIndexes.includes(filter.attributeId)) {
-                        return index
+                        acc.push(idx)
                     }
-                })
-                .filter((index) => index !== undefined)
+                    return acc
+                }, [])
+            }
         }
-    }
 
-    // Handle saving acccordion state
-    const updateAccordionState = (expandedIndex) => {
-        const filterState = filters
-            ?.filter((filter, index) => expandedIndex.includes(index))
+        // On the server, or with no saved state, open every effective filter by default.
+        return effectiveFilters.map((_, idx) => idx)
+    }, [effectiveFilterIdsString])
+
+    // Handle saving accordion state
+    const updateAccordionState = (expandedIndexes) => {
+        const filterState = effectiveFilters
+            .filter((filter, index) => expandedIndexes.includes(index))
             .map((filter) => filter.attributeId)
 
-        // TODO: Update when localStorage detection is more robust? useLocalStorage is only a getter
-        window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
+        window.localStorage?.setItem?.(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
     }
 
     return (
         <Stack spacing={8}>
             {/* Wait to have filters before rendering the Accordion to allow the default indexes to be accurate */}
-            {filtersIndexes && (
+            {effectiveFilterIndexes && (
                 <Accordion
                     pointerEvents={isLoading ? 'none' : 'auto'}
                     onChange={updateAccordionState}
                     opacity={isLoading ? 0.2 : 1}
                     allowMultiple={true}
-                    defaultIndex={filtersIndexes}
+                    defaultIndex={effectiveFilterIndexes}
                     reduceMotion={true}
                 >
                     {itemsBefore}
 
-                    {filters?.map((filter, idx) => {
+                    {effectiveFilters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
                         let selectedFiltersArray = selectedFilters?.[filter.attributeId] ?? []
@@ -107,7 +124,7 @@ const Refinements = ({
                                     <AccordionItem
                                         paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
                                         borderBottom={
-                                            idx === filters.length - 1
+                                            idx === effectiveFilters.length - 1
                                                 ? '1px solid gray.200'
                                                 : 'none'
                                         }
