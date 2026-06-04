@@ -6,8 +6,13 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
+import {renderToString} from 'react-dom/server'
+import {IntlProvider} from 'react-intl'
+import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import theme from '@salesforce/retail-react-app/app/theme'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
+import CategoryLinks from '@salesforce/retail-react-app/app/pages/product-list/partials/category-links'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
 const filters = [
@@ -70,5 +75,34 @@ describe('Refinements', () => {
             'false'
         )
         expect(screen.getByRole('button', {name: /size/i})).toHaveAttribute('aria-expanded', 'true')
+    })
+})
+
+// `renderToString` runs no effects, mirroring real server-side rendering. The
+// JSDOM tests above can't catch the SSR-closed regression because JSDOM runs
+// layout effects and so always reports the hydrated (open) state.
+const renderToStringWithProviders = (node) =>
+    renderToString(
+        <IntlProvider locale="en-GB" defaultLocale="en-GB">
+            <ChakraProvider theme={theme}>{node}</ChakraProvider>
+        </IntlProvider>
+    )
+
+describe('Refinements server-side rendering', () => {
+    test('renders every filter panel open server-side', () => {
+        const html = renderToStringWithProviders(
+            <Refinements filters={filters} toggleFilter={jest.fn()} selectedFilters={{}} />
+        )
+
+        const expandedStates = html.match(/aria-expanded="(true|false)"/g)
+        expect(expandedStates).toHaveLength(filters.length)
+        expect(expandedStates.every((state) => state === 'aria-expanded="true"')).toBe(true)
+    })
+
+    test('renders the category panel open server-side', () => {
+        const html = renderToStringWithProviders(<CategoryLinks category={{categories: []}} />)
+
+        expect(html).toContain('aria-expanded="true"')
+        expect(html).not.toContain('aria-expanded="false"')
     })
 })
