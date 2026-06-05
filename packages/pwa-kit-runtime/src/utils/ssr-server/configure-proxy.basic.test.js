@@ -276,8 +276,11 @@ describe('setScapiAuthRequestHeaders', () => {
             })
         ).not.toThrow()
 
-        // Should not override the existing Authorization header
-        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
+        // The incoming Bearer is re-emitted under the canonical scheme (same token).
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer server-side-token'
+        )
     })
 
     it('preserves a valid Bearer header when access token cookie is also present', () => {
@@ -308,7 +311,12 @@ describe('setScapiAuthRequestHeaders', () => {
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
-        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
+        // The fresh SSR token is re-emitted (canonical scheme) and still wins
+        // over the stale cookie — only the scheme/separator is normalized.
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer fresh-sdk-token'
+        )
     })
 
     it('replaces empty `Bearer ` (no value) with cookie-derived Bearer', () => {
@@ -394,7 +402,10 @@ describe('setScapiAuthRequestHeaders', () => {
         expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
     })
 
-    it('matches the Bearer scheme case-insensitively', () => {
+    it('normalizes the Bearer scheme to canonical case', () => {
+        // SCAPI rejects a lowercase `bearer` scheme. The proxy detects a bearer
+        // case-insensitively and re-emits it as canonical `Bearer <token>` so
+        // SCAPI accepts it, regardless of the incoming scheme case.
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_RefArch': 'cookie-token'})
 
@@ -421,14 +432,48 @@ describe('setScapiAuthRequestHeaders', () => {
                 targetHost: 'abc-001.api.commercecloud.salesforce.com'
             })
 
-            expect(proxyRequest.setHeader).not.toHaveBeenCalledWith(
+            // Always re-emitted under the canonical `Bearer` scheme, never the
+            // cookie value — the incoming token wins.
+            expect(proxyRequest.setHeader).toHaveBeenCalledWith(
                 'authorization',
-                expect.any(String)
+                'Bearer fresh-token'
             )
         })
     })
 
-    it('preserves a Bearer header when scheme and token are tab-separated', () => {
+    it('forwards a lowercase `bearer` scheme as canonical `Bearer`', () => {
+        // The core hardening fix: an incoming lowercase `bearer <jwt>` must be
+        // re-emitted as `Bearer <jwt>`, otherwise SCAPI 401s on the scheme.
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'cookie-token'})
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {
+                cookie: 'cc-at_RefArch=cookie-token',
+                authorization: 'bearer eyJraWQ.eyJzdWI.signature',
+                [X_SITE_ID]: 'RefArch'
+            }
+        }
+
+        setScapiAuthRequestHeaders({
+            proxyRequest,
+            incomingRequest,
+            caching: false,
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
+        })
+
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer eyJraWQ.eyJzdWI.signature'
+        )
+    })
+
+    it('normalizes a tab separator between scheme and token to a single space', () => {
         utils.isScapiDomain.mockReturnValue(true)
         cookie.parse.mockReturnValue({'cc-at_RefArch': 'cookie-token'})
 
@@ -452,7 +497,40 @@ describe('setScapiAuthRequestHeaders', () => {
             targetHost: 'abc-001.api.commercecloud.salesforce.com'
         })
 
-        expect(proxyRequest.setHeader).not.toHaveBeenCalledWith('authorization', expect.any(String))
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer fresh-sdk-token'
+        )
+    })
+
+    it('trims trailing whitespace from the token when re-emitting', () => {
+        utils.isScapiDomain.mockReturnValue(true)
+        cookie.parse.mockReturnValue({'cc-at_RefArch': 'cookie-token'})
+
+        const proxyRequest = {
+            setHeader: jest.fn(),
+            removeHeader: jest.fn()
+        }
+        const incomingRequest = {
+            url: '/shopper/products/v1/products',
+            headers: {
+                cookie: 'cc-at_RefArch=cookie-token',
+                authorization: 'Bearer fresh-sdk-token  ',
+                [X_SITE_ID]: 'RefArch'
+            }
+        }
+
+        setScapiAuthRequestHeaders({
+            proxyRequest,
+            incomingRequest,
+            caching: false,
+            targetHost: 'abc-001.api.commercecloud.salesforce.com'
+        })
+
+        expect(proxyRequest.setHeader).toHaveBeenCalledWith(
+            'authorization',
+            'Bearer fresh-sdk-token'
+        )
     })
 
     it('uses x-site-id header to resolve correct cookie', () => {

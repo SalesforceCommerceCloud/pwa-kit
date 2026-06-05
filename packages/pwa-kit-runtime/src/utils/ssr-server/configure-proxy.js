@@ -57,11 +57,13 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  *
  * Otherwise the Authorization precedence is:
  *
- * 1. Incoming `Authorization: Bearer <jwt>` — passed through unchanged.
- *    The caller (typically the SDK during SSR after a fresh SLAS token
- *    fetch) is trusted to have set a valid bearer. Scheme match is
+ * 1. Incoming `Authorization: Bearer <jwt>` — re-emitted with the canonical
+ *    `Bearer` scheme. The caller (typically the SDK during SSR after a fresh
+ *    SLAS token fetch) is trusted to have set a valid bearer. Scheme match is
  *    case-insensitive and requires at least one non-whitespace character
- *    after the scheme.
+ *    after the scheme. The token is forwarded unchanged, but the scheme case
+ *    and separator are normalized to `Bearer <jwt>` so SCAPI — which rejects
+ *    a lowercase `bearer` — accepts it.
  *
  * 2. Access-token cookie present — set `Authorization: Bearer <cookie>`,
  *    overwriting whatever was there. Covers:
@@ -74,9 +76,9 @@ const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
  * 3. No cookie and no incoming Authorization — throw
  *    {@link AccessTokenNotFoundError}.
  *
- * 4. No cookie but a non-valid Bearer incoming Authorization (Basic, custom,
- *    etc.) — pass through unchanged. SCAPI will reject it; we don't
- *    actively rewrite it.
+ * 4. No cookie but a non-bearer (or value-less `Bearer`) incoming
+ *    Authorization (Basic, custom, etc.) — pass through unchanged. SCAPI
+ *    will reject it; we don't actively rewrite it.
  *
  * @private
  * @function
@@ -116,24 +118,30 @@ export const setScapiAuthRequestHeaders = ({
 
     const existingAuth = incomingRequest.headers.authorization
     // A `Bearer <token>` header (case-insensitive scheme, requires at least
-    // one non-whitespace character after the space) is treated as already
-    // authenticated. An empty `Bearer ` falls through to the cookie path.
-    const isBearerWithValue = /^bearer\s+\S/i.test(existingAuth || '')
+    // one non-whitespace character after the separator) is treated as already
+    // authenticated. Capture the token so we can re-emit it with the canonical
+    // scheme: SCAPI rejects a lowercase `bearer`, and an incoming header may
+    // arrive with any scheme case or a tab separator. An empty `Bearer ` has
+    // no token and falls through to the cookie path.
+    const bearerMatch = /^bearer\s+(\S.*?)\s*$/i.exec(existingAuth || '')
 
-    // The caller — typically the SDK during SSR after obtaining a fresh
-    // token from SLAS — has already set a valid Bearer. Pass it through
-    // to SCAPI unchanged. If not, we need to inject the cookie-derived JWT.
-    if (!isBearerWithValue) {
-        if (accessToken) {
-            // No incoming Authorization, an empty `Bearer `, or `Basic <…>` (the
-            // Protected Storefronts pattern). Inject the cookie-derived JWT.
-            proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
-        } else if (!existingAuth) {
-            // No cookie and no incoming auth — nothing to forward.
-            throw new AccessTokenNotFoundError(
-                'Access token cookie not found. Cannot proceed with SCAPI request.'
-            )
-        }
+    if (bearerMatch) {
+        // The caller — typically the SDK during SSR after obtaining a fresh
+        // token from SLAS — is trusted to have set a valid token. Re-emit it
+        // under the canonical `Bearer` scheme (normalizing scheme case and the
+        // separator) so SCAPI accepts it. Only the scheme/separator is
+        // normalized — the token is forwarded as-is, so a fresh SSR token still
+        // wins over a stale cookie.
+        proxyRequest.setHeader('authorization', `Bearer ${bearerMatch[1]}`)
+    } else if (accessToken) {
+        // No incoming Authorization, an empty `Bearer `, or `Basic <…>` (the
+        // Protected Storefronts pattern). Inject the cookie-derived JWT.
+        proxyRequest.setHeader('authorization', `Bearer ${accessToken}`)
+    } else if (!existingAuth) {
+        // No cookie and no incoming auth — nothing to forward.
+        throw new AccessTokenNotFoundError(
+            'Access token cookie not found. Cannot proceed with SCAPI request.'
+        )
     }
 
     // Transform dwsid cookie into sfdc_dwsid header (same as MRT)
