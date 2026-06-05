@@ -25,7 +25,7 @@ const RefinementDisclosure = ({isOpen, onToggle, label, children, ...styleProps}
 
     return (
         <Box {...styleProps}>
-            <Heading as="h2" fontSize="md" fontWeight={600}>
+            <Heading as="h2" fontSize="md">
                 <Box
                     as="button"
                     type="button"
@@ -37,10 +37,11 @@ const RefinementDisclosure = ({isOpen, onToggle, label, children, ...styleProps}
                     alignItems="center"
                     width="full"
                     textAlign="left"
+                    paddingRight={4}
                     outline={0}
                     _focusVisible={{boxShadow: 'outline'}}
                 >
-                    <Box as="span" flex="1">
+                    <Box as="span" flex="1" fontWeight={600}>
                         {label}
                     </Box>
                     {isOpen ? (
