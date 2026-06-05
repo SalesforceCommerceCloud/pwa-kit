@@ -36,7 +36,10 @@ const Refinements = ({
     // attribute IDs. The parent rebuilds the `filters` array on every render, so without
     // memoizing on its contents the default-open set would recompute each time and churn
     // the panel. Keying on the joined-IDs string makes the open-set memo below recompute
-    // only when the filter set actually changes.
+    // only when the filter set actually changes. `excludedFilters` is depended on via its
+    // joined-string form, not its array identity, so a caller passing a fresh `['cgid']`
+    // each render doesn't defeat the memo while a genuine change to the exclusions does.
+    const excludedFiltersKey = Array.isArray(excludedFilters) ? excludedFilters.join(',') : ''
     const {effectiveFilters, effectiveFilterIdsString} = useMemo(() => {
         const hasExcludes = Array.isArray(excludedFilters) && excludedFilters.length > 0
         const [filtered, attributeIds] = (Array.isArray(filters) ? filters : []).reduce(
@@ -50,7 +53,7 @@ const Refinements = ({
             [[], []]
         )
         return {effectiveFilters: filtered, effectiveFilterIdsString: attributeIds.join(',')}
-    }, [filters])
+    }, [filters, excludedFiltersKey])
 
     const allOpenIds = useMemo(
         () => effectiveFilters.map((filter) => filter.attributeId),

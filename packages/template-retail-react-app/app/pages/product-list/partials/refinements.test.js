@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
 import {IntlProvider} from 'react-intl'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -75,6 +75,33 @@ describe('Refinements', () => {
             'false'
         )
         expect(screen.getByRole('button', {name: /size/i})).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    test('recomputes effective filters when excludedFilters changes but filters is unchanged', () => {
+        // The parent can hand a stable `filters` reference while changing `excludedFilters`.
+        // The effective-filters memo must react to the exclusions, not only the filters array.
+        // `renderWithProviders` captures its `children` in the wrapper, so a prop-changing
+        // rerender has to drive the component through a state-holding harness instead.
+        let setExcluded
+        const Harness = () => {
+            const [excludedFilters, _setExcluded] = React.useState([])
+            setExcluded = _setExcluded
+            return (
+                <Refinements
+                    filters={filters}
+                    excludedFilters={excludedFilters}
+                    toggleFilter={jest.fn()}
+                    selectedFilters={{}}
+                />
+            )
+        }
+        renderWithProviders(<Harness />)
+        expect(screen.getByRole('button', {name: /size/i})).toBeInTheDocument()
+
+        act(() => setExcluded(['c_size']))
+
+        expect(screen.queryByRole('button', {name: /size/i})).not.toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /colour/i})).toBeInTheDocument()
     })
 })
 
