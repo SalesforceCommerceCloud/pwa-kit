@@ -176,7 +176,8 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         idpRefreshToken
     } = SESSION_COOKIE_CONFIG
 
-    // Decode JWT and extract claims
+    // Decode JWT and extract claims. `isGuest` is hoisted because the
+    // refresh-token block below needs it to choose the guest/registered cookie.
     let isGuest = true
     if (parsed.access_token) {
         const tokenClaims = getTokenClaims(parsed.access_token)
@@ -237,6 +238,30 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
                 attributes: idToken.attributes
             })
         }
+
+        // Hybrid SFRA + PWA: customer_id and customer_type describe the identity
+        // carried by the access token (customer_type is derived from the JWT
+        // `isb` claim), so they are mirrored as non-HttpOnly siteId-suffixed
+        // cookies here — aligned to the access-token expiry, alongside cc-at /
+        // cc-at-expires / uido / id_token. Written on every access-token response
+        // so they stay in sync with the current token (mirroring the client's
+        // handleTokenResponse). The session-scoped usid / enc_user_id cookies
+        // stay refresh-TTL-aligned in the refresh-token block below.
+        appendCookie({
+            name: getCookieName(customerType, site),
+            value: tokenClaims.isGuest ? 'guest' : 'registered',
+            expires: tokenClaims.accessExpires,
+            attributes: customerType.attributes
+        })
+
+        if (parsed.customer_id) {
+            appendCookie({
+                name: getCookieName(customerId, site),
+                value: parsed.customer_id,
+                expires: tokenClaims.accessExpires,
+                attributes: customerId.attributes
+            })
+        }
     }
 
     // Refresh token (HttpOnly) — uses its own TTL, independent of access token expiry
@@ -268,31 +293,12 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
             attributes: staleRefreshConfig.attributes
         })
 
-        // Hybrid SFRA + PWA: mirror SLAS metadata as siteId-suffixed cookies so SFRA
-        // can read the same session state. Expiry aligned with refresh token TTL.
-        //
-        // These writes live inside `if (parsed.refresh_token)` because we need a fresh
-        // refresh-token TTL to choose `refreshExpires`. SLAS responses that include
-        // these metadata fields always also include a refresh_token (login flows and
-        // refresh-with-rotation), so in practice this is the same condition. If a
-        // future flow returns metadata without a refresh_token, the existing cookies
-        // remain valid until they expire on their own schedule.
-        appendCookie({
-            name: getCookieName(customerType, site),
-            value: isGuest ? 'guest' : 'registered',
-            expires: refreshExpires,
-            attributes: customerType.attributes
-        })
-
-        if (parsed.customer_id) {
-            appendCookie({
-                name: getCookieName(customerId, site),
-                value: parsed.customer_id,
-                expires: refreshExpires,
-                attributes: customerId.attributes
-            })
-        }
-
+        // Hybrid SFRA + PWA: mirror session-scoped SLAS metadata as
+        // siteId-suffixed cookies so SFRA can read the same session state. These
+        // are aligned to the refresh-token TTL because they must survive
+        // access-token refreshes within a single shopper session. (customer_id
+        // and customer_type are identity-scoped and written in the access-token
+        // block above, aligned to the access-token expiry.)
         if (parsed.enc_user_id) {
             appendCookie({
                 name: getCookieName(encUserId, site),

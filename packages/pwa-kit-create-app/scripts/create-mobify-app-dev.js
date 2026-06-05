@@ -138,7 +138,12 @@ const withLocalNPMRepo = (func) => {
                     const poll = async () => {
                         if (await probe()) {
                             console.log('local NPM repository is up')
-                            process.env['npm_config_registry'] = 'http://localhost:4873/'
+                            // Use the IPv4 loopback explicitly. Verdaccio is bound to
+                            // 127.0.0.1:4873 (see local-npm-repo/config.yaml), and Node
+                            // 18+ on Linux may resolve `localhost` to ::1 first under
+                            // verbatim DNS — that combination produces ECONNREFUSED
+                            // ::1:4873 from npm/lerna child processes.
+                            process.env['npm_config_registry'] = 'http://127.0.0.1:4873/'
                             resolve()
                             return
                         }
