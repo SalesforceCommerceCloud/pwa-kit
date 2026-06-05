@@ -220,7 +220,7 @@ describe('setHttpOnlySessionCookies', () => {
         expect(staleRegisteredCookie.value).toBe('')
         expect(staleRegisteredCookie.expires).toEqual(new Date(0))
 
-        // customer_id (non-HttpOnly, refresh TTL)
+        // customer_id (non-HttpOnly, aligned to access-token expiry)
         const custIdCookie = parseCookie(
             res.cookies.find((c) => c.includes('customer_id_testsite='))
         )
@@ -228,6 +228,8 @@ describe('setHttpOnlySessionCookies', () => {
         expect(custIdCookie.httpOnly).toBeUndefined()
         expect(custIdCookie.secure).toBe(true)
         expect(custIdCookie.path).toBe('/')
+        // Expiry tied to the access-token JWT exp (2800), matching cc-at-expires/id_token.
+        expect(custIdCookie.expires).toEqual(new Date(2800 * 1000))
 
         // enc_user_id (non-HttpOnly, refresh TTL)
         const encUserIdCookie = parseCookie(
@@ -242,11 +244,18 @@ describe('setHttpOnlySessionCookies', () => {
         )
         expect(custTypeCookie.value).toBe('guest')
         expect(custTypeCookie.httpOnly).toBeUndefined()
+        // Expiry tied to the access-token JWT exp (2800), not the refresh-token TTL.
+        expect(custTypeCookie.expires).toEqual(new Date(2800 * 1000))
 
         // usid (non-HttpOnly, refresh-TTL-aligned)
         const usidCookie = parseCookie(res.cookies.find((c) => c.includes('usid_testsite=')))
         expect(usidCookie.value).toBe('usid-abc')
         expect(usidCookie.httpOnly).toBeUndefined()
+
+        // customer_id/customer_type expire with the access token, which is sooner
+        // than the refresh-TTL-aligned usid cookie (the previous behavior).
+        expect(custIdCookie.expires.getTime()).toBeLessThan(usidCookie.expires.getTime())
+        expect(custTypeCookie.expires.getTime()).toBeLessThan(usidCookie.expires.getTime())
 
         // cc-nx-expires (non-HttpOnly, absolute epoch when refresh token expires)
         const refreshExpiresCookie = parseCookie(
@@ -331,6 +340,8 @@ describe('setHttpOnlySessionCookies', () => {
         )
         expect(custTypeCookie.value).toBe('registered')
         expect(custTypeCookie.httpOnly).toBeUndefined()
+        // Expiry tied to the access-token JWT exp (3800), not the refresh-token TTL.
+        expect(custTypeCookie.expires).toEqual(new Date(3800 * 1000))
 
         // cc-nx-exists has been removed; cc-nx-expires now serves as the
         // non-HttpOnly indicator that a refresh token cookie exists.
@@ -350,6 +361,41 @@ describe('setHttpOnlySessionCookies', () => {
         const body = JSON.parse(result.toString('utf8'))
         expect(body).not.toHaveProperty('access_token')
         expect(body).not.toHaveProperty('refresh_token')
+    })
+
+    test('writes customer_id/customer_type on an access-token response with no refresh_token, aligned to access-token expiry', () => {
+        // customer_id/customer_type follow the access token, not the refresh
+        // token, so an access-token-only response (e.g. a refresh without
+        // refresh-token rotation) still refreshes them — keeping them in sync
+        // with the current token instead of leaving stale/evicted cookies.
+        const res = makeRes()
+        const accessToken = makeJWT({
+            iat: 1000,
+            exp: 2800,
+            isb: 'uido:ecom::upn:john@example.com::uidn:John'
+        })
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            customer_id: 'cust-x'
+            // no refresh_token
+        })
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.value).toBe('registered')
+        expect(custTypeCookie.expires).toEqual(new Date(2800 * 1000))
+
+        const custIdCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_id_testsite='))
+        )
+        expect(custIdCookie.value).toBe('cust-x')
+        expect(custIdCookie.expires).toEqual(new Date(2800 * 1000))
+
+        // No refresh_token → the refresh-token block is skipped entirely.
+        expect(res.cookies.find((c) => c.includes('cc-nx-expires_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.startsWith('cc-nx_testsite='))).toBeUndefined()
     })
 
     test('omits optional metadata cookies when SLAS response fields are absent', () => {
