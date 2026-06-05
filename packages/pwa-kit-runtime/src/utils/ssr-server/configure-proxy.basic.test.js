@@ -441,7 +441,7 @@ describe('setScapiAuthRequestHeaders', () => {
         })
     })
 
-    it('forwards a lowercase `bearer` scheme as canonical `Bearer` (W-22846335)', () => {
+    it('forwards a lowercase `bearer` scheme as canonical `Bearer`', () => {
         // The core hardening fix: an incoming lowercase `bearer <jwt>` must be
         // re-emitted as `Bearer <jwt>`, otherwise SCAPI 401s on the scheme.
         utils.isScapiDomain.mockReturnValue(true)
