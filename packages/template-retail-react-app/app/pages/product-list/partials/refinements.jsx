@@ -119,13 +119,10 @@ const Refinements = ({
                                     label={filter.label}
                                     paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
                                     paddingBottom={6}
-                                    borderTop={
-                                        idx === 0 && !itemsBefore ? 'none' : '1px solid gray.200'
-                                    }
-                                    borderBottom={
-                                        idx === effectiveFilters.length - 1
-                                            ? '1px solid gray.200'
-                                            : 'none'
+                                    borderColor="gray.200"
+                                    borderTopWidth={idx === 0 && !itemsBefore ? 0 : '1px'}
+                                    borderBottomWidth={
+                                        idx === effectiveFilters.length - 1 ? '1px' : 0
                                     }
                                 >
                                     <Values
