@@ -25,9 +25,7 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
         <RefinementDisclosure
             isOpen={isOpen}
             onToggle={onToggle}
-            label={
-                <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
-            }
+            label={<FormattedMessage defaultMessage="Categories" id="category_links.button_text" />}
             paddingBottom={6}
         >
             <Stack spacing={1}>
