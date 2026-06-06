@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Flex, Stack, VStack} from '@chakra-ui/react'
+import {Box, Flex, Stack, VStack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -17,189 +17,99 @@ import {
     ModalBody,
     ModalCloseButton,
     Button,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
     Box,
-    Stack,
-    useBreakpointValue
-} from '@chakra-ui/react'
-import {ChevronDownIcon} from '@chakra-ui/icons'
-import {useProducts} from '@salesforce/commerce-sdk-react'
-import ProductList from '@salesforce/retail-react-app/app/components/product-list'
+    Text,
+    Select,
+    Stack
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     messages,
     CANCELLATION_REASONS
 } from '@salesforce/retail-react-app/app/components/cancel-order-modal/constants'
 
-const onClient = typeof window !== 'undefined'
-
-/**
- * Modal component for requesting order cancellation.
- * Displays order products and provides a dropdown for selecting cancellation reasons.
- *
- * @param {boolean} isOpen - Controls modal visibility
- * @param {Function} onClose - Callback to close the modal
- * @param {Object} order - Order object containing productItems and currency
- * @param {Function} onCancel - Callback fired when cancellation is requested (order, reason)
- * @returns {JSX.Element} Modal component with order content or "No order provided" message
- */
-const CancelOrderModal = ({isOpen, onClose, order, onCancel}) => {
+const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
     const intl = useIntl()
     const [selectedReason, setSelectedReason] = useState('')
-    const headerRef = useRef(null)
 
-    // Fetch product data for order items
-    const productIds = order?.productItems?.map((product) => product.productId) || []
-    const {data: products, isLoading} = useProducts(
-        {
-            parameters: {
-                ids: productIds.join(','),
-                allImages: true
-            }
-        },
-        {
-            enabled: !!productIds.length && onClient,
-            select: (result) => {
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
-
-    // Merge product data with order items
-    const variants =
-        order?.productItems?.map((item) => {
-            const product = products?.[item.productId]
-            return {
-                ...(product ? product : {}),
-                isProductUnavailable: !product,
-                ...item
-            }
-        }) || []
-
-    // For responsive sizing
-    const modalSize = useBreakpointValue({base: 'full', md: '2xl'})
-    const buttonSize = useBreakpointValue({base: 'lg', md: 'md'})
-
-    const cancellationReasons = CANCELLATION_REASONS.map((reason) => ({
+    const cancellationReasons = CANCELLATION_REASONS.filter((r) => !r.isDefault).map((reason) => ({
         id: reason.id,
         label: intl.formatMessage(messages[reason.messageKey])
     }))
 
-    const getCancellationReasonDisplayText = () => {
-        if (selectedReason) {
-            return cancellationReasons.find((reason) => reason.id === selectedReason)?.label
-        }
-        return intl.formatMessage(messages.selectReason)
+    const handleConfirm = () => {
+        onCancel(order, selectedReason)
     }
 
-    const handleCancel = () => {
-        onCancel(order, selectedReason)
+    const handleClose = () => {
+        setSelectedReason('')
         onClose()
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            initialFocusRef={headerRef}
-            size={modalSize}
-            isCentered
-            scrollBehavior="inside"
-        >
+        <Modal isOpen={isOpen} onClose={handleClose} size="lg" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader ref={headerRef} tabIndex={-1}>
-                    <FormattedMessage {...messages.requestCancellation} />
+                <ModalHeader pb={1}>
+                    <FormattedMessage
+                        defaultMessage="Cancel order {orderNo}"
+                        id="cancel_order_modal.heading.cancel_order"
+                        values={{orderNo: order?.orderNo}}
+                    />
                 </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody pb={6}>
-                    {order ? (
-                        !isLoading ? (
-                            <ProductList
-                                variants={variants}
-                                currency={order.currency}
-                                imageWidth="20"
-                                padding={4}
-                                spacing={2}
+                <ModalBody pt={0}>
+                    <Stack spacing={4}>
+                        <Text fontSize="sm" color="gray.600">
+                            <FormattedMessage
+                                defaultMessage="Select a reason and confirm cancellation."
+                                id="cancel_order_modal.text.select_reason_description"
                             />
-                        ) : (
-                            <Box textAlign="center" color="gray.500" fontSize="md" py={8}>
-                                Loading products...
-                            </Box>
-                        )
-                    ) : (
-                        <Box textAlign="center" color="gray.500" fontSize="md" py={8}>
-                            <FormattedMessage {...messages.noOrderProvided} />
+                        </Text>
+                        <Text fontSize="sm">
+                            <FormattedMessage
+                                defaultMessage="This cancels the entire order."
+                                id="cancel_order_modal.text.impact"
+                            />
+                        </Text>
+                        <Box>
+                            <Text fontSize="sm" fontWeight="semibold" mb={1}>
+                                <FormattedMessage
+                                    defaultMessage="Reason"
+                                    id="cancel_order_modal.label.reason"
+                                />
+                            </Text>
+                            <Select
+                                value={selectedReason}
+                                onChange={(e) => setSelectedReason(e.target.value)}
+                                placeholder={intl.formatMessage(messages.selectReason)}
+                            >
+                                {cancellationReasons.map((reason) => (
+                                    <option key={reason.id} value={reason.id}>
+                                        {reason.label}
+                                    </option>
+                                ))}
+                            </Select>
                         </Box>
-                    )}
+                    </Stack>
                 </ModalBody>
-
                 <ModalFooter>
-                    <Stack
-                        direction={['column', 'row']}
-                        spacing={4}
-                        w="full"
-                        justify="space-between"
-                        align="center"
-                    >
-                        {/* Cancellation Reason Dropdown */}
-                        <Box w="full" flex={1}>
-                            <Menu>
-                                <MenuButton
-                                    as={Button}
-                                    rightIcon={<ChevronDownIcon />}
-                                    variant="outline"
-                                    size={buttonSize}
-                                    w="full"
-                                    textAlign="left"
-                                    justifyContent="space-between"
-                                    fontWeight="normal"
-                                    color={selectedReason ? 'black' : 'gray.500'}
-                                    isDisabled={!order}
-                                >
-                                    {getCancellationReasonDisplayText()}
-                                </MenuButton>
-                                <MenuList maxH="72" overflowY="auto">
-                                    {cancellationReasons.map((reason) => (
-                                        <MenuItem
-                                            key={reason.id}
-                                            onClick={() => setSelectedReason(reason.id)}
-                                            bg={
-                                                selectedReason === reason.id ? 'blue.50' : undefined
-                                            }
-                                            color={
-                                                selectedReason === reason.id
-                                                    ? 'blue.600'
-                                                    : reason.isDefault
-                                                    ? 'gray.500'
-                                                    : undefined
-                                            }
-                                            fontWeight={
-                                                selectedReason === reason.id ? 'medium' : undefined
-                                            }
-                                        >
-                                            {reason.label}
-                                        </MenuItem>
-                                    ))}
-                                </MenuList>
-                            </Menu>
-                        </Box>
-
-                        {/* Request Cancellation Button */}
+                    <Stack direction="row" spacing={3}>
+                        <Button variant="outline" onClick={handleClose} isDisabled={isSubmitting}>
+                            <FormattedMessage
+                                defaultMessage="Keep order"
+                                id="cancel_order_modal.button.keep_order"
+                            />
+                        </Button>
                         <Button
                             colorScheme="blue"
-                            onClick={handleCancel}
-                            size={buttonSize}
-                            w={['full', 'auto']}
-                            isDisabled={!order}
+                            onClick={handleConfirm}
+                            isDisabled={isSubmitting}
+                            isLoading={isSubmitting}
                         >
-                            <FormattedMessage {...messages.requestCancellation} />
+                            <FormattedMessage
+                                defaultMessage="Confirm cancellation"
+                                id="cancel_order_modal.button.confirm_cancellation"
+                            />
                         </Button>
                     </Stack>
                 </ModalFooter>
@@ -211,8 +121,9 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel}) => {
 CancelOrderModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    order: PropTypes.object.isRequired,
-    onCancel: PropTypes.func.isRequired
+    order: PropTypes.object,
+    onCancel: PropTypes.func.isRequired,
+    isSubmitting: PropTypes.bool
 }
 
 export default CancelOrderModal

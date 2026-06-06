@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useMemo, useCallback} from 'react'
+import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
@@ -20,10 +20,11 @@ import {
     Grid,
     Link as ChakraLink,
     SimpleGrid,
-    Skeleton
+    Skeleton,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts, useStores} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useStores, useCustomerType} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -37,6 +38,7 @@ import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/u
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
+import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -112,11 +114,21 @@ OrderProducts.propTypes = {
     currency: PropTypes.string
 }
 
+const CANCEL_INELIGIBLE_STATUSES = ['cancelled', 'canceled', 'completed', 'failed']
+
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
+    const {isRegistered} = useCustomerType()
+    const {
+        isOpen: isCancelModalOpen,
+        onOpen: openCancelModal,
+        onClose: closeCancelModal
+    } = useDisclosure()
+    const [cancelFeedback, setCancelFeedback] = useState(null)
 
     // expand: 'oms' returns order data from OMS if the order is successfully
     // ingested to OMS, otherwise returns data from ECOM
@@ -148,6 +160,35 @@ const AccountOrderDetail = () => {
     )
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
+
+    const canCancel = useMemo(() => {
+        if (!isOmsEnabled || !isRegistered || !order) return false
+        const status = (order.omsData?.status || order.status || '').toLowerCase()
+        const statusEligible = !CANCEL_INELIGIBLE_STATUSES.includes(status)
+        const shippingStatus = (order.shippingStatus || '').toLowerCase()
+        const shippingEligible = shippingStatus === 'not_shipped' || shippingStatus === ''
+        return statusEligible && shippingEligible
+    }, [isOmsEnabled, isRegistered, order])
+
+    const handleCancelOrder = useCallback(
+        (order, reason) => {
+            // TODO: W-22806925 will integrate the real SCAPI cancel API
+            console.log('Cancel order:', order.orderNo, 'Reason:', reason)
+            closeCancelModal()
+            setCancelFeedback({
+                status: 'success',
+                title: formatMessage({
+                    defaultMessage: 'Order cancelled',
+                    id: 'account_order_detail.alert.cancellation_success_title'
+                }),
+                description: formatMessage({
+                    defaultMessage: 'Your order was cancelled successfully.',
+                    id: 'account_order_detail.alert.cancellation_success_description'
+                })
+            })
+        },
+        [closeCancelModal, formatMessage]
+    )
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -316,8 +357,17 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">
-                                    {order.status || order.omsData?.status}
+                                <Badge
+                                    colorScheme={
+                                        cancelFeedback?.status === 'success' ? 'red' : 'green'
+                                    }
+                                >
+                                    {cancelFeedback?.status === 'success'
+                                        ? formatMessage({
+                                              defaultMessage: 'Cancelled',
+                                              id: 'account_order_detail.badge.cancelled'
+                                          })
+                                        : order.status || order.omsData?.status}
                                 </Badge>
                             </Stack>
                         </Stack>
@@ -326,6 +376,48 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            {cancelFeedback && (
+                <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
+                    <Text fontWeight="semibold" fontSize="sm">
+                        {cancelFeedback.title}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600">
+                        {cancelFeedback.description}
+                    </Text>
+                </Box>
+            )}
+
+            {!isLoading && isOmsEnabled && (
+                <Box>
+                    <Text
+                        fontSize="xs"
+                        fontWeight="semibold"
+                        textTransform="uppercase"
+                        letterSpacing="wide"
+                        color="gray.500"
+                        mb={2}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Order Actions"
+                            id="account_order_detail.heading.order_actions"
+                        />
+                    </Text>
+                    <Flex gap={2} wrap="wrap">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={openCancelModal}
+                            isDisabled={!canCancel || cancelFeedback?.status === 'success'}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Cancel order"
+                                id="account_order_detail.button.cancel_order"
+                            />
+                        </Button>
+                    </Flex>
+                </Box>
+            )}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
@@ -587,6 +679,15 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            {isOmsEnabled && (
+                <CancelOrderModal
+                    isOpen={isCancelModalOpen}
+                    onClose={closeCancelModal}
+                    order={order}
+                    onCancel={handleCancelOrder}
+                />
+            )}
         </Stack>
     )
 }
