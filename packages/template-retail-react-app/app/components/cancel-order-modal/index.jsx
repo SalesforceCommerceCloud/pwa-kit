@@ -72,11 +72,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
                         </Text>
                         <Box>
                             <label htmlFor="cancel-reason-select">
-                                <Text
-                                    fontSize="sm"
-                                    fontWeight="semibold"
-                                    mb={1}
-                                >
+                                <Text fontSize="sm" fontWeight="semibold" mb={1}>
                                     <FormattedMessage
                                         defaultMessage="Reason"
                                         id="cancel_order_modal.label.reason"

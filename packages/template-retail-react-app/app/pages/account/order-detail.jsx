@@ -194,6 +194,7 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const showCancelError = useCallback(() => {
         setCancelFeedback({
             status: 'error',
@@ -343,18 +344,9 @@ const AccountOrderDetail = () => {
                     </Button>
                 </Box>
 
-                <Box
-                    role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true"
-                >
+                <Box role="alert" aria-live="assertive" aria-atomic="true">
                     {cancelFeedback && (
-                        <Box
-                            p={4}
-                            border="1px solid"
-                            borderColor="gray.200"
-                            borderRadius="base"
-                        >
+                        <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
                             <Text
                                 fontWeight="semibold"
                                 fontSize="sm"

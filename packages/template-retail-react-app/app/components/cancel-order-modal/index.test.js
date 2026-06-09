@@ -195,19 +195,36 @@ describe('Cancellation Reason Select', () => {
     })
 
     test('resets selected reason when modal closes', () => {
+        const onClose = jest.fn()
+        const onCancel = jest.fn()
         const {rerender} = renderWithProviders(
-            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+            <CancelOrderModal
+                isOpen={true}
+                onClose={onClose}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
         )
 
         const select = screen.getByRole('combobox')
         expect(select.value).toBe('')
 
         rerender(
-            <CancelOrderModal isOpen={false} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+            <CancelOrderModal
+                isOpen={false}
+                onClose={onClose}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
         )
 
         rerender(
-            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+            <CancelOrderModal
+                isOpen={true}
+                onClose={onClose}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
         )
 
         expect(screen.getByRole('combobox').value).toBe('')
@@ -217,7 +234,12 @@ describe('Cancellation Reason Select', () => {
 describe('Accessibility', () => {
     test('reason select has an associated label', () => {
         renderWithProviders(
-            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
         )
 
         const select = screen.getByRole('combobox')
