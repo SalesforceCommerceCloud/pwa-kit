@@ -9,10 +9,6 @@ import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
-    Alert,
-    AlertIcon,
-    AlertTitle,
-    AlertDescription,
     Box,
     Heading,
     Text,
@@ -218,7 +214,8 @@ const AccountOrderDetail = () => {
         // On success: showCancelSuccess()
         // On error: showCancelError()
         closeCancelModal()
-        showCancelSuccess()
+        // Delay allows screen readers to finish announcing modal close before the alert
+        setTimeout(showCancelSuccess, 300)
     }, [closeCancelModal, showCancelSuccess])
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
@@ -346,19 +343,34 @@ const AccountOrderDetail = () => {
                     </Button>
                 </Box>
 
-                {cancelFeedback && (
-                    <Alert status={cancelFeedback.status} variant="left-accent">
-                        <AlertIcon />
-                        <Box>
-                            <AlertTitle fontSize="sm">
+                <Box
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                >
+                    {cancelFeedback && (
+                        <Box
+                            p={4}
+                            border="1px solid"
+                            borderColor="gray.200"
+                            borderRadius="base"
+                        >
+                            <Text
+                                fontWeight="semibold"
+                                fontSize="sm"
+                                color={cancelFeedback.status === 'error' ? 'red.700' : undefined}
+                            >
                                 {cancelFeedback.title}
-                            </AlertTitle>
-                            <AlertDescription fontSize="sm">
+                            </Text>
+                            <Text
+                                fontSize="sm"
+                                color={cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'}
+                            >
                                 {cancelFeedback.description}
-                            </AlertDescription>
+                            </Text>
                         </Box>
-                    </Alert>
-                )}
+                    )}
+                </Box>
 
                 <Stack spacing={[1, 2]}>
                     <Flex justify="space-between" align="center">

@@ -193,4 +193,37 @@ describe('Cancellation Reason Select', () => {
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
         expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
     })
+
+    test('resets selected reason when modal closes', () => {
+        const {rerender} = renderWithProviders(
+            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+        )
+
+        const select = screen.getByRole('combobox')
+        expect(select.value).toBe('')
+
+        rerender(
+            <CancelOrderModal isOpen={false} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+        )
+
+        rerender(
+            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+        )
+
+        expect(screen.getByRole('combobox').value).toBe('')
+    })
+})
+
+describe('Accessibility', () => {
+    test('reason select has an associated label', () => {
+        renderWithProviders(
+            <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={jest.fn()} />
+        )
+
+        const select = screen.getByRole('combobox')
+        expect(select).toHaveAttribute('id', 'cancel-reason-select')
+        const label = document.querySelector('label[for="cancel-reason-select"]')
+        expect(label).toBeInTheDocument()
+        expect(label).toHaveTextContent('Reason')
+    })
 })
