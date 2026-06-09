@@ -19,7 +19,9 @@ const mockLogger = {
 const createMockError = (status: number, responseBody: Record<string, unknown>) => ({
     response: {
         status,
-        json: () => responseBody
+        // A real Response body is a one-shot stream; use a mock so tests can assert it is
+        // read exactly once.
+        json: jest.fn().mockResolvedValue(responseBody)
     }
 })
 
@@ -78,14 +80,40 @@ describe('handleInvalidToken', () => {
         expect(mockAuth.clearAccessTokenExpiry).not.toHaveBeenCalled()
     })
 
-    test('re-throws 401 with unrecognized response body', async () => {
+    test('clears access token expiry and refreshes on a generic 401 (invalid/revoked token)', async () => {
         const error = createMockError(401, {
             detail: 'Some other SCAPI error.'
         })
 
-        await expect(handleInvalidToken(error, mockAuth as any, mockLogger)).rejects.toEqual(error)
+        const result = await handleInvalidToken(error, mockAuth as any, mockLogger)
 
+        // clearAccessTokenExpiry() must run BEFORE the refresh so isAccessTokenExpired()
+        // reports true and refreshAccessToken() doesn't short-circuit on the stale token.
+        expect(mockAuth.clearAccessTokenExpiry).toHaveBeenCalled()
+        expect(mockAuth.refreshAccessToken).toHaveBeenCalled()
+        expect(mockAuth.clearAccessTokenExpiry.mock.invocationCallOrder[0]).toBeLessThan(
+            mockAuth.refreshAccessToken.mock.invocationCallOrder[0]
+        )
         expect(mockAuth.logout).not.toHaveBeenCalled()
-        expect(mockAuth.clearAccessTokenExpiry).not.toHaveBeenCalled()
+        // The 401 body is read exactly once (a real Response body is a one-shot stream).
+        expect(error.response.json).toHaveBeenCalledTimes(1)
+        expect(result).toEqual({access_token: 'refreshed_token'})
+        expect(mockLogger.warn).toHaveBeenCalledWith(
+            expect.stringContaining('Access token rejected with a 401')
+        )
+    })
+
+    test('propagates the rejection when refreshAccessToken() itself fails on a generic 401', async () => {
+        const error = createMockError(401, {detail: 'Some other SCAPI error.'})
+        const refreshFailure = new Error('guest login failed')
+        mockAuth.refreshAccessToken.mockRejectedValueOnce(refreshFailure)
+
+        await expect(handleInvalidToken(error, mockAuth as any, mockLogger)).rejects.toBe(
+            refreshFailure
+        )
+
+        // Expiry is still cleared before the failed refresh attempt.
+        expect(mockAuth.clearAccessTokenExpiry).toHaveBeenCalled()
+        expect(mockAuth.logout).not.toHaveBeenCalled()
     })
 })
