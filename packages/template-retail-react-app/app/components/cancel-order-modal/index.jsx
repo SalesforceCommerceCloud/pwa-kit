@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -31,6 +31,10 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
     const intl = useIntl()
     const [selectedReason, setSelectedReason] = useState('')
 
+    useEffect(() => {
+        if (!isOpen) setSelectedReason('')
+    }, [isOpen])
+
     const cancellationReasons = CANCELLATION_REASONS.filter((r) => !r.isDefault).map((reason) => ({
         id: reason.id,
         label: intl.formatMessage(messages[reason.messageKey])
@@ -40,13 +44,8 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
         onCancel(order, selectedReason)
     }
 
-    const handleClose = () => {
-        setSelectedReason('')
-        onClose()
-    }
-
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} size="lg" isCentered>
+        <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader pb={1}>
@@ -102,7 +101,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
                 </ModalBody>
                 <ModalFooter>
                     <Stack direction="row" spacing={3}>
-                        <Button variant="outline" onClick={handleClose} isDisabled={isSubmitting}>
+                        <Button variant="outline" onClick={onClose} isDisabled={isSubmitting}>
                             <FormattedMessage
                                 defaultMessage="Keep order"
                                 id="cancel_order_modal.button.keep_order"

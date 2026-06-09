@@ -9,6 +9,10 @@ import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
     Box,
     Heading,
     Text,
@@ -32,7 +36,7 @@ import {
     useCustomerId
 } from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon, CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
@@ -343,21 +347,17 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 {cancelFeedback && (
-                    <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
-                        <Text
-                            fontWeight="semibold"
-                            fontSize="sm"
-                            color={cancelFeedback.status === 'error' ? 'red.700' : undefined}
-                        >
-                            {cancelFeedback.title}
-                        </Text>
-                        <Text
-                            fontSize="sm"
-                            color={cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'}
-                        >
-                            {cancelFeedback.description}
-                        </Text>
-                    </Box>
+                    <Alert status={cancelFeedback.status} variant="left-accent">
+                        <AlertIcon />
+                        <Box>
+                            <AlertTitle fontSize="sm">
+                                {cancelFeedback.title}
+                            </AlertTitle>
+                            <AlertDescription fontSize="sm">
+                                {cancelFeedback.description}
+                            </AlertDescription>
+                        </Box>
+                    </Alert>
                 )}
 
                 <Stack spacing={[1, 2]}>
@@ -373,13 +373,13 @@ const AccountOrderDetail = () => {
                                 colorScheme={cancelFeedback?.status === 'success' ? 'red' : 'green'}
                             >
                                 {cancelFeedback?.status === 'success' ? (
-                                    <>
-                                        {'× '}
+                                    <Flex display="inline-flex" alignItems="center" gap={1}>
+                                        <CloseIcon boxSize={2} aria-hidden />
                                         {formatMessage({
                                             defaultMessage: 'Cancelled',
                                             id: 'account_order_detail.badge.cancelled'
                                         })}
-                                    </>
+                                    </Flex>
                                 ) : (
                                     order.status || order.omsData?.status
                                 )}
@@ -446,8 +446,11 @@ const AccountOrderDetail = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={openCancelModal}
-                            isDisabled={!canCancel || !!cancelFeedback}
+                            onClick={() => {
+                                setCancelFeedback(null)
+                                openCancelModal()
+                            }}
+                            isDisabled={!canCancel || cancelFeedback?.status === 'success'}
                         >
                             <FormattedMessage
                                 defaultMessage="Cancel order"
