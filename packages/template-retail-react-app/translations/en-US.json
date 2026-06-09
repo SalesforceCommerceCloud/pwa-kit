@@ -95,11 +95,32 @@
   "account_detail.title.account_details": {
     "defaultMessage": "Account Details"
   },
+  "account_order_detail.alert.cancellation_error_description": {
+    "defaultMessage": "We could not cancel this order. Please try again or contact support."
+  },
+  "account_order_detail.alert.cancellation_error_title": {
+    "defaultMessage": "Unable to cancel order"
+  },
+  "account_order_detail.alert.cancellation_success_description": {
+    "defaultMessage": "Your order was cancelled successfully."
+  },
+  "account_order_detail.alert.cancellation_success_title": {
+    "defaultMessage": "Order cancelled"
+  },
+  "account_order_detail.badge.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
+  "account_order_detail.button.cancel_order": {
+    "defaultMessage": "Cancel order"
+  },
   "account_order_detail.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
   "account_order_detail.heading.num_of_items": {
     "defaultMessage": "{count} items"
+  },
+  "account_order_detail.heading.order_actions": {
+    "defaultMessage": "Order Actions"
   },
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
@@ -290,6 +311,51 @@
   },
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
+  "cancel_order_modal.button.confirm_cancellation": {
+    "defaultMessage": "Confirm cancellation"
+  },
+  "cancel_order_modal.button.keep_order": {
+    "defaultMessage": "Keep order"
+  },
+  "cancel_order_modal.dropdown.select_reason": {
+    "defaultMessage": "Select a cancellation reason"
+  },
+  "cancel_order_modal.heading.cancel_order": {
+    "defaultMessage": "Cancel order {orderNo}"
+  },
+  "cancel_order_modal.label.reason": {
+    "defaultMessage": "Reason"
+  },
+  "cancel_order_modal.reason.changed_mind": {
+    "defaultMessage": "Changed my mind"
+  },
+  "cancel_order_modal.reason.financial_reasons": {
+    "defaultMessage": "Financial reasons"
+  },
+  "cancel_order_modal.reason.item_not_arrive_on_time": {
+    "defaultMessage": "Item(s) would not arrive on time"
+  },
+  "cancel_order_modal.reason.item_price_too_high": {
+    "defaultMessage": "Item price too high"
+  },
+  "cancel_order_modal.reason.no_longer_needed": {
+    "defaultMessage": "No longer needed"
+  },
+  "cancel_order_modal.reason.order_created_by_mistake": {
+    "defaultMessage": "Order created by mistake"
+  },
+  "cancel_order_modal.reason.other": {
+    "defaultMessage": "Other"
+  },
+  "cancel_order_modal.reason.shipping_cost_too_high": {
+    "defaultMessage": "Shipping cost too high"
+  },
+  "cancel_order_modal.text.impact": {
+    "defaultMessage": "This cancels the entire order."
+  },
+  "cancel_order_modal.text.select_reason_description": {
+    "defaultMessage": "Select a reason and confirm cancellation."
   },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"

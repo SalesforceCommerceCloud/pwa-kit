@@ -110,6 +110,9 @@ module.exports = {
                 forwardedHost: ''
             }
         },
+        oms: {
+            enabled: false
+        },
         storeLocatorEnabled: true,
         multishipEnabled: true,
         // Salesforce Payments configuration
