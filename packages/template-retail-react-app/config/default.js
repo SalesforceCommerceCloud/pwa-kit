@@ -111,7 +111,7 @@ module.exports = {
             }
         },
         oms: {
-            enabled: true
+            enabled: false
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,

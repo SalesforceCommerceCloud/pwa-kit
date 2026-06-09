@@ -24,7 +24,13 @@ import {
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts, useStores, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {
+    useOrder,
+    useProducts,
+    useStores,
+    useCustomerType,
+    useCustomerId
+} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -123,11 +129,13 @@ const AccountOrderDetail = () => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const {isRegistered} = useCustomerType()
+    const customerId = useCustomerId()
     const {
         isOpen: isCancelModalOpen,
         onOpen: openCancelModal,
         onClose: closeCancelModal
     } = useDisclosure()
+    // TODO: W-22806925 — replace dummy feedback with real API response
     const [cancelFeedback, setCancelFeedback] = useState(null)
 
     // expand: 'oms' returns order data from OMS if the order is successfully
@@ -163,32 +171,51 @@ const AccountOrderDetail = () => {
 
     const canCancel = useMemo(() => {
         if (!isOmsEnabled || !isRegistered || !order) return false
+        const ownsOrder = order.customerInfo?.customerId === customerId
+        if (!ownsOrder) return false
         const status = (order.omsData?.status || order.status || '').toLowerCase()
         const statusEligible = !CANCEL_INELIGIBLE_STATUSES.includes(status)
         const shippingStatus = (order.shippingStatus || '').toLowerCase()
-        const shippingEligible = shippingStatus === 'not_shipped' || shippingStatus === ''
+        const shippingEligible = shippingStatus === 'not_shipped'
         return statusEligible && shippingEligible
-    }, [isOmsEnabled, isRegistered, order])
+    }, [isOmsEnabled, isRegistered, order, customerId])
 
-    const handleCancelOrder = useCallback(
-        (order, reason) => {
-            // TODO: W-22806925 will integrate the real SCAPI cancel API
-            console.log('Cancel order:', order.orderNo, 'Reason:', reason)
-            closeCancelModal()
-            setCancelFeedback({
-                status: 'success',
-                title: formatMessage({
-                    defaultMessage: 'Order cancelled',
-                    id: 'account_order_detail.alert.cancellation_success_title'
-                }),
-                description: formatMessage({
-                    defaultMessage: 'Your order was cancelled successfully.',
-                    id: 'account_order_detail.alert.cancellation_success_description'
-                })
+    const showCancelSuccess = useCallback(() => {
+        setCancelFeedback({
+            status: 'success',
+            title: formatMessage({
+                defaultMessage: 'Order cancelled',
+                id: 'account_order_detail.alert.cancellation_success_title'
+            }),
+            description: formatMessage({
+                defaultMessage: 'Your order was cancelled successfully.',
+                id: 'account_order_detail.alert.cancellation_success_description'
             })
-        },
-        [closeCancelModal, formatMessage]
-    )
+        })
+    }, [formatMessage])
+
+    const showCancelError = useCallback(() => {
+        setCancelFeedback({
+            status: 'error',
+            title: formatMessage({
+                defaultMessage: 'Unable to cancel order',
+                id: 'account_order_detail.alert.cancellation_error_title'
+            }),
+            description: formatMessage({
+                defaultMessage:
+                    'We could not cancel this order. Please try again or contact support.',
+                id: 'account_order_detail.alert.cancellation_error_description'
+            })
+        })
+    }, [formatMessage])
+
+    const handleCancelOrder = useCallback(() => {
+        // TODO: W-22806925 — replace with real SCAPI cancel API call
+        // On success: showCancelSuccess()
+        // On error: showCancelError()
+        closeCancelModal()
+        showCancelSuccess()
+    }, [closeCancelModal, showCancelSuccess])
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -315,13 +342,59 @@ const AccountOrderDetail = () => {
                     </Button>
                 </Box>
 
+                {cancelFeedback && (
+                    <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
+                        <Text
+                            fontWeight="semibold"
+                            fontSize="sm"
+                            color={cancelFeedback.status === 'error' ? 'red.700' : undefined}
+                        >
+                            {cancelFeedback.title}
+                        </Text>
+                        <Text
+                            fontSize="sm"
+                            color={
+                                cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'
+                            }
+                        >
+                            {cancelFeedback.description}
+                        </Text>
+                    </Box>
+                )}
+
                 <Stack spacing={[1, 2]}>
-                    <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
-                        <FormattedMessage
-                            defaultMessage="Order Details"
-                            id="account_order_detail.title.order_details"
-                        />
-                    </Heading>
+                    <Flex justify="space-between" align="center">
+                        <Heading
+                            as="h1"
+                            fontSize={['lg', '2xl']}
+                            tabIndex="0"
+                            ref={headingRef}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Order Details"
+                                id="account_order_detail.title.order_details"
+                            />
+                        </Heading>
+                        {!isLoading && (
+                            <Badge
+                                colorScheme={
+                                    cancelFeedback?.status === 'success' ? 'red' : 'green'
+                                }
+                            >
+                                {cancelFeedback?.status === 'success' ? (
+                                    <>
+                                        {'× '}
+                                        {formatMessage({
+                                            defaultMessage: 'Cancelled',
+                                            id: 'account_order_detail.badge.cancelled'
+                                        })}
+                                    </>
+                                ) : (
+                                    order.status || order.omsData?.status
+                                )}
+                            </Badge>
+                        )}
+                    </Flex>
 
                     {!isLoading ? (
                         <Stack
@@ -349,44 +422,19 @@ const AccountOrderDetail = () => {
                                     }}
                                 />
                             </Text>
-                            <Stack direction="row" alignItems="center">
-                                <Text fontSize={['sm', 'md']}>
-                                    <FormattedMessage
-                                        defaultMessage="Order Number: {orderNumber}"
-                                        id="account_order_detail.label.order_number"
-                                        values={{orderNumber: order.orderNo}}
-                                    />
-                                </Text>
-                                <Badge
-                                    colorScheme={
-                                        cancelFeedback?.status === 'success' ? 'red' : 'green'
-                                    }
-                                >
-                                    {cancelFeedback?.status === 'success'
-                                        ? formatMessage({
-                                              defaultMessage: 'Cancelled',
-                                              id: 'account_order_detail.badge.cancelled'
-                                          })
-                                        : order.status || order.omsData?.status}
-                                </Badge>
-                            </Stack>
+                            <Text fontSize={['sm', 'md']}>
+                                <FormattedMessage
+                                    defaultMessage="Order Number: {orderNumber}"
+                                    id="account_order_detail.label.order_number"
+                                    values={{orderNumber: order.orderNo}}
+                                />
+                            </Text>
                         </Stack>
                     ) : (
                         <Skeleton h="20px" w="192px" />
                     )}
                 </Stack>
             </Stack>
-
-            {cancelFeedback && (
-                <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
-                    <Text fontWeight="semibold" fontSize="sm">
-                        {cancelFeedback.title}
-                    </Text>
-                    <Text fontSize="sm" color="gray.600">
-                        {cancelFeedback.description}
-                    </Text>
-                </Box>
-            )}
 
             {!isLoading && isOmsEnabled && (
                 <Box>
@@ -408,7 +456,7 @@ const AccountOrderDetail = () => {
                             variant="outline"
                             size="sm"
                             onClick={openCancelModal}
-                            isDisabled={!canCancel || cancelFeedback?.status === 'success'}
+                            isDisabled={!canCancel || !!cancelFeedback}
                         >
                             <FormattedMessage
                                 defaultMessage="Cancel order"

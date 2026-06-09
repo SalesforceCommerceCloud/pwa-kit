@@ -72,13 +72,21 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
                             />
                         </Text>
                         <Box>
-                            <Text fontSize="sm" fontWeight="semibold" mb={1}>
+                            <Text
+                                as="label"
+                                htmlFor="cancel-reason-select"
+                                fontSize="sm"
+                                fontWeight="semibold"
+                                mb={1}
+                                display="block"
+                            >
                                 <FormattedMessage
                                     defaultMessage="Reason"
                                     id="cancel_order_modal.label.reason"
                                 />
                             </Text>
                             <Select
+                                id="cancel-reason-select"
                                 value={selectedReason}
                                 onChange={(e) => setSelectedReason(e.target.value)}
                                 placeholder={intl.formatMessage(messages.selectReason)}

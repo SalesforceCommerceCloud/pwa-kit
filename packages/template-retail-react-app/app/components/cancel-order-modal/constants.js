@@ -7,30 +7,11 @@
 
 import {defineMessages} from 'react-intl'
 
-// Messages for the cancel order modal
 export const messages = defineMessages({
-    requestCancellation: {
-        defaultMessage: 'Request Cancellation',
-        id: 'cancel_order_modal.heading.request_cancellation'
-    },
     selectReason: {
         defaultMessage: 'Select a cancellation reason',
         id: 'cancel_order_modal.dropdown.select_reason'
     },
-    confirmationText: {
-        defaultMessage:
-            "We'll send you an email confirmation once your cancellation request has been processed.",
-        id: 'cancel_order_modal.text.confirmation'
-    },
-    close: {
-        defaultMessage: 'Close',
-        id: 'cancel_order_modal.button.close'
-    },
-    noOrderProvided: {
-        defaultMessage: 'No order provided',
-        id: 'cancel_order_modal.message.no_order_provided'
-    },
-    // Cancellation reason labels
     itemPriceTooHigh: {
         defaultMessage: 'Item price too high',
         id: 'cancel_order_modal.reason.item_price_too_high'
