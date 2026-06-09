@@ -88,12 +88,7 @@ test('closes modal when user clicks close button', async () => {
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onCancel={jest.fn()}
-        />
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={jest.fn()} />
     )
 
     await user.click(screen.getByRole('button', {name: /close/i}))
@@ -105,12 +100,7 @@ test('closes modal when user clicks Keep order', async () => {
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onCancel={jest.fn()}
-        />
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={jest.fn()} />
     )
 
     await user.click(screen.getByRole('button', {name: /keep order/i}))
@@ -122,12 +112,7 @@ test('triggers cancellation when user clicks Confirm cancellation', async () => 
     const onCancel = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={jest.fn()}
-            order={mockOrder}
-            onCancel={onCancel}
-        />
+        <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={onCancel} />
     )
 
     await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))

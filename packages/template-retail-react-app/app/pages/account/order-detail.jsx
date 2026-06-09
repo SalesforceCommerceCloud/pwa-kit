@@ -353,9 +353,7 @@ const AccountOrderDetail = () => {
                         </Text>
                         <Text
                             fontSize="sm"
-                            color={
-                                cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'
-                            }
+                            color={cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'}
                         >
                             {cancelFeedback.description}
                         </Text>
@@ -364,12 +362,7 @@ const AccountOrderDetail = () => {
 
                 <Stack spacing={[1, 2]}>
                     <Flex justify="space-between" align="center">
-                        <Heading
-                            as="h1"
-                            fontSize={['lg', '2xl']}
-                            tabIndex="0"
-                            ref={headingRef}
-                        >
+                        <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
                             <FormattedMessage
                                 defaultMessage="Order Details"
                                 id="account_order_detail.title.order_details"
@@ -377,9 +370,7 @@ const AccountOrderDetail = () => {
                         </Heading>
                         {!isLoading && (
                             <Badge
-                                colorScheme={
-                                    cancelFeedback?.status === 'success' ? 'red' : 'green'
-                                }
+                                colorScheme={cancelFeedback?.status === 'success' ? 'red' : 'green'}
                             >
                                 {cancelFeedback?.status === 'success' ? (
                                     <>
