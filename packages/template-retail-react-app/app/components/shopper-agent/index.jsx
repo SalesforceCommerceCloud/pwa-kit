@@ -7,7 +7,13 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -24,7 +30,7 @@ const HTTP_OK = 200
 
 const SESSION_INIT_ERROR_MESSAGE = defineMessage({
     id: 'shopper_agent.error.session_init_failed',
-    defaultMessage: 'We could not start the shopping assistant. Please try again.'
+    defaultMessage: 'Something went wrong. Try again.'
 })
 
 /**
@@ -200,6 +206,12 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {usid} = useUsid()
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
+
+    // Fetch my_domain from Shopper Configurations API
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
 
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
@@ -387,9 +399,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             })
         }
 
-        const handleEmbeddedMessagingConversationStarted = (event) => {
-            const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
+        const handleEmbeddedMessagingConversationStarted = async (event) => {
+            const {
+                organizationId: orgId,
+                configSiteId: sid,
+            } = embeddedLifecycleRef.current
+
             if (!orgId || !sid) return
+            if (!myDomain) return
 
             const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
             if (conversationId && lastConversationSessionInitRef.current === conversationId) return
@@ -415,7 +432,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                         const result = await callTokenBridge({
                             authLinkKey,
                             slasAccessToken,
-                            slasRefreshToken
+                            slasRefreshToken,
+                            myDomain: myDomain
                         })
 
                         if (result.status !== HTTP_OK) {
@@ -480,7 +498,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         refreshToken,
         domainUrl,
         organizationId,
-        configSiteId
+        configSiteId,
+        myDomain
     ])
 
     // Load the embedded messaging script asynchronously
