@@ -7,7 +7,13 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -24,7 +30,7 @@ const HTTP_OK = 200
 
 const SESSION_INIT_ERROR_MESSAGE = defineMessage({
     id: 'shopper_agent.error.session_init_failed',
-    defaultMessage: 'We could not start the shopping assistant. Please try again.'
+    defaultMessage: 'Something went wrong. Try again.'
 })
 
 /**
@@ -134,8 +140,7 @@ const isEnabled = (enabled) => {
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
  * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
- * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`),
- *   only when `my_domain` is present in the configuration
+ * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
  * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
@@ -150,7 +155,6 @@ const isEnabled = (enabled) => {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
- * @param {string} [props.commerceAgentConfiguration.my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
  * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
  * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @param {string} props.domainUrl - The domain URL of the current page
@@ -193,7 +197,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         salesforceOrgId,
         commerceOrgId,
         siteId,
-        my_domain: myDomain,
         enableConversationContext = 'false',
         conversationContext = [],
         enableAgentFromFloatingButton = 'true'
@@ -204,15 +207,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
 
-    // Warn once at mount if my_domain is missing — Token Bridge calls will be silently skipped.
-    useEffect(() => {
-        if (!myDomain) {
-            console.warn(
-                '[ShopperAgent] my_domain is not set in the commerce agent configuration. ' +
-                    'Token Bridge calls will be skipped until it is provided.'
-            )
-        }
-    }, [])
+    // Fetch my_domain from Shopper Configurations API
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
 
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
@@ -255,8 +254,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         sfLanguage,
         domainUrl,
         organizationId,
-        configSiteId,
-        myDomain
+        configSiteId
     }
 
     const lastConversationSessionInitRef = useRef(null)
@@ -401,14 +399,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             })
         }
 
-        const handleEmbeddedMessagingConversationStarted = (event) => {
+        const handleEmbeddedMessagingConversationStarted = async (event) => {
             const {
                 organizationId: orgId,
                 configSiteId: sid,
-                myDomain: myDomainValue
             } = embeddedLifecycleRef.current
+
             if (!orgId || !sid) return
-            if (!myDomainValue) return
+            if (!myDomain) return
 
             const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
             if (conversationId && lastConversationSessionInitRef.current === conversationId) return
@@ -435,7 +433,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                             authLinkKey,
                             slasAccessToken,
                             slasRefreshToken,
-                            myDomain: myDomainValue
+                            myDomain: myDomain
                         })
 
                         if (result.status !== HTTP_OK) {
@@ -538,7 +536,6 @@ ShopperAgentWindow.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
-     * @property {string} [my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
      * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
      * @property {string[]} [conversationContext] - Conversation context data array
      */
@@ -576,7 +573,6 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
- * @param {string} [props.commerceAgentConfiguration.my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
  * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
  * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @param {boolean} props.basketDoneLoading - Whether the basket has finished loading
@@ -636,7 +632,6 @@ ShopperAgent.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
-     * @property {string} [my_domain] - ANC MyDomain from the Shopper Configurations API; Token Bridge is skipped when absent
      * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
      * @property {string[]} [conversationContext] - Conversation context data array
      *

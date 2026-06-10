@@ -94,7 +94,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
-    useCustomerType: jest.fn()
+    useCustomerType: jest.fn(),
+    useConfigurations: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -111,7 +112,13 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -122,14 +129,13 @@ const mockedUseMiaw = useMiaw
 const mockedUseAccessToken = useAccessToken
 const mockedUseUsid = useUsid
 const mockedUseConfig = useConfig
+const mockedUseConfigurations = useConfigurations
 const mockedUseCustomerType = useCustomerType
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
 
 const mockGetTokenWhenReady = jest.fn()
-
-const TEST_MY_DOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -140,8 +146,7 @@ const commerceAgentSettings = {
     scrt2Url: 'https://test.salesforce.com/scrt2.js',
     salesforceOrgId: 'test-org-id',
     commerceOrgId: 'test-commerce-org-id',
-    siteId: 'RefArchGlobal',
-    my_domain: TEST_MY_DOMAIN
+    siteId: 'RefArchGlobal'
 }
 
 const defaultProps = {
@@ -199,6 +204,19 @@ describe('ShopperAgent Component', () => {
 
         // Mock useAppOrigin hook
         mockUseAppOrigin.mockReturnValue('https://example.com')
+
+        // Mock useConfigurations hook
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: [
+                    {
+                        configurationType: 'globalConfiguration',
+                        id: 'my_domain',
+                        value: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+                    }
+                ]
+            }
+        })
 
         // Default Token Bridge response: success
         mockCallTokenBridge.mockReset()
@@ -425,7 +443,7 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should call Token Bridge with auth link key, access token, refresh token, and myDomain when conversation starts', async () => {
+    test('should call Token Bridge with auth link key, access token, and refresh token when conversation starts', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
@@ -437,7 +455,7 @@ describe('ShopperAgent Component', () => {
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
             slasRefreshToken: 'test-refresh-token',
-            myDomain: TEST_MY_DOMAIN
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         })
     })
 
@@ -603,16 +621,14 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should NOT call Token Bridge when my_domain is absent from configuration', async () => {
-        const propsWithoutMyDomain = {
-            ...defaultProps,
-            commerceAgentConfiguration: {
-                ...commerceAgentSettings,
-                my_domain: undefined
+    test('should NOT call Token Bridge when myDomain is missing', async () => {
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: []
             }
-        }
+        })
 
-        render(<ShopperAgent {...propsWithoutMyDomain} />)
+        render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
@@ -621,41 +637,69 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should call Token Bridge after my_domain becomes available even with same conversationId', async () => {
-        // First render without my_domain — event with conversationId should be ignored
-        const propsWithoutMyDomain = {
-            ...defaultProps,
-            commerceAgentConfiguration: {
-                ...commerceAgentSettings,
-                my_domain: undefined
+    test('should NOT call Token Bridge when myDomain is undefined', async () => {
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: [
+                    {
+                        configurationType: 'globalConfiguration',
+                        id: 'my_domain',
+                        value: undefined
+                    }
+                ]
             }
-        }
-        const {rerender} = render(<ShopperAgent {...propsWithoutMyDomain} />)
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(
-                new CustomEvent('onEmbeddedMessagingConversationStarted', {
-                    detail: {conversationId: 'conv-123'}
-                })
-            )
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
 
-        // Re-render with my_domain now present — same conversationId should fire Token Bridge
-        await act(async () => {
-            rerender(<ShopperAgent {...defaultProps} />)
+    test('should NOT call Token Bridge when useConfigurations returns no data', async () => {
+        mockedUseConfigurations.mockReturnValue({
+            data: undefined
         })
 
+        render(<ShopperAgent {...defaultProps} />)
+
         await act(async () => {
-            window.dispatchEvent(
-                new CustomEvent('onEmbeddedMessagingConversationStarted', {
-                    detail: {conversationId: 'conv-123'}
-                })
-            )
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
+
+    test('should call Token Bridge with myDomain from configurations', async () => {
+        const customMyDomain = 'https://custom-domain.salesforce.com'
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: [
+                    {
+                        configurationType: 'globalConfiguration',
+                        id: 'my_domain',
+                        value: customMyDomain
+                    }
+                ]
+            }
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+        expect(mockCallTokenBridge).toHaveBeenCalledWith({
+            authLinkKey: 'test-auth-link-key',
+            slasAccessToken: 'test-slas-access-token',
+            slasRefreshToken: 'test-refresh-token',
+            myDomain: customMyDomain
+        })
     })
 
     test('should update prechat fields when refresh token changes', async () => {
@@ -743,7 +787,7 @@ describe('ShopperAgent Component', () => {
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
             slasRefreshToken: null,
-            myDomain: TEST_MY_DOMAIN
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         })
     })
 

@@ -10,7 +10,6 @@ import {ApiClientConfigParams, ApiClients, SDKClientTransformer} from './hooks/t
 import {Logger} from './types'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
-    ShopperAgents,
     ShopperBaskets,
     ShopperBasketsV2,
     ShopperConsents,

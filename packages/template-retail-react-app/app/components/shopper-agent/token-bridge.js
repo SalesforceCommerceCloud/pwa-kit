@@ -15,18 +15,19 @@
  * the browser-side helper `callTokenBridge` from here.
  *
  * Flow:
- *   1. Browser reads the SLAS access token (useAccessToken) and SLAS refresh
- *      token (useRefreshToken) from the commerce-sdk-react auth context.
- *      All three — access token, refresh token, and my_domain (from the Shopper
- *      Configurations API) — are sent in the request body to the same-origin proxy
- *      (POST /api/agent/identity/bridge), along with the auth_link_key.
+ *   1. Browser reads:
+ *      - SLAS access token via useAccessToken hook
+ *      - SLAS refresh token via useRefreshToken hook
+ *      - my_domain via useConfigurations hook (Shopper Configurations API)
+ *      All three tokens plus my_domain are sent in the request body to the
+ *      same-origin proxy (POST /api/agent/identity/bridge), along with auth_link_key.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js)
  *      resolves the ANC MyDomain from the request body and forwards to Core with
  *      `Authorization: SLAS <access_token>` and `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
- * MyDomain resolution: sourced from the Shopper Configurations API (`my_domain`),
+ * MyDomain resolution: sourced from the Shopper Configurations API via useConfigurations hook,
  * forwarded from the browser through the request body to the server-side handler.
  * ------------------------------------------------------------------------- */
 
@@ -35,7 +36,6 @@ const CORE_TOKEN_BRIDGE_PATH = '/agent/identity/bridge'
 
 /**
  * Resolve the ANC MyDomain origin to call.
- * Expects the value supplied by the Shopper Configurations API.
  * Accepts values with or without a scheme; always returns an absolute URL
  * origin (or null) so `fetch()` can parse it.
  *
