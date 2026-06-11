@@ -100,7 +100,7 @@ const Payment = () => {
         const paymentInstrument = {
             paymentMethodId: 'CREDIT_CARD',
             // Required for downstream OMS ingestion.
-            amount: basket?.orderTotal ?? basket?.productSubTotal,
+            amount: basket.orderTotal ?? basket.productSubTotal,
             paymentCard: {
                 holder: formValue.holder,
                 maskedNumber: getMaskCreditCardNumber(formValue.number),
