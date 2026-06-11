@@ -16,24 +16,6 @@ import {
     Link as ChakraLink
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-// Localized labels for the known shipping-status keys. Hoisted to module scope so
-// the descriptors are allocated once (not per render); react-intl still statically
-// extracts the ids because the descriptors are literals.
-const SHIPPING_STATUS_MESSAGES = {
-    not_shipped: {
-        defaultMessage: 'Not shipped',
-        id: 'account_order_detail.shipping_status.not_shipped'
-    },
-    part_shipped: {
-        defaultMessage: 'Partially shipped',
-        id: 'account_order_detail.shipping_status.part_shipped'
-    },
-    shipped: {
-        defaultMessage: 'Shipped',
-        id: 'account_order_detail.shipping_status.shipped'
-    }
-}
-
 /**
  * Presentational tracking block for a single shipment on the Order Details page.
  *
@@ -55,10 +37,6 @@ const OrderTracking = ({
 }) => {
     const {formatMessage} = useIntl()
 
-    const statusLabel = SHIPPING_STATUS_MESSAGES[shippingStatus]
-        ? formatMessage(SHIPPING_STATUS_MESSAGES[shippingStatus])
-        : shippingStatus
-
     return (
         <Stack spacing={1}>
             <Heading as="h2" fontSize="sm" pt={1}>
@@ -77,7 +55,22 @@ const OrderTracking = ({
             </Heading>
             <Box>
                 <Text fontSize="sm" textTransform="titlecase">
-                    {statusLabel}
+                    {/* Inline literal descriptors so babel-plugin-formatjs can statically
+                        extract these ids (a hoisted/variable descriptor is NOT extracted). */}
+                    {{
+                        not_shipped: formatMessage({
+                            defaultMessage: 'Not shipped',
+                            id: 'account_order_detail.shipping_status.not_shipped'
+                        }),
+                        part_shipped: formatMessage({
+                            defaultMessage: 'Partially shipped',
+                            id: 'account_order_detail.shipping_status.part_shipped'
+                        }),
+                        shipped: formatMessage({
+                            defaultMessage: 'Shipped',
+                            id: 'account_order_detail.shipping_status.shipped'
+                        })
+                    }[shippingStatus] || shippingStatus}
                 </Text>
                 <Text fontSize="sm">{shippingMethodName}</Text>
                 {trackingNumber && (
