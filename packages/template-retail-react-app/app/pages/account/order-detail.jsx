@@ -18,7 +18,6 @@ import {
     Button,
     Divider,
     Grid,
-    Link as ChakraLink,
     SimpleGrid,
     Skeleton,
     useDisclosure
@@ -40,6 +39,7 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
+import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -247,67 +247,6 @@ const AccountOrderDetail = () => {
             return storeData.data.find((store) => store.id === storeId)
         },
         [storeData?.data]
-    )
-
-    const renderShippingMethod = (
-        shippingMethodName,
-        shippingStatus,
-        trackingNumber,
-        trackingUrl,
-        shipmentsLength,
-        index
-    ) => (
-        <Stack spacing={1}>
-            <Heading as="h2" fontSize="sm" pt={1}>
-                {shipmentsLength > 1 ? (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method {number}"
-                        id="account_order_detail.heading.shipping_method_number"
-                        values={{number: index + 1}}
-                    />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method"
-                        id="account_order_detail.heading.shipping_method"
-                    />
-                )}
-            </Heading>
-            <Box>
-                <Text fontSize="sm" textTransform="titlecase">
-                    {{
-                        not_shipped: formatMessage({
-                            defaultMessage: 'Not shipped',
-                            id: 'account_order_detail.shipping_status.not_shipped'
-                        }),
-                        part_shipped: formatMessage({
-                            defaultMessage: 'Partially shipped',
-                            id: 'account_order_detail.shipping_status.part_shipped'
-                        }),
-                        shipped: formatMessage({
-                            defaultMessage: 'Shipped',
-                            id: 'account_order_detail.shipping_status.shipped'
-                        })
-                    }[shippingStatus] || shippingStatus}
-                </Text>
-                <Text fontSize="sm">{shippingMethodName}</Text>
-                {trackingNumber && (
-                    <Text fontSize="sm">
-                        <FormattedMessage
-                            defaultMessage="Tracking Number"
-                            id="account_order_detail.label.tracking_number"
-                        />
-                        :{' '}
-                        {trackingUrl ? (
-                            <ChakraLink href={trackingUrl} isExternal color="blue.600">
-                                {trackingNumber}
-                            </ChakraLink>
-                        ) : (
-                            trackingNumber
-                        )}
-                    </Text>
-                )}
-            </Box>
-        </Stack>
     )
 
     const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
@@ -556,14 +495,14 @@ const AccountOrderDetail = () => {
 
                                         return (
                                             <React.Fragment key={`delivery-${index}`}>
-                                                {renderShippingMethod(
-                                                    shippingMethodName,
-                                                    shippingStatus,
-                                                    trackingNumber,
-                                                    trackingUrl,
-                                                    deliveryShipments.length,
-                                                    index
-                                                )}
+                                                <OrderTracking
+                                                    shippingMethodName={shippingMethodName}
+                                                    shippingStatus={shippingStatus}
+                                                    trackingNumber={trackingNumber}
+                                                    trackingUrl={trackingUrl}
+                                                    shipmentsLength={deliveryShipments.length}
+                                                    index={index}
+                                                />
                                                 <Stack spacing={1}>
                                                     <Heading as="h2" fontSize="sm" pt={1}>
                                                         {deliveryShipments.length > 1 ? (
@@ -604,14 +543,14 @@ const AccountOrderDetail = () => {
                                 {showMultiShipmentsFromOmsOnly &&
                                     order?.omsData?.shipments?.map((shipment, index) => (
                                         <React.Fragment key={`oms-shipment-${index}`}>
-                                            {renderShippingMethod(
-                                                shipment.provider,
-                                                shipment.status,
-                                                shipment.trackingNumber,
-                                                shipment.trackingUrl,
-                                                omsShipmentCount,
-                                                index
-                                            )}
+                                            <OrderTracking
+                                                shippingMethodName={shipment.provider}
+                                                shippingStatus={shipment.status}
+                                                trackingNumber={shipment.trackingNumber}
+                                                trackingUrl={shipment.trackingUrl}
+                                                shipmentsLength={omsShipmentCount}
+                                                index={index}
+                                            />
                                         </React.Fragment>
                                     ))}
 
