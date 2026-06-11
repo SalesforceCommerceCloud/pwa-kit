@@ -64,9 +64,6 @@ const Payment = () => {
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
-    const {mutateAsync: updatePaymentInstrumentInBasket} = useShopperBasketsMutation(
-        'updatePaymentInstrumentInBasket'
-    )
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
         'updateBillingAddressForBasket'
     )
@@ -80,26 +77,6 @@ const Payment = () => {
             status: 'error'
         })
     }
-
-    // Re-sync the payment instrument's amount when the basket's orderTotal changes
-    // (promo applied, shipping method changed, item added/removed) after a payment
-    // has been added. Without this, the order is placed with a payment record that
-    // reflects the total at payment-add time, not the actual amount the shopper agreed to.
-    useEffect(() => {
-        if (
-            appliedPayment?.paymentInstrumentId &&
-            basket?.orderTotal != null &&
-            appliedPayment.amount !== basket.orderTotal
-        ) {
-            updatePaymentInstrumentInBasket({
-                parameters: {
-                    basketId: basket.basketId,
-                    paymentInstrumentId: appliedPayment.paymentInstrumentId
-                },
-                body: {amount: basket.orderTotal}
-            }).catch(showError)
-        }
-    }, [basket?.orderTotal, appliedPayment?.paymentInstrumentId, appliedPayment?.amount])
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
