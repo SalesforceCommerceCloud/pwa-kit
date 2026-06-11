@@ -4760,7 +4760,7 @@
   "shopper_agent.error.session_init_failed": [
     {
       "type": 0,
-      "value": "We could not start the shopping assistant. Please try again."
+      "value": "Something went wrong. Try again."
     }
   ],
   "signout_confirmation_dialog.button.cancel": [

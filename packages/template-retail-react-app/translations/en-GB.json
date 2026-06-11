@@ -2013,7 +2013,7 @@
     "defaultMessage": "Shipping Options"
   },
   "shopper_agent.error.session_init_failed": {
-    "defaultMessage": "We could not start the shopping assistant. Please try again."
+    "defaultMessage": "Something went wrong. Try again."
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Cancel"
