@@ -426,7 +426,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -719,7 +718,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'initial-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -743,7 +741,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'updated-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -766,7 +763,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: null,
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -811,7 +807,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -838,7 +833,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'EUR',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -865,7 +859,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -892,7 +885,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'test-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'GBP',
             Language: 'en_GB',
             DomainUrl: 'https://example.com/us/en-US'
@@ -923,7 +915,6 @@ describe('ShopperAgent Component', () => {
             OrganizationId: 'new-commerce-org-id',
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: 'test-refresh-token',
             Currency: 'USD',
             Language: 'en_US',
             DomainUrl: 'https://example.com/us/en-US'
@@ -1009,7 +1000,7 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com',
             'https://test.salesforce.com/scrt2.js',
             'en-US',
-            'test-refresh-token',
+            'test-refresh-token', // refreshToken
             'false' // enableAgentFromFloatingButton
         )
     })
@@ -1058,7 +1049,6 @@ describe('ShopperAgent Component', () => {
                 OrganizationId: 'test-commerce-org-id',
                 UsId: 'test-usid',
                 IsCartMgmtSupported: 'true',
-                RefreshToken: 'test-refresh-token',
                 Currency: 'USD',
                 Language: 'en_US',
                 DomainUrl: 'https://example.com/us/en-US'
@@ -1083,7 +1073,6 @@ describe('ShopperAgent Component', () => {
                 OrganizationId: 'test-commerce-org-id',
                 UsId: 'test-usid',
                 IsCartMgmtSupported: 'true',
-                RefreshToken: 'test-refresh-token',
                 Currency: 'USD',
                 Language: 'en_US',
                 DomainUrl: 'https://example.com/us/en-US'

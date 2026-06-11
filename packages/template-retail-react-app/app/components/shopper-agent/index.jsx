@@ -376,7 +376,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 OrganizationId: s.commerceOrgId,
                 UsId: s.usid,
                 IsCartMgmtSupported: 'true',
-                RefreshToken: s.refreshToken,
                 Currency: s.preferredCurrency,
                 Language: s.sfLanguage,
                 DomainUrl: s.domainUrl
