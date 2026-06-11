@@ -99,6 +99,10 @@ const Payment = () => {
 
         const paymentInstrument = {
             paymentMethodId: 'CREDIT_CARD',
+            // Without `amount`, the resulting PaymentTransaction is persisted with a
+            // null amount/currency, which downstream OMS ingestion rejects with
+            // "Payment currency code [N/A] does not match order currency code [...]".
+            amount: basket?.orderTotal ?? basket?.productSubTotal,
             paymentCard: {
                 holder: formValue.holder,
                 maskedNumber: getMaskCreditCardNumber(formValue.number),
