@@ -542,16 +542,15 @@ const AccountOrderDetail = () => {
                                 {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
                                 {showMultiShipmentsFromOmsOnly &&
                                     order?.omsData?.shipments?.map((shipment, index) => (
-                                        <React.Fragment key={`oms-shipment-${index}`}>
-                                            <OrderTracking
-                                                shippingMethodName={shipment.provider}
-                                                shippingStatus={shipment.status}
-                                                trackingNumber={shipment.trackingNumber}
-                                                trackingUrl={shipment.trackingUrl}
-                                                shipmentsLength={omsShipmentCount}
-                                                index={index}
-                                            />
-                                        </React.Fragment>
+                                        <OrderTracking
+                                            key={`oms-shipment-${index}`}
+                                            shippingMethodName={shipment.provider}
+                                            shippingStatus={shipment.status}
+                                            trackingNumber={shipment.trackingNumber}
+                                            trackingUrl={shipment.trackingUrl}
+                                            shipmentsLength={omsShipmentCount}
+                                            index={index}
+                                        />
                                     ))}
 
                                 {/* Payment Method */}
