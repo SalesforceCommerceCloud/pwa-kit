@@ -99,7 +99,6 @@ const Payment = () => {
 
         const paymentInstrument = {
             paymentMethodId: 'CREDIT_CARD',
-            amount: basket.orderTotal ?? basket.productSubTotal,
             paymentCard: {
                 holder: formValue.holder,
                 maskedNumber: getMaskCreditCardNumber(formValue.number),
