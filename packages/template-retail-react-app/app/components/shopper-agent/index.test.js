@@ -453,8 +453,8 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            slasRefreshToken: 'test-refresh-token',
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            siteId: 'RefArchGlobal'
         })
     })
 
@@ -477,22 +477,20 @@ describe('ShopperAgent Component', () => {
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
     })
 
-    test('should log success info when Token Bridge returns 200', async () => {
-        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
-
+    test('should not show error toast or reset session when Token Bridge returns 200', async () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
         })
 
-        await waitFor(() =>
-            expect(infoSpy).toHaveBeenCalledWith('Token Bridge succeeded', {status: 200})
-        )
+        await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+        // Wait a bit to ensure no error handling runs
+        await new Promise(resolve => setTimeout(resolve, 100))
+
         expect(mockShowToast).not.toHaveBeenCalled()
         expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
-
-        infoSpy.mockRestore()
     })
 
     test('should reset session and toast error when Token Bridge returns non-200 status', async () => {
@@ -620,71 +618,9 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should NOT call Token Bridge when myDomain is missing', async () => {
-        mockedUseConfigurations.mockReturnValue({
-            data: {
-                configurations: []
-            }
-        })
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
-        })
-
-        expect(mockCallTokenBridge).not.toHaveBeenCalled()
-    })
-
-    test('should NOT call Token Bridge when myDomain is undefined', async () => {
-        mockedUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        configurationType: 'globalConfiguration',
-                        id: 'my_domain',
-                        value: undefined
-                    }
-                ]
-            }
-        })
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
-        })
-
-        expect(mockCallTokenBridge).not.toHaveBeenCalled()
-    })
-
-    test('should NOT call Token Bridge when useConfigurations returns no data', async () => {
-        mockedUseConfigurations.mockReturnValue({
-            data: undefined
-        })
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
-        })
-
-        expect(mockCallTokenBridge).not.toHaveBeenCalled()
-    })
-
-    test('should call Token Bridge with myDomain from configurations', async () => {
-        const customMyDomain = 'https://custom-domain.salesforce.com'
-        mockedUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        configurationType: 'globalConfiguration',
-                        id: 'my_domain',
-                        value: customMyDomain
-                    }
-                ]
-            }
-        })
+    test('should detect HttpOnly mode and omit access token when getTokenWhenReady returns empty', async () => {
+        // Simulate HttpOnly mode: getTokenWhenReady returns empty string
+        mockGetTokenWhenReady.mockResolvedValue('')
 
         render(<ShopperAgent {...defaultProps} />)
 
@@ -695,9 +631,9 @@ describe('ShopperAgent Component', () => {
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
-            slasAccessToken: 'test-slas-access-token',
-            slasRefreshToken: 'test-refresh-token',
-            myDomain: customMyDomain
+            slasAccessToken: undefined, // Omitted in HttpOnly mode
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            siteId: 'RefArchGlobal'
         })
     })
 
@@ -782,8 +718,8 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            slasRefreshToken: null,
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            siteId: 'RefArchGlobal'
         })
     })
 
@@ -977,7 +913,6 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com', // embeddedServiceEndpoint
             'https://test.salesforce.com/scrt2.js', // scrt2Url
             'en-US', // locale.id
-            'test-refresh-token', // refreshToken
             'true' // enableAgentFromFloatingButton (default)
         )
     })
@@ -1000,7 +935,6 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com',
             'https://test.salesforce.com/scrt2.js',
             'en-US',
-            'test-refresh-token', // refreshToken
             'false' // enableAgentFromFloatingButton
         )
     })

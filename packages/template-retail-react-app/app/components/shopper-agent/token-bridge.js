@@ -15,24 +15,47 @@
  * the browser-side helper `callTokenBridge` from here.
  *
  * Flow:
- *   1. Browser reads:
- *      - SLAS access token via useAccessToken hook
- *      - SLAS refresh token via useRefreshToken hook
- *      - my_domain via useConfigurations hook (Shopper Configurations API)
- *      All three tokens plus my_domain are sent in the request body to the
- *      same-origin proxy (POST /api/agent/identity/bridge), along with auth_link_key.
- *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js)
- *      resolves the ANC MyDomain from the request body and forwards to Core with
- *      `Authorization: SLAS <access_token>` and `refresh_token` in the body.
+ *   1. Browser: Depending on HttpOnly mode:
+ *      - HttpOnly ON: Tokens in cookies (cc-at_{siteId}, cc-nx / cc-nx-g)
+ *        sent automatically to same-origin proxy. Client sends auth_link_key,
+ *        my_domain, and site_id in request body.
+ *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
+ *        Client sends auth_link_key, slas_access_token (from localStorage),
+ *        my_domain, and site_id in request body. Refresh token read from cookie.
+ *      my_domain via useConfigurations hook (Shopper Configurations API)
+ *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
+ *      - Reads tokens from cookies (HttpOnly mode) or request body (non-HttpOnly)
+ *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
+ *      - Forwards to Core with `Authorization: SLAS <access_token>` and
+ *        `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
  * MyDomain resolution: sourced from the Shopper Configurations API via useConfigurations hook,
- * forwarded from the browser through the request body to the server-side handler.
+ * forwarded from the browser through the request body, then validated server-side against
+ * a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
 
 export const TOKEN_BRIDGE_PROXY_PATH = '/api/agent/identity/bridge'
 const CORE_TOKEN_BRIDGE_PATH = '/agent/identity/bridge'
+
+/**
+ * Parse cookies from the Cookie header string.
+ * @param {string} [cookieHeader] - Cookie header string
+ * @returns {Object} Object with cookie name-value pairs
+ */
+function parseCookies(cookieHeader) {
+    const cookies = {}
+    if (!cookieHeader) return cookies
+
+    cookieHeader.split(';').forEach((cookie) => {
+        const [name, ...rest] = cookie.split('=')
+        if (name && rest.length > 0) {
+            cookies[name.trim()] = rest.join('=').trim()
+        }
+    })
+    return cookies
+}
 
 /**
  * Resolve the ANC MyDomain origin to call.
@@ -53,16 +76,44 @@ export async function handleTokenBridge(req, res) {
     try {
         const {
             auth_link_key: authLinkKey,
-            slas_access_token: slasAccessToken,
-            slas_refresh_token: refreshToken,
-            my_domain: myDomainFromConfig
+            slas_access_token: slasAccessTokenFromBody,
+            slas_refresh_token: refreshTokenFromBody,
+            my_domain: myDomainFromConfig,
+            site_id: siteId
         } = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
         }
-        if (!slasAccessToken || typeof slasAccessToken !== 'string') {
-            return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
+
+        // Check if HttpOnly mode is enabled
+        const isHttpOnly = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+        // Parse cookies from the request
+        const cookies = parseCookies(req.headers.cookie)
+
+        // Default siteId if not provided (matches PWA Kit default)
+        const effectiveSiteId = siteId || 'RefArch'
+
+        let slasAccessToken, refreshToken
+
+        if (isHttpOnly) {
+            // HttpOnly mode: Read tokens from cookies
+            slasAccessToken = cookies[`cc-at_${effectiveSiteId}`]
+            refreshToken = cookies[`cc-nx_${effectiveSiteId}`] || cookies[`cc-nx-g_${effectiveSiteId}`]
+
+            if (!slasAccessToken) {
+                console.error('[token-bridge] HttpOnly mode: Access token cookie not found')
+                return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
+            }
+        } else {
+            // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
+            slasAccessToken = slasAccessTokenFromBody
+            refreshToken = cookies[`cc-nx_${effectiveSiteId}`] || cookies[`cc-nx-g_${effectiveSiteId}`]
+
+            if (!slasAccessToken || typeof slasAccessToken !== 'string') {
+                return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
+            }
         }
 
         const myDomain = resolveAncMyDomain(myDomainFromConfig)
@@ -72,6 +123,23 @@ export async function handleTokenBridge(req, res) {
                     'Provide my_domain via the Shopper Configurations API.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
+        }
+
+        // Validate myDomain is from a trusted Salesforce domain (SSRF prevention)
+        try {
+            const myDomainHost = new URL(myDomain).hostname
+            const isTrusted =
+                myDomainHost.endsWith('.salesforce.com') ||
+                myDomainHost.endsWith('.my.salesforce.com') ||
+                myDomainHost.endsWith('.pc-rnd.salesforce.com')
+
+            if (!isTrusted) {
+                console.error('[token-bridge] Untrusted myDomain host:', myDomainHost)
+                return res.status(400).json({error: 'UNTRUSTED_MYDOMAIN'})
+            }
+        } catch (err) {
+            console.error('[token-bridge] Invalid myDomain URL:', myDomain)
+            return res.status(400).json({error: 'INVALID_MYDOMAIN_URL'})
         }
 
         if (!refreshToken) {
@@ -117,30 +185,38 @@ export function registerTokenBridgeRoute(app) {
 /**
  * Browser helper: POSTs to the same-origin proxy and returns Core's status + body.
  *
- * Both the SLAS access token and refresh token are read on the client via the
- * commerce-sdk-react auth context (see useAccessToken / useRefreshToken) and
- * passed through the body. The proxy forwards them to Core.
+ * In HttpOnly mode, tokens are sent automatically via cookies. In non-HttpOnly mode,
+ * the access token is read from localStorage and sent in the body, while the refresh
+ * token is read from cookies server-side.
  *
  * @param {string} authLinkKey - Auth link key from the embedded messaging API
- * @param {string} slasAccessToken - SLAS access token
- * @param {string} [slasRefreshToken] - SLAS refresh token
+ * @param {string} [slasAccessToken] - SLAS access token (non-HttpOnly mode only)
+ * @param {string} [slasRefreshToken] - DEPRECATED: Refresh token read from cookie server-side
  * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
+ * @param {string} [siteId] - Site ID for cookie name resolution
  */
 export const callTokenBridge = async ({
     authLinkKey,
     slasAccessToken,
-    slasRefreshToken,
-    myDomain
+    slasRefreshToken, // Deprecated but kept for backward compatibility
+    myDomain,
+    siteId
 }) => {
+    const bodyTokenBridge = {
+        auth_link_key: authLinkKey,
+        ...(myDomain ? {my_domain: myDomain} : {}),
+        ...(siteId ? {site_id: siteId} : {})
+    }
+
+    // Only include access token if provided (non-HttpOnly mode)
+    if (slasAccessToken) {
+        bodyTokenBridge.slas_access_token = slasAccessToken
+    }
+
     const res = await fetch(TOKEN_BRIDGE_PROXY_PATH, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            auth_link_key: authLinkKey,
-            slas_access_token: slasAccessToken,
-            ...(slasRefreshToken ? {slas_refresh_token: slasRefreshToken} : {}),
-            ...(myDomain ? {my_domain: myDomain} : {})
-        })
+        body: JSON.stringify(body)
     })
 
     let body = null

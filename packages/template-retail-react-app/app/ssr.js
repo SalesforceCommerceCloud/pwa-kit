@@ -506,12 +506,14 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+    
     // Shopper Agent — Token Bridge proxy.
-    // Browser POSTs an auth_link_key, SLAS access token, and SLAS refresh
-    // token in the request body. The proxy forwards them to Core's
-    // `/agent/identity/bridge` endpoint on the configured ANC MyDomain
-    // (env: ANC_MYDOMAIN), with the access token in an `Authorization: SLAS`
-    // header and the refresh token in the body.
+    // Browser POSTs an auth_link_key, SLAS access token, SLAS refresh token,
+    // and my_domain (from Shopper Configurations API) in the request body.
+    // The proxy validates the my_domain is a trusted Salesforce host, then
+    // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
+    // the access token in an `Authorization: SLAS` header and the refresh
+    // token in the body.
     registerTokenBridgeRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

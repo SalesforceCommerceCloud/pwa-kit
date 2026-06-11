@@ -1,4 +1,7 @@
 ## v10.1.0-dev
+-   [Feature] Enable customer context for Shopper Agent: pass SLAS access + refresh tokens to Core via a same-origin Token Bridge proxy on conversation start, and reset the embedded messaging session on guest ↔ registered transitions so the agent never picks up a stale shopper identity.
+
+## v10.1.0-dev
 - [Feature] Add cancel order modal on order detail page. Registered users with OMS enabled can cancel orders that are not yet shipped. Modal includes reason code selection and inline success/error feedback. Gated behind `app.oms.enabled` config flag. [#3861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3861)
 - [Bugfix] Render the search refinements panels open during server-side rendering. ChakraUI v2's Accordion forces every item closed in SSR (its open state depends on a post-mount layout effect that never runs on the server), so the panels opened only after hydration — a late relayout that could become the PLP largest-contentful-paint element. Replaced the Accordion with a controlled disclosure that honors its open state server-side.
 - [Bugfix] Memoize the search refinements panel so it stops re-rendering on every parent render when the filter set is unchanged, improving PLP render stability. [#3855](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3855)

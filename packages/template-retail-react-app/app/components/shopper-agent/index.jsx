@@ -398,7 +398,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             })
         }
 
-        const handleEmbeddedMessagingConversationStarted = async (event) => {
+        const handleEmbeddedMessagingConversationStarted = (event) => {
             const {
                 organizationId: orgId,
                 configSiteId: sid,
@@ -407,6 +407,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             if (!orgId || !sid) return
             if (!myDomain) return
 
+            //Prevents refiring of the event if already call has been done
             const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
             if (conversationId && lastConversationSessionInitRef.current === conversationId) return
             if (conversationId) lastConversationSessionInitRef.current = conversationId
@@ -423,16 +424,18 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                     // Direct callout to Core's Token Bridge via the same-origin
                     // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
                     try {
+                        // Check if HttpOnly mode is enabled by checking if access token is in cookie
+                        // In HttpOnly mode, getTokenWhenReady returns empty string because tokens are HttpOnly
                         const slasAccessToken = await getTokenWhenReadyRef.current()
-                        // useRefreshToken() resolves the refresh token from
-                        // the SDK's auth context. Send it through the
-                        // request body so the proxy can forward it to Core.
-                        const slasRefreshToken = embeddedLifecycleRef.current.refreshToken
+                        const isHttpOnly = !slasAccessToken || slasAccessToken === ''
+
                         const result = await callTokenBridge({
                             authLinkKey,
-                            slasAccessToken,
-                            slasRefreshToken,
-                            myDomain: myDomain
+                            // Only send access token in non-HttpOnly mode (from localStorage)
+                            // In HttpOnly mode, server reads from cc-at_{siteId} cookie
+                            slasAccessToken: isHttpOnly ? undefined : slasAccessToken,
+                            myDomain: myDomain,
+                            siteId: sid
                         })
 
                         if (result.status !== HTTP_OK) {
@@ -442,8 +445,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                                 error: errorCode
                             })
                             failSessionInit()
-                        } else {
-                            console.info('Token Bridge succeeded', {status: result.status})
                         }
                     } catch (error) {
                         console.error('Token Bridge threw', error)

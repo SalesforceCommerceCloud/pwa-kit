@@ -15,6 +15,7 @@ import {
 
 const ORIGINAL_FETCH = global.fetch
 const ORIGINAL_ANC_MYDOMAIN = process.env.ANC_MYDOMAIN
+const ORIGINAL_HTTPONLY = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
 
 const buildRes = () => {
     const res = {
@@ -32,8 +33,14 @@ const buildRes = () => {
     return res
 }
 
+const buildReq = (body = {}, cookies = '') => ({
+    body,
+    headers: {cookie: cookies}
+})
+
 beforeEach(() => {
     global.fetch = jest.fn()
+    delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
 })
 
 afterEach(() => {
@@ -42,6 +49,11 @@ afterEach(() => {
         delete process.env.ANC_MYDOMAIN
     } else {
         process.env.ANC_MYDOMAIN = ORIGINAL_ANC_MYDOMAIN
+    }
+    if (ORIGINAL_HTTPONLY === undefined) {
+        delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+    } else {
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = ORIGINAL_HTTPONLY
     }
     jest.restoreAllMocks()
 })
@@ -86,14 +98,11 @@ describe('resolveAncMyDomain', () => {
     })
 })
 
-describe('handleTokenBridge', () => {
+describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     test('returns 400 MISSING_AUTH_LINK_KEY when auth_link_key is missing', async () => {
-        const req = {
-            body: {
-                slas_access_token: 'a',
-                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+        const req = buildReq({
+            slas_access_token: 'a'
+        })
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(400)
@@ -102,26 +111,20 @@ describe('handleTokenBridge', () => {
     })
 
     test('returns 400 MISSING_AUTH_LINK_KEY when auth_link_key is not a string', async () => {
-        const req = {
-            body: {
-                auth_link_key: 123,
-                slas_access_token: 'a',
-                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+        const req = buildReq({
+            auth_link_key: 123,
+            slas_access_token: 'a'
+        })
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(400)
         expect(res.body).toEqual({error: 'MISSING_AUTH_LINK_KEY'})
     })
 
-    test('returns 401 INVALID_SLAS_TOKEN when slas_access_token is missing', async () => {
-        const req = {
-            body: {
-                auth_link_key: 'k',
-                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+    test('returns 401 INVALID_SLAS_TOKEN when slas_access_token is missing (non-HttpOnly)', async () => {
+        const req = buildReq({
+            auth_link_key: 'k'
+        })
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(401)
@@ -131,7 +134,7 @@ describe('handleTokenBridge', () => {
 
     test('returns 500 MYDOMAIN_NOT_CONFIGURED when my_domain is not provided', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        const req = {body: {auth_link_key: 'k', slas_access_token: 'a'}}
+        const req = buildReq({auth_link_key: 'k', slas_access_token: 'a'})
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(500)
@@ -142,7 +145,7 @@ describe('handleTokenBridge', () => {
 
     test('returns 500 MYDOMAIN_NOT_CONFIGURED when my_domain is empty', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        const req = {body: {auth_link_key: 'k', slas_access_token: 'a', my_domain: '   '}}
+        const req = buildReq({auth_link_key: 'k', slas_access_token: 'a', my_domain: '   '})
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(500)
@@ -151,19 +154,97 @@ describe('handleTokenBridge', () => {
         errorSpy.mockRestore()
     })
 
-    test('forwards to Core with refresh_token in body when provided', async () => {
+    test('returns 400 UNTRUSTED_MYDOMAIN when host is not Salesforce domain', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a',
+            my_domain: 'https://attacker.com'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toEqual({error: 'UNTRUSTED_MYDOMAIN'})
+        expect(global.fetch).not.toHaveBeenCalled()
+        errorSpy.mockRestore()
+    })
+
+    test('returns 400 UNTRUSTED_MYDOMAIN for AWS IMDS', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a',
+            my_domain: 'http://169.254.169.254'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toEqual({error: 'UNTRUSTED_MYDOMAIN'})
+        expect(global.fetch).not.toHaveBeenCalled()
+        errorSpy.mockRestore()
+    })
+
+    test('accepts valid .salesforce.com domain', async () => {
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
         })
-        const req = {
-            body: {
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a',
+            my_domain: 'https://test.salesforce.com'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
+    test('accepts valid .my.salesforce.com domain', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a',
+            my_domain: 'https://org.my.salesforce.com'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
+    test('accepts valid .pc-rnd.salesforce.com domain', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a',
+            my_domain: 'https://orgfarm-1234.test1.pc-rnd.salesforce.com'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
+    test('forwards to Core with refresh_token from cookie when provided', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
                 auth_link_key: 'auth-key',
                 slas_access_token: 'access-token',
-                slas_refresh_token: 'refresh-token',
                 my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+            },
+            'cc-nx_RefArch=refresh-token'
+        )
         const res = buildRes()
         await handleTokenBridge(req, res)
 
@@ -185,19 +266,17 @@ describe('handleTokenBridge', () => {
         expect(res.body).toEqual({result: 'ok'})
     })
 
-    test('forwards to Core without refresh_token when not provided and warns', async () => {
+    test('forwards to Core without refresh_token when cookie not present and warns', async () => {
         const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
         })
-        const req = {
-            body: {
-                auth_link_key: 'auth-key',
-                slas_access_token: 'access-token',
-                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+        const req = buildReq({
+            auth_link_key: 'auth-key',
+            slas_access_token: 'access-token',
+            my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        })
         const res = buildRes()
         await handleTokenBridge(req, res)
 
@@ -205,7 +284,7 @@ describe('handleTokenBridge', () => {
         const init = global.fetch.mock.calls[0][1]
         expect(JSON.parse(init.body)).toEqual({auth_link_key: 'auth-key'})
         expect(warnSpy).toHaveBeenCalledWith(
-            expect.stringContaining('No SLAS refresh token in request body')
+            expect.stringContaining('No SLAS refresh token')
         )
         warnSpy.mockRestore()
     })
@@ -215,14 +294,14 @@ describe('handleTokenBridge', () => {
             status: 401,
             json: jest.fn().mockResolvedValue({error: 'INVALID_SLAS_TOKEN'})
         })
-        const req = {
-            body: {
+        const req = buildReq(
+            {
                 auth_link_key: 'auth-key',
                 slas_access_token: 'access-token',
-                slas_refresh_token: 'refresh-token',
                 my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+            },
+            'cc-nx_RefArch=refresh-token'
+        )
         const res = buildRes()
         await handleTokenBridge(req, res)
 
@@ -235,14 +314,14 @@ describe('handleTokenBridge', () => {
             status: 502,
             json: jest.fn().mockRejectedValue(new Error('not json'))
         })
-        const req = {
-            body: {
+        const req = buildReq(
+            {
                 auth_link_key: 'auth-key',
                 slas_access_token: 'access-token',
-                slas_refresh_token: 'refresh-token',
                 my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+            },
+            'cc-nx_RefArch=refresh-token'
+        )
         const res = buildRes()
         await handleTokenBridge(req, res)
 
@@ -253,14 +332,14 @@ describe('handleTokenBridge', () => {
     test('returns 500 SLAS_INTERNAL_ERROR when fetch throws', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         global.fetch.mockRejectedValueOnce(new Error('connection refused'))
-        const req = {
-            body: {
+        const req = buildReq(
+            {
                 auth_link_key: 'auth-key',
                 slas_access_token: 'access-token',
-                slas_refresh_token: 'refresh-token',
                 my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-            }
-        }
+            },
+            'cc-nx_RefArch=refresh-token'
+        )
         const res = buildRes()
         await handleTokenBridge(req, res)
 
@@ -274,11 +353,179 @@ describe('handleTokenBridge', () => {
     })
 
     test('handles missing req.body without throwing', async () => {
-        const req = {}
+        const req = buildReq()
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(400)
         expect(res.body).toEqual({error: 'MISSING_AUTH_LINK_KEY'})
+    })
+
+    test('reads refresh token from cc-nx-g cookie for guest users', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                slas_access_token: 'access-token',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+            },
+            'cc-nx-g_RefArch=guest-refresh-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const init = global.fetch.mock.calls[0][1]
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            refresh_token: 'guest-refresh-token'
+        })
+    })
+})
+
+describe('handleTokenBridge - HttpOnly Mode', () => {
+    beforeEach(() => {
+        process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
+    })
+
+    test('returns 401 INVALID_SLAS_TOKEN when access token cookie is missing', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = buildReq({
+            auth_link_key: 'k',
+            my_domain: 'https://test.salesforce.com'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(401)
+        expect(res.body).toEqual({error: 'INVALID_SLAS_TOKEN'})
+        expect(errorSpy).toHaveBeenCalledWith(
+            expect.stringContaining('HttpOnly mode: Access token cookie not found')
+        )
+        errorSpy.mockRestore()
+    })
+
+    test('reads access token from cc-at cookie in HttpOnly mode', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+                site_id: 'RefArch'
+            },
+            'cc-at_RefArch=httponly-access-token; cc-nx_RefArch=httponly-refresh-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const [url, init] = global.fetch.mock.calls[0]
+        expect(url).toBe(
+            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com/agent/identity/bridge'
+        )
+        expect(init.headers.Authorization).toBe('SLAS httponly-access-token')
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            refresh_token: 'httponly-refresh-token'
+        })
+    })
+
+    test('reads refresh token from cc-nx-g cookie for guest users in HttpOnly mode', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+                site_id: 'RefArch'
+            },
+            'cc-at_RefArch=httponly-access-token; cc-nx-g_RefArch=guest-refresh-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const init = global.fetch.mock.calls[0][1]
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            refresh_token: 'guest-refresh-token'
+        })
+    })
+
+    test('works without refresh token cookie in HttpOnly mode (warns)', async () => {
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+                site_id: 'RefArch'
+            },
+            'cc-at_RefArch=httponly-access-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        expect(warnSpy).toHaveBeenCalled()
+        warnSpy.mockRestore()
+    })
+
+    test('ignores slas_access_token from body in HttpOnly mode (uses cookie)', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                slas_access_token: 'body-token-should-be-ignored',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+                site_id: 'RefArch'
+            },
+            'cc-at_RefArch=httponly-cookie-token; cc-nx_RefArch=refresh-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const init = global.fetch.mock.calls[0][1]
+        // Should use cookie token, not body token
+        expect(init.headers.Authorization).toBe('SLAS httponly-cookie-token')
+    })
+
+    test('uses custom siteId for cookie name resolution', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {
+                auth_link_key: 'auth-key',
+                my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+                site_id: 'CustomSite'
+            },
+            'cc-at_CustomSite=custom-access-token; cc-nx_CustomSite=custom-refresh-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const init = global.fetch.mock.calls[0][1]
+        expect(init.headers.Authorization).toBe('SLAS custom-access-token')
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            refresh_token: 'custom-refresh-token'
+        })
     })
 })
 
@@ -294,7 +541,7 @@ describe('registerTokenBridgeRoute', () => {
 })
 
 describe('callTokenBridge (browser helper)', () => {
-    test('POSTs auth link key, access token, refresh token, and myDomain to the proxy path', async () => {
+    test('POSTs auth link key, access token, myDomain, and siteId (non-HttpOnly mode)', async () => {
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({ok: true})
@@ -303,8 +550,8 @@ describe('callTokenBridge (browser helper)', () => {
         const result = await callTokenBridge({
             authLinkKey: 'auth-key',
             slasAccessToken: 'access-token',
-            slasRefreshToken: 'refresh-token',
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            siteId: 'RefArch'
         })
 
         expect(global.fetch).toHaveBeenCalledTimes(1)
@@ -315,13 +562,53 @@ describe('callTokenBridge (browser helper)', () => {
         expect(JSON.parse(init.body)).toEqual({
             auth_link_key: 'auth-key',
             slas_access_token: 'access-token',
-            slas_refresh_token: 'refresh-token',
-            my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+            my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            site_id: 'RefArch'
         })
         expect(result).toEqual({status: 200, body: {ok: true}})
     })
 
-    test('omits slas_refresh_token when not provided', async () => {
+    test('omits slas_access_token when not provided (HttpOnly mode)', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({ok: true})
+        })
+
+        await callTokenBridge({
+            authLinkKey: 'auth-key',
+            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            siteId: 'RefArch'
+        })
+
+        const init = global.fetch.mock.calls[0][1]
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
+            site_id: 'RefArch'
+        })
+    })
+
+    test('omits myDomain when not provided', async () => {
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({ok: true})
+        })
+
+        await callTokenBridge({
+            authLinkKey: 'auth-key',
+            slasAccessToken: 'access-token',
+            siteId: 'RefArch'
+        })
+
+        const init = global.fetch.mock.calls[0][1]
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            slas_access_token: 'access-token',
+            site_id: 'RefArch'
+        })
+    })
+
+    test('omits siteId when not provided', async () => {
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({ok: true})
@@ -338,68 +625,6 @@ describe('callTokenBridge (browser helper)', () => {
             auth_link_key: 'auth-key',
             slas_access_token: 'access-token',
             my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        })
-    })
-
-    test('omits slas_refresh_token when null', async () => {
-        global.fetch.mockResolvedValueOnce({
-            status: 200,
-            json: jest.fn().mockResolvedValue({ok: true})
-        })
-
-        await callTokenBridge({
-            authLinkKey: 'auth-key',
-            slasAccessToken: 'access-token',
-            slasRefreshToken: null,
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        })
-
-        const init = global.fetch.mock.calls[0][1]
-        expect(JSON.parse(init.body)).toEqual({
-            auth_link_key: 'auth-key',
-            slas_access_token: 'access-token',
-            my_domain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        })
-    })
-
-    test('omits my_domain when not provided', async () => {
-        global.fetch.mockResolvedValueOnce({
-            status: 200,
-            json: jest.fn().mockResolvedValue({ok: true})
-        })
-
-        await callTokenBridge({
-            authLinkKey: 'auth-key',
-            slasAccessToken: 'access-token',
-            slasRefreshToken: 'refresh-token'
-        })
-
-        const init = global.fetch.mock.calls[0][1]
-        expect(JSON.parse(init.body)).toEqual({
-            auth_link_key: 'auth-key',
-            slas_access_token: 'access-token',
-            slas_refresh_token: 'refresh-token'
-        })
-    })
-
-    test('omits my_domain when null', async () => {
-        global.fetch.mockResolvedValueOnce({
-            status: 200,
-            json: jest.fn().mockResolvedValue({ok: true})
-        })
-
-        await callTokenBridge({
-            authLinkKey: 'auth-key',
-            slasAccessToken: 'access-token',
-            slasRefreshToken: 'refresh-token',
-            myDomain: null
-        })
-
-        const init = global.fetch.mock.calls[0][1]
-        expect(JSON.parse(init.body)).toEqual({
-            auth_link_key: 'auth-key',
-            slas_access_token: 'access-token',
-            slas_refresh_token: 'refresh-token'
         })
     })
 
