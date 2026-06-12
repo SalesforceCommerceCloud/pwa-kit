@@ -20,22 +20,39 @@ import {
  * Presentational tracking block for a single shipment on the Order Details page.
  *
  * Renders the shipping method heading, the (localized) shipping status, the
- * shipping method / provider name, and — when a tracking number is present —
- * the tracking number, hyperlinked to the carrier site when a tracking URL is
- * available (otherwise shown as plain text).
+ * shipping method / provider name, the tracking number (hyperlinked to the
+ * carrier site when a tracking URL is available, otherwise plain text), and —
+ * when present — the expected and actual delivery dates.
  *
- * Extracted verbatim from the former inline `renderShippingMethod` in
- * `order-detail.jsx`; the DOM it produces is intentionally identical.
+ * Note: the OMS-over-ECOM fallback for the shipment fields lives at the call
+ * sites in `order-detail.jsx` (the component receives already-resolved scalar
+ * props). A future WI may centralize that fallback into a normalized-shipment
+ * helper if more call sites are added.
  */
 const OrderTracking = ({
     shippingMethodName,
     shippingStatus,
     trackingNumber,
     trackingUrl,
+    expectedDeliveryDate,
+    actualDeliveryDate,
     shipmentsLength,
     index
 }) => {
-    const {formatMessage} = useIntl()
+    const {formatMessage, formatDate} = useIntl()
+
+    // Same date format the order header uses for "Ordered:" — e.g. "Jun 12, 2026".
+    // Returns null for missing or malformed values (a truthy-but-unparseable string
+    // would otherwise render "Invalid Date" or throw in formatDate), so the caller
+    // can omit the line entirely.
+    const formatTrackingDate = (value) => {
+        const date = new Date(value)
+        if (isNaN(date.getTime())) return null
+        return formatDate(date, {year: 'numeric', month: 'short', day: 'numeric'})
+    }
+
+    const expectedDeliveryLabel = formatTrackingDate(expectedDeliveryDate)
+    const actualDeliveryLabel = formatTrackingDate(actualDeliveryDate)
 
     return (
         <Stack spacing={1}>
@@ -89,6 +106,26 @@ const OrderTracking = ({
                         )}
                     </Text>
                 )}
+                {expectedDeliveryLabel && (
+                    <Text fontSize="sm">
+                        <FormattedMessage
+                            defaultMessage="Expected delivery"
+                            id="account_order_detail.label.expected_delivery"
+                        />
+                        : {expectedDeliveryLabel}
+                    </Text>
+                )}
+                {actualDeliveryLabel && (
+                    <Text fontSize="sm">
+                        {/* id is `delivered_on` (mirrors SFN's deliveredOn) but the label is
+                            just "Delivered"; the date follows after the colon, not inside the message. */}
+                        <FormattedMessage
+                            defaultMessage="Delivered"
+                            id="account_order_detail.label.delivered_on"
+                        />
+                        : {actualDeliveryLabel}
+                    </Text>
+                )}
             </Box>
         </Stack>
     )
@@ -103,6 +140,10 @@ OrderTracking.propTypes = {
     trackingNumber: PropTypes.string,
     /** Carrier tracking URL; when present, the tracking number is rendered as an external link. */
     trackingUrl: PropTypes.string,
+    /** Expected delivery date (ISO string); when present, renders an "Expected delivery: <date>" line. */
+    expectedDeliveryDate: PropTypes.string,
+    /** Actual delivery date (ISO string); when present, renders a "Delivered: <date>" line. */
+    actualDeliveryDate: PropTypes.string,
     /** Total number of shipments being rendered (drives the numbered heading). */
     shipmentsLength: PropTypes.number,
     /** Zero-based index of this shipment (drives the numbered heading). */

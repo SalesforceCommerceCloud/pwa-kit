@@ -492,6 +492,9 @@ const AccountOrderDetail = () => {
                                         const trackingNumber =
                                             omsShipment?.trackingNumber || shipment.trackingNumber
                                         const trackingUrl = omsShipment?.trackingUrl
+                                        const expectedDeliveryDate =
+                                            omsShipment?.expectedDeliveryDate
+                                        const actualDeliveryDate = omsShipment?.actualDeliveryDate
 
                                         return (
                                             <React.Fragment key={`delivery-${index}`}>
@@ -500,6 +503,8 @@ const AccountOrderDetail = () => {
                                                     shippingStatus={shippingStatus}
                                                     trackingNumber={trackingNumber}
                                                     trackingUrl={trackingUrl}
+                                                    expectedDeliveryDate={expectedDeliveryDate}
+                                                    actualDeliveryDate={actualDeliveryDate}
                                                     shipmentsLength={deliveryShipments.length}
                                                     index={index}
                                                 />
@@ -548,6 +553,8 @@ const AccountOrderDetail = () => {
                                             shippingStatus={shipment.status}
                                             trackingNumber={shipment.trackingNumber}
                                             trackingUrl={shipment.trackingUrl}
+                                            expectedDeliveryDate={shipment.expectedDeliveryDate}
+                                            actualDeliveryDate={shipment.actualDeliveryDate}
                                             shipmentsLength={omsShipmentCount}
                                             index={index}
                                         />

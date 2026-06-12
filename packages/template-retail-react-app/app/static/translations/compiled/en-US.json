@@ -315,6 +315,18 @@
       "value": "number"
     }
   ],
+  "account_order_detail.label.delivered_on": [
+    {
+      "type": 0,
+      "value": "Delivered"
+    }
+  ],
+  "account_order_detail.label.expected_delivery": [
+    {
+      "type": 0,
+      "value": "Expected delivery"
+    }
+  ],
   "account_order_detail.label.order_number": [
     {
       "type": 0,
