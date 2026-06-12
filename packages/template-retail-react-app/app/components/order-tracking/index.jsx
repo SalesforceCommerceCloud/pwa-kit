@@ -42,8 +42,17 @@ const OrderTracking = ({
     const {formatMessage, formatDate} = useIntl()
 
     // Same date format the order header uses for "Ordered:" — e.g. "Jun 12, 2026".
-    const formatTrackingDate = (value) =>
-        formatDate(new Date(value), {year: 'numeric', month: 'short', day: 'numeric'})
+    // Returns null for missing or malformed values (a truthy-but-unparseable string
+    // would otherwise render "Invalid Date" or throw in formatDate), so the caller
+    // can omit the line entirely.
+    const formatTrackingDate = (value) => {
+        const date = new Date(value)
+        if (isNaN(date.getTime())) return null
+        return formatDate(date, {year: 'numeric', month: 'short', day: 'numeric'})
+    }
+
+    const expectedDeliveryLabel = formatTrackingDate(expectedDeliveryDate)
+    const actualDeliveryLabel = formatTrackingDate(actualDeliveryDate)
 
     return (
         <Stack spacing={1}>
@@ -97,16 +106,16 @@ const OrderTracking = ({
                         )}
                     </Text>
                 )}
-                {expectedDeliveryDate && (
+                {expectedDeliveryLabel && (
                     <Text fontSize="sm">
                         <FormattedMessage
                             defaultMessage="Expected delivery"
                             id="account_order_detail.label.expected_delivery"
                         />
-                        : {formatTrackingDate(expectedDeliveryDate)}
+                        : {expectedDeliveryLabel}
                     </Text>
                 )}
-                {actualDeliveryDate && (
+                {actualDeliveryLabel && (
                     <Text fontSize="sm">
                         {/* id is `delivered_on` (mirrors SFN's deliveredOn) but the label is
                             just "Delivered"; the date follows after the colon, not inside the message. */}
@@ -114,7 +123,7 @@ const OrderTracking = ({
                             defaultMessage="Delivered"
                             id="account_order_detail.label.delivered_on"
                         />
-                        : {formatTrackingDate(actualDeliveryDate)}
+                        : {actualDeliveryLabel}
                     </Text>
                 )}
             </Box>

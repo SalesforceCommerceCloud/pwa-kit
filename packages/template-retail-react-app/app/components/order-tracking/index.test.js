@@ -111,4 +111,20 @@ describe('OrderTracking component', () => {
         expect(container.textContent).toMatch(/Expected delivery:\s*\d{1,2} Jun 2026/)
         expect(container.textContent).toMatch(/Delivered:\s*\d{1,2} Jun 2026/)
     })
+
+    test('omits the date line for a malformed date string (no "Invalid Date", no throw)', () => {
+        renderWithProviders(
+            <OrderTracking
+                {...baseProps}
+                expectedDeliveryDate="not-a-real-date"
+                actualDeliveryDate="also-bad"
+            />
+        )
+        // Malformed values must not surface to the shopper or crash the render.
+        expect(screen.queryByText(/Expected delivery/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Delivered/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Invalid Date/i)).not.toBeInTheDocument()
+        // The rest of the block still renders.
+        expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
+    })
 })
