@@ -67,4 +67,48 @@ describe('OrderTracking component', () => {
         // index is zero-based; heading shows index + 1
         expect(screen.getByRole('heading', {name: /Shipping Method 2/i})).toBeInTheDocument()
     })
+
+    // The date is formatted by locale + timezone (the test IntlProvider is en-GB),
+    // so we assert the label + month/year rather than a hardcoded exact string.
+    // `expectedDeliveryDate` of June renders as e.g. "11 Jun 2026" (en-GB, day-month-year).
+    test('renders the expected delivery date (locale-formatted) when present (AC3)', () => {
+        const {container} = renderWithProviders(
+            <OrderTracking {...baseProps} expectedDeliveryDate="2026-06-12T00:00:00.000Z" />
+        )
+        expect(screen.getByText(/Expected delivery/i)).toBeInTheDocument()
+        // The formatted date sits in the same <Text> line as the label.
+        expect(container.textContent).toMatch(/Expected delivery:\s*\d{1,2} Jun 2026/)
+    })
+
+    test('omits the expected-delivery line when no expectedDeliveryDate is present', () => {
+        renderWithProviders(<OrderTracking {...baseProps} expectedDeliveryDate={undefined} />)
+        expect(screen.queryByText(/Expected delivery/i)).not.toBeInTheDocument()
+    })
+
+    test('renders the delivered date (locale-formatted) when actualDeliveryDate is present', () => {
+        const {container} = renderWithProviders(
+            <OrderTracking {...baseProps} actualDeliveryDate="2026-06-15T00:00:00.000Z" />
+        )
+        expect(screen.getByText(/Delivered/i)).toBeInTheDocument()
+        expect(container.textContent).toMatch(/Delivered:\s*\d{1,2} Jun 2026/)
+    })
+
+    test('omits the delivered line when no actualDeliveryDate is present', () => {
+        renderWithProviders(<OrderTracking {...baseProps} actualDeliveryDate={undefined} />)
+        expect(screen.queryByText(/Delivered/i)).not.toBeInTheDocument()
+    })
+
+    test('renders both expected and delivered lines when both dates are present', () => {
+        const {container} = renderWithProviders(
+            <OrderTracking
+                {...baseProps}
+                expectedDeliveryDate="2026-06-12T00:00:00.000Z"
+                actualDeliveryDate="2026-06-15T00:00:00.000Z"
+            />
+        )
+        expect(screen.getByText(/Expected delivery/i)).toBeInTheDocument()
+        expect(screen.getByText(/Delivered/i)).toBeInTheDocument()
+        expect(container.textContent).toMatch(/Expected delivery:\s*\d{1,2} Jun 2026/)
+        expect(container.textContent).toMatch(/Delivered:\s*\d{1,2} Jun 2026/)
+    })
 })

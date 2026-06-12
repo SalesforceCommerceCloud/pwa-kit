@@ -699,6 +699,34 @@
       "value": "]"
     }
   ],
+  "account_order_detail.label.delivered_on": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.label.expected_delivery": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗẋƥḗḗƈŧḗḗḓ ḓḗḗŀīṽḗḗřẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.label.order_number": [
     {
       "type": 0,
