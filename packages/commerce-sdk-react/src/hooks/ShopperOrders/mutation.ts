@@ -52,7 +52,13 @@ The payment instrument is added with the provided details. The payment method mu
      * Creates a HistoryEntry in the failed Order with provided reasonCode.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `failOrder` endpoint.
      */
-    FailOrder: 'failOrder'
+    FailOrder: 'failOrder',
+    /**
+     * Cancels an order that is integrated with Order Management (OMS).
+     * The cancellation always applies to the entire order; partial cancellations are not supported.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `cancelOmsOrder` endpoint.
+     */
+    CancelOmsOrder: 'cancelOmsOrder'
 } as const
 
 /**

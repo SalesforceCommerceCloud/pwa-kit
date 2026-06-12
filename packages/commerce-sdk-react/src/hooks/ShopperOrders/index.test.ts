@@ -16,7 +16,9 @@ describe('Shopper Orders hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperOrders, queries, mutations)
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
-        expect(unimplemented).toEqual(['guestOrderLookup'])
+        // guestOrderLookup: uses ShopperTokenTsob auth, handled separately
+        // returnOmsOrder: item-level returns are a separate epic (W-22806929)
+        expect(unimplemented).toEqual(['guestOrderLookup', 'returnOmsOrder'])
     })
     test('all mutations have cache update logic', () => {
         // unimplemented = value in mutations enum, but no method in cache update matrix

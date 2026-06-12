@@ -16,7 +16,6 @@ describe('Shopper Experience hooks', () => {
             'getContentFolder', //TODO: implement later
             'getContentFolders', //TODO: implement later
             'getMultipleContent', //TODO: implement later
-            'resolveQualifiers', //TODO: implement later
             'searchContent' //TODO: implement later
         ])
     })
