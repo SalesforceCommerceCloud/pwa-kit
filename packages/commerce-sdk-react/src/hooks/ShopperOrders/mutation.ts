@@ -58,7 +58,12 @@ The payment instrument is added with the provided details. The payment method mu
      * The cancellation always applies to the entire order; partial cancellations are not supported.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `cancelOmsOrder` endpoint.
      */
-    CancelOmsOrder: 'cancelOmsOrder'
+    CancelOmsOrder: 'cancelOmsOrder',
+    /**
+     * Initiates the return of one or more items of an order that is integrated with Order Management (OMS).
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `returnOmsOrder` endpoint.
+     */
+    ReturnOmsOrder: 'returnOmsOrder'
 } as const
 
 /**

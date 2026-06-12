@@ -72,5 +72,14 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             })
         }
         return {invalidate}
+    },
+    returnOmsOrder(customerId, {parameters}) {
+        const invalidate: CacheUpdateInvalidate[] = [{queryKey: getOrder.queryKey(parameters)}]
+        if (customerId) {
+            invalidate.push({
+                queryKey: getCustomerOrders.queryKey({...parameters, customerId})
+            })
+        }
+        return {invalidate}
     }
 }
