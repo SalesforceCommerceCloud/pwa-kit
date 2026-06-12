@@ -73,6 +73,7 @@ const updatePaymentOptions = createOptions<'updatePaymentInstrumentForOrder'>(
 const removePaymentOptions = createOptions<'removePaymentInstrumentFromOrder'>(undefined, {
     paymentInstrumentId: PAYMENT_INSTRUMENT_ID
 })
+const cancelOmsOrderOptions = createOptions<'cancelOmsOrder'>({reason: 'Changed my mind'}, {})
 
 // --- TEST CASES --- //
 /** Every mutation modifies an existing order, except `createOrder`, which creates one. */
@@ -82,7 +83,8 @@ type TestMap = {[Mut in NonCreateMutation]?: Argument<Client[Mut]>}
 const testMap: TestMap = {
     createPaymentInstrumentForOrder: createPaymentOptions,
     updatePaymentInstrumentForOrder: updatePaymentOptions,
-    removePaymentInstrumentFromOrder: removePaymentOptions
+    removePaymentInstrumentFromOrder: removePaymentOptions,
+    cancelOmsOrder: cancelOmsOrderOptions
 }
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
@@ -158,5 +160,24 @@ describe('ShopperOrders mutations', () => {
         await waitAndExpectError(() => result.current.mutation)
         // The query cache should not have changed
         expect(getQueries()).toEqual([])
+    })
+    test('`cancelOmsOrder` invalidates the order cache on success', async () => {
+        mockQueryEndpoint(ordersEndpoint, ORDER) // getOrder
+        // First, populate the order cache
+        const {result: query} = renderHookWithProviders(() =>
+            queries.useOrder({parameters: {orderNo: ORDER_NO}})
+        )
+        await waitAndExpectSuccess(() => query.current)
+        expect(query.current.data).toEqual(ORDER)
+
+        // Now cancel the order
+        mockMutationEndpoints(ordersEndpoint, {...ORDER, status: 'cancelled'})
+        mockQueryEndpoint(ordersEndpoint, {...ORDER, status: 'cancelled'}) // refetch after invalidation
+        const {result: mut} = renderHookWithProviders(() =>
+            useShopperOrdersMutation('cancelOmsOrder')
+        )
+        act(() => mut.current.mutate(cancelOmsOrderOptions))
+        await waitAndExpectSuccess(() => mut.current)
+        expect(mut.current.data).toEqual({...ORDER, status: 'cancelled'})
     })
 })
