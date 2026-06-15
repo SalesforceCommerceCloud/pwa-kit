@@ -40,6 +40,7 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
+import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -141,7 +142,11 @@ const AccountOrderDetail = () => {
     // expand: 'oms' returns order data from OMS if the order is successfully
     // ingested to OMS, otherwise returns data from ECOM
     // For regular non-oms orders, the order data is returned from ECOM
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {
+        data: order,
+        isLoading: isOrderLoading,
+        isError
+    } = useOrder(
         {
             parameters: {
                 orderNo: params.orderNo,
@@ -152,6 +157,11 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
+    // Note: keep `|| !order` so the skeleton shows until the order resolves, but a
+    // failed fetch is caught by `isError` below and routed to the error card — so it
+    // no longer hangs on the skeleton forever (the AC6 bug). `isError` is the
+    // TanStack Query failure flag; it is NOT set merely because the query is
+    // disabled/not-yet-fetched (e.g. during SSR), so the SSR skeleton is unaffected.
     const isLoading = isOrderLoading || !order
 
     // Check if order has OMS data
@@ -258,6 +268,14 @@ const AccountOrderDetail = () => {
         // Focus the 'Order Details' header when the component mounts for accessibility
         headingRef?.current?.focus()
     }, [])
+
+    // A failed order fetch shows a full-card error with a path back to order history,
+    // instead of hanging on the loading skeleton forever (AC6). The success-with-no-
+    // omsData case is NOT an error — it has `order` and falls through to the normal
+    // render (ECOM fallback), so only the TanStack Query `isError` flag triggers this.
+    if (isError) {
+        return <OrderLoadError />
+    }
 
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
