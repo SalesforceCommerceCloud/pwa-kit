@@ -228,15 +228,16 @@ const AccountOrderDetail = () => {
 
     const handleCancelOrder = useCallback(
         async (order, reason) => {
-            closeCancelModal()
             try {
                 await cancelMutation.mutateAsync({
                     parameters: {orderNo: order.orderNo},
                     body: reason ? {reason} : {}
                 })
+                closeCancelModal()
                 // Delay allows screen readers to finish announcing modal close before the alert
                 setTimeout(showCancelSuccess, 300)
             } catch (e) {
+                closeCancelModal()
                 setTimeout(showCancelError, 300)
             }
         },
