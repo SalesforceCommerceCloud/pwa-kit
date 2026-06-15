@@ -179,9 +179,9 @@ const AccountOrderDetail = () => {
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
-    const {data: omsMetaData, isLoading: isMetaDataLoading} = useOmsMetaData(
+    const {data: omsMetaData} = useOmsMetaData(
         {parameters: {}},
-        {enabled: isCancelModalOpen}
+        {enabled: isOmsOrder && onClient}
     )
 
     const canCancel = useMemo(() => {
@@ -712,7 +712,6 @@ const AccountOrderDetail = () => {
                     onCancel={handleCancelOrder}
                     isSubmitting={cancelMutation.isLoading}
                     reasonCodes={omsMetaData?.cancelReasonCodes}
-                    isReasonCodesLoading={isMetaDataLoading}
                 />
             )}
         </Stack>

@@ -165,22 +165,6 @@ test('hides reason dropdown when no reason codes provided', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
 })
 
-test('shows skeleton while reason codes are loading', () => {
-    renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={jest.fn()}
-            order={mockOrder}
-            onCancel={jest.fn()}
-            isReasonCodesLoading={true}
-        />
-    )
-
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    const label = document.querySelector('label[for="cancel-reason-select"]')
-    expect(label).toBeInTheDocument()
-})
-
 describe('Cancellation Reason Select', () => {
     test('displays reason select with placeholder', () => {
         renderWithProviders(

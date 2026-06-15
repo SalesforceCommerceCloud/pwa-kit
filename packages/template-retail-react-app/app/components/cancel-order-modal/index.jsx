@@ -20,20 +20,11 @@ import {
     Box,
     Text,
     Select,
-    Stack,
-    Skeleton
+    Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {messages} from '@salesforce/retail-react-app/app/components/cancel-order-modal/constants'
 
-const CancelOrderModal = ({
-    isOpen,
-    onClose,
-    order,
-    onCancel,
-    isSubmitting,
-    reasonCodes,
-    isReasonCodesLoading
-}) => {
+const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reasonCodes}) => {
     const intl = useIntl()
     const [selectedReason, setSelectedReason] = useState('')
 
@@ -45,7 +36,7 @@ const CancelOrderModal = ({
         onCancel(order, selectedReason)
     }
 
-    const showReasonDropdown = reasonCodes?.length > 0 || isReasonCodesLoading
+    const showReasonDropdown = reasonCodes?.length > 0
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
@@ -83,22 +74,18 @@ const CancelOrderModal = ({
                                         />
                                     </Text>
                                 </label>
-                                {isReasonCodesLoading ? (
-                                    <Skeleton h="40px" />
-                                ) : (
-                                    <Select
-                                        id="cancel-reason-select"
-                                        value={selectedReason}
-                                        onChange={(e) => setSelectedReason(e.target.value)}
-                                        placeholder={intl.formatMessage(messages.selectReason)}
-                                    >
-                                        {reasonCodes?.map((reason) => (
+                                <Select
+                                    id="cancel-reason-select"
+                                    value={selectedReason}
+                                    onChange={(e) => setSelectedReason(e.target.value)}
+                                    placeholder={intl.formatMessage(messages.selectReason)}
+                                >
+                                    {reasonCodes.map((reason) => (
                                         <option key={reason.reason} value={reason.reason}>
                                             {reason.reason}
                                         </option>
                                     ))}
-                                    </Select>
-                                )}
+                                </Select>
                             </Box>
                         )}
                     </Stack>
@@ -114,7 +101,7 @@ const CancelOrderModal = ({
                         <Button
                             colorScheme="blue"
                             onClick={handleConfirm}
-                            isDisabled={isSubmitting || isReasonCodesLoading}
+                            isDisabled={isSubmitting}
                             isLoading={isSubmitting}
                         >
                             <FormattedMessage
@@ -140,8 +127,7 @@ CancelOrderModal.propTypes = {
             reason: PropTypes.string.isRequired,
             default: PropTypes.bool.isRequired
         })
-    ),
-    isReasonCodesLoading: PropTypes.bool
+    )
 }
 
 export default CancelOrderModal
