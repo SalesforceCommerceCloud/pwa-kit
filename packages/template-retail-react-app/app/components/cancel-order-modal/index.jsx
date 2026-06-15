@@ -92,11 +92,11 @@ const CancelOrderModal = ({
                                         onChange={(e) => setSelectedReason(e.target.value)}
                                         placeholder={intl.formatMessage(messages.selectReason)}
                                     >
-                                        {reasonCodes?.map((reason) => (
-                                        <option key={reason.reason} value={reason.reason}>
-                                            {reason.reason}
-                                        </option>
-                                    ))}
+                                            {reasonCodes?.map((reason) => (
+                                            <option key={reason.reason} value={reason.reason}>
+                                                {reason.reason}
+                                            </option>
+                                        ))}
                                     </Select>
                                 )}
                             </Box>
