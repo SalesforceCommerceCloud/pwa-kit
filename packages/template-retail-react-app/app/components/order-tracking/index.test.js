@@ -127,4 +127,19 @@ describe('OrderTracking component', () => {
         // The rest of the block still renders.
         expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
     })
+
+    test('omits the date line when the delivery date is explicitly null (no "31 Dec 1969")', () => {
+        // Regression guard: new Date(null) is the epoch (1970-01-01), NOT Invalid Date,
+        // so a null delivery date must be caught by the falsy check — otherwise it would
+        // render "31 Dec 1969" to the shopper. (Found in QA on W-22918455.)
+        renderWithProviders(
+            <OrderTracking {...baseProps} expectedDeliveryDate={null} actualDeliveryDate={null} />
+        )
+        expect(screen.queryByText(/Expected delivery/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Delivered/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/1969/)).not.toBeInTheDocument()
+        expect(screen.queryByText(/1970/)).not.toBeInTheDocument()
+        // The rest of the block still renders.
+        expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
+    })
 })

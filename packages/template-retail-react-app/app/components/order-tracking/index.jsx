@@ -42,10 +42,13 @@ const OrderTracking = ({
     const {formatMessage, formatDate} = useIntl()
 
     // Same date format the order header uses for "Ordered:" — e.g. "Jun 12, 2026".
-    // Returns null for missing or malformed values (a truthy-but-unparseable string
-    // would otherwise render "Invalid Date" or throw in formatDate), so the caller
-    // can omit the line entirely.
+    // Returns null for missing, null, or malformed values so the caller can omit the
+    // line entirely. The `!value` guard is load-bearing: `new Date(null)` returns the
+    // epoch (1970-01-01), NOT an Invalid Date, so without it a null delivery date would
+    // render "31 Dec 1969" to the shopper. A truthy-but-unparseable string is caught by
+    // the isNaN check.
     const formatTrackingDate = (value) => {
+        if (!value) return null
         const date = new Date(value)
         if (isNaN(date.getTime())) return null
         return formatDate(date, {year: 'numeric', month: 'short', day: 'numeric'})
