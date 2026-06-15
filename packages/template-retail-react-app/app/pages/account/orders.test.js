@@ -365,6 +365,49 @@ describe('Order without payment data', () => {
     })
 })
 
+describe('Order detail error/fallback state (AC6)', () => {
+    // Set up the detail route, but make the order fetch fail (HTTP 500). With the
+    // global QueryClient retry disabled, useOrder reports isError immediately.
+    const setupFailedOrderFetch = () => {
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => res(ctx.delay(0), ctx.status(500)))
+        )
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults('/account/orders/FAILED-ORDER')
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+    }
+
+    test('shows the full-card error (not a perpetual skeleton) when the order fetch fails', async () => {
+        setupFailedOrderFetch()
+        // The error card renders...
+        expect(await screen.findByTestId('account-order-details-error')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /Order Not Found/i})).toBeInTheDocument()
+        // ...and the normal order-details page does NOT (no perpetual skeleton).
+        expect(screen.queryByTestId('account-order-details-page')).not.toBeInTheDocument()
+    })
+
+    test('offers a path back to order history from the error card', async () => {
+        setupFailedOrderFetch()
+        const backLink = await screen.findByRole('link', {name: /Back to Order History/i})
+        expect(backLink.getAttribute('href')).toMatch(/\/account\/orders$/)
+    })
+
+    test('does NOT show the error card for a successful order with no OMS data (ECOM fallback, not an error)', async () => {
+        // 200 OK with no omsData (org not SOM-connected / order not ingested) is NOT an
+        // error — the page should render normally via the ECOM fallback, never the card.
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-details-error')).not.toBeInTheDocument()
+        // ECOM fields still render (proves the fallback path, not the error path).
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+    })
+})
+
 describe('OMS/SOM Integration - Order Details', () => {
     // ECOM order tests - uses order.status, firstName/lastName, and has payment data
     test('should display ECOM order status from order.status', async () => {

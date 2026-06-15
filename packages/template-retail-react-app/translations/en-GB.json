@@ -113,6 +113,15 @@
   "account_order_detail.button.cancel_order": {
     "defaultMessage": "Cancel order"
   },
+  "account_order_detail.error.back_to_history": {
+    "defaultMessage": "Back to Order History"
+  },
+  "account_order_detail.error.description": {
+    "defaultMessage": "We couldn't find the order you're looking for."
+  },
+  "account_order_detail.error.title": {
+    "defaultMessage": "Order Not Found"
+  },
   "account_order_detail.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
