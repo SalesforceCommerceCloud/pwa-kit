@@ -14,11 +14,17 @@
  * Returns the subset of an order's product items that can currently be returned.
  *
  * An item is returnable when its `omsData.quantityAvailableToReturn` is greater
- * than zero AND the parent order's status is one of `returnEligibleStatuses`.
- * Status comparison is case-insensitive and trims surrounding whitespace.
+ * than zero AND the parent order's `omsData.status` is one of
+ * `returnEligibleStatuses`. Status comparison is case-insensitive and trims
+ * surrounding whitespace.
  *
- * Order documents without an `omsData` envelope (ECOM-only) safely return [],
- * because the order-level OMS status is undefined and cannot match.
+ * Eligibility is strictly OMS-driven: orders without an `omsData` envelope
+ * (ECOM-only) always return [] regardless of the plain `order.status`.
+ *
+ * Adversarial inputs are normalized rather than thrown on, since
+ * `returnEligibleStatuses` originates from merchant config and `omsData.status`
+ * comes from a backend response: a non-array `returnEligibleStatuses` is treated
+ * as empty, and a non-string `omsData.status` is coerced to a string.
  *
  * @param {Object} order Shopper Orders order document, optionally with `omsData`.
  * @param {string[]} [returnEligibleStatuses] Order-level statuses that allow returns.
@@ -26,11 +32,21 @@
  */
 export const getReturnableItems = (order, returnEligibleStatuses = []) => {
     if (!order?.productItems?.length) return []
-    const allowed = (returnEligibleStatuses || [])
-        .map((s) => String(s).trim().toLowerCase())
+    const statuses = Array.isArray(returnEligibleStatuses) ? returnEligibleStatuses : []
+    const allowed = statuses
+        .map((s) =>
+            String(s ?? '')
+                .trim()
+                .toLowerCase()
+        )
         .filter(Boolean)
     if (!allowed.length) return []
-    const orderStatus = (order.omsData?.status || order.status || '').trim().toLowerCase()
+    const orderStatus = String(order.omsData?.status ?? '')
+        .trim()
+        .toLowerCase()
     if (!allowed.includes(orderStatus)) return []
-    return order.productItems.filter((item) => (item?.omsData?.quantityAvailableToReturn ?? 0) > 0)
+    return order.productItems.filter((item) => {
+        const qty = item?.omsData?.quantityAvailableToReturn
+        return Number.isFinite(qty) && qty > 0
+    })
 }

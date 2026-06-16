@@ -32,9 +32,30 @@ describe('getReturnableItems', () => {
         expect(getReturnableItems({omsData: {status: 'shipped'}}, ELIGIBLE)).toEqual([])
     })
 
-    test('returns [] when order has no omsData envelope (ECOM-only)', () => {
+    test('returns [] when order has no omsData envelope (ECOM-only, ECOM status NOT in eligible list)', () => {
         const order = {
-            status: 'open', // ECOM status, not in eligible list
+            status: 'open',
+            productItems: [item('a', 1)]
+        }
+        expect(getReturnableItems(order, ELIGIBLE)).toEqual([])
+    })
+
+    test('returns [] when order has no omsData envelope EVEN IF order.status is in eligible list (eligibility is OMS-only)', () => {
+        // Regression test for an earlier draft of the helper that fell back to
+        // `order.status` when `omsData.status` was missing — that would have
+        // let pure-ECOM orders through whenever the merchant's eligible list
+        // happened to contain a value the SCAPI ECOM status also uses.
+        const order = {
+            status: 'shipped',
+            productItems: [item('a', 1)]
+        }
+        expect(getReturnableItems(order, ELIGIBLE)).toEqual([])
+    })
+
+    test('ignores order.status entirely when omsData.status is present and not eligible', () => {
+        const order = {
+            status: 'shipped', // would match if the helper read this
+            omsData: {status: 'created'}, // but the OMS status wins and is not eligible
             productItems: [item('a', 1)]
         }
         expect(getReturnableItems(order, ELIGIBLE)).toEqual([])
@@ -128,5 +149,42 @@ describe('getReturnableItems', () => {
             productItems: [item('a', 1)]
         }
         expect(getReturnableItems(order, [null, undefined, '', 'SHIPPED'])).toHaveLength(1)
+    })
+
+    test('does not throw when returnEligibleStatuses is a non-array (e.g. merchant config typo)', () => {
+        const order = {
+            omsData: {status: 'shipped'},
+            productItems: [item('a', 1)]
+        }
+        // String, object, number — all should be coerced to "no eligible statuses".
+        expect(() => getReturnableItems(order, 'SHIPPED')).not.toThrow()
+        expect(getReturnableItems(order, 'SHIPPED')).toEqual([])
+        expect(getReturnableItems(order, {})).toEqual([])
+        expect(getReturnableItems(order, 42)).toEqual([])
+    })
+
+    test('does not throw when omsData.status is a non-string', () => {
+        const order = {
+            omsData: {status: 42},
+            productItems: [item('a', 1)]
+        }
+        expect(() => getReturnableItems(order, ELIGIBLE)).not.toThrow()
+        expect(getReturnableItems(order, ELIGIBLE)).toEqual([])
+    })
+
+    test('rejects items with NaN, negative, or non-numeric quantityAvailableToReturn', () => {
+        const order = {
+            omsData: {status: 'shipped'},
+            productItems: [
+                {productId: 'nan', omsData: {quantityAvailableToReturn: NaN}},
+                {productId: 'neg', omsData: {quantityAvailableToReturn: -1}},
+                {productId: 'str', omsData: {quantityAvailableToReturn: '2'}},
+                {productId: 'inf', omsData: {quantityAvailableToReturn: Infinity}},
+                {productId: 'ok', omsData: {quantityAvailableToReturn: 1}}
+            ]
+        }
+        // Only the finite, positive 'ok' item is returnable. '2' is a string,
+        // Infinity is finite-checked out, NaN and -1 fail the > 0 test.
+        expect(getReturnableItems(order, ELIGIBLE).map((i) => i.productId)).toEqual(['ok'])
     })
 })
