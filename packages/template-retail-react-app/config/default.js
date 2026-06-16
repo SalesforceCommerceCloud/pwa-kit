@@ -13,9 +13,9 @@ module.exports = {
         // MRT Data Store (opt-in): when true, SSR resolves prefs and serializes `__MRT_DATA_STORE__` in
         // `#mobify-data`; when false, that key is omitted. See `isMrtDataStoreEnabled` in pwa-kit-runtime.
         // Set `PWAKIT_MRT_DATA_STORE_ENABLED=true|false` to override without editing files.
-        // Local dev without DynamoDB: use `MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects)
-        // and optional `MRT_DATA_STORE_WARN_ON_MISSING=false`. Local data store provided by
-        // @salesforce/mrt-utilities via conditional exports (automatic in development mode).
+        // Local dev without DynamoDB: use `PWAKIT_MRT_DATA_STORE_DEFAULTS` (JSON map of full DAL keys → objects),
+        // `PWAKIT_MRT_DATA_STORE_ALLOW_LOCAL=true` in production-like NODE_ENV, and optional
+        // `PWAKIT_MRT_DATA_STORE_WARN_ON_MISSING=false`.
         // Demo page + scripted env: `npm run start:mrt-data-store-demo` in this package, route `/demo/mrt-data-store`.
         mrtDataStore: {
             enabled: false
@@ -59,7 +59,7 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -68,10 +68,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '7e9399be-766f-40c1-b597-b4cc79bb107d',
-                organizationId: 'f_ecom_zysn_007',
-                shortCode: 'sandbox-001',
-                siteId: 'RefArch'
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: '8o7m175y',
+                siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
@@ -101,17 +101,7 @@ module.exports = {
         pages: {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
-            },
-            maintenancePage: {
-                // When true (default), the maintenance page is fetched from the CDN URL below
-                // and rendered as-is. Set to false to display the built-in maintenance message.
-                sharedMaintenancePage: true,
-                cdnUrl: 'https://prd.cmp.cdn.commercecloud.salesforce.com',
-                forwardedHost: ''
             }
-        },
-        oms: {
-            enabled: false
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,
@@ -143,17 +133,14 @@ module.exports = {
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
-        // Store the session cookies as HttpOnly for enhanced security.
-        // WIP: Do not enable. This feature is in-progress.
-        enableHttpOnlySessionCookies: false,
         proxyConfigs: [
-            {    
-                host: 'sandbox-001.api.commercecloud.salesforce.com',    
-                path: 'api'    
-            },    
-            {    
-                host: 'zysn-007.unified.demandware.net',    
-                path: 'ocapi'    
+            {
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                path: 'api'
+            },
+            {
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                path: 'ocapi'
             }
         ]
     }
