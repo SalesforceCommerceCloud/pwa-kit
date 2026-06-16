@@ -20,7 +20,8 @@ import {
     Grid,
     SimpleGrid,
     Skeleton,
-    useDisclosure
+    useDisclosure,
+    VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
@@ -427,28 +428,34 @@ const AccountOrderDetail = () => {
                             />
                         </Button>
                         {showStartReturn && (
-                            // Phase 1 placeholder: button renders disabled with a
-                            // "Returns coming soon" accessible label. The full return
-                            // flow (route + page) lands in WI 3 (W-22821837).
-                            <Button
-                                data-testid="account-order-detail-start-return"
-                                variant="outline"
-                                size="sm"
-                                isDisabled
-                                title={formatMessage({
-                                    defaultMessage: 'Returns coming soon',
-                                    id: 'account_order_detail.button.start_return_disabled_explanation'
-                                })}
-                                aria-label={formatMessage({
-                                    defaultMessage: 'Returns coming soon',
-                                    id: 'account_order_detail.button.start_return_disabled_explanation'
-                                })}
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Start return"
-                                    id="account_order_detail.button.start_return"
-                                />
-                            </Button>
+                            // Phase 1 placeholder: button is disabled and announces
+                            // "Returns coming soon" to assistive tech via an
+                            // `aria-describedby` association. The full flow lands in
+                            // a follow-up story.
+                            <>
+                                <Button
+                                    data-testid="account-order-detail-start-return"
+                                    variant="outline"
+                                    size="sm"
+                                    isDisabled
+                                    aria-describedby="account-order-detail-start-return-description"
+                                    title={formatMessage({
+                                        defaultMessage: 'Returns coming soon',
+                                        id: 'account_order_detail.button.start_return_disabled_explanation'
+                                    })}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Start return"
+                                        id="account_order_detail.button.start_return"
+                                    />
+                                </Button>
+                                <VisuallyHidden id="account-order-detail-start-return-description">
+                                    <FormattedMessage
+                                        defaultMessage="Returns coming soon"
+                                        id="account_order_detail.button.start_return_disabled_explanation"
+                                    />
+                                </VisuallyHidden>
+                            </>
                         )}
                     </Flex>
                 </Box>

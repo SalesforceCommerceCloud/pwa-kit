@@ -494,7 +494,12 @@ describe('Start Return CTA (W-22821836)', () => {
         const cta = await screen.findByTestId('account-order-detail-start-return')
         expect(cta).toBeInTheDocument()
         expect(cta).toBeDisabled()
-        expect(cta).toHaveAttribute('aria-label', 'Returns coming soon')
+        // Accessible name preserves the visible "Start return" label so voice
+        // control users can activate the button by saying its visible text
+        // (WCAG 2.5.3 Label in Name). The "Returns coming soon" explanation is
+        // exposed via aria-describedby + a visually-hidden node.
+        expect(cta).toHaveAccessibleName('Start return')
+        expect(cta).toHaveAccessibleDescription('Returns coming soon')
         expect(cta).toHaveAttribute('title', 'Returns coming soon')
     })
 
