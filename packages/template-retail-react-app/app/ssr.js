@@ -58,12 +58,14 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
-    // To extend the SLAS private-client proxy allow-list, supply
-    // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
-    // for the entry shape. A startup warning is logged whenever a custom list
-    // is in use.
+    // If you wish to use additional SLAS endpoints that require private clients,
+    // customize this regex to include the additional endpoints the custom SLAS
+    // private client secret handler will inject an Authorization header.
+    // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
+    // applySLASPrivateClientToEndpoints:
+    //    /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -363,12 +365,22 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
                         '*.adyen.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.vf.pc-rnd.force.com',
+                        '*.git.soma.salesforce.com',
+                        '*.test1.my.pc-rnd.site.com',
                         'pay.google.com', // Google Pay payment handler icon
                         'www.gstatic.com' // optional, if icon is on gstatic
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.vf.pc-rnd.force.com',
+                        '*.git.soma.salesforce.com',
+                        '*.test1.my.pc-rnd.site.com',
                         // Payment gateways
                         '*.stripe.com',
                         '*.paypal.com',
@@ -414,7 +426,12 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         'payments.google.com',
-                        'pay.google.com'
+                        'pay.google.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.vf.pc-rnd.force.com',
+                        '*.git.soma.salesforce.com',
+                        '*.test1.my.pc-rnd.site.com'
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
@@ -506,7 +523,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
-    
+
     // Shopper Agent — Token Bridge proxy.
     // Browser POSTs an auth_link_key, SLAS access token, SLAS refresh token,
     // and my_domain (from Shopper Configurations API) in the request body.
@@ -514,7 +531,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
-    registerTokenBridgeRoute(app)
+    registerTokenBridgeRoute(app, config)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
