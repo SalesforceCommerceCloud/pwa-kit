@@ -239,6 +239,18 @@
       "value": "Cancel order"
     }
   ],
+  "account_order_detail.button.start_return": [
+    {
+      "type": 0,
+      "value": "Start return"
+    }
+  ],
+  "account_order_detail.button.start_return_disabled_explanation": [
+    {
+      "type": 0,
+      "value": "Returns coming soon"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,

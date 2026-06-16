@@ -42,6 +42,7 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -129,6 +130,7 @@ const AccountOrderDetail = () => {
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const isOmsEnabled = getConfig()?.app?.oms?.enabled
+    const returnEligibleStatuses = getConfig()?.app?.oms?.returnEligibleStatuses
     const {isRegistered} = useCustomerType()
     const customerId = useCustomerId()
     const {
@@ -178,6 +180,12 @@ const AccountOrderDetail = () => {
     )
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
+
+    const returnableItems = useMemo(
+        () => getReturnableItems(order, returnEligibleStatuses),
+        [order, returnEligibleStatuses]
+    )
+    const showStartReturn = isOmsEnabled && isRegistered && returnableItems.length > 0
 
     const canCancel = useMemo(() => {
         if (!isOmsEnabled || !isRegistered || !order) return false
@@ -418,6 +426,30 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.button.cancel_order"
                             />
                         </Button>
+                        {showStartReturn && (
+                            // Phase 1 placeholder: button renders disabled with a
+                            // "Returns coming soon" accessible label. The full return
+                            // flow (route + page) lands in WI 3 (W-22821837).
+                            <Button
+                                data-testid="account-order-detail-start-return"
+                                variant="outline"
+                                size="sm"
+                                isDisabled
+                                title={formatMessage({
+                                    defaultMessage: 'Returns coming soon',
+                                    id: 'account_order_detail.button.start_return_disabled_explanation'
+                                })}
+                                aria-label={formatMessage({
+                                    defaultMessage: 'Returns coming soon',
+                                    id: 'account_order_detail.button.start_return_disabled_explanation'
+                                })}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Start return"
+                                    id="account_order_detail.button.start_return"
+                                />
+                            </Button>
+                        )}
                     </Flex>
                 </Box>
             )}

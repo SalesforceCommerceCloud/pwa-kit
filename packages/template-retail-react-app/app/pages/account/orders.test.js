@@ -455,6 +455,109 @@ describe('OMS/SOM Integration - Order Details', () => {
     })
 })
 
+describe('Start Return CTA (W-22821836)', () => {
+    // Build an OMS order in a return-eligible state with at least one item carrying
+    // a positive `omsData.quantityAvailableToReturn`. The mock-config defaults
+    // `app.oms.returnEligibleStatuses` to ['SHIPPED','DELIVERED'] (case-insensitive).
+    const createReturnEligibleOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            omsData: {status: 'shipped', shipments: []},
+            productItems: [
+                {
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 2
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    // The order-detail.jsx component reads `app.oms.*` from the globally-mocked
+    // `getConfig()` (see jest-setup.js). `wrapperProps.appConfig` does NOT change
+    // what `order-detail.jsx` reads, so per-test config overrides must mutate the
+    // shared `mockConfig` reference and restore it afterward.
+    let originalOms
+    beforeEach(() => {
+        originalOms = mockConfig.app.oms
+    })
+    afterEach(() => {
+        mockConfig.app.oms = originalOms
+    })
+
+    test('renders the disabled Start Return CTA when an item is returnable and order status is eligible', async () => {
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        expect(cta).toBeInTheDocument()
+        expect(cta).toBeDisabled()
+        expect(cta).toHaveAttribute('aria-label', 'Returns coming soon')
+        expect(cta).toHaveAttribute('title', 'Returns coming soon')
+    })
+
+    test('does NOT render the CTA when the order has no returnable items', async () => {
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({
+                productItems: [
+                    {
+                        productId: 'no-return-1',
+                        productName: 'Already Returned',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA when the order status is not in returnEligibleStatuses', async () => {
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({omsData: {status: 'Created', shipments: []}})
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA when oms is disabled', async () => {
+        mockConfig.app.oms = {
+            enabled: false,
+            returnEligibleStatuses: ['SHIPPED', 'DELIVERED']
+        }
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA when returnEligibleStatuses is empty', async () => {
+        mockConfig.app.oms = {enabled: true, returnEligibleStatuses: []}
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA for an ECOM-only order (no omsData envelope)', async () => {
+        // createMockOrder produces a vanilla ECOM order with no omsData on the order
+        // or items. Even with OMS enabled in config, no return CTA should render.
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('matches the eligible status case-insensitively', async () => {
+        mockConfig.app.oms = {enabled: true, returnEligibleStatuses: ['shipped']}
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({omsData: {status: 'SHIPPED', shipments: []}})
+        )
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        expect(cta).toBeInTheDocument()
+    })
+})
+
 describe('OMS/SOM Integration - Order History', () => {
     // Helper to setup order history with mock data
     const setupOrderHistoryMock = (orderData) => {
