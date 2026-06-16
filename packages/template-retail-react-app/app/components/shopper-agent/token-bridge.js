@@ -17,23 +17,23 @@
  * Flow:
  *   1. Browser: Depending on HttpOnly mode:
  *      - HttpOnly ON: Tokens in cookies (cc-at_{siteId}, cc-nx / cc-nx-g)
- *        sent automatically to same-origin proxy. Client sends auth_link_key,
- *        my_domain, and site_id in request body.
+ *        sent automatically to same-origin proxy. Client sends auth_link_key
+ *        in request body, and siteId as x-site-id header.
  *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
- *        Client sends auth_link_key, slas_access_token (from localStorage),
- *        my_domain, and site_id in request body. Refresh token read from cookie.
- *      my_domain via useConfigurations hook (Shopper Configurations API)
+ *        Client sends auth_link_key, slas_access_token (from localStorage)
+ *        in request body, and siteId as x-site-id header.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
+ *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
  *      - Reads tokens from cookies (HttpOnly mode) or request body (non-HttpOnly)
+ *      - Reads my_domain directly from ANC_MYDOMAIN environment variable
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
  *        `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
- * MyDomain resolution: sourced from the Shopper Configurations API via useConfigurations hook,
- * forwarded from the browser through the request body, then validated server-side against
- * a Salesforce domain allowlist (prevents SSRF).
+ * MyDomain resolution: read directly from ANC_MYDOMAIN environment variable,
+ * then validated against a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
 
 export const TOKEN_BRIDGE_PROXY_PATH = '/api/agent/identity/bridge'
@@ -71,20 +71,40 @@ export function resolveAncMyDomain(myDomain) {
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
+/**
+ * Extract myDomain from ANC_MYDOMAIN environment variable.
+ * Returns the domain directly from the environment variable.
+ * Example: https://orgfarm-8fcc267362.test1.my.pc-rnd.site.com
+ *
+ * @returns {string|null} - The myDomain or null if not found
+ */
+export function extractMyDomainFromEnv() {
+    const myDomain = process.env.ANC_MYDOMAIN
+
+    if (!myDomain) {
+        console.error('[token-bridge] ANC_MYDOMAIN environment variable not set')
+        return null
+    }
+
+    console.log('[token-bridge] ANC_MYDOMAIN found:', myDomain)
+    return myDomain.trim()
+}
+
 /** Express handler for POST /api/agent/identity/bridge. */
-export async function handleTokenBridge(req, res) {
+export async function handleTokenBridge(req, res, config) {
     try {
         const {
             auth_link_key: authLinkKey,
-            slas_access_token: slasAccessTokenFromBody,
-            slas_refresh_token: refreshTokenFromBody,
-            my_domain: myDomainFromConfig,
-            site_id: siteId
+            slas_access_token: slasAccessTokenFromBody
         } = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
         }
+
+        // Read siteId from x-site-id header (same pattern as other PWA Kit server routes)
+        // This is set by the platform middleware and used for HttpOnly cookie names
+        const siteId = req.headers['x-site-id']
 
         // Check if HttpOnly mode is enabled
         const isHttpOnly = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
@@ -92,15 +112,13 @@ export async function handleTokenBridge(req, res) {
         // Parse cookies from the request
         const cookies = parseCookies(req.headers.cookie)
 
-        // Default siteId if not provided (matches PWA Kit default)
-        const effectiveSiteId = siteId || 'RefArch'
-
         let slasAccessToken, refreshToken
 
         if (isHttpOnly) {
             // HttpOnly mode: Read tokens from cookies
-            slasAccessToken = cookies[`cc-at_${effectiveSiteId}`]
-            refreshToken = cookies[`cc-nx_${effectiveSiteId}`] || cookies[`cc-nx-g_${effectiveSiteId}`]
+            // Cookie names follow the pattern from commerce-sdk-react: cc-at_{siteId}, cc-nx_{siteId}
+            slasAccessToken = cookies[`cc-at_${siteId}`]
+            refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
 
             if (!slasAccessToken) {
                 console.error('[token-bridge] HttpOnly mode: Access token cookie not found')
@@ -109,45 +127,29 @@ export async function handleTokenBridge(req, res) {
         } else {
             // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
             slasAccessToken = slasAccessTokenFromBody
-            refreshToken = cookies[`cc-nx_${effectiveSiteId}`] || cookies[`cc-nx-g_${effectiveSiteId}`]
+            refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
 
             if (!slasAccessToken || typeof slasAccessToken !== 'string') {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         }
 
-        const myDomain = resolveAncMyDomain(myDomainFromConfig)
+        // Extract myDomain from ANC_MYDOMAIN environment variable
+        const myDomain = extractMyDomainFromEnv()
+
         if (!myDomain) {
             console.error(
                 '[token-bridge] ANC MyDomain is not configured. ' +
-                    'Provide my_domain via the Shopper Configurations API.'
+                    'Set ANC_MYDOMAIN environment variable.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
         }
 
-        // Validate myDomain is from a trusted Salesforce domain (SSRF prevention)
-        try {
-            const myDomainHost = new URL(myDomain).hostname
-            const isTrusted =
-                myDomainHost.endsWith('.salesforce.com') ||
-                myDomainHost.endsWith('.my.salesforce.com') ||
-                myDomainHost.endsWith('.pc-rnd.salesforce.com')
-
-            if (!isTrusted) {
-                console.error('[token-bridge] Untrusted myDomain host:', myDomainHost)
-                return res.status(400).json({error: 'UNTRUSTED_MYDOMAIN'})
-            }
-        } catch (err) {
-            console.error('[token-bridge] Invalid myDomain URL:', myDomain)
-            return res.status(400).json({error: 'INVALID_MYDOMAIN_URL'})
-        }
-
         if (!refreshToken) {
-            // Core treats refresh_token as optional, so we still forward — but
-            // warn so a misconfig surfaces. Without it, the Named Credential
-            // cannot refresh once the SLAS access token expires.
-            console.warn(
-                '[token-bridge] No SLAS refresh token in request body; ' +
+            // Core treats refresh_token as optional (guest sessions never have one).
+            // Only log at debug level to avoid noise in production monitoring.
+            console.debug(
+                '[token-bridge] No SLAS refresh token available; ' +
                     'forwarding to Core without refresh_token.'
             )
         }
@@ -173,13 +175,16 @@ export async function handleTokenBridge(req, res) {
         return res.status(coreResponse.status).json(body)
     } catch (err) {
         console.error('[token-bridge] Unexpected error:', err)
-        return res.status(500).json({error: 'SLAS_INTERNAL_ERROR', details: err?.message})
+        return res.status(500).json({error: 'INTERNAL_ERROR'})
     }
 }
 
 /** Mount the Token Bridge proxy on the given Express app (called from app/ssr.js). */
-export function registerTokenBridgeRoute(app) {
-    app.post(TOKEN_BRIDGE_PROXY_PATH, handleTokenBridge)
+export function registerTokenBridgeRoute(app, config) {
+    // Pass config to the handler via middleware
+    app.post(TOKEN_BRIDGE_PROXY_PATH, (req, res) => {
+        handleTokenBridge(req, res, config)
+    })
 }
 
 /**
@@ -189,41 +194,49 @@ export function registerTokenBridgeRoute(app) {
  * the access token is read from localStorage and sent in the body, while the refresh
  * token is read from cookies server-side.
  *
+ * myDomain is now derived server-side from ANC_MYDOMAIN environment variable.
+ *
  * @param {string} authLinkKey - Auth link key from the embedded messaging API
  * @param {string} [slasAccessToken] - SLAS access token (non-HttpOnly mode only)
  * @param {string} [slasRefreshToken] - DEPRECATED: Refresh token read from cookie server-side
- * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
- * @param {string} [siteId] - Site ID for cookie name resolution
+ * @param {string} [siteId] - Site ID sent as x-site-id header for cookie name resolution
  */
 export const callTokenBridge = async ({
     authLinkKey,
     slasAccessToken,
     slasRefreshToken, // Deprecated but kept for backward compatibility
-    myDomain,
     siteId
 }) => {
-    const bodyTokenBridge = {
-        auth_link_key: authLinkKey,
-        ...(myDomain ? {my_domain: myDomain} : {}),
-        ...(siteId ? {site_id: siteId} : {})
+    const requestBody = {
+        auth_link_key: authLinkKey
     }
 
     // Only include access token if provided (non-HttpOnly mode)
     if (slasAccessToken) {
-        bodyTokenBridge.slas_access_token = slasAccessToken
+        requestBody.slas_access_token = slasAccessToken
+    }
+
+    const headers = {
+        'Content-Type': 'application/json'
+    }
+
+    // Send siteId as x-site-id header (same pattern as other PWA Kit routes)
+    // This is used server-side to resolve HttpOnly cookie names (cc-at_{siteId}, cc-nx_{siteId})
+    if (siteId) {
+        headers['x-site-id'] = siteId
     }
 
     const res = await fetch(TOKEN_BRIDGE_PROXY_PATH, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
+        headers,
+        body: JSON.stringify(requestBody)
     })
 
-    let body = null
+    let responseBody = null
     try {
-        body = await res.json()
+        responseBody = await res.json()
     } catch {
-        body = null
+        responseBody = null
     }
-    return {status: res.status, body}
+    return {status: res.status, body: responseBody}
 }

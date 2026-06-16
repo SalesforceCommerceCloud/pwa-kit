@@ -10,7 +10,6 @@ import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
     useAccessToken,
     useConfig,
-    useConfigurations,
     useCustomerType,
     useUsid
 } from '@salesforce/commerce-sdk-react'
@@ -207,12 +206,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
 
-    // Fetch my_domain from Shopper Configurations API
-    const {data: configurationsData} = useConfigurations({})
-    const myDomain = configurationsData?.configurations?.find(
-        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
-    )?.value
-
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
@@ -401,11 +394,10 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         const handleEmbeddedMessagingConversationStarted = (event) => {
             const {
                 organizationId: orgId,
-                configSiteId: sid,
+                configSiteId: sid
             } = embeddedLifecycleRef.current
 
             if (!orgId || !sid) return
-            if (!myDomain) return
 
             //Prevents refiring of the event if already call has been done
             const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
@@ -434,7 +426,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                             // Only send access token in non-HttpOnly mode (from localStorage)
                             // In HttpOnly mode, server reads from cc-at_{siteId} cookie
                             slasAccessToken: isHttpOnly ? undefined : slasAccessToken,
-                            myDomain: myDomain,
                             siteId: sid
                         })
 
@@ -488,19 +479,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [
-        siteId,
-        locale.id,
-        locale.preferredCurrency,
-        commerceOrgId,
-        usid,
-        theme.zIndices.sticky,
-        refreshToken,
-        domainUrl,
-        organizationId,
-        configSiteId,
-        myDomain
-    ])
+    // All dynamic config/auth values are read from embeddedLifecycleRef inside
+    // the handlers, so we only re-register listeners when the z-index token
+    // (used directly in the maximize handler's DOM mutation) changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [theme.zIndices.sticky])
 
     // Load the embedded messaging script asynchronously
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -513,7 +496,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken,
         enableAgentFromFloatingButton
     )
 
