@@ -96,12 +96,10 @@ export function extractMyDomainFromEnv() {
 }
 
 /** Express handler for POST /api/agent/identity/bridge. */
-export async function handleTokenBridge(req, res, config) {
+export async function handleTokenBridge(req, res) {
     try {
-        const {
-            auth_link_key: authLinkKey,
-            slas_access_token: slasAccessTokenFromBody
-        } = req.body || {}
+        const {auth_link_key: authLinkKey, slas_access_token: slasAccessTokenFromBody} =
+            req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
@@ -202,11 +200,8 @@ export async function handleTokenBridge(req, res, config) {
 }
 
 /** Mount the Token Bridge proxy on the given Express app (called from app/ssr.js). */
-export function registerTokenBridgeRoute(app, config) {
-    // Pass config to the handler via middleware
-    app.post(TOKEN_BRIDGE_PROXY_PATH, (req, res) => {
-        handleTokenBridge(req, res, config)
-    })
+export function registerTokenBridgeRoute(app) {
+    app.post(TOKEN_BRIDGE_PROXY_PATH, handleTokenBridge)
 }
 
 /**
@@ -220,15 +215,9 @@ export function registerTokenBridgeRoute(app, config) {
  *
  * @param {string} authLinkKey - Auth link key from the embedded messaging API
  * @param {string} [slasAccessToken] - SLAS access token (non-HttpOnly mode only)
- * @param {string} [slasRefreshToken] - DEPRECATED: Refresh token read from cookie server-side
  * @param {string} [siteId] - Site ID sent as x-site-id header for cookie name resolution
  */
-export const callTokenBridge = async ({
-    authLinkKey,
-    slasAccessToken,
-    slasRefreshToken, // Deprecated but kept for backward compatibility
-    siteId
-}) => {
+export const callTokenBridge = async ({authLinkKey, slasAccessToken, siteId}) => {
     const requestBody = {
         auth_link_key: authLinkKey
     }

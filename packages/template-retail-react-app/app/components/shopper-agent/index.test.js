@@ -486,7 +486,7 @@ describe('ShopperAgent Component', () => {
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
 
         // Wait a bit to ensure no error handling runs
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
 
         expect(mockShowToast).not.toHaveBeenCalled()
         expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()

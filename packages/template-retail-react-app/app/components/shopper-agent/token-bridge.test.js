@@ -312,9 +312,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).toHaveBeenCalledTimes(1)
         const init = global.fetch.mock.calls[0][1]
         expect(JSON.parse(init.body)).toEqual({auth_link_key: 'auth-key'})
-        expect(debugSpy).toHaveBeenCalledWith(
-            expect.stringContaining('No SLAS refresh token')
-        )
+        expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
         debugSpy.mockRestore()
         logSpy.mockRestore()
     })

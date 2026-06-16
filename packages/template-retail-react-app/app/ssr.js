@@ -516,7 +516,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
-    registerTokenBridgeRoute(app, config)
+    registerTokenBridgeRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

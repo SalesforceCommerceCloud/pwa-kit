@@ -7,12 +7,7 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {
-    useAccessToken,
-    useConfig,
-    useCustomerType,
-    useUsid
-} from '@salesforce/commerce-sdk-react'
+import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -392,10 +387,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
 
         const handleEmbeddedMessagingConversationStarted = (event) => {
-            const {
-                organizationId: orgId,
-                configSiteId: sid
-            } = embeddedLifecycleRef.current
+            const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
 
             if (!orgId || !sid) return
 
@@ -483,10 +475,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    // All dynamic config/auth values are read from embeddedLifecycleRef inside
-    // the handlers, so we only re-register listeners when the z-index token
-    // (used directly in the maximize handler's DOM mutation) changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // All dynamic config/auth values are read from embeddedLifecycleRef inside
+        // the handlers, so we only re-register listeners when the z-index token
+        // (used directly in the maximize handler's DOM mutation) changes.
     }, [theme.zIndices.sticky])
 
     // Load the embedded messaging script asynchronously
