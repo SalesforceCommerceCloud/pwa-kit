@@ -195,11 +195,15 @@ const AccountOrderDetail = () => {
     }, [isRegistered, order, customerId])
 
     const showCancelSuccess = useCallback(() => {
-        setCancelFeedback({
-            status: 'success',
-            title: formatMessage({defaultMessage: 'Order cancelled', id: 'account_order_detail.alert.cancellation_success_title'}),
-            description: formatMessage({defaultMessage: 'Your order was cancelled successfully.', id: 'account_order_detail.alert.cancellation_success_description'})
+        const title = formatMessage({
+            defaultMessage: 'Order cancelled',
+            id: 'account_order_detail.alert.cancellation_success_title'
         })
+        const description = formatMessage({
+            defaultMessage: 'Your order was cancelled successfully.',
+            id: 'account_order_detail.alert.cancellation_success_description'
+        })
+        setCancelFeedback({status: 'success', title, description})
     }, [formatMessage])
 
     const showCancelError = useCallback(() => {
