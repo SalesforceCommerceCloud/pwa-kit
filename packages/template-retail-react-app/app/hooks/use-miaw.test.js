@@ -120,8 +120,7 @@ describe('useMiaw hook', () => {
         embeddedServiceDeploymentName: 'test-deployment',
         embeddedServiceDeploymentUrl: 'https://test.com',
         scrt2Url: 'https://scrt2.test.com',
-        locale: 'fr-FR',
-        refreshToken: 'test-refresh-token'
+        locale: 'fr-FR'
     }
 
     beforeEach(() => {
@@ -256,24 +255,6 @@ describe('useMiaw hook', () => {
 
         expect(window.embeddedservice_bootstrap.settings.language).toBe('en_US')
         expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(2)
-    })
-
-    test('should not re-initialize when only refresh token changes', () => {
-        const {rerender} = renderHook(
-            ({refreshToken}) =>
-                useMiaw(mockScriptLoadStatus, ...Object.values({...mockParams, refreshToken})),
-            {
-                initialProps: {
-                    refreshToken: 'token-a'
-                }
-            }
-        )
-
-        expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(1)
-
-        rerender({refreshToken: 'token-b'})
-
-        expect(window.embeddedservice_bootstrap.init).toHaveBeenCalledTimes(1)
     })
 
     test('should handle initialization errors gracefully', () => {

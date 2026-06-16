@@ -121,7 +121,6 @@ const initEmbeddedMessaging = (
  * @param {string} embeddedServiceDeploymentUrl - URL of the embedded service deployment
  * @param {string} scrt2Url - SCRT2 URL for the embedded messaging service
  * @param {string} locale - BCP-47 locale for the embedded messaging service
- * @param {string} _refreshToken - Refresh token for prechat fields in the parent; omitted from `init()` effect deps so SLAS refresh does not re-bootstrap the widget
  * @param {string} [enableAgentFromFloatingButton='true'] - When 'false', hides the floating chat button on load
  */
 const useMiaw = (
@@ -131,7 +130,6 @@ const useMiaw = (
     embeddedServiceDeploymentUrl,
     scrt2Url,
     locale,
-    _refreshToken,
     enableAgentFromFloatingButton = 'true'
 ) => {
     useEffect(() => {
