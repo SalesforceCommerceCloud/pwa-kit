@@ -111,7 +111,12 @@ module.exports = {
             }
         },
         oms: {
-            enabled: false
+            enabled: false,
+            // Order-level statuses (case-insensitive) that allow shoppers to start a
+            // return on the order-detail page. The CTA only renders when the order's
+            // OMS status matches one of these AND at least one product item has a
+            // positive `omsData.quantityAvailableToReturn`.
+            returnEligibleStatuses: ['SHIPPED', 'DELIVERED']
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,
