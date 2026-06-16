@@ -134,7 +134,7 @@ test('closes modal when user clicks Keep order', async () => {
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('triggers cancellation when user clicks Confirm cancellation', async () => {
+test('triggers cancellation with default reason when user clicks Confirm cancellation', async () => {
     const user = userEvent.setup()
     const onCancel = jest.fn()
 
@@ -149,7 +149,7 @@ test('triggers cancellation when user clicks Confirm cancellation', async () => 
     )
 
     await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
-    expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
+    expect(onCancel).toHaveBeenCalledWith(mockOrder, 'Not specified')
 })
 
 test('hides reason dropdown when no reason codes provided', () => {
@@ -163,6 +163,23 @@ test('hides reason dropdown when no reason codes provided', () => {
     )
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+})
+
+test('passes empty string when no reason codes and confirm is clicked', async () => {
+    const user = userEvent.setup()
+    const onCancel = jest.fn()
+
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={jest.fn()}
+            order={mockOrder}
+            onCancel={onCancel}
+        />
+    )
+
+    await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+    expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
 })
 
 describe('Cancellation Reason Select', () => {
@@ -220,7 +237,7 @@ describe('Cancellation Reason Select', () => {
         expect(onCancel).toHaveBeenCalledWith(mockOrder, 'Changed my mind')
     })
 
-    test('resets selected reason when modal closes', () => {
+    test('resets selected reason to default when modal closes and reopens', () => {
         const onClose = jest.fn()
         const onCancel = jest.fn()
         const {rerender} = renderWithProviders(
@@ -234,7 +251,8 @@ describe('Cancellation Reason Select', () => {
         )
 
         const select = screen.getByRole('combobox')
-        expect(select.value).toBe('')
+        // Default reason is pre-selected
+        expect(select.value).toBe('Not specified')
 
         rerender(
             <CancelOrderModal
@@ -256,7 +274,8 @@ describe('Cancellation Reason Select', () => {
             />
         )
 
-        expect(screen.getByRole('combobox').value).toBe('')
+        // After close and reopen, default reason is re-selected
+        expect(screen.getByRole('combobox').value).toBe('Not specified')
     })
 })
 

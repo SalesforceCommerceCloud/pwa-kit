@@ -29,8 +29,12 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reaso
     const [selectedReason, setSelectedReason] = useState('')
 
     useEffect(() => {
-        if (!isOpen) setSelectedReason('')
-    }, [isOpen])
+        if (!isOpen) {
+            setSelectedReason('')
+        } else if (reasonCodes?.length) {
+            setSelectedReason(reasonCodes.find((r) => r.default)?.reason ?? '')
+        }
+    }, [isOpen, reasonCodes])
 
     const handleConfirm = () => {
         onCancel(order, selectedReason)
