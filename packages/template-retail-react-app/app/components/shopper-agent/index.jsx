@@ -399,10 +399,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
             if (!orgId || !sid) return
 
-            //Prevents refiring of the event if already call has been done
-            const conversationId = String(event?.detail?.conversationId ?? '').trim() || null
-            if (conversationId && lastConversationSessionInitRef.current === conversationId) return
-            if (conversationId) lastConversationSessionInitRef.current = conversationId
+            // Prevents refiring of the event if already call has been done
+            const conversationId = event?.detail?.conversationId
+            if (!conversationId || typeof conversationId !== 'string' || !conversationId.trim()) {
+                return
+            }
+            const normalizedConversationId = conversationId.trim()
+            if (lastConversationSessionInitRef.current === normalizedConversationId) return
+            lastConversationSessionInitRef.current = normalizedConversationId
 
             const getAuthLinkKey =
                 window.embeddedservice_bootstrap?.userVerificationAPI?.getAuthLinkKey
