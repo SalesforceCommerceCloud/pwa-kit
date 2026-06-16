@@ -617,6 +617,61 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
+    test('should NOT call Token Bridge when my_domain is not configured', async () => {
+        // Mock useConfigurations to return no my_domain configuration
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: []
+            }
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
+
+    test('should NOT call Token Bridge when my_domain value is empty', async () => {
+        // Mock useConfigurations to return empty my_domain value
+        mockedUseConfigurations.mockReturnValue({
+            data: {
+                configurations: [
+                    {
+                        configurationType: 'globalConfiguration',
+                        id: 'my_domain',
+                        value: ''
+                    }
+                ]
+            }
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
+
+    test('should NOT call Token Bridge when useConfigurations returns undefined', async () => {
+        // Mock useConfigurations to return undefined data
+        mockedUseConfigurations.mockReturnValue({
+            data: undefined
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+        })
+
+        expect(mockCallTokenBridge).not.toHaveBeenCalled()
+    })
+
     test('should detect HttpOnly mode and omit access token when getTokenWhenReady returns empty', async () => {
         // Simulate HttpOnly mode: getTokenWhenReady returns empty string
         mockGetTokenWhenReady.mockResolvedValue('')

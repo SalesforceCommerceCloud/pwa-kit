@@ -7,7 +7,13 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useAccessToken, useConfig, useCustomerType, useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -201,6 +207,12 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
 
+    // Fetch my_domain from Shopper Configurations API
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
+
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
@@ -390,6 +402,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
 
             if (!orgId || !sid) return
+
+            if (!myDomain) return
 
             // Prevents refiring of the event if already call has been done
             const conversationId = event?.detail?.conversationId
