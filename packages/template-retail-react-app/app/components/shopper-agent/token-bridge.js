@@ -5,6 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {
+    getCookieName,
+    getSiteId,
+    SESSION_COOKIE_CONFIG
+} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+
 /* -------------------------------------------------------------------------
  * Token Bridge PoC — calls Core's `/agent/identity/bridge` from PWA Kit.
  *
@@ -102,9 +108,8 @@ export async function handleTokenBridge(req, res, config) {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
         }
 
-        // Read siteId from x-site-id header (same pattern as other PWA Kit server routes)
-        // This is set by the platform middleware and used for HttpOnly cookie names
-        const siteId = req.headers['x-site-id']
+        // Read siteId from x-site-id header using official helper
+        const siteId = getSiteId(req)
 
         // Check if HttpOnly mode is enabled
         const isHttpOnly = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
@@ -115,10 +120,19 @@ export async function handleTokenBridge(req, res, config) {
         let slasAccessToken, refreshToken
 
         if (isHttpOnly) {
-            // HttpOnly mode: Read tokens from cookies
-            // Cookie names follow the pattern from commerce-sdk-react: cc-at_{siteId}, cc-nx_{siteId}
-            slasAccessToken = cookies[`cc-at_${siteId}`]
-            refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
+            // HttpOnly mode: Read tokens from cookies using official cookie name helpers
+            const accessTokenCookie = getCookieName(SESSION_COOKIE_CONFIG.accessToken, siteId)
+            const refreshTokenRegisteredCookie = getCookieName(
+                SESSION_COOKIE_CONFIG.refreshTokenRegistered,
+                siteId
+            )
+            const refreshTokenGuestCookie = getCookieName(
+                SESSION_COOKIE_CONFIG.refreshTokenGuest,
+                siteId
+            )
+
+            slasAccessToken = cookies[accessTokenCookie]
+            refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
             if (!slasAccessToken) {
                 console.error('[token-bridge] HttpOnly mode: Access token cookie not found')
@@ -126,8 +140,17 @@ export async function handleTokenBridge(req, res, config) {
             }
         } else {
             // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
+            const refreshTokenRegisteredCookie = getCookieName(
+                SESSION_COOKIE_CONFIG.refreshTokenRegistered,
+                siteId
+            )
+            const refreshTokenGuestCookie = getCookieName(
+                SESSION_COOKIE_CONFIG.refreshTokenGuest,
+                siteId
+            )
+
             slasAccessToken = slasAccessTokenFromBody
-            refreshToken = cookies[`cc-nx_${siteId}`] || cookies[`cc-nx-g_${siteId}`]
+            refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
             if (!slasAccessToken || typeof slasAccessToken !== 'string') {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})

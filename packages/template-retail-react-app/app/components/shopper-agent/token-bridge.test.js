@@ -13,6 +13,17 @@ import {
     TOKEN_BRIDGE_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
+// Mock the httponly-cookie-config helpers
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config', () => ({
+    getSiteId: (req) => req.headers?.['x-site-id'],
+    getCookieName: (config, siteId) => `${config.key}_${siteId}`,
+    SESSION_COOKIE_CONFIG: {
+        accessToken: {key: 'cc-at'},
+        refreshTokenRegistered: {key: 'cc-nx'},
+        refreshTokenGuest: {key: 'cc-nx-g'}
+    }
+}))
+
 const ORIGINAL_FETCH = global.fetch
 const ORIGINAL_ANC_MYDOMAIN = process.env.ANC_MYDOMAIN
 const ORIGINAL_HTTPONLY = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
