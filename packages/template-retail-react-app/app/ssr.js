@@ -59,7 +59,7 @@ const options = {
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: false,
-    
+
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
     // for the entry shape. A startup warning is logged whenever a custom list
