@@ -64,6 +64,9 @@ const Checkout = () => {
     const {confirmingBasket} = useSFPayments()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    const {mutateAsync: updatePaymentInstrumentInBasket} = useShopperBasketsMutation(
+        'updatePaymentInstrumentInBasket'
+    )
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
@@ -117,6 +120,23 @@ const Checkout = () => {
     }
 
     const doCreateOrder = async () => {
+        // Sync payment instrument amount to current orderTotal right before placing
+        // the order. The amount stamped at addPaymentInstrumentToBasket time can go
+        // stale if the basket changes (promo, shipping method, items) afterward.
+        const appliedPayment = basket?.paymentInstruments?.[0]
+        if (
+            appliedPayment?.paymentInstrumentId &&
+            basket?.orderTotal != null &&
+            appliedPayment.amount !== basket.orderTotal
+        ) {
+            await updatePaymentInstrumentInBasket({
+                parameters: {
+                    basketId: basket.basketId,
+                    paymentInstrumentId: appliedPayment.paymentInstrumentId
+                },
+                body: {amount: basket.orderTotal}
+            })
+        }
         return await createOrder({
             body: {basketId: basket.basketId}
         })
