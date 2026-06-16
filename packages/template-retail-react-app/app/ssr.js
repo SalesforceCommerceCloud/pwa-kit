@@ -59,13 +59,11 @@ const options = {
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: false,
+    // To extend the SLAS private-client proxy allow-list, supply
+    // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
+    // for the entry shape. A startup warning is logged whenever a custom list
+    // is in use.
 
-    // If you wish to use additional SLAS endpoints that require private clients,
-    // customize this regex to include the additional endpoints the custom SLAS
-    // private client secret handler will inject an Authorization header.
-    // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //    /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
