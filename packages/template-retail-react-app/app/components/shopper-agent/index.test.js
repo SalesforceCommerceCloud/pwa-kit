@@ -453,7 +453,6 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
             siteId: 'RefArchGlobal'
         })
     })
@@ -632,7 +631,6 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: undefined, // Omitted in HttpOnly mode
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
             siteId: 'RefArchGlobal'
         })
     })
@@ -718,7 +716,6 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
             slasAccessToken: 'test-slas-access-token',
-            myDomain: 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com',
             siteId: 'RefArchGlobal'
         })
     })
