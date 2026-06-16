@@ -92,7 +92,6 @@ export function extractMyDomainFromEnv() {
         return null
     }
 
-    console.log('[token-bridge] ANC_MYDOMAIN found:', myDomain)
     return myDomain.trim()
 }
 
