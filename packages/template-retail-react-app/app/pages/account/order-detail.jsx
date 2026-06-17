@@ -20,8 +20,7 @@ import {
     Grid,
     SimpleGrid,
     Skeleton,
-    useDisclosure,
-    VisuallyHidden
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
@@ -51,6 +50,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
+import ReturnOrderModal from '@salesforce/retail-react-app/app/components/return-order-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -138,8 +138,17 @@ const AccountOrderDetail = () => {
         onOpen: openCancelModal,
         onClose: closeCancelModal
     } = useDisclosure()
+    const {
+        isOpen: isReturnModalOpen,
+        onOpen: openReturnModal,
+        onClose: closeReturnModal
+    } = useDisclosure()
     const [cancelFeedback, setCancelFeedback] = useState(null)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
+    // Selection state lives on the parent so the Modal/Drawer wrapper swap on
+    // viewport resize doesn't lose the shopper's progress, and so W-22821838's
+    // review step can read the same payload without prop-drilling.
+    const [returnSelection, setReturnSelection] = useState({})
 
     // expand: 'oms' returns order data from OMS if the order is successfully
     // ingested to OMS, otherwise returns data from ECOM
@@ -185,6 +194,46 @@ const AccountOrderDetail = () => {
     const showStartReturn = isRegistered && returnableItems.length > 0
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
+
+    // Fetch product detail for the items the shopper can return so the modal
+    // can render a "<Name> — <Variation>" line. Gated on modal open + at least
+    // one returnable item to keep the order-detail page itself cheap.
+    const returnableProductIds = useMemo(
+        () => returnableItems.map((i) => i.productId).filter(Boolean),
+        [returnableItems]
+    )
+    const {data: returnableProducts} = useProducts(
+        {parameters: {ids: returnableProductIds.join(',')}},
+        {
+            enabled: onClient && isReturnModalOpen && returnableProductIds.length > 0,
+            select: (result) =>
+                result?.data?.reduce((acc, p) => {
+                    acc[p.id] = p
+                    return acc
+                }, {})
+        }
+    )
+    const enrichedReturnableItems = useMemo(
+        () =>
+            returnableItems.map((item) => ({
+                ...(returnableProducts?.[item.productId] || {}),
+                ...item
+            })),
+        [returnableItems, returnableProducts]
+    )
+
+    const handleCloseReturnModal = useCallback(() => {
+        closeReturnModal()
+        setReturnSelection({})
+    }, [closeReturnModal])
+
+    const handleReviewReturn = useCallback(
+        (/* payload */) => {
+            // W-22821838 picks up here: swap the modal to its review view and use
+            // `returnSelection` (held above) to render the confirmation rows.
+        },
+        []
+    )
 
     const canCancel = useMemo(() => {
         if (!isRegistered || !order) return false
@@ -437,34 +486,17 @@ const AccountOrderDetail = () => {
                             />
                         </Button>
                         {showStartReturn && (
-                            // Phase 1 placeholder: button is disabled and announces
-                            // "Returns coming soon" to assistive tech via an
-                            // `aria-describedby` association. The full flow lands in
-                            // a follow-up story.
-                            <>
-                                <Button
-                                    data-testid="account-order-detail-start-return"
-                                    variant="outline"
-                                    size="sm"
-                                    isDisabled
-                                    aria-describedby="account-order-detail-start-return-description"
-                                    title={formatMessage({
-                                        defaultMessage: 'Returns coming soon',
-                                        id: 'account_order_detail.button.start_return_disabled_explanation'
-                                    })}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Start return"
-                                        id="account_order_detail.button.start_return"
-                                    />
-                                </Button>
-                                <VisuallyHidden id="account-order-detail-start-return-description">
-                                    <FormattedMessage
-                                        defaultMessage="Returns coming soon"
-                                        id="account_order_detail.button.start_return_disabled_explanation"
-                                    />
-                                </VisuallyHidden>
-                            </>
+                            <Button
+                                data-testid="account-order-detail-start-return"
+                                variant="outline"
+                                size="sm"
+                                onClick={openReturnModal}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Return Items"
+                                    id="account_order_detail.button.start_return"
+                                />
+                            </Button>
                         )}
                     </Flex>
                 </Box>
@@ -745,6 +777,17 @@ const AccountOrderDetail = () => {
                     onCancel={handleCancelOrder}
                     isSubmitting={cancelMutation.isLoading}
                     reasonCodes={omsMetaData?.cancelReasonCodes}
+                />
+            )}
+            {isOmsOrder && (
+                <ReturnOrderModal
+                    isOpen={isReturnModalOpen}
+                    onClose={handleCloseReturnModal}
+                    order={order}
+                    returnableItems={enrichedReturnableItems}
+                    selection={returnSelection}
+                    onSelectionChange={setReturnSelection}
+                    onReview={handleReviewReturn}
                 />
             )}
         </Stack>
