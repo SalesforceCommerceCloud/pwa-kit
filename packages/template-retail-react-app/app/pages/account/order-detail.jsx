@@ -28,8 +28,11 @@ import {
     useProducts,
     useStores,
     useCustomerType,
-    useCustomerId
+    useCustomerId,
+    useShopperOrdersMutation,
+    ShopperOrdersMutations
 } from '@salesforce/commerce-sdk-react'
+import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon, CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -121,14 +124,11 @@ OrderProducts.propTypes = {
     currency: PropTypes.string
 }
 
-const CANCEL_INELIGIBLE_STATUSES = ['cancelled', 'canceled', 'completed', 'failed']
-
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const {isRegistered} = useCustomerType()
     const customerId = useCustomerId()
     const {
@@ -136,8 +136,8 @@ const AccountOrderDetail = () => {
         onOpen: openCancelModal,
         onClose: closeCancelModal
     } = useDisclosure()
-    // TODO: W-22806925 — replace dummy feedback with real API response
     const [cancelFeedback, setCancelFeedback] = useState(null)
+    const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
 
     // expand: 'oms' returns order data from OMS if the order is successfully
     // ingested to OMS, otherwise returns data from ECOM
@@ -179,16 +179,21 @@ const AccountOrderDetail = () => {
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
+    const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
+
     const canCancel = useMemo(() => {
-        if (!isOmsEnabled || !isRegistered || !order) return false
+        if (!isRegistered || !order) return false
+        if (!order.omsData) return false
         const ownsOrder = order.customerInfo?.customerId === customerId
         if (!ownsOrder) return false
-        const status = (order.omsData?.status || order.status || '').toLowerCase()
-        const statusEligible = !CANCEL_INELIGIBLE_STATUSES.includes(status)
-        const shippingStatus = (order.shippingStatus || '').toLowerCase()
-        const shippingEligible = shippingStatus === 'not_shipped'
-        return statusEligible && shippingEligible
-    }, [isOmsEnabled, isRegistered, order, customerId])
+        return (
+            order.productItems?.every(
+                (item) =>
+                    item.omsData != null &&
+                    item.omsData.quantityAvailableToCancel === item.omsData.quantityOrdered
+            ) ?? false
+        )
+    }, [isRegistered, order, customerId])
 
     const showCancelSuccess = useCallback(() => {
         setCancelFeedback({
@@ -204,7 +209,6 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const showCancelError = useCallback(() => {
         setCancelFeedback({
             status: 'error',
@@ -220,14 +224,23 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
-    const handleCancelOrder = useCallback(() => {
-        // TODO: W-22806925 — replace with real SCAPI cancel API call
-        // On success: showCancelSuccess()
-        // On error: showCancelError()
-        closeCancelModal()
-        // Delay allows screen readers to finish announcing modal close before the alert
-        setTimeout(showCancelSuccess, 300)
-    }, [closeCancelModal, showCancelSuccess])
+    const handleCancelOrder = useCallback(
+        async (order, reason) => {
+            try {
+                await cancelMutation.mutateAsync({
+                    parameters: {orderNo: order.orderNo},
+                    body: reason ? {reason} : {}
+                })
+                closeCancelModal()
+                // Delay allows screen readers to finish announcing modal close before the alert
+                setTimeout(showCancelSuccess, 300)
+            } catch (e) {
+                closeCancelModal()
+                setTimeout(showCancelError, 300)
+            }
+        },
+        [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
+    )
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -388,7 +401,7 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {!isLoading && isOmsEnabled && (
+            {!isLoading && isOmsOrder && (
                 <Box>
                     <Text
                         fontSize="xs"
@@ -689,12 +702,14 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {isOmsEnabled && (
+            {isOmsOrder && (
                 <CancelOrderModal
                     isOpen={isCancelModalOpen}
                     onClose={closeCancelModal}
                     order={order}
                     onCancel={handleCancelOrder}
+                    isSubmitting={cancelMutation.isLoading}
+                    reasonCodes={omsMetaData?.cancelReasonCodes}
                 />
             )}
         </Stack>

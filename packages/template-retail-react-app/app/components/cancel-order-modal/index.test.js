@@ -28,13 +28,26 @@ const mockOrder = {
     ]
 }
 
+const mockReasonCodes = [
+    {reason: 'Not specified', default: true},
+    {reason: 'Defect', default: false},
+    {reason: 'Wrong item', default: false},
+    {reason: 'Changed my mind', default: false}
+]
+
 const MockedComponent = (props) => {
     const modalProps = useDisclosure()
 
     return (
         <Box>
             <button onClick={modalProps.onOpen}>Open Cancel Modal</button>
-            <CancelOrderModal {...modalProps} onCancel={jest.fn()} order={mockOrder} {...props} />
+            <CancelOrderModal
+                {...modalProps}
+                onCancel={jest.fn()}
+                order={mockOrder}
+                reasonCodes={mockReasonCodes}
+                {...props}
+            />
         </Box>
     )
 }
@@ -55,6 +68,7 @@ test('displays modal with correct title when opened', () => {
             onClose={jest.fn()}
             order={mockOrder}
             onCancel={jest.fn()}
+            reasonCodes={mockReasonCodes}
         />
     )
     expect(screen.getByRole('dialog')).toBeInTheDocument()
@@ -68,6 +82,7 @@ test('displays description and impact text', () => {
             onClose={jest.fn()}
             order={mockOrder}
             onCancel={jest.fn()}
+            reasonCodes={mockReasonCodes}
         />
     )
     expect(screen.getByText(/select a reason and confirm cancellation/i)).toBeInTheDocument()
@@ -88,7 +103,13 @@ test('closes modal when user clicks close button', async () => {
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={jest.fn()} />
+        <CancelOrderModal
+            isOpen={true}
+            onClose={onClose}
+            order={mockOrder}
+            onCancel={jest.fn()}
+            reasonCodes={mockReasonCodes}
+        />
     )
 
     await user.click(screen.getByRole('button', {name: /close/i}))
@@ -100,14 +121,51 @@ test('closes modal when user clicks Keep order', async () => {
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={jest.fn()} />
+        <CancelOrderModal
+            isOpen={true}
+            onClose={onClose}
+            order={mockOrder}
+            onCancel={jest.fn()}
+            reasonCodes={mockReasonCodes}
+        />
     )
 
     await user.click(screen.getByRole('button', {name: /keep order/i}))
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('triggers cancellation when user clicks Confirm cancellation', async () => {
+test('triggers cancellation with default reason when user clicks Confirm cancellation', async () => {
+    const user = userEvent.setup()
+    const onCancel = jest.fn()
+
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={jest.fn()}
+            order={mockOrder}
+            onCancel={onCancel}
+            reasonCodes={mockReasonCodes}
+        />
+    )
+
+    await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+    expect(onCancel).toHaveBeenCalledWith(mockOrder, 'Not specified')
+})
+
+test('hides reason dropdown when no reason codes provided', () => {
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={jest.fn()}
+            order={mockOrder}
+            onCancel={jest.fn()}
+        />
+    )
+
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+})
+
+test('passes empty string when no reason codes and confirm is clicked', async () => {
     const user = userEvent.setup()
     const onCancel = jest.fn()
 
@@ -127,6 +185,7 @@ describe('Cancellation Reason Select', () => {
                 onClose={jest.fn()}
                 order={mockOrder}
                 onCancel={jest.fn()}
+                reasonCodes={mockReasonCodes}
             />
         )
 
@@ -135,26 +194,21 @@ describe('Cancellation Reason Select', () => {
         expect(screen.getByText(/select a cancellation reason/i)).toBeInTheDocument()
     })
 
-    test('displays all available cancellation reasons as options', () => {
+    test('displays all reason codes as options', () => {
         renderWithProviders(
             <CancelOrderModal
                 isOpen={true}
                 onClose={jest.fn()}
                 order={mockOrder}
                 onCancel={jest.fn()}
+                reasonCodes={mockReasonCodes}
             />
         )
 
-        expect(screen.getByRole('option', {name: /item price too high/i})).toBeInTheDocument()
-        expect(screen.getByRole('option', {name: /shipping cost too high/i})).toBeInTheDocument()
-        expect(
-            screen.getByRole('option', {name: /item\(s\) would not arrive on time/i})
-        ).toBeInTheDocument()
-        expect(screen.getByRole('option', {name: /order created by mistake/i})).toBeInTheDocument()
+        expect(screen.getByRole('option', {name: /not specified/i})).toBeInTheDocument()
+        expect(screen.getByRole('option', {name: /defect/i})).toBeInTheDocument()
+        expect(screen.getByRole('option', {name: /wrong item/i})).toBeInTheDocument()
         expect(screen.getByRole('option', {name: /changed my mind/i})).toBeInTheDocument()
-        expect(screen.getByRole('option', {name: /no longer needed/i})).toBeInTheDocument()
-        expect(screen.getByRole('option', {name: /financial reasons/i})).toBeInTheDocument()
-        expect(screen.getByRole('option', {name: /other/i})).toBeInTheDocument()
     })
 
     test('passes selected reason when cancellation is confirmed', async () => {
@@ -167,34 +221,18 @@ describe('Cancellation Reason Select', () => {
                 onClose={jest.fn()}
                 order={mockOrder}
                 onCancel={onCancel}
+                reasonCodes={mockReasonCodes}
             />
         )
 
         const select = screen.getByRole('combobox')
-        await user.selectOptions(select, 'financial_reasons')
+        await user.selectOptions(select, 'Changed my mind')
 
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
-        expect(onCancel).toHaveBeenCalledWith(mockOrder, 'financial_reasons')
+        expect(onCancel).toHaveBeenCalledWith(mockOrder, 'Changed my mind')
     })
 
-    test('passes empty string when no reason is selected', async () => {
-        const user = userEvent.setup()
-        const onCancel = jest.fn()
-
-        renderWithProviders(
-            <CancelOrderModal
-                isOpen={true}
-                onClose={jest.fn()}
-                order={mockOrder}
-                onCancel={onCancel}
-            />
-        )
-
-        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
-        expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
-    })
-
-    test('resets selected reason when modal closes', () => {
+    test('resets selected reason to default when modal closes and reopens', () => {
         const onClose = jest.fn()
         const onCancel = jest.fn()
         const {rerender} = renderWithProviders(
@@ -203,11 +241,13 @@ describe('Cancellation Reason Select', () => {
                 onClose={onClose}
                 order={mockOrder}
                 onCancel={onCancel}
+                reasonCodes={mockReasonCodes}
             />
         )
 
         const select = screen.getByRole('combobox')
-        expect(select.value).toBe('')
+        // Default reason is pre-selected
+        expect(select.value).toBe('Not specified')
 
         rerender(
             <CancelOrderModal
@@ -215,6 +255,7 @@ describe('Cancellation Reason Select', () => {
                 onClose={onClose}
                 order={mockOrder}
                 onCancel={onCancel}
+                reasonCodes={mockReasonCodes}
             />
         )
 
@@ -224,10 +265,12 @@ describe('Cancellation Reason Select', () => {
                 onClose={onClose}
                 order={mockOrder}
                 onCancel={onCancel}
+                reasonCodes={mockReasonCodes}
             />
         )
 
-        expect(screen.getByRole('combobox').value).toBe('')
+        // After close and reopen, default reason is re-selected
+        expect(screen.getByRole('combobox').value).toBe('Not specified')
     })
 })
 
@@ -239,6 +282,7 @@ describe('Accessibility', () => {
                 onClose={jest.fn()}
                 order={mockOrder}
                 onCancel={jest.fn()}
+                reasonCodes={mockReasonCodes}
             />
         )
 

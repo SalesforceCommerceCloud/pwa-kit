@@ -22,6 +22,15 @@ import {
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        useShopperOrdersMutation: () => ({mutateAsync: jest.fn(), isLoading: false}),
+        useOmsMetaData: () => ({data: null, isLoading: false})
+    }
+})
+
 // Simple mock order for SOM integration tests
 const createMockOrder = (overrides = {}) => ({
     orderNo: '00099999',
