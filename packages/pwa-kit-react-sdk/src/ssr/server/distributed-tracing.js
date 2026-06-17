@@ -178,6 +178,27 @@ export const withChildSpan = async (name, fn) => {
  *
  * @returns {string|null} e.g. "00-<traceId>-<spanId>-01"
  */
+/**
+ * Sets an attribute on the currently-active span, if any. Used for attributes
+ * that are only known partway through the render (e.g. `http.route`, which is
+ * resolved after route matching, inside the server span). No-op when tracing is
+ * disabled or there is no active span.
+ *
+ * @param {string} key
+ * @param {string|number|boolean} value
+ */
+export const setActiveSpanAttribute = (key, value) => {
+    if (!isDistributedTracingEnabled()) return
+    try {
+        const span = trace.getSpan(context.active())
+        if (span && value != null && value !== '') {
+            span.setAttribute(key, value)
+        }
+    } catch {
+        // attributes are non-essential — never break request handling
+    }
+}
+
 export const getCurrentTraceparent = () => {
     if (!isDistributedTracingEnabled()) return null
     try {

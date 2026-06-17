@@ -23,6 +23,24 @@ jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => {
         useOrigin: jest.fn(() => 'https://www.example.com')
     }
 })
+
+// Optional capture hook for CommerceApiProvider props. Defaults to the real provider;
+// a test sets `mockCaptureProviderProps` to intercept the props without the auth stack.
+let mockCaptureProviderProps = null
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        CommerceApiProvider: (props) => {
+            if (mockCaptureProviderProps) {
+                mockCaptureProviderProps(props)
+                return props.children || null
+            }
+            return actual.CommerceApiProvider(props)
+        }
+    }
+})
+
 describe('AppConfig', () => {
     let originalFetch
     beforeAll(() => {
@@ -81,5 +99,32 @@ describe('AppConfig', () => {
         expect(AppConfig.restore()).toBeUndefined()
         expect(AppConfig.restore({frozen: 'any values here'})).toBeUndefined()
         expect(AppConfig.freeze()).toBeUndefined()
+    })
+
+    test('passes a callable traceparent header to CommerceApiProvider', () => {
+        // Capture the props handed to CommerceApiProvider without standing up the
+        // full provider/auth stack (the module-level mock swaps in a passthrough
+        // when mockCaptureProviderProps is set).
+        let captured
+        mockCaptureProviderProps = (props) => {
+            captured = props
+        }
+        try {
+            const locals = {site: mockConfig.app.sites[0], appConfig: mockConfig.app}
+            render(
+                <StaticRouter>
+                    <CorrelationIdProvider correlationId={() => uuidv4()}>
+                        <AppConfig locals={locals} />
+                    </CorrelationIdProvider>
+                </StaticRouter>
+            )
+
+            expect(typeof captured.headers.traceparent).toBe('function')
+            // In jsdom (browser-like) the thunk resolves to undefined so the provider
+            // emits no traceparent header.
+            expect(captured.headers.traceparent()).toBeUndefined()
+        } finally {
+            mockCaptureProviderProps = null
+        }
     })
 })

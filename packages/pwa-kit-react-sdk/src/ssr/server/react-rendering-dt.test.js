@@ -26,13 +26,15 @@ const mockWithServerSpan = jest.fn()
 const mockWithChildSpan = jest.fn()
 const mockExtractContext = jest.fn()
 const mockIsDistributedTracingEnabled = jest.fn()
+const mockSetActiveSpanAttribute = jest.fn()
 const mockTracePerformance = jest.fn()
 
 jest.mock('./distributed-tracing', () => ({
     isDistributedTracingEnabled: (...args) => mockIsDistributedTracingEnabled(...args),
     extractContext: (...args) => mockExtractContext(...args),
     withServerSpan: (...args) => mockWithServerSpan(...args),
-    withChildSpan: (...args) => mockWithChildSpan(...args)
+    withChildSpan: (...args) => mockWithChildSpan(...args),
+    setActiveSpanAttribute: (...args) => mockSetActiveSpanAttribute(...args)
 }))
 
 jest.mock('./opentelemetry-server', () => ({
@@ -213,7 +215,42 @@ describe('react-rendering distributed-tracing wiring', () => {
         expect(mockWithServerSpan).not.toHaveBeenCalled()
     })
 
-    test('child spans: withChildSpan called with getProps and render-to-string inside withServerSpan', async () => {
+    test('http.route is set on the active span after route matching', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(true)
+
+        let serverSpanFn
+        mockWithServerSpan.mockImplementation((req, res, ctx, fn) => {
+            serverSpanFn = fn
+            return Promise.resolve()
+        })
+
+        const req = {
+            headers: {traceparent: '00-abc-def-01'},
+            method: 'GET',
+            originalUrl: '/',
+            url: '/',
+            query: {},
+            path: '/'
+        }
+        const res = {
+            locals: {requestId: 'test-id'},
+            setHeader: jest.fn(),
+            set: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            on: jest.fn(),
+            statusCode: 200
+        }
+        const next = jest.fn()
+
+        await render(req, res, next)
+        await serverSpanFn()
+
+        // The matched route path ('/' from the mocked routes) is reported as http.route.
+        expect(mockSetActiveSpanAttribute).toHaveBeenCalledWith('http.route', '/')
+    })
+
+    test('child spans: withChildSpan called with route-match, getProps and render-to-string inside withServerSpan', async () => {
         mockIsDistributedTracingEnabled.mockReturnValue(true)
 
         // Capture the fn passed to withServerSpan, then inspect the withChildSpan calls
@@ -257,6 +294,7 @@ describe('react-rendering distributed-tracing wiring', () => {
         // Now execute it — this runs performRender (which calls withChildSpan)
         await serverSpanFn()
 
+        expect(childSpanNames).toContain('route-match')
         expect(childSpanNames).toContain('getProps')
         expect(childSpanNames).toContain('render-to-string')
     })

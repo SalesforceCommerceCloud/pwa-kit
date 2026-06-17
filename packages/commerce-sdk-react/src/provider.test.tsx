@@ -160,4 +160,114 @@ describe('provider', () => {
             })
         )
     })
+
+    describe('resolveHeaders', () => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const {resolveHeaders} = require('./provider')
+
+        test('string values pass through unchanged', () => {
+            expect(resolveHeaders({'correlation-id': 'static-value'})).toEqual({
+                'correlation-id': 'static-value'
+            })
+        })
+
+        test('callable values are invoked and their return value is used', () => {
+            const getTraceparent = jest.fn(() => '00-trace-span-01')
+            const result = resolveHeaders({traceparent: getTraceparent})
+            expect(getTraceparent).toHaveBeenCalledTimes(1)
+            expect(result).toEqual({traceparent: '00-trace-span-01'})
+        })
+
+        test('callable returning undefined is excluded from the result', () => {
+            const result = resolveHeaders({
+                'correlation-id': 'keep-me',
+                traceparent: () => undefined
+            })
+            expect(result).toEqual({'correlation-id': 'keep-me'})
+            expect(result).not.toHaveProperty('traceparent')
+        })
+
+        test('callable returning empty string is excluded from the result', () => {
+            const result = resolveHeaders({
+                'correlation-id': 'keep-me',
+                traceparent: () => ''
+            })
+            expect(result).toEqual({'correlation-id': 'keep-me'})
+            expect(result).not.toHaveProperty('traceparent')
+        })
+    })
+
+    describe('callable header resolution (resolved to string at construction)', () => {
+        // During SSR the provider is constructed inside the active server span, so
+        // resolving the callable to a string at construction captures the request's
+        // trace id. The SDK never invokes function-valued headers, so a raw callable
+        // must NOT be left in clientConfig.headers — it is resolved to a string first.
+        test('callable header is resolved to a string in client config', () => {
+            const getTraceparent = jest.fn(() => '00-trace-span-01')
+            const Component = () => {
+                const api = useCommerceApi()
+                const stored = api?.shopperSearch?.clientConfig?.headers?.['traceparent']
+                return (
+                    <>
+                        <span data-testid="stored-type">{typeof stored}</span>
+                        <span data-testid="stored-value">{String(stored)}</span>
+                    </>
+                )
+            }
+            renderWithProviders(<Component />, {
+                headers: {traceparent: getTraceparent} as any
+            })
+            // A raw function must never reach the SDK's clientConfig.headers.
+            expect(screen.getByTestId('stored-type').textContent).toBe('string')
+            expect(screen.getByTestId('stored-value').textContent).toBe('00-trace-span-01')
+        })
+
+        test('callable returning undefined yields no header in client config', () => {
+            const Component = () => {
+                const api = useCommerceApi()
+                const has = 'traceparent' in (api?.shopperSearch?.clientConfig?.headers ?? {})
+                return <span data-testid="has-header">{String(has)}</span>
+            }
+            renderWithProviders(<Component />, {
+                headers: {traceparent: () => undefined} as any
+            })
+            expect(screen.getByTestId('has-header').textContent).toBe('false')
+        })
+    })
+
+    describe('outbound integration: traceparent reaches the wire', () => {
+        test('a callable traceparent header is resolved and sent on an outbound SCAPI request', async () => {
+            const nock = require('nock')
+            const {renderHookWithProviders, DEFAULT_TEST_HOST} = require('./test-utils')
+            const queries = require('./hooks/ShopperSearch/query')
+
+            nock.cleanAll()
+            let sentTraceparent: string | string[] | undefined
+            nock(DEFAULT_TEST_HOST)
+                .get((uri: string) => uri.includes('/search/shopper-search/'))
+                .reply(function (this: any) {
+                    sentTraceparent = this.req.headers['traceparent']
+                    return [200, {query: 'pants'}]
+                })
+
+            // Auth.ready resolves to a token so the query proceeds to the SCAPI call.
+            ;(Auth as jest.Mock).mockImplementation(() => ({
+                ready: jest.fn().mockResolvedValue({access_token: 'access_token'}),
+                get: jest.fn(),
+                getAccessToken: jest.fn().mockReturnValue('access_token')
+            }))
+
+            const {result} = renderHookWithProviders(
+                () => queries.useProductSearch({parameters: {q: 'something'}}),
+                {headers: {traceparent: () => '00-abc123-def456-01'} as any}
+            )
+
+            const {waitFor} = require('@testing-library/react')
+            await waitFor(() => expect(result.current.isSuccess || result.current.isError).toBe(true))
+
+            // nock exposes a header as either a string or a single-element array.
+            const sent = Array.isArray(sentTraceparent) ? sentTraceparent[0] : sentTraceparent
+            expect(sent).toBe('00-abc123-def456-01')
+        })
+    })
 })

@@ -38,7 +38,8 @@ import {
     isDistributedTracingEnabled,
     extractContext,
     withServerSpan,
-    withChildSpan
+    withChildSpan,
+    setActiveSpanAttribute
 } from './distributed-tracing'
 
 import {getAssetUrl} from '../universal/utils'
@@ -190,15 +191,24 @@ const performRender = async (req, res, next) => {
     let route
     let match
 
-    routes.some((_route) => {
-        const _match = matchPath(req.path, _route)
-        if (_match) {
-            match = _match
-            route = _route
-        }
-        return !!match
+    await withChildSpan('route-match', () => {
+        routes.some((_route) => {
+            const _match = matchPath(req.path, _route)
+            if (_match) {
+                match = _match
+                route = _route
+            }
+            return !!match
+        })
     })
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
+
+    // Report the matched route template (e.g. '/category/:categoryId') as http.route
+    // on the active DT server span. Uses the route path, never the concrete URL, so
+    // no path parameters / query string leak into the attribute.
+    if (route?.path) {
+        setActiveSpanAttribute('http.route', route.path)
+    }
 
     // Step 2 - Get the component
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')

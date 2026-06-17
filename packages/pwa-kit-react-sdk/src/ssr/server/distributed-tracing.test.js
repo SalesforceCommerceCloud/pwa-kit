@@ -20,7 +20,8 @@ import {
     extractContext,
     withServerSpan,
     withChildSpan,
-    getCurrentTraceparent
+    getCurrentTraceparent,
+    setActiveSpanAttribute
 } from './distributed-tracing'
 import {getOTELConfig} from '../../utils/opentelemetry-config'
 
@@ -252,6 +253,33 @@ describe('distributed-tracing', () => {
             expect(spans[0].attributes['client_id']).toBe('test-client-id')
             expect(spans[0].attributes['realm']).toBe('test-realm')
             expect(spans[0].attributes['instance_type']).toBe('sandbox')
+        })
+
+        test('http.route set via setActiveSpanAttribute reaches the server span', async () => {
+            const headers = {traceparent: `00-${TRACE_ID}-b7ad6b7169203331-01`}
+            const req = {headers, method: 'GET', originalUrl: '/category/:id', url: '/category/5'}
+            const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
+            const ctx = extractContext(headers)
+            await withServerSpan(req, res, ctx, async () => {
+                // Route is only known after route matching, inside the render.
+                setActiveSpanAttribute('http.route', '/category/:id')
+            })
+
+            const spans = infoSpy.mock.calls
+                .map(([line]) => {
+                    try {
+                        return JSON.parse(line)
+                    } catch {
+                        return null
+                    }
+                })
+                .filter((s) => s && s.name && s.name.includes('ssr.render'))
+
+            expect(spans[0].attributes['http.route']).toBe('/category/:id')
+        })
+
+        test('setActiveSpanAttribute is a no-op (no throw) when there is no active span', () => {
+            expect(() => setActiveSpanAttribute('http.route', '/x')).not.toThrow()
         })
 
         test('http.response.status_code set at response close', async () => {
