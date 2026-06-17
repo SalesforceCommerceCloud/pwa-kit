@@ -189,7 +189,8 @@ const AccountOrderDetail = () => {
         return (
             order.productItems?.every(
                 (item) =>
-                    item.omsData?.quantityAvailableToCancel === item.omsData?.quantityOrdered
+                    item.omsData != null &&
+                    item.omsData.quantityAvailableToCancel === item.omsData.quantityOrdered
             ) ?? false
         )
     }, [isRegistered, order, customerId])
@@ -197,14 +198,8 @@ const AccountOrderDetail = () => {
     const showCancelSuccess = useCallback(() => {
         setCancelFeedback({
             status: 'success',
-            title: formatMessage({
-                defaultMessage: 'Order cancelled',
-                id: 'account_order_detail.alert.cancellation_success_title'
-            }),
-            description: formatMessage({
-                defaultMessage: 'Your order was cancelled successfully.',
-                id: 'account_order_detail.alert.cancellation_success_description'
-            })
+            title: formatMessage({defaultMessage: 'Order cancelled', id: 'account_order_detail.alert.cancellation_success_title'}),
+            description: formatMessage({defaultMessage: 'Your order was cancelled successfully.', id: 'account_order_detail.alert.cancellation_success_description'})
         })
     }, [formatMessage])
 

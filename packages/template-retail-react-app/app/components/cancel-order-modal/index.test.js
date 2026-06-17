@@ -170,12 +170,7 @@ test('passes empty string when no reason codes and confirm is clicked', async ()
     const onCancel = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={jest.fn()}
-            order={mockOrder}
-            onCancel={onCancel}
-        />
+        <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={onCancel} />
     )
 
     await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
