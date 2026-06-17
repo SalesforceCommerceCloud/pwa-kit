@@ -456,6 +456,65 @@ ShopperAgentWindow.propTypes = {
 }
 
 /**
+ * Class name added to the Cimulate widget elements (via the widget's
+ * `globalClassName` option) so our overrides can be scoped/strengthened.
+ */
+const CIMULATE_GLOBAL_CLASS = 'cimulate-shopper-agent'
+
+/**
+ * Default width of the Cimulate side panel.
+ */
+const DEFAULT_CIMULATE_PANEL_WIDTH = '420px'
+
+/**
+ * Builds the CSS that restyles the Cimulate dialog (`.cim-widget-dialog`) into a
+ * full-height panel docked to the right edge of the viewport that slides in when
+ * it opens. By default the widget renders the dialog as a small fixed-position
+ * corner box (35dvw x 55dvh), so these rules override its position, size, and
+ * border radius.
+ *
+ * `!important` is required because we are overriding styles injected by the
+ * third-party widget bundle. The dialog is rendered via a React portal, so the
+ * selectors are global (there is a single widget instance on the page).
+ *
+ * @param {string} panelWidth - CSS width for the panel (e.g. '420px')
+ * @returns {string} CSS to inject for the side-panel layout
+ */
+const buildCimulatePanelStyles = (panelWidth) => `
+.cim-widget-dialog.${CIMULATE_GLOBAL_CLASS},
+.cim-widget-dialog {
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: ${panelWidth} !important;
+    max-width: 100dvw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12) !important;
+    animation: cimulate-panel-slide-in 0.25s ease-out;
+}
+
+/* The built-in left/right corner toggle is meaningless for a docked side panel. */
+.cim-widget-left-right-toggle-button {
+    display: none !important;
+}
+
+@keyframes cimulate-panel-slide-in {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+`
+
+/**
  * Internal component that renders the Cimulate Copilot messaging widget.
  *
  * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
@@ -473,8 +532,10 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.commerceAgentConfiguration.cimulateScriptSourceUrl - Cimulate messaging bundle URL
  * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
  * @param {string} [props.commerceAgentConfiguration.cimulateElementId] - Container element id (defaults to 'cimulate-messaging-widget')
- * @param {string} [props.commerceAgentConfiguration.cimulateComponentType] - Widget type: 'chat' | 'dialog' | 'modal'
- * @param {string} [props.commerceAgentConfiguration.cimulateDialogPosition] - Dialog position when type is 'dialog'
+ * @param {string} [props.commerceAgentConfiguration.cimulateDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
+ * @param {string} [props.commerceAgentConfiguration.cimulatePanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
+ * @param {string} [props.commerceAgentConfiguration.cimulateComponentType] - Widget type when display mode is 'dialog': 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.cimulateDialogPosition] - Dialog position when display mode is 'dialog'
  * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
  * @param {Object} [props.commerceAgentConfiguration.cimulateTheme] - Partial theme overrides for the widget
  * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
@@ -489,6 +550,8 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
         cimulateScriptSourceUrl,
         headerText,
         cimulateElementId = DEFAULT_CIMULATE_ELEMENT_ID,
+        cimulateDisplayMode = 'panel',
+        cimulatePanelWidth = DEFAULT_CIMULATE_PANEL_WIDTH,
         cimulateComponentType = 'dialog',
         cimulateDialogPosition = 'bottom-right',
         isDevelopment = 'false',
@@ -499,6 +562,10 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
     // Load the Cimulate messaging UMD bundle, which exposes window.CimulateMessaging
     const scriptLoadStatus = useScript(cimulateScriptSourceUrl)
 
+    // In 'panel' mode we render the widget as a 'dialog' anchored to the right and
+    // restyle it (via injected CSS below) into a full-height right side panel.
+    const isPanel = cimulateDisplayMode === 'panel'
+
     const widgetOptions = useMemo(
         () => ({
             elementId: cimulateElementId,
@@ -507,11 +574,12 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
             esDeveloperName: esDeveloperName || embeddedServiceName,
             routingAttributes,
             headerText,
+            globalClassName: CIMULATE_GLOBAL_CLASS,
             isDevelopment: isDevelopment === 'true',
             componentConfig: {
                 isOpen: false,
-                type: cimulateComponentType,
-                dialogPosition: cimulateDialogPosition
+                type: isPanel ? 'dialog' : cimulateComponentType,
+                dialogPosition: isPanel ? 'bottom-right' : cimulateDialogPosition
             },
             theme: cimulateTheme
         }),
@@ -524,6 +592,7 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
             routingAttributes,
             headerText,
             isDevelopment,
+            isPanel,
             cimulateComponentType,
             cimulateDialogPosition,
             cimulateTheme
@@ -533,7 +602,12 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
     // Inject the widget into the container once the bundle is loaded
     useCimulateMessaging(scriptLoadStatus, widgetOptions)
 
-    return <div id={cimulateElementId} data-testid="cimulate-agent-widget" />
+    return (
+        <>
+            {isPanel && <style>{buildCimulatePanelStyles(cimulatePanelWidth)}</style>}
+            <div id={cimulateElementId} data-testid="cimulate-agent-widget" />
+        </>
+    )
 }
 
 CimulateAgentWindow.propTypes = {

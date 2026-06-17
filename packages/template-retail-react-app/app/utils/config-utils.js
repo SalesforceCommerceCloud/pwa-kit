@@ -27,7 +27,9 @@ export const getCommerceAgentConfig = () => {
         provider: 'miaw',
         cimulateScriptSourceUrl: '',
         esDeveloperName: '',
-        headerText: ''
+        headerText: '',
+        cimulateDisplayMode: 'panel',
+        cimulatePanelWidth: '420px'
     }
     return getConfig().app.commerceAgent ?? defaults
 }

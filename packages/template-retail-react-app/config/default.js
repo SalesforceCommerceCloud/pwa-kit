@@ -44,7 +44,13 @@ module.exports = {
             // to embeddedServiceName when not set.
             esDeveloperName: '',
             // Header text shown at the top of the Cimulate widget.
-            headerText: ''
+            headerText: '',
+            // Cimulate widget layout: 'panel' (default) renders a full-height side
+            // panel docked to the right that slides in/out; 'dialog' renders the
+            // default floating corner dialog; 'modal' renders a centered modal.
+            cimulateDisplayMode: 'panel',
+            // Width of the side panel when cimulateDisplayMode is 'panel'.
+            cimulatePanelWidth: '420px'
         },
         url: {
             site: 'path',
