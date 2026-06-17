@@ -7,22 +7,47 @@
 
 const config = require('../config.js')
 
-// commerce-sdk-react stores tokens in localStorage with the siteId as suffix:
-// e.g. `access_token_RefArch`, `customer_id_RefArch`. Match by prefix so the
-// helper works regardless of the active siteId.
+const SITE_ID = config.RETAIL_APP_HOME_SITE
+
+// The cleanup helper authenticates SCAPI calls with the active shopper session.
+// Where that session lives depends on whether the target environment has
+// HttpOnly session cookies enabled (MRT_ENABLE_HTTPONLY_SESSION_COOKIES):
 //
-// NOTE: When SLAS tokens migrate from localStorage to httpOnly cookies, this
-// helper will silently no-op (no access_token/customer_id in localStorage →
-// readSession returns null → cleanup skips). Follow-up: switch to reading
-// the session from cookies, or call cookie-authed /mobify/slas/private/*
-// endpoints. Tracked separately from this PR.
-const readSession = (page) =>
+//   - HttpOnly OFF (legacy): commerce-sdk-react keeps the tokens in
+//     localStorage, suffixed by siteId (e.g. `access_token_RefArch`).
+//   - HttpOnly ON: the access token moves into the `cc-at_<siteId>` cookie and
+//     `customer_id` into the `customer_id_<siteId>` cookie; both are stripped
+//     from the SLAS response body, so localStorage no longer carries them.
+//
+// readSession is dual-mode: prefer cookies, fall back to localStorage. The
+// `cc-at` cookie only exists when HttpOnly is enabled, so legacy environments
+// cleanly fall through to the localStorage path. This keeps cleanup working in
+// both modes, and no change is needed when HttpOnly becomes the default.
+//
+// Note: `cc-at_<siteId>` is HttpOnly, so page JS (`document.cookie`) can't read
+// it — but `page.context().cookies()` reads the browser cookie store over the
+// DevTools protocol, which is not gated by the HttpOnly flag.
+const readSessionFromCookies = async (page) => {
+    const cookies = await page.context().cookies()
+    const valueOf = (name) => cookies.find((c) => c.name === name)?.value
+    // Names mirror pwa-kit-runtime SESSION_COOKIE_CONFIG (`${key}_${siteId}`).
+    // Exact match avoids matching the `cc-at-expires_`/`cc-at-dnt_` siblings.
+    const accessToken = valueOf(`cc-at_${SITE_ID}`)
+    const customerId = valueOf(`customer_id_${SITE_ID}`)
+    return accessToken && customerId ? {accessToken, customerId} : null
+}
+
+// Match by prefix so the helper works regardless of the active siteId.
+const readSessionFromLocalStorage = (page) =>
     page.evaluate(() => {
         const entries = Object.entries(window.localStorage)
-        const accessToken = entries.find(([k]) => k.startsWith('access_token'))?.[1]
-        const customerId = entries.find(([k]) => k.startsWith('customer_id'))?.[1]
+        const accessToken = entries.find(([k]) => k.startsWith('access_token_'))?.[1]
+        const customerId = entries.find(([k]) => k.startsWith('customer_id_'))?.[1]
         return accessToken && customerId ? {accessToken, customerId} : null
     })
+
+const readSession = async (page) =>
+    (await readSessionFromCookies(page)) ?? (await readSessionFromLocalStorage(page))
 
 const safeRequest = async (label, fn) => {
     try {
@@ -35,9 +60,9 @@ const safeRequest = async (label, fn) => {
 
 /**
  * Empty the active basket and wishlist for the currently logged-in shopper.
- * Reads the session from localStorage and calls SCAPI directly via the
- * storefront's /mobify/proxy/api path, so cookies/SLAS auth match the test
- * browser's existing session.
+ * Reads the session (HttpOnly cookies or localStorage — see readSession) and
+ * calls SCAPI directly via the storefront's /mobify/proxy/api path, so
+ * cookies/SLAS auth match the test browser's existing session.
  *
  * Always best-effort: a missing session, a failed call, or a missing
  * wishlist must never fail the test that just ran.
@@ -47,7 +72,7 @@ async function clearCartAndWishlist(page) {
     if (!session) return
 
     const baseUrl = `${config.RETAIL_APP_HOME}/mobify/proxy/api`
-    const siteId = config.RETAIL_APP_HOME_SITE
+    const siteId = SITE_ID
     const orgId = config.RETAIL_APP_HOME_ORGANIZATION_ID
     const headers = {Authorization: `Bearer ${session.accessToken}`}
 

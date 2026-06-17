@@ -11,7 +11,7 @@ module.exports = {
     RETAIL_APP_HOME:
         process.env.RETAIL_APP_HOME ||
         'https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com',
-    RETAIL_APP_HOME_SITE: 'RefArch',
+    RETAIL_APP_HOME_SITE: process.env.RETAIL_APP_HOME_SITE || 'RefArch',
     RETAIL_APP_HOME_ORGANIZATION_ID:
         process.env.RETAIL_APP_HOME_ORGANIZATION_ID || 'f_ecom_zzrf_002',
     /**
