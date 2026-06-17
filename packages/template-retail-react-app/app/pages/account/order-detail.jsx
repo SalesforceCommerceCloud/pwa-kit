@@ -131,6 +131,7 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const {isRegistered} = useCustomerType()
     const customerId = useCustomerId()
     const {
