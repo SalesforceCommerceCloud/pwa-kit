@@ -114,10 +114,7 @@
     "defaultMessage": "Cancel order"
   },
   "account_order_detail.button.start_return": {
-    "defaultMessage": "Start return"
-  },
-  "account_order_detail.button.start_return_disabled_explanation": {
-    "defaultMessage": "Returns coming soon"
+    "defaultMessage": "Return Items"
   },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
@@ -1795,6 +1792,45 @@
   },
   "reset_password_form.title.reset_password": {
     "defaultMessage": "Reset Password"
+  },
+  "return_order_modal.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "return_order_modal.button.retry": {
+    "defaultMessage": "Retry"
+  },
+  "return_order_modal.button.review_return": {
+    "defaultMessage": "Review return"
+  },
+  "return_order_modal.heading.return_items": {
+    "defaultMessage": "Return items from order #{orderNo}"
+  },
+  "return_order_modal.hint.review_disabled": {
+    "defaultMessage": "Select at least one item and choose a reason to continue."
+  },
+  "return_order_modal.label.item_checkbox": {
+    "defaultMessage": "{name}, up to {count, plural, one {# available} other {# available}} to return"
+  },
+  "return_order_modal.label.quantity": {
+    "defaultMessage": "Quantity"
+  },
+  "return_order_modal.label.reason": {
+    "defaultMessage": "Reason"
+  },
+  "return_order_modal.placeholder.select_reason": {
+    "defaultMessage": "Select a reason"
+  },
+  "return_order_modal.text.available_to_return": {
+    "defaultMessage": "Up to {count, plural, one {# available} other {# available}} to return"
+  },
+  "return_order_modal.text.loading_reasons": {
+    "defaultMessage": "Loading return reasons…"
+  },
+  "return_order_modal.text.reasons_error": {
+    "defaultMessage": "We could not load the return reasons. Please try again."
+  },
+  "return_order_modal.text.select_items_description": {
+    "defaultMessage": "Select the items you want to return and tell us why."
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
