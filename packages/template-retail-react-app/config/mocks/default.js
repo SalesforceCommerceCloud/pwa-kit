@@ -125,8 +125,7 @@ module.exports = {
             enabled: false
         },
         oms: {
-            enabled: true,
-            returnEligibleStatuses: ['SHIPPED', 'DELIVERED']
+            enabled: true
         },
         storeLocatorEnabled: true,
         multishipEnabled: true,
