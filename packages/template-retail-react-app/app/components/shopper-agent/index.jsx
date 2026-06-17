@@ -4,13 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import useCimulateMessaging, {
+    DEFAULT_CIMULATE_ELEMENT_ID
+} from '@salesforce/retail-react-app/app/hooks/use-cimulate-messaging'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
@@ -99,6 +102,67 @@ const validateCommerceAgentSettings = (commerceAgent) => {
             console.error('Script URL must be from a trusted Salesforce domain.')
             return false
         }
+    }
+
+    return true
+}
+
+/**
+ * Validates that a URL is served from a trusted Cimulate domain.
+ *
+ * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
+ * @returns {boolean} True if the URL is from a trusted Cimulate domain, false otherwise
+ */
+const validateCimulateDomain = (url) => {
+    try {
+        const {hostname} = new URL(url)
+        return hostname === 'cimulate.ai' || hostname.endsWith('.cimulate.ai')
+    } catch {
+        return false
+    }
+}
+
+/**
+ * Validates the commerce agent configuration for the Cimulate Copilot widget.
+ * The Cimulate widget requires a different (smaller) set of fields than MIAW:
+ * the SCRT2 URL, Salesforce org id, embedded service developer name, and the
+ * URL of the Cimulate messaging UMD bundle.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {string} commerceAgent.scrt2Url - SCRT2 instance URL
+ * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID (passed as `orgId`)
+ * @param {string} [commerceAgent.esDeveloperName] - Embedded Service developer name
+ * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `esDeveloperName`
+ * @param {string} commerceAgent.cimulateScriptSourceUrl - URL of the Cimulate messaging bundle
+ * @returns {boolean} True if configuration is valid, false otherwise
+ */
+const validateCimulateAgentSettings = (commerceAgent) => {
+    if (!commerceAgent || typeof commerceAgent !== 'object') {
+        console.error('Commerce agent configuration must be an object.')
+        return false
+    }
+
+    const requiredValues = {
+        scrt2Url: commerceAgent.scrt2Url,
+        salesforceOrgId: commerceAgent.salesforceOrgId,
+        esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
+        cimulateScriptSourceUrl: commerceAgent.cimulateScriptSourceUrl
+    }
+
+    const isValid = Object.values(requiredValues).every(
+        (value) => typeof value === 'string' && value.trim() !== ''
+    )
+
+    if (!isValid) {
+        console.error(
+            'Invalid Cimulate agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and cimulateScriptSourceUrl.'
+        )
+        return false
+    }
+
+    if (!validateCimulateDomain(commerceAgent.cimulateScriptSourceUrl)) {
+        console.error('Cimulate script URL must be served from a trusted cimulate.ai domain.')
+        return false
     }
 
     return true
@@ -392,6 +456,97 @@ ShopperAgentWindow.propTypes = {
 }
 
 /**
+ * Internal component that renders the Cimulate Copilot messaging widget.
+ *
+ * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
+ * Messaging iframe), this component loads the Cimulate messaging UMD bundle and
+ * injects the widget into a container element via
+ * `window.CimulateMessaging.injectMessagingWidget`. The two providers are
+ * mutually exclusive and selected by `commerceAgent.provider`.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
+ * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
+ * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
+ * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
+ * @param {string} props.commerceAgentConfiguration.cimulateScriptSourceUrl - Cimulate messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.cimulateElementId] - Container element id (defaults to 'cimulate-messaging-widget')
+ * @param {string} [props.commerceAgentConfiguration.cimulateComponentType] - Widget type: 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.cimulateDialogPosition] - Dialog position when type is 'dialog'
+ * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
+ * @param {Object} [props.commerceAgentConfiguration.cimulateTheme] - Partial theme overrides for the widget
+ * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
+ * @returns {JSX.Element} A container element the Cimulate widget is rendered into
+ */
+const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
+    const {
+        scrt2Url,
+        salesforceOrgId,
+        esDeveloperName,
+        embeddedServiceName,
+        cimulateScriptSourceUrl,
+        headerText,
+        cimulateElementId = DEFAULT_CIMULATE_ELEMENT_ID,
+        cimulateComponentType = 'dialog',
+        cimulateDialogPosition = 'bottom-right',
+        isDevelopment = 'false',
+        cimulateTheme,
+        routingAttributes
+    } = commerceAgentConfiguration
+
+    // Load the Cimulate messaging UMD bundle, which exposes window.CimulateMessaging
+    const scriptLoadStatus = useScript(cimulateScriptSourceUrl)
+
+    const widgetOptions = useMemo(
+        () => ({
+            elementId: cimulateElementId,
+            scrt2Url,
+            orgId: salesforceOrgId,
+            esDeveloperName: esDeveloperName || embeddedServiceName,
+            routingAttributes,
+            headerText,
+            isDevelopment: isDevelopment === 'true',
+            componentConfig: {
+                isOpen: false,
+                type: cimulateComponentType,
+                dialogPosition: cimulateDialogPosition
+            },
+            theme: cimulateTheme
+        }),
+        [
+            cimulateElementId,
+            scrt2Url,
+            salesforceOrgId,
+            esDeveloperName,
+            embeddedServiceName,
+            routingAttributes,
+            headerText,
+            isDevelopment,
+            cimulateComponentType,
+            cimulateDialogPosition,
+            cimulateTheme
+        ]
+    )
+
+    // Inject the widget into the container once the bundle is loaded
+    useCimulateMessaging(scriptLoadStatus, widgetOptions)
+
+    return <div id={cimulateElementId} data-testid="cimulate-agent-widget" />
+}
+
+CimulateAgentWindow.propTypes = {
+    /**
+     * Commerce agent configuration object containing the Cimulate widget settings.
+     *
+     * @type {Object}
+     * @required
+     */
+    commerceAgentConfiguration: PropTypes.object.isRequired
+}
+
+/**
  * Main ShopperAgent component that initializes and manages the embedded messaging service.
  * This component acts as a conditional wrapper that only renders the messaging service
  * when all required conditions are met (enabled, basket loaded, valid configuration).
@@ -424,8 +579,10 @@ ShopperAgentWindow.propTypes = {
  * @see {@link isEnabled} - Enabled state checker
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
-    // Extract enabled state from configuration
-    const {enabled} = commerceAgentConfiguration
+    // Extract enabled state and provider from configuration.
+    // `provider` defaults to 'miaw' to preserve backwards compatibility with the
+    // existing Salesforce Embedded Messaging (MIAW) integration.
+    const {enabled, provider = 'miaw'} = commerceAgentConfiguration
 
     // Get current location and app origin for domain URL
     const appOrigin = useAppOrigin()
@@ -437,13 +594,22 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Build the current domain URL
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
-    // Conditional rendering: only render when all conditions are met
-    // 1. Agent is enabled and running on client
-    // 2. Basket has finished loading
-    // 3. Configuration is valid
-    return isShopperAgentEnabled &&
-        basketDoneLoading &&
-        validateCommerceAgentSettings(commerceAgentConfiguration) ? (
+    // Only render when the agent is enabled (client-side) and the basket has loaded.
+    if (!isShopperAgentEnabled || !basketDoneLoading) {
+        return null
+    }
+
+    // Cimulate Copilot widget provider
+    if (provider === 'cimulate') {
+        return validateCimulateAgentSettings(commerceAgentConfiguration) ? (
+            <div data-testid="shopper-agent">
+                <CimulateAgentWindow commerceAgentConfiguration={commerceAgentConfiguration} />
+            </div>
+        ) : null
+    }
+
+    // Default: Salesforce Embedded Messaging (MIAW) provider
+    return validateCommerceAgentSettings(commerceAgentConfiguration) ? (
         <div data-testid="shopper-agent">
             <ShopperAgentWindow
                 commerceAgentConfiguration={commerceAgentConfiguration}

@@ -31,7 +31,20 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
+            // 'cimulate' (Cimulate Copilot widget). Selecting 'cimulate' uses the
+            // fields below instead of the MIAW embedded-service fields above.
+            provider: 'miaw',
+            // URL of the Cimulate messaging UMD bundle (e.g.
+            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
+            // Only used when provider === 'cimulate'.
+            cimulateScriptSourceUrl: '',
+            // Embedded Service developer name for the Cimulate widget. Falls back
+            // to embeddedServiceName when not set.
+            esDeveloperName: '',
+            // Header text shown at the top of the Cimulate widget.
+            headerText: ''
         },
         url: {
             site: 'path',

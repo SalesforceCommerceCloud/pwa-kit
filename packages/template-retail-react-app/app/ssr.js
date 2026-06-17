@@ -375,6 +375,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cc.salesforce.com'
                     ],
                     'script-src': [
+                        // Cimulate Copilot messaging widget bundle (messaging.umd.js)
+                        '*.cimulate.ai',
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -399,6 +401,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
+                        // Connect to Cimulate Copilot widget APIs
+                        '*.cimulate.ai',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
                         'maps.googleapis.com',

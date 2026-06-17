@@ -22,7 +22,12 @@ export const getCommerceAgentConfig = () => {
         conversationContext: [],
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
-        enableAgentFromSearchSuggestions: 'false'
+        enableAgentFromSearchSuggestions: 'false',
+        // Widget provider: 'miaw' (default) or 'cimulate'. See config/default.js.
+        provider: 'miaw',
+        cimulateScriptSourceUrl: '',
+        esDeveloperName: '',
+        headerText: ''
     }
     return getConfig().app.commerceAgent ?? defaults
 }

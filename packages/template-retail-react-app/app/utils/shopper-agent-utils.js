@@ -56,3 +56,53 @@ export function openShopperAgent() {
         console.error('Shopper Agent: Error opening agent', error)
     }
 }
+
+/**
+ * Show or hide the Cimulate Copilot messaging widget.
+ *
+ * Uses the SDK exposed on `window.CimulateMessaging.eventHandlers`. Passing no
+ * argument toggles the widget; pass `true`/`false` to explicitly set its state.
+ *
+ * @function openCimulateWidget
+ * @param {boolean} [show=true] - Whether to show (true) or hide (false) the widget
+ * @returns {void}
+ */
+export function openCimulateWidget(show = true) {
+    if (!onClient) return
+
+    try {
+        const components = window.CimulateMessaging?.eventHandlers?.components
+        if (components && typeof components.toggleWidgetOpen === 'function') {
+            components.toggleWidgetOpen(show)
+        }
+    } catch (error) {
+        console.error('Shopper Agent: Error toggling Cimulate widget', error)
+    }
+}
+
+/**
+ * Open whichever shopper agent widget is active on the page.
+ *
+ * Detects the provider at runtime so callers (e.g. the header agent button)
+ * don't need to know which integration is configured. The Cimulate widget is
+ * preferred when its SDK is present; otherwise it falls back to MIAW. This keeps
+ * the header/agent entry points backwards compatible with the existing MIAW
+ * integration.
+ *
+ * @function openShopperAgentWidget
+ * @returns {void}
+ */
+export function openShopperAgentWidget() {
+    if (!onClient) return
+
+    try {
+        if (window.CimulateMessaging?.eventHandlers?.components?.toggleWidgetOpen) {
+            openCimulateWidget(true)
+            return
+        }
+
+        launchChat()
+    } catch (error) {
+        console.error('Shopper Agent: Error opening agent', error)
+    }
+}
