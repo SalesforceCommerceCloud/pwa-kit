@@ -28,6 +28,7 @@ export const getCommerceAgentConfig = () => {
         cimulateScriptSourceUrl: '',
         esDeveloperName: '',
         headerText: '',
+        disclaimerMarkdown: '',
         cimulateDisplayMode: 'panel',
         cimulatePanelWidth: '420px'
     }

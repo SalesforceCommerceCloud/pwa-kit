@@ -55,6 +55,7 @@ const DEFAULT_CIMULATE_COMPONENT_CONFIG = {
  * @param {string} options.esDeveloperName - Embedded Service developer name
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.headerText] - Header text shown at the top of the widget
+ * @param {string} [options.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
  * @param {string} [options.globalClassName] - Custom class added to widget elements for CSS specificity
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
@@ -68,6 +69,7 @@ const injectCimulateWidget = ({
     esDeveloperName,
     routingAttributes,
     headerText,
+    disclaimerMarkdown,
     globalClassName,
     isDevelopment = false,
     componentConfig,
@@ -93,6 +95,7 @@ const injectCimulateWidget = ({
             elementId,
             messagingConfig,
             ...(headerText ? {headerText} : {}),
+            ...(disclaimerMarkdown ? {disclaimerMarkdown} : {}),
             ...(globalClassName ? {globalClassName} : {}),
             isDevelopment,
             componentConfig: {...DEFAULT_CIMULATE_COMPONENT_CONFIG, ...componentConfig},

@@ -531,6 +531,7 @@ const buildCimulatePanelStyles = (panelWidth) => `
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
  * @param {string} props.commerceAgentConfiguration.cimulateScriptSourceUrl - Cimulate messaging bundle URL
  * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
  * @param {string} [props.commerceAgentConfiguration.cimulateElementId] - Container element id (defaults to 'cimulate-messaging-widget')
  * @param {string} [props.commerceAgentConfiguration.cimulateDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
  * @param {string} [props.commerceAgentConfiguration.cimulatePanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
@@ -549,6 +550,7 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
         embeddedServiceName,
         cimulateScriptSourceUrl,
         headerText,
+        disclaimerMarkdown,
         cimulateElementId = DEFAULT_CIMULATE_ELEMENT_ID,
         cimulateDisplayMode = 'panel',
         cimulatePanelWidth = DEFAULT_CIMULATE_PANEL_WIDTH,
@@ -574,6 +576,7 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
             esDeveloperName: esDeveloperName || embeddedServiceName,
             routingAttributes,
             headerText,
+            disclaimerMarkdown,
             globalClassName: CIMULATE_GLOBAL_CLASS,
             isDevelopment: isDevelopment === 'true',
             componentConfig: {
@@ -591,6 +594,7 @@ const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
             embeddedServiceName,
             routingAttributes,
             headerText,
+            disclaimerMarkdown,
             isDevelopment,
             isPanel,
             cimulateComponentType,

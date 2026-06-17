@@ -45,6 +45,9 @@ module.exports = {
             esDeveloperName: '',
             // Header text shown at the top of the Cimulate widget.
             headerText: '',
+            // Markdown disclaimer shown in the Cimulate widget. Supports links and
+            // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
+            disclaimerMarkdown: '',
             // Cimulate widget layout: 'panel' (default) renders a full-height side
             // panel docked to the right that slides in/out; 'dialog' renders the
             // default floating corner dialog; 'modal' renders a centered modal.
