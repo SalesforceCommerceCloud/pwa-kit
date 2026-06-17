@@ -4316,7 +4316,7 @@
     },
     {
       "type": 0,
-      "value": ", up to "
+      "value": ", "
     },
     {
       "offset": 0,
@@ -4328,7 +4328,7 @@
             },
             {
               "type": 0,
-              "value": " available"
+              "value": " unit"
             }
           ]
         },
@@ -4339,7 +4339,7 @@
             },
             {
               "type": 0,
-              "value": " available"
+              "value": " units"
             }
           ]
         }
@@ -4350,7 +4350,7 @@
     },
     {
       "type": 0,
-      "value": " to return"
+      "value": " available to return"
     }
   ],
   "return_items_modal.label.quantity": [
@@ -4359,10 +4359,50 @@
       "value": "Quantity"
     }
   ],
+  "return_items_modal.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Decrease quantity for "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "return_items_modal.label.quantity_for": [
+    {
+      "type": 0,
+      "value": "Quantity for "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "return_items_modal.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Increase quantity for "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
   "return_items_modal.label.reason": [
     {
       "type": 0,
       "value": "Reason"
+    }
+  ],
+  "return_items_modal.label.reason_for": [
+    {
+      "type": 0,
+      "value": "Reason for "
+    },
+    {
+      "type": 1,
+      "value": "name"
     }
   ],
   "return_items_modal.placeholder.select_reason": [
@@ -4386,7 +4426,7 @@
             },
             {
               "type": 0,
-              "value": " available"
+              "value": " unit"
             }
           ]
         },
@@ -4397,7 +4437,7 @@
             },
             {
               "type": 0,
-              "value": " available"
+              "value": " units"
             }
           ]
         }
@@ -4408,7 +4448,7 @@
     },
     {
       "type": 0,
-      "value": " to return"
+      "value": " available to return"
     }
   ],
   "return_items_modal.text.loading_reasons": [

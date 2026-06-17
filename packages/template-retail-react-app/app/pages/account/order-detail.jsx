@@ -191,7 +191,8 @@ const AccountOrderDetail = () => {
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
-    const showStartReturn = isRegistered && returnableItems.length > 0
+    const ownsOrder = order?.customerInfo?.customerId === customerId
+    const showStartReturn = isRegistered && ownsOrder && returnableItems.length > 0
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 

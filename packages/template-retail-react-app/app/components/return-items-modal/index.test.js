@@ -6,11 +6,11 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {fireEvent, screen, within} from '@testing-library/react'
+import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
-import {buildReturnPayload} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
+import {buildReturnProductItems} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 let mockOmsMetaData = {
     data: {
@@ -124,8 +124,13 @@ test('toggling a row expands it and pre-selects the OMS default reason', async (
     await user.click(checkboxes[0])
 
     const row = screen.getAllByTestId('return-items-modal-item-row')[0]
-    expect(within(row).getByLabelText(/reason/i)).toHaveValue('Wrong size')
-    expect(within(row).getByLabelText(/quantity/i)).toHaveValue('1')
+    // Contextual aria-labels include the product name so screen readers can
+    // distinguish rows. Scope queries to the input element to avoid matching
+    // the +/- buttons, which also carry "Quantity for {name}"-style labels.
+    expect(within(row).getByLabelText(/reason for /i, {selector: 'select'})).toHaveValue(
+        'Wrong size'
+    )
+    expect(within(row).getByLabelText(/quantity for /i, {selector: 'input'})).toHaveValue('1')
 })
 
 test('quantity field clamps to the available-to-return ceiling', async () => {
@@ -135,7 +140,7 @@ test('quantity field clamps to the available-to-return ceiling', async () => {
     await user.click(checkboxes[0]) // item-1 has max 2
 
     const row = screen.getAllByTestId('return-items-modal-item-row')[0]
-    const qty = within(row).getByLabelText(/quantity/i)
+    const qty = within(row).getByLabelText(/quantity for /i, {selector: 'input'})
     // Set value directly then blur — Chakra's useNumberInput clamps on blur,
     // and userEvent.clear() doesn't propagate to a controlled NumberInput
     // because the hook rejects empty intermediate values.
@@ -162,7 +167,8 @@ test('clicking Review return forwards a properly shaped payload', async () => {
 
     // Change reason away from default so it gets serialized
     const reason = within(screen.getAllByTestId('return-items-modal-item-row')[1]).getByLabelText(
-        /reason/i
+        /reason for /i,
+        {selector: 'select'}
     )
     await user.selectOptions(reason, 'Defect')
 
@@ -172,12 +178,14 @@ test('clicking Review return forwards a properly shaped payload', async () => {
 
 test('omits reason from payload when shopper kept the OMS default', () => {
     const selection = {'item-2': {checked: true, quantity: 1, reasonCode: 'Wrong size'}}
-    expect(buildReturnPayload(selection, 'Wrong size')).toEqual([{itemId: 'item-2', quantity: 1}])
+    expect(buildReturnProductItems(selection, 'Wrong size')).toEqual([
+        {itemId: 'item-2', quantity: 1}
+    ])
 })
 
 test('serializes quantity as a JS Number (not a string)', () => {
     const selection = {'item-2': {checked: true, quantity: '3', reasonCode: 'Defect'}}
-    const [row] = buildReturnPayload(selection, 'Wrong size')
+    const [row] = buildReturnProductItems(selection, 'Wrong size')
     expect(typeof row.quantity).toBe('number')
     expect(row.quantity).toBe(3)
 })
@@ -186,6 +194,37 @@ test('renders skeleton placeholders while OMS metadata is loading', () => {
     mockOmsMetaData = {data: undefined, isLoading: true, isError: false, refetch: jest.fn()}
     renderWithProviders(<Harness />)
     expect(screen.getByTestId('return-items-modal-loading')).toBeInTheDocument()
+})
+
+test('drops malformed rows (non-numeric or zero quantity) from the payload', () => {
+    expect(
+        buildReturnProductItems(
+            {
+                'item-a': {checked: true, quantity: '', reasonCode: 'Defect'},
+                'item-b': {checked: true, quantity: 'abc', reasonCode: 'Defect'},
+                'item-c': {checked: true, quantity: 0, reasonCode: 'Defect'},
+                'item-d': {checked: true, quantity: 2, reasonCode: 'Defect'}
+            },
+            'Wrong size'
+        )
+    ).toEqual([{itemId: 'item-d', quantity: 2, reason: 'Defect'}])
+})
+
+test('backfills the OMS default reason on already-checked rows when metadata is available', async () => {
+    // Models the case where the parent has a checked row whose reasonCode
+    // was never set (e.g. selection rehydrated from URL state in a future
+    // WI, or initial open where the user clicked the row before reasons
+    // resolved). The modal's mount-time backfill effect must apply the
+    // OMS default so the row is valid without forcing a re-pick.
+    const initial = {'item-1': {checked: true, quantity: 1, reasonCode: undefined}}
+
+    renderWithProviders(<Harness initialSelection={initial} />)
+
+    await waitFor(() => expect(screen.getByTestId('return-items-modal-review')).toBeEnabled())
+    const row = screen.getAllByTestId('return-items-modal-item-row')[0]
+    expect(within(row).getByLabelText(/reason for /i, {selector: 'select'})).toHaveValue(
+        'Wrong size'
+    )
 })
 
 test('renders an error alert + Retry when OMS metadata fails', async () => {

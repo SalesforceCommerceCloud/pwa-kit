@@ -17,16 +17,32 @@ export const messages = defineMessages({
         id: 'return_items_modal.text.select_items_description'
     },
     availableToReturn: {
-        defaultMessage: 'Up to {count, plural, one {# available} other {# available}} to return',
+        defaultMessage: 'Up to {count, plural, one {# unit} other {# units}} available to return',
         id: 'return_items_modal.text.available_to_return'
     },
     quantityLabel: {
         defaultMessage: 'Quantity',
         id: 'return_items_modal.label.quantity'
     },
+    quantityFor: {
+        defaultMessage: 'Quantity for {name}',
+        id: 'return_items_modal.label.quantity_for'
+    },
+    quantityIncrement: {
+        defaultMessage: 'Increase quantity for {name}',
+        id: 'return_items_modal.label.quantity_increment'
+    },
+    quantityDecrement: {
+        defaultMessage: 'Decrease quantity for {name}',
+        id: 'return_items_modal.label.quantity_decrement'
+    },
     reasonLabel: {
         defaultMessage: 'Reason',
         id: 'return_items_modal.label.reason'
+    },
+    reasonFor: {
+        defaultMessage: 'Reason for {name}',
+        id: 'return_items_modal.label.reason_for'
     },
     selectReasonPlaceholder: {
         defaultMessage: 'Select a reason',
@@ -57,33 +73,34 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.retry'
     },
     itemCheckboxLabel: {
-        defaultMessage:
-            '{name}, up to {count, plural, one {# available} other {# available}} to return',
+        defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
         id: 'return_items_modal.label.item_checkbox'
     }
 })
 
 /**
- * Build the API payload from the modal selection.
+ * Build the `productItems` array for an `OmsReturnOrderRequest`. Caller wraps
+ * it: `body: {productItems: buildReturnProductItems(selection, defaultReasonCode)}`.
  *
- * Shape (matches `OmsReturnOrderRequest` in shopper-orders-oas):
- *   { productItems: [{ itemId, quantity: Number, reason? }, ...] }
+ * Quantity is `number` / `format: double` per oms.yaml. UX is integer-valued
+ * but we serialize as a JS Number, not a string. Reason is omitted when the
+ * shopper kept the OMS-default code so the server applies the default per the
+ * API contract.
  *
- * Quantity is `number` / `format: double` per the schema (oms.yaml). UX is
- * integer-valued, but we serialize as a JS Number rather than a string. Reason
- * is omitted when the shopper kept the OMS-default code, so the server applies
- * the default per the API contract.
- *
- * Caller is responsible for ensuring at least one row is `checked`. The helper
- * silently drops unchecked rows.
+ * Rows without a positive numeric quantity are dropped — the upstream UI is
+ * already gated by `isSelectionValid`, but this hardens reuse from elsewhere
+ * (e.g. step 2's review modal in W-22821838) against malformed state.
  */
-export const buildReturnPayload = (selection, defaultReasonCode) =>
+export const buildReturnProductItems = (selection, defaultReasonCode) =>
     Object.entries(selection || {})
         .filter(([, row]) => row?.checked)
-        .map(([itemId, row]) => {
-            const payload = {itemId, quantity: Number(row.quantity)}
+        .reduce((items, [itemId, row]) => {
+            const quantity = Number(row.quantity)
+            if (!Number.isFinite(quantity) || quantity <= 0) return items
+            const item = {itemId, quantity}
             if (row.reasonCode && row.reasonCode !== defaultReasonCode) {
-                payload.reason = row.reasonCode
+                item.reason = row.reasonCode
             }
-            return payload
-        })
+            items.push(item)
+            return items
+        }, [])

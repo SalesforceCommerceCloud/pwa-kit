@@ -46,7 +46,7 @@ import {
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {
     messages,
-    buildReturnPayload
+    buildReturnProductItems
 } from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -72,7 +72,8 @@ const formatVariationSummary = (item) => {
  * convention (Chakra's `NumberInput` is not exported from the shared UI). The
  * underlying field clamps on blur and on increment/decrement.
  */
-const QuantityField = ({value, max, onChange, ariaLabel, id}) => {
+const QuantityField = ({value, max, onChange, ariaLabel, productName, id}) => {
+    const intl = useIntl()
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         value,
         min: 1,
@@ -89,8 +90,16 @@ const QuantityField = ({value, max, onChange, ariaLabel, id}) => {
         }
     })
 
-    const dec = getDecrementButtonProps({variant: 'outline', size: 'sm'})
-    const inc = getIncrementButtonProps({variant: 'outline', size: 'sm'})
+    const dec = getDecrementButtonProps({
+        variant: 'outline',
+        size: 'sm',
+        'aria-label': intl.formatMessage(messages.quantityDecrement, {name: productName})
+    })
+    const inc = getIncrementButtonProps({
+        variant: 'outline',
+        size: 'sm',
+        'aria-label': intl.formatMessage(messages.quantityIncrement, {name: productName})
+    })
     const input = getInputProps({
         id,
         textAlign: 'center',
@@ -116,6 +125,7 @@ QuantityField.propTypes = {
     max: PropTypes.number.isRequired,
     onChange: PropTypes.func.isRequired,
     ariaLabel: PropTypes.string.isRequired,
+    productName: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired
 }
 
@@ -164,7 +174,10 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                                     value={row.quantity}
                                     max={max}
                                     onChange={onQuantityChange}
-                                    ariaLabel={intl.formatMessage(messages.quantityLabel)}
+                                    ariaLabel={intl.formatMessage(messages.quantityFor, {
+                                        name: displayName
+                                    })}
+                                    productName={displayName}
                                 />
                             </FormControl>
                             <FormControl>
@@ -176,6 +189,9 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                                     size="sm"
                                     value={row.reasonCode || ''}
                                     onChange={(e) => onReasonChange(e.target.value)}
+                                    aria-label={intl.formatMessage(messages.reasonFor, {
+                                        name: displayName
+                                    })}
                                     placeholder={intl.formatMessage(
                                         messages.selectReasonPlaceholder
                                     )}
@@ -240,6 +256,7 @@ const ReturnItemsModal = ({
     onReview
 }) => {
     const isMobile = useBreakpointValue({base: true, md: false})
+    const reviewDisabledHintId = useId()
 
     const reviewQuery = useOmsMetaData(
         {},
@@ -316,14 +333,15 @@ const ReturnItemsModal = ({
     )
 
     const handleReview = useCallback(() => {
-        const payload = buildReturnPayload(selection, defaultReasonCode)
+        const payload = buildReturnProductItems(selection, defaultReasonCode)
         onReview(payload)
     }, [selection, defaultReasonCode, onReview])
 
-    const reviewDisabledHintId = 'return-items-modal-review-disabled-hint'
-
     const body = reviewQuery.isLoading ? (
-        <Stack spacing={3} data-testid="return-items-modal-loading">
+        <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
+            <VisuallyHidden>
+                <FormattedMessage {...messages.loadingReasons} />
+            </VisuallyHidden>
             <Skeleton h="64px" />
             <Skeleton h="64px" />
         </Stack>

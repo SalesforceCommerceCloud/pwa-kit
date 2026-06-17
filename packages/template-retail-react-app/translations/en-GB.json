@@ -1809,19 +1809,31 @@
     "defaultMessage": "Select at least one item and choose a reason to continue."
   },
   "return_items_modal.label.item_checkbox": {
-    "defaultMessage": "{name}, up to {count, plural, one {# available} other {# available}} to return"
+    "defaultMessage": "{name}, {count, plural, one {# unit} other {# units}} available to return"
   },
   "return_items_modal.label.quantity": {
     "defaultMessage": "Quantity"
   },
+  "return_items_modal.label.quantity_decrement": {
+    "defaultMessage": "Decrease quantity for {name}"
+  },
+  "return_items_modal.label.quantity_for": {
+    "defaultMessage": "Quantity for {name}"
+  },
+  "return_items_modal.label.quantity_increment": {
+    "defaultMessage": "Increase quantity for {name}"
+  },
   "return_items_modal.label.reason": {
     "defaultMessage": "Reason"
+  },
+  "return_items_modal.label.reason_for": {
+    "defaultMessage": "Reason for {name}"
   },
   "return_items_modal.placeholder.select_reason": {
     "defaultMessage": "Select a reason"
   },
   "return_items_modal.text.available_to_return": {
-    "defaultMessage": "Up to {count, plural, one {# available} other {# available}} to return"
+    "defaultMessage": "Up to {count, plural, one {# unit} other {# units}} available to return"
   },
   "return_items_modal.text.loading_reasons": {
     "defaultMessage": "Loading return reasons…"

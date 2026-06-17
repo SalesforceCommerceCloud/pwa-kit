@@ -472,6 +472,12 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
     // is no client-side status allowlist.
     const createReturnEligibleOmsOrder = (overrides = {}) =>
         createMockOmsOrder({
+            // The return CTA gates on ownership: order.customerInfo.customerId
+            // must match the current shopper's id. With bypassAuth=true, the
+            // commerce-sdk-react auth init derives customer_id from the
+            // registered token's `rcid` claim (`abUMsavpD9Y6jW00di2SjxGCMU` —
+            // see registeredUserPayload.isb in test-utils.js).
+            customerInfo: {customerId: 'abUMsavpD9Y6jW00di2SjxGCMU'},
             productItems: [
                 {
                     productId: 'returnable-1',
@@ -523,12 +529,25 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
     })
 
-    test('clicking Return Items opens the return-order modal (W-22821837)', async () => {
+    test('clicking Return Items opens the return-items modal (W-22821837)', async () => {
         const user = userEvent.setup()
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const cta = await screen.findByTestId('account-order-detail-start-return')
         await user.click(cta)
         expect(await screen.findByText(/return items from order #/i)).toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA when the order belongs to a different customer', async () => {
+        // Defense-in-depth: even if useOrder somehow returned an order owned
+        // by a different customer, the trigger must not render. Mirrors the
+        // ownership guard already in place on the cancel-order CTA.
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({
+                customerInfo: {customerId: 'someone-else'}
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
     })
 })
 
