@@ -57,7 +57,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -363,7 +363,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.demandware.net',
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
-                        'www.gstatic.com' // optional, if icon is on gstatic
+                        'www.gstatic.com', // optional, if icon is on gstatic
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay specific images
+                        'https://www.gstatic.com/',
+                        '*.demandware.net',
+                        '*.sfcc-store-internal.net',
+                        's3.amazonaws.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com',
+                        '*.cc.salesforce.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -376,7 +385,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.gstatic.com',
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
-                        'places.googleapis.com'
+                        'places.googleapis.com',
+                        '*.adyen.com',
+                        'https://checkoutshopper-test.adyen.com',
+                        'https://pay.google.com/gp/p/js/pay.js',
+                        '*.site.com',
+                        '*.commercecloud.com',
+                        '*.test1.my.pc-rnd.site.com',
+                        '*.test2.my.pc-rnd.site.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -403,7 +421,17 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.google.com/pay',
                         'www.google.com/pay/',
                         // Connect to SFCC/ODS instances
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        '*.site.com',
+                        'checkoutshopper-test.adyen.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test2.my.pc-rnd.salesforce-scrt.com',
+                        '*.test2.my.pc-rnd.site.com',
+                        'https://*.exp-delivery.com',
+                        '*.test1.my.pc-rn.site.com',
+                        'https://*.exp-delivery-soak.com',
+                        'https://pay.google.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -413,11 +441,23 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         'payments.google.com',
-                        'pay.google.com'
+                        'pay.google.com',
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay Specific frames
+                        'https://pay.google.com'
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        'self',
+                        'https://*.test1.my.pc-rnd.site.com',
+                        'https://*.test2.my.pc-rnd.site.com',
+                        'https://*.mobify-storefront.com',
+                        'https://runtime.commercecloud.com',
+                        'https://*.exp-delivery.com',
+                        'https://*.exp-delivery-soak.com',
+                        'https://*.force.com',
+                        'https://*.lightning.force.com'
                     ]
                 }
             }
