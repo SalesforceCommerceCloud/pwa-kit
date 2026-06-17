@@ -4275,25 +4275,25 @@
       "value": "Reset Password"
     }
   ],
-  "return_order_modal.button.cancel": [
+  "return_items_modal.button.cancel": [
     {
       "type": 0,
       "value": "Cancel"
     }
   ],
-  "return_order_modal.button.retry": [
+  "return_items_modal.button.retry": [
     {
       "type": 0,
       "value": "Retry"
     }
   ],
-  "return_order_modal.button.review_return": [
+  "return_items_modal.button.review_return": [
     {
       "type": 0,
       "value": "Review return"
     }
   ],
-  "return_order_modal.heading.return_items": [
+  "return_items_modal.heading.return_items": [
     {
       "type": 0,
       "value": "Return items from order #"
@@ -4303,13 +4303,13 @@
       "value": "orderNo"
     }
   ],
-  "return_order_modal.hint.review_disabled": [
+  "return_items_modal.hint.review_disabled": [
     {
       "type": 0,
       "value": "Select at least one item and choose a reason to continue."
     }
   ],
-  "return_order_modal.label.item_checkbox": [
+  "return_items_modal.label.item_checkbox": [
     {
       "type": 1,
       "value": "name"
@@ -4353,25 +4353,25 @@
       "value": " to return"
     }
   ],
-  "return_order_modal.label.quantity": [
+  "return_items_modal.label.quantity": [
     {
       "type": 0,
       "value": "Quantity"
     }
   ],
-  "return_order_modal.label.reason": [
+  "return_items_modal.label.reason": [
     {
       "type": 0,
       "value": "Reason"
     }
   ],
-  "return_order_modal.placeholder.select_reason": [
+  "return_items_modal.placeholder.select_reason": [
     {
       "type": 0,
       "value": "Select a reason"
     }
   ],
-  "return_order_modal.text.available_to_return": [
+  "return_items_modal.text.available_to_return": [
     {
       "type": 0,
       "value": "Up to "
@@ -4411,19 +4411,19 @@
       "value": " to return"
     }
   ],
-  "return_order_modal.text.loading_reasons": [
+  "return_items_modal.text.loading_reasons": [
     {
       "type": 0,
       "value": "Loading return reasons…"
     }
   ],
-  "return_order_modal.text.reasons_error": [
+  "return_items_modal.text.reasons_error": [
     {
       "type": 0,
       "value": "We could not load the return reasons. Please try again."
     }
   ],
-  "return_order_modal.text.select_items_description": [
+  "return_items_modal.text.select_items_description": [
     {
       "type": 0,
       "value": "Select the items you want to return and tell us why."

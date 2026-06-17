@@ -9,8 +9,8 @@ import PropTypes from 'prop-types'
 import {fireEvent, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import ReturnOrderModal from '@salesforce/retail-react-app/app/components/return-order-modal'
-import {buildReturnPayload} from '@salesforce/retail-react-app/app/components/return-order-modal/constants'
+import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
+import {buildReturnPayload} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 let mockOmsMetaData = {
     data: {
@@ -61,7 +61,7 @@ const baseOrder = {
 const Harness = ({onReview = jest.fn(), onClose = jest.fn(), initialSelection = {}} = {}) => {
     const [selection, setSelection] = useState(initialSelection)
     return (
-        <ReturnOrderModal
+        <ReturnItemsModal
             isOpen={true}
             onClose={onClose}
             order={baseOrder}
@@ -99,7 +99,7 @@ test('renders header with order number and a row per returnable item', async () 
     renderWithProviders(<Harness />)
     expect(await screen.findByText(/return items from order #00123456/i)).toBeInTheDocument()
     expect(screen.getByText(/select the items you want to return/i)).toBeInTheDocument()
-    expect(screen.getAllByTestId('return-modal-item-row')).toHaveLength(2)
+    expect(screen.getAllByTestId('return-items-modal-item-row')).toHaveLength(2)
     expect(screen.getByText(/cotton crew t-shirt/i)).toBeInTheDocument()
     expect(screen.getByText(/slim fit chino pants/i)).toBeInTheDocument()
 })
@@ -107,7 +107,7 @@ test('renders header with order number and a row per returnable item', async () 
 test('Review return is disabled until at least one valid row is selected', async () => {
     const user = userEvent.setup()
     renderWithProviders(<Harness />)
-    const reviewButton = screen.getByTestId('return-modal-review')
+    const reviewButton = screen.getByTestId('return-items-modal-review')
     expect(reviewButton).toBeDisabled()
     expect(reviewButton).toHaveAttribute('aria-describedby')
 
@@ -123,7 +123,7 @@ test('toggling a row expands it and pre-selects the OMS default reason', async (
     const checkboxes = screen.getAllByRole('checkbox')
     await user.click(checkboxes[0])
 
-    const row = screen.getAllByTestId('return-modal-item-row')[0]
+    const row = screen.getAllByTestId('return-items-modal-item-row')[0]
     expect(within(row).getByLabelText(/reason/i)).toHaveValue('Wrong size')
     expect(within(row).getByLabelText(/quantity/i)).toHaveValue('1')
 })
@@ -134,7 +134,7 @@ test('quantity field clamps to the available-to-return ceiling', async () => {
     const checkboxes = screen.getAllByRole('checkbox')
     await user.click(checkboxes[0]) // item-1 has max 2
 
-    const row = screen.getAllByTestId('return-modal-item-row')[0]
+    const row = screen.getAllByTestId('return-items-modal-item-row')[0]
     const qty = within(row).getByLabelText(/quantity/i)
     // Set value directly then blur — Chakra's useNumberInput clamps on blur,
     // and userEvent.clear() doesn't propagate to a controlled NumberInput
@@ -148,7 +148,7 @@ test('Cancel calls onClose', async () => {
     const user = userEvent.setup()
     const onClose = jest.fn()
     renderWithProviders(<Harness onClose={onClose} />)
-    await user.click(screen.getByTestId('return-modal-cancel'))
+    await user.click(screen.getByTestId('return-items-modal-cancel'))
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
@@ -161,12 +161,12 @@ test('clicking Review return forwards a properly shaped payload', async () => {
     await user.click(checkboxes[1]) // item-2: max 1, should default-reason
 
     // Change reason away from default so it gets serialized
-    const reason = within(screen.getAllByTestId('return-modal-item-row')[1]).getByLabelText(
+    const reason = within(screen.getAllByTestId('return-items-modal-item-row')[1]).getByLabelText(
         /reason/i
     )
     await user.selectOptions(reason, 'Defect')
 
-    await user.click(screen.getByTestId('return-modal-review'))
+    await user.click(screen.getByTestId('return-items-modal-review'))
     expect(onReview).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
 })
 
@@ -185,7 +185,7 @@ test('serializes quantity as a JS Number (not a string)', () => {
 test('renders skeleton placeholders while OMS metadata is loading', () => {
     mockOmsMetaData = {data: undefined, isLoading: true, isError: false, refetch: jest.fn()}
     renderWithProviders(<Harness />)
-    expect(screen.getByTestId('return-modal-loading')).toBeInTheDocument()
+    expect(screen.getByTestId('return-items-modal-loading')).toBeInTheDocument()
 })
 
 test('renders an error alert + Retry when OMS metadata fails', async () => {
@@ -193,7 +193,7 @@ test('renders an error alert + Retry when OMS metadata fails', async () => {
     const refetch = jest.fn()
     mockOmsMetaData = {data: undefined, isLoading: false, isError: true, refetch}
     renderWithProviders(<Harness />)
-    expect(screen.getByTestId('return-modal-error')).toBeInTheDocument()
-    await user.click(screen.getByTestId('return-modal-retry'))
+    expect(screen.getByTestId('return-items-modal-error')).toBeInTheDocument()
+    await user.click(screen.getByTestId('return-items-modal-retry'))
     expect(refetch).toHaveBeenCalledTimes(1)
 })

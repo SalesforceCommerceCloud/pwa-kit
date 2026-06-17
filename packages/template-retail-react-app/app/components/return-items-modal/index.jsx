@@ -47,7 +47,7 @@ import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/
 import {
     messages,
     buildReturnPayload
-} from '@salesforce/retail-react-app/app/components/return-order-modal/constants'
+} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -101,11 +101,11 @@ const QuantityField = ({value, max, onChange, ariaLabel, id}) => {
 
     return (
         <HStack spacing={1}>
-            <Button data-testid="return-modal-quantity-decrement" {...dec}>
+            <Button data-testid="return-items-modal-quantity-decrement" {...dec}>
                 {'−'}
             </Button>
             <Input {...input} />
-            <Button data-testid="return-modal-quantity-increment" {...inc}>
+            <Button data-testid="return-items-modal-quantity-increment" {...inc}>
                 {'+'}
             </Button>
         </HStack>
@@ -134,7 +134,7 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
             border="1px solid"
             borderColor="gray.200"
             borderRadius="base"
-            data-testid="return-modal-item-row"
+            data-testid="return-items-modal-item-row"
         >
             <HStack alignItems="flex-start" spacing={3}>
                 <Checkbox
@@ -230,7 +230,7 @@ const isSelectionValid = (selection, returnableItems) => {
  * modal stack. This component invokes `onReview(payload)` with the API-shaped
  * `productItems` array when the shopper clicks **Review return**.
  */
-const ReturnOrderModal = ({
+const ReturnItemsModal = ({
     isOpen,
     onClose,
     order,
@@ -320,15 +320,15 @@ const ReturnOrderModal = ({
         onReview(payload)
     }, [selection, defaultReasonCode, onReview])
 
-    const reviewDisabledHintId = 'return-order-modal-review-disabled-hint'
+    const reviewDisabledHintId = 'return-items-modal-review-disabled-hint'
 
     const body = reviewQuery.isLoading ? (
-        <Stack spacing={3} data-testid="return-modal-loading">
+        <Stack spacing={3} data-testid="return-items-modal-loading">
             <Skeleton h="64px" />
             <Skeleton h="64px" />
         </Stack>
     ) : reviewQuery.isError ? (
-        <Alert status="error" data-testid="return-modal-error">
+        <Alert status="error" data-testid="return-items-modal-error">
             <AlertIcon />
             <Stack spacing={2}>
                 <AlertDescription>
@@ -338,7 +338,7 @@ const ReturnOrderModal = ({
                     size="sm"
                     variant="outline"
                     onClick={() => reviewQuery.refetch()}
-                    data-testid="return-modal-retry"
+                    data-testid="return-items-modal-retry"
                 >
                     <FormattedMessage {...messages.retryButton} />
                 </Button>
@@ -382,7 +382,7 @@ const ReturnOrderModal = ({
                 variant="outline"
                 onClick={onClose}
                 width={{base: 'full', md: 'auto'}}
-                data-testid="return-modal-cancel"
+                data-testid="return-items-modal-cancel"
             >
                 <FormattedMessage {...messages.cancelButton} />
             </Button>
@@ -392,7 +392,7 @@ const ReturnOrderModal = ({
                 isDisabled={!reviewEnabled}
                 aria-describedby={reviewEnabled ? undefined : reviewDisabledHintId}
                 width={{base: 'full', md: 'auto'}}
-                data-testid="return-modal-review"
+                data-testid="return-items-modal-review"
             >
                 <FormattedMessage {...messages.reviewButton} />
             </Button>
@@ -406,7 +406,7 @@ const ReturnOrderModal = ({
         return (
             <Drawer isOpen={isOpen} onClose={onClose} placement="bottom" size="full">
                 <DrawerOverlay />
-                <DrawerContent data-testid="return-order-modal-drawer">
+                <DrawerContent data-testid="return-items-modal-drawer">
                     <DrawerHeader pb={1}>{header}</DrawerHeader>
                     <DrawerCloseButton />
                     <DrawerBody pt={2}>{body}</DrawerBody>
@@ -419,7 +419,7 @@ const ReturnOrderModal = ({
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="2xl" isCentered scrollBehavior="inside">
             <ModalOverlay />
-            <ModalContent data-testid="return-order-modal">
+            <ModalContent data-testid="return-items-modal">
                 <ModalHeader pb={1}>{header}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pt={2}>{body}</ModalBody>
@@ -429,7 +429,7 @@ const ReturnOrderModal = ({
     )
 }
 
-ReturnOrderModal.propTypes = {
+ReturnItemsModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     order: PropTypes.object,
@@ -439,4 +439,4 @@ ReturnOrderModal.propTypes = {
     onReview: PropTypes.func.isRequired
 }
 
-export default ReturnOrderModal
+export default ReturnItemsModal

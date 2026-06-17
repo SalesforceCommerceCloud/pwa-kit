@@ -50,7 +50,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
-import ReturnOrderModal from '@salesforce/retail-react-app/app/components/return-order-modal'
+import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -780,7 +780,7 @@ const AccountOrderDetail = () => {
                 />
             )}
             {isOmsOrder && (
-                <ReturnOrderModal
+                <ReturnItemsModal
                     isOpen={isReturnModalOpen}
                     onClose={handleCloseReturnModal}
                     order={order}
