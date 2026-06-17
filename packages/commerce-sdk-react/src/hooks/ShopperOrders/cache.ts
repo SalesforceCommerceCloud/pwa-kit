@@ -42,7 +42,10 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
               ]
         const invalidate: CacheUpdateInvalidate[] = !customerId
             ? []
-            : [{queryKey: getCustomerBaskets.queryKey({...parameters, customerId})}]
+            : [
+                  {queryKey: getCustomerBaskets.queryKey({...parameters, customerId})},
+                  {queryKey: getCustomerOrders.queryKey({...parameters, customerId})}
+              ]
         return {update, invalidate}
     },
     createPaymentInstrumentForOrder: updateOrderQuery,

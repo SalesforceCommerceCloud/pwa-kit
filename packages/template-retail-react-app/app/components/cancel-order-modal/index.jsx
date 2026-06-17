@@ -22,27 +22,25 @@ import {
     Select,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {
-    messages,
-    CANCELLATION_REASONS
-} from '@salesforce/retail-react-app/app/components/cancel-order-modal/constants'
+import {messages} from '@salesforce/retail-react-app/app/components/cancel-order-modal/constants'
 
-const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
+const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reasonCodes}) => {
     const intl = useIntl()
     const [selectedReason, setSelectedReason] = useState('')
 
     useEffect(() => {
-        if (!isOpen) setSelectedReason('')
-    }, [isOpen])
-
-    const cancellationReasons = CANCELLATION_REASONS.filter((r) => !r.isDefault).map((reason) => ({
-        id: reason.id,
-        label: intl.formatMessage(messages[reason.messageKey])
-    }))
+        if (!isOpen) {
+            setSelectedReason('')
+        } else if (reasonCodes?.length) {
+            setSelectedReason(reasonCodes.find((r) => r.default)?.reason ?? '')
+        }
+    }, [isOpen, reasonCodes])
 
     const handleConfirm = () => {
         onCancel(order, selectedReason)
     }
+
+    const showReasonDropdown = reasonCodes?.length > 0
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
@@ -70,28 +68,30 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting}) => {
                                 id="cancel_order_modal.text.impact"
                             />
                         </Text>
-                        <Box>
-                            <label htmlFor="cancel-reason-select">
-                                <Text fontSize="sm" fontWeight="semibold" mb={1}>
-                                    <FormattedMessage
-                                        defaultMessage="Reason"
-                                        id="cancel_order_modal.label.reason"
-                                    />
-                                </Text>
-                            </label>
-                            <Select
-                                id="cancel-reason-select"
-                                value={selectedReason}
-                                onChange={(e) => setSelectedReason(e.target.value)}
-                                placeholder={intl.formatMessage(messages.selectReason)}
-                            >
-                                {cancellationReasons.map((reason) => (
-                                    <option key={reason.id} value={reason.id}>
-                                        {reason.label}
-                                    </option>
-                                ))}
-                            </Select>
-                        </Box>
+                        {showReasonDropdown && (
+                            <Box>
+                                <label htmlFor="cancel-reason-select">
+                                    <Text fontSize="sm" fontWeight="semibold" mb={1}>
+                                        <FormattedMessage
+                                            defaultMessage="Reason"
+                                            id="cancel_order_modal.label.reason"
+                                        />
+                                    </Text>
+                                </label>
+                                <Select
+                                    id="cancel-reason-select"
+                                    value={selectedReason}
+                                    onChange={(e) => setSelectedReason(e.target.value)}
+                                    placeholder={intl.formatMessage(messages.selectReason)}
+                                >
+                                    {reasonCodes.map((reason) => (
+                                        <option key={reason.reason} value={reason.reason}>
+                                            {reason.reason}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </Box>
+                        )}
                     </Stack>
                 </ModalBody>
                 <ModalFooter>
@@ -125,7 +125,13 @@ CancelOrderModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     order: PropTypes.object,
     onCancel: PropTypes.func.isRequired,
-    isSubmitting: PropTypes.bool
+    isSubmitting: PropTypes.bool,
+    reasonCodes: PropTypes.arrayOf(
+        PropTypes.shape({
+            reason: PropTypes.string.isRequired,
+            default: PropTypes.bool.isRequired
+        })
+    )
 }
 
 export default CancelOrderModal
