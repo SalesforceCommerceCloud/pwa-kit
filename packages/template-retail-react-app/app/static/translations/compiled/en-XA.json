@@ -459,14 +459,42 @@
       "value": "]"
     }
   ],
-  "account_order_detail.alert.cancellation_error_description": [
+  "account_order_detail.alert.cancellation_error_conflict": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƈȧȧƞƈḗḗŀ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř ƈǿǿƞŧȧȧƈŧ şŭŭƥƥǿǿřŧ."
+      "value": "Ŧħīş ǿǿřḓḗḗř īş ȧȧŀřḗḗȧȧḓẏ ƀḗḗīƞɠ ƥřǿǿƈḗḗşşḗḗḓ ȧȧƞḓ ƈȧȧƞƞǿǿŧ ƀḗḗ ƈȧȧƞƈḗḗŀḗḗḓ. Ƥŀḗḗȧȧşḗḗ řḗḗȧȧƈħ ǿǿŭŭŧ ŧǿǿ ŧħḗḗ Ḿḗḗřƈħȧȧƞŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_generic": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓƞ'ŧ ƥřǿǿƈḗḗşş ẏǿǿŭŭř ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ řīɠħŧ ƞǿǿẇ. Ƥŀḗḗȧȧşḗḗ ẇȧȧīŧ ȧȧ ḿǿǿḿḗḗƞŧ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_not_found": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƒīƞḓ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ řḗḗƒřḗḗşħ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
     },
     {
       "type": 0,
@@ -481,6 +509,20 @@
     {
       "type": 0,
       "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ ƈȧȧƞƈḗḗŀ ǿǿřḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_title_generic": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗŧħīƞɠ ẇḗḗƞŧ ẇřǿǿƞɠ"
     },
     {
       "type": 0,

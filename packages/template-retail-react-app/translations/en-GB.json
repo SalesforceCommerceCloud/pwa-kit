@@ -95,11 +95,20 @@
   "account_detail.title.account_details": {
     "defaultMessage": "Account Details"
   },
-  "account_order_detail.alert.cancellation_error_description": {
-    "defaultMessage": "We could not cancel this order. Please try again or contact support."
+  "account_order_detail.alert.cancellation_error_conflict": {
+    "defaultMessage": "This order is already being processed and cannot be canceled. Please reach out to the Merchant."
+  },
+  "account_order_detail.alert.cancellation_error_generic": {
+    "defaultMessage": "We couldn't process your cancellation right now. Please wait a moment and try again."
+  },
+  "account_order_detail.alert.cancellation_error_not_found": {
+    "defaultMessage": "We could not find this order. Please refresh and try again."
   },
   "account_order_detail.alert.cancellation_error_title": {
     "defaultMessage": "Unable to cancel order"
+  },
+  "account_order_detail.alert.cancellation_error_title_generic": {
+    "defaultMessage": "Something went wrong"
   },
   "account_order_detail.alert.cancellation_success_description": {
     "defaultMessage": "Your order was cancelled successfully."

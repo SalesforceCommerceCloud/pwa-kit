@@ -209,20 +209,43 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
-    const showCancelError = useCallback(() => {
-        setCancelFeedback({
-            status: 'error',
-            title: formatMessage({
-                defaultMessage: 'Unable to cancel order',
-                id: 'account_order_detail.alert.cancellation_error_title'
-            }),
-            description: formatMessage({
-                defaultMessage:
-                    'We could not cancel this order. Please try again or contact support.',
-                id: 'account_order_detail.alert.cancellation_error_description'
-            })
-        })
-    }, [formatMessage])
+    const showCancelError = useCallback(
+        (error) => {
+            const status = error?.response?.status
+            let description
+            if (status === 404) {
+                description = formatMessage({
+                    defaultMessage:
+                        'We could not find this order. Please refresh and try again.',
+                    id: 'account_order_detail.alert.cancellation_error_not_found'
+                })
+            } else if (status === 409) {
+                description = formatMessage({
+                    defaultMessage:
+                        'This order is already being processed and cannot be canceled. Please reach out to the Merchant.',
+                    id: 'account_order_detail.alert.cancellation_error_conflict'
+                })
+            } else {
+                description = formatMessage({
+                    defaultMessage:
+                        "We couldn't process your cancellation right now. Please wait a moment and try again.",
+                    id: 'account_order_detail.alert.cancellation_error_generic'
+                })
+            }
+            const title =
+                status === 404 || status === 409
+                    ? formatMessage({
+                          defaultMessage: 'Unable to cancel order',
+                          id: 'account_order_detail.alert.cancellation_error_title'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'Something went wrong',
+                          id: 'account_order_detail.alert.cancellation_error_title_generic'
+                      })
+            setCancelFeedback({status: 'error', title, description})
+        },
+        [formatMessage]
+    )
 
     const handleCancelOrder = useCallback(
         async (order, reason) => {
@@ -236,7 +259,7 @@ const AccountOrderDetail = () => {
                 setTimeout(showCancelSuccess, 300)
             } catch (e) {
                 closeCancelModal()
-                setTimeout(showCancelError, 300)
+                setTimeout(() => showCancelError(e), 300)
             }
         },
         [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
