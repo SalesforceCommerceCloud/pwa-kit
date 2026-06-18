@@ -124,9 +124,6 @@ module.exports = {
         oneClickCheckout: {
             enabled: false
         },
-        oms: {
-            enabled: true
-        },
         storeLocatorEnabled: true,
         multishipEnabled: true,
         sfPayments: {
