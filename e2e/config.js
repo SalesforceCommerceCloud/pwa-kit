@@ -174,5 +174,6 @@ module.exports = {
     EXTRA_FEATURES_E2E_RETAIL_APP_HOME:
         process.env.EXTRA_FEATURES_E2E_RETAIL_APP_HOME ||
         'https://scaffold-pwa-extra-features-e2e.mobify-storefront.com',
-    EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: 'RefArchGlobal'
+    EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE:
+        process.env.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE || 'RefArchGlobal'
 }

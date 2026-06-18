@@ -34,7 +34,13 @@ const readSessionFromCookies = async (page) => {
     // Exact match avoids matching the `cc-at-expires_`/`cc-at-dnt_` siblings.
     const accessToken = valueOf(`cc-at_${SITE_ID}`)
     const customerId = valueOf(`customer_id_${SITE_ID}`)
-    return accessToken && customerId ? {accessToken, customerId} : null
+    // `cc-at-expires` is the JWT `exp` (epoch seconds, non-HttpOnly). Skip a
+    // present-but-expired access token so we don't fire a doomed SCAPI 401 that
+    // safeRequest would swallow into a silent no-op. A missing/unparseable
+    // expiry cookie is treated as not-expired (best-effort, don't block).
+    const expiresAt = Number(valueOf(`cc-at-expires_${SITE_ID}`))
+    const expired = Number.isFinite(expiresAt) && expiresAt * 1000 < Date.now()
+    return accessToken && customerId && !expired ? {accessToken, customerId} : null
 }
 
 // Match by prefix so the helper works regardless of the active siteId.
