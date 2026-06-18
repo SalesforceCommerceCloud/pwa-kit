@@ -135,6 +135,90 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(res.body).toEqual({error: 'MISSING_AUTH_LINK_KEY'})
     })
 
+    test('returns 403 FORBIDDEN_ORIGIN when Origin is untrusted', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        req.headers.origin = 'https://attacker.com'
+        req.headers.host = 'mystore.com'
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(403)
+        expect(res.body).toEqual({error: 'FORBIDDEN_ORIGIN'})
+        expect(global.fetch).not.toHaveBeenCalled()
+        errorSpy.mockRestore()
+    })
+
+    test('returns 400 INVALID_ORIGIN when Origin header is malformed', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        req.headers.origin = 'not-a-valid-url'
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toEqual({error: 'INVALID_ORIGIN'})
+        expect(global.fetch).not.toHaveBeenCalled()
+        errorSpy.mockRestore()
+    })
+
+    test('allows same-origin requests', async () => {
+        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        req.headers.origin = 'https://mystore.com'
+        req.headers.host = 'mystore.com'
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
+    test('allows trusted Salesforce Origin (Storefront Preview)', async () => {
+        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        req.headers.origin = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        req.headers.host = 'mystore.com'
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
+    test('allows requests with no Origin header (some browsers/tools)', async () => {
+        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        // No origin header set
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
     test('returns 401 INVALID_SLAS_TOKEN when slas_access_token is missing (non-HttpOnly)', async () => {
         const req = buildReq({
             auth_link_key: 'k'

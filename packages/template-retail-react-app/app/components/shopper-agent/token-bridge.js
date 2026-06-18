@@ -95,6 +95,30 @@ export function extractMyDomainFromEnv() {
     return myDomain.trim()
 }
 
+/**
+ * Validate that the myDomain hostname is a trusted Salesforce domain.
+ * SSRF prevention: only allow requests to known Salesforce infrastructure.
+ *
+ * @param {string} myDomain - The full myDomain URL (e.g., https://org.my.salesforce.com)
+ * @returns {boolean} - True if the domain is trusted, false otherwise
+ */
+export function isTrustedSalesforceDomain(myDomain) {
+    try {
+        const url = new URL(myDomain)
+        const host = url.hostname.toLowerCase()
+
+        // Allowlist: Salesforce production, sandbox, and developer domains
+        return (
+            host.endsWith('.salesforce.com') ||
+            host.endsWith('.my.salesforce.com') ||
+            host.endsWith('.pc-rnd.salesforce.com')
+        )
+    } catch {
+        // Invalid URL
+        return false
+    }
+}
+
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
     try {
@@ -104,6 +128,38 @@ export async function handleTokenBridge(req, res) {
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
         }
+
+        // CSRF protection: Validate Origin header for state-changing POST
+        // In HttpOnly mode, this endpoint acts on ambient cookie authority (cc-at/cc-nx),
+        // so we verify the request comes from a same-origin or trusted Salesforce origin.
+        // This provides defense-in-depth beyond SameSite=Lax cookie protection.
+        const origin = req.headers.origin || req.headers.referer
+        if (origin) {
+            try {
+                const originUrl = new URL(origin)
+                const originHost = originUrl.hostname.toLowerCase()
+
+                // Allow same-origin requests (PWA Kit storefront calling its own API)
+                const requestHost = req.headers.host?.toLowerCase()
+                const isSameOrigin = originHost === requestHost
+
+                // Allow trusted Salesforce origins (for Storefront Preview iframe)
+                const isTrustedSalesforceOrigin = isTrustedSalesforceDomain(origin)
+
+                if (!isSameOrigin && !isTrustedSalesforceOrigin) {
+                    console.error(
+                        '[token-bridge] CSRF attempt blocked: untrusted Origin',
+                        {origin, requestHost}
+                    )
+                    return res.status(403).json({error: 'FORBIDDEN_ORIGIN'})
+                }
+            } catch (err) {
+                // Invalid Origin URL
+                console.error('[token-bridge] Invalid Origin header', {origin})
+                return res.status(400).json({error: 'INVALID_ORIGIN'})
+            }
+        }
+        // If no Origin/Referer header, allow (same-origin POSTs from some browsers/tools)
 
         // Read siteId from x-site-id header using official helper
         const siteId = getSiteId(req)
@@ -163,6 +219,15 @@ export async function handleTokenBridge(req, res) {
                     'Set ANC_MYDOMAIN environment variable.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
+        }
+
+        // SSRF prevention: validate myDomain against Salesforce allowlist
+        if (!isTrustedSalesforceDomain(myDomain)) {
+            console.error(
+                '[token-bridge] SSRF attempt blocked: myDomain is not a trusted Salesforce domain',
+                {myDomain}
+            )
+            return res.status(400).json({error: 'UNTRUSTED_MYDOMAIN'})
         }
 
         if (!refreshToken) {

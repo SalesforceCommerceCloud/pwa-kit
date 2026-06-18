@@ -82,11 +82,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
     })
 }))
 
-// Mock the useRefreshToken hook
-jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
-    __esModule: true,
-    default: jest.fn()
-}))
+// useRefreshToken is no longer used (refresh token read server-side from cookies)
 
 // Mock commerce-sdk-react hooks. useAccessToken returns a stable object so the
 // component can read getTokenWhenReady() during the conversation-started flow.
@@ -119,7 +115,6 @@ import {
     useCustomerType,
     useUsid
 } from '@salesforce/commerce-sdk-react'
-import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -131,7 +126,6 @@ const mockedUseUsid = useUsid
 const mockedUseConfig = useConfig
 const mockedUseConfigurations = useConfigurations
 const mockedUseCustomerType = useCustomerType
-const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
 
@@ -164,9 +158,6 @@ describe('ShopperAgent Component', () => {
 
         // Mock useMiaw hook
         mockedUseMiaw.mockReturnValue(undefined)
-
-        // Mock useRefreshToken hook
-        mockedUseRefreshToken.mockReturnValue('test-refresh-token')
 
         // Mock useUsid hook
         mockedUseUsid.mockReturnValue({usid: 'test-usid'})
@@ -672,9 +663,9 @@ describe('ShopperAgent Component', () => {
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
     })
 
-    test('should detect HttpOnly mode and omit access token when getTokenWhenReady returns empty', async () => {
-        // Simulate HttpOnly mode: getTokenWhenReady returns empty string
-        mockGetTokenWhenReady.mockResolvedValue('')
+    test('should detect HttpOnly mode and omit access token when flag is enabled', async () => {
+        // Simulate HttpOnly mode: set the flag
+        window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ = 'true'
 
         render(<ShopperAgent {...defaultProps} />)
 
@@ -688,78 +679,17 @@ describe('ShopperAgent Component', () => {
             slasAccessToken: undefined, // Omitted in HttpOnly mode
             siteId: 'RefArchGlobal'
         })
+
+        // Verify getTokenWhenReady was NOT called in HttpOnly mode
+        expect(mockGetTokenWhenReady).not.toHaveBeenCalled()
+
+        // Clean up
+        delete window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__
     })
 
-    test('should update prechat fields when refresh token changes', async () => {
-        // Initial refresh token
-        mockedUseRefreshToken.mockReturnValue('initial-token')
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        // Trigger prechat fields setup
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-        })
-
-        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            SiteId: 'RefArchGlobal',
-            Locale: 'en-US',
-            OrganizationId: 'test-commerce-org-id',
-            UsId: 'test-usid',
-            IsCartMgmtSupported: 'true',
-            Currency: 'USD',
-            Language: 'en_US',
-            DomainUrl: 'https://example.com/us/en-US'
-        })
-
-        // Clear mock and change refresh token
-        mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
-        mockedUseRefreshToken.mockReturnValue('updated-token')
-
-        // Re-render with new refresh token
-        render(<ShopperAgent {...defaultProps} />)
-
-        // Trigger prechat fields setup again
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-        })
-
-        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            SiteId: 'RefArchGlobal',
-            Locale: 'en-US',
-            OrganizationId: 'test-commerce-org-id',
-            UsId: 'test-usid',
-            IsCartMgmtSupported: 'true',
-            Currency: 'USD',
-            Language: 'en_US',
-            DomainUrl: 'https://example.com/us/en-US'
-        })
-    })
-
-    test('should handle null refresh token in prechat fields', async () => {
-        mockedUseRefreshToken.mockReturnValue(null)
-
-        render(<ShopperAgent {...defaultProps} />)
-
-        // Trigger prechat fields setup
-        await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-        })
-
-        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            SiteId: 'RefArchGlobal',
-            Locale: 'en-US',
-            OrganizationId: 'test-commerce-org-id',
-            UsId: 'test-usid',
-            IsCartMgmtSupported: 'true',
-            Currency: 'USD',
-            Language: 'en_US',
-            DomainUrl: 'https://example.com/us/en-US'
-        })
-    })
-
-    test('should omit slasRefreshToken in Token Bridge call when refresh token is null', async () => {
-        mockedUseRefreshToken.mockReturnValue(null)
+    test('should fetch access token in non-HttpOnly mode', async () => {
+        // Simulate non-HttpOnly mode: flag is false or unset
+        window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ = 'false'
 
         render(<ShopperAgent {...defaultProps} />)
 
@@ -770,9 +700,15 @@ describe('ShopperAgent Component', () => {
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
         expect(mockCallTokenBridge).toHaveBeenCalledWith({
             authLinkKey: 'test-auth-link-key',
-            slasAccessToken: 'test-slas-access-token',
+            slasAccessToken: 'test-slas-access-token', // Token fetched from localStorage
             siteId: 'RefArchGlobal'
         })
+
+        // Verify getTokenWhenReady WAS called in non-HttpOnly mode
+        expect(mockGetTokenWhenReady).toHaveBeenCalled()
+
+        // Clean up
+        delete window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__
     })
 
     test('should update prechat fields when currency changes', async () => {

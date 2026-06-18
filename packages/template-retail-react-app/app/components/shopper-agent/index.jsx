@@ -17,7 +17,6 @@ import {
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -167,7 +166,6 @@ const isEnabled = (enabled) => {
  * @see {@link useScript} - For script loading functionality
  * @see {@link useMiaw} - For MIAW initialization
  * @see {@link useMultiSite} - For locale and currency information
- * @see {@link useRefreshToken} - For authentication token
  * @see {@link useUsid} - For user session identifier
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
@@ -181,9 +179,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // Multi-site hook for locale and currency information
     const {locale} = useMultiSite()
-
-    // Authentication hook for refresh token
-    const refreshToken = useRefreshToken()
 
     // Normalize locale to Salesforce language format
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
@@ -250,7 +245,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         preferredCurrency: locale.preferredCurrency,
         commerceOrgId,
         usid,
-        refreshToken,
         sfLanguage,
         domainUrl,
         organizationId,
@@ -426,16 +420,23 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                     // Direct callout to Core's Token Bridge via the same-origin
                     // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
                     try {
-                        // Check if HttpOnly mode is enabled by checking if access token is in cookie
-                        // In HttpOnly mode, getTokenWhenReady returns empty string because tokens are HttpOnly
-                        const slasAccessToken = await getTokenWhenReadyRef.current()
-                        const isHttpOnly = !slasAccessToken || slasAccessToken === ''
+                        // Check if HttpOnly mode is enabled by reading the flag directly
+                        // (same source as CommerceApiProvider's enableHttpOnlySessionCookies)
+                        const isHttpOnly =
+                            typeof window !== 'undefined'
+                                ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                                : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+                        // In non-HttpOnly mode, fetch the access token from localStorage
+                        const slasAccessToken = isHttpOnly
+                            ? undefined
+                            : await getTokenWhenReadyRef.current()
 
                         const result = await callTokenBridge({
                             authLinkKey,
                             // Only send access token in non-HttpOnly mode (from localStorage)
                             // In HttpOnly mode, server reads from cc-at_{siteId} cookie
-                            slasAccessToken: isHttpOnly ? undefined : slasAccessToken,
+                            slasAccessToken,
                             siteId: sid
                         })
 
