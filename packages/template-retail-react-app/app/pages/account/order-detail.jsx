@@ -131,7 +131,6 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const {isRegistered} = useCustomerType()
     const customerId = useCustomerId()
     const {
@@ -183,7 +182,7 @@ const AccountOrderDetail = () => {
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
-    const showStartReturn = isOmsEnabled && isRegistered && returnableItems.length > 0
+    const showStartReturn = isRegistered && returnableItems.length > 0
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 

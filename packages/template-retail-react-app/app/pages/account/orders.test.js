@@ -486,18 +486,6 @@ describe('Start Return CTA (W-22821836)', () => {
             ...overrides
         })
 
-    // order-detail.jsx reads `app.oms.enabled` from the globally-mocked
-    // `getConfig()` (see jest-setup.js); `wrapperProps.appConfig` does not affect
-    // that read, so the oms-disabled test mutates `mockConfig.app.oms` directly
-    // and restores it afterwards.
-    let originalOms
-    beforeEach(() => {
-        originalOms = mockConfig.app.oms
-    })
-    afterEach(() => {
-        mockConfig.app.oms = originalOms
-    })
-
     test('renders the disabled Start Return CTA when an item has quantityAvailableToReturn > 0', async () => {
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const cta = await screen.findByTestId('account-order-detail-start-return')
@@ -525,13 +513,6 @@ describe('Start Return CTA (W-22821836)', () => {
                 ]
             })
         )
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
-    })
-
-    test('does NOT render the CTA when oms is disabled', async () => {
-        mockConfig.app.oms = {enabled: false}
-        setupOrderDetailsPage(createReturnEligibleOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
     })
