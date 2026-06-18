@@ -334,6 +334,11 @@ export const render = (req, res, next) => {
     // onto it. Falls through to existing behavior when disabled or unparented.
     if (isDistributedTracingEnabled()) {
         const ctx = extractContext(req.headers)
+        // Expose the child-span helper to the universal with-react-query layer
+        // (via res.locals) so each SSR query fetch becomes its own span under
+        // `getProps`, without that universal module importing this server-only
+        // OTel code.
+        res.locals.__withChildSpan = withChildSpan
         return withServerSpan(req, res, ctx, runRender)
     }
     return runRender()

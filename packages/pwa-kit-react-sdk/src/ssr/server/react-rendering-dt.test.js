@@ -160,6 +160,56 @@ describe('react-rendering distributed-tracing wiring', () => {
         expect(mockTracePerformance).not.toHaveBeenCalled()
     })
 
+    test('OTEL_TRACING_ENABLED=true → withChildSpan injected on res.locals for per-query SSR spans', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(true)
+
+        const req = {
+            headers: {traceparent: '00-abc-def-01'},
+            method: 'GET',
+            originalUrl: '/',
+            url: '/',
+            query: {},
+            path: '/'
+        }
+        const res = {locals: {requestId: 'test-id'}}
+        const next = jest.fn()
+
+        await render(req, res, next)
+
+        // The universal with-react-query layer reads res.locals.__withChildSpan to
+        // span each SSR query without importing the server-only DT module.
+        expect(typeof res.locals.__withChildSpan).toBe('function')
+        res.locals.__withChildSpan('scapi:test', () => 'ran')
+        expect(mockWithChildSpan).toHaveBeenCalledWith('scapi:test', expect.any(Function))
+    })
+
+    test('OTEL_TRACING_ENABLED unset → no withChildSpan injected on res.locals', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(false)
+
+        const req = {
+            headers: {},
+            method: 'GET',
+            originalUrl: '/',
+            url: '/',
+            query: {},
+            path: '/'
+        }
+        const res = {
+            locals: {requestId: 'test-id'},
+            setHeader: jest.fn(),
+            set: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            on: jest.fn(),
+            statusCode: 200
+        }
+        const next = jest.fn()
+
+        await render(req, res, next)
+
+        expect(res.locals.__withChildSpan).toBeUndefined()
+    })
+
     test('OTEL_TRACING_ENABLED=true + __server_timing → both DT and server_timing execute', async () => {
         mockIsDistributedTracingEnabled.mockReturnValue(true)
         // When DT is on, withServerSpan calls fn (which calls runRender, which calls tracePerformance)

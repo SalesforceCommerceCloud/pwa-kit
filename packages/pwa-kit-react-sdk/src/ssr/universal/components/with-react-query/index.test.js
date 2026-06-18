@@ -490,4 +490,72 @@ describe('withReactQuery', function () {
             }
         })
     })
+
+    describe('per-query child spans (res.locals.__withChildSpan)', () => {
+        const makeRes = (queries, withChildSpan) => ({
+            locals: {
+                __queryClient: {
+                    getQueryCache: () => ({getAll: () => queries})
+                },
+                ...(withChildSpan ? {__withChildSpan: withChildSpan} : {})
+            },
+            __performanceTimer: {mark: jest.fn()}
+        })
+
+        test('wraps each query fetch in an injected child span named for the query', async () => {
+            const spanNames = []
+            // Faithful stand-in for the real withChildSpan: runs fn() within the span.
+            const withChildSpan = (name, fn) => {
+                spanNames.push(name)
+                return fn()
+            }
+            const fetchA = jest.fn().mockResolvedValue({data: 'a'})
+            const fetchB = jest.fn().mockResolvedValue({data: 'b'})
+            const queries = [
+                {options: {enabled: true}, meta: {displayName: 'useProductSearch'}, queryHash: 'h-a', fetch: fetchA},
+                {options: {enabled: true}, meta: {displayName: 'useCategory'}, queryHash: 'h-b', fetch: fetchB}
+            ]
+            const res = makeRes(queries, withChildSpan)
+
+            const Component = withReactQuery({})
+            await Component.doInitAppState({res, appJSX: <div>Test</div>})
+
+            // Each query fetch ran inside an injected child span.
+            expect(fetchA).toHaveBeenCalledTimes(1)
+            expect(fetchB).toHaveBeenCalledTimes(1)
+            expect(spanNames).toContain('scapi:useProductSearch')
+            expect(spanNames).toContain('scapi:useCategory')
+        })
+
+        test('falls back to the query index when no displayName is present', async () => {
+            const spanNames = []
+            const withChildSpan = (name, fn) => {
+                spanNames.push(name)
+                return fn()
+            }
+            const queries = [
+                {options: {enabled: true}, meta: {}, queryHash: 'h-0', fetch: jest.fn().mockResolvedValue({})}
+            ]
+            const res = makeRes(queries, withChildSpan)
+
+            const Component = withReactQuery({})
+            await Component.doInitAppState({res, appJSX: <div>Test</div>})
+
+            expect(spanNames).toContain('scapi:0')
+        })
+
+        test('no-op when __withChildSpan is absent: queries still fetch (no throw)', async () => {
+            const fetchA = jest.fn().mockResolvedValue({data: 'a'})
+            const queries = [
+                {options: {enabled: true}, meta: {displayName: 'useX'}, queryHash: 'h-a', fetch: fetchA}
+            ]
+            const res = makeRes(queries, undefined)
+
+            const Component = withReactQuery({})
+            await expect(
+                Component.doInitAppState({res, appJSX: <div>Test</div>})
+            ).resolves.toBeDefined()
+            expect(fetchA).toHaveBeenCalledTimes(1)
+        })
+    })
 })
