@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useMemo} from 'react'
-import {useLocation} from 'react-router-dom'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -221,7 +220,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const theme = useTheme()
 
     // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {locale} = useMultiSite()
 
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()

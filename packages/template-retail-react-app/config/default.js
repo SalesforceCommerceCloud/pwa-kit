@@ -81,20 +81,19 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'NTOManaged',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
-            RefArchGlobal: 'global',
-            NTOManaged: 'managed'
+            RefArchGlobal: 'global'
         },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '4da8563d-78e6-4ded-bc80-6d34be8186d9',
-                organizationId: 'f_ecom_tbdp_prd',
-                shortCode: 'sandbox-001',
-                siteId: 'NTOManaged'
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: '8o7m175y',
+                siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
@@ -171,11 +170,11 @@ module.exports = {
         enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
-                host: 'sandbox-001.api.commercecloud.salesforce.com',
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zaac-001.dx.commercecloud.salesforce.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
