@@ -543,6 +543,34 @@
       "value": "]"
     }
   ],
+  "account_order_detail.button.start_return": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şŧȧȧřŧ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.button.start_return_disabled_explanation": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧŭŭřƞş ƈǿǿḿīƞɠ şǿǿǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,

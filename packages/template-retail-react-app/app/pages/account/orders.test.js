@@ -464,6 +464,68 @@ describe('OMS/SOM Integration - Order Details', () => {
     })
 })
 
+describe('Start Return CTA (W-22821836)', () => {
+    // Eligibility is OMS-driven: the CTA renders when at least one productItem has
+    // omsData.quantityAvailableToReturn > 0. OMS computes that field per item; the
+    // server returns 409 if the order is no longer in a returnable state, so there
+    // is no client-side status allowlist.
+    const createReturnEligibleOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            productItems: [
+                {
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 2
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    test('renders the disabled Start Return CTA when an item has quantityAvailableToReturn > 0', async () => {
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        expect(cta).toBeInTheDocument()
+        expect(cta).toBeDisabled()
+        // Accessible name preserves the visible "Start return" label so voice
+        // control users can activate the button by saying its visible text
+        // (WCAG 2.5.3 Label in Name). The "Returns coming soon" explanation is
+        // exposed via aria-describedby + a visually-hidden node.
+        expect(cta).toHaveAccessibleName('Start return')
+        expect(cta).toHaveAccessibleDescription('Returns coming soon')
+        expect(cta).toHaveAttribute('title', 'Returns coming soon')
+    })
+
+    test('does NOT render the CTA when no item has quantityAvailableToReturn > 0', async () => {
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({
+                productItems: [
+                    {
+                        productId: 'no-return-1',
+                        productName: 'Already Returned',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA for an ECOM-only order (no omsData envelope)', async () => {
+        // createMockOrder produces a vanilla ECOM order with no omsData on the order
+        // or items. Even with OMS enabled in config, no return CTA should render.
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+})
+
 describe('OMS/SOM Integration - Order History', () => {
     // Helper to setup order history with mock data
     const setupOrderHistoryMock = (orderData) => {

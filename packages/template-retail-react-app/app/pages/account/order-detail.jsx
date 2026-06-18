@@ -20,7 +20,8 @@ import {
     Grid,
     SimpleGrid,
     Skeleton,
-    useDisclosure
+    useDisclosure,
+    VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
@@ -45,6 +46,7 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -178,6 +180,9 @@ const AccountOrderDetail = () => {
     )
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
+
+    const returnableItems = useMemo(() => getReturnableItems(order), [order])
+    const showStartReturn = isRegistered && returnableItems.length > 0
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
@@ -431,6 +436,36 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.button.cancel_order"
                             />
                         </Button>
+                        {showStartReturn && (
+                            // Phase 1 placeholder: button is disabled and announces
+                            // "Returns coming soon" to assistive tech via an
+                            // `aria-describedby` association. The full flow lands in
+                            // a follow-up story.
+                            <>
+                                <Button
+                                    data-testid="account-order-detail-start-return"
+                                    variant="outline"
+                                    size="sm"
+                                    isDisabled
+                                    aria-describedby="account-order-detail-start-return-description"
+                                    title={formatMessage({
+                                        defaultMessage: 'Returns coming soon',
+                                        id: 'account_order_detail.button.start_return_disabled_explanation'
+                                    })}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Start return"
+                                        id="account_order_detail.button.start_return"
+                                    />
+                                </Button>
+                                <VisuallyHidden id="account-order-detail-start-return-description">
+                                    <FormattedMessage
+                                        defaultMessage="Returns coming soon"
+                                        id="account_order_detail.button.start_return_disabled_explanation"
+                                    />
+                                </VisuallyHidden>
+                            </>
+                        )}
                     </Flex>
                 </Box>
             )}

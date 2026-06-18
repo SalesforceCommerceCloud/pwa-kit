@@ -113,6 +113,12 @@
   "account_order_detail.button.cancel_order": {
     "defaultMessage": "Cancel order"
   },
+  "account_order_detail.button.start_return": {
+    "defaultMessage": "Start return"
+  },
+  "account_order_detail.button.start_return_disabled_explanation": {
+    "defaultMessage": "Returns coming soon"
+  },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
