@@ -215,20 +215,17 @@ const AccountOrderDetail = () => {
             let description
             if (status === 404) {
                 description = formatMessage({
-                    defaultMessage:
-                        'We could not find this order. Please refresh and try again.',
+                    defaultMessage: 'We could not find this order. Please refresh and try again.',
                     id: 'account_order_detail.alert.cancellation_error_not_found'
                 })
             } else if (status === 409) {
                 description = formatMessage({
-                    defaultMessage:
-                        'This order is already being processed and cannot be canceled. Please reach out to the Merchant.',
+                    defaultMessage: 'This order is already being processed and cannot be canceled. Please reach out to the Merchant.',
                     id: 'account_order_detail.alert.cancellation_error_conflict'
                 })
             } else {
                 description = formatMessage({
-                    defaultMessage:
-                        "We couldn't process your cancellation right now. Please wait a moment and try again.",
+                    defaultMessage: "We couldn't process your cancellation right now. Please wait a moment and try again.",
                     id: 'account_order_detail.alert.cancellation_error_generic'
                 })
             }
