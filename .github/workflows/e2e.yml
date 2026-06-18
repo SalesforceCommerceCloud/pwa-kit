@@ -7,6 +7,9 @@ on:
 
 jobs:
   run-generator-demo:
+    # Backstop so a hung step can never run to GitHub's 6h default job timeout
+    # (see run 27750038306). All values are well above healthy run durations.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -58,6 +61,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
   run-generator-retail-app-no-ext:
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -134,12 +138,33 @@ jobs:
           FLAGS: --wait
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # Only Chromium is needed — every project in playwright.config.js uses
+        # Desktop Chrome or Pixel 5 (both Chromium). Each attempt is wrapped in
+        # `timeout` so a stalled browser download from the Playwright CDN (which
+        # hung ~6h in run 27750038306, exhausting the default job timeout and
+        # blocking the serialized matrix) is killed and retried. The step- and
+        # job-level timeout-minutes are hard backstops.
+        timeout-minutes: 35
+        run: |-
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "::group::Install Playwright browsers (attempt ${attempt}/3)"
+            if timeout --kill-after=1m 10m npx playwright install --with-deps chromium; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "::warning::Playwright install attempt ${attempt} timed out or failed; retrying"
+            sleep "$((attempt * 15))"
+          done
+          echo "::error::Playwright install failed after 3 attempts"
+          exit 1
 
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
   notify-slack-pwa-no-ext:
+    timeout-minutes: 10
     needs: [run-generator-retail-app-no-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -168,6 +193,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   run-generator-retail-app-ext:
+    timeout-minutes: 60
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
     needs: [run-generator-retail-app-no-ext]
@@ -246,12 +272,33 @@ jobs:
           FLAGS: --wait
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # Only Chromium is needed — every project in playwright.config.js uses
+        # Desktop Chrome or Pixel 5 (both Chromium). Each attempt is wrapped in
+        # `timeout` so a stalled browser download from the Playwright CDN (which
+        # hung ~6h in run 27750038306, exhausting the default job timeout and
+        # blocking the serialized matrix) is killed and retried. The step- and
+        # job-level timeout-minutes are hard backstops.
+        timeout-minutes: 35
+        run: |-
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "::group::Install Playwright browsers (attempt ${attempt}/3)"
+            if timeout --kill-after=1m 10m npx playwright install --with-deps chromium; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "::warning::Playwright install attempt ${attempt} timed out or failed; retrying"
+            sleep "$((attempt * 15))"
+          done
+          echo "::error::Playwright install failed after 3 attempts"
+          exit 1
 
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
   notify-slack-pwa-ext:
+    timeout-minutes: 10
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -280,6 +327,9 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   run-generator-private-client:
+    # Higher budget than the other matrix jobs: the node24/npm11 entry also runs
+    # the a11y suite (test:e2e:a11y) after the standard e2e run.
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -363,7 +413,27 @@ jobs:
         run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # Only Chromium is needed — every project in playwright.config.js uses
+        # Desktop Chrome or Pixel 5 (both Chromium). Each attempt is wrapped in
+        # `timeout` so a stalled browser download from the Playwright CDN (which
+        # hung ~6h in run 27750038306, exhausting the default job timeout and
+        # blocking the serialized matrix) is killed and retried. The step- and
+        # job-level timeout-minutes are hard backstops.
+        timeout-minutes: 35
+        run: |-
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "::group::Install Playwright browsers (attempt ${attempt}/3)"
+            if timeout --kill-after=1m 10m npx playwright install --with-deps chromium; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "::warning::Playwright install attempt ${attempt} timed out or failed; retrying"
+            sleep "$((attempt * 15))"
+          done
+          echo "::error::Playwright install failed after 3 attempts"
+          exit 1
 
       # this will not include a11y tests
       - name: Run Playwright tests
@@ -373,6 +443,7 @@ jobs:
         if: env.IS_MRT_NODE == 'true'
         run: npm run test:e2e:a11y
   notify-slack-pwa-private-client:
+    timeout-minutes: 10
     needs: [run-generator-private-client]
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -403,6 +474,7 @@ jobs:
 
   test-extra-features:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -414,7 +486,27 @@ jobs:
       - name: Install Monorepo Dependencies
         run: node ./scripts/gtime.js monorepo_install npm ci
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        # Only Chromium is needed — every project in playwright.config.js uses
+        # Desktop Chrome or Pixel 5 (both Chromium). Each attempt is wrapped in
+        # `timeout` so a stalled browser download from the Playwright CDN (which
+        # hung ~6h in run 27750038306, exhausting the default job timeout and
+        # blocking the serialized matrix) is killed and retried. The step- and
+        # job-level timeout-minutes are hard backstops.
+        timeout-minutes: 35
+        run: |-
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "::group::Install Playwright browsers (attempt ${attempt}/3)"
+            if timeout --kill-after=1m 10m npx playwright install --with-deps chromium; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "::warning::Playwright install attempt ${attempt} timed out or failed; retrying"
+            sleep "$((attempt * 15))"
+          done
+          echo "::error::Playwright install failed after 3 attempts"
+          exit 1
       - name: Set PWA Kit E2E Test User
         run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
       - name: Run extra features tests
@@ -424,6 +516,7 @@ jobs:
         run: npm run test:e2e:extra_features
 
   notify-slack-extra-features:
+    timeout-minutes: 10
     needs: [test-extra-features]
     if: ${{ always() }}
     runs-on: ubuntu-latest
