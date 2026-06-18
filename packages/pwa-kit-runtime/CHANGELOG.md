@@ -1,3 +1,4 @@
+## v3.19.0-nightly-20260618092633 (Jun 18, 2026)
 ## v3.19.0-dev
 - HttpOnly session cookies now honor `commerceAPI.cookieDomain` from the runtime config: when set, the SLAS proxy attaches `Domain=` to every Set-Cookie header it emits and also expires the host-scoped versions for clean migration. Mirrors the existing client-side behavior in commerce-sdk-react.
 - HttpOnly session cookies: SLAS proxy now mirrors `customer_id`, `customer_type`, `enc_user_id`, `id_token` (non-HttpOnly) and `idp_refresh_token` (HttpOnly) as siteId-suffixed cookies; replaces `cc-nx-exists` with `cc-nx-expires` (absolute epoch seconds, mirroring `cc-at-expires`); strips `idp_refresh_token` from the response body and upstream proxy requests [#3830](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3830)

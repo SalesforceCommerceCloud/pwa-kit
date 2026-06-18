@@ -1,3 +1,6 @@
+## v5.3.0-nightly-20260618092633 (Jun 18, 2026)
+## v5.3.0-dev (Jun 18, 2026)
+## v3.19.0-nightly-20260618092633 (Jun 18, 2026)
 ## v5.3.0-dev
 - [Bugfix] Refresh and retry on a SCAPI 401 instead of rendering a hard error page. When an access token is invalid-but-unexpired (server-revoked, tampered, or after a SLAS key rotation), `handleInvalidToken` now clears the stale `cc-at-expires` indicator and refreshes off the still-valid refresh token, retrying the request once, rather than re-throwing the 401. Applies to both HttpOnly and localStorage modes. [#3860](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3860)
 - Move SLAS metadata (customer_id, customer_type, enc_user_id, id_token, idp_refresh_token) from localStorage to proxy-set cookies in HttpOnly mode; replace `cc-nx-exists` and `refresh_token_expires_in` with a single `cc-nx-expires` cookie carrying the absolute refresh-token expiry; add `useCookie` hook backed by a custom cookie-change event [#3830](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3830)
