@@ -7,7 +7,9 @@
 
 import {
     launchChat,
-    openShopperAgent
+    openShopperAgent,
+    openCommerceClientWidget,
+    openShopperAgentWidget
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 describe('shopper-agent-utils', () => {
@@ -228,6 +230,125 @@ describe('shopper-agent-utils', () => {
 
             // Should not throw, launchChat handles missing bootstrap gracefully
             expect(() => openShopperAgent()).not.toThrow()
+        })
+    })
+
+    describe('openCommerceClientWidget', () => {
+        test('should return early if not on client side', () => {
+            delete global.window
+
+            expect(openCommerceClientWidget()).toBeUndefined()
+        })
+
+        test('should show the widget by default (show defaults to true)', () => {
+            const mockToggle = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                }
+            }
+
+            openCommerceClientWidget()
+
+            expect(mockToggle).toHaveBeenCalledTimes(1)
+            expect(mockToggle).toHaveBeenCalledWith(true)
+        })
+
+        test('should hide the widget when show is false', () => {
+            const mockToggle = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                }
+            }
+
+            openCommerceClientWidget(false)
+
+            expect(mockToggle).toHaveBeenCalledWith(false)
+        })
+
+        test('should do nothing when the Commerce Client SDK is not present', () => {
+            global.window = {}
+
+            expect(() => openCommerceClientWidget()).not.toThrow()
+        })
+
+        test('should do nothing when toggleWidgetOpen is not a function', () => {
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: 'not a function'}}
+                }
+            }
+
+            expect(() => openCommerceClientWidget()).not.toThrow()
+        })
+
+        test('should handle errors and log when toggleWidgetOpen throws', () => {
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {
+                        components: {
+                            toggleWidgetOpen: jest.fn(() => {
+                                throw new Error('toggle error')
+                            })
+                        }
+                    }
+                }
+            }
+
+            openCommerceClientWidget()
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Shopper Agent: Error toggling Commerce Client widget',
+                expect.any(Error)
+            )
+        })
+    })
+
+    describe('openShopperAgentWidget', () => {
+        test('should return early if not on client side', () => {
+            delete global.window
+
+            expect(openShopperAgentWidget()).toBeUndefined()
+        })
+
+        test('should open the Commerce Client widget when its SDK is present', () => {
+            const mockToggle = jest.fn()
+            const mockLaunchChat = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                },
+                embeddedservice_bootstrap: {
+                    utilAPI: {launchChat: mockLaunchChat}
+                }
+            }
+
+            openShopperAgentWidget()
+
+            // Commerce Client widget is preferred and opened...
+            expect(mockToggle).toHaveBeenCalledWith(true)
+            // ...and the MIAW fallback is NOT used.
+            expect(mockLaunchChat).not.toHaveBeenCalled()
+        })
+
+        test('should fall back to MIAW launchChat when the Commerce Client SDK is absent', () => {
+            const mockLaunchChat = jest.fn()
+            global.window = {
+                embeddedservice_bootstrap: {
+                    utilAPI: {launchChat: mockLaunchChat}
+                }
+            }
+
+            openShopperAgentWidget()
+
+            expect(mockLaunchChat).toHaveBeenCalledTimes(1)
+        })
+
+        test('should not throw when neither provider is available', () => {
+            global.window = {}
+
+            expect(() => openShopperAgentWidget()).not.toThrow()
         })
     })
 })
