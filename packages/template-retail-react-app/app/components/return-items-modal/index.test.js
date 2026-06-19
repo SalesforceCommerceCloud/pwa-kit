@@ -124,13 +124,14 @@ test('toggling a row expands it and pre-selects the OMS default reason', async (
     await user.click(checkboxes[0])
 
     const row = screen.getAllByTestId('return-items-modal-item-row')[0]
-    // Contextual aria-labels include the product name so screen readers can
-    // distinguish rows. Scope queries to the input element to avoid matching
-    // the +/- buttons, which also carry "Quantity for {name}"-style labels.
+    // Reason carries a per-row aria-label (so screen readers can distinguish
+    // the dropdowns). Quantity reuses the shared QuantityPicker which sets
+    // aria-label="Quantity"; we scope to the row + the input element to
+    // disambiguate from the +/- buttons.
     expect(within(row).getByLabelText(/reason for /i, {selector: 'select'})).toHaveValue(
         'Wrong size'
     )
-    expect(within(row).getByLabelText(/quantity for /i, {selector: 'input'})).toHaveValue('1')
+    expect(within(row).getByLabelText(/^quantity$/i, {selector: 'input'})).toHaveValue('1')
 })
 
 test('quantity field clamps to the available-to-return ceiling', async () => {
@@ -140,7 +141,7 @@ test('quantity field clamps to the available-to-return ceiling', async () => {
     await user.click(checkboxes[0]) // item-1 has max 2
 
     const row = screen.getAllByTestId('return-items-modal-item-row')[0]
-    const qty = within(row).getByLabelText(/quantity for /i, {selector: 'input'})
+    const qty = within(row).getByLabelText(/^quantity$/i, {selector: 'input'})
     // Set value directly then blur — Chakra's useNumberInput clamps on blur,
     // and userEvent.clear() doesn't propagate to a controlled NumberInput
     // because the hook rejects empty intermediate values.

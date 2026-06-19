@@ -9159,60 +9159,6 @@
       "value": "]"
     }
   ],
-  "return_items_modal.label.quantity_decrement": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḓḗḗƈřḗḗȧȧşḗḗ ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "return_items_modal.label.quantity_for": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "return_items_modal.label.quantity_increment": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Īƞƈřḗḗȧȧşḗḗ ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "return_items_modal.label.reason": [
     {
       "type": 0,

@@ -26,7 +26,6 @@ import {
     FormControl,
     FormLabel,
     HStack,
-    Input,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -40,9 +39,9 @@ import {
     Stack,
     Text,
     VisuallyHidden,
-    useBreakpointValue,
-    useNumberInput
+    useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {
     messages,
@@ -65,68 +64,6 @@ const formatVariationSummary = (item) => {
     return Object.values(values || {})
         .filter(Boolean)
         .join(' / ')
-}
-
-/**
- * Quantity stepper field. Uses `useNumberInput` + plain `Input` per repo
- * convention (Chakra's `NumberInput` is not exported from the shared UI). The
- * underlying field clamps on blur and on increment/decrement.
- */
-const QuantityField = ({value, max, onChange, ariaLabel, productName, id}) => {
-    const intl = useIntl()
-    const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
-        value,
-        min: 1,
-        max,
-        step: 1,
-        clampValueOnBlur: true,
-        precision: 0,
-        focusInputOnChange: false,
-        onChange: (_str, num) => {
-            // Chakra's onChange fires with both the string and numeric value;
-            // we only persist when we have a finite number to avoid storing
-            // "" while the field is being edited.
-            if (Number.isFinite(num)) onChange(num)
-        }
-    })
-
-    const dec = getDecrementButtonProps({
-        variant: 'outline',
-        size: 'sm',
-        'aria-label': intl.formatMessage(messages.quantityDecrement, {name: productName})
-    })
-    const inc = getIncrementButtonProps({
-        variant: 'outline',
-        size: 'sm',
-        'aria-label': intl.formatMessage(messages.quantityIncrement, {name: productName})
-    })
-    const input = getInputProps({
-        id,
-        textAlign: 'center',
-        maxWidth: '64px',
-        size: 'sm',
-        'aria-label': ariaLabel
-    })
-
-    return (
-        <HStack spacing={1}>
-            <Button data-testid="return-items-modal-quantity-decrement" {...dec}>
-                {'−'}
-            </Button>
-            <Input {...input} />
-            <Button data-testid="return-items-modal-quantity-increment" {...inc}>
-                {'+'}
-            </Button>
-        </HStack>
-    )
-}
-QuantityField.propTypes = {
-    value: PropTypes.number.isRequired,
-    max: PropTypes.number.isRequired,
-    onChange: PropTypes.func.isRequired,
-    ariaLabel: PropTypes.string.isRequired,
-    productName: PropTypes.string.isRequired,
-    id: PropTypes.string.isRequired
 }
 
 const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onReasonChange}) => {
@@ -165,18 +102,20 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                     </Text>
                     {row?.checked && (
                         <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={3} mt={2}>
-                            <FormControl>
-                                <FormLabel htmlFor={quantityId} fontSize="xs" mb={1}>
+                            <FormControl id={quantityId}>
+                                <FormLabel fontSize="xs" mb={1}>
                                     <FormattedMessage {...messages.quantityLabel} />
                                 </FormLabel>
-                                <QuantityField
-                                    id={quantityId}
+                                <QuantityPicker
                                     value={row.quantity}
+                                    min={1}
                                     max={max}
-                                    onChange={onQuantityChange}
-                                    ariaLabel={intl.formatMessage(messages.quantityFor, {
-                                        name: displayName
-                                    })}
+                                    step={1}
+                                    clampValueOnBlur={true}
+                                    precision={0}
+                                    onChange={(_str, num) => {
+                                        if (Number.isFinite(num)) onQuantityChange(num)
+                                    }}
                                     productName={displayName}
                                 />
                             </FormControl>

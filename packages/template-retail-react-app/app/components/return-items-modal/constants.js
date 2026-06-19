@@ -24,18 +24,6 @@ export const messages = defineMessages({
         defaultMessage: 'Quantity',
         id: 'return_items_modal.label.quantity'
     },
-    quantityFor: {
-        defaultMessage: 'Quantity for {name}',
-        id: 'return_items_modal.label.quantity_for'
-    },
-    quantityIncrement: {
-        defaultMessage: 'Increase quantity for {name}',
-        id: 'return_items_modal.label.quantity_increment'
-    },
-    quantityDecrement: {
-        defaultMessage: 'Decrease quantity for {name}',
-        id: 'return_items_modal.label.quantity_decrement'
-    },
     reasonLabel: {
         defaultMessage: 'Reason',
         id: 'return_items_modal.label.reason'

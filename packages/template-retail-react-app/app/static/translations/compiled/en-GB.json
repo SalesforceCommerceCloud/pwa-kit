@@ -4359,36 +4359,6 @@
       "value": "Quantity"
     }
   ],
-  "return_items_modal.label.quantity_decrement": [
-    {
-      "type": 0,
-      "value": "Decrease quantity for "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    }
-  ],
-  "return_items_modal.label.quantity_for": [
-    {
-      "type": 0,
-      "value": "Quantity for "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    }
-  ],
-  "return_items_modal.label.quantity_increment": [
-    {
-      "type": 0,
-      "value": "Increase quantity for "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    }
-  ],
   "return_items_modal.label.reason": [
     {
       "type": 0,
