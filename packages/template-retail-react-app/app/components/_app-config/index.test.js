@@ -101,10 +101,36 @@ describe('AppConfig', () => {
         expect(AppConfig.freeze()).toBeUndefined()
     })
 
-    test('passes a callable traceparent header to CommerceApiProvider', () => {
+    test('forwards locals.traceparent (a plain string) to CommerceApiProvider headers', () => {
         // Capture the props handed to CommerceApiProvider without standing up the
         // full provider/auth stack (the module-level mock swaps in a passthrough
-        // when mockCaptureProviderProps is set).
+        // when mockCaptureProviderProps is set). The SDK sets locals.traceparent
+        // server-side; the template forwards it as a plain string header.
+        let captured
+        mockCaptureProviderProps = (props) => {
+            captured = props
+        }
+        try {
+            const locals = {
+                site: mockConfig.app.sites[0],
+                appConfig: mockConfig.app,
+                traceparent: '00-abc123-def456-01'
+            }
+            render(
+                <StaticRouter>
+                    <CorrelationIdProvider correlationId={() => uuidv4()}>
+                        <AppConfig locals={locals} />
+                    </CorrelationIdProvider>
+                </StaticRouter>
+            )
+
+            expect(captured.headers.traceparent).toBe('00-abc123-def456-01')
+        } finally {
+            mockCaptureProviderProps = null
+        }
+    })
+
+    test('omits traceparent when locals.traceparent is absent', () => {
         let captured
         mockCaptureProviderProps = (props) => {
             captured = props
@@ -119,10 +145,7 @@ describe('AppConfig', () => {
                 </StaticRouter>
             )
 
-            expect(typeof captured.headers.traceparent).toBe('function')
-            // In jsdom (browser-like) the thunk resolves to undefined so the provider
-            // emits no traceparent header.
-            expect(captured.headers.traceparent()).toBeUndefined()
+            expect(captured.headers.traceparent).toBeUndefined()
         } finally {
             mockCaptureProviderProps = null
         }

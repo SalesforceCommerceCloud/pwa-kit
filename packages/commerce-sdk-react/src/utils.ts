@@ -199,21 +199,3 @@ export const transformSDKClient = <T extends Record<string, (...args: any[]) => 
         }
     })
 }
-
-/**
- * Resolves header values that may be callable (functions) into plain strings.
- * Each callable is invoked once and its return value used; headers resolving to
- * `undefined` or empty string are excluded. Used by the provider to resolve
- * dynamic headers (e.g. a `traceparent` thunk) at construction time, since the
- * underlying SDK never invokes function-valued headers.
- */
-export const resolveHeaders = (
-    headers: Record<string, string | (() => string | undefined)>
-): Record<string, string> => {
-    const resolved: Record<string, string> = {}
-    for (const [key, value] of Object.entries(headers)) {
-        const v = typeof value === 'function' ? value() : value
-        if (v != null && v !== '') resolved[key] = v
-    }
-    return resolved
-}

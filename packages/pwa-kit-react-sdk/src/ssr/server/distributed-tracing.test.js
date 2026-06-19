@@ -70,6 +70,25 @@ describe('distributed-tracing', () => {
         )
     })
 
+    test('withServerSpan exposes the span traceparent on res.locals for outbound propagation', async () => {
+        const traceId = '0af7651916cd43dd8448eb211c80319c'
+        const headers = {traceparent: `00-${traceId}-b7ad6b7169203331-01`}
+        const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
+        const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
+
+        let localsTraceparentDuringRender
+        const ctx = extractContext(headers)
+        await withServerSpan(req, res, ctx, async () => {
+            // Templates read res.locals.traceparent (a plain string) to forward on
+            // outbound SCAPI calls. It must be set before the render runs.
+            localsTraceparentDuringRender = res.locals.traceparent
+        })
+
+        // Same value as the response header, carrying the request's trace id.
+        expect(localsTraceparentDuringRender).toMatch(new RegExp(`^00-${traceId}-[0-9a-f]{16}-01$`))
+        expect(res.locals.traceparent).toBe(localsTraceparentDuringRender)
+    })
+
     test('extract-only: no incoming traceparent → runs fn without minting a span', async () => {
         const req = {headers: {}, method: 'GET', originalUrl: '/', url: '/'}
         const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}

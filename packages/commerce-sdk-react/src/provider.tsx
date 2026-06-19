@@ -28,7 +28,7 @@ import {
     ShopperStores,
     FetchOptions
 } from 'commerce-sdk-isomorphic'
-import {transformSDKClient, resolveHeaders} from './utils'
+import {transformSDKClient} from './utils'
 
 export interface PageDesignerParams {
     mode?: string
@@ -43,7 +43,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     currency: string
     redirectURI: string
     fetchOptions?: FetchOptions
-    headers?: Record<string, string | (() => string | undefined)>
+    headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
     privateClientProxyEndpoint?: string
@@ -64,6 +64,9 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     enableHttpOnlySessionCookies?: boolean
 }
 
+/**
+ * @internal
+ */
 export const CommerceApiContext = React.createContext({} as ApiClients)
 
 /**
@@ -171,22 +174,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // Without this, the Auth useMemo would recreate the Auth instance on every render,
     // causing unnecessary useEffect re-runs, context re-renders, and breaking
     // request deduplication.
-    // JSON.stringify skips function values, so we also include callable header
-    // names in the key to detect when callables are added/removed.
-    const callableHeaderNames = Object.keys(headers)
-        .filter((k) => typeof headers[k] === 'function')
-        .sort()
-        .join(',')
-    const headersKey = JSON.stringify(headers) + '|' + callableHeaderNames
+    const headersKey = JSON.stringify(headers)
 
     const stableHeaders = useMemo(() => headers, [headersKey])
-
-    // Resolve callable header values (e.g. `traceparent: () => getCurrentTraceparent()`)
-    // to strings. The underlying SDK never invokes function-valued headers, so a raw
-    // callable left in clientConfig.headers would be sent as a useless `[Function]`.
-    // During SSR the provider is constructed inside the active server span, so resolving
-    // here captures the request's trace id for outbound SCAPI/SLAS propagation.
-    const resolvedHeaders = useMemo(() => resolveHeaders(stableHeaders), [stableHeaders])
 
     const loggerRef = useRef(configLogger)
     loggerRef.current = configLogger
@@ -210,7 +200,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             siteId,
             proxy,
             redirectURI,
-            headers: resolvedHeaders,
+            headers: stableHeaders,
             fetchOptions: effectiveFetchOptions,
             fetchedToken,
             enablePWAKitPrivateClient,
@@ -234,7 +224,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         siteId,
         proxy,
         redirectURI,
-        resolvedHeaders,
+        stableHeaders,
         effectiveFetchOptions,
         fetchedToken,
         enablePWAKitPrivateClient,
@@ -260,12 +250,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }
 
     const _defaultTransformer: SDKClientTransformer<Record<string, any>> = (_, _$, options) => {
-        // Resolve any callable per-call header values (e.g. traceparent)
-        const resolvedOptionHeaders = options.headers ? resolveHeaders(options.headers) : {}
         return {
             ...options,
             headers: {
-                ...resolvedOptionHeaders,
+                ...options.headers,
                 ...serverAffinityHeader
             },
             throwOnBadResponse: true,
@@ -299,7 +287,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         const config = {
             proxy,
             headers: {
-                ...resolvedHeaders,
+                ...headers,
                 ...serverAffinityHeader
             },
             parameters: {
@@ -355,7 +343,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         effectiveFetchOptions,
         locale,
         currency,
-        resolvedHeaders,
+        headers?.['correlation-id'],
         apiClients,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,
@@ -374,10 +362,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         <ConfigContext.Provider
             value={{
                 clientId,
-                // Expose resolved (string) headers, not the raw callable-valued prop:
-                // consumers like generateCustomEndpointOptions spread these straight onto
-                // outbound requests, and a function value would be sent as `[Function]`.
-                headers: resolvedHeaders,
+                headers,
                 organizationId,
                 proxy,
                 redirectURI,

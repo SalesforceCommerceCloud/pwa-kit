@@ -136,12 +136,22 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
     return context.with(trace.setSpan(parentCtx, span), async () => {
         try {
             const sc = span.spanContext()
-            if (sc && res && typeof res.setHeader === 'function') {
+            if (sc) {
                 const flags = sc.traceFlags.toString(16).padStart(2, '0')
-                res.setHeader('traceparent', `00-${sc.traceId}-${sc.spanId}-${flags}`)
+                const traceparent = `00-${sc.traceId}-${sc.spanId}-${flags}`
+                // Expose the traceparent as a plain string for outbound propagation:
+                // the template reads res.locals.traceparent and forwards it on the
+                // CommerceApiProvider `headers` prop. Set inside the active span so it
+                // carries this request's trace id.
+                if (res?.locals) {
+                    res.locals.traceparent = traceparent
+                }
+                if (res && typeof res.setHeader === 'function') {
+                    res.setHeader('traceparent', traceparent)
+                }
             }
         } catch {
-            // traceparent response header is non-essential
+            // traceparent exposure is non-essential
         }
         try {
             return await fn()

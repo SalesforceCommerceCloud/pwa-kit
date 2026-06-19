@@ -56,29 +56,6 @@ import {
 
 const sfdcUserAgent = generateSfdcUserAgent()
 
-/* global WEBPACK_TARGET */
-
-/**
- * Returns the current W3C `traceparent` for outbound SCAPI/SLAS propagation, or
- * undefined when unavailable (browser, tracing disabled, or no active span).
- *
- * The distributed-tracing module is server-only (it pulls in Node OpenTelemetry),
- * so it is required lazily behind a server guard. `WEBPACK_TARGET` is a build-time
- * constant (DefinePlugin) that lets webpack strip this branch — and the require —
- * out of the client bundle entirely.
- */
-const getServerTraceparent = () => {
-    if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET !== 'node') return undefined
-    if (typeof window !== 'undefined') return undefined
-    try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const dt = require('@salesforce/pwa-kit-react-sdk/ssr/server/distributed-tracing')
-        return dt.getCurrentTraceparent() || undefined
-    } catch {
-        return undefined
-    }
-}
-
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -89,14 +66,15 @@ const getServerTraceparent = () => {
  */
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
-    // Stable identity so the provider's headers memo isn't invalidated each render.
-    // Resolved per outbound request on the server; the provider drops it when undefined.
-    const traceparent = React.useCallback(() => getServerTraceparent(), [])
     const headers = {
         'correlation-id': correlationId,
         sfdc_user_agent: sfdcUserAgent,
         'x-site-id': locals.site?.id,
-        traceparent
+        // Distributed tracing: the SDK sets `locals.traceparent` to the active SSR
+        // span's W3C traceparent (server-side, inside the span). Forwarding it here
+        // propagates the trace onto outbound SCAPI/SLAS calls. Undefined when tracing
+        // is off or in the browser, in which case no header is sent.
+        traceparent: locals.traceparent
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
