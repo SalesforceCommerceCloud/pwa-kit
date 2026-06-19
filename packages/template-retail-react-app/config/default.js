@@ -53,7 +53,14 @@ module.exports = {
             // default floating corner dialog; 'modal' renders a centered modal.
             cimulateDisplayMode: 'panel',
             // Width of the side panel when cimulateDisplayMode is 'panel'.
-            cimulatePanelWidth: '420px'
+            cimulatePanelWidth: '420px',
+            // Widget mode forwarded to the Cimulate bundle as `mode` ('messaging').
+            cimulateMode: 'messaging',
+            // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
+            cimulateLogoUrl: ''
+            // Optional: pass `cimulateSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            // to customize the widget search input. Forwarded to the widget as
+            // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
         },
         url: {
             site: 'path',

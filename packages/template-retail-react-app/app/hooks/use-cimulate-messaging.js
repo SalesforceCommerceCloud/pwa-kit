@@ -32,11 +32,16 @@ const DEFAULT_CIMULATE_THEME = {
  * Default component configuration for the Cimulate widget. The widget renders
  * closed by default and is opened programmatically (e.g. from the header agent
  * button) via `eventHandlers.components.toggleWidgetOpen`.
+ *
+ * Layout-related settings (`dialogPosition`, `dialogFullHeight`, `dialogWidth`,
+ * `isModalFullscreen`) live under the nested `options` object.
  */
 const DEFAULT_CIMULATE_COMPONENT_CONFIG = {
     isOpen: false,
     type: 'dialog',
-    dialogPosition: 'bottom-right'
+    options: {
+        dialogPosition: 'bottom-right'
+    }
 }
 
 /**
@@ -54,8 +59,15 @@ const DEFAULT_CIMULATE_COMPONENT_CONFIG = {
  * @param {string} options.orgId - Salesforce organization ID
  * @param {string} options.esDeveloperName - Embedded Service developer name
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
+ * @param {string} [options.mode] - Widget mode forwarded to the bundle (defaults to 'messaging')
+ * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
  * @param {string} [options.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [options.searchConfig] - Search input configuration for the widget
+ * @param {string} [options.searchConfig.placeholder] - Placeholder text for the search input
+ * @param {string} [options.searchConfig.buttonLabel] - Label for the search button
+ * @param {string} [options.searchConfig.buttonType] - Search button style (e.g. 'icon', 'text', 'icon-text')
+ * @param {string} [options.searchConfig.buttonIconUrl] - URL of the icon shown on the search button
  * @param {string} [options.globalClassName] - Custom class added to widget elements for CSS specificity
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
@@ -68,8 +80,11 @@ const injectCimulateWidget = ({
     orgId,
     esDeveloperName,
     routingAttributes,
+    mode = 'messaging',
+    logoUrl,
     headerText,
     disclaimerMarkdown,
+    searchConfig,
     globalClassName,
     isDevelopment = false,
     componentConfig,
@@ -93,12 +108,22 @@ const injectCimulateWidget = ({
 
         cimulate.injectMessagingWidget({
             elementId,
+            ...(mode ? {mode} : {}),
             messagingConfig,
+            ...(logoUrl ? {logoUrl} : {}),
             ...(headerText ? {headerText} : {}),
             ...(disclaimerMarkdown ? {disclaimerMarkdown} : {}),
+            ...(searchConfig && typeof searchConfig === 'object' ? {searchConfig} : {}),
             ...(globalClassName ? {globalClassName} : {}),
             isDevelopment,
-            componentConfig: {...DEFAULT_CIMULATE_COMPONENT_CONFIG, ...componentConfig},
+            componentConfig: {
+                ...DEFAULT_CIMULATE_COMPONENT_CONFIG,
+                ...componentConfig,
+                options: {
+                    ...DEFAULT_CIMULATE_COMPONENT_CONFIG.options,
+                    ...componentConfig?.options
+                }
+            },
             theme: {...DEFAULT_CIMULATE_THEME, ...theme}
         })
         return true

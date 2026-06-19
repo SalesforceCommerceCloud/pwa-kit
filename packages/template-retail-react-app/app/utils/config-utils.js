@@ -30,7 +30,9 @@ export const getCommerceAgentConfig = () => {
         headerText: '',
         disclaimerMarkdown: '',
         cimulateDisplayMode: 'panel',
-        cimulatePanelWidth: '420px'
+        cimulatePanelWidth: '420px',
+        cimulateMode: 'messaging',
+        cimulateLogoUrl: ''
     }
     return getConfig().app.commerceAgent ?? defaults
 }
