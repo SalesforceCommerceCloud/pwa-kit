@@ -222,7 +222,7 @@ const AccountOrderDetail = () => {
                 })
             } else if (status === 409) {
                 description = formatMessage({
-                    defaultMessage: 'This order is already being processed and cannot be cancelled. Please contact the merchant for assistance.',
+                    defaultMessage: 'This order is already being processed and cannot be cancelled. Please reach out to the merchant.',
                     id: 'account_order_detail.alert.cancellation_error_conflict'
                 })
             } else {

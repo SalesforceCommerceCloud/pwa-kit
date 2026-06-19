@@ -206,7 +206,7 @@
   "account_order_detail.alert.cancellation_error_conflict": [
     {
       "type": 0,
-      "value": "This order is already being processed and cannot be cancelled. Please contact the merchant for assistance."
+      "value": "This order is already being processed and cannot be cancelled. Please reach out to the merchant."
     }
   ],
   "account_order_detail.alert.cancellation_error_generic": [

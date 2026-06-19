@@ -6,7 +6,8 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {screen, act, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {
     renderWithProviders,
@@ -22,12 +23,15 @@ import {
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+const mockMutateAsync = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...actual,
-        useShopperOrdersMutation: () => ({mutateAsync: jest.fn(), isLoading: false}),
-        useOmsMetaData: () => ({data: null, isLoading: false})
+        useShopperOrdersMutation: () => ({mutateAsync: mockMutateAsync, isLoading: false}),
+        useOmsMetaData: () => ({data: null, isLoading: false}),
+        useCustomerType: () => ({isRegistered: true, isGuest: false}),
+        useCustomerId: () => 'testCustomerId'
     }
 })
 
@@ -1523,5 +1527,80 @@ describe('OMS order with no OMS shipments - default to ECOM shipment display (mu
         expect(await screen.findByText(/456 Second St/i)).toBeInTheDocument()
         expect(await screen.findByText(/Ground/i)).toBeInTheDocument()
         expect(await screen.findByText(/Express/i)).toBeInTheDocument()
+    })
+})
+
+describe('Cancel order error scenarios', () => {
+    const cancelEligibleOmsOrder = createMockOmsOrder({
+        omsData: {status: 'Created'},
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Test Product',
+                quantity: 1,
+                omsData: {
+                    status: 'created',
+                    quantityAvailableToCancel: 1,
+                    quantityOrdered: 1
+                }
+            }
+        ],
+        customerInfo: {customerId: 'testCustomerId'}
+    })
+
+    beforeEach(() => {
+        mockMutateAsync.mockReset()
+    })
+
+    test('shows 404 error message when cancel API returns 404', async () => {
+        mockMutateAsync.mockRejectedValueOnce({response: {status: 404}})
+        setupOrderDetailsPage(cancelEligibleOmsOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
+        await user.click(await screen.findByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(screen.getByText(/we could not find this order/i)).toBeInTheDocument()
+        })
+        expect(screen.getByText(/unable to cancel order/i)).toBeInTheDocument()
+    })
+
+    test('shows 409 error message when cancel API returns 409', async () => {
+        mockMutateAsync.mockRejectedValueOnce({response: {status: 409}})
+        setupOrderDetailsPage(cancelEligibleOmsOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
+        await user.click(await screen.findByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(screen.getByText(/already being processed/i)).toBeInTheDocument()
+        })
+        expect(screen.getByText(/unable to cancel order/i)).toBeInTheDocument()
+    })
+
+    test('shows generic error message when cancel API returns 500', async () => {
+        mockMutateAsync.mockRejectedValueOnce({response: {status: 500}})
+        setupOrderDetailsPage(cancelEligibleOmsOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
+        await user.click(await screen.findByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(screen.getByText(/couldn't process your cancellation/i)).toBeInTheDocument()
+        })
+        expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
+    })
+
+    test('shows generic error message when error has no response (network failure)', async () => {
+        mockMutateAsync.mockRejectedValueOnce(new Error('Network error'))
+        setupOrderDetailsPage(cancelEligibleOmsOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
+        await user.click(await screen.findByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(screen.getByText(/couldn't process your cancellation/i)).toBeInTheDocument()
+        })
+        expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
     })
 })
