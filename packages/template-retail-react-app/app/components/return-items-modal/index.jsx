@@ -43,10 +43,8 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {
-    messages,
-    buildReturnProductItems
-} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
+import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import {messages} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
 

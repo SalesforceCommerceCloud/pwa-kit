@@ -10,7 +10,6 @@ import {act, fireEvent, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
-import {buildReturnProductItems} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 let mockOmsMetaData = {
     data: {
@@ -177,38 +176,10 @@ test('clicking Review return forwards a properly shaped payload', async () => {
     expect(onReview).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
 })
 
-test('omits reason from payload when shopper kept the OMS default', () => {
-    const selection = {'item-2': {checked: true, quantity: 1, reasonCode: 'Wrong size'}}
-    expect(buildReturnProductItems(selection, 'Wrong size')).toEqual([
-        {itemId: 'item-2', quantity: 1}
-    ])
-})
-
-test('serializes quantity as a JS Number (not a string)', () => {
-    const selection = {'item-2': {checked: true, quantity: '3', reasonCode: 'Defect'}}
-    const [row] = buildReturnProductItems(selection, 'Wrong size')
-    expect(typeof row.quantity).toBe('number')
-    expect(row.quantity).toBe(3)
-})
-
 test('renders skeleton placeholders while OMS metadata is loading', () => {
     mockOmsMetaData = {data: undefined, isLoading: true, isError: false, refetch: jest.fn()}
     renderWithProviders(<Harness />)
     expect(screen.getByTestId('return-items-modal-loading')).toBeInTheDocument()
-})
-
-test('drops malformed rows (non-numeric or zero quantity) from the payload', () => {
-    expect(
-        buildReturnProductItems(
-            {
-                'item-a': {checked: true, quantity: '', reasonCode: 'Defect'},
-                'item-b': {checked: true, quantity: 'abc', reasonCode: 'Defect'},
-                'item-c': {checked: true, quantity: 0, reasonCode: 'Defect'},
-                'item-d': {checked: true, quantity: 2, reasonCode: 'Defect'}
-            },
-            'Wrong size'
-        )
-    ).toEqual([{itemId: 'item-d', quantity: 2, reason: 'Defect'}])
 })
 
 test('backfills the OMS default reason on already-checked rows when metadata is available', async () => {
