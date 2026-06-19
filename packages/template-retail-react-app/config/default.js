@@ -33,32 +33,32 @@ module.exports = {
             enableConversationContext: 'false',
             conversationContext: [],
             // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
-            // 'cimulate' (Cimulate Copilot widget). Selecting 'cimulate' uses the
+            // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
             provider: 'miaw',
-            // URL of the Cimulate messaging UMD bundle (e.g.
+            // URL of the Commerce Client messaging UMD bundle (e.g.
             // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
-            // Only used when provider === 'cimulate'.
-            cimulateScriptSourceUrl: '',
-            // Embedded Service developer name for the Cimulate widget. Falls back
+            // Only used when provider === 'commerce-client'.
+            commerceClientScriptSourceUrl: '',
+            // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
             esDeveloperName: '',
-            // Header text shown at the top of the Cimulate widget.
+            // Header text shown at the top of the Commerce Client widget.
             headerText: '',
-            // Markdown disclaimer shown in the Cimulate widget. Supports links and
+            // Markdown disclaimer shown in the Commerce Client widget. Supports links and
             // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
             disclaimerMarkdown: '',
-            // Cimulate widget layout: 'panel' (default) renders a full-height side
+            // Commerce Client widget layout: 'panel' (default) renders a full-height side
             // panel docked to the right that slides in/out; 'dialog' renders the
             // default floating corner dialog; 'modal' renders a centered modal.
-            cimulateDisplayMode: 'panel',
-            // Width of the side panel when cimulateDisplayMode is 'panel'.
-            cimulatePanelWidth: '420px',
-            // Widget mode forwarded to the Cimulate bundle as `mode` ('messaging').
-            cimulateMode: 'messaging',
+            commerceClientDisplayMode: 'panel',
+            // Width of the side panel when commerceClientDisplayMode is 'panel'.
+            commerceClientPanelWidth: '420px',
+            // Widget mode forwarded to the Commerce Client bundle as `mode` ('messaging').
+            commerceClientMode: 'messaging',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
-            cimulateLogoUrl: ''
-            // Optional: pass `cimulateSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            commerceClientLogoUrl: ''
+            // Optional: pass `commerceClientSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
         },

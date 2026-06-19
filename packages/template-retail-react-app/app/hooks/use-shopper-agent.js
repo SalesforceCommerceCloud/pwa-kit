@@ -10,7 +10,7 @@ import {openShopperAgentWidget} from '@salesforce/retail-react-app/app/utils/sho
 /**
  * React hook that returns shopper agent actions.
  *
- * The `open` action is provider-aware: it opens the Cimulate Copilot widget when
+ * The `open` action is provider-aware: it opens the Commerce Client widget when
  * present, otherwise falls back to the Salesforce Embedded Messaging (MIAW)
  * chat. Structured for future extension (e.g. close, sendMessage).
  */

@@ -366,7 +366,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.gstatic.com' // optional, if icon is on gstatic
                     ],
                     'script-src': [
-                        // Cimulate Copilot messaging widget bundle (messaging.umd.js)
+                        // Commerce Client messaging widget bundle (messaging.umd.js)
                         '*.cimulate.ai',
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
@@ -383,7 +383,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
-                        // Connect to Cimulate Copilot widget APIs
+                        // Connect to Commerce Client widget APIs
                         '*.cimulate.ai',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',

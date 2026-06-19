@@ -10,9 +10,9 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import useCimulateMessaging, {
-    DEFAULT_CIMULATE_ELEMENT_ID
-} from '@salesforce/retail-react-app/app/hooks/use-cimulate-messaging'
+import useCommerceClientMessaging, {
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
@@ -107,12 +107,12 @@ const validateCommerceAgentSettings = (commerceAgent) => {
 }
 
 /**
- * Validates that a URL is served from a trusted Cimulate domain.
+ * Validates that a URL is served from a trusted Commerce Client domain.
  *
  * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
- * @returns {boolean} True if the URL is from a trusted Cimulate domain, false otherwise
+ * @returns {boolean} True if the URL is from a trusted Commerce Client domain, false otherwise
  */
-const validateCimulateDomain = (url) => {
+const validateCommerceClientDomain = (url) => {
     try {
         const {hostname} = new URL(url)
         return hostname === 'cimulate.ai' || hostname.endsWith('.cimulate.ai')
@@ -122,20 +122,20 @@ const validateCimulateDomain = (url) => {
 }
 
 /**
- * Validates the commerce agent configuration for the Cimulate Copilot widget.
- * The Cimulate widget requires a different (smaller) set of fields than MIAW:
+ * Validates the commerce agent configuration for the Commerce Client widget.
+ * The Commerce Client widget requires a different (smaller) set of fields than MIAW:
  * the SCRT2 URL, Salesforce org id, embedded service developer name, and the
- * URL of the Cimulate messaging UMD bundle.
+ * URL of the Commerce Client messaging UMD bundle.
  *
  * @param {Object} commerceAgent - Commerce agent configuration object
  * @param {string} commerceAgent.scrt2Url - SCRT2 instance URL
  * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID (passed as `orgId`)
  * @param {string} [commerceAgent.esDeveloperName] - Embedded Service developer name
  * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} commerceAgent.cimulateScriptSourceUrl - URL of the Cimulate messaging bundle
+ * @param {string} commerceAgent.commerceClientScriptSourceUrl - URL of the Commerce Client messaging bundle
  * @returns {boolean} True if configuration is valid, false otherwise
  */
-const validateCimulateAgentSettings = (commerceAgent) => {
+const validateCommerceClientAgentSettings = (commerceAgent) => {
     if (!commerceAgent || typeof commerceAgent !== 'object') {
         console.error('Commerce agent configuration must be an object.')
         return false
@@ -145,7 +145,7 @@ const validateCimulateAgentSettings = (commerceAgent) => {
         scrt2Url: commerceAgent.scrt2Url,
         salesforceOrgId: commerceAgent.salesforceOrgId,
         esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
-        cimulateScriptSourceUrl: commerceAgent.cimulateScriptSourceUrl
+        commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl
     }
 
     const isValid = Object.values(requiredValues).every(
@@ -154,13 +154,15 @@ const validateCimulateAgentSettings = (commerceAgent) => {
 
     if (!isValid) {
         console.error(
-            'Invalid Cimulate agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and cimulateScriptSourceUrl.'
+            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
         )
         return false
     }
 
-    if (!validateCimulateDomain(commerceAgent.cimulateScriptSourceUrl)) {
-        console.error('Cimulate script URL must be served from a trusted cimulate.ai domain.')
+    if (!validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
+        console.error(
+            'Commerce Client script URL must be served from a trusted cimulate.ai domain.'
+        )
         return false
     }
 
@@ -455,23 +457,23 @@ ShopperAgentWindow.propTypes = {
 }
 
 /**
- * Class name added to the Cimulate widget elements via the widget's
+ * Class name added to the Commerce Client widget elements via the widget's
  * `globalClassName` option. Provides a stable hook for targeting the widget
  * (e.g. analytics or optional consumer CSS).
  */
-const CIMULATE_GLOBAL_CLASS = 'cimulate-shopper-agent'
+const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
 
 /**
- * Default width of the Cimulate side panel. Applied through the widget's
+ * Default width of the Commerce Client side panel. Applied through the widget's
  * `componentConfig.options.dialogWidth` option when in 'panel' display mode.
  */
-const DEFAULT_CIMULATE_PANEL_WIDTH = '420px'
+const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
 
 /**
- * Internal component that renders the Cimulate Copilot messaging widget.
+ * Internal component that renders the Commerce Client messaging widget.
  *
  * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
- * Messaging iframe), this component loads the Cimulate messaging UMD bundle and
+ * Messaging iframe), this component loads the Commerce Client messaging UMD bundle and
  * injects the widget into a container element via
  * `window.CimulateMessaging.injectMessagingWidget`. The two providers are
  * mutually exclusive and selected by `commerceAgent.provider`.
@@ -482,109 +484,109 @@ const DEFAULT_CIMULATE_PANEL_WIDTH = '420px'
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
  * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} props.commerceAgentConfiguration.cimulateScriptSourceUrl - Cimulate messaging bundle URL
- * @param {string} [props.commerceAgentConfiguration.cimulateMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
- * @param {string} [props.commerceAgentConfiguration.cimulateLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
  * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
  * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
- * @param {Object} [props.commerceAgentConfiguration.cimulateSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
- * @param {string} [props.commerceAgentConfiguration.cimulateElementId] - Container element id (defaults to 'cimulate-messaging-widget')
- * @param {string} [props.commerceAgentConfiguration.cimulateDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
- * @param {string} [props.commerceAgentConfiguration.cimulatePanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
- * @param {string} [props.commerceAgentConfiguration.cimulateComponentType] - Widget type when display mode is 'dialog': 'chat' | 'dialog' | 'modal'
- * @param {string} [props.commerceAgentConfiguration.cimulateDialogPosition] - Dialog position when display mode is 'dialog'
+ * @param {Object} [props.commerceAgentConfiguration.commerceClientSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
+ * @param {string} [props.commerceAgentConfiguration.commerceClientPanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientComponentType] - Widget type when display mode is 'dialog': 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.commerceClientDialogPosition] - Dialog position when display mode is 'dialog'
  * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
- * @param {Object} [props.commerceAgentConfiguration.cimulateTheme] - Partial theme overrides for the widget
+ * @param {Object} [props.commerceAgentConfiguration.commerceClientTheme] - Partial theme overrides for the widget
  * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
- * @returns {JSX.Element} A container element the Cimulate widget is rendered into
+ * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
-const CimulateAgentWindow = ({commerceAgentConfiguration}) => {
+const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     const {
         scrt2Url,
         salesforceOrgId,
         esDeveloperName,
         embeddedServiceName,
-        cimulateScriptSourceUrl,
-        cimulateMode = 'messaging',
-        cimulateLogoUrl,
+        commerceClientScriptSourceUrl,
+        commerceClientMode = 'messaging',
+        commerceClientLogoUrl,
         headerText,
         disclaimerMarkdown,
-        cimulateElementId = DEFAULT_CIMULATE_ELEMENT_ID,
-        cimulateDisplayMode = 'panel',
-        cimulatePanelWidth = DEFAULT_CIMULATE_PANEL_WIDTH,
-        cimulateComponentType = 'dialog',
-        cimulateDialogPosition = 'bottom-right',
+        commerceClientElementId = DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+        commerceClientDisplayMode = 'panel',
+        commerceClientPanelWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
+        commerceClientComponentType = 'dialog',
+        commerceClientDialogPosition = 'bottom-right',
         isDevelopment = 'false',
-        cimulateTheme,
-        cimulateSearchConfig,
+        commerceClientTheme,
+        commerceClientSearchConfig,
         routingAttributes
     } = commerceAgentConfiguration
 
-    // Load the Cimulate messaging UMD bundle, which exposes window.CimulateMessaging
-    const scriptLoadStatus = useScript(cimulateScriptSourceUrl)
+    // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
+    const scriptLoadStatus = useScript(commerceClientScriptSourceUrl)
 
     // In 'panel' mode we render the widget as a 'dialog' docked to the right and
     // use the widget's built-in full-height + width options to turn it
     // into a full-height side panel.
-    const isPanel = cimulateDisplayMode === 'panel'
+    const isPanel = commerceClientDisplayMode === 'panel'
 
     const widgetOptions = useMemo(
         () => ({
-            elementId: cimulateElementId,
+            elementId: commerceClientElementId,
             scrt2Url,
             orgId: salesforceOrgId,
             esDeveloperName: esDeveloperName || embeddedServiceName,
             routingAttributes,
-            mode: cimulateMode,
-            logoUrl: cimulateLogoUrl,
+            mode: commerceClientMode,
+            logoUrl: commerceClientLogoUrl,
             headerText,
             disclaimerMarkdown,
-            searchConfig: cimulateSearchConfig,
-            globalClassName: CIMULATE_GLOBAL_CLASS,
+            searchConfig: commerceClientSearchConfig,
+            globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
             isDevelopment: isDevelopment === 'true',
             componentConfig: {
                 isOpen: false,
-                type: isPanel ? 'dialog' : cimulateComponentType,
+                type: isPanel ? 'dialog' : commerceClientComponentType,
                 options: {
-                    dialogPosition: isPanel ? 'bottom-right' : cimulateDialogPosition,
+                    dialogPosition: isPanel ? 'bottom-right' : commerceClientDialogPosition,
                     ...(isPanel && {
                         dialogFullHeight: true,
-                        dialogWidth: cimulatePanelWidth
+                        dialogWidth: commerceClientPanelWidth
                     })
                 }
             },
-            theme: cimulateTheme
+            theme: commerceClientTheme
         }),
         [
-            cimulateElementId,
+            commerceClientElementId,
             scrt2Url,
             salesforceOrgId,
             esDeveloperName,
             embeddedServiceName,
             routingAttributes,
-            cimulateMode,
-            cimulateLogoUrl,
+            commerceClientMode,
+            commerceClientLogoUrl,
             headerText,
             disclaimerMarkdown,
-            cimulateSearchConfig,
+            commerceClientSearchConfig,
             isDevelopment,
             isPanel,
-            cimulateComponentType,
-            cimulateDialogPosition,
-            cimulatePanelWidth,
-            cimulateTheme
+            commerceClientComponentType,
+            commerceClientDialogPosition,
+            commerceClientPanelWidth,
+            commerceClientTheme
         ]
     )
 
     // Inject the widget into the container once the bundle is loaded
-    useCimulateMessaging(scriptLoadStatus, widgetOptions)
+    useCommerceClientMessaging(scriptLoadStatus, widgetOptions)
 
-    return <div id={cimulateElementId} data-testid="cimulate-agent-widget" />
+    return <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
 }
 
-CimulateAgentWindow.propTypes = {
+CommerceClientAgentWindow.propTypes = {
     /**
-     * Commerce agent configuration object containing the Cimulate widget settings.
+     * Commerce agent configuration object containing the Commerce Client widget settings.
      *
      * @type {Object}
      * @required
@@ -645,11 +647,13 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
         return null
     }
 
-    // Cimulate Copilot widget provider
-    if (provider === 'cimulate') {
-        return validateCimulateAgentSettings(commerceAgentConfiguration) ? (
+    // Commerce Client widget provider
+    if (provider === 'commerce-client') {
+        return validateCommerceClientAgentSettings(commerceAgentConfiguration) ? (
             <div data-testid="shopper-agent">
-                <CimulateAgentWindow commerceAgentConfiguration={commerceAgentConfiguration} />
+                <CommerceClientAgentWindow
+                    commerceAgentConfiguration={commerceAgentConfiguration}
+                />
             </div>
         ) : null
     }

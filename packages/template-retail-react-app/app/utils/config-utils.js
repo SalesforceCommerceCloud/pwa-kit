@@ -23,16 +23,16 @@ export const getCommerceAgentConfig = () => {
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
         enableAgentFromSearchSuggestions: 'false',
-        // Widget provider: 'miaw' (default) or 'cimulate'. See config/default.js.
+        // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
         provider: 'miaw',
-        cimulateScriptSourceUrl: '',
+        commerceClientScriptSourceUrl: '',
         esDeveloperName: '',
         headerText: '',
         disclaimerMarkdown: '',
-        cimulateDisplayMode: 'panel',
-        cimulatePanelWidth: '420px',
-        cimulateMode: 'messaging',
-        cimulateLogoUrl: ''
+        commerceClientDisplayMode: 'panel',
+        commerceClientPanelWidth: '420px',
+        commerceClientMode: 'messaging',
+        commerceClientLogoUrl: ''
     }
     return getConfig().app.commerceAgent ?? defaults
 }
