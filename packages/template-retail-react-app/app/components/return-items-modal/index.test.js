@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {fireEvent, screen, waitFor, within} from '@testing-library/react'
+import {act, fireEvent, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
@@ -225,6 +225,20 @@ test('backfills the OMS default reason on already-checked rows when metadata is 
     expect(within(row).getByLabelText(/reason for /i, {selector: 'select'})).toHaveValue(
         'Wrong size'
     )
+})
+
+test('two toggles in the same React batch both stick (no stale closure)', async () => {
+    // Regression: updateRow used to close over `selection`, so two checkbox
+    // toggles dispatched in a single render cycle each spread the same stale
+    // object — only the second won, silently dropping the first row.
+    renderWithProviders(<Harness />)
+    const [first, second] = screen.getAllByRole('checkbox')
+    act(() => {
+        fireEvent.click(first)
+        fireEvent.click(second)
+    })
+    await waitFor(() => expect(first).toBeChecked())
+    expect(second).toBeChecked()
 })
 
 test('renders an error alert + Retry when OMS metadata fails', async () => {

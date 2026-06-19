@@ -267,26 +267,36 @@ const ReturnItemsModal = ({
     const reasons = reviewQuery.data?.returnReasonCodes || []
     const defaultReasonCode = useMemo(() => findDefaultReasonCode(reasons), [reasons])
 
+    // Functional updater so two toggles dispatched in the same React batch
+    // both observe the latest selection. Closing over `selection` would cause
+    // the second update to spread a stale object and clobber the first.
     const updateRow = useCallback(
         (itemId, patch) => {
-            const next = {...(selection || {})}
-            next[itemId] = {...(next[itemId] || {}), ...patch}
-            onSelectionChange(next)
+            onSelectionChange((prev) => ({
+                ...(prev || {}),
+                [itemId]: {...((prev || {})[itemId] || {}), ...patch}
+            }))
         },
-        [selection, onSelectionChange]
+        [onSelectionChange]
     )
 
     const handleToggle = useCallback(
         (item, checked) => {
             const itemId = item.itemId
-            const existing = selection?.[itemId]
-            updateRow(itemId, {
-                checked,
-                quantity: existing?.quantity ?? 1,
-                reasonCode: existing?.reasonCode || (checked ? defaultReasonCode : undefined)
+            onSelectionChange((prev) => {
+                const existing = (prev || {})[itemId]
+                return {
+                    ...(prev || {}),
+                    [itemId]: {
+                        checked,
+                        quantity: existing?.quantity ?? 1,
+                        reasonCode:
+                            existing?.reasonCode || (checked ? defaultReasonCode : undefined)
+                    }
+                }
             })
         },
-        [selection, updateRow, defaultReasonCode]
+        [onSelectionChange, defaultReasonCode]
     )
 
     const handleQuantityChange = useCallback(
