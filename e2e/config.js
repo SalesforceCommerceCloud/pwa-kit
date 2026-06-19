@@ -11,7 +11,7 @@ module.exports = {
     RETAIL_APP_HOME:
         process.env.RETAIL_APP_HOME ||
         'https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com',
-    RETAIL_APP_HOME_SITE: 'RefArch',
+    RETAIL_APP_HOME_SITE: process.env.RETAIL_APP_HOME_SITE || 'RefArch',
     RETAIL_APP_HOME_ORGANIZATION_ID:
         process.env.RETAIL_APP_HOME_ORGANIZATION_ID || 'f_ecom_zzrf_002',
     /**
@@ -174,5 +174,6 @@ module.exports = {
     EXTRA_FEATURES_E2E_RETAIL_APP_HOME:
         process.env.EXTRA_FEATURES_E2E_RETAIL_APP_HOME ||
         'https://scaffold-pwa-extra-features-e2e.mobify-storefront.com',
-    EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: 'RefArchGlobal'
+    EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE:
+        process.env.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE || 'RefArchGlobal'
 }
