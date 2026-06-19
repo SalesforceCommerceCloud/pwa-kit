@@ -897,6 +897,12 @@
       "value": "Reason"
     }
   ],
+  "cancel_order_modal.text.confirm_description": [
+    {
+      "type": 0,
+      "value": "Confirm cancellation below."
+    }
+  ],
   "cancel_order_modal.text.impact": [
     {
       "type": 0,

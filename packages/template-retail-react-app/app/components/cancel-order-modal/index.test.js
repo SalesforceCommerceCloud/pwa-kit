@@ -237,7 +237,7 @@ describe('Metadata API failure scenarios', () => {
         )
 
         expect(screen.getByText(/cancel order 00028011/i)).toBeInTheDocument()
-        expect(screen.getByText(/select a reason and confirm cancellation/i)).toBeInTheDocument()
+        expect(screen.getByText(/confirm cancellation below/i)).toBeInTheDocument()
         expect(screen.getByText(/this cancels the entire order/i)).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /keep order/i})).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()

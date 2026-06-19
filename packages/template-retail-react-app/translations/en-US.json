@@ -342,6 +342,9 @@
   "cancel_order_modal.label.reason": {
     "defaultMessage": "Reason"
   },
+  "cancel_order_modal.text.confirm_description": {
+    "defaultMessage": "Confirm cancellation below."
+  },
   "cancel_order_modal.text.impact": {
     "defaultMessage": "This cancels the entire order."
   },

@@ -179,10 +179,7 @@ const AccountOrderDetail = () => {
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
 
-    const {data: omsMetaData} = useOmsMetaData(
-        {parameters: {}},
-        {enabled: isOmsOrder && onClient, retry: 1}
-    )
+    const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
     const canCancel = useMemo(() => {
         if (!isRegistered || !order) return false
