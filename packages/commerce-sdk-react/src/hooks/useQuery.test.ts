@@ -206,7 +206,10 @@ describe('useQuery', () => {
                     reject({
                         response: {
                             status: 401,
-                            json: () => mockRes
+                            // A real fetch Response body is single-use; handleInvalidToken reads
+                            // it via clone(), so the mock must expose clone() too.
+                            json: () => mockRes,
+                            clone: () => ({json: () => mockRes})
                         }
                     })
                 }),
