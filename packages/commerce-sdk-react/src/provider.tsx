@@ -28,7 +28,7 @@ import {
     ShopperStores,
     FetchOptions
 } from 'commerce-sdk-isomorphic'
-import {transformSDKClient} from './utils'
+import {transformSDKClient, resolveHeaders} from './utils'
 
 export interface PageDesignerParams {
     mode?: string
@@ -62,26 +62,6 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     pageDesignerParams?: PageDesignerParams
     /** When true, proxy returns tokens in HttpOnly cookies. */
     enableHttpOnlySessionCookies?: boolean
-}
-
-/**
- * @internal
- */
-/**
- * Resolves header values that may be callable (functions). Callable headers are
- * invoked per-request, allowing dynamic values like traceparent to be resolved
- * at the time of each API call rather than at provider construction time.
- * Headers returning undefined or empty string are excluded from the result.
- */
-export const resolveHeaders = (
-    headers: Record<string, string | (() => string | undefined)>
-): Record<string, string> => {
-    const resolved: Record<string, string> = {}
-    for (const [key, value] of Object.entries(headers)) {
-        const v = typeof value === 'function' ? value() : value
-        if (v != null && v !== '') resolved[key] = v
-    }
-    return resolved
 }
 
 export const CommerceApiContext = React.createContext({} as ApiClients)

@@ -11,7 +11,6 @@ import useCommerceApi from './hooks/useCommerceApi'
 import useConfig from './hooks/useConfig'
 import {renderWithProviders, renderHookWithProviders, DEFAULT_TEST_HOST} from './test-utils'
 import * as shopperSearchQueries from './hooks/ShopperSearch/query'
-import {resolveHeaders} from './provider'
 import Auth from './auth'
 
 jest.mock('./auth/index.ts')
@@ -163,39 +162,6 @@ describe('provider', () => {
                 fetchOptions: expect.objectContaining({credentials: 'omit'})
             })
         )
-    })
-
-    describe('resolveHeaders', () => {
-        test('string values pass through unchanged', () => {
-            expect(resolveHeaders({'correlation-id': 'static-value'})).toEqual({
-                'correlation-id': 'static-value'
-            })
-        })
-
-        test('callable values are invoked and their return value is used', () => {
-            const getTraceparent = jest.fn(() => '00-trace-span-01')
-            const result = resolveHeaders({traceparent: getTraceparent})
-            expect(getTraceparent).toHaveBeenCalledTimes(1)
-            expect(result).toEqual({traceparent: '00-trace-span-01'})
-        })
-
-        test('callable returning undefined is excluded from the result', () => {
-            const result = resolveHeaders({
-                'correlation-id': 'keep-me',
-                traceparent: () => undefined
-            })
-            expect(result).toEqual({'correlation-id': 'keep-me'})
-            expect(result).not.toHaveProperty('traceparent')
-        })
-
-        test('callable returning empty string is excluded from the result', () => {
-            const result = resolveHeaders({
-                'correlation-id': 'keep-me',
-                traceparent: () => ''
-            })
-            expect(result).toEqual({'correlation-id': 'keep-me'})
-            expect(result).not.toHaveProperty('traceparent')
-        })
     })
 
     describe('callable header resolution (resolved to string at construction)', () => {

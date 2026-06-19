@@ -37,6 +37,7 @@ import {
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getServerTraceparent} from '@salesforce/retail-react-app/app/utils/tracing-utils'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -55,29 +56,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 const sfdcUserAgent = generateSfdcUserAgent()
-
-/* global WEBPACK_TARGET */
-
-/**
- * Returns the current W3C `traceparent` for outbound SCAPI/SLAS propagation, or
- * undefined when unavailable (browser, tracing disabled, or no active span).
- *
- * The distributed-tracing module is server-only (it pulls in Node OpenTelemetry),
- * so it is required lazily behind a server guard. `WEBPACK_TARGET` is a build-time
- * constant (DefinePlugin) that lets webpack strip this branch — and the require —
- * out of the client bundle entirely.
- */
-const getServerTraceparent = () => {
-    if (typeof WEBPACK_TARGET !== 'undefined' && WEBPACK_TARGET !== 'node') return undefined
-    if (typeof window !== 'undefined') return undefined
-    try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const dt = require('@salesforce/pwa-kit-react-sdk/ssr/server/distributed-tracing')
-        return dt.getCurrentTraceparent() || undefined
-    } catch {
-        return undefined
-    }
-}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
