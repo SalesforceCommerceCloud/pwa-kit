@@ -1327,6 +1327,7 @@ describe('Checkout error display and submitOrder', () => {
         ]
 
         let orderPostCalled = false
+        let updatePaymentInstrumentCalled = false
         global.server.use(
             rest.post('*/orders', (req, res, ctx) => {
                 orderPostCalled = true
@@ -1340,6 +1341,10 @@ describe('Checkout error display and submitOrder', () => {
             }),
             rest.get('*/baskets', (req, res, ctx) => {
                 return res(ctx.json({baskets: [currentBasket], total: 1}))
+            }),
+            rest.patch('*/baskets/*/payment-instruments/*', (req, res, ctx) => {
+                updatePaymentInstrumentCalled = true
+                return res(ctx.json(currentBasket))
             })
         )
 
@@ -1364,6 +1369,9 @@ describe('Checkout error display and submitOrder', () => {
         await waitFor(() => {
             expect(orderPostCalled).toBe(true)
         })
+        // The fixture's payment instrument has amount=0 while orderTotal is non-zero,
+        // so doCreateOrder should have synced the amount before placing the order.
+        expect(updatePaymentInstrumentCalled).toBe(true)
         expect(
             screen.queryByText(/An unexpected error occurred during checkout/i)
         ).not.toBeInTheDocument()
