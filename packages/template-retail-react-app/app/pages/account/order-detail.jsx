@@ -196,33 +196,6 @@ const AccountOrderDetail = () => {
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
-    // Fetch product detail for the items the shopper can return so the modal
-    // can render a "<Name> — <Variation>" line. Gated on modal open + at least
-    // one returnable item to keep the order-detail page itself cheap.
-    const returnableProductIds = useMemo(
-        () => returnableItems.map((i) => i.productId).filter(Boolean),
-        [returnableItems]
-    )
-    const {data: returnableProducts} = useProducts(
-        {parameters: {ids: returnableProductIds.join(',')}},
-        {
-            enabled: onClient && isReturnModalOpen && returnableProductIds.length > 0,
-            select: (result) =>
-                result?.data?.reduce((acc, p) => {
-                    acc[p.id] = p
-                    return acc
-                }, {})
-        }
-    )
-    const enrichedReturnableItems = useMemo(
-        () =>
-            returnableItems.map((item) => ({
-                ...(returnableProducts?.[item.productId] || {}),
-                ...item
-            })),
-        [returnableItems, returnableProducts]
-    )
-
     const handleCloseReturnModal = useCallback(() => {
         closeReturnModal()
         setReturnSelection({})
@@ -785,7 +758,7 @@ const AccountOrderDetail = () => {
                     isOpen={isReturnModalOpen}
                     onClose={handleCloseReturnModal}
                     order={order}
-                    returnableItems={enrichedReturnableItems}
+                    returnableItems={returnableItems}
                     selection={returnSelection}
                     onSelectionChange={setReturnSelection}
                     onReview={handleReviewReturn}
