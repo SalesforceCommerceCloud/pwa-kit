@@ -152,29 +152,96 @@ test('triggers cancellation with default reason when user clicks Confirm cancell
     expect(onCancel).toHaveBeenCalledWith(mockOrder, 'Not specified')
 })
 
-test('hides reason dropdown when no reason codes provided', () => {
-    renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={jest.fn()}
-            order={mockOrder}
-            onCancel={jest.fn()}
-        />
-    )
+describe('Metadata API failure scenarios', () => {
+    test('hides reason dropdown when no reason codes provided (API failed)', () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
 
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-})
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+        expect(document.querySelector('label[for="cancel-reason-select"]')).not.toBeInTheDocument()
+    })
 
-test('passes empty string when no reason codes and confirm is clicked', async () => {
-    const user = userEvent.setup()
-    const onCancel = jest.fn()
+    test('hides reason dropdown when reason codes is undefined', () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+                reasonCodes={undefined}
+            />
+        )
 
-    renderWithProviders(
-        <CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} onCancel={onCancel} />
-    )
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    })
 
-    await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
-    expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
+    test('hides reason dropdown when reason codes is empty array', () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+                reasonCodes={[]}
+            />
+        )
+
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    })
+
+    test('confirm button remains enabled when reason codes unavailable', () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
+
+        const confirmButton = screen.getByRole('button', {name: /confirm cancellation/i})
+        expect(confirmButton).not.toBeDisabled()
+    })
+
+    test('passes empty string when metadata failed and confirm is clicked', async () => {
+        const user = userEvent.setup()
+        const onCancel = jest.fn()
+
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
+        )
+
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+        expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
+    })
+
+    test('still shows modal title, description, and impact text when metadata failed', () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
+
+        expect(screen.getByText(/cancel order 00028011/i)).toBeInTheDocument()
+        expect(screen.getByText(/confirm cancellation below/i)).toBeInTheDocument()
+        expect(screen.getByText(/this cancels the entire order/i)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /keep order/i})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+    })
 })
 
 describe('Cancellation Reason Select', () => {

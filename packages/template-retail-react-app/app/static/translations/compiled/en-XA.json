@@ -1879,6 +1879,20 @@
       "value": "]"
     }
   ],
+  "cancel_order_modal.text.confirm_description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿƞƒīřḿ ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ ƀḗḗŀǿǿẇ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "cancel_order_modal.text.impact": [
     {
       "type": 0,
