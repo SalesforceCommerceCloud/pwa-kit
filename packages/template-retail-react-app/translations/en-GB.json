@@ -96,7 +96,7 @@
     "defaultMessage": "Account Details"
   },
   "account_order_detail.alert.cancellation_error_conflict": {
-    "defaultMessage": "This order is already being processed and cannot be canceled. Please reach out to the Merchant."
+    "defaultMessage": "This order is already being processed and cannot be cancelled. Please contact the merchant for assistance."
   },
   "account_order_detail.alert.cancellation_error_generic": {
     "defaultMessage": "We couldn't process your cancellation right now. Please wait a moment and try again."

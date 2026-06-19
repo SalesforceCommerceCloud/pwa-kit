@@ -137,6 +137,8 @@ const AccountOrderDetail = () => {
         onClose: closeCancelModal
     } = useDisclosure()
     const [cancelFeedback, setCancelFeedback] = useState(null)
+    // Terminal errors (404/409) mean retrying won't help — disable the button
+    const [cancelTerminal, setCancelTerminal] = useState(false)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
 
     // expand: 'oms' returns order data from OMS if the order is successfully
@@ -220,7 +222,7 @@ const AccountOrderDetail = () => {
                 })
             } else if (status === 409) {
                 description = formatMessage({
-                    defaultMessage: 'This order is already being processed and cannot be canceled. Please reach out to the Merchant.',
+                    defaultMessage: 'This order is already being processed and cannot be cancelled. Please contact the merchant for assistance.',
                     id: 'account_order_detail.alert.cancellation_error_conflict'
                 })
             } else {
@@ -240,6 +242,8 @@ const AccountOrderDetail = () => {
                           id: 'account_order_detail.alert.cancellation_error_title_generic'
                       })
             setCancelFeedback({status: 'error', title, description})
+            // 404/409 are terminal — the order can't be cancelled, disable the button
+            if (status === 404 || status === 409) setCancelTerminal(true)
         },
         [formatMessage]
     )
@@ -444,7 +448,7 @@ const AccountOrderDetail = () => {
                                 setCancelFeedback(null)
                                 openCancelModal()
                             }}
-                            isDisabled={!canCancel || cancelFeedback?.status === 'success'}
+                            isDisabled={!canCancel || cancelFeedback?.status === 'success' || cancelTerminal}
                         >
                             <FormattedMessage
                                 defaultMessage="Cancel order"
