@@ -394,7 +394,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         <ConfigContext.Provider
             value={{
                 clientId,
-                headers,
+                // Expose resolved (string) headers, not the raw callable-valued prop:
+                // consumers like generateCustomEndpointOptions spread these straight onto
+                // outbound requests, and a function value would be sent as `[Function]`.
+                headers: resolvedHeaders,
                 organizationId,
                 proxy,
                 redirectURI,

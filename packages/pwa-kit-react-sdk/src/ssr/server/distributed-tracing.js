@@ -169,16 +169,6 @@ export const withChildSpan = async (name, fn) => {
 }
 
 /**
- * Returns the W3C `traceparent` string for the currently-active span, or null
- * if tracing is disabled or there is no active span. Must be called from within
- * the active server-span context (e.g. during SSR inside withServerSpan).
- *
- * Used for outbound propagation: the template passes this as a callable header
- * value so each SCAPI request carries the current span's traceparent.
- *
- * @returns {string|null} e.g. "00-<traceId>-<spanId>-01"
- */
-/**
  * Sets an attribute on the currently-active span, if any. Used for attributes
  * that are only known partway through the render (e.g. `http.route`, which is
  * resolved after route matching, inside the server span). No-op when tracing is
@@ -199,6 +189,16 @@ export const setActiveSpanAttribute = (key, value) => {
     }
 }
 
+/**
+ * Returns the W3C `traceparent` string for the currently-active span, or null
+ * if tracing is disabled or there is no active span. Must be called from within
+ * the active server-span context (e.g. during SSR inside withServerSpan).
+ *
+ * Used for outbound propagation: the template passes this as a callable header
+ * value so each SCAPI request carries the current span's traceparent.
+ *
+ * @returns {string|null} e.g. "00-<traceId>-<spanId>-01"
+ */
 export const getCurrentTraceparent = () => {
     if (!isDistributedTracingEnabled()) return null
     try {

@@ -7,6 +7,7 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
+import useConfig from './hooks/useConfig'
 import {renderWithProviders} from './test-utils'
 import Auth from './auth'
 
@@ -232,6 +233,28 @@ describe('provider', () => {
                 headers: {traceparent: () => undefined} as any
             })
             expect(screen.getByTestId('has-header').textContent).toBe('false')
+        })
+
+        test('ConfigContext exposes resolved (string) headers, not the raw callable', () => {
+            // generateCustomEndpointOptions spreads config.headers (from this context)
+            // straight onto outbound requests, so a raw function would be sent as
+            // `[Function]`. The context must expose resolved strings.
+            const getTraceparent = jest.fn(() => '00-trace-span-01')
+            const Component = () => {
+                const config = useConfig()
+                const val = config?.headers?.['traceparent']
+                return (
+                    <>
+                        <span data-testid="cfg-type">{typeof val}</span>
+                        <span data-testid="cfg-value">{String(val)}</span>
+                    </>
+                )
+            }
+            renderWithProviders(<Component />, {
+                headers: {traceparent: getTraceparent} as any
+            })
+            expect(screen.getByTestId('cfg-type').textContent).toBe('string')
+            expect(screen.getByTestId('cfg-value').textContent).toBe('00-trace-span-01')
         })
     })
 
