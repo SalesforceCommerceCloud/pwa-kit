@@ -363,7 +363,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.demandware.net',
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
-                        'www.gstatic.com' // optional, if icon is on gstatic
+                        'www.gstatic.com', // optional, if icon is on gstatic
+                        // Commerce Client messaging widget images
+                        'cimulate.ai',
+                        '*.cimulate.ai'
                     ],
                     'script-src': [
                         // Commerce Client messaging widget bundle (messaging.umd.js)
