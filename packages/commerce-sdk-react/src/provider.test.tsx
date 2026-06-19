@@ -5,10 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import nock from 'nock'
+import {screen, waitFor} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
 import useConfig from './hooks/useConfig'
-import {renderWithProviders} from './test-utils'
+import {renderWithProviders, renderHookWithProviders, DEFAULT_TEST_HOST} from './test-utils'
+import * as shopperSearchQueries from './hooks/ShopperSearch/query'
+import {resolveHeaders} from './provider'
 import Auth from './auth'
 
 jest.mock('./auth/index.ts')
@@ -163,9 +166,6 @@ describe('provider', () => {
     })
 
     describe('resolveHeaders', () => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const {resolveHeaders} = require('./provider')
-
         test('string values pass through unchanged', () => {
             expect(resolveHeaders({'correlation-id': 'static-value'})).toEqual({
                 'correlation-id': 'static-value'
@@ -260,10 +260,6 @@ describe('provider', () => {
 
     describe('outbound integration: traceparent reaches the wire', () => {
         test('a callable traceparent header is resolved and sent on an outbound SCAPI request', async () => {
-            const nock = require('nock')
-            const {renderHookWithProviders, DEFAULT_TEST_HOST} = require('./test-utils')
-            const queries = require('./hooks/ShopperSearch/query')
-
             nock.cleanAll()
             let sentTraceparent: string | string[] | undefined
             nock(DEFAULT_TEST_HOST)
@@ -281,12 +277,13 @@ describe('provider', () => {
             }))
 
             const {result} = renderHookWithProviders(
-                () => queries.useProductSearch({parameters: {q: 'something'}}),
+                () => shopperSearchQueries.useProductSearch({parameters: {q: 'something'}}),
                 {headers: {traceparent: () => '00-abc123-def456-01'} as any}
             )
 
-            const {waitFor} = require('@testing-library/react')
-            await waitFor(() => expect(result.current.isSuccess || result.current.isError).toBe(true))
+            await waitFor(() =>
+                expect(result.current.isSuccess || result.current.isError).toBe(true)
+            )
 
             // nock exposes a header as either a string or a single-element array.
             const sent = Array.isArray(sentTraceparent) ? sentTraceparent[0] : sentTraceparent

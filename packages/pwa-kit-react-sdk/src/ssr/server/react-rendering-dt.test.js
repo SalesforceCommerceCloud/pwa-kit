@@ -42,7 +42,11 @@ jest.mock('./opentelemetry-server', () => ({
     tracePerformance: (...args) => mockTracePerformance(...args)
 }))
 
-// Mock everything that performRender needs so it doesn't blow up if reached
+// Mock everything that performRender needs so it doesn't blow up if reached.
+// jest.mock factories must require() inline (hoisted above imports) and define
+// minimal mock components — disable the rules that conflict with that pattern,
+// matching react-rendering.test.js.
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-empty-function, react/prop-types */
 jest.mock('../universal/compatibility', () => {
     const React = require('react')
     class MockAppConfig extends React.Component {
@@ -81,6 +85,7 @@ jest.mock('../universal/routes', () => {
     }
     return [{path: '/', component: TestPage, exact: true}]
 })
+/* eslint-enable @typescript-eslint/no-var-requires, @typescript-eslint/no-empty-function, react/prop-types */
 
 jest.mock('@loadable/server', () => ({
     ChunkExtractor: class {

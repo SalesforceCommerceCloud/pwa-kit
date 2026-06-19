@@ -15,6 +15,7 @@ jest.mock('../../utils/opentelemetry-config', () => ({
     getOTELConfig: jest.fn()
 }))
 
+import {context} from '@opentelemetry/api'
 import {
     isDistributedTracingEnabled,
     extractContext,
@@ -41,13 +42,11 @@ describe('distributed-tracing', () => {
     })
 
     test('extractContext returns context.active() on malformed headers', () => {
-        const {context} = require('@opentelemetry/api')
         const result = extractContext(null)
         // Should not throw and should return a valid context
         expect(result).toBeDefined()
-        // The result with null/malformed headers should equal context.active()
-        const activeCtx = context.active()
-        expect(result).toBeDefined()
+        // The result with null/malformed headers should fall back to context.active()
+        expect(result).toEqual(context.active())
     })
 
     test('withServerSpan parents onto an incoming W3C traceparent', async () => {

@@ -512,8 +512,18 @@ describe('withReactQuery', function () {
             const fetchA = jest.fn().mockResolvedValue({data: 'a'})
             const fetchB = jest.fn().mockResolvedValue({data: 'b'})
             const queries = [
-                {options: {enabled: true}, meta: {displayName: 'useProductSearch'}, queryHash: 'h-a', fetch: fetchA},
-                {options: {enabled: true}, meta: {displayName: 'useCategory'}, queryHash: 'h-b', fetch: fetchB}
+                {
+                    options: {enabled: true},
+                    meta: {displayName: 'useProductSearch'},
+                    queryHash: 'h-a',
+                    fetch: fetchA
+                },
+                {
+                    options: {enabled: true},
+                    meta: {displayName: 'useCategory'},
+                    queryHash: 'h-b',
+                    fetch: fetchB
+                }
             ]
             const res = makeRes(queries, withChildSpan)
 
@@ -534,7 +544,12 @@ describe('withReactQuery', function () {
                 return fn()
             }
             const queries = [
-                {options: {enabled: true}, meta: {}, queryHash: 'h-0', fetch: jest.fn().mockResolvedValue({})}
+                {
+                    options: {enabled: true},
+                    meta: {},
+                    queryHash: 'h-0',
+                    fetch: jest.fn().mockResolvedValue({})
+                }
             ]
             const res = makeRes(queries, withChildSpan)
 
@@ -547,7 +562,12 @@ describe('withReactQuery', function () {
         test('no-op when __withChildSpan is absent: queries still fetch (no throw)', async () => {
             const fetchA = jest.fn().mockResolvedValue({data: 'a'})
             const queries = [
-                {options: {enabled: true}, meta: {displayName: 'useX'}, queryHash: 'h-a', fetch: fetchA}
+                {
+                    options: {enabled: true},
+                    meta: {displayName: 'useX'},
+                    queryHash: 'h-a',
+                    fetch: fetchA
+                }
             ]
             const res = makeRes(queries, undefined)
 
