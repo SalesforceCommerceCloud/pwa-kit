@@ -66,7 +66,14 @@ const formatVariationSummary = (item) => {
         .join(' / ')
 }
 
-const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onReasonChange}) => {
+const ReturnableItemRow = React.memo(function ReturnableItemRow({
+    item,
+    row,
+    reasons,
+    onToggle,
+    onQuantityChange,
+    onReasonChange
+}) {
     const intl = useIntl()
     const checkboxId = useId()
     const quantityId = useId()
@@ -74,6 +81,22 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
     const max = item.omsData?.quantityAvailableToReturn ?? 1
     const variation = formatVariationSummary(item)
     const displayName = variation ? `${item.productName} — ${variation}` : item.productName || ''
+    const itemId = item.itemId
+
+    const handleCheckboxChange = useCallback(
+        (e) => onToggle(item, e.target.checked),
+        [onToggle, item]
+    )
+    const handleQuantityPickerChange = useCallback(
+        (_str, num) => {
+            if (Number.isFinite(num)) onQuantityChange(itemId, num)
+        },
+        [onQuantityChange, itemId]
+    )
+    const handleReasonSelectChange = useCallback(
+        (e) => onReasonChange(itemId, e.target.value),
+        [onReasonChange, itemId]
+    )
 
     return (
         <Box
@@ -87,7 +110,7 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                 <Checkbox
                     id={checkboxId}
                     isChecked={!!row?.checked}
-                    onChange={(e) => onToggle(e.target.checked)}
+                    onChange={handleCheckboxChange}
                     aria-label={intl.formatMessage(messages.itemCheckboxLabel, {
                         name: displayName,
                         count: max
@@ -113,9 +136,7 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                                     step={1}
                                     clampValueOnBlur={true}
                                     precision={0}
-                                    onChange={(_str, num) => {
-                                        if (Number.isFinite(num)) onQuantityChange(num)
-                                    }}
+                                    onChange={handleQuantityPickerChange}
                                     productName={displayName}
                                 />
                             </FormControl>
@@ -127,7 +148,7 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
                                     id={reasonId}
                                     size="sm"
                                     value={row.reasonCode || ''}
-                                    onChange={(e) => onReasonChange(e.target.value)}
+                                    onChange={handleReasonSelectChange}
                                     aria-label={intl.formatMessage(messages.reasonFor, {
                                         name: displayName
                                     })}
@@ -148,7 +169,7 @@ const ReturnableItemRow = ({item, row, reasons, onToggle, onQuantityChange, onRe
             </HStack>
         </Box>
     )
-}
+})
 ReturnableItemRow.propTypes = {
     item: PropTypes.object.isRequired,
     row: PropTypes.object,
@@ -319,9 +340,9 @@ const ReturnItemsModal = ({
                     item={item}
                     row={selection?.[item.itemId]}
                     reasons={reasons}
-                    onToggle={(checked) => handleToggle(item, checked)}
-                    onQuantityChange={(qty) => handleQuantityChange(item.itemId, qty)}
-                    onReasonChange={(code) => handleReasonChange(item.itemId, code)}
+                    onToggle={handleToggle}
+                    onQuantityChange={handleQuantityChange}
+                    onReasonChange={handleReasonChange}
                 />
             ))}
         </Stack>
