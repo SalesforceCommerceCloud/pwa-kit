@@ -63,5 +63,34 @@ export const messages = defineMessages({
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
         id: 'return_items_modal.label.item_checkbox'
+    },
+    reviewTitle: {
+        defaultMessage: 'Review your return',
+        id: 'return_items_modal.heading.review_return'
+    },
+    reviewSubhead: {
+        defaultMessage:
+            "Confirm the items below. We'll email a return label once your request is submitted.",
+        id: 'return_items_modal.text.review_description'
+    },
+    reviewQuantity: {
+        defaultMessage: 'Quantity: {count}',
+        id: 'return_items_modal.text.review_quantity'
+    },
+    reviewReason: {
+        defaultMessage: 'Reason: {reason}',
+        id: 'return_items_modal.text.review_reason'
+    },
+    backButton: {
+        defaultMessage: 'Back',
+        id: 'return_items_modal.button.back'
+    },
+    submitButton: {
+        defaultMessage: 'Submit return',
+        id: 'return_items_modal.button.submit_return'
+    },
+    submitError: {
+        defaultMessage: 'Something went wrong submitting your return. Please try again.',
+        id: 'return_items_modal.text.submit_error'
     }
 })

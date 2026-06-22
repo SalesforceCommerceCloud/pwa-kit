@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useCallback, useEffect, useId, useMemo, useRef} from 'react'
+import React, {useCallback, useEffect, useId, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
@@ -195,14 +195,18 @@ const isSelectionValid = (selection, returnableItems) => {
 }
 
 /**
- * Step 1 of the return flow. Renders as a centered Modal at `md+` and a
+ * The two-step return flow. Renders as a centered Modal at `md+` and a
  * bottom-sheet Drawer on `base` (per design). Selection state lives in the
  * parent (`order-detail.jsx`) so the wrapper swap on viewport resize doesn't
  * reset what the shopper has chosen.
  *
- * The follow-up review step (W-22821838) is a sibling view inside the same
- * modal stack. This component invokes `onReview(payload)` with the API-shaped
- * `productItems` array when the shopper clicks **Review return**.
+ * The review step (W-22821838) is a second view *inside the same* Modal/Drawer
+ * shell, swapped via local `view` state so the Chakra dialog never remounts and
+ * the focus trap survives the transition. **Review return** advances to the
+ * review view; **Back** returns to selection with all state preserved; **Submit
+ * return** invokes `onSubmit(payload)` with the API-shaped `productItems` array.
+ * The parent owns the `returnOmsOrder` mutation and feeds `isSubmitting` /
+ * `submitError` back in.
  */
 const ReturnItemsModal = ({
     isOpen,
@@ -211,10 +215,25 @@ const ReturnItemsModal = ({
     returnableItems,
     selection,
     onSelectionChange,
-    onReview
+    onSubmit,
+    isSubmitting = false,
+    submitError = null,
+    finalFocusRef
 }) => {
     const isMobile = useBreakpointValue({base: true, md: false})
     const reviewDisabledHintId = useId()
+
+    // 'select' (step 1) | 'review' (step 2). Lives locally so the same Chakra
+    // shell swaps its inner header/body/footer without remounting.
+    const [view, setView] = useState('select')
+    // Headings to move focus to on each view swap (a11y: announce the change).
+    const selectHeadingRef = useRef(null)
+    const reviewHeadingRef = useRef(null)
+
+    // Reopening the modal always starts at the selection view.
+    useEffect(() => {
+        if (!isOpen) setView('select')
+    }, [isOpen])
 
     const reviewQuery = useOmsMetaData(
         {},
@@ -300,12 +319,66 @@ const ReturnItemsModal = ({
         [selection, returnableItems]
     )
 
-    const handleReview = useCallback(() => {
-        const payload = buildReturnProductItems(selection, defaultReasonCode)
-        onReview(payload)
-    }, [selection, defaultReasonCode, onReview])
+    const handleReview = useCallback(() => setView('review'), [])
+    const handleBack = useCallback(() => setView('select'), [])
 
-    const body = reviewQuery.isLoading ? (
+    // Guard against a double-fire: the parent's `isSubmitting` only flips true
+    // after it re-renders, so two clicks dispatched in the same tick would both
+    // pass the prop check. The ref latches synchronously on the first click and
+    // releases once the request settles (isSubmitting falls back to false) or
+    // the modal closes.
+    const submitInFlightRef = useRef(false)
+    useEffect(() => {
+        if (!isSubmitting) submitInFlightRef.current = false
+    }, [isSubmitting])
+    useEffect(() => {
+        if (!isOpen) submitInFlightRef.current = false
+    }, [isOpen])
+    // A reported error settles the in-flight request too, so Retry can re-fire
+    // even when the parent's `isSubmitting` flag never toggled (e.g. a
+    // synchronous rejection that resolves within the same render).
+    useEffect(() => {
+        if (submitError) submitInFlightRef.current = false
+    }, [submitError])
+
+    const handleSubmit = useCallback(() => {
+        if (isSubmitting || submitInFlightRef.current) return
+        submitInFlightRef.current = true
+        const payload = buildReturnProductItems(selection, defaultReasonCode)
+        onSubmit(payload)
+    }, [isSubmitting, selection, defaultReasonCode, onSubmit])
+
+    // Move focus to the active view's heading on swap so screen readers know
+    // the content changed (forward to review and back to selection).
+    useEffect(() => {
+        if (!isOpen) return
+        const target = view === 'review' ? reviewHeadingRef.current : selectHeadingRef.current
+        target?.focus()
+    }, [view, isOpen])
+
+    // Resolve the human-readable label for the picked reason code. OMS
+    // `returnReasonCodes` entries are `{reason, default}` — `reason` is both the
+    // code and the display text — so we match on it and fall back to the raw
+    // code (never the default; that would misstate the shopper's choice).
+    const reviewRows = useMemo(() => {
+        if (view !== 'review') return []
+        return Object.entries(selection || {})
+            .filter(([, row]) => row?.checked)
+            .map(([itemId, row]) => {
+                const item = returnableItems.find((i) => i.itemId === itemId)
+                const variation = item ? formatVariationSummary(item) : ''
+                const displayName = item
+                    ? variation
+                        ? `${item.productName} — ${variation}`
+                        : item.productName || ''
+                    : itemId
+                const reasonLabel =
+                    reasons.find((r) => r.reason === row.reasonCode)?.reason || row.reasonCode
+                return {itemId, displayName, quantity: row.quantity, reasonLabel}
+            })
+    }, [view, selection, returnableItems, reasons])
+
+    const selectBody = reviewQuery.isLoading ? (
         <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
             <VisuallyHidden>
                 <FormattedMessage {...messages.loadingReasons} />
@@ -346,9 +419,67 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
-    const header = (
+    const reviewBody = (
+        <Stack spacing={3}>
+            {submitError && (
+                <Alert status="error" role="alert" data-testid="return-items-modal-submit-error">
+                    <AlertIcon />
+                    <Stack spacing={2}>
+                        <AlertDescription>
+                            <FormattedMessage {...messages.submitError} />
+                        </AlertDescription>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleSubmit}
+                            isDisabled={isSubmitting}
+                            data-testid="return-items-modal-submit-retry"
+                        >
+                            <FormattedMessage {...messages.retryButton} />
+                        </Button>
+                    </Stack>
+                </Alert>
+            )}
+            {reviewRows.map((row) => (
+                <Box
+                    key={row.itemId}
+                    p={4}
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="base"
+                    data-testid="return-items-modal-review-row"
+                >
+                    <Stack spacing={1}>
+                        <Text fontSize="sm" fontWeight="semibold">
+                            {row.displayName}
+                        </Text>
+                        <Text fontSize="xs" color="gray.600">
+                            <FormattedMessage
+                                {...messages.reviewQuantity}
+                                values={{count: row.quantity}}
+                            />
+                        </Text>
+                        <Text fontSize="xs" color="gray.600">
+                            <FormattedMessage
+                                {...messages.reviewReason}
+                                values={{reason: row.reasonLabel}}
+                            />
+                        </Text>
+                    </Stack>
+                </Box>
+            ))}
+        </Stack>
+    )
+
+    const selectHeader = (
         <Stack spacing={1}>
-            <Text fontSize="lg" fontWeight="bold">
+            <Text
+                ref={selectHeadingRef}
+                tabIndex={-1}
+                fontSize="lg"
+                fontWeight="bold"
+                _focus={{outline: 'none'}}
+            >
                 <FormattedMessage {...messages.title} values={{orderNo: order?.orderNo}} />
             </Text>
             <Text fontSize="sm" color="gray.600" fontWeight="normal">
@@ -357,7 +488,24 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
-    const footer = (
+    const reviewHeader = (
+        <Stack spacing={1}>
+            <Text
+                ref={reviewHeadingRef}
+                tabIndex={-1}
+                fontSize="lg"
+                fontWeight="bold"
+                _focus={{outline: 'none'}}
+            >
+                <FormattedMessage {...messages.reviewTitle} />
+            </Text>
+            <Text fontSize="sm" color="gray.600" fontWeight="normal">
+                <FormattedMessage {...messages.reviewSubhead} />
+            </Text>
+        </Stack>
+    )
+
+    const selectFooter = (
         <Stack
             direction={{base: 'column-reverse', md: 'row'}}
             spacing={3}
@@ -388,14 +536,57 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
+    const reviewFooter = (
+        <Stack
+            direction={{base: 'column-reverse', md: 'row'}}
+            spacing={3}
+            width={{base: 'full', md: 'auto'}}
+            justifyContent="flex-end"
+        >
+            <Button
+                variant="outline"
+                onClick={handleBack}
+                isDisabled={isSubmitting}
+                width={{base: 'full', md: 'auto'}}
+                data-testid="return-items-modal-back"
+            >
+                <FormattedMessage {...messages.backButton} />
+            </Button>
+            <Button
+                colorScheme="blue"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                isDisabled={isSubmitting}
+                aria-busy={isSubmitting}
+                width={{base: 'full', md: 'auto'}}
+                data-testid="return-items-modal-submit"
+            >
+                <FormattedMessage {...messages.submitButton} />
+            </Button>
+        </Stack>
+    )
+
+    const isReview = view === 'review'
+    const header = isReview ? reviewHeader : selectHeader
+    const body = isReview ? reviewBody : selectBody
+    const footer = isReview ? reviewFooter : selectFooter
+
     if (isMobile) {
         return (
-            <Drawer isOpen={isOpen} onClose={onClose} placement="bottom" size="full">
+            <Drawer
+                isOpen={isOpen}
+                onClose={onClose}
+                placement="bottom"
+                size="full"
+                finalFocusRef={finalFocusRef}
+            >
                 <DrawerOverlay />
                 <DrawerContent data-testid="return-items-modal-drawer">
                     <DrawerHeader pb={1}>{header}</DrawerHeader>
                     <DrawerCloseButton />
-                    <DrawerBody pt={2}>{body}</DrawerBody>
+                    <DrawerBody pt={2} aria-live="polite">
+                        {body}
+                    </DrawerBody>
                     <DrawerFooter>{footer}</DrawerFooter>
                 </DrawerContent>
             </Drawer>
@@ -403,12 +594,21 @@ const ReturnItemsModal = ({
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="2xl" isCentered scrollBehavior="inside">
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            size="2xl"
+            isCentered
+            scrollBehavior="inside"
+            finalFocusRef={finalFocusRef}
+        >
             <ModalOverlay />
             <ModalContent data-testid="return-items-modal">
                 <ModalHeader pb={1}>{header}</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody pt={2}>{body}</ModalBody>
+                <ModalBody pt={2} aria-live="polite">
+                    {body}
+                </ModalBody>
                 <ModalFooter>{footer}</ModalFooter>
             </ModalContent>
         </Modal>
@@ -422,7 +622,14 @@ ReturnItemsModal.propTypes = {
     returnableItems: PropTypes.array.isRequired,
     selection: PropTypes.object,
     onSelectionChange: PropTypes.func.isRequired,
-    onReview: PropTypes.func.isRequired
+    /** Invoked with the API-shaped `productItems` array when the shopper submits. */
+    onSubmit: PropTypes.func.isRequired,
+    /** True while the parent's `returnOmsOrder` mutation is in flight. */
+    isSubmitting: PropTypes.bool,
+    /** Truthy when the submit failed; renders an inline error + Retry on the review view. */
+    submitError: PropTypes.any,
+    /** Element to receive focus when the modal closes (stable across the post-success refetch). */
+    finalFocusRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
 export default ReturnItemsModal

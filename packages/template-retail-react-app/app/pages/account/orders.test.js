@@ -23,13 +23,31 @@ import {
 import Orders from '@salesforce/retail-react-app/app/pages/account/orders'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+// `mockMutateAsync` backs the cancel flow (cancelOmsOrder); `mockReturnMutateAsync`
+// backs the return flow (returnOmsOrder). The hook mock branches on the mutation
+// name so a test can prove which endpoint was actually invoked instead of a single
+// shared spy answering for every mutation.
 const mockMutateAsync = jest.fn()
+const mockReturnMutateAsync = jest.fn()
+// Per-name isLoading control so the modal's `isSubmitting` can be exercised.
+let mockReturnIsLoading = false
+const mockOmsMetaDataReturnReasonCodes = [
+    {reason: 'Wrong size', default: true},
+    {reason: 'Defect', default: false},
+    {reason: 'Changed my mind', default: false}
+]
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...actual,
-        useShopperOrdersMutation: () => ({mutateAsync: mockMutateAsync, isLoading: false}),
-        useOmsMetaData: () => ({data: null, isLoading: false}),
+        useShopperOrdersMutation: (name) =>
+            name === 'returnOmsOrder'
+                ? {mutateAsync: mockReturnMutateAsync, isLoading: mockReturnIsLoading}
+                : {mutateAsync: mockMutateAsync, isLoading: false},
+        useOmsMetaData: () => ({
+            data: {cancelReasonCodes: [], returnReasonCodes: mockOmsMetaDataReturnReasonCodes},
+            isLoading: false
+        }),
         useCustomerType: () => ({isRegistered: true, isGuest: false}),
         useCustomerId: () => 'testCustomerId'
     }
@@ -481,6 +499,7 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
             customerInfo: {customerId: 'testCustomerId'},
             productItems: [
                 {
+                    itemId: 'returnable-item-1',
                     productId: 'returnable-1',
                     productName: 'Returnable A',
                     quantity: 2,
@@ -549,6 +568,111 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         )
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+})
+
+describe('Return submission (W-22821838)', () => {
+    const createReturnEligibleOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            customerInfo: {customerId: 'testCustomerId'},
+            productItems: [
+                {
+                    itemId: 'returnable-item-1',
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 2
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    // Walk the modal from the trigger through select → review.
+    const openModalAndReview = async (user) => {
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+        await user.click(screen.getAllByRole('checkbox')[0])
+        await user.click(screen.getByTestId('return-items-modal-review'))
+        return screen.findByTestId('return-items-modal-submit')
+    }
+
+    beforeEach(() => {
+        mockReturnMutateAsync.mockReset()
+        mockReturnIsLoading = false
+    })
+    afterEach(() => {
+        mockReturnIsLoading = false
+    })
+
+    test('Submit invokes returnOmsOrder (not cancel) with the orderNo + productItems body', async () => {
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        const order = createReturnEligibleOmsOrder()
+        setupOrderDetailsPage(order)
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(1))
+        expect(mockReturnMutateAsync).toHaveBeenCalledWith({
+            parameters: {orderNo: order.orderNo},
+            body: {productItems: [{itemId: 'returnable-item-1', quantity: 1}]}
+        })
+        // The cancel mutation must NOT have fired.
+        expect(mockMutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('success closes the modal and shows the return-submitted feedback', async () => {
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        // The success alert is announced (after the 300ms a11y delay).
+        expect(await screen.findByText(/return submitted/i)).toBeInTheDocument()
+        // Modal is gone.
+        await waitFor(() =>
+            expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
+        )
+        // A return success must NOT flip the order status Badge to "Cancelled".
+        expect(screen.queryByText(/^cancelled$/i)).not.toBeInTheDocument()
+    })
+
+    test('success returns focus to the Order Details heading', async () => {
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        await screen.findByText(/return submitted/i)
+        const heading = screen.getByRole('heading', {level: 1, name: /order details/i})
+        await waitFor(() => expect(heading).toHaveFocus())
+    })
+
+    test('error keeps the modal open with an inline alert + Retry that re-fires', async () => {
+        mockReturnMutateAsync.mockRejectedValueOnce({response: {status: 500}})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        // Inline error surfaces and the review view stays mounted.
+        expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
+        expect(screen.getByText(/review your return/i)).toBeInTheDocument()
+
+        // Retry re-invokes the mutation.
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        await user.click(screen.getByTestId('return-items-modal-submit-retry'))
+        await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(2))
     })
 })
 

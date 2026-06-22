@@ -147,6 +147,11 @@ const AccountOrderDetail = () => {
     // Terminal errors (404/409) mean retrying won't help — disable the button
     const [cancelTerminal, setCancelTerminal] = useState(false)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
+    const returnMutation = useShopperOrdersMutation(ShopperOrdersMutations.ReturnOmsOrder)
+    // Return feedback is kept separate from cancelFeedback so the "Cancelled"
+    // badge (which keys off cancelFeedback) never fires on a return success.
+    const [returnFeedback, setReturnFeedback] = useState(null)
+    const [returnSubmitError, setReturnSubmitError] = useState(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
     // viewport resize doesn't lose the shopper's progress, and so W-22821838's
     // review step can read the same payload without prop-drilling.
@@ -201,14 +206,40 @@ const AccountOrderDetail = () => {
     const handleCloseReturnModal = useCallback(() => {
         closeReturnModal()
         setReturnSelection({})
+        setReturnSubmitError(null)
     }, [closeReturnModal])
 
-    const handleReviewReturn = useCallback(
-        (/* payload */) => {
-            // W-22821838 picks up here: swap the modal to its review view and use
-            // `returnSelection` (held above) to render the confirmation rows.
+    const showReturnSuccess = useCallback(() => {
+        setReturnFeedback({
+            status: 'success',
+            title: formatMessage({
+                defaultMessage: 'Return submitted',
+                id: 'account_order_detail.alert.return_success_title'
+            }),
+            description: formatMessage({
+                defaultMessage: "We'll email a return label shortly.",
+                id: 'account_order_detail.alert.return_success_description'
+            })
+        })
+    }, [formatMessage])
+
+    const handleSubmitReturn = useCallback(
+        async (productItems) => {
+            setReturnSubmitError(null)
+            try {
+                await returnMutation.mutateAsync({
+                    parameters: {orderNo: order.orderNo},
+                    body: {productItems}
+                })
+                handleCloseReturnModal()
+                // Delay lets screen readers finish announcing modal close before the alert
+                setTimeout(showReturnSuccess, 300)
+            } catch (e) {
+                // Keep the modal open so the shopper can retry from the review view
+                setReturnSubmitError(e)
+            }
         },
-        []
+        [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess]
     )
 
     const canCancel = useMemo(() => {
@@ -369,23 +400,34 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 <Box role="alert" aria-live="assertive" aria-atomic="true">
-                    {cancelFeedback && (
-                        <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
-                            <Text
-                                fontWeight="semibold"
-                                fontSize="sm"
-                                color={cancelFeedback.status === 'error' ? 'red.700' : undefined}
-                            >
-                                {cancelFeedback.title}
-                            </Text>
-                            <Text
-                                fontSize="sm"
-                                color={cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'}
-                            >
-                                {cancelFeedback.description}
-                            </Text>
-                        </Box>
-                    )}
+                    {/* Cancel and return each clear the other's feedback before they run,
+                        so at most one is set; render whichever is present. */}
+                    {(returnFeedback || cancelFeedback) &&
+                        (() => {
+                            const feedback = returnFeedback || cancelFeedback
+                            return (
+                                <Box
+                                    p={4}
+                                    border="1px solid"
+                                    borderColor="gray.200"
+                                    borderRadius="base"
+                                >
+                                    <Text
+                                        fontWeight="semibold"
+                                        fontSize="sm"
+                                        color={feedback.status === 'error' ? 'red.700' : undefined}
+                                    >
+                                        {feedback.title}
+                                    </Text>
+                                    <Text
+                                        fontSize="sm"
+                                        color={feedback.status === 'error' ? 'red.700' : 'gray.600'}
+                                    >
+                                        {feedback.description}
+                                    </Text>
+                                </Box>
+                            )
+                        })()}
                 </Box>
 
                 <Stack spacing={[1, 2]}>
@@ -476,6 +518,7 @@ const AccountOrderDetail = () => {
                             size="sm"
                             onClick={() => {
                                 setCancelFeedback(null)
+                                setReturnFeedback(null)
                                 openCancelModal()
                             }}
                             isDisabled={
@@ -492,7 +535,11 @@ const AccountOrderDetail = () => {
                                 data-testid="account-order-detail-start-return"
                                 variant="outline"
                                 size="sm"
-                                onClick={openReturnModal}
+                                onClick={() => {
+                                    setCancelFeedback(null)
+                                    setReturnFeedback(null)
+                                    openReturnModal()
+                                }}
                             >
                                 <FormattedMessage
                                     defaultMessage="Return Items"
@@ -789,7 +836,10 @@ const AccountOrderDetail = () => {
                     returnableItems={returnableItems}
                     selection={returnSelection}
                     onSelectionChange={setReturnSelection}
-                    onReview={handleReviewReturn}
+                    onSubmit={handleSubmitReturn}
+                    isSubmitting={returnMutation.isLoading}
+                    submitError={returnSubmitError}
+                    finalFocusRef={headingRef}
                 />
             )}
         </Stack>
