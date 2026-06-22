@@ -301,9 +301,13 @@ const ReturnItemsModal = ({
     )
 
     const handleReview = useCallback(() => {
+        // Guard the action: the button stays focusable while invalid (see the
+        // aria-disabled note on the Review button) so we must no-op the click
+        // ourselves rather than rely on the native disabled attribute.
+        if (!reviewEnabled) return
         const payload = buildReturnProductItems(selection, defaultReasonCode)
         onReview(payload)
-    }, [selection, defaultReasonCode, onReview])
+    }, [reviewEnabled, selection, defaultReasonCode, onReview])
 
     const body = reviewQuery.isLoading ? (
         <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
@@ -346,15 +350,22 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
+    // Title sits in the header so Chakra wires it as the dialog's
+    // `aria-labelledby`. The subhead leads the body — Chakra auto-sets the
+    // dialog's `aria-describedby` to the ModalBody/DrawerBody id, so keeping
+    // the subhead first in the body is what actually makes it the accessible
+    // description (passing `aria-describedby` to ModalContent is silently
+    // overridden by Chakra's getDialogProps). Mirrors cancel-order-modal.
     const header = (
-        <Stack spacing={1}>
-            <Text fontSize="lg" fontWeight="bold">
-                <FormattedMessage {...messages.title} values={{orderNo: order?.orderNo}} />
-            </Text>
-            <Text fontSize="sm" color="gray.600" fontWeight="normal">
-                <FormattedMessage {...messages.subhead} />
-            </Text>
-        </Stack>
+        <Text fontSize="lg" fontWeight="bold">
+            <FormattedMessage {...messages.title} values={{orderNo: order?.orderNo}} />
+        </Text>
+    )
+
+    const subhead = (
+        <Text fontSize="sm" color="gray.600" fontWeight="normal" mb={3}>
+            <FormattedMessage {...messages.subhead} />
+        </Text>
     )
 
     const footer = (
@@ -375,7 +386,13 @@ const ReturnItemsModal = ({
             <Button
                 colorScheme="blue"
                 onClick={handleReview}
-                isDisabled={!reviewEnabled}
+                // Use aria-disabled (not isDisabled) so the button stays in the
+                // tab order while invalid — a native `disabled` button can't be
+                // focused, so a keyboard/SR user would never hear the
+                // aria-describedby hint explaining why it's disabled. Chakra's
+                // `_disabled` styles still apply (the pseudo matches
+                // [aria-disabled=true]); handleReview no-ops when invalid.
+                aria-disabled={!reviewEnabled}
                 aria-describedby={reviewEnabled ? undefined : reviewDisabledHintId}
                 width={{base: 'full', md: 'auto'}}
                 data-testid="return-items-modal-review"
@@ -395,7 +412,10 @@ const ReturnItemsModal = ({
                 <DrawerContent data-testid="return-items-modal-drawer">
                     <DrawerHeader pb={1}>{header}</DrawerHeader>
                     <DrawerCloseButton />
-                    <DrawerBody pt={2}>{body}</DrawerBody>
+                    <DrawerBody pt={2}>
+                        {subhead}
+                        {body}
+                    </DrawerBody>
                     <DrawerFooter>{footer}</DrawerFooter>
                 </DrawerContent>
             </Drawer>
@@ -408,7 +428,10 @@ const ReturnItemsModal = ({
             <ModalContent data-testid="return-items-modal">
                 <ModalHeader pb={1}>{header}</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody pt={2}>{body}</ModalBody>
+                <ModalBody pt={2}>
+                    {subhead}
+                    {body}
+                </ModalBody>
                 <ModalFooter>{footer}</ModalFooter>
             </ModalContent>
         </Modal>
