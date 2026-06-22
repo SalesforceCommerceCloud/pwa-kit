@@ -57,10 +57,17 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reaso
                 <ModalBody pt={0}>
                     <Stack spacing={4}>
                         <Text fontSize="sm" color="gray.600">
-                            <FormattedMessage
-                                defaultMessage="Select a reason and confirm cancellation."
-                                id="cancel_order_modal.text.select_reason_description"
-                            />
+                            {showReasonDropdown ? (
+                                <FormattedMessage
+                                    defaultMessage="Select a reason and confirm cancellation."
+                                    id="cancel_order_modal.text.select_reason_description"
+                                />
+                            ) : (
+                                <FormattedMessage
+                                    defaultMessage="Confirm cancellation below."
+                                    id="cancel_order_modal.text.confirm_description"
+                                />
+                            )}
                         </Text>
                         <Text fontSize="sm">
                             <FormattedMessage

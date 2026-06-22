@@ -144,6 +144,8 @@ const AccountOrderDetail = () => {
         onClose: closeReturnModal
     } = useDisclosure()
     const [cancelFeedback, setCancelFeedback] = useState(null)
+    // Terminal errors (404/409) mean retrying won't help — disable the button
+    const [cancelTerminal, setCancelTerminal] = useState(false)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
     // viewport resize doesn't lose the shopper's progress, and so W-22821838's
@@ -237,20 +239,44 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
-    const showCancelError = useCallback(() => {
-        setCancelFeedback({
-            status: 'error',
-            title: formatMessage({
-                defaultMessage: 'Unable to cancel order',
-                id: 'account_order_detail.alert.cancellation_error_title'
-            }),
-            description: formatMessage({
-                defaultMessage:
-                    'We could not cancel this order. Please try again or contact support.',
-                id: 'account_order_detail.alert.cancellation_error_description'
-            })
-        })
-    }, [formatMessage])
+    const showCancelError = useCallback(
+        (error) => {
+            const status = error?.response?.status
+            let description
+            if (status === 404) {
+                description = formatMessage({
+                    defaultMessage: 'We could not find this order. Please refresh and try again.',
+                    id: 'account_order_detail.alert.cancellation_error_not_found'
+                })
+            } else if (status === 409) {
+                description = formatMessage({
+                    defaultMessage:
+                        'This order is already being processed and cannot be cancelled. Please reach out to the merchant.',
+                    id: 'account_order_detail.alert.cancellation_error_conflict'
+                })
+            } else {
+                description = formatMessage({
+                    defaultMessage:
+                        "We couldn't process your cancellation right now. Please wait a moment and try again.",
+                    id: 'account_order_detail.alert.cancellation_error_generic'
+                })
+            }
+            const title =
+                status === 404 || status === 409
+                    ? formatMessage({
+                          defaultMessage: 'Unable to cancel order',
+                          id: 'account_order_detail.alert.cancellation_error_title'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'Something went wrong',
+                          id: 'account_order_detail.alert.cancellation_error_title_generic'
+                      })
+            setCancelFeedback({status: 'error', title, description})
+            // 404/409 are terminal — the order can't be cancelled, disable the button
+            if (status === 404 || status === 409) setCancelTerminal(true)
+        },
+        [formatMessage]
+    )
 
     const handleCancelOrder = useCallback(
         async (order, reason) => {
@@ -264,7 +290,7 @@ const AccountOrderDetail = () => {
                 setTimeout(showCancelSuccess, 300)
             } catch (e) {
                 closeCancelModal()
-                setTimeout(showCancelError, 300)
+                setTimeout(() => showCancelError(e), 300)
             }
         },
         [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
@@ -452,7 +478,9 @@ const AccountOrderDetail = () => {
                                 setCancelFeedback(null)
                                 openCancelModal()
                             }}
-                            isDisabled={!canCancel || cancelFeedback?.status === 'success'}
+                            isDisabled={
+                                !canCancel || cancelFeedback?.status === 'success' || cancelTerminal
+                            }
                         >
                             <FormattedMessage
                                 defaultMessage="Cancel order"

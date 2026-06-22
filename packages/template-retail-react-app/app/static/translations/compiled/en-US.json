@@ -203,16 +203,34 @@
       "value": "Account Details"
     }
   ],
-  "account_order_detail.alert.cancellation_error_description": [
+  "account_order_detail.alert.cancellation_error_conflict": [
     {
       "type": 0,
-      "value": "We could not cancel this order. Please try again or contact support."
+      "value": "This order is already being processed and cannot be cancelled. Please reach out to the merchant."
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_generic": [
+    {
+      "type": 0,
+      "value": "We couldn't process your cancellation right now. Please wait a moment and try again."
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_not_found": [
+    {
+      "type": 0,
+      "value": "We could not find this order. Please refresh and try again."
     }
   ],
   "account_order_detail.alert.cancellation_error_title": [
     {
       "type": 0,
       "value": "Unable to cancel order"
+    }
+  ],
+  "account_order_detail.alert.cancellation_error_title_generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong"
     }
   ],
   "account_order_detail.alert.cancellation_success_description": [
@@ -901,6 +919,12 @@
     {
       "type": 0,
       "value": "Reason"
+    }
+  ],
+  "cancel_order_modal.text.confirm_description": [
+    {
+      "type": 0,
+      "value": "Confirm cancellation below."
     }
   ],
   "cancel_order_modal.text.impact": [
