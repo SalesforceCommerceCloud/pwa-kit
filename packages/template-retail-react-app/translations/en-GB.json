@@ -123,10 +123,7 @@
     "defaultMessage": "Cancel order"
   },
   "account_order_detail.button.start_return": {
-    "defaultMessage": "Start return"
-  },
-  "account_order_detail.button.start_return_disabled_explanation": {
-    "defaultMessage": "Returns coming soon"
+    "defaultMessage": "Return Items"
   },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
@@ -1807,6 +1804,48 @@
   },
   "reset_password_form.title.reset_password": {
     "defaultMessage": "Reset Password"
+  },
+  "return_items_modal.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "return_items_modal.button.retry": {
+    "defaultMessage": "Retry"
+  },
+  "return_items_modal.button.review_return": {
+    "defaultMessage": "Review return"
+  },
+  "return_items_modal.heading.return_items": {
+    "defaultMessage": "Return items from order #{orderNo}"
+  },
+  "return_items_modal.hint.review_disabled": {
+    "defaultMessage": "Select at least one item and choose a reason to continue."
+  },
+  "return_items_modal.label.item_checkbox": {
+    "defaultMessage": "{name}, {count, plural, one {# unit} other {# units}} available to return"
+  },
+  "return_items_modal.label.quantity": {
+    "defaultMessage": "Quantity"
+  },
+  "return_items_modal.label.reason": {
+    "defaultMessage": "Reason"
+  },
+  "return_items_modal.label.reason_for": {
+    "defaultMessage": "Reason for {name}"
+  },
+  "return_items_modal.placeholder.select_reason": {
+    "defaultMessage": "Select a reason"
+  },
+  "return_items_modal.text.available_to_return": {
+    "defaultMessage": "Up to {count, plural, one {# unit} other {# units}} available to return"
+  },
+  "return_items_modal.text.loading_reasons": {
+    "defaultMessage": "Loading return reasons…"
+  },
+  "return_items_modal.text.reasons_error": {
+    "defaultMessage": "We could not load the return reasons. Please try again."
+  },
+  "return_items_modal.text.select_items_description": {
+    "defaultMessage": "Select the items you want to return and tell us why."
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"

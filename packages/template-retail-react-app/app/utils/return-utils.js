@@ -27,3 +27,30 @@ export const getReturnableItems = (order) => {
         return Number.isFinite(qty) && qty > 0
     })
 }
+
+/**
+ * Build the `productItems` array for an `OmsReturnOrderRequest`. Caller wraps
+ * it: `body: {productItems: buildReturnProductItems(selection, defaultReasonCode)}`.
+ *
+ * Quantity is `number` / `format: double` per oms.yaml. UX is integer-valued
+ * but we serialize as a JS Number, not a string. Reason is omitted when the
+ * shopper kept the OMS-default code so the server applies the default per the
+ * API contract.
+ *
+ * Rows without a positive numeric quantity are dropped — the upstream UI is
+ * already gated by `isSelectionValid`, but this hardens reuse from elsewhere
+ * (e.g. step 2's review modal in W-22821838) against malformed state.
+ */
+export const buildReturnProductItems = (selection, defaultReasonCode) =>
+    Object.entries(selection || {})
+        .filter(([, row]) => row?.checked)
+        .reduce((items, [itemId, row]) => {
+            const quantity = Number(row.quantity)
+            if (!Number.isFinite(quantity) || quantity <= 0) return items
+            const item = {itemId, quantity}
+            if (row.reasonCode && row.reasonCode !== defaultReasonCode) {
+                item.reason = row.reasonCode
+            }
+            items.push(item)
+            return items
+        }, [])

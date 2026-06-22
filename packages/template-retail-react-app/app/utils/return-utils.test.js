@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import {
+    buildReturnProductItems,
+    getReturnableItems
+} from '@salesforce/retail-react-app/app/utils/return-utils'
 
 const item = (id, qtyAvailableToReturn) => ({
     productId: id,
@@ -54,5 +57,50 @@ describe('getReturnableItems', () => {
             ]
         }
         expect(getReturnableItems(order).map((i) => i.productId)).toEqual(['ok'])
+    })
+})
+
+describe('buildReturnProductItems', () => {
+    test('omits reason from payload when shopper kept the OMS default', () => {
+        const selection = {'item-2': {checked: true, quantity: 1, reasonCode: 'Wrong size'}}
+        expect(buildReturnProductItems(selection, 'Wrong size')).toEqual([
+            {itemId: 'item-2', quantity: 1}
+        ])
+    })
+
+    test('serializes quantity as a JS Number (not a string)', () => {
+        const selection = {'item-2': {checked: true, quantity: '3', reasonCode: 'Defect'}}
+        const [row] = buildReturnProductItems(selection, 'Wrong size')
+        expect(typeof row.quantity).toBe('number')
+        expect(row.quantity).toBe(3)
+    })
+
+    test('drops malformed rows (non-numeric or zero quantity) from the payload', () => {
+        expect(
+            buildReturnProductItems(
+                {
+                    'item-a': {checked: true, quantity: '', reasonCode: 'Defect'},
+                    'item-b': {checked: true, quantity: 'abc', reasonCode: 'Defect'},
+                    'item-c': {checked: true, quantity: 0, reasonCode: 'Defect'},
+                    'item-d': {checked: true, quantity: 2, reasonCode: 'Defect'}
+                },
+                'Wrong size'
+            )
+        ).toEqual([{itemId: 'item-d', quantity: 2, reason: 'Defect'}])
+    })
+
+    test('skips unchecked rows', () => {
+        const selection = {
+            'item-1': {checked: false, quantity: 2, reasonCode: 'Defect'},
+            'item-2': {checked: true, quantity: 1, reasonCode: 'Defect'}
+        }
+        expect(buildReturnProductItems(selection, 'Wrong size')).toEqual([
+            {itemId: 'item-2', quantity: 1, reason: 'Defect'}
+        ])
+    })
+
+    test('returns [] for null/undefined selection', () => {
+        expect(buildReturnProductItems(null, 'Wrong size')).toEqual([])
+        expect(buildReturnProductItems(undefined, 'Wrong size')).toEqual([])
     })
 })

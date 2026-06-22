@@ -592,21 +592,7 @@
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧ řḗḗŧŭŭřƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.button.start_return_disabled_explanation": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗŧŭŭřƞş ƈǿǿḿīƞɠ şǿǿǿǿƞ"
+      "value": "Řḗḗŧŭŭřƞ Īŧḗḗḿş"
     },
     {
       "type": 0,
@@ -9083,6 +9069,282 @@
     {
       "type": 0,
       "value": "Řḗḗşḗḗŧ Ƥȧȧşşẇǿǿřḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.button.cancel": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧƞƈḗḗŀ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.button.retry": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧřẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.button.review_return": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗṽīḗḗẇ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.heading.return_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧŭŭřƞ īŧḗḗḿş ƒřǿǿḿ ǿǿřḓḗḗř #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.hint.review_disabled": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ ȧȧŧ ŀḗḗȧȧşŧ ǿǿƞḗḗ īŧḗḗḿ ȧȧƞḓ ƈħǿǿǿǿşḗḗ ȧȧ řḗḗȧȧşǿǿƞ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.label.item_checkbox": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " ŭŭƞīŧ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " ŭŭƞīŧş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.label.quantity": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.label.reason": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗȧȧşǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.label.reason_for": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗȧȧşǿǿƞ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.placeholder.select_reason": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ ȧȧ řḗḗȧȧşǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.available_to_return": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƥ ŧǿǿ "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " ŭŭƞīŧ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " ŭŭƞīŧş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.loading_reasons": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ řḗḗŧŭŭřƞ řḗḗȧȧşǿǿƞş…"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.reasons_error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ŀǿǿȧȧḓ ŧħḗḗ řḗḗŧŭŭřƞ řḗḗȧȧşǿǿƞş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.select_items_description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ ŧħḗḗ īŧḗḗḿş ẏǿǿŭŭ ẇȧȧƞŧ ŧǿǿ řḗḗŧŭŭřƞ ȧȧƞḓ ŧḗḗŀŀ ŭŭş ẇħẏ."
     },
     {
       "type": 0,

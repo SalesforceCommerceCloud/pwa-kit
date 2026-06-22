@@ -468,13 +468,17 @@ describe('OMS/SOM Integration - Order Details', () => {
     })
 })
 
-describe('Start Return CTA (W-22821836)', () => {
+describe('Return Items CTA (W-22821836 / W-22821837)', () => {
     // Eligibility is OMS-driven: the CTA renders when at least one productItem has
     // omsData.quantityAvailableToReturn > 0. OMS computes that field per item; the
     // server returns 409 if the order is no longer in a returnable state, so there
     // is no client-side status allowlist.
     const createReturnEligibleOmsOrder = (overrides = {}) =>
         createMockOmsOrder({
+            // The return CTA gates on ownership: order.customerInfo.customerId
+            // must match the current shopper's id. `useCustomerId` is mocked
+            // at the top of this file to return `'testCustomerId'`.
+            customerInfo: {customerId: 'testCustomerId'},
             productItems: [
                 {
                     productId: 'returnable-1',
@@ -490,18 +494,15 @@ describe('Start Return CTA (W-22821836)', () => {
             ...overrides
         })
 
-    test('renders the disabled Start Return CTA when an item has quantityAvailableToReturn > 0', async () => {
+    test('renders the enabled Return Items CTA when an item has quantityAvailableToReturn > 0', async () => {
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const cta = await screen.findByTestId('account-order-detail-start-return')
         expect(cta).toBeInTheDocument()
-        expect(cta).toBeDisabled()
-        // Accessible name preserves the visible "Start return" label so voice
-        // control users can activate the button by saying its visible text
-        // (WCAG 2.5.3 Label in Name). The "Returns coming soon" explanation is
-        // exposed via aria-describedby + a visually-hidden node.
-        expect(cta).toHaveAccessibleName('Start return')
-        expect(cta).toHaveAccessibleDescription('Returns coming soon')
-        expect(cta).toHaveAttribute('title', 'Returns coming soon')
+        expect(cta).toBeEnabled()
+        // The label was renamed from "Start return" to "Return Items" in
+        // W-22821837 to match the storefront-next designs; the underlying
+        // message id stays stable so downstream extenders aren't broken.
+        expect(cta).toHaveAccessibleName('Return Items')
     })
 
     test('does NOT render the CTA when no item has quantityAvailableToReturn > 0', async () => {
@@ -525,6 +526,27 @@ describe('Start Return CTA (W-22821836)', () => {
         // createMockOrder produces a vanilla ECOM order with no omsData on the order
         // or items. Even with OMS enabled in config, no return CTA should render.
         setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+    })
+
+    test('clicking Return Items opens the return-items modal (W-22821837)', async () => {
+        const user = userEvent.setup()
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        await user.click(cta)
+        expect(await screen.findByText(/return items from order #/i)).toBeInTheDocument()
+    })
+
+    test('does NOT render the CTA when the order belongs to a different customer', async () => {
+        // Defense-in-depth: even if useOrder somehow returned an order owned
+        // by a different customer, the trigger must not render. Mirrors the
+        // ownership guard already in place on the cancel-order CTA.
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({
+                customerInfo: {customerId: 'someone-else'}
+            })
+        )
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
     })

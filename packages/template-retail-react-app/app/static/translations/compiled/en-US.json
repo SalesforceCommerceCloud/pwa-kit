@@ -260,13 +260,7 @@
   "account_order_detail.button.start_return": [
     {
       "type": 0,
-      "value": "Start return"
-    }
-  ],
-  "account_order_detail.button.start_return_disabled_explanation": [
-    {
-      "type": 0,
-      "value": "Returns coming soon"
+      "value": "Return Items"
     }
   ],
   "account_order_detail.error.back_to_history": [
@@ -4303,6 +4297,170 @@
     {
       "type": 0,
       "value": "Reset Password"
+    }
+  ],
+  "return_items_modal.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "return_items_modal.button.retry": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "return_items_modal.button.review_return": [
+    {
+      "type": 0,
+      "value": "Review return"
+    }
+  ],
+  "return_items_modal.heading.return_items": [
+    {
+      "type": 0,
+      "value": "Return items from order #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "return_items_modal.hint.review_disabled": [
+    {
+      "type": 0,
+      "value": "Select at least one item and choose a reason to continue."
+    }
+  ],
+  "return_items_modal.label.item_checkbox": [
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " unit"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " units"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " available to return"
+    }
+  ],
+  "return_items_modal.label.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
+  "return_items_modal.label.reason": [
+    {
+      "type": 0,
+      "value": "Reason"
+    }
+  ],
+  "return_items_modal.label.reason_for": [
+    {
+      "type": 0,
+      "value": "Reason for "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "return_items_modal.placeholder.select_reason": [
+    {
+      "type": 0,
+      "value": "Select a reason"
+    }
+  ],
+  "return_items_modal.text.available_to_return": [
+    {
+      "type": 0,
+      "value": "Up to "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " unit"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " units"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " available to return"
+    }
+  ],
+  "return_items_modal.text.loading_reasons": [
+    {
+      "type": 0,
+      "value": "Loading return reasons…"
+    }
+  ],
+  "return_items_modal.text.reasons_error": [
+    {
+      "type": 0,
+      "value": "We could not load the return reasons. Please try again."
+    }
+  ],
+  "return_items_modal.text.select_items_description": [
+    {
+      "type": 0,
+      "value": "Select the items you want to return and tell us why."
     }
   ],
   "search.action.cancel": [
