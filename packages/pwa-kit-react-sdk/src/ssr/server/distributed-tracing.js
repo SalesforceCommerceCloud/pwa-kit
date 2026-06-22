@@ -68,6 +68,9 @@ export const extractContext = (headers) => {
     try {
         return propagator.extract(context.active(), headers || {}, {
             get: (carrier, key) => carrier[key],
+            // W3CTraceContextPropagator.extract only reads via get(), never keys() —
+            // this is required by the TextMapGetter shape but unreachable in practice.
+            /* istanbul ignore next */
             keys: (carrier) => Object.keys(carrier)
         })
     } catch (error) {

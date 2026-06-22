@@ -15,7 +15,7 @@ jest.mock('../../utils/opentelemetry-config', () => ({
     getOTELConfig: jest.fn()
 }))
 
-import {context} from '@opentelemetry/api'
+import {context, trace} from '@opentelemetry/api'
 import {
     isDistributedTracingEnabled,
     extractContext,
@@ -105,6 +105,91 @@ describe('distributed-tracing', () => {
         expect(result).toBe('ok')
     })
 
+    test('withChildSpan passes through fn() when tracing is disabled', async () => {
+        getOTELConfig.mockReturnValue({enabled: false})
+        const result = await withChildSpan('child.demo', async () => 'passthrough')
+        expect(result).toBe('passthrough')
+    })
+
+    test('withChildSpan sets span status ERROR and rethrows when fn throws', async () => {
+        const traceId = '0af7651916cd43dd8448eb211c80319c'
+        const headers = {traceparent: `00-${traceId}-b7ad6b7169203331-01`}
+        const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
+        const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
+        const ctx = extractContext(headers)
+
+        await expect(
+            withServerSpan(req, res, ctx, async () => {
+                await withChildSpan('child.fails', async () => {
+                    throw new Error('child boom')
+                })
+            })
+        ).rejects.toThrow('child boom')
+    })
+
+    test('extractContext falls back to context.active() when the propagator throws', () => {
+        // A headers object whose property access throws forces the propagator's
+        // internal getter to throw, exercising the catch path.
+        const hostileHeaders = new Proxy(
+            {},
+            {
+                ownKeys() {
+                    throw new Error('keys blew up')
+                },
+                get() {
+                    throw new Error('get blew up')
+                }
+            }
+        )
+        const result = extractContext(hostileHeaders)
+        expect(result).toEqual(context.active())
+    })
+
+    test('withServerSpan tolerates a bare res (no locals, no on, no setHeader)', async () => {
+        const traceId = '0af7651916cd43dd8448eb211c80319c'
+        const headers = {traceparent: `00-${traceId}-b7ad6b7169203331-01`}
+        // No host header → server.address branch is skipped.
+        const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
+        const res = {}
+
+        const result = await withServerSpan(req, res, extractContext(headers), async () => 'rendered')
+        expect(result).toBe('rendered')
+    })
+
+    test('withServerSpan passes through fn() when tracing is disabled', async () => {
+        getOTELConfig.mockReturnValue({enabled: false})
+        const req = {headers: {}, method: 'GET', originalUrl: '/', url: '/'}
+        const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
+        const result = await withServerSpan(req, res, extractContext({}), async () => 'disabled-passthrough')
+        expect(result).toBe('disabled-passthrough')
+        expect(res.setHeader).not.toHaveBeenCalled()
+    })
+
+    test('withServerSpan defaults method to GET and path to / when req fields are absent', async () => {
+        const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+        const traceId = '0af7651916cd43dd8448eb211c80319c'
+        const headers = {traceparent: `00-${traceId}-b7ad6b7169203331-01`}
+        // No method, no originalUrl, no url → exercises the `|| 'GET'` and `|| '/'` fallbacks.
+        const req = {headers}
+        const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
+
+        await withServerSpan(req, res, extractContext(headers), async () => {})
+
+        const span = infoSpy.mock.calls
+            .map(([line]) => {
+                try {
+                    return JSON.parse(line)
+                } catch {
+                    return null
+                }
+            })
+            .find((s) => s && s.name && s.name.includes('ssr.render'))
+        infoSpy.mockRestore()
+
+        expect(span.attributes['http.request.method']).toBe('GET')
+        expect(span.attributes['url.path']).toBe('/')
+    })
+
     describe('sampling flag is honored by OTel built-ins', () => {
         let infoSpy
         const TRACE_ID = '0af7651916cd43dd8448eb211c80319c'
@@ -159,6 +244,17 @@ describe('distributed-tracing', () => {
 
         test('returns null when no active span', () => {
             expect(getCurrentTraceparent()).toBeNull()
+        })
+
+        test('returns null (no throw) when reading the active span throws', () => {
+            const spy = jest.spyOn(trace, 'getSpan').mockImplementation(() => {
+                throw new Error('context blew up')
+            })
+            try {
+                expect(getCurrentTraceparent()).toBeNull()
+            } finally {
+                spy.mockRestore()
+            }
         })
 
         test('returns 00-<traceId>-<spanId>-01 inside withServerSpan', async () => {
