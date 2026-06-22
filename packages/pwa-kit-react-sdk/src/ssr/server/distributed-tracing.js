@@ -50,12 +50,14 @@ const getTracer = () => {
         contextManagerInitialized = true
     }
 
+    // Resource attributes sourced from the MRT-provided runtime env. BUNDLE_ID
+    // is a deploy identifier (numeric), not a semver — MRT exposes no semver var.
     const resource = new Resource({
         'service.name': SERVICE_NAME,
-        'service.namespace': process.env.MRT_NAMESPACE || '',
-        'service.version': process.env.npm_package_version || '',
-        'service.instance.id': process.env.MRT_INSTANCE_ID || '',
-        'deployment.environment': process.env.MRT_ENVIRONMENT || ''
+        'service.namespace': process.env.MOBIFY_PROPERTY_ID || '',
+        'service.version': process.env.BUNDLE_ID || '',
+        'service.instance.id': process.env.AWS_LAMBDA_FUNCTION_NAME || '',
+        'deployment.environment': process.env.DEPLOY_TARGET || ''
     })
 
     const provider = new NodeTracerProvider({resource})

@@ -474,18 +474,19 @@ describe('distributed-tracing', () => {
         })
         afterEach(() => {
             infoSpy.mockRestore()
-            delete process.env.MRT_NAMESPACE
-            delete process.env.npm_package_version
-            delete process.env.MRT_INSTANCE_ID
-            delete process.env.MRT_ENVIRONMENT
+            delete process.env.MOBIFY_PROPERTY_ID
+            delete process.env.BUNDLE_ID
+            delete process.env.AWS_LAMBDA_FUNCTION_NAME
+            delete process.env.DEPLOY_TARGET
         })
 
         test('service.namespace, service.version, service.instance.id, deployment.environment', async () => {
-            // Set env vars BEFORE requiring module (fresh instance via isolateModules)
-            process.env.MRT_NAMESPACE = 'test-namespace'
-            process.env.npm_package_version = '1.2.3'
-            process.env.MRT_INSTANCE_ID = 'instance-abc'
-            process.env.MRT_ENVIRONMENT = 'staging'
+            // Set env vars BEFORE requiring module (fresh instance via isolateModules).
+            // These are the real MRT-provided runtime vars (BUNDLE_ID is the deploy id).
+            process.env.MOBIFY_PROPERTY_ID = 'test-namespace'
+            process.env.BUNDLE_ID = '42'
+            process.env.AWS_LAMBDA_FUNCTION_NAME = 'instance-abc'
+            process.env.DEPLOY_TARGET = 'staging'
 
             let dtModule
             jest.isolateModules(() => {
@@ -517,7 +518,7 @@ describe('distributed-tracing', () => {
             const attrs = spans[0].attributes
             expect(attrs['service.name']).toBe('pwa-kit-react-sdk')
             expect(attrs['service.namespace']).toBe('test-namespace')
-            expect(attrs['service.version']).toBe('1.2.3')
+            expect(attrs['service.version']).toBe('42')
             expect(attrs['service.instance.id']).toBe('instance-abc')
             expect(attrs['deployment.environment']).toBe('staging')
         })
