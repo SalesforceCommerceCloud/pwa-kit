@@ -14,7 +14,6 @@ forwards to the trace backend (Jaeger).
 
 Key properties:
 
-- **Internal only.** No customer-facing span-creation API.
 - **SSR-only.** Only SCAPI calls made during the initial server render are
   traced. Browser (post-hydration) calls carry no `traceparent` — by design,
   the client bundle ships no OpenTelemetry ("OTel"). Same scope as
