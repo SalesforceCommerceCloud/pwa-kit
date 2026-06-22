@@ -175,6 +175,46 @@ describe('useCustomQuery', () => {
         await waitAndExpectError(() => result.current)
         expect(spy).toHaveBeenCalled()
     })
+
+    test('preserves the SCAPI error body on a non-token 400 so the caller can still read the details (regression for #3885)', async () => {
+        // An SFRA hook returning dw.system.Status.ERROR surfaces as a 400 whose body carries the
+        // error details. handleInvalidToken inspects the body to detect token errors but must not
+        // drain it, so the error surfaced to the caller still exposes those details.
+        // Regression test for https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3885
+        const errorBody = {
+            title: 'Bad Request',
+            type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/bad-request',
+            detail: 'Custom SFRA hook returned an error.'
+        }
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+
+        mockQueryEndpoint(
+            `${apiName}/v1/organizations/${DEFAULT_TEST_CONFIG.organizationId}/${endpointPath}`,
+            errorBody,
+            400
+        )
+
+        const {result} = renderHookWithProviders(() => {
+            return useCustomQuery({
+                options: {
+                    customApiPathParameters: {
+                        apiVersion: 'v1',
+                        endpointPath,
+                        apiName
+                    }
+                },
+                rawResponse: false
+            })
+        })
+
+        await waitAndExpectError(() => result.current)
+
+        // The body must not have been consumed by handleInvalidToken: reading it still succeeds
+        // and returns the SFRA hook details.
+        const error = result.current.error as {response: Response}
+        await expect(error.response.json()).resolves.toEqual(errorBody)
+    })
 })
 
 describe('useQuery', () => {
@@ -206,7 +246,10 @@ describe('useQuery', () => {
                     reject({
                         response: {
                             status: 401,
-                            json: () => mockRes
+                            // A real fetch Response body is single-use; handleInvalidToken reads
+                            // it via clone(), so the mock must expose clone() too.
+                            json: () => mockRes,
+                            clone: () => ({json: () => mockRes})
                         }
                     })
                 }),
