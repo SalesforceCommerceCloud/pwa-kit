@@ -152,7 +152,12 @@ describe('distributed-tracing', () => {
         const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
         const res = {}
 
-        const result = await withServerSpan(req, res, extractContext(headers), async () => 'rendered')
+        const result = await withServerSpan(
+            req,
+            res,
+            extractContext(headers),
+            async () => 'rendered'
+        )
         expect(result).toBe('rendered')
     })
 
@@ -160,7 +165,12 @@ describe('distributed-tracing', () => {
         getOTELConfig.mockReturnValue({enabled: false})
         const req = {headers: {}, method: 'GET', originalUrl: '/', url: '/'}
         const res = {setHeader: jest.fn(), locals: {}, on: jest.fn()}
-        const result = await withServerSpan(req, res, extractContext({}), async () => 'disabled-passthrough')
+        const result = await withServerSpan(
+            req,
+            res,
+            extractContext({}),
+            async () => 'disabled-passthrough'
+        )
         expect(result).toBe('disabled-passthrough')
         expect(res.setHeader).not.toHaveBeenCalled()
     })
