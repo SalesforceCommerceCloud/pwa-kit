@@ -2,19 +2,23 @@
 
 ## Overview
 
-DT produces [W3C Trace Context](https://www.w3.org/TR/trace-context/) spans for
-the PWA Kit SSR render path. It is **extract-only**: PWA Kit reads the incoming
-`traceparent` (minted upstream by eCDN/MRT), creates an `ssr.render` server span
-parented on it, adds internal child spans for the render phases, and forwards
-the `traceparent` to outbound SCAPI/SLAS calls made during SSR. Spans are
-printed to stdout, which MRT scrapes and forwards to the trace backend (Jaeger).
+Distributed tracing (DT) produces
+[W3C Trace Context](https://www.w3.org/TR/trace-context/) spans for the PWA Kit
+server-side rendering (SSR) render path. It is **extract-only**: PWA Kit reads
+the incoming `traceparent` (minted upstream by the enhanced CDN (eCDN) and
+Managed Runtime (MRT)), creates an `ssr.render` server span parented on it, adds
+internal child spans for the render phases, and forwards the `traceparent` to
+outbound Shopper Commerce API (SCAPI) and Shopper Login & API Access Service
+(SLAS) calls made during SSR. Spans are printed to stdout, which MRT scrapes and
+forwards to the trace backend (Jaeger).
 
 Key properties:
 
 - **Internal only.** No customer-facing span-creation API.
 - **SSR-only.** Only SCAPI calls made during the initial server render are
   traced. Browser (post-hydration) calls carry no `traceparent` — by design,
-  the client bundle ships no OpenTelemetry. Same scope as `server_timing`.
+  the client bundle ships no OpenTelemetry ("OTel"). Same scope as
+  `server_timing`.
 - **Coexists with `server_timing`.** DT never registers a global provider or a
   global propagator, so it does not disturb the existing `server_timing`
   instrumentation (which uses a global B3 propagator). See
@@ -55,7 +59,7 @@ application code is required to toggle it.
 mints a synthetic root. In production MRT sends a `traceparent` on every request,
 so the unparented path is dev / direct-hit only.
 
-### Attributes (HLD set)
+### Attributes (high-level design (HLD) set)
 
 | Group | Attribute | Source |
 |-------|-----------|--------|
@@ -160,8 +164,8 @@ SCAPI calls carry the request's trace id (same trace, connected).
 ### Exporter — `mrt-console-span-exporter.js`
 
 Extends `ConsoleSpanExporter`. For each span it prints a JSON line to stdout via
-`console.info`. MRT scrapes stdout and forwards to Jaeger — **no OTLP endpoint /
-collector is involved**. Resource attributes (e.g. `service.name`) are merged into
+`console.info`. MRT scrapes stdout and forwards to Jaeger — **no OpenTelemetry
+Protocol (OTLP) endpoint / collector is involved**. Resource attributes (e.g. `service.name`) are merged into
 the emitted span's `attributes` because MRT/Jaeger keys on `service.name` there.
 A malformed span is skipped rather than allowed to throw.
 
@@ -194,7 +198,8 @@ Because DT never touches the global propagator, the B3 ↔ W3C state of
 
 ## Limitations & non-goals
 
-- **No client-side tracing.** Post-hydration SCAPI calls (SPA navigation, user
+- **No client-side tracing.** Post-hydration SCAPI calls (single-page app (SPA)
+  navigation, user
   actions, react-query refetches) carry no `traceparent`. Tracked separately.
 - **No sampling.** MRT owns the sample decision; PWA Kit inherits the incoming
   trace flag as-is. A client-injected `traceparent` does not get PWA Kit to
