@@ -216,6 +216,7 @@ const ReturnItemsModal = ({
     selection,
     onSelectionChange,
     onSubmit,
+    onClearSubmitError,
     isSubmitting = false,
     submitError = null,
     finalFocusRef
@@ -320,7 +321,12 @@ const ReturnItemsModal = ({
     )
 
     const handleReview = useCallback(() => setView('review'), [])
-    const handleBack = useCallback(() => setView('select'), [])
+    // Going Back to edit clears any prior submit error so a stale message can't
+    // reappear on the review view before the next submit fires.
+    const handleBack = useCallback(() => {
+        if (submitError) onClearSubmitError?.()
+        setView('select')
+    }, [submitError, onClearSubmitError])
 
     // Guard against a double-fire: the parent's `isSubmitting` only flips true
     // after it re-renders, so two clicks dispatched in the same tick would both
@@ -624,6 +630,8 @@ ReturnItemsModal.propTypes = {
     onSelectionChange: PropTypes.func.isRequired,
     /** Invoked with the API-shaped `productItems` array when the shopper submits. */
     onSubmit: PropTypes.func.isRequired,
+    /** Invoked to clear a stale submit error when the shopper edits their selection (Back). */
+    onClearSubmitError: PropTypes.func,
     /** True while the parent's `returnOmsOrder` mutation is in flight. */
     isSubmitting: PropTypes.bool,
     /** Truthy when the submit failed; renders an inline error + Retry on the review view. */

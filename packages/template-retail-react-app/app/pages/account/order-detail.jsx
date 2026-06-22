@@ -152,6 +152,18 @@ const AccountOrderDetail = () => {
     // badge (which keys off cancelFeedback) never fires on a return success.
     const [returnFeedback, setReturnFeedback] = useState(null)
     const [returnSubmitError, setReturnSubmitError] = useState(null)
+    // Terminal return errors (404/409) mean retrying won't help — disable the button
+    const [returnTerminal, setReturnTerminal] = useState(false)
+    // Monotonic token: a submit's async result is only applied if it's still the
+    // latest submit AND the modal hasn't been closed/reopened since it started.
+    // Guards against a stale success closing a freshly-reopened modal or a stale
+    // failure setting an error after close.
+    const returnSubmitTokenRef = useRef(0)
+    // setTimeout ids for the SR-announce-delayed feedback alerts, cleared on
+    // unmount and before scheduling a new one so a late timer can't fire after
+    // the component is gone or after feedback was intentionally cleared.
+    const returnFeedbackTimerRef = useRef(null)
+    const cancelFeedbackTimerRef = useRef(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
     // viewport resize doesn't lose the shopper's progress, and so W-22821838's
     // review step can read the same payload without prop-drilling.
@@ -163,7 +175,8 @@ const AccountOrderDetail = () => {
     const {
         data: order,
         isLoading: isOrderLoading,
-        isError
+        isError,
+        refetch: refetchOrder
     } = useOrder(
         {
             parameters: {
@@ -204,9 +217,12 @@ const AccountOrderDetail = () => {
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
     const handleCloseReturnModal = useCallback(() => {
+        // Invalidate any in-flight submit so its async result is ignored.
+        returnSubmitTokenRef.current += 1
         closeReturnModal()
         setReturnSelection({})
         setReturnSubmitError(null)
+        setReturnTerminal(false)
     }, [closeReturnModal])
 
     const showReturnSuccess = useCallback(() => {
@@ -223,23 +239,78 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
+    // Inline submit-error copy lives in the modal (with Retry); this is the
+    // post-close banner shown only for terminal failures, mirroring the cancel
+    // flow's 404/409 messaging.
+    const showReturnError = useCallback(
+        (error) => {
+            const status = error?.response?.status
+            const description =
+                status === 404
+                    ? formatMessage({
+                          defaultMessage:
+                              'We could not find this order. Please refresh and try again.',
+                          id: 'account_order_detail.alert.return_error_not_found'
+                      })
+                    : formatMessage({
+                          defaultMessage:
+                              'Some of these items can no longer be returned. We have refreshed the order — please review and try again.',
+                          id: 'account_order_detail.alert.return_error_conflict'
+                      })
+            setReturnFeedback({
+                status: 'error',
+                title: formatMessage({
+                    defaultMessage: 'Unable to submit return',
+                    id: 'account_order_detail.alert.return_error_title'
+                }),
+                description
+            })
+        },
+        [formatMessage]
+    )
+
     const handleSubmitReturn = useCallback(
         async (productItems) => {
             setReturnSubmitError(null)
+            // Snapshot the token for this submit. If the modal is closed/reopened
+            // (token bumps) before the request settles, this result is stale.
+            const token = returnSubmitTokenRef.current
             try {
                 await returnMutation.mutateAsync({
                     parameters: {orderNo: order.orderNo},
                     body: {productItems}
                 })
+                if (token !== returnSubmitTokenRef.current) return
                 handleCloseReturnModal()
                 // Delay lets screen readers finish announcing modal close before the alert
-                setTimeout(showReturnSuccess, 300)
+                if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
+                returnFeedbackTimerRef.current = setTimeout(showReturnSuccess, 300)
             } catch (e) {
-                // Keep the modal open so the shopper can retry from the review view
-                setReturnSubmitError(e)
+                if (token !== returnSubmitTokenRef.current) return
+                const status = e?.response?.status
+                // 404 (order gone) / 409 (items no longer returnable) are terminal:
+                // retrying the same payload won't help. Close the modal, refetch so
+                // returnableItems reflect reality, and show a terminal banner.
+                if (status === 404 || status === 409) {
+                    setReturnTerminal(true)
+                    handleCloseReturnModal()
+                    refetchOrder?.()
+                    if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
+                    returnFeedbackTimerRef.current = setTimeout(() => showReturnError(e), 300)
+                } else {
+                    // Transient — keep the modal open so the shopper can retry inline.
+                    setReturnSubmitError(e)
+                }
             }
         },
-        [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess]
+        [
+            returnMutation,
+            order?.orderNo,
+            handleCloseReturnModal,
+            showReturnSuccess,
+            showReturnError,
+            refetchOrder
+        ]
     )
 
     const canCancel = useMemo(() => {
@@ -318,14 +389,25 @@ const AccountOrderDetail = () => {
                 })
                 closeCancelModal()
                 // Delay allows screen readers to finish announcing modal close before the alert
-                setTimeout(showCancelSuccess, 300)
+                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+                cancelFeedbackTimerRef.current = setTimeout(showCancelSuccess, 300)
             } catch (e) {
                 closeCancelModal()
-                setTimeout(() => showCancelError(e), 300)
+                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+                cancelFeedbackTimerRef.current = setTimeout(() => showCancelError(e), 300)
             }
         },
         [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
     )
+
+    // Clear any pending feedback timers on unmount so they can't fire after the
+    // component is gone (e.g. shopper navigates away during the 300ms delay).
+    useEffect(() => {
+        return () => {
+            if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
+            if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+        }
+    }, [])
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -536,10 +618,21 @@ const AccountOrderDetail = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                    setCancelFeedback(null)
+                                    // Don't wipe a *successful* cancellation — that's the
+                                    // source of the "Cancelled" badge. Only clear a stale
+                                    // cancel error/in-progress feedback.
+                                    if (cancelFeedback?.status !== 'success') {
+                                        setCancelFeedback(null)
+                                    }
                                     setReturnFeedback(null)
                                     openReturnModal()
                                 }}
+                                isDisabled={
+                                    cancelFeedback?.status === 'success' ||
+                                    cancelMutation.isLoading ||
+                                    cancelTerminal ||
+                                    returnTerminal
+                                }
                             >
                                 <FormattedMessage
                                     defaultMessage="Return Items"
@@ -837,6 +930,7 @@ const AccountOrderDetail = () => {
                     selection={returnSelection}
                     onSelectionChange={setReturnSelection}
                     onSubmit={handleSubmitReturn}
+                    onClearSubmitError={() => setReturnSubmitError(null)}
                     isSubmitting={returnMutation.isLoading}
                     submitError={returnSubmitError}
                     finalFocusRef={headingRef}

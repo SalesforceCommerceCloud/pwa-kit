@@ -557,6 +557,48 @@
       "value": "]"
     }
   ],
+  "account_order_detail.alert.return_error_conflict": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗ ǿǿƒ ŧħḗḗşḗḗ īŧḗḗḿş ƈȧȧƞ ƞǿǿ ŀǿǿƞɠḗḗř ƀḗḗ řḗḗŧŭŭřƞḗḗḓ. Ẇḗḗ ħȧȧṽḗḗ řḗḗƒřḗḗşħḗḗḓ ŧħḗḗ ǿǿřḓḗḗř — ƥŀḗḗȧȧşḗḗ řḗḗṽīḗḗẇ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_error_not_found": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƒīƞḓ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ řḗḗƒřḗḗşħ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_error_title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şŭŭƀḿīŧ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.alert.return_success_description": [
     {
       "type": 0,

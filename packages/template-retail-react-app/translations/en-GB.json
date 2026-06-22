@@ -116,6 +116,15 @@
   "account_order_detail.alert.cancellation_success_title": {
     "defaultMessage": "Order cancelled"
   },
+  "account_order_detail.alert.return_error_conflict": {
+    "defaultMessage": "Some of these items can no longer be returned. We have refreshed the order — please review and try again."
+  },
+  "account_order_detail.alert.return_error_not_found": {
+    "defaultMessage": "We could not find this order. Please refresh and try again."
+  },
+  "account_order_detail.alert.return_error_title": {
+    "defaultMessage": "Unable to submit return"
+  },
   "account_order_detail.alert.return_success_description": {
     "defaultMessage": "We'll email a return label shortly."
   },
