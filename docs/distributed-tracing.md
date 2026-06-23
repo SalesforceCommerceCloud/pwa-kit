@@ -33,7 +33,7 @@ DT env var**.
 | Env var | Effect |
 |---------|--------|
 | `OTEL_TRACING_ENABLED=true` | Enables DT (and `server_timing`'s OTel path). Resolved via `getOTELConfig().enabled`. |
-| `OTEL_SERVICE_NAME` | Optional. Overrides the service name. Defaults to `pwa-kit-react-sdk`. |
+| `OTEL_SERVICE_NAME` | Affects `server_timing` only. DT's `service.name` is a hardcoded constant (`pwa-kit-react-sdk`) and ignores this var. |
 
 When `OTEL_TRACING_ENABLED` is unset (or anything other than `"true"`), DT is a
 complete no-op: no spans, no header injection, zero behavior change.
@@ -47,7 +47,7 @@ application code is required to toggle it.
 
 | Span | Kind | Created in | Notes |
 |------|------|-----------|-------|
-| `ssr.render <METHOD> <path>` | server | `withServerSpan` (`react-rendering.js`) | Root span for the render; parented on the incoming `traceparent`. |
+| `ssr.render <METHOD>` | internal | `withServerSpan` (`react-rendering.js`) | Root span for the render; parented on the incoming `traceparent`. The code passes no `SpanKind`, so OTel defaults it to `internal`. The concrete path is in `url.path`, not the span name. |
 | `route-match` | internal | `withChildSpan` | Route matching. |
 | `getProps` | internal | `withChildSpan` | App-state fetch (`initAppState`). |
 | `scapi:<queryName>` | internal | `withChildSpan` via `with-react-query` | One per react-query `useQuery` fetched during SSR, nested under `getProps`. Name uses the query's `meta.displayName` (e.g. `scapi:useProductSearch`) or its index. |
@@ -80,6 +80,15 @@ so the unparented path is dev / direct-hit only.
 **PII guard:** DT records `url.path` only and **never** `url.full`, so
 query-string tokens / PII never enter a span. `http.route` is the route template,
 not the concrete path, so path parameters don't leak either.
+
+> **MRT ingest normalizes spans — what PWA Kit emits is not what lands in
+> Jaeger.** On the MRT ingest path, span names get an `mrt.` prefix,
+> `service.name` is overwritten to `mrt-customer-data-plane`, and the custom
+> attributes (`site_name`, `client_id`, `realm`, `instance_type`) are dropped to
+> MRT's fixed attribute set. The span and attribute tables above describe the
+> shape PWA Kit **emits**; do not expect to search Jaeger for `ssr.render`,
+> `service.name=pwa-kit-react-sdk`, or `site_name` and find them verbatim.
+> Closing this gap is an observability follow-up.
 
 ## How it's wired
 
