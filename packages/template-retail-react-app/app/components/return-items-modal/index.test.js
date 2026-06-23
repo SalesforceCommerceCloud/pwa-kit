@@ -9,7 +9,21 @@ import PropTypes from 'prop-types'
 import {act, fireEvent, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
+
+// Mock only useBreakpointValue so we can drive the desktop Modal vs. mobile
+// Drawer branch deterministically; everything else stays the real component.
+// Default (undefined) is falsy → desktop Modal, matching the suite's default.
+jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+    const originalModule = jest.requireActual(
+        '@salesforce/retail-react-app/app/components/shared/ui'
+    )
+    return {
+        ...originalModule,
+        useBreakpointValue: jest.fn()
+    }
+})
 
 let mockOmsMetaData = {
     data: {
@@ -105,6 +119,9 @@ afterEach(() => {
         refetch: jest.fn()
     }
     jest.clearAllMocks()
+    // clearAllMocks wipes the implementation too; restore the default
+    // (undefined → desktop Modal branch) so order-independent tests are stable.
+    useBreakpointValue.mockReturnValue(undefined)
 })
 
 test('renders header with order number and a row per returnable item', async () => {
@@ -337,4 +354,61 @@ test('renders an error alert + Retry when OMS metadata fails', async () => {
     expect(screen.getByTestId('return-items-modal-error')).toBeInTheDocument()
     await user.click(screen.getByTestId('return-items-modal-retry'))
     expect(refetch).toHaveBeenCalledTimes(1)
+})
+
+// Drives the open/close lifecycle from a real trigger so we can assert focus
+// returns to it on close (Chakra's finalFocusRef). Mirrors how order-detail.jsx
+// passes its heading ref, but a button is the clearer focus target under test.
+const FocusHarness = () => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [selection, setSelection] = useState({})
+    const triggerRef = React.useRef(null)
+    return (
+        <>
+            <button
+                data-testid="return-items-trigger"
+                ref={triggerRef}
+                onClick={() => setIsOpen(true)}
+            >
+                Return Items
+            </button>
+            <ReturnItemsModal
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                order={baseOrder}
+                returnableItems={baseOrder.productItems}
+                selection={selection}
+                onSelectionChange={setSelection}
+                onSubmit={jest.fn()}
+                finalFocusRef={triggerRef}
+            />
+        </>
+    )
+}
+
+test('returns focus to the trigger when the modal closes', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<FocusHarness />)
+
+    const trigger = screen.getByTestId('return-items-trigger')
+    await user.click(trigger)
+    expect(await screen.findByTestId('return-items-modal')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('return-items-modal-cancel'))
+    await waitFor(() => expect(screen.queryByTestId('return-items-modal')).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
+})
+
+test('renders the bottom-sheet Drawer branch on mobile', async () => {
+    // base breakpoint → useBreakpointValue returns true → Drawer, not Modal.
+    useBreakpointValue.mockReturnValue(true)
+    renderWithProviders(<Harness />)
+
+    expect(await screen.findByTestId('return-items-modal-drawer')).toBeInTheDocument()
+    expect(screen.queryByTestId('return-items-modal')).not.toBeInTheDocument()
+    // Same content + footer actions render inside the Drawer branch.
+    expect(screen.getByText(/return items from order #00123456/i)).toBeInTheDocument()
+    expect(screen.getByText(/select the items you want to return/i)).toBeInTheDocument()
+    expect(screen.getAllByTestId('return-items-modal-item-row')).toHaveLength(2)
+    expect(screen.getByTestId('return-items-modal-review')).toBeInTheDocument()
 })
