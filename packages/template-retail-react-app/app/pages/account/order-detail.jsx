@@ -265,6 +265,9 @@ const AccountOrderDetail = () => {
                 }),
                 description
             })
+            // 404/409 are terminal — set it here (after the modal close) so a fresh
+            // open via handleCloseReturnModal doesn't immediately reset it.
+            if (status === 404 || status === 409) setReturnTerminal(true)
         },
         [formatMessage]
     )
@@ -290,9 +293,10 @@ const AccountOrderDetail = () => {
                 const status = e?.response?.status
                 // 404 (order gone) / 409 (items no longer returnable) are terminal:
                 // retrying the same payload won't help. Close the modal, refetch so
-                // returnableItems reflect reality, and show a terminal banner.
+                // returnableItems reflect reality, and show a terminal banner. The
+                // terminal flag is set inside showReturnError (after the close) so
+                // handleCloseReturnModal's reset doesn't clobber it.
                 if (status === 404 || status === 409) {
-                    setReturnTerminal(true)
                     handleCloseReturnModal()
                     refetchOrder?.()
                     if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)

@@ -674,6 +674,29 @@ describe('Return submission (W-22821838)', () => {
         await user.click(screen.getByTestId('return-items-modal-submit-retry'))
         await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(2))
     })
+
+    test.each([404, 409])(
+        'a terminal %i closes the modal, shows a terminal banner, and disables Return Items',
+        async (status) => {
+            mockReturnMutateAsync.mockRejectedValueOnce({response: {status}})
+            setupOrderDetailsPage(createReturnEligibleOmsOrder())
+            const user = userEvent.setup()
+
+            const submit = await openModalAndReview(user)
+            await user.click(submit)
+
+            // Terminal failures close the modal (no inline Retry) ...
+            await waitFor(() =>
+                expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
+            )
+            // ... surface the post-close terminal banner ...
+            expect(await screen.findByText(/unable to submit return/i)).toBeInTheDocument()
+            // ... and disable the Return Items trigger so the dead-end isn't retried.
+            await waitFor(() =>
+                expect(screen.getByTestId('account-order-detail-start-return')).toBeDisabled()
+            )
+        }
+    )
 })
 
 describe('OMS/SOM Integration - Order History', () => {
