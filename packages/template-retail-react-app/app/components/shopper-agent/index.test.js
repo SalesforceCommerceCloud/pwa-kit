@@ -48,6 +48,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
     default: jest.fn()
 }))
 
+// Mock the useCommerceClientMessaging hook (Commerce Client provider)
+jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
 // Mock the useMiaw hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
     __esModule: true,
@@ -93,6 +99,7 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 
 // Get mocked functions
 const mockedUseScript = useScript
@@ -101,6 +108,7 @@ const mockedUseUsid = useUsid
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
+const mockedUseCommerceClientMessaging = useCommerceClientMessaging
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -1050,6 +1058,115 @@ describe('ShopperAgent Component', () => {
 
             // Should handle missing iframe gracefully without throwing
             expect(() => render(<ShopperAgent {...defaultProps} />)).not.toThrow()
+        })
+    })
+
+    describe('Commerce Client provider', () => {
+        const commerceClientSettings = {
+            enabled: 'true',
+            provider: 'commerce-client',
+            scrt2Url: 'https://test.salesforce-scrt.com',
+            salesforceOrgId: 'test-org-id',
+            esDeveloperName: 'My_Embedded_Service',
+            commerceClientScriptSourceUrl:
+                'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+        }
+
+        const renderCommerceClient = (overrides = {}) =>
+            render(
+                <ShopperAgent
+                    commerceAgentConfiguration={{...commerceClientSettings, ...overrides}}
+                    basketDoneLoading={true}
+                />
+            )
+
+        test('renders the Commerce Client widget when settings are valid', () => {
+            renderCommerceClient()
+
+            expect(screen.getByTestId('shopper-agent')).toBeInTheDocument()
+            expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+        })
+
+        test('does not render the MIAW iframe window for the commerce-client provider', () => {
+            renderCommerceClient()
+
+            // The MIAW provider boots via useMiaw; the Commerce Client provider must not.
+            expect(mockedUseMiaw).not.toHaveBeenCalled()
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledTimes(1)
+        })
+
+        test('does not render when the script URL is not a trusted cimulate.ai domain', () => {
+            renderCommerceClient({
+                commerceClientScriptSourceUrl: 'https://evil.example.com/messaging.umd.js'
+            })
+
+            expect(screen.queryByTestId('shopper-agent')).toBeNull()
+        })
+
+        test('renders when the script URL is served from a trusted sfcc-store-internal.net domain', () => {
+            renderCommerceClient({
+                commerceClientScriptSourceUrl:
+                    'https://www.shop.prd.tbdp.sfcc-store-internal.net/on/demandware.static/Sites-nto-Site/-/en_US/v1782164019601/jscript/cimulate/messaging.umd.js'
+            })
+
+            expect(screen.getByTestId('shopper-agent')).toBeInTheDocument()
+            expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+        })
+
+        test('does not render when a required Commerce Client field is missing', () => {
+            renderCommerceClient({scrt2Url: ''})
+
+            expect(screen.queryByTestId('shopper-agent')).toBeNull()
+        })
+
+        test('falls back to embeddedServiceName when esDeveloperName is not provided', () => {
+            renderCommerceClient({esDeveloperName: '', embeddedServiceName: 'Fallback_Service'})
+
+            expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({esDeveloperName: 'Fallback_Service'})
+            )
+        })
+
+        test('loads the Commerce Client bundle via useScript', () => {
+            renderCommerceClient()
+
+            expect(mockedUseScript).toHaveBeenCalledWith(
+                commerceClientSettings.commerceClientScriptSourceUrl
+            )
+        })
+
+        test('builds full-height side panel options in the default panel display mode', () => {
+            renderCommerceClient({commerceClientPanelWidth: '500px'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    componentConfig: expect.objectContaining({
+                        type: 'dialog',
+                        options: expect.objectContaining({
+                            dialogPosition: 'bottom-right',
+                            dialogFullHeight: true,
+                            dialogWidth: '500px'
+                        })
+                    })
+                })
+            )
+        })
+
+        test('does not apply panel-specific options in dialog display mode', () => {
+            renderCommerceClient({
+                commerceClientDisplayMode: 'dialog',
+                commerceClientComponentType: 'modal',
+                commerceClientDialogPosition: 'top-left'
+            })
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.type).toBe('modal')
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'top-left'})
         })
     })
 })
