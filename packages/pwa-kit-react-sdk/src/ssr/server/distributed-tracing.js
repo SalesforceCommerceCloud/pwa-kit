@@ -121,7 +121,8 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
         attributes['instance_type'] = res.locals.instanceType
     }
 
-    const span = t.startSpan(`ssr.render ${method} ${urlPath}`, {attributes}, parentCtx)
+    // Name on method only; concrete path stays in url.path, template in 
+    const span = t.startSpan(`ssr.render ${method}`, {attributes}, parentCtx)
 
     // Set http.response.status_code on response finish (once-guard)
     let statusCaptured = false
