@@ -7,7 +7,11 @@
 
 import {
     launchChat,
-    openShopperAgent
+    openShopperAgent,
+    openCommerceClientWidget,
+    openShopperAgentWidget,
+    validateCommerceClientDomain,
+    validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 describe('shopper-agent-utils', () => {
@@ -228,6 +232,251 @@ describe('shopper-agent-utils', () => {
 
             // Should not throw, launchChat handles missing bootstrap gracefully
             expect(() => openShopperAgent()).not.toThrow()
+        })
+    })
+
+    describe('openCommerceClientWidget', () => {
+        test('should return early if not on client side', () => {
+            delete global.window
+
+            expect(openCommerceClientWidget()).toBeUndefined()
+        })
+
+        test('should show the widget by default (show defaults to true)', () => {
+            const mockToggle = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                }
+            }
+
+            openCommerceClientWidget()
+
+            expect(mockToggle).toHaveBeenCalledTimes(1)
+            expect(mockToggle).toHaveBeenCalledWith(true)
+        })
+
+        test('should hide the widget when show is false', () => {
+            const mockToggle = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                }
+            }
+
+            openCommerceClientWidget(false)
+
+            expect(mockToggle).toHaveBeenCalledWith(false)
+        })
+
+        test('should do nothing when the Commerce Client SDK is not present', () => {
+            global.window = {}
+
+            expect(() => openCommerceClientWidget()).not.toThrow()
+        })
+
+        test('should do nothing when toggleWidgetOpen is not a function', () => {
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: 'not a function'}}
+                }
+            }
+
+            expect(() => openCommerceClientWidget()).not.toThrow()
+        })
+
+        test('should handle errors and log when toggleWidgetOpen throws', () => {
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {
+                        components: {
+                            toggleWidgetOpen: jest.fn(() => {
+                                throw new Error('toggle error')
+                            })
+                        }
+                    }
+                }
+            }
+
+            openCommerceClientWidget()
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Shopper Agent: Error toggling Commerce Client widget',
+                expect.any(Error)
+            )
+        })
+    })
+
+    describe('openShopperAgentWidget', () => {
+        test('should return early if not on client side', () => {
+            delete global.window
+
+            expect(openShopperAgentWidget()).toBeUndefined()
+        })
+
+        test('should open the Commerce Client widget when its SDK is present', () => {
+            const mockToggle = jest.fn()
+            const mockLaunchChat = jest.fn()
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {components: {toggleWidgetOpen: mockToggle}}
+                },
+                embeddedservice_bootstrap: {
+                    utilAPI: {launchChat: mockLaunchChat}
+                }
+            }
+
+            openShopperAgentWidget()
+
+            // Commerce Client widget is preferred and opened...
+            expect(mockToggle).toHaveBeenCalledWith(true)
+            // ...and the MIAW fallback is NOT used.
+            expect(mockLaunchChat).not.toHaveBeenCalled()
+        })
+
+        test('should fall back to MIAW launchChat when the Commerce Client SDK is absent', () => {
+            const mockLaunchChat = jest.fn()
+            global.window = {
+                embeddedservice_bootstrap: {
+                    utilAPI: {launchChat: mockLaunchChat}
+                }
+            }
+
+            openShopperAgentWidget()
+
+            expect(mockLaunchChat).toHaveBeenCalledTimes(1)
+        })
+
+        test('should not throw when neither provider is available', () => {
+            global.window = {}
+
+            expect(() => openShopperAgentWidget()).not.toThrow()
+        })
+    })
+
+    describe('validateCommerceClientDomain', () => {
+        test('returns true for the exact cimulate.ai domain', () => {
+            expect(validateCommerceClientDomain('https://cimulate.ai/messaging.umd.js')).toBe(true)
+        })
+
+        test('returns true for a cimulate.ai subdomain', () => {
+            expect(
+                validateCommerceClientDomain(
+                    'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+                )
+            ).toBe(true)
+        })
+
+        test('returns true for an sfcc-store-internal.net subdomain', () => {
+            expect(
+                validateCommerceClientDomain(
+                    'https://www.shop.prd.tbdp.sfcc-store-internal.net/jscript/messaging.umd.js'
+                )
+            ).toBe(true)
+        })
+
+        test('returns false for an untrusted domain', () => {
+            expect(validateCommerceClientDomain('https://evil.example.com/messaging.umd.js')).toBe(
+                false
+            )
+        })
+
+        test('returns false for a look-alike domain', () => {
+            expect(
+                validateCommerceClientDomain('https://cimulate.ai.evil.com/messaging.umd.js')
+            ).toBe(false)
+        })
+
+        test('returns false for an invalid URL', () => {
+            expect(validateCommerceClientDomain('not-a-valid-url')).toBe(false)
+        })
+    })
+
+    describe('validateCommerceClientAgentSettings', () => {
+        const validConfig = {
+            scrt2Url: 'https://test.salesforce-scrt.com',
+            salesforceOrgId: 'test-org-id',
+            esDeveloperName: 'My_Embedded_Service',
+            commerceClientScriptSourceUrl:
+                'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+        }
+
+        test('returns true for a valid configuration', () => {
+            expect(validateCommerceClientAgentSettings(validConfig)).toBe(true)
+        })
+
+        test('returns true for a trusted sfcc-store-internal.net script URL', () => {
+            const result = validateCommerceClientAgentSettings({
+                ...validConfig,
+                commerceClientScriptSourceUrl:
+                    'https://www.shop.prd.tbdp.sfcc-store-internal.net/jscript/messaging.umd.js'
+            })
+
+            expect(result).toBe(true)
+        })
+
+        test('falls back to embeddedServiceName when esDeveloperName is absent', () => {
+            const result = validateCommerceClientAgentSettings({
+                ...validConfig,
+                esDeveloperName: undefined,
+                embeddedServiceName: 'Fallback_Service'
+            })
+
+            expect(result).toBe(true)
+        })
+
+        test('returns false and logs when the configuration is null', () => {
+            expect(validateCommerceClientAgentSettings(null)).toBe(false)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Commerce agent configuration must be an object.'
+            )
+        })
+
+        test('returns false and logs when the configuration is not an object', () => {
+            expect(validateCommerceClientAgentSettings('not-an-object')).toBe(false)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Commerce agent configuration must be an object.'
+            )
+        })
+
+        test('returns false and logs when a required field is missing', () => {
+            const result = validateCommerceClientAgentSettings({...validConfig, scrt2Url: ''})
+
+            expect(result).toBe(false)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
+            )
+        })
+
+        test('returns false when esDeveloperName and embeddedServiceName are absent', () => {
+            const result = validateCommerceClientAgentSettings({
+                scrt2Url: validConfig.scrt2Url,
+                salesforceOrgId: validConfig.salesforceOrgId,
+                commerceClientScriptSourceUrl: validConfig.commerceClientScriptSourceUrl
+            })
+
+            expect(result).toBe(false)
+        })
+
+        test('returns false for a whitespace-only required field', () => {
+            const result = validateCommerceClientAgentSettings({
+                ...validConfig,
+                salesforceOrgId: '   '
+            })
+
+            expect(result).toBe(false)
+        })
+
+        test('returns false and logs when the script URL is from an untrusted domain', () => {
+            const result = validateCommerceClientAgentSettings({
+                ...validConfig,
+                commerceClientScriptSourceUrl: 'https://evil.example.com/messaging.umd.js'
+            })
+
+            expect(result).toBe(false)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
+            )
         })
     })
 })

@@ -7,10 +7,10 @@
 
 import {renderHook, act} from '@testing-library/react'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
-import {launchChat} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {openShopperAgentWidget} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-utils', () => ({
-    launchChat: jest.fn()
+    openShopperAgentWidget: jest.fn()
 }))
 
 describe('useShopperAgent', () => {
@@ -26,17 +26,17 @@ describe('useShopperAgent', () => {
         expect(typeof result.current.actions.open).toBe('function')
     })
 
-    test('should call launchChat when actions.open is invoked', () => {
+    test('should call openShopperAgentWidget when actions.open is invoked', () => {
         const {result} = renderHook(() => useShopperAgent())
 
         act(() => {
             result.current.actions.open()
         })
 
-        expect(launchChat).toHaveBeenCalledTimes(1)
+        expect(openShopperAgentWidget).toHaveBeenCalledTimes(1)
     })
 
-    test('should call launchChat each time actions.open is invoked', () => {
+    test('should call openShopperAgentWidget each time actions.open is invoked', () => {
         const {result} = renderHook(() => useShopperAgent())
 
         act(() => {
@@ -44,7 +44,7 @@ describe('useShopperAgent', () => {
             result.current.actions.open()
         })
 
-        expect(launchChat).toHaveBeenCalledTimes(2)
+        expect(openShopperAgentWidget).toHaveBeenCalledTimes(2)
     })
 
     test('should return a stable open callback reference across re-renders', () => {

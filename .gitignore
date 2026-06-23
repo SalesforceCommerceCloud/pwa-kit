@@ -5,6 +5,10 @@ package/
 node_modules/
 *.log
 coverage/
+
+# Local environment variables (secrets / per-developer config)
+.env
+.env.local
 packages/*/out
 packages/*/docs/www
 lerna-debug.log
