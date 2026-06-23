@@ -163,9 +163,14 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
         } catch (error) {
             span.setStatus({code: SpanStatusCode.ERROR, message: error.message})
             throw error
-        } finally {
-            span.end()
+        try {
+            if (res?.statusCode) {
+                span.setAttribute('http.response.status_code', res.statusCode)
+            }
+        } catch {
+            // non-essential
         }
+        span.end()}
     })
 }
 
