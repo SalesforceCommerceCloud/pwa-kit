@@ -557,6 +557,76 @@
       "value": "]"
     }
   ],
+  "account_order_detail.alert.return_error_conflict": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗ ǿǿƒ ŧħḗḗşḗḗ īŧḗḗḿş ƈȧȧƞ ƞǿǿ ŀǿǿƞɠḗḗř ƀḗḗ řḗḗŧŭŭřƞḗḗḓ. Ẇḗḗ ħȧȧṽḗḗ řḗḗƒřḗḗşħḗḗḓ ŧħḗḗ ǿǿřḓḗḗř — ƥŀḗḗȧȧşḗḗ řḗḗṽīḗḗẇ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_error_not_found": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƒīƞḓ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ řḗḗƒřḗḗşħ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_error_title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şŭŭƀḿīŧ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_success_description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ'ŀŀ ḗḗḿȧȧīŀ ȧȧ řḗḗŧŭŭřƞ ŀȧȧƀḗḗŀ şħǿǿřŧŀẏ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.alert.return_success_title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧŭŭřƞ şŭŭƀḿīŧŧḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.badge.cancelled": [
     {
       "type": 0,
@@ -9075,6 +9145,20 @@
       "value": "]"
     }
   ],
+  "return_items_modal.button.back": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓȧȧƈķ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "return_items_modal.button.cancel": [
     {
       "type": 0,
@@ -9117,6 +9201,20 @@
       "value": "]"
     }
   ],
+  "return_items_modal.button.submit_return": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şŭŭƀḿīŧ řḗḗŧŭŭřƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "return_items_modal.heading.return_items": [
     {
       "type": 0,
@@ -9129,6 +9227,20 @@
     {
       "type": 1,
       "value": "orderNo"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.heading.review_return": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗṽīḗḗẇ ẏǿǿŭŭř řḗḗŧŭŭřƞ"
     },
     {
       "type": 0,
@@ -9337,6 +9449,56 @@
       "value": "]"
     }
   ],
+  "return_items_modal.text.review_description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿƞƒīřḿ ŧħḗḗ īŧḗḗḿş ƀḗḗŀǿǿẇ. Ẇḗḗ'ŀŀ ḗḗḿȧȧīŀ ȧȧ řḗḗŧŭŭřƞ ŀȧȧƀḗḗŀ ǿǿƞƈḗḗ ẏǿǿŭŭř řḗḗɋŭŭḗḗşŧ īş şŭŭƀḿīŧŧḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.review_quantity": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ: "
+    },
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.review_reason": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗȧȧşǿǿƞ: "
+    },
+    {
+      "type": 1,
+      "value": "reason"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "return_items_modal.text.select_items_description": [
     {
       "type": 0,
@@ -9345,6 +9507,20 @@
     {
       "type": 0,
       "value": "Şḗḗŀḗḗƈŧ ŧħḗḗ īŧḗḗḿş ẏǿǿŭŭ ẇȧȧƞŧ ŧǿǿ řḗḗŧŭŭřƞ ȧȧƞḓ ŧḗḗŀŀ ŭŭş ẇħẏ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.submit_error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗŧħīƞɠ ẇḗḗƞŧ ẇřǿǿƞɠ şŭŭƀḿīŧŧīƞɠ ẏǿǿŭŭř řḗḗŧŭŭřƞ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
     },
     {
       "type": 0,

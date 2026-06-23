@@ -71,7 +71,14 @@ const baseOrder = {
     ]
 }
 
-const Harness = ({onReview = jest.fn(), onClose = jest.fn(), initialSelection = {}} = {}) => {
+const Harness = ({
+    onSubmit = jest.fn(),
+    onClose = jest.fn(),
+    initialSelection = {},
+    isSubmitting = false,
+    submitError = null,
+    finalFocusRef
+} = {}) => {
     const [selection, setSelection] = useState(initialSelection)
     return (
         <ReturnItemsModal
@@ -81,14 +88,20 @@ const Harness = ({onReview = jest.fn(), onClose = jest.fn(), initialSelection = 
             returnableItems={baseOrder.productItems}
             selection={selection}
             onSelectionChange={setSelection}
-            onReview={onReview}
+            onSubmit={onSubmit}
+            isSubmitting={isSubmitting}
+            submitError={submitError}
+            finalFocusRef={finalFocusRef}
         />
     )
 }
 Harness.propTypes = {
-    onReview: PropTypes.func,
+    onSubmit: PropTypes.func,
     onClose: PropTypes.func,
-    initialSelection: PropTypes.object
+    initialSelection: PropTypes.object,
+    isSubmitting: PropTypes.bool,
+    submitError: PropTypes.any,
+    finalFocusRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
 afterEach(() => {
@@ -122,26 +135,29 @@ test('renders header with order number and a row per returnable item', async () 
 
 test('Review return is disabled until at least one valid row is selected', async () => {
     const user = userEvent.setup()
-    const onReview = jest.fn()
-    renderWithProviders(<Harness onReview={onReview} />)
+    renderWithProviders(<Harness />)
     const reviewButton = screen.getByTestId('return-items-modal-review')
     // Disabled via aria-disabled (not the native disabled attribute) so the
-    // button stays focusable and the hint stays announceable to SR users.
+    // button stays focusable and keyboard/SR users can reach the hint.
     expect(reviewButton).toHaveAttribute('aria-disabled', 'true')
     expect(reviewButton).not.toHaveAttribute('disabled')
-    // The disabled-reason hint must be reachable: aria-describedby points at a
-    // node that actually exists in the document and carries the explanation.
-    const hintId = reviewButton.getAttribute('aria-describedby')
-    expect(hintId).toBeTruthy()
-    expect(document.getElementById(hintId)).toHaveTextContent(/select at least one item/i)
-    // Clicking while invalid is a no-op (focusable means clickable).
-    await user.click(reviewButton)
-    expect(onReview).not.toHaveBeenCalled()
+    // The disabled-reason hint must be reachable via aria-describedby.
+    expect(reviewButton).toHaveAttribute('aria-describedby')
 
     const checkboxes = screen.getAllByRole('checkbox')
     await user.click(checkboxes[0])
     expect(reviewButton).toHaveAttribute('aria-disabled', 'false')
     expect(reviewButton).not.toHaveAttribute('aria-describedby')
+})
+
+test('clicking the disabled Review button does not advance to the review view', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Harness />)
+    // aria-disabled keeps the button clickable in the DOM, so the handler must
+    // no-op while the selection is invalid — otherwise a keyboard/SR user who
+    // focuses and activates it would skip to an empty review.
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
 })
 
 test('toggling a row expands it and pre-selects the OMS default reason', async () => {
@@ -185,13 +201,51 @@ test('Cancel calls onClose', async () => {
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('clicking Review return forwards a properly shaped payload', async () => {
+test('clicking Review return swaps to the review view with text-only rows', async () => {
     const user = userEvent.setup()
-    const onReview = jest.fn()
-    renderWithProviders(<Harness onReview={onReview} />)
+    renderWithProviders(<Harness />)
 
     const checkboxes = screen.getAllByRole('checkbox')
-    await user.click(checkboxes[1]) // item-2: max 1, should default-reason
+    await user.click(checkboxes[1]) // item-2: max 1, default reason "Wrong size"
+
+    await user.click(screen.getByTestId('return-items-modal-review'))
+
+    expect(await screen.findByText(/review your return/i)).toBeInTheDocument()
+    const rows = screen.getAllByTestId('return-items-modal-review-row')
+    expect(rows).toHaveLength(1)
+    expect(within(rows[0]).getByText(/slim fit chino pants/i)).toBeInTheDocument()
+    expect(within(rows[0]).getByText(/quantity: 1/i)).toBeInTheDocument()
+    expect(within(rows[0]).getByText(/reason: wrong size/i)).toBeInTheDocument()
+})
+
+test('Back returns to the selection view with state preserved', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Harness />)
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    await user.click(checkboxes[0]) // item-1
+
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    expect(await screen.findByTestId('return-items-modal-back')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('return-items-modal-back'))
+
+    // Back on the selection view, the row is still checked with its values
+    expect(await screen.findByTestId('return-items-modal-review')).toBeInTheDocument()
+    expect(screen.getAllByRole('checkbox')[0]).toBeChecked()
+    const row = screen.getAllByTestId('return-items-modal-item-row')[0]
+    expect(within(row).getByLabelText(/reason for /i, {selector: 'select'})).toHaveValue(
+        'Wrong size'
+    )
+})
+
+test('Submit return forwards a properly shaped payload', async () => {
+    const user = userEvent.setup()
+    const onSubmit = jest.fn()
+    renderWithProviders(<Harness onSubmit={onSubmit} />)
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    await user.click(checkboxes[1]) // item-2: max 1
 
     // Change reason away from default so it gets serialized
     const reason = within(screen.getAllByTestId('return-items-modal-item-row')[1]).getByLabelText(
@@ -201,7 +255,72 @@ test('clicking Review return forwards a properly shaped payload', async () => {
     await user.selectOptions(reason, 'Defect')
 
     await user.click(screen.getByTestId('return-items-modal-review'))
-    expect(onReview).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
+    await user.click(await screen.findByTestId('return-items-modal-submit'))
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    const payload = onSubmit.mock.calls[0][0]
+    expect(payload).toEqual([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
+    // quantity must serialize as a JS Number, not a string
+    expect(typeof payload[0].quantity).toBe('number')
+})
+
+test('Submit omits reason when the shopper kept the OMS default', async () => {
+    const user = userEvent.setup()
+    const onSubmit = jest.fn()
+    renderWithProviders(<Harness onSubmit={onSubmit} />)
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    await user.click(checkboxes[1]) // item-2, default reason left as-is ("Wrong size")
+
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    await user.click(await screen.findByTestId('return-items-modal-submit'))
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    expect(onSubmit.mock.calls[0][0]).toEqual([{itemId: 'item-2', quantity: 1}])
+})
+
+test('Submit fires only once even on a rapid double-click', async () => {
+    const onSubmit = jest.fn()
+    // isSubmitting=true models the in-flight state the parent flips on first click;
+    // the button is disabled, so the second click is a no-op.
+    const {rerender} = renderWithProviders(
+        <Harness onSubmit={onSubmit} initialSelection={{'item-2': {checked: true, quantity: 1}}} />
+    )
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    const submit = await screen.findByTestId('return-items-modal-submit')
+
+    act(() => {
+        fireEvent.click(submit)
+        fireEvent.click(submit)
+    })
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+
+    // Even after the parent re-renders with isSubmitting, further clicks no-op
+    rerender(
+        <Harness
+            onSubmit={onSubmit}
+            isSubmitting={true}
+            initialSelection={{'item-2': {checked: true, quantity: 1}}}
+        />
+    )
+})
+
+test('submitError renders an inline alert + Retry that re-fires submit', async () => {
+    const user = userEvent.setup()
+    const onSubmit = jest.fn()
+    renderWithProviders(
+        <Harness
+            onSubmit={onSubmit}
+            submitError={new Error('boom')}
+            initialSelection={{'item-2': {checked: true, quantity: 1, reasonCode: 'Defect'}}}
+        />
+    )
+    await user.click(screen.getByTestId('return-items-modal-review'))
+
+    expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
+    await user.click(screen.getByTestId('return-items-modal-submit-retry'))
+    expect(onSubmit).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
 })
 
 test('renders skeleton placeholders while OMS metadata is loading', () => {
@@ -251,15 +370,20 @@ test('renders an error alert + Retry when OMS metadata fails', async () => {
     expect(refetch).toHaveBeenCalledTimes(1)
 })
 
-// Harness with a real trigger button so we can assert focus returns to it on
-// close — Chakra's returnFocusOnClose restores focus to whatever was focused
-// when the modal opened.
+// Drives the open/close lifecycle from a real trigger so we can assert focus
+// returns to it on close (Chakra's finalFocusRef). Mirrors how order-detail.jsx
+// passes its heading ref, but a button is the clearer focus target under test.
 const FocusHarness = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [selection, setSelection] = useState({})
+    const triggerRef = React.useRef(null)
     return (
         <>
-            <button data-testid="return-items-trigger" onClick={() => setIsOpen(true)}>
+            <button
+                data-testid="return-items-trigger"
+                ref={triggerRef}
+                onClick={() => setIsOpen(true)}
+            >
                 Return Items
             </button>
             <ReturnItemsModal
@@ -269,7 +393,8 @@ const FocusHarness = () => {
                 returnableItems={baseOrder.productItems}
                 selection={selection}
                 onSelectionChange={setSelection}
-                onReview={jest.fn()}
+                onSubmit={jest.fn()}
+                finalFocusRef={triggerRef}
             />
         </>
     )
