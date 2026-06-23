@@ -1,4 +1,5 @@
 ## v10.1.0-dev
+- [Feature] Forward the distributed-tracing `traceparent` (a plain string set on `res.locals.traceparent` by the SDK during SSR) on the `CommerceApiProvider` `headers` prop, so outbound SCAPI/SLAS calls made during SSR carry the current trace context. No-op when tracing is disabled. [#3889](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3889)
 - [Bugfix] Fix PayPal/Venmo express checkout: resolve buyer-approved address from the upstream PayPal Order via `getBasket?expand=payment_references` (the SDK does not provide it client-side), and PATCH the basket payment instrument on shipping address change so the PayPal review screen reflects the new amount and shipping options. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
 - Bump `main.js` bundle-size budget from 102 kB to 103 kB to accommodate the PayPal/Venmo express address-resolution and shipping-PATCH paths. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
 - [Bugfix] Sync `amount` on the basket payment instrument before placing the order so the persisted `PaymentTransaction` matches `orderTotal`.
