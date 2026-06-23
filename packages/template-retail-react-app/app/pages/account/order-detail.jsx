@@ -274,6 +274,10 @@ const AccountOrderDetail = () => {
 
     const handleSubmitReturn = useCallback(
         async (productItems) => {
+            // Guard against `order` going null between modal open and submit
+            // (e.g. a background refetch error) — the body dereferences
+            // order.orderNo unconditionally below.
+            if (!order) return
             setReturnSubmitError(null)
             // Snapshot the token for this submit. If the modal is closed/reopened
             // (token bumps) before the request settles, this result is stale.

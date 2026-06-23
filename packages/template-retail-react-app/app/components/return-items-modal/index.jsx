@@ -320,7 +320,14 @@ const ReturnItemsModal = ({
         [selection, returnableItems]
     )
 
-    const handleReview = useCallback(() => setView('review'), [])
+    // No-op when the selection is invalid: the Review button stays in the tab
+    // order via aria-disabled (so keyboard/SR users can focus it and hear the
+    // aria-describedby hint), which means the click handler must guard itself
+    // rather than relying on a native `disabled` attribute.
+    const handleReview = useCallback(() => {
+        if (!reviewEnabled) return
+        setView('review')
+    }, [reviewEnabled])
     // Going Back to edit clears any prior submit error so a stale message can't
     // reappear on the review view before the next submit fires.
     const handleBack = useCallback(() => {
@@ -529,7 +536,13 @@ const ReturnItemsModal = ({
             <Button
                 colorScheme="blue"
                 onClick={handleReview}
-                isDisabled={!reviewEnabled}
+                // Use aria-disabled (not isDisabled) so the button stays in the
+                // tab order while invalid — a native `disabled` button can't be
+                // focused, so a keyboard/SR user would never hear the
+                // aria-describedby hint explaining why it's disabled. Chakra's
+                // `_disabled` styles still apply (the pseudo matches
+                // [aria-disabled=true]); handleReview no-ops when invalid.
+                aria-disabled={!reviewEnabled}
                 aria-describedby={reviewEnabled ? undefined : reviewDisabledHintId}
                 width={{base: 'full', md: 'auto'}}
                 data-testid="return-items-modal-review"

@@ -137,13 +137,27 @@ test('Review return is disabled until at least one valid row is selected', async
     const user = userEvent.setup()
     renderWithProviders(<Harness />)
     const reviewButton = screen.getByTestId('return-items-modal-review')
-    expect(reviewButton).toBeDisabled()
+    // Disabled via aria-disabled (not the native disabled attribute) so the
+    // button stays focusable and keyboard/SR users can reach the hint.
+    expect(reviewButton).toHaveAttribute('aria-disabled', 'true')
+    expect(reviewButton).not.toHaveAttribute('disabled')
+    // The disabled-reason hint must be reachable via aria-describedby.
     expect(reviewButton).toHaveAttribute('aria-describedby')
 
     const checkboxes = screen.getAllByRole('checkbox')
     await user.click(checkboxes[0])
-    expect(reviewButton).toBeEnabled()
+    expect(reviewButton).toHaveAttribute('aria-disabled', 'false')
     expect(reviewButton).not.toHaveAttribute('aria-describedby')
+})
+
+test('clicking the disabled Review button does not advance to the review view', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Harness />)
+    // aria-disabled keeps the button clickable in the DOM, so the handler must
+    // no-op while the selection is invalid — otherwise a keyboard/SR user who
+    // focuses and activates it would skip to an empty review.
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
 })
 
 test('toggling a row expands it and pre-selects the OMS default reason', async () => {
