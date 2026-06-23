@@ -69,7 +69,12 @@ const AppConfig = ({children, locals = {}}) => {
     const headers = {
         'correlation-id': correlationId,
         sfdc_user_agent: sfdcUserAgent,
-        'x-site-id': locals.site?.id
+        'x-site-id': locals.site?.id,
+        // Distributed tracing: the SDK sets `locals.traceparent` to the active SSR
+        // span's W3C traceparent (server-side, inside the span). Forwarding it here
+        // propagates the trace onto outbound SCAPI/SLAS calls. Undefined when tracing
+        // is off or in the browser, in which case no header is sent.
+        traceparent: locals.traceparent
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
