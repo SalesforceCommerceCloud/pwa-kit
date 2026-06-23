@@ -7,11 +7,13 @@
 
 import {renderHook} from '@testing-library/react'
 import useCommerceClientMessaging, {
-    injectCommerceClientWidget,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME,
-    DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG
+    injectCommerceClientWidget
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {
+    DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+    DEFAULT_COMMERCE_CLIENT_THEME
+} from '@salesforce/retail-react-app/app/constants'
 
 const messagingFields = {
     scrt2Url: 'https://scrt2.example.salesforce-scrt.com',

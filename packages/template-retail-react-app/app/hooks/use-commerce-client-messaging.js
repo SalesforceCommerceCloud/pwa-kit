@@ -6,43 +6,13 @@
  */
 
 import {useEffect, useRef} from 'react'
+import {
+    DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+    DEFAULT_COMMERCE_CLIENT_THEME
+} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
-
-/**
- * Default DOM element id the Commerce Client widget is rendered into.
- */
-const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-widget'
-
-/**
- * Default theme applied to the Commerce Client widget. Individual values can be
- * overridden by passing a partial `theme` object to the hook.
- * These map internally to the `--cim-widget-*` CSS custom properties.
- */
-const DEFAULT_COMMERCE_CLIENT_THEME = {
-    primaryColor: '#0176d3',
-    secondaryColor: '#014486',
-    fontColor: '#1a202c',
-    fontFamily: 'inherit',
-    backgroundColor: '#ffffff',
-    borderColor: '#dddddd'
-}
-
-/**
- * Default component configuration for the Commerce Client widget. The widget renders
- * closed by default and is opened programmatically (e.g. from the header agent
- * button) via `eventHandlers.components.toggleWidgetOpen`.
- *
- * Layout-related settings (`dialogPosition`, `dialogFullHeight`, `dialogWidth`,
- * `isModalFullscreen`) live under the nested `options` object.
- */
-const DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG = {
-    isOpen: false,
-    type: 'dialog',
-    options: {
-        dialogPosition: 'bottom-right'
-    }
-}
 
 /**
  * Injects the Commerce Client messaging widget into the page using the global
@@ -163,9 +133,4 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
 }
 
 export default useCommerceClientMessaging
-export {
-    injectCommerceClientWidget,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME,
-    DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG
-}
+export {injectCommerceClientWidget}

@@ -51,8 +51,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
 // Mock the useCommerceClientMessaging hook (Commerce Client provider)
 jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging', () => ({
     __esModule: true,
-    default: jest.fn(),
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID: 'commerce-client-messaging-widget'
+    default: jest.fn()
 }))
 
 // Mock the useMiaw hook
@@ -1102,6 +1101,16 @@ describe('ShopperAgent Component', () => {
             })
 
             expect(screen.queryByTestId('shopper-agent')).toBeNull()
+        })
+
+        test('renders when the script URL is served from a trusted sfcc-store-internal.net domain', () => {
+            renderCommerceClient({
+                commerceClientScriptSourceUrl:
+                    'https://www.shop.prd.tbdp.sfcc-store-internal.net/on/demandware.static/Sites-nto-Site/-/en_US/v1782164019601/jscript/cimulate/messaging.umd.js'
+            })
+
+            expect(screen.getByTestId('shopper-agent')).toBeInTheDocument()
+            expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
         test('does not render when a required Commerce Client field is missing', () => {

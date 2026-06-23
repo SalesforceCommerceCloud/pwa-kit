@@ -10,12 +10,12 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import useCommerceClientMessaging, {
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
-} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {DEFAULT_COMMERCE_CLIENT_ELEMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {validateCommerceClientAgentSettings} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -101,69 +101,6 @@ const validateCommerceAgentSettings = (commerceAgent) => {
             console.error('Script URL must be from a trusted Salesforce domain.')
             return false
         }
-    }
-
-    return true
-}
-
-/**
- * Validates that a URL is served from a trusted Commerce Client domain.
- *
- * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
- * @returns {boolean} True if the URL is from a trusted Commerce Client domain, false otherwise
- */
-const validateCommerceClientDomain = (url) => {
-    try {
-        const {hostname} = new URL(url)
-        return hostname === 'cimulate.ai' || hostname.endsWith('.cimulate.ai')
-    } catch {
-        return false
-    }
-}
-
-/**
- * Validates the commerce agent configuration for the Commerce Client widget.
- * The Commerce Client widget requires a different (smaller) set of fields than MIAW:
- * the SCRT2 URL, Salesforce org id, embedded service developer name, and the
- * URL of the Commerce Client messaging UMD bundle.
- *
- * @param {Object} commerceAgent - Commerce agent configuration object
- * @param {string} commerceAgent.scrt2Url - SCRT2 instance URL
- * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID (passed as `orgId`)
- * @param {string} [commerceAgent.esDeveloperName] - Embedded Service developer name
- * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} commerceAgent.commerceClientScriptSourceUrl - URL of the Commerce Client messaging bundle
- * @returns {boolean} True if configuration is valid, false otherwise
- */
-const validateCommerceClientAgentSettings = (commerceAgent) => {
-    if (!commerceAgent || typeof commerceAgent !== 'object') {
-        console.error('Commerce agent configuration must be an object.')
-        return false
-    }
-
-    const requiredValues = {
-        scrt2Url: commerceAgent.scrt2Url,
-        salesforceOrgId: commerceAgent.salesforceOrgId,
-        esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
-        commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl
-    }
-
-    const isValid = Object.values(requiredValues).every(
-        (value) => typeof value === 'string' && value.trim() !== ''
-    )
-
-    if (!isValid) {
-        console.error(
-            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
-        )
-        return false
-    }
-
-    if (!validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
-        console.error(
-            'Commerce Client script URL must be served from a trusted cimulate.ai domain.'
-        )
-        return false
     }
 
     return true

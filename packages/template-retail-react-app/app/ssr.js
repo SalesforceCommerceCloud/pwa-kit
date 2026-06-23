@@ -371,6 +371,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': [
                         // Commerce Client messaging widget bundle (messaging.umd.js)
                         '*.cimulate.ai',
+                        // Commerce Client bundle served from the SFCC static CDN
+                        '*.sfcc-store-internal.net',
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
