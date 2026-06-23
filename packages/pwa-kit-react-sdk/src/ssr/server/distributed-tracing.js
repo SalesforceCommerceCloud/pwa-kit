@@ -121,7 +121,8 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
         attributes['instance_type'] = res.locals.instanceType
     }
 
-    // Name on method only; concrete path stays in url.path, template in 
+    // Name on method only; the concrete path stays in url.path and the route
+    // template in http.route, so the span name has low cardinality.
     const span = t.startSpan(`ssr.render ${method}`, {attributes}, parentCtx)
 
     // Set http.response.status_code on response finish (once-guard)
@@ -164,14 +165,19 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
         } catch (error) {
             span.setStatus({code: SpanStatusCode.ERROR, message: error.message})
             throw error
-        try {
-            if (res?.statusCode) {
-                span.setAttribute('http.response.status_code', res.statusCode)
+        } finally {
+            // Fallback: capture the final status code in case the response
+            // 'finish' event never fired (e.g. error path). The once-guard on
+            // the finish handler makes a double-set harmless.
+            try {
+                if (res?.statusCode) {
+                    span.setAttribute('http.response.status_code', res.statusCode)
+                }
+            } catch {
+                // non-essential
             }
-        } catch {
-            // non-essential
+            span.end()
         }
-        span.end()}
     })
 }
 
