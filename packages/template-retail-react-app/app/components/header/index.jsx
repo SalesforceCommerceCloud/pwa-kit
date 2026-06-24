@@ -125,6 +125,10 @@ const Header = ({
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const commerceAgentConfig = getCommerceAgentConfig()
     const showLaunchAgentButton = commerceAgentConfig?.enableAgentFromHeader === 'true'
+    const shopperAgentLabel = intl.formatMessage({
+        id: 'header.button.shopper_agent',
+        defaultMessage: 'Shopper Agent'
+    })
     const {
         getButtonProps: getAccountMenuButtonProps,
         getDisclosureProps: getAccountMenuDisclosureProps,
@@ -209,17 +213,17 @@ const Header = ({
                         <SearchBar />
                     </HideOnMobile>
                     {showLaunchAgentButton && (
-                        <IconButton
-                            icon={<SparkleIcon />}
-                            aria-label={intl.formatMessage({
-                                id: 'header.button.assistive_msg.ask_shopping_agent',
-                                defaultMessage: 'Ask Shopping Agent'
-                            })}
-                            variant="unstyled"
-                            {...styles.icons}
-                            {...styles.agentIcon}
+                        <Button
+                            aria-label={shopperAgentLabel}
+                            colorScheme="black"
+                            {...styles.agentButton}
                             onClick={onAgentClick}
-                        />
+                        >
+                            <SparkleIcon boxSize={5} aria-hidden={true} />
+                            <Text as="span" {...styles.agentButtonText}>
+                                {shopperAgentLabel}
+                            </Text>
+                        </Button>
                     )}
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}

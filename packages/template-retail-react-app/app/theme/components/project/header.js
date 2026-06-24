@@ -44,8 +44,35 @@ export default {
                 outline: 0
             }
         },
-        agentIcon: {
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto']
+        agentButton: {
+            height: 11,
+            minWidth: 11,
+            paddingX: [0, 0, 0, 3],
+            color: 'white',
+            backgroundColor: 'black',
+            borderRadius: 'lg',
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            marginBottom: [1, 1, 2, 0],
+            _hover: {
+                backgroundColor: 'gray.700'
+            },
+            _active: {
+                backgroundColor: 'gray.800'
+            },
+            _focus: {
+                boxShadow: 'outline'
+            },
+            _focusVisible: {
+                outline: 0
+            }
+        },
+        agentButtonText: {
+            display: ['none', 'none', 'none', 'inline-block'],
+            marginLeft: 2,
+            fontSize: 'sm',
+            fontWeight: 'semibold',
+            lineHeight: 'normal',
+            whiteSpace: 'nowrap'
         },
         accountIcon: {
             cursor: 'pointer',
@@ -86,7 +113,8 @@ export default {
         'bodyContainer',
         'logo',
         'icons',
-        'agentIcon',
+        'agentButton',
+        'agentButtonText',
         'wishlistIcon',
         'signout'
     ]

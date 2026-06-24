@@ -336,7 +336,7 @@ test('handles search functionality', async () => {
     expect(searchInput.value).toBe('test search')
 })
 
-describe('Agent button (SparkleIcon)', () => {
+describe('Agent button (Shopper Agent)', () => {
     test('renders agent button when enableAgentFromHeader is true', async () => {
         getCommerceAgentConfig.mockReturnValue({
             enableAgentFromHeader: 'true'
@@ -345,8 +345,20 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            const agentButton = screen.getByLabelText('Shopper Agent')
             expect(agentButton).toBeInTheDocument()
+        })
+    })
+
+    test('renders the Shopper Agent label text', async () => {
+        getCommerceAgentConfig.mockReturnValue({
+            enableAgentFromHeader: 'true'
+        })
+
+        renderWithProviders(<Header />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Shopper Agent')).toBeInTheDocument()
         })
     })
 
@@ -358,7 +370,7 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            const agentButton = screen.queryByLabelText('Shopper Agent')
             expect(agentButton).not.toBeInTheDocument()
         })
     })
@@ -371,7 +383,7 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            const agentButton = screen.queryByLabelText('Shopper Agent')
             expect(agentButton).not.toBeInTheDocument()
         })
     })
@@ -384,7 +396,7 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            const agentButton = screen.queryByLabelText('Ask Shopping Agent')
+            const agentButton = screen.queryByLabelText('Shopper Agent')
             expect(agentButton).not.toBeInTheDocument()
         })
     })
@@ -398,11 +410,11 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header onAgentClick={onAgentClick} />)
 
         await waitFor(() => {
-            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            const agentButton = screen.getByLabelText('Shopper Agent')
             expect(agentButton).toBeInTheDocument()
         })
 
-        const agentButton = screen.getByLabelText('Ask Shopping Agent')
+        const agentButton = screen.getByLabelText('Shopper Agent')
         fireEvent.click(agentButton)
 
         expect(onAgentClick).toHaveBeenCalledTimes(1)
@@ -416,9 +428,9 @@ describe('Agent button (SparkleIcon)', () => {
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            const agentButton = screen.getByLabelText('Ask Shopping Agent')
+            const agentButton = screen.getByLabelText('Shopper Agent')
             expect(agentButton).toBeInTheDocument()
-            expect(agentButton).toHaveAttribute('aria-label', 'Ask Shopping Agent')
+            expect(agentButton).toHaveAttribute('aria-label', 'Shopper Agent')
         })
     })
 

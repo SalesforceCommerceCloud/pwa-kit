@@ -993,9 +993,6 @@
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
   },
-  "header.button.assistive_msg.ask_shopping_agent": {
-    "defaultMessage": "Ask Shopping Agent"
-  },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
@@ -1019,6 +1016,9 @@
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
+  },
+  "header.button.shopper_agent": {
+    "defaultMessage": "Shopper Agent"
   },
   "header.field.placeholder.search_for_products": {
     "defaultMessage": "Search for products..."
