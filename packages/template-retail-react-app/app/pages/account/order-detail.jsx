@@ -464,10 +464,11 @@ const AccountOrderDetail = () => {
                         // Terminal: retrying the same payload won't help. Keep the
                         // modal open and hand the classified error to it — the modal
                         // shows a no-retry banner with a recovery link (404 -> order
-                        // history, 409 -> support) in place. Refetch so returnableItems
-                        // reflect reality if the shopper backs out. We no longer close
-                        // the modal or write a banner onto the order-detail page.
-                        refetchOrder?.()
+                        // history, 409 -> support) in place. Do NOT refetch: the same
+                        // 404/409 would flip useOrder's isError and collapse the whole
+                        // page (modal included) to <OrderLoadError />. Mirror the cancel
+                        // flow, which also leaves the loaded order on screen on terminal
+                        // errors so order details stay visible behind the modal.
                         setReturnSubmitError(classified)
                         break
                     case ReturnErrorKind.QUANTITY_EXCEEDED:
