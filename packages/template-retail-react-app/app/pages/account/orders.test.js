@@ -701,7 +701,7 @@ describe('Return submission (W-22821838)', () => {
     })
 
     test.each([404, 409])(
-        'a terminal %i closes the modal, shows a terminal banner, and disables Return Items',
+        'a terminal %i keeps the modal open and shows an in-modal terminal banner (no page banner)',
         async (status) => {
             mockReturnMutateAsync.mockRejectedValueOnce({response: {status}})
             setupOrderDetailsPage(createReturnEligibleOmsOrder())
@@ -710,23 +710,26 @@ describe('Return submission (W-22821838)', () => {
             const submit = await openModalAndReview(user)
             await user.click(submit)
 
-            // Terminal failures close the modal (no inline Retry) ...
-            await waitFor(() =>
-                expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
+            // The terminal banner renders INSIDE the still-open modal (review view) ...
+            expect(
+                await screen.findByTestId('return-items-modal-terminal-error')
+            ).toBeInTheDocument()
+            expect(screen.getByText(/review your return/i)).toBeInTheDocument()
+            // ... with no inline Retry (resubmitting the same payload can't succeed) ...
+            expect(
+                screen.queryByTestId('return-items-modal-submit-retry')
+            ).not.toBeInTheDocument()
+            // ... and Submit is disabled, leaving the recovery link as the only path.
+            expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
+            // The order-detail page behind the modal is NOT mutated: the Return Items
+            // trigger stays enabled and no page-level terminal hint appears.
+            expect(screen.getByTestId('account-order-detail-start-return')).toHaveAttribute(
+                'aria-disabled',
+                'false'
             )
-            // ... surface the post-close terminal banner ...
-            expect(await screen.findByText(/unable to submit return/i)).toBeInTheDocument()
-            // ... and disable the Return Items trigger so the dead-end isn't retried.
-            // The button uses aria-disabled (stays focusable) rather than native disabled.
-            await waitFor(() =>
-                expect(screen.getByTestId('account-order-detail-start-return')).toHaveAttribute(
-                    'aria-disabled',
-                    'true'
-                )
-            )
-            // The focusable-but-disabled button carries an SR hint explaining the
-            // terminal state (not just silently disabled).
-            expect(screen.getByText(/this order can no longer be returned/i)).toBeInTheDocument()
+            expect(
+                screen.queryByText(/this order can no longer be returned/i)
+            ).not.toBeInTheDocument()
         }
     )
 })
@@ -888,7 +891,7 @@ describe('Item-level return error states (W-22821839)', () => {
         expect(screen.getByText(/review your return/i)).toBeInTheDocument()
     })
 
-    test('a terminal 404 surfaces a "back to order history" recovery link', async () => {
+    test('a terminal 404 surfaces an in-modal "back to order history" recovery link', async () => {
         rejectWith({status: 404, body: {}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -896,12 +899,13 @@ describe('Item-level return error states (W-22821839)', () => {
         const submit = await openModalAndReview(user)
         await user.click(submit)
 
-        expect(await screen.findByText(/unable to submit return/i)).toBeInTheDocument()
-        const link = await screen.findByTestId('return-feedback-link')
+        const banner = await screen.findByTestId('return-items-modal-terminal-error')
+        expect(banner).toHaveTextContent(/we could not find this order/i)
+        const link = await screen.findByTestId('return-items-modal-terminal-link')
         expect(link).toHaveTextContent(/back to order history/i)
     })
 
-    test('a terminal 409 surfaces a "contact support" recovery link', async () => {
+    test('a terminal 409 surfaces an in-modal "contact support" recovery link', async () => {
         rejectWith({status: 409, body: {}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -909,8 +913,9 @@ describe('Item-level return error states (W-22821839)', () => {
         const submit = await openModalAndReview(user)
         await user.click(submit)
 
-        expect(await screen.findByText(/unable to submit return/i)).toBeInTheDocument()
-        const link = await screen.findByTestId('return-feedback-link')
+        const banner = await screen.findByTestId('return-items-modal-terminal-error')
+        expect(banner).toHaveTextContent(/can't be returned at this time/i)
+        const link = await screen.findByTestId('return-items-modal-terminal-link')
         expect(link).toHaveTextContent(/contact support/i)
     })
 

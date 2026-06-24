@@ -116,15 +116,6 @@
   "account_order_detail.alert.cancellation_success_title": {
     "defaultMessage": "Order cancelled"
   },
-  "account_order_detail.alert.return_error_conflict": {
-    "defaultMessage": "This order can't be returned at this time."
-  },
-  "account_order_detail.alert.return_error_not_found": {
-    "defaultMessage": "We could not find this order."
-  },
-  "account_order_detail.alert.return_error_title": {
-    "defaultMessage": "Unable to submit return"
-  },
   "account_order_detail.alert.return_success_description": {
     "defaultMessage": "We'll email a return label shortly."
   },
@@ -205,12 +196,6 @@
   },
   "account_order_detail.link.back_to_history": {
     "defaultMessage": "Back to Order History"
-  },
-  "account_order_detail.link.return_error_orders": {
-    "defaultMessage": "Back to order history"
-  },
-  "account_order_detail.link.return_error_support": {
-    "defaultMessage": "Contact support"
   },
   "account_order_detail.shipping_status.not_shipped": {
     "defaultMessage": "Not shipped"
@@ -1868,6 +1853,12 @@
   "return_items_modal.label.reason_for": {
     "defaultMessage": "Reason for {name}"
   },
+  "return_items_modal.link.terminal_orders": {
+    "defaultMessage": "Back to order history"
+  },
+  "return_items_modal.link.terminal_support": {
+    "defaultMessage": "Contact support"
+  },
   "return_items_modal.placeholder.select_reason": {
     "defaultMessage": "Select a reason"
   },
@@ -1909,6 +1900,15 @@
   },
   "return_items_modal.text.submit_error_unknown_items": {
     "defaultMessage": "One or more items couldn't be found on this order. Please refresh and try again."
+  },
+  "return_items_modal.text.terminal_error_conflict": {
+    "defaultMessage": "This order can't be returned at this time."
+  },
+  "return_items_modal.text.terminal_error_not_found": {
+    "defaultMessage": "We could not find this order."
+  },
+  "return_items_modal.text.terminal_error_title": {
+    "defaultMessage": "Unable to submit return"
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"

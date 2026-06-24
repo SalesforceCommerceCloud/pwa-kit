@@ -41,10 +41,12 @@ import {
     VisuallyHidden,
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import Link from '@salesforce/retail-react-app/app/components/link'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 import {ReturnErrorKind} from '@salesforce/retail-react-app/app/utils/return-error-utils'
+import {RETURN_SUPPORT_CONTACT_URL} from '@salesforce/retail-react-app/app/constants'
 import {messages} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -57,6 +59,12 @@ const SELECT_VIEW_ERROR_KINDS = new Set([
     ReturnErrorKind.UNKNOWN_ITEMS,
     ReturnErrorKind.QUANTITY_EXCEEDED
 ])
+
+// Terminal error kinds: the order can't be returned (404 not found / 409
+// conflict), so retrying the same payload is futile. The modal stays open and
+// shows a banner with a recovery link (navigate away) instead of a Retry — it
+// no longer closes the modal or writes a banner onto the order-detail page.
+const TERMINAL_ERROR_KINDS = new Set([ReturnErrorKind.NOT_FOUND, ReturnErrorKind.CONFLICT])
 
 // Inline (review-view) retry messages, keyed by kind. Only network/unknown land
 // here; the select-view kinds render their own banner (see selectErrorBanner).
@@ -559,15 +567,58 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
+    // Terminal error banner (404/409): the order can't be returned, so there's no
+    // Retry — just a recovery link out of the dead end. Submitted from the review
+    // view, so it renders there. role="alert" announces it like the other banners.
+    const isTerminalError = !!normalizedError && TERMINAL_ERROR_KINDS.has(normalizedError.kind)
+    const terminalErrorBanner = isTerminalError ? (
+        <Alert status="error" role="alert" data-testid="return-items-modal-terminal-error">
+            <AlertIcon />
+            <Stack spacing={2}>
+                <AlertDescription fontWeight="semibold">
+                    <FormattedMessage {...messages.terminalErrorTitle} />
+                </AlertDescription>
+                <AlertDescription>
+                    {normalizedError.kind === ReturnErrorKind.NOT_FOUND ? (
+                        <FormattedMessage {...messages.terminalErrorNotFound} />
+                    ) : (
+                        <FormattedMessage {...messages.terminalErrorConflict} />
+                    )}
+                </AlertDescription>
+                <Button
+                    as={Link}
+                    to={
+                        normalizedError.kind === ReturnErrorKind.NOT_FOUND
+                            ? '/account/orders'
+                            : RETURN_SUPPORT_CONTACT_URL
+                    }
+                    variant="link"
+                    size="sm"
+                    data-testid="return-items-modal-terminal-link"
+                >
+                    {normalizedError.kind === ReturnErrorKind.NOT_FOUND ? (
+                        <FormattedMessage {...messages.terminalLinkOrders} />
+                    ) : (
+                        <FormattedMessage {...messages.terminalLinkSupport} />
+                    )}
+                </Button>
+            </Stack>
+        </Alert>
+    ) : null
+
     // Inline review-view error: only the same-payload-retry kinds (network /
     // unknown) render here. The select-view kinds switch views (see the effect
-    // above) and render their banner on the select view instead.
+    // above) and render their banner on the select view; terminal kinds render
+    // their own no-retry banner (above) instead.
     const showInlineReviewError =
-        normalizedError && !SELECT_VIEW_ERROR_KINDS.has(normalizedError.kind)
+        normalizedError &&
+        !SELECT_VIEW_ERROR_KINDS.has(normalizedError.kind) &&
+        !TERMINAL_ERROR_KINDS.has(normalizedError.kind)
     const inlineErrorMessage = INLINE_ERROR_MESSAGE[normalizedError?.kind] || messages.submitError
 
     const reviewBody = (
         <Stack spacing={3}>
+            {terminalErrorBanner}
             {showInlineReviewError && (
                 <Alert status="error" role="alert" data-testid="return-items-modal-submit-error">
                     <AlertIcon />
@@ -709,7 +760,9 @@ const ReturnItemsModal = ({
                 colorScheme="blue"
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
-                isDisabled={isSubmitting}
+                // A terminal error (404/409) can't be resolved by resubmitting, so
+                // disable Submit and let the banner's recovery link be the only path.
+                isDisabled={isSubmitting || isTerminalError}
                 aria-busy={isSubmitting}
                 width={{base: 'full', md: 'auto'}}
                 data-testid="return-items-modal-submit"

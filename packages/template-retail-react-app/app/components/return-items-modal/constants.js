@@ -119,5 +119,27 @@ export const messages = defineMessages({
         defaultMessage:
             "We're unable to process your request right now. Please try again in a few minutes.",
         id: 'return_items_modal.text.submit_error_network'
+    },
+    // Terminal errors (404/409): retrying the same payload can't succeed, so the
+    // banner offers a recovery path (navigate away) instead of a Retry button.
+    terminalErrorTitle: {
+        defaultMessage: 'Unable to submit return',
+        id: 'return_items_modal.text.terminal_error_title'
+    },
+    terminalErrorNotFound: {
+        defaultMessage: 'We could not find this order.',
+        id: 'return_items_modal.text.terminal_error_not_found'
+    },
+    terminalErrorConflict: {
+        defaultMessage: "This order can't be returned at this time.",
+        id: 'return_items_modal.text.terminal_error_conflict'
+    },
+    terminalLinkOrders: {
+        defaultMessage: 'Back to order history',
+        id: 'return_items_modal.link.terminal_orders'
+    },
+    terminalLinkSupport: {
+        defaultMessage: 'Contact support',
+        id: 'return_items_modal.link.terminal_support'
     }
 })

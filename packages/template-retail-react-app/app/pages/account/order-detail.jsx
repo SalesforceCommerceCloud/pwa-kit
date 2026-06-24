@@ -52,10 +52,7 @@ import {
     classifyReturnError,
     ReturnErrorKind
 } from '@salesforce/retail-react-app/app/utils/return-error-utils'
-import {
-    STORE_LOCATOR_IS_ENABLED,
-    RETURN_SUPPORT_CONTACT_URL
-} from '@salesforce/retail-react-app/app/constants'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
@@ -215,8 +212,6 @@ const AccountOrderDetail = () => {
     // badge (which keys off cancelFeedback) never fires on a return success.
     const [returnFeedback, setReturnFeedback] = useState(null)
     const [returnSubmitError, setReturnSubmitError] = useState(null)
-    // Terminal return errors (404/409) mean retrying won't help — disable the button
-    const [returnTerminal, setReturnTerminal] = useState(false)
     // Monotonic token: a submit's async result is only applied if it's still the
     // latest submit AND the modal hasn't been closed/reopened since it started.
     // Guards against a stale success closing a freshly-reopened modal or a stale
@@ -283,24 +278,25 @@ const AccountOrderDetail = () => {
     const hasReturnableItems = returnableItems.length > 0
     // The button renders whenever the shopper owns the order, but is disabled when
     // there's nothing to return, a cancellation just succeeded / is in flight, or a
-    // terminal cancel/return error has made the order un-actionable.
+    // terminal cancel error has made the order un-actionable. A terminal *return*
+    // error (404/409) is surfaced inside the modal (no-retry banner + recovery
+    // link), so it no longer disables the page-level trigger.
     const returnDisabled =
         !hasReturnableItems ||
         cancelFeedback?.status === 'success' ||
         cancelMutation.isLoading ||
-        cancelTerminal ||
-        returnTerminal
+        cancelTerminal
     // SR hint explaining *why* the focusable-but-disabled button is unavailable.
     // The two persistent reasons get explicit copy: nothing to return, or the
-    // order has reached a terminal cancel/return state. The transient reasons
-    // (cancel success / in-flight) are self-evident from the adjacent feedback
-    // banner and the Cancelled badge, so they intentionally carry no hint.
+    // order has reached a terminal cancel state. The transient reasons (cancel
+    // success / in-flight) are self-evident from the adjacent feedback banner and
+    // the Cancelled badge, so they intentionally carry no hint.
     const returnDisabledHint = !hasReturnableItems
         ? formatMessage({
               defaultMessage: 'No items on this order are available to return.',
               id: 'account_order_detail.hint.no_returnable_items'
           })
-        : returnTerminal || cancelTerminal
+        : cancelTerminal
         ? formatMessage({
               defaultMessage: 'This order can no longer be returned.',
               id: 'account_order_detail.hint.return_unavailable'
@@ -338,7 +334,6 @@ const AccountOrderDetail = () => {
         closeReturnModal()
         setReturnSelection({})
         setReturnSubmitError(null)
-        setReturnTerminal(false)
     }, [closeReturnModal, stripReturnDraftParam])
 
     // Restore an in-progress return that survived a silent token-refresh remount
@@ -437,58 +432,6 @@ const AccountOrderDetail = () => {
         })
     }, [formatMessage])
 
-    // Inline submit-error copy lives in the modal (with Retry); this is the
-    // post-close banner shown only for terminal failures (404/409), mirroring the
-    // cancel flow's 404/409 messaging. Takes the classified `{kind}` and renders
-    // code-specific copy + a recovery link (404 -> order history, 409 -> support).
-    const showReturnError = useCallback(
-        (classified) => {
-            const kind = classified?.kind
-            const title = formatMessage({
-                defaultMessage: 'Unable to submit return',
-                id: 'account_order_detail.alert.return_error_title'
-            })
-            if (kind === ReturnErrorKind.NOT_FOUND) {
-                setReturnFeedback({
-                    status: 'error',
-                    title,
-                    description: formatMessage({
-                        defaultMessage: 'We could not find this order.',
-                        id: 'account_order_detail.alert.return_error_not_found'
-                    }),
-                    link: {
-                        to: '/account/orders',
-                        label: formatMessage({
-                            defaultMessage: 'Back to order history',
-                            id: 'account_order_detail.link.return_error_orders'
-                        })
-                    }
-                })
-            } else {
-                // 409 conflict.
-                setReturnFeedback({
-                    status: 'error',
-                    title,
-                    description: formatMessage({
-                        defaultMessage: "This order can't be returned at this time.",
-                        id: 'account_order_detail.alert.return_error_conflict'
-                    }),
-                    link: {
-                        to: RETURN_SUPPORT_CONTACT_URL,
-                        label: formatMessage({
-                            defaultMessage: 'Contact support',
-                            id: 'account_order_detail.link.return_error_support'
-                        })
-                    }
-                })
-            }
-            // Note: the terminal flag (returnTerminal) is set synchronously by the
-            // caller in handleSubmitReturn, not here — so the trigger is disabled
-            // immediately rather than after this delayed banner fires.
-        },
-        [formatMessage]
-    )
-
     const handleSubmitReturn = useCallback(
         async (productItems) => {
             // Guard against `order` going null between modal open and submit
@@ -518,23 +461,14 @@ const AccountOrderDetail = () => {
                 switch (classified.kind) {
                     case ReturnErrorKind.NOT_FOUND:
                     case ReturnErrorKind.CONFLICT:
-                        // Terminal: retrying the same payload won't help. Close the
-                        // modal, refetch so returnableItems reflect reality, and show
-                        // a code-specific terminal banner. Set the terminal flag
-                        // SYNCHRONOUSLY (in the same render batch, after the close
-                        // handler's reset) so the trigger is disabled immediately —
-                        // not only after the 300ms banner delay, which would briefly
-                        // leave the dead-end re-clickable. showReturnError only
-                        // displays the banner now (it no longer owns the flag).
-                        handleCloseReturnModal()
-                        setReturnTerminal(true)
+                        // Terminal: retrying the same payload won't help. Keep the
+                        // modal open and hand the classified error to it — the modal
+                        // shows a no-retry banner with a recovery link (404 -> order
+                        // history, 409 -> support) in place. Refetch so returnableItems
+                        // reflect reality if the shopper backs out. We no longer close
+                        // the modal or write a banner onto the order-detail page.
                         refetchOrder?.()
-                        if (returnFeedbackTimerRef.current)
-                            clearTimeout(returnFeedbackTimerRef.current)
-                        returnFeedbackTimerRef.current = setTimeout(
-                            () => showReturnError(classified),
-                            300
-                        )
+                        setReturnSubmitError(classified)
                         break
                     case ReturnErrorKind.QUANTITY_EXCEEDED:
                     case ReturnErrorKind.UNKNOWN_ITEMS:
@@ -552,14 +486,7 @@ const AccountOrderDetail = () => {
                 }
             }
         },
-        [
-            returnMutation,
-            order?.orderNo,
-            handleCloseReturnModal,
-            showReturnSuccess,
-            showReturnError,
-            refetchOrder
-        ]
+        [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess, refetchOrder]
     )
 
     const canCancel = useMemo(() => {

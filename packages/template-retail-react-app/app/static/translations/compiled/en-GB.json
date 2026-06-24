@@ -245,24 +245,6 @@
       "value": "Order cancelled"
     }
   ],
-  "account_order_detail.alert.return_error_conflict": [
-    {
-      "type": 0,
-      "value": "This order can't be returned at this time."
-    }
-  ],
-  "account_order_detail.alert.return_error_not_found": [
-    {
-      "type": 0,
-      "value": "We could not find this order."
-    }
-  ],
-  "account_order_detail.alert.return_error_title": [
-    {
-      "type": 0,
-      "value": "Unable to submit return"
-    }
-  ],
   "account_order_detail.alert.return_success_description": [
     {
       "type": 0,
@@ -451,18 +433,6 @@
     {
       "type": 0,
       "value": "Back to Order History"
-    }
-  ],
-  "account_order_detail.link.return_error_orders": [
-    {
-      "type": 0,
-      "value": "Back to order history"
-    }
-  ],
-  "account_order_detail.link.return_error_support": [
-    {
-      "type": 0,
-      "value": "Contact support"
     }
   ],
   "account_order_detail.shipping_status.not_shipped": [
@@ -4471,6 +4441,18 @@
       "value": "name"
     }
   ],
+  "return_items_modal.link.terminal_orders": [
+    {
+      "type": 0,
+      "value": "Back to order history"
+    }
+  ],
+  "return_items_modal.link.terminal_support": [
+    {
+      "type": 0,
+      "value": "Contact support"
+    }
+  ],
   "return_items_modal.placeholder.select_reason": [
     {
       "type": 0,
@@ -4603,6 +4585,24 @@
     {
       "type": 0,
       "value": "One or more items couldn't be found on this order. Please refresh and try again."
+    }
+  ],
+  "return_items_modal.text.terminal_error_conflict": [
+    {
+      "type": 0,
+      "value": "This order can't be returned at this time."
+    }
+  ],
+  "return_items_modal.text.terminal_error_not_found": [
+    {
+      "type": 0,
+      "value": "We could not find this order."
+    }
+  ],
+  "return_items_modal.text.terminal_error_title": [
+    {
+      "type": 0,
+      "value": "Unable to submit return"
     }
   ],
   "search.action.cancel": [
