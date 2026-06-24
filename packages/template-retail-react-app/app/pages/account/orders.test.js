@@ -1917,7 +1917,7 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         expect(cancelButton).toBeDisabled()
     })
 
-    test('disables cancel button when any item has quantityAvailableToCancel < quantityOrdered', async () => {
+    test('disables cancel button when any item is not fully cancellable', async () => {
         setupOrderDetailsPage(omsPartiallyShippedOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
@@ -1930,7 +1930,7 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         expect(screen.queryByText(/order actions/i)).not.toBeInTheDocument()
     })
 
-    test('does not show cancel button when order belongs to different customer', async () => {
+    test('disables cancel button when order belongs to different customer', async () => {
         const otherCustomerOrder = createMockOmsOrder({
             omsData: {status: 'Created'},
             productItems: [
@@ -1949,14 +1949,15 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         })
         setupOrderDetailsPage(otherCustomerOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        const cancelButton = screen.queryByRole('button', {name: /cancel order/i})
-        if (cancelButton) {
-            expect(cancelButton).toBeDisabled()
-        }
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeDisabled()
     })
 
     test('cancel happy path: modal opens, submit succeeds, feedback shows', async () => {
-        mockMutateAsync.mockResolvedValueOnce({orderNo: omsEligibleOrder.orderNo, status: 'cancelled'})
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
         setupOrderDetailsPage(omsEligibleOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
@@ -1983,28 +1984,22 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         })
     })
 
-    test('cancel submits with selected reason', async () => {
-        mockMutateAsync.mockResolvedValueOnce({orderNo: omsEligibleOrder.orderNo, status: 'cancelled'})
+    test('cancel submits empty body when no reason codes available', async () => {
+        // The module-level mock returns cancelReasonCodes: [] so the dropdown
+        // is hidden and the modal submits with no reason (server applies default)
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
         setupOrderDetailsPage(omsEligibleOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
         const user = userEvent.setup()
-        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
-
-        // If reason dropdown is visible, select a reason
-        const dropdown = screen.queryByRole('combobox')
-        if (dropdown) {
-            await user.selectOptions(dropdown, 'Defect')
-        }
-
+        await user.click(await screen.findByRole('button', {name: /^cancel order$/i}))
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
 
         expect(mockMutateAsync).toHaveBeenCalledTimes(1)
-        const callBody = mockMutateAsync.mock.calls[0][0].body
-        // Body should contain the reason if dropdown was visible
-        if (dropdown) {
-            expect(callBody).toEqual({reason: 'Defect'})
-        }
+        expect(mockMutateAsync.mock.calls[0][0].body).toEqual({})
 
         await waitFor(() => {
             expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
@@ -2012,7 +2007,10 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
     })
 
     test('cancel button disabled after successful cancellation', async () => {
-        mockMutateAsync.mockResolvedValueOnce({orderNo: omsEligibleOrder.orderNo, status: 'cancelled'})
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
         setupOrderDetailsPage(omsEligibleOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
