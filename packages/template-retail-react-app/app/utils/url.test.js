@@ -15,7 +15,8 @@ import {
     removeQueryParamsFromPath,
     createUrlTemplate,
     removeSiteLocaleFromPath,
-    serverSafeEncode
+    serverSafeEncode,
+    ensureExternalUrl
 } from '@salesforce/retail-react-app/app/utils/url'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -488,5 +489,48 @@ describe('serverSafeEncode', () => {
         // Decode should give us original string
         const decoded = decodeURIComponent(encoded)
         expect(decoded).toBe(input)
+    })
+})
+
+describe('ensureExternalUrl', () => {
+    test('normalizes external URLs to an absolute https href', () => {
+        // scheme-less host -> prepend https:// (the carrier-tracking bug)
+        expect(ensureExternalUrl('www.testingtracking.com')).toBe(
+            'https://www.testingtracking.com/'
+        )
+        expect(ensureExternalUrl('fedex.com/track?n=123')).toBe('https://fedex.com/track?n=123')
+        // protocol-relative, host:port (URL would misread as a scheme), and IPv4 hosts
+        expect(ensureExternalUrl('//carrier.com/track')).toBe('https://carrier.com/track')
+        expect(ensureExternalUrl('carrier.com:8080/track')).toBe('https://carrier.com:8080/track')
+        expect(ensureExternalUrl('192.168.0.1/track')).toBe('https://192.168.0.1/track')
+        // already-absolute http(s): kept; scheme + host lowercased by the URL parser
+        expect(ensureExternalUrl('https://www.carrier.com/track?n=1')).toBe(
+            'https://www.carrier.com/track?n=1'
+        )
+        expect(ensureExternalUrl('http://carrier.com')).toBe('http://carrier.com/')
+        expect(ensureExternalUrl('HTTPS://Carrier.COM/Path')).toBe('https://carrier.com/Path')
+        // control characters stripped, surrounding whitespace trimmed
+        expect(ensureExternalUrl('  www.carrier.com  ')).toBe('https://www.carrier.com/')
+        expect(ensureExternalUrl('https://carrier.com\t/track\n')).toBe('https://carrier.com/track')
+    })
+
+    test('returns undefined (never throws) for unsafe, internal, or unusable input', () => {
+        // dangerous / non-web schemes
+        expect(ensureExternalUrl('javascript:alert(1)')).toBeUndefined()
+        expect(ensureExternalUrl('javascript:alert(1)//')).toBeUndefined()
+        expect(ensureExternalUrl('data:text/html,<script>alert(1)</script>')).toBeUndefined()
+        expect(ensureExternalUrl('vbscript:msgbox(1)')).toBeUndefined()
+        expect(ensureExternalUrl('file:///etc/passwd')).toBeUndefined()
+        expect(ensureExternalUrl('mailto:a@b.com')).toBeUndefined()
+        expect(ensureExternalUrl('tel:+15551234')).toBeUndefined()
+        // app-internal / relative paths (must not become external links)
+        expect(ensureExternalUrl('/account/orders/123')).toBeUndefined()
+        expect(ensureExternalUrl('track')).toBeUndefined()
+        expect(ensureExternalUrl('./relative')).toBeUndefined()
+        // empty / nullish
+        expect(ensureExternalUrl('')).toBeUndefined()
+        expect(ensureExternalUrl('   ')).toBeUndefined()
+        expect(ensureExternalUrl(null)).toBeUndefined()
+        expect(ensureExternalUrl(undefined)).toBeUndefined()
     })
 })

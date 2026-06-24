@@ -309,3 +309,55 @@ export const serverSafeEncode = (input) => {
     // WARNING: only use this because server double-decodes URL components
     return encodeURIComponent(input)
 }
+
+/**
+ * Normalize a possibly scheme-less external URL (e.g. a carrier tracking URL) into
+ * a safe, absolute http(s) URL for an `href`. Prepends `https://` to a scheme-less
+ * value so the browser doesn't treat it as a path relative to the current page.
+ *
+ * Only `http`/`https` pass; unsafe/non-web values (`javascript:`, `data:`, `mailto:`,
+ * internal paths, …) return `undefined` so callers render an inactive link. Pair the
+ * link with `target="_blank" rel="noopener noreferrer"` (Chakra `isExternal`).
+ *
+ * @param {string|null|undefined} input - The raw URL (may be scheme-less)
+ * @returns {string|undefined} An absolute http(s) URL, or `undefined` if unsafe/unusable
+ * @example
+ * ensureExternalUrl('www.carrier.com/t') // 'https://www.carrier.com/t'
+ * ensureExternalUrl('javascript:alert(1)') // undefined
+ * ensureExternalUrl('/account/orders/1') // undefined
+ */
+export const ensureExternalUrl = (input) => {
+    if (!input) return undefined
+    // eslint-disable-next-line no-control-regex -- strip control chars so they can't smuggle past the scheme checks
+    const sanitized = input.replace(/[\x00-\x1f\x7f]/g, '').trim()
+    if (!sanitized) return undefined
+
+    // Relative / app-internal paths are never external (allow protocol-relative "//host").
+    if (sanitized.startsWith('/') && !sanitized.startsWith('//')) return undefined
+    if (sanitized.startsWith('.')) return undefined
+
+    try {
+        const parsed = new URL(sanitized)
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.toString()
+        // Reject non-http(s) schemes — except a "host:port" that URL misreads as a
+        // scheme (protocol "carrier.com:"); a dotted protocol means fall through to prepend.
+        if (!parsed.protocol.includes('.')) return undefined
+    } catch {
+        // no scheme — fall through to prepend
+    }
+
+    // Require a host-like value so a bare word ("track") isn't externalized.
+    const host = sanitized.replace(/^\/+/, '').split(/[/?#]/)[0]
+    const isIpv4 = /^\d{1,3}(\.\d{1,3}){3}$/.test(host)
+    if (!host.includes('.') && !isIpv4) return undefined
+
+    const candidate = sanitized.startsWith('//') ? `https:${sanitized}` : `https://${sanitized}`
+    try {
+        const fixed = new URL(candidate)
+        return fixed.protocol === 'http:' || fixed.protocol === 'https:'
+            ? fixed.toString()
+            : undefined
+    } catch {
+        return undefined
+    }
+}
