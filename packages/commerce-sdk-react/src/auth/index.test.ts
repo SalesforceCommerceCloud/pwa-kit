@@ -1818,7 +1818,12 @@ describe('HttpOnly Session Cookies', () => {
         const refreshMock = helpers.refreshAccessToken as jest.Mock
         refreshMock.mockRejectedValueOnce(
             Object.assign(new Error('invalid refresh_token'), {
-                response: {json: () => Promise.resolve({message: 'invalid refresh_token'})}
+                // The body is read via a clone (a Response body is single-use), so the mock
+                // must expose clone() for the 'invalid refresh_token' branch to be exercised.
+                response: {
+                    json: () => Promise.resolve({message: 'invalid refresh_token'}),
+                    clone: () => ({json: () => Promise.resolve({message: 'invalid refresh_token'})})
+                }
             })
         )
         // After refresh fails, it falls through to loginGuestUser
