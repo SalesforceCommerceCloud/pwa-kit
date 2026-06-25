@@ -31,7 +31,36 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
+            // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
+            // fields below instead of the MIAW embedded-service fields above.
+            provider: 'miaw',
+            // URL of the Commerce Client messaging UMD bundle (e.g.
+            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
+            // Only used when provider === 'commerce-client'.
+            commerceClientScriptSourceUrl: '',
+            // Embedded Service developer name for the Commerce Client widget. Falls back
+            // to embeddedServiceName when not set.
+            esDeveloperName: '',
+            // Header text shown at the top of the Commerce Client widget.
+            headerText: '',
+            // Markdown disclaimer shown in the Commerce Client widget. Supports links and
+            // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
+            disclaimerMarkdown: '',
+            // Commerce Client widget layout: 'panel' (default) renders a full-height side
+            // panel docked to the right that slides in/out; 'dialog' renders the
+            // default floating corner dialog; 'modal' renders a centered modal.
+            commerceClientDisplayMode: 'panel',
+            // Width of the side panel when commerceClientDisplayMode is 'panel'.
+            commerceClientPanelWidth: '420px',
+            // Widget mode forwarded to the Commerce Client bundle as `mode` ('messaging').
+            commerceClientMode: 'messaging',
+            // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
+            commerceClientLogoUrl: ''
+            // Optional: pass `commerceClientSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            // to customize the widget search input. Forwarded to the widget as
+            // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
         },
         url: {
             site: 'path',
@@ -116,7 +145,7 @@ module.exports = {
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
         // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
         // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
-        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v3/sfp.js'
         //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         sfPayments: {
             enabled: false,

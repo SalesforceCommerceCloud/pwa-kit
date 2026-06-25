@@ -22,7 +22,17 @@ export const getCommerceAgentConfig = () => {
         conversationContext: [],
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
-        enableAgentFromSearchSuggestions: 'false'
+        enableAgentFromSearchSuggestions: 'false',
+        // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
+        provider: 'miaw',
+        commerceClientScriptSourceUrl: '',
+        esDeveloperName: '',
+        headerText: '',
+        disclaimerMarkdown: '',
+        commerceClientDisplayMode: 'panel',
+        commerceClientPanelWidth: '420px',
+        commerceClientMode: 'messaging',
+        commerceClientLogoUrl: ''
     }
     return getConfig().app.commerceAgent ?? defaults
 }

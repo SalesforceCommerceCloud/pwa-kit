@@ -22,7 +22,8 @@ import {
     onClient,
     getDefaultCookieAttributes,
     stringToBase64,
-    extractCustomParameters
+    extractCustomParameters,
+    parseResponseBodyClone
 } from '../utils'
 import {
     SLAS_SECRET_WARNING_MSG,
@@ -952,9 +953,10 @@ class Auth {
                 if (error instanceof Error && 'response' in error) {
                     // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
                     // We can't use `instanceof`, so instead we just check for the `response` property
-                    // and assume it is a fetch Response.
-                    const json = await (error['response'] as Response).json()
-                    if (json.message === 'invalid refresh_token') {
+                    // and assume it is a fetch Response. Read a clone so the original body stream
+                    // stays intact for any downstream consumer of the error.
+                    const json = await parseResponseBodyClone(error['response'] as Response)
+                    if (json?.message === 'invalid refresh_token') {
                         // In a multi-tab scenario, another tab may have already consumed the
                         // one-time-use refresh token and stored fresh tokens. Re-check storage
                         // before clearing — if a valid access token exists, use it instead of
@@ -1024,9 +1026,11 @@ class Auth {
         // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
         // to get a more descriptive error message from SLAS
         if ('response' in error) {
-            const json = await (error['response'] as Response).json()
-            const status_code: string = json.status_code
-            const responseMessage: string = json.message
+            // Read a clone so the original body stream stays intact for any caller that
+            // surfaces or re-throws this error after extracting the status/message.
+            const json = await parseResponseBodyClone(error['response'] as Response)
+            const status_code: string | undefined = json?.status_code
+            const responseMessage: string | undefined = json?.message
 
             return {
                 status_code,
@@ -1173,7 +1177,11 @@ class Auth {
         } catch (error) {
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.
-            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            // extractResponseError can return undefined fields (non-JSON / non-Response error);
+            // default to '' so the log and error messages stay well-formed strings.
+            const {status_code = '', responseMessage = ''} = await this.extractResponseError(
+                error as Error
+            )
             this.logger.error(`${status_code} ${responseMessage}`)
             throw new Error(
                 `New guest user could not be logged in. ${status_code} ${responseMessage}`
