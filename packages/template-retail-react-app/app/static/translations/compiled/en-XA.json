@@ -1033,6 +1033,20 @@
       "value": "]"
     }
   ],
+  "account_order_history.badge.cancelled": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧƞƈḗḗŀŀḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,

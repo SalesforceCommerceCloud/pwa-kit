@@ -212,6 +212,9 @@
   "account_order_detail.title.order_details": {
     "defaultMessage": "Order Details"
   },
+  "account_order_history.badge.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
   "account_order_history.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
   },

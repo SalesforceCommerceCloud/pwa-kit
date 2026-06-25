@@ -465,6 +465,12 @@
       "value": "Order Details"
     }
   ],
+  "account_order_history.badge.cancelled": [
+    {
+      "type": 0,
+      "value": "Cancelled"
+    }
+  ],
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,

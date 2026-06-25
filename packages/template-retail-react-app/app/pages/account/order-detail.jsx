@@ -46,6 +46,10 @@ import OrderTracking from '@salesforce/retail-react-app/app/components/order-tra
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import {
+    getOrderDisplayStatus,
+    ORDER_DISPLAY_STATUS
+} from '@salesforce/retail-react-app/app/utils/order-status-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -528,23 +532,27 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
-                        {!isLoading && (
-                            <Badge
-                                colorScheme={cancelFeedback?.status === 'success' ? 'red' : 'green'}
-                            >
-                                {cancelFeedback?.status === 'success' ? (
-                                    <Flex display="inline-flex" alignItems="center" gap={1}>
-                                        <CloseIcon boxSize={2} aria-hidden />
-                                        {formatMessage({
-                                            defaultMessage: 'Cancelled',
-                                            id: 'account_order_detail.badge.cancelled'
-                                        })}
-                                    </Flex>
-                                ) : (
-                                    order.status || order.omsData?.status
-                                )}
-                            </Badge>
-                        )}
+                        {!isLoading &&
+                            (() => {
+                                const isCancelled =
+                                    cancelFeedback?.status === 'success' ||
+                                    getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
+                                return (
+                                    <Badge colorScheme={isCancelled ? 'red' : 'green'}>
+                                        {isCancelled ? (
+                                            <Flex display="inline-flex" alignItems="center" gap={1}>
+                                                <CloseIcon boxSize={2} aria-hidden />
+                                                {formatMessage({
+                                                    defaultMessage: 'Cancelled',
+                                                    id: 'account_order_detail.badge.cancelled'
+                                                })}
+                                            </Flex>
+                                        ) : (
+                                            order.status || order.omsData?.status
+                                        )}
+                                    </Badge>
+                                )
+                            })()}
                     </Flex>
 
                     {!isLoading ? (
