@@ -56,6 +56,15 @@ describe('OrderTracking component', () => {
         expect(screen.getByText(/TRACK-12345/)).toBeInTheDocument()
     })
 
+    test('renders the tracking number as plain text (no link) when trackingUrl is unsafe', () => {
+        // ensureExternalUrl rejects the userinfo spoof -> no href -> plain text, not a link to evil.com
+        renderWithProviders(
+            <OrderTracking {...baseProps} trackingUrl="https://www.ups.com@evil.com" />
+        )
+        expect(screen.queryByRole('link', {name: /TRACK-12345/i})).not.toBeInTheDocument()
+        expect(screen.getByText(/TRACK-12345/)).toBeInTheDocument()
+    })
+
     test('omits the tracking line entirely when there is no tracking number', () => {
         renderWithProviders(
             <OrderTracking {...baseProps} trackingNumber={undefined} trackingUrl={undefined} />

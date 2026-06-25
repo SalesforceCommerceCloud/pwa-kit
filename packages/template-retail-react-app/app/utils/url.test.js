@@ -533,4 +533,36 @@ describe('ensureExternalUrl', () => {
         expect(ensureExternalUrl(null)).toBeUndefined()
         expect(ensureExternalUrl(undefined)).toBeUndefined()
     })
+
+    // Security/correctness regressions from PR review — each asserts the resolved host
+    // so a refactor can't silently reopen a bypass. Grouped by failure class.
+    test('rejects host-confusion bypasses (href would navigate to a different host than it reads)', () => {
+        // userinfo `@` — "www.ups.com" is the username, real host is evil.com — on BOTH branches
+        expect(ensureExternalUrl('https://www.ups.com@evil.com/track')).toBeUndefined()
+        expect(ensureExternalUrl('www.ups.com@evil.com/track')).toBeUndefined()
+        expect(ensureExternalUrl('ups.com:@evil.com/track')).toBeUndefined()
+        expect(ensureExternalUrl('carrier.com:user@evil.com/track')).toBeUndefined()
+        // backslash authority (WHATWG treats `\` as `/`)
+        expect(ensureExternalUrl('https:\\\\evil.com')).toBeUndefined()
+        expect(ensureExternalUrl('\\\\evil.com')).toBeUndefined()
+        // control char between slashes must NOT collapse a relative path into //host
+        expect(ensureExternalUrl('/\x00/evil.com')).toBeUndefined()
+    })
+
+    test('rejects junk / non-host values that would become dead external links', () => {
+        // bare filenames and degenerate-dot hosts (contradict the relative→undefined contract)
+        expect(ensureExternalUrl('data.html')).toBeUndefined()
+        expect(ensureExternalUrl('index.html')).toBeUndefined()
+        expect(ensureExternalUrl('a..b')).toBeUndefined()
+        // non-string input must not throw (never-throws contract)
+        expect(ensureExternalUrl(1234)).toBeUndefined()
+        expect(ensureExternalUrl({})).toBeUndefined()
+        expect(ensureExternalUrl([])).toBeUndefined()
+    })
+
+    test('does NOT reject legit carrier URLs that merely contain @ in the path/query', () => {
+        expect(ensureExternalUrl('https://tracking.dhl.com/track?email=a@b.com')).toBe(
+            'https://tracking.dhl.com/track?email=a@b.com'
+        )
+    })
 })
