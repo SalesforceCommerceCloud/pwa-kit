@@ -1835,3 +1835,261 @@ describe('Cancel order error scenarios', () => {
         expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
     })
 })
+
+describe('Cancel order — eligibility and full flow (W-22806929)', () => {
+    const omsEligibleOrder = createMockOmsOrder({
+        omsData: {status: 'Created'},
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Test Product',
+                quantity: 2,
+                omsData: {
+                    status: 'created',
+                    quantityAvailableToCancel: 2,
+                    quantityOrdered: 2
+                }
+            }
+        ],
+        customerInfo: {customerId: 'testCustomerId'}
+    })
+
+    const omsCancelledOrder = createMockOmsOrder({
+        omsData: {status: 'Approved'},
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Cancelled Product',
+                quantity: 1,
+                omsData: {
+                    status: 'canceled',
+                    quantityAvailableToCancel: 0,
+                    quantityOrdered: 1
+                }
+            }
+        ],
+        customerInfo: {customerId: 'testCustomerId'}
+    })
+
+    const omsPartiallyShippedOrder = createMockOmsOrder({
+        omsData: {status: 'Approved'},
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Shipped Product',
+                quantity: 1,
+                omsData: {
+                    status: 'fulfilled',
+                    quantityAvailableToCancel: 0,
+                    quantityOrdered: 1
+                }
+            },
+            {
+                productId: 'product-2',
+                productName: 'Pending Product',
+                quantity: 1,
+                omsData: {
+                    status: 'created',
+                    quantityAvailableToCancel: 1,
+                    quantityOrdered: 1
+                }
+            }
+        ],
+        customerInfo: {customerId: 'testCustomerId'}
+    })
+
+    beforeEach(() => {
+        mockMutateAsync.mockReset()
+    })
+
+    test('shows ORDER ACTIONS with enabled cancel button for eligible OMS order', async () => {
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText(/order actions/i)).toBeInTheDocument()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeEnabled()
+    })
+
+    test('disables cancel button when all items have quantityAvailableToCancel === 0', async () => {
+        setupOrderDetailsPage(omsCancelledOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeDisabled()
+    })
+
+    test('disables cancel button when any item is not fully cancellable', async () => {
+        setupOrderDetailsPage(omsPartiallyShippedOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeDisabled()
+    })
+
+    test('does not show ORDER ACTIONS for non-OMS order', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByText(/order actions/i)).not.toBeInTheDocument()
+    })
+
+    test('disables cancel button when order belongs to different customer', async () => {
+        const otherCustomerOrder = createMockOmsOrder({
+            omsData: {status: 'Created'},
+            productItems: [
+                {
+                    productId: 'product-1',
+                    productName: 'Product',
+                    quantity: 1,
+                    omsData: {
+                        status: 'created',
+                        quantityAvailableToCancel: 1,
+                        quantityOrdered: 1
+                    }
+                }
+            ],
+            customerInfo: {customerId: 'differentCustomerId'}
+        })
+        setupOrderDetailsPage(otherCustomerOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeDisabled()
+    })
+
+    test('cancel happy path: modal opens, submit succeeds, feedback shows', async () => {
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /^cancel order$/i}))
+
+        // Modal opens
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+        expect(screen.getByText(/this cancels the entire order/i)).toBeInTheDocument()
+
+        // Submit
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+
+        // API called
+        expect(mockMutateAsync).toHaveBeenCalledTimes(1)
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+            parameters: {orderNo: omsEligibleOrder.orderNo},
+            body: {}
+        })
+
+        // Success feedback appears
+        await waitFor(() => {
+            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+        })
+    })
+
+    test('cancel submits empty body when no reason codes available', async () => {
+        // The module-level mock returns cancelReasonCodes: [] so the dropdown
+        // is hidden and the modal submits with no reason (server applies default)
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /^cancel order$/i}))
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+
+        expect(mockMutateAsync).toHaveBeenCalledTimes(1)
+        expect(mockMutateAsync.mock.calls[0][0].body).toEqual({})
+
+        await waitFor(() => {
+            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+        })
+    })
+
+    test('cancel button disabled after successful cancellation', async () => {
+        mockMutateAsync.mockResolvedValueOnce({
+            orderNo: omsEligibleOrder.orderNo,
+            status: 'cancelled'
+        })
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+
+        await waitFor(() => {
+            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+        })
+
+        // Button should now be disabled
+        expect(cancelButton).toBeDisabled()
+    })
+
+    test('cancel button stays enabled after transient error (500)', async () => {
+        mockMutateAsync.mockRejectedValueOnce({response: {status: 500}})
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+
+        await waitFor(() => {
+            expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
+        })
+
+        // Button should still be enabled for retry
+        expect(cancelButton).toBeEnabled()
+    })
+
+    test('cancel button disabled after terminal error (409)', async () => {
+        mockMutateAsync.mockRejectedValueOnce({response: {status: 409}})
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+
+        await waitFor(() => {
+            expect(screen.getByText(/already being processed/i)).toBeInTheDocument()
+        })
+
+        // Button should be disabled — terminal error, retrying won't help
+        expect(cancelButton).toBeDisabled()
+    })
+
+    test('keep order closes modal without calling API', async () => {
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /^cancel order$/i}))
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+        await user.click(screen.getByRole('button', {name: /keep order/i}))
+
+        // Modal closes (wait for animation)
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
+        // API not called
+        expect(mockMutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('modal shows "Confirm cancellation below" when no reason codes available', async () => {
+        setupOrderDetailsPage(omsEligibleOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const user = userEvent.setup()
+        await user.click(await screen.findByRole('button', {name: /cancel order/i}))
+
+        // The mock returns cancelReasonCodes: [] — dropdown should be hidden
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+        expect(screen.getByText(/confirm cancellation below/i)).toBeInTheDocument()
+    })
+})
