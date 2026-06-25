@@ -23,6 +23,24 @@ jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => {
         useOrigin: jest.fn(() => 'https://www.example.com')
     }
 })
+
+// Optional capture hook for CommerceApiProvider props. Defaults to the real provider;
+// a test sets `mockCaptureProviderProps` to intercept the props without the auth stack.
+let mockCaptureProviderProps = null
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...actual,
+        CommerceApiProvider: (props) => {
+            if (mockCaptureProviderProps) {
+                mockCaptureProviderProps(props)
+                return props.children || null
+            }
+            return actual.CommerceApiProvider(props)
+        }
+    }
+})
+
 describe('AppConfig', () => {
     let originalFetch
     beforeAll(() => {
@@ -81,5 +99,55 @@ describe('AppConfig', () => {
         expect(AppConfig.restore()).toBeUndefined()
         expect(AppConfig.restore({frozen: 'any values here'})).toBeUndefined()
         expect(AppConfig.freeze()).toBeUndefined()
+    })
+
+    test('forwards locals.traceparent (a plain string) to CommerceApiProvider headers', () => {
+        // Capture the props handed to CommerceApiProvider without standing up the
+        // full provider/auth stack (the module-level mock swaps in a passthrough
+        // when mockCaptureProviderProps is set). The SDK sets locals.traceparent
+        // server-side; the template forwards it as a plain string header.
+        let captured
+        mockCaptureProviderProps = (props) => {
+            captured = props
+        }
+        try {
+            const locals = {
+                site: mockConfig.app.sites[0],
+                appConfig: mockConfig.app,
+                traceparent: '00-abc123-def456-01'
+            }
+            render(
+                <StaticRouter>
+                    <CorrelationIdProvider correlationId={() => uuidv4()}>
+                        <AppConfig locals={locals} />
+                    </CorrelationIdProvider>
+                </StaticRouter>
+            )
+
+            expect(captured.headers.traceparent).toBe('00-abc123-def456-01')
+        } finally {
+            mockCaptureProviderProps = null
+        }
+    })
+
+    test('omits traceparent when locals.traceparent is absent', () => {
+        let captured
+        mockCaptureProviderProps = (props) => {
+            captured = props
+        }
+        try {
+            const locals = {site: mockConfig.app.sites[0], appConfig: mockConfig.app}
+            render(
+                <StaticRouter>
+                    <CorrelationIdProvider correlationId={() => uuidv4()}>
+                        <AppConfig locals={locals} />
+                    </CorrelationIdProvider>
+                </StaticRouter>
+            )
+
+            expect(captured.headers.traceparent).toBeUndefined()
+        } finally {
+            mockCaptureProviderProps = null
+        }
     })
 })
