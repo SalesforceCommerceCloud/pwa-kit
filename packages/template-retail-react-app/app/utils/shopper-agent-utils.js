@@ -92,6 +92,9 @@ export function resetEmbeddedMessagingForCommerceSessionChange() {
             error
         )
     }
+}
+
+/**
  * Show or hide the Commerce Client messaging widget.
  *
  * Uses the SDK exposed on `window.CimulateMessaging.eventHandlers`. Passing no
