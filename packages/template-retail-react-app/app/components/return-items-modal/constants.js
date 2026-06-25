@@ -131,15 +131,12 @@ export const messages = defineMessages({
         id: 'return_items_modal.text.terminal_error_not_found'
     },
     terminalErrorConflict: {
-        defaultMessage: "This order can't be returned at this time.",
+        defaultMessage:
+            "This order can't be returned at this time. Please reach out to the merchant.",
         id: 'return_items_modal.text.terminal_error_conflict'
     },
     terminalLinkOrders: {
         defaultMessage: 'Back to order history',
         id: 'return_items_modal.link.terminal_orders'
-    },
-    terminalLinkSupport: {
-        defaultMessage: 'Contact support',
-        id: 'return_items_modal.link.terminal_support'
     }
 })

@@ -908,7 +908,7 @@ describe('Item-level return error states (W-22821839)', () => {
         expect(link).toHaveTextContent(/back to order history/i)
     })
 
-    test('a terminal 409 surfaces an in-modal "contact support" recovery link', async () => {
+    test('a terminal 409 surfaces an in-modal text-only merchant-contact message (no dead link)', async () => {
         rejectWith({status: 409, body: {}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -918,8 +918,10 @@ describe('Item-level return error states (W-22821839)', () => {
 
         const banner = await screen.findByTestId('return-items-modal-terminal-error')
         expect(banner).toHaveTextContent(/can't be returned at this time/i)
-        const link = await screen.findByTestId('return-items-modal-terminal-link')
-        expect(link).toHaveTextContent(/contact support/i)
+        // Mirrors the cancel flow: merchant guidance is text only — there's no valid
+        // self-service route, so we don't render a link that would 404.
+        expect(banner).toHaveTextContent(/reach out to the merchant/i)
+        expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
     })
 
     test('restores an in-progress return from a returnDraft URL param on mount (case 1 token-refresh survival)', async () => {

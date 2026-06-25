@@ -283,14 +283,6 @@ export const SETUP_FUTURE_USAGE = {
     OFF_SESSION: 'off_session'
 }
 
-/**
- * Where the order-return 409 ("this order can't be returned at this time")
- * message points shoppers for help. Merchants should override this with their
- * real support URL (config/CMS) — documented for WI-7. Default is the generic
- * help path so the link is never dead.
- */
-export const RETURN_SUPPORT_CONTACT_URL = '/customer-service'
-
 // Constants for the Commerce Client messaging widget
 /**
  * Default DOM element id the Commerce Client widget is rendered into.

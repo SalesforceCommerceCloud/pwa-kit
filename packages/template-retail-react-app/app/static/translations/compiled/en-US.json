@@ -4447,12 +4447,6 @@
       "value": "Back to order history"
     }
   ],
-  "return_items_modal.link.terminal_support": [
-    {
-      "type": 0,
-      "value": "Contact support"
-    }
-  ],
   "return_items_modal.placeholder.select_reason": [
     {
       "type": 0,
@@ -4590,7 +4584,7 @@
   "return_items_modal.text.terminal_error_conflict": [
     {
       "type": 0,
-      "value": "This order can't be returned at this time."
+      "value": "This order can't be returned at this time. Please reach out to the merchant."
     }
   ],
   "return_items_modal.text.terminal_error_not_found": [

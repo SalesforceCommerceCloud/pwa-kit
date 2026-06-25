@@ -46,7 +46,6 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 import {ReturnErrorKind} from '@salesforce/retail-react-app/app/utils/return-error-utils'
-import {RETURN_SUPPORT_CONTACT_URL} from '@salesforce/retail-react-app/app/constants'
 import {messages} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -568,9 +567,14 @@ const ReturnItemsModal = ({
     )
 
     // Terminal error banner (404/409): the order can't be returned, so there's no
-    // Retry — just a recovery link out of the dead end. Submitted from the review
-    // view, so it renders there. role="alert" announces it like the other banners.
+    // Retry. The 404 ("order not found") offers a recovery link back to order
+    // history (a real route). The 409 ("can't be returned right now") has no valid
+    // self-service destination, so — mirroring the cancel flow — it points shoppers
+    // to the merchant in text only, rather than linking to a route that doesn't
+    // exist. Submitted from the review view, so it renders there. role="alert"
+    // announces it like the other banners.
     const isTerminalError = !!normalizedError && TERMINAL_ERROR_KINDS.has(normalizedError.kind)
+    const isNotFound = normalizedError?.kind === ReturnErrorKind.NOT_FOUND
     const terminalErrorBanner = isTerminalError ? (
         <Alert status="error" role="alert" data-testid="return-items-modal-terminal-error">
             <AlertIcon />
@@ -579,29 +583,23 @@ const ReturnItemsModal = ({
                     <FormattedMessage {...messages.terminalErrorTitle} />
                 </AlertDescription>
                 <AlertDescription>
-                    {normalizedError.kind === ReturnErrorKind.NOT_FOUND ? (
+                    {isNotFound ? (
                         <FormattedMessage {...messages.terminalErrorNotFound} />
                     ) : (
                         <FormattedMessage {...messages.terminalErrorConflict} />
                     )}
                 </AlertDescription>
-                <Button
-                    as={Link}
-                    to={
-                        normalizedError.kind === ReturnErrorKind.NOT_FOUND
-                            ? '/account/orders'
-                            : RETURN_SUPPORT_CONTACT_URL
-                    }
-                    variant="link"
-                    size="sm"
-                    data-testid="return-items-modal-terminal-link"
-                >
-                    {normalizedError.kind === ReturnErrorKind.NOT_FOUND ? (
+                {isNotFound && (
+                    <Button
+                        as={Link}
+                        to="/account/orders"
+                        variant="link"
+                        size="sm"
+                        data-testid="return-items-modal-terminal-link"
+                    >
                         <FormattedMessage {...messages.terminalLinkOrders} />
-                    ) : (
-                        <FormattedMessage {...messages.terminalLinkSupport} />
-                    )}
-                </Button>
+                    </Button>
+                )}
             </Stack>
         </Alert>
     ) : null
