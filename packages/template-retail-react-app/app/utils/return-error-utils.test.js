@@ -26,7 +26,9 @@ const makeError = ({status, body, bodyUsed = false, jsonThrows = false} = {}) =>
 
 describe('classifyReturnError', () => {
     test('400 InvalidReasonCode -> invalidReason', async () => {
-        const result = await classifyReturnError(makeError({status: 400, body: {errorCode: 'InvalidReasonCode'}}))
+        const result = await classifyReturnError(
+            makeError({status: 400, body: {errorCode: 'InvalidReasonCode'}})
+        )
         expect(result).toEqual({
             kind: ReturnErrorKind.INVALID_REASON,
             status: 400,

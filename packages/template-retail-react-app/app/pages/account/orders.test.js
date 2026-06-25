@@ -544,7 +544,9 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         expect(cta).toBeInTheDocument()
         // aria-disabled (not native disabled) keeps it focusable so the SR hint is heard.
         expect(cta).toHaveAttribute('aria-disabled', 'true')
-        expect(screen.getByText(/no items on this order are available to return/i)).toBeInTheDocument()
+        expect(
+            screen.getByText(/no items on this order are available to return/i)
+        ).toBeInTheDocument()
     })
 
     test('clicking the disabled CTA does not open the modal', async () => {
@@ -716,9 +718,7 @@ describe('Return submission (W-22821838)', () => {
             ).toBeInTheDocument()
             expect(screen.getByText(/review your return/i)).toBeInTheDocument()
             // ... with no inline Retry (resubmitting the same payload can't succeed) ...
-            expect(
-                screen.queryByTestId('return-items-modal-submit-retry')
-            ).not.toBeInTheDocument()
+            expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
             // ... and Submit is disabled, leaving the recovery link as the only path.
             expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
             // The order-detail page behind the modal is NOT mutated: the Return Items
@@ -815,7 +815,10 @@ describe('Item-level return error states (W-22821839)', () => {
         // the selection invalid with no on-screen control to fix it.
         rejectWith({
             status: 400,
-            body: {errorCode: 'ReturnQuantityExceeded', productItems: [{itemId: 'returnable-item-1'}]}
+            body: {
+                errorCode: 'ReturnQuantityExceeded',
+                productItems: [{itemId: 'returnable-item-1'}]
+            }
         })
         const returnable = createReturnEligibleOmsOrder()
         // Second GET (the refetch) returns the same order with nothing returnable.
