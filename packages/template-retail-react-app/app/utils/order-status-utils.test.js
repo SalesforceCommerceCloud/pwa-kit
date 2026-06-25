@@ -110,9 +110,7 @@ describe('getOrderDisplayStatus - matrix rows', () => {
 
     test('all return initiated -> RETURN_INITIATED', () => {
         expect(
-            getOrderDisplayStatus(
-                orderWithItemStatuses(['Return Initiated', 'Return Initiated'])
-            )
+            getOrderDisplayStatus(orderWithItemStatuses(['Return Initiated', 'Return Initiated']))
         ).toBe(ORDER_DISPLAY_STATUS.RETURN_INITIATED)
     })
 
