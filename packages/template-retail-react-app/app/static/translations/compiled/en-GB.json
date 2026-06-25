@@ -369,10 +369,22 @@
       "value": "number"
     }
   ],
+  "account_order_detail.hint.cancel_unavailable": [
+    {
+      "type": 0,
+      "value": "This order can no longer be cancelled."
+    }
+  ],
   "account_order_detail.hint.no_returnable_items": [
     {
       "type": 0,
       "value": "No items on this order are available to return."
+    }
+  ],
+  "account_order_detail.hint.not_cancellable": [
+    {
+      "type": 0,
+      "value": "This order is not eligible for cancellation."
     }
   ],
   "account_order_detail.hint.return_unavailable": [
@@ -4497,20 +4509,6 @@
     {
       "type": 0,
       "value": "Loading return reasons…"
-    }
-  ],
-  "return_items_modal.text.quantity_exceeded_affected": [
-    {
-      "type": 0,
-      "value": "The return quantity changed for: "
-    },
-    {
-      "type": 1,
-      "value": "items"
-    },
-    {
-      "type": 0,
-      "value": ". Please review the updated limits below."
     }
   ],
   "return_items_modal.text.quantity_exceeded_affected_generic": [

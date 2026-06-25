@@ -61,38 +61,14 @@ const readBodyOnce = async (response) => {
 }
 
 /**
- * Pull the affected product-item ids out of a `ReturnQuantityExceeded` body.
- *
- * The exact shape is defined in the OAS, not this repo, so this is best-effort:
- * it probes the field names the contract is expected to use and returns [] when
- * none match. Callers must tolerate an empty list (they fall back to a generic
- * "quantities changed" message without naming items).
- *
- * @param {Object|null} body
- * @returns {string[]}
- */
-const extractAffectedItemIds = (body) => {
-    if (!body || typeof body !== 'object') return []
-    // Probe the documented/likely carriers in priority order.
-    const candidates =
-        body.affectedItemIds ??
-        body.productItemIds ??
-        (Array.isArray(body.productItems)
-            ? body.productItems.map((i) => i?.itemId ?? i?.productItemId).filter(Boolean)
-            : undefined) ??
-        body.details?.affectedItemIds
-    return Array.isArray(candidates) ? candidates.filter(Boolean) : []
-}
-
-/**
  * Normalize a return-submit error into a UI-actionable classification.
  *
  * Reads `error.response.status` synchronously and the JSON body once (for the
- * 400 `errorCode` discriminator + affected items). Pure aside from the single
- * body read; never throws.
+ * 400 `errorCode` discriminator). Pure aside from the single body read; never
+ * throws.
  *
  * @param {*} error The error thrown by the `ReturnOmsOrder` mutation.
- * @returns {Promise<{kind: string, status: (number|undefined), errorCode: (string|undefined), affectedItemIds: string[]}>}
+ * @returns {Promise<{kind: string, status: (number|undefined), errorCode: (string|undefined)}>}
  */
 export const classifyReturnError = async (error) => {
     const response = error?.response
@@ -101,31 +77,24 @@ export const classifyReturnError = async (error) => {
     // No HTTP response at all -> network/timeout (fetch rejected before a
     // response was produced). This also covers a thrown non-Response error.
     if (!response || typeof status !== 'number') {
-        return {
-            kind: ReturnErrorKind.NETWORK,
-            status: undefined,
-            errorCode: undefined,
-            affectedItemIds: []
-        }
+        return {kind: ReturnErrorKind.NETWORK, status: undefined, errorCode: undefined}
     }
 
     if (status === 404) {
-        return {kind: ReturnErrorKind.NOT_FOUND, status, errorCode: undefined, affectedItemIds: []}
+        return {kind: ReturnErrorKind.NOT_FOUND, status, errorCode: undefined}
     }
     if (status === 409) {
-        return {kind: ReturnErrorKind.CONFLICT, status, errorCode: undefined, affectedItemIds: []}
+        return {kind: ReturnErrorKind.CONFLICT, status, errorCode: undefined}
     }
 
     if (status === 400) {
         const body = await readBodyOnce(response)
         const errorCode = body?.errorCode
         const kind = ERROR_CODE_TO_KIND[errorCode] ?? ReturnErrorKind.UNKNOWN
-        const affectedItemIds =
-            kind === ReturnErrorKind.QUANTITY_EXCEEDED ? extractAffectedItemIds(body) : []
-        return {kind, status, errorCode, affectedItemIds}
+        return {kind, status, errorCode}
     }
 
     // Any other status (incl. an intercepted-but-leaked 401, or a 5xx) is
     // treated as a generic retryable failure.
-    return {kind: ReturnErrorKind.UNKNOWN, status, errorCode: undefined, affectedItemIds: []}
+    return {kind: ReturnErrorKind.UNKNOWN, status, errorCode: undefined}
 }

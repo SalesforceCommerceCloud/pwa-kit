@@ -785,7 +785,7 @@ describe('Item-level return error states (W-22821839)', () => {
         mockReturnIsLoading = false
     })
 
-    test('a 400 QuantityExceeded keeps the modal open and drops to the select view with an affected-items banner', async () => {
+    test('a 400 QuantityExceeded keeps the modal open and drops to the select view with the quantity-changed banner', async () => {
         rejectWith({
             status: 400,
             body: {
@@ -802,8 +802,8 @@ describe('Item-level return error states (W-22821839)', () => {
         // Modal stays open and falls back to the select view with the banner.
         const banner = await screen.findByTestId('return-items-modal-select-error')
         expect(banner).toBeInTheDocument()
-        // The affected item is named in the banner copy.
-        expect(banner).toHaveTextContent(/Returnable A/i)
+        // Generic "quantities changed" copy (the API does not name specific items).
+        expect(banner).toHaveTextContent(/available return quantities changed/i)
         // Still on the select view (item checkboxes visible), not the terminal banner.
         expect(screen.queryByText(/unable to submit return/i)).not.toBeInTheDocument()
     })
@@ -922,28 +922,6 @@ describe('Item-level return error states (W-22821839)', () => {
         // self-service route, so we don't render a link that would 404.
         expect(banner).toHaveTextContent(/reach out to the merchant/i)
         expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
-    })
-
-    test('restores an in-progress return from a returnDraft URL param on mount (case 1 token-refresh survival)', async () => {
-        const order = createReturnEligibleOmsOrder()
-        global.server.use(
-            rest.get('*/orders/:orderNo', (req, res, ctx) => res(ctx.delay(0), ctx.json(order)))
-        )
-        const draft = encodeURIComponent(
-            JSON.stringify([{i: 'returnable-item-1', q: 1, r: 'Wrong size'}])
-        )
-        window.history.pushState(
-            {},
-            'Order Details',
-            createPathWithDefaults(`/account/orders/${order.orderNo}?returnDraft=${draft}`)
-        )
-        renderWithProviders(<MockedComponent history={history} />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
-        })
-
-        // The modal auto-opens with the restored selection.
-        expect(await screen.findByText(/return items from order #/i)).toBeInTheDocument()
-        await waitFor(() => expect(screen.getAllByRole('checkbox')[0]).toBeChecked())
     })
 })
 
@@ -2162,14 +2140,16 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         setupOrderDetailsPage(omsCancelledOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        // aria-disabled (not native disabled) so the button stays focusable and
+        // its screen-reader hint is reachable. Mirrors the Return Items button.
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('disables cancel button when any item is not fully cancellable', async () => {
         setupOrderDetailsPage(omsPartiallyShippedOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('does not show ORDER ACTIONS for non-OMS order', async () => {
@@ -2198,7 +2178,7 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         setupOrderDetailsPage(otherCustomerOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('cancel happy path: modal opens, submit succeeds, feedback shows', async () => {
@@ -2271,8 +2251,8 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
             expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
         })
 
-        // Button should now be disabled
-        expect(cancelButton).toBeDisabled()
+        // Button should now be disabled (aria-disabled, stays focusable)
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('cancel button stays enabled after transient error (500)', async () => {
@@ -2308,7 +2288,8 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         })
 
         // Button should be disabled — terminal error, retrying won't help
-        expect(cancelButton).toBeDisabled()
+        // (aria-disabled, stays focusable)
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('keep order closes modal without calling API', async () => {

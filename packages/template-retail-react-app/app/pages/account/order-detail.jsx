@@ -7,7 +7,7 @@
 
 import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useHistory, useLocation, useRouteMatch} from 'react-router'
+import {useHistory, useRouteMatch} from 'react-router'
 import {
     Box,
     Heading,
@@ -47,7 +47,6 @@ import OrderTracking from '@salesforce/retail-react-app/app/components/order-tra
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
-import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {
     classifyReturnError,
     ReturnErrorKind
@@ -60,58 +59,13 @@ import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
-// Name of the URL query param that carries an in-progress return selection so
-// it survives a silent SDK token-refresh mid-return (WI-5 case 1). Only the
-// checked rows' itemId/quantity/reasonCode are stored — no PII.
-const RETURN_DRAFT_PARAM = 'returnDraft'
-
 // Static id linking the Return Items button to its VisuallyHidden disabled-reason
 // hint (only one such button exists per page, so a constant is safe).
 const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
 
-/**
- * Serialize the checked rows of a return selection to a compact URL-safe
- * string, or '' when nothing is selected (so the param is dropped).
- */
-const encodeReturnDraft = (selection) => {
-    const rows = Object.entries(selection || {})
-        .filter(([, row]) => row?.checked)
-        .map(([itemId, row]) => ({i: itemId, q: row.quantity, r: row.reasonCode}))
-    if (!rows.length) return ''
-    try {
-        return encodeURIComponent(JSON.stringify(rows))
-    } catch {
-        return ''
-    }
-}
-
-/**
- * Inverse of {@link encodeReturnDraft}: returns a `returnSelection`-shaped
- * object, or null when the param is absent/malformed.
- */
-const decodeReturnDraft = (raw) => {
-    if (!raw) return null
-    try {
-        const rows = JSON.parse(decodeURIComponent(raw))
-        if (!Array.isArray(rows) || !rows.length) return null
-        const selection = {}
-        rows.forEach((row) => {
-            if (!row?.i) return
-            selection[row.i] = {
-                checked: true,
-                // Clamp to a whole number >= 1: a tampered URL could carry 0,
-                // a negative, or a float. The modal re-validates against the
-                // live max before enabling submit, but a sane floor keeps the
-                // restored quantity picker from showing a nonsense value.
-                quantity: Number.isFinite(row.q) && row.q >= 1 ? Math.floor(row.q) : 1,
-                reasonCode: row.r
-            }
-        })
-        return Object.keys(selection).length ? selection : null
-    } catch {
-        return null
-    }
-}
+// Static id linking the Cancel order button to its VisuallyHidden disabled-reason
+// hint (only one such button exists per page, so a constant is safe).
+const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
 
 const OrderProducts = ({productItems, currency}) => {
     const orderProductIds = productItems.map((product) => product.productId)
@@ -188,7 +142,6 @@ OrderProducts.propTypes = {
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
-    const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {isRegistered} = useCustomerType()
@@ -305,78 +258,13 @@ const AccountOrderDetail = () => {
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
-    // Debounce timer for the returnDraft URL write; cancelled on close/unmount so
-    // a late write can't re-introduce a draft after the selection was cleared.
-    const returnDraftTimerRef = useRef(null)
-    // Restore-once latch so stripping the returnDraft param after hydrate doesn't
-    // retrigger restore, and a manual close doesn't reopen the modal.
-    const didRestoreDraftRef = useRef(false)
-
-    // Drop the returnDraft param from the current URL without a history push, so
-    // a closed/submitted return doesn't leave a stale draft that would re-open
-    // the modal on the next mount. Reads history.location (always current) to
-    // avoid threading `location` through the close callback's deps.
-    const stripReturnDraftParam = useCallback(() => {
-        const {pathname, search} = history.location
-        if (!search || !search.includes(`${RETURN_DRAFT_PARAM}=`)) return
-        history.replace(rebuildPathWithParams(`${pathname}${search}`, {[RETURN_DRAFT_PARAM]: ''}))
-    }, [history])
-
     const handleCloseReturnModal = useCallback(() => {
         // Invalidate any in-flight submit so its async result is ignored.
         returnSubmitTokenRef.current += 1
-        // Cancel any pending debounced draft write so it can't fire after we clear.
-        if (returnDraftTimerRef.current) {
-            clearTimeout(returnDraftTimerRef.current)
-            returnDraftTimerRef.current = null
-        }
-        stripReturnDraftParam()
         closeReturnModal()
         setReturnSelection({})
         setReturnSubmitError(null)
-    }, [closeReturnModal, stripReturnDraftParam])
-
-    // Restore an in-progress return that survived a silent token-refresh remount
-    // (WI-5 case 1): if the URL carries a returnDraft, hydrate the selection and
-    // re-open the modal. Runs once per mount (latched) so manually closing the
-    // modal — which strips the param — can't reopen it.
-    useEffect(() => {
-        if (didRestoreDraftRef.current) return
-        const params = new URLSearchParams(location.search)
-        const raw = params.get(RETURN_DRAFT_PARAM)
-        if (!raw) return
-        didRestoreDraftRef.current = true
-        const restored = decodeReturnDraft(raw)
-        if (!restored) {
-            // Malformed/empty draft — clean the URL and bail.
-            stripReturnDraftParam()
-            return
-        }
-        setReturnSelection(restored)
-        openReturnModal()
-    }, [])
-
-    // Persist the in-progress selection to the URL (debounced) while the modal is
-    // open, so a silent token-refresh remount can restore it. Cleared on close via
-    // handleCloseReturnModal; here we only write while open.
-    useEffect(() => {
-        if (!isReturnModalOpen) return undefined
-        if (returnDraftTimerRef.current) clearTimeout(returnDraftTimerRef.current)
-        returnDraftTimerRef.current = setTimeout(() => {
-            const encoded = encodeReturnDraft(returnSelection)
-            const {pathname, search} = history.location
-            const next = rebuildPathWithParams(`${pathname}${search}`, {
-                [RETURN_DRAFT_PARAM]: encoded
-            })
-            if (next !== `${pathname}${search}`) history.replace(next)
-        }, 400)
-        return () => {
-            if (returnDraftTimerRef.current) {
-                clearTimeout(returnDraftTimerRef.current)
-                returnDraftTimerRef.current = null
-            }
-        }
-    }, [returnSelection, isReturnModalOpen, history])
+    }, [closeReturnModal])
 
     // After a recoverable error (quantityExceeded / unknownItems) the parent
     // refetches the order, so `returnableItems` may shrink (an item is now fully
@@ -386,9 +274,8 @@ const AccountOrderDetail = () => {
     // `isSelectionValid` false with no on-screen control for the shopper to fix.
     useEffect(() => {
         // Gate on `order` being loaded: returnableItems is [] while the order
-        // fetch is in flight (e.g. the restore-on-mount path opens the modal
-        // before the order resolves), and pruning then would wipe a valid
-        // restored selection before the real items arrive.
+        // fetch is in flight, and pruning then would wipe a valid selection
+        // before the real items arrive.
         if (!isReturnModalOpen || !order) return
         setReturnSelection((prev) => {
             if (!prev || !Object.keys(prev).length) return prev
@@ -458,33 +345,21 @@ const AccountOrderDetail = () => {
                 // the modal may have been closed/reopened while we were reading.
                 const classified = await classifyReturnError(e)
                 if (token !== returnSubmitTokenRef.current) return
-                switch (classified.kind) {
-                    case ReturnErrorKind.NOT_FOUND:
-                    case ReturnErrorKind.CONFLICT:
-                        // Terminal: retrying the same payload won't help. Keep the
-                        // modal open and hand the classified error to it — the modal
-                        // shows a no-retry banner with a recovery link (404 -> order
-                        // history, 409 -> support) in place. Do NOT refetch: the same
-                        // 404/409 would flip useOrder's isError and collapse the whole
-                        // page (modal included) to <OrderLoadError />. Mirror the cancel
-                        // flow, which also leaves the loaded order on screen on terminal
-                        // errors so order details stay visible behind the modal.
-                        setReturnSubmitError(classified)
-                        break
-                    case ReturnErrorKind.QUANTITY_EXCEEDED:
-                    case ReturnErrorKind.UNKNOWN_ITEMS:
-                        // Recoverable but needs fresh server state: refetch the order
-                        // so returnableItems/maxes update, keep the modal open, and
-                        // hand the classified error to the modal (it drops to the
-                        // select view and shows the affected-items banner).
-                        refetchOrder?.()
-                        setReturnSubmitError(classified)
-                        break
-                    default:
-                        // invalidReason / network / unknown — keep the modal open for
-                        // an inline retry / reason repopulation.
-                        setReturnSubmitError(classified)
+                // Recoverable-but-stale errors (quantityExceeded / unknownItems) need
+                // fresh server state, so refetch the order — returnableItems/maxes
+                // update and the open modal's reconciliation effect clamps the
+                // selection. All other kinds keep the current order on screen: terminal
+                // 404/409 must NOT refetch (the same error would flip useOrder's isError
+                // and collapse the page to <OrderLoadError />, modal included), and
+                // invalidReason / network / unknown just need an inline retry. In every
+                // case we keep the modal open and hand it the classified error to render.
+                if (
+                    classified.kind === ReturnErrorKind.QUANTITY_EXCEEDED ||
+                    classified.kind === ReturnErrorKind.UNKNOWN_ITEMS
+                ) {
+                    refetchOrder?.()
                 }
+                setReturnSubmitError(classified)
             }
         },
         [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess, refetchOrder]
@@ -503,6 +378,26 @@ const AccountOrderDetail = () => {
             ) ?? false
         )
     }, [isRegistered, order, customerId])
+
+    // The Cancel order button renders unconditionally but is disabled when the
+    // order can't be cancelled, a cancellation just succeeded, or a terminal
+    // cancel error has made the order un-actionable. Mirrors returnDisabled.
+    const cancelDisabled = !canCancel || cancelFeedback?.status === 'success' || cancelTerminal
+    // SR hint explaining *why* the focusable-but-disabled button is unavailable.
+    // Only the persistent reasons get copy: the order isn't cancellable, or it has
+    // reached a terminal cancel state. The transient success case is self-evident
+    // from the adjacent Cancelled badge, so it intentionally carries no hint.
+    const cancelDisabledHint = cancelTerminal
+        ? formatMessage({
+              defaultMessage: 'This order can no longer be cancelled.',
+              id: 'account_order_detail.hint.cancel_unavailable'
+          })
+        : !canCancel
+        ? formatMessage({
+              defaultMessage: 'This order is not eligible for cancellation.',
+              id: 'account_order_detail.hint.not_cancellable'
+          })
+        : null
 
     const showCancelSuccess = useCallback(() => {
         setCancelFeedback({
@@ -789,12 +684,20 @@ const AccountOrderDetail = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => {
+                                // No-op while disabled — see aria-disabled note below.
+                                if (cancelDisabled) return
                                 setCancelFeedback(null)
                                 setReturnFeedback(null)
                                 openCancelModal()
                             }}
-                            isDisabled={
-                                !canCancel || cancelFeedback?.status === 'success' || cancelTerminal
+                            // Use aria-disabled (not isDisabled) so the button stays
+                            // focusable while disabled — a native disabled button can't be
+                            // focused, so a keyboard/SR user would never hear the hint
+                            // explaining why it's unavailable. Mirrors the Return Items
+                            // button. The hint is wired only for the persistent reasons.
+                            aria-disabled={cancelDisabled}
+                            aria-describedby={
+                                cancelDisabledHint ? CANCEL_DISABLED_HINT_ID : undefined
                             }
                         >
                             <FormattedMessage
@@ -802,6 +705,11 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.button.cancel_order"
                             />
                         </Button>
+                        {cancelDisabledHint && (
+                            <VisuallyHidden id={CANCEL_DISABLED_HINT_ID}>
+                                {cancelDisabledHint}
+                            </VisuallyHidden>
+                        )}
                         {showStartReturn && (
                             <>
                                 <Button

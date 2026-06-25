@@ -50,43 +50,6 @@ import {messages} from '@salesforce/retail-react-app/app/components/return-items
 
 const onClient = typeof window !== 'undefined'
 
-// Error kinds whose recovery requires the shopper to change their selection, so
-// the modal drops back to the select view and shows a banner there. Everything
-// else (network/unknown) is a same-payload retry shown inline on the review view.
-const SELECT_VIEW_ERROR_KINDS = new Set([
-    ReturnErrorKind.INVALID_REASON,
-    ReturnErrorKind.UNKNOWN_ITEMS,
-    ReturnErrorKind.QUANTITY_EXCEEDED
-])
-
-// Terminal error kinds: the order can't be returned (404 not found / 409
-// conflict), so retrying the same payload is futile. The modal stays open and
-// shows a banner with a recovery link (navigate away) instead of a Retry — it
-// no longer closes the modal or writes a banner onto the order-detail page.
-const TERMINAL_ERROR_KINDS = new Set([ReturnErrorKind.NOT_FOUND, ReturnErrorKind.CONFLICT])
-
-// Inline (review-view) retry messages, keyed by kind. Only network/unknown land
-// here; the select-view kinds render their own banner (see selectErrorBanner).
-const INLINE_ERROR_MESSAGE = {
-    [ReturnErrorKind.NETWORK]: messages.submitErrorNetwork,
-    [ReturnErrorKind.UNKNOWN]: messages.submitError
-}
-
-/**
- * Normalize the `submitError` prop into `{kind, affectedItemIds}`.
- *
- * The parent (WI-5) passes a classified `{kind, ...}` object, but for backward
- * compatibility (WI-4 callers / existing tests) a raw `Error` is also accepted
- * and treated as the generic `unknown` kind.
- */
-const normalizeSubmitError = (submitError) => {
-    if (!submitError) return null
-    if (typeof submitError === 'object' && typeof submitError.kind === 'string') {
-        return {kind: submitError.kind, affectedItemIds: submitError.affectedItemIds || []}
-    }
-    return {kind: ReturnErrorKind.UNKNOWN, affectedItemIds: []}
-}
-
 /**
  * Format the variant attributes a shopper sees inline next to the product name.
  *
@@ -260,7 +223,6 @@ const ReturnItemsModal = ({
     submitError = null,
     finalFocusRef
 }) => {
-    const intl = useIntl()
     const isMobile = useBreakpointValue({base: true, md: false})
     const reviewDisabledHintId = useId()
 
@@ -369,24 +331,36 @@ const ReturnItemsModal = ({
         [selection, returnableItems]
     )
 
-    // Classify the parent-supplied submit error (tolerating a raw Error).
-    const normalizedError = useMemo(() => normalizeSubmitError(submitError), [submitError])
+    // The parent (WI-5) always supplies a classified `{kind, ...}` submit error,
+    // or null. Derive the kind once and the two behavioral buckets from it:
+    //  - select-view kinds (invalid reason / unknown items / quantity exceeded)
+    //    require editing the selection, so the modal drops to the select view and
+    //    shows a banner there.
+    //  - terminal kinds (404 not found / 409 conflict) can't be retried with the
+    //    same payload, so the modal shows a no-retry banner with a recovery link.
+    // Everything else (network / unknown) is a same-payload retry shown inline on
+    // the review view.
+    const errorKind = submitError?.kind || null
+    const isSelectViewError =
+        errorKind === ReturnErrorKind.INVALID_REASON ||
+        errorKind === ReturnErrorKind.UNKNOWN_ITEMS ||
+        errorKind === ReturnErrorKind.QUANTITY_EXCEEDED
+    const isTerminalError =
+        errorKind === ReturnErrorKind.NOT_FOUND || errorKind === ReturnErrorKind.CONFLICT
 
     // Recovery side effects driven by the error kind:
-    //  - select-view kinds (invalid reason / unknown items / quantity exceeded)
-    //    require editing the selection, so drop back to the select view where the
-    //    rows (and the new banner) live.
+    //  - select-view kinds drop back to the select view where the rows (and the
+    //    new banner) live.
     //  - invalid reason additionally repopulates the reason dropdowns from OMS.
     // Guarded on the error identity so it fires once per new error, not every render.
     const handledErrorRef = useRef(null)
     useEffect(() => {
         if (!submitError || handledErrorRef.current === submitError) return
         handledErrorRef.current = submitError
-        const kind = normalizedError?.kind
-        if (kind && SELECT_VIEW_ERROR_KINDS.has(kind)) {
+        if (isSelectViewError) {
             setView('select')
         }
-        if (kind === ReturnErrorKind.INVALID_REASON) {
+        if (errorKind === ReturnErrorKind.INVALID_REASON) {
             // The picked reason is no longer valid. Refetch the reason list AND
             // clear the stale reasonCode on every checked row, so the shopper
             // can't simply re-review/resubmit the same rejected reason (the
@@ -408,7 +382,7 @@ const ReturnItemsModal = ({
                 return changed ? next : prev
             })
         }
-    }, [submitError, normalizedError, reviewQuery, onSelectionChange])
+    }, [submitError, isSelectViewError, errorKind, reviewQuery, onSelectionChange])
     useEffect(() => {
         if (!submitError) handledErrorRef.current = null
     }, [submitError])
@@ -484,45 +458,23 @@ const ReturnItemsModal = ({
             })
     }, [view, selection, returnableItems, reasons])
 
-    // Map affected item ids -> display names for the quantity-exceeded banner.
-    const affectedItemNames = useMemo(() => {
-        const ids = normalizedError?.affectedItemIds || []
-        if (!ids.length) return []
-        return ids.map((id) => {
-            const item = returnableItems.find((i) => i.itemId === id)
-            if (!item) return id
-            const variation = formatVariationSummary(item)
-            return variation ? `${item.productName} — ${variation}` : item.productName || id
-        })
-    }, [normalizedError, returnableItems])
-
     // Select-view error banner: rendered above the rows when the error kind
     // requires editing the selection (invalid reason / unknown items / quantity
     // exceeded). role="alert" matches the inline review-view alert convention.
-    const selectErrorBanner =
-        normalizedError && SELECT_VIEW_ERROR_KINDS.has(normalizedError.kind) ? (
-            <Alert status="error" role="alert" data-testid="return-items-modal-select-error">
-                <AlertIcon />
-                <AlertDescription>
-                    {normalizedError.kind === ReturnErrorKind.INVALID_REASON ? (
-                        <FormattedMessage {...messages.submitErrorInvalidReason} />
-                    ) : normalizedError.kind === ReturnErrorKind.UNKNOWN_ITEMS ? (
-                        <FormattedMessage {...messages.submitErrorUnknownItems} />
-                    ) : affectedItemNames.length ? (
-                        <FormattedMessage
-                            {...messages.quantityExceededAffected}
-                            // Locale-aware list join (e.g. "A, B, and C" in en;
-                            // localized separators/conjunctions elsewhere).
-                            values={{
-                                items: intl.formatList(affectedItemNames, {type: 'conjunction'})
-                            }}
-                        />
-                    ) : (
-                        <FormattedMessage {...messages.quantityExceededAffectedGeneric} />
-                    )}
-                </AlertDescription>
-            </Alert>
-        ) : null
+    const selectErrorBanner = isSelectViewError ? (
+        <Alert status="error" role="alert" data-testid="return-items-modal-select-error">
+            <AlertIcon />
+            <AlertDescription>
+                {errorKind === ReturnErrorKind.INVALID_REASON ? (
+                    <FormattedMessage {...messages.submitErrorInvalidReason} />
+                ) : errorKind === ReturnErrorKind.UNKNOWN_ITEMS ? (
+                    <FormattedMessage {...messages.submitErrorUnknownItems} />
+                ) : (
+                    <FormattedMessage {...messages.quantityExceededAffectedGeneric} />
+                )}
+            </AlertDescription>
+        </Alert>
+    ) : null
 
     const selectBody = reviewQuery.isLoading ? (
         <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
@@ -573,8 +525,7 @@ const ReturnItemsModal = ({
     // to the merchant in text only, rather than linking to a route that doesn't
     // exist. Submitted from the review view, so it renders there. role="alert"
     // announces it like the other banners.
-    const isTerminalError = !!normalizedError && TERMINAL_ERROR_KINDS.has(normalizedError.kind)
-    const isNotFound = normalizedError?.kind === ReturnErrorKind.NOT_FOUND
+    const isNotFound = errorKind === ReturnErrorKind.NOT_FOUND
     const terminalErrorBanner = isTerminalError ? (
         <Alert status="error" role="alert" data-testid="return-items-modal-terminal-error">
             <AlertIcon />
@@ -608,11 +559,9 @@ const ReturnItemsModal = ({
     // unknown) render here. The select-view kinds switch views (see the effect
     // above) and render their banner on the select view; terminal kinds render
     // their own no-retry banner (above) instead.
-    const showInlineReviewError =
-        normalizedError &&
-        !SELECT_VIEW_ERROR_KINDS.has(normalizedError.kind) &&
-        !TERMINAL_ERROR_KINDS.has(normalizedError.kind)
-    const inlineErrorMessage = INLINE_ERROR_MESSAGE[normalizedError?.kind] || messages.submitError
+    const showInlineReviewError = !!errorKind && !isSelectViewError && !isTerminalError
+    const inlineErrorMessage =
+        errorKind === ReturnErrorKind.NETWORK ? messages.submitErrorNetwork : messages.submitError
 
     const reviewBody = (
         <Stack spacing={3}>
@@ -837,19 +786,14 @@ ReturnItemsModal.propTypes = {
     /** True while the parent's `returnOmsOrder` mutation is in flight. */
     isSubmitting: PropTypes.bool,
     /**
-     * Truthy when the submit failed. Preferred shape is the classified object
-     * `{kind, affectedItemIds}` from `classifyReturnError`; a raw `Error` is
-     * also accepted (treated as the generic `unknown` kind) for back-compat.
-     * Drives the inline review-view retry (network/unknown) or the select-view
-     * banner (invalid reason / unknown items / quantity exceeded).
+     * Truthy when the submit failed: the classified `{kind}` object from
+     * `classifyReturnError`. Drives the inline review-view retry (network/unknown)
+     * or the select-view banner (invalid reason / unknown items / quantity
+     * exceeded) or the terminal no-retry banner (404/409).
      */
-    submitError: PropTypes.oneOfType([
-        PropTypes.instanceOf(Error),
-        PropTypes.shape({
-            kind: PropTypes.string,
-            affectedItemIds: PropTypes.arrayOf(PropTypes.string)
-        })
-    ]),
+    submitError: PropTypes.shape({
+        kind: PropTypes.string
+    }),
     /** Element to receive focus when the modal closes (stable across the post-success refetch). */
     finalFocusRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }

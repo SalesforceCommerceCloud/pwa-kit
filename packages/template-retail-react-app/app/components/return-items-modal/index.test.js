@@ -316,7 +316,7 @@ test('submitError renders an inline alert + Retry that re-fires submit', async (
     renderWithProviders(
         <Harness
             onSubmit={onSubmit}
-            submitError={new Error('boom')}
+            submitError={{kind: ReturnErrorKind.UNKNOWN}}
             initialSelection={{'item-2': {checked: true, quantity: 1, reasonCode: 'Defect'}}}
         />
     )
@@ -359,13 +359,10 @@ test('unknown error renders the generic inline retry message', async () => {
     expect(screen.getByText(/something went wrong submitting your return/i)).toBeInTheDocument()
 })
 
-test('quantityExceeded error drops to the select view and shows an affected-items banner', async () => {
+test('quantityExceeded error drops to the select view and shows the quantity-changed banner', async () => {
     renderWithProviders(
         <Harness
-            submitError={{
-                kind: ReturnErrorKind.QUANTITY_EXCEEDED,
-                affectedItemIds: ['item-1']
-            }}
+            submitError={{kind: ReturnErrorKind.QUANTITY_EXCEEDED}}
             initialSelection={{'item-1': {checked: true, quantity: 2, reasonCode: 'Defect'}}}
         />
     )
@@ -374,21 +371,10 @@ test('quantityExceeded error drops to the select view and shows an affected-item
     expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
     const banner = screen.getByTestId('return-items-modal-select-error')
     expect(banner).toHaveAttribute('role', 'alert')
-    // Names the affected item.
-    expect(within(banner).getByText(/cotton crew t-shirt/i)).toBeInTheDocument()
+    // Generic "quantities changed" copy (the API does not name specific items).
+    expect(within(banner).getByText(/available return quantities changed/i)).toBeInTheDocument()
     // No inline review-view error in this state.
     expect(screen.queryByTestId('return-items-modal-submit-error')).not.toBeInTheDocument()
-})
-
-test('quantityExceeded with no affected ids shows the generic banner copy', async () => {
-    renderWithProviders(
-        <Harness
-            submitError={{kind: ReturnErrorKind.QUANTITY_EXCEEDED, affectedItemIds: []}}
-            initialSelection={{'item-1': {checked: true, quantity: 2, reasonCode: 'Defect'}}}
-        />
-    )
-    const banner = await screen.findByTestId('return-items-modal-select-error')
-    expect(within(banner).getByText(/available return quantities changed/i)).toBeInTheDocument()
 })
 
 test('unknownItems error drops to the select view with a refresh-and-try-again banner', async () => {

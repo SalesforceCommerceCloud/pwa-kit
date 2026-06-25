@@ -32,8 +32,7 @@ describe('classifyReturnError', () => {
         expect(result).toEqual({
             kind: ReturnErrorKind.INVALID_REASON,
             status: 400,
-            errorCode: 'InvalidReasonCode',
-            affectedItemIds: []
+            errorCode: 'InvalidReasonCode'
         })
     })
 
@@ -45,36 +44,12 @@ describe('classifyReturnError', () => {
         expect(result.status).toBe(400)
     })
 
-    test('400 ReturnQuantityExceeded -> quantityExceeded with affected ids (affectedItemIds)', async () => {
-        const result = await classifyReturnError(
-            makeError({
-                status: 400,
-                body: {errorCode: 'ReturnQuantityExceeded', affectedItemIds: ['item-1', 'item-2']}
-            })
-        )
-        expect(result.kind).toBe(ReturnErrorKind.QUANTITY_EXCEEDED)
-        expect(result.affectedItemIds).toEqual(['item-1', 'item-2'])
-    })
-
-    test('400 ReturnQuantityExceeded extracts ids from productItems[].itemId', async () => {
-        const result = await classifyReturnError(
-            makeError({
-                status: 400,
-                body: {
-                    errorCode: 'ReturnQuantityExceeded',
-                    productItems: [{itemId: 'a'}, {itemId: 'b'}, {}]
-                }
-            })
-        )
-        expect(result.affectedItemIds).toEqual(['a', 'b'])
-    })
-
-    test('400 ReturnQuantityExceeded with no recognizable ids -> empty list', async () => {
+    test('400 ReturnQuantityExceeded -> quantityExceeded', async () => {
         const result = await classifyReturnError(
             makeError({status: 400, body: {errorCode: 'ReturnQuantityExceeded'}})
         )
         expect(result.kind).toBe(ReturnErrorKind.QUANTITY_EXCEEDED)
-        expect(result.affectedItemIds).toEqual([])
+        expect(result.status).toBe(400)
     })
 
     test('400 OrderReturnFailed -> unknown (no dedicated recovery)', async () => {

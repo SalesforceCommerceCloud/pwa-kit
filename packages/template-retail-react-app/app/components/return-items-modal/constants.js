@@ -103,13 +103,7 @@ export const messages = defineMessages({
             "One or more items couldn't be found on this order. Please refresh and try again.",
         id: 'return_items_modal.text.submit_error_unknown_items'
     },
-    // Shown on the select view above the rows after a quantity-exceeded error,
-    // naming the items whose limits changed (when the API tells us which).
-    quantityExceededAffected: {
-        defaultMessage:
-            'The return quantity changed for: {items}. Please review the updated limits below.',
-        id: 'return_items_modal.text.quantity_exceeded_affected'
-    },
+    // Shown on the select view above the rows after a quantity-exceeded error.
     quantityExceededAffectedGeneric: {
         defaultMessage:
             "Some items' available return quantities changed. Please review the updated limits below.",
