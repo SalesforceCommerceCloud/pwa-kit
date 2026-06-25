@@ -24,6 +24,7 @@ const orderWithItemStatuses = (statuses) => ({
 describe('normalizeItemStatus', () => {
     test.each([
         ['allocated', 'in_progress'],
+        ['Fulfilled', 'in_progress'],
         ['In Progress', 'in_progress'],
         ['Processing', 'in_progress'],
         ['Created', 'ordered'],
@@ -59,8 +60,6 @@ describe('normalizeItemStatus', () => {
         expect(normalizeItemStatus('preorder')).toBe('in_progress')
         expect(normalizeItemStatus('worship')).toBe('in_progress')
         expect(normalizeItemStatus('kinship')).toBe('in_progress')
-        // "fulfilled" is intentionally non-terminal until the real SOM value is confirmed.
-        expect(normalizeItemStatus('fulfilled')).toBe('in_progress')
     })
 })
 

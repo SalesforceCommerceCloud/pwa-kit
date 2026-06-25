@@ -50,12 +50,11 @@ const ITEM_BUCKET = {
  * — substring matching mis-classifies values like "reorder"/"preorder" (→ ORDERED) or
  * "worship"/"kinship" (→ SHIPPED). Keys must be lowercase; lookups lowercase the input first.
  *
- * Note: "fulfilled" is intentionally treated as non-terminal (it falls through to the IN_PROGRESS
- * default rather than mapping to DELIVERED). SOM's routing diagram uses "Fulfillment Order is
- * Fulfilled" for the terminal delivery state, but the real item-level value for a delivered order
- * has not been confirmed against a live sandbox yet. Mapping an unconfirmed value to a terminal,
- * customer-visible "Delivered" badge is riskier than leaving it in progress; this is tracked for the
- * badge work (W-23093717).
+ * Note: "allocated" and "fulfilled" are intentionally mapped to IN_PROGRESS, not a terminal state.
+ * Both are upstream fulfillment-order (FO) milestones: an FO is created/"allocated" when a warehouse
+ * picks up the order, and "Fulfillment Order is Fulfilled" means that FO's work is done — but the
+ * Shipment entity (and actual delivery) is created later, after the FO. So "fulfilled" is in-flight,
+ * not delivered; mapping it to a terminal, customer-visible "Delivered" badge would be wrong.
  */
 const STATUS_MAP = {
     ordered: ITEM_BUCKET.ORDERED,
@@ -66,6 +65,7 @@ const STATUS_MAP = {
     'in progress': ITEM_BUCKET.IN_PROGRESS,
     processing: ITEM_BUCKET.IN_PROGRESS,
     allocated: ITEM_BUCKET.IN_PROGRESS,
+    fulfilled: ITEM_BUCKET.IN_PROGRESS,
     shipped: ITEM_BUCKET.SHIPPED,
     'in transit': ITEM_BUCKET.SHIPPED,
     delivered: ITEM_BUCKET.DELIVERED,
