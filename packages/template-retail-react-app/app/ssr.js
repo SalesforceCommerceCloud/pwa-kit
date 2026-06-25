@@ -26,7 +26,8 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
-import {registerTokenBridgeRoute} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 
 const config = getConfig()
 
