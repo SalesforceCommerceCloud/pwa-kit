@@ -51,6 +51,17 @@ describe('normalizeItemStatus', () => {
     test('falls back to in_progress for unknown statuses (never a terminal state)', () => {
         expect(normalizeItemStatus('some-future-status')).toBe('in_progress')
     })
+
+    test('exact-match only: substring look-alikes do not match a real status', () => {
+        // These would have been false positives under substring matching; the exact-match map keeps
+        // them as unknown -> in_progress (non-terminal) instead.
+        expect(normalizeItemStatus('reorder')).toBe('in_progress')
+        expect(normalizeItemStatus('preorder')).toBe('in_progress')
+        expect(normalizeItemStatus('worship')).toBe('in_progress')
+        expect(normalizeItemStatus('kinship')).toBe('in_progress')
+        // "fulfilled" is intentionally non-terminal until the real SOM value is confirmed.
+        expect(normalizeItemStatus('fulfilled')).toBe('in_progress')
+    })
 })
 
 describe('getOrderDisplayStatus - matrix rows', () => {
@@ -206,6 +217,15 @@ describe('getOrderDisplayStatus - fallback', () => {
             getOrderDisplayStatus({
                 orderNo: 'x',
                 productItems: [{productId: 'a', quantity: 1}]
+            })
+        ).toBeNull()
+    })
+
+    test('returns null when omsData is present but the status key is absent', () => {
+        expect(
+            getOrderDisplayStatus({
+                orderNo: 'x',
+                productItems: [{productId: 'a', quantity: 1, omsData: {}}]
             })
         ).toBeNull()
     })

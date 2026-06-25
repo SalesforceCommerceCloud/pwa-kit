@@ -44,10 +44,43 @@ const ITEM_BUCKET = {
 }
 
 /**
- * Maps a raw item-level `omsData.status` string to a canonical {@link ITEM_BUCKET}. The SOM
- * vocabulary is not strictly defined and arrives in mixed case, so matching is case-insensitive and
- * synonym-based. Unknown values fall back to `in_progress` (a safe, non-terminal bucket) so an
- * unexpected status never reads as a terminal state like "Delivered" or "Cancelled".
+ * Case-insensitive exact-match map from a raw SOM item status to a canonical {@link ITEM_BUCKET}.
+ * The item-level vocabulary is a finite, known set derived from SOM's fulfillment-order state
+ * machine (not free text), so an exact map is both safer and more readable than substring matching
+ * — substring matching mis-classifies values like "reorder"/"preorder" (→ ORDERED) or
+ * "worship"/"kinship" (→ SHIPPED). Keys must be lowercase; lookups lowercase the input first.
+ *
+ * Note: "fulfilled" is intentionally treated as non-terminal (it falls through to the IN_PROGRESS
+ * default rather than mapping to DELIVERED). SOM's routing diagram uses "Fulfillment Order is
+ * Fulfilled" for the terminal delivery state, but the real item-level value for a delivered order
+ * has not been confirmed against a live sandbox yet. Mapping an unconfirmed value to a terminal,
+ * customer-visible "Delivered" badge is riskier than leaving it in progress; this is tracked for the
+ * badge work (W-23093717).
+ */
+const STATUS_MAP = {
+    ordered: ITEM_BUCKET.ORDERED,
+    created: ITEM_BUCKET.ORDERED,
+    new: ITEM_BUCKET.ORDERED,
+    open: ITEM_BUCKET.ORDERED,
+    placed: ITEM_BUCKET.ORDERED,
+    'in progress': ITEM_BUCKET.IN_PROGRESS,
+    processing: ITEM_BUCKET.IN_PROGRESS,
+    allocated: ITEM_BUCKET.IN_PROGRESS,
+    shipped: ITEM_BUCKET.SHIPPED,
+    'in transit': ITEM_BUCKET.SHIPPED,
+    delivered: ITEM_BUCKET.DELIVERED,
+    canceled: ITEM_BUCKET.CANCELLED,
+    cancelled: ITEM_BUCKET.CANCELLED,
+    'return initiated': ITEM_BUCKET.RETURN_INITIATED,
+    'return requested': ITEM_BUCKET.RETURN_INITIATED,
+    returned: ITEM_BUCKET.RETURNED
+}
+
+/**
+ * Maps a raw item-level `omsData.status` string to a canonical {@link ITEM_BUCKET} via a
+ * case-insensitive exact-match lookup ({@link STATUS_MAP}). Unknown values fall back to
+ * `in_progress` (a safe, non-terminal bucket) so an unexpected status never reads as a terminal
+ * state like "Delivered" or "Cancelled".
  *
  * @param {string} rawStatus item-level omsData.status
  * @returns {string|undefined} canonical bucket, or undefined when no status is provided
@@ -56,34 +89,8 @@ export function normalizeItemStatus(rawStatus) {
     if (!rawStatus || typeof rawStatus !== 'string') return undefined
     const s = rawStatus.trim().toLowerCase()
     if (!s) return undefined
-
-    if (s.includes('cancel')) return ITEM_BUCKET.CANCELLED
-    // Order matters: check "return initiated" before the generic "returned".
-    if (s.includes('return') && (s.includes('initiat') || s.includes('requested'))) {
-        return ITEM_BUCKET.RETURN_INITIATED
-    }
-    if (s.includes('return')) return ITEM_BUCKET.RETURNED
-    if (s.includes('deliver')) return ITEM_BUCKET.DELIVERED
-    if (s.includes('ship') || s.includes('transit')) return ITEM_BUCKET.SHIPPED
-    if (
-        s.includes('allocat') ||
-        s.includes('progress') ||
-        s.includes('process') ||
-        s.includes('fulfil')
-    ) {
-        return ITEM_BUCKET.IN_PROGRESS
-    }
-    if (
-        s.includes('order') ||
-        s === 'created' ||
-        s === 'new' ||
-        s === 'open' ||
-        s.includes('placed')
-    ) {
-        return ITEM_BUCKET.ORDERED
-    }
     // Unknown status: treat as in-progress rather than risk an incorrect terminal state.
-    return ITEM_BUCKET.IN_PROGRESS
+    return STATUS_MAP[s] ?? ITEM_BUCKET.IN_PROGRESS
 }
 
 /**
