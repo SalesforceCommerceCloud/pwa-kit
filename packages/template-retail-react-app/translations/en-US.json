@@ -1859,9 +1859,6 @@
   "return_items_modal.label.reason_for": {
     "defaultMessage": "Reason for {name}"
   },
-  "return_items_modal.link.terminal_orders": {
-    "defaultMessage": "Back to order history"
-  },
   "return_items_modal.placeholder.select_reason": {
     "defaultMessage": "Select a reason"
   },

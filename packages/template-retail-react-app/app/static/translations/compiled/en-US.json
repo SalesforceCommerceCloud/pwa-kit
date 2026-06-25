@@ -4453,12 +4453,6 @@
       "value": "name"
     }
   ],
-  "return_items_modal.link.terminal_orders": [
-    {
-      "type": 0,
-      "value": "Back to order history"
-    }
-  ],
   "return_items_modal.placeholder.select_reason": [
     {
       "type": 0,
