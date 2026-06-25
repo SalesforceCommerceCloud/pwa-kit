@@ -8,7 +8,7 @@
 import {
     launchChat,
     openShopperAgent,
-    resetEmbeddedMessagingForCommerceSessionChange
+    resetEmbeddedMessagingForCommerceSessionChange,
     openCommerceClientWidget,
     openShopperAgentWidget,
     validateCommerceClientDomain,
@@ -291,6 +291,9 @@ describe('shopper-agent-utils', () => {
             delete global.window
 
             expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+        })
+    })
+
     describe('openCommerceClientWidget', () => {
         test('should return early if not on client side', () => {
             delete global.window

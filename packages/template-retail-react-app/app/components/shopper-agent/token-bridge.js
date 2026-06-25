@@ -147,10 +147,10 @@ export async function handleTokenBridge(req, res) {
                 const isTrustedSalesforceOrigin = isTrustedSalesforceDomain(origin)
 
                 if (!isSameOrigin && !isTrustedSalesforceOrigin) {
-                    console.error(
-                        '[token-bridge] CSRF attempt blocked: untrusted Origin',
-                        {origin, requestHost}
-                    )
+                    console.error('[token-bridge] CSRF attempt blocked: untrusted Origin', {
+                        origin,
+                        requestHost
+                    })
                     return res.status(403).json({error: 'FORBIDDEN_ORIGIN'})
                 }
             } catch (err) {

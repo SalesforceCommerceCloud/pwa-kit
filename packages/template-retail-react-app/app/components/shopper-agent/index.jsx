@@ -24,9 +24,11 @@ import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {resetEmbeddedMessagingForCommerceSessionChange, validateCommerceClientAgentSettings} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {
+    resetEmbeddedMessagingForCommerceSessionChange,
+    validateCommerceClientAgentSettings
+} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
-
 
 const onClient = typeof window !== 'undefined'
 
