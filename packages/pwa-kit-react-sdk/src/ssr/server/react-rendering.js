@@ -34,6 +34,13 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
 import {shutdownServerTracing, tracePerformance} from './opentelemetry-server'
+import {
+    isDistributedTracingEnabled,
+    extractContext,
+    withServerSpan,
+    withChildSpan,
+    setActiveSpanAttribute
+} from './distributed-tracing'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider, MrtDataStoreProvider} from '../universal/contexts'
@@ -184,15 +191,24 @@ const performRender = async (req, res, next) => {
     let route
     let match
 
-    routes.some((_route) => {
-        const _match = matchPath(req.path, _route)
-        if (_match) {
-            match = _match
-            route = _route
-        }
-        return !!match
+    await withChildSpan('route-match', () => {
+        routes.some((_route) => {
+            const _match = matchPath(req.path, _route)
+            if (_match) {
+                match = _match
+                route = _route
+            }
+            return !!match
+        })
     })
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
+
+    // Report the matched route template (e.g. '/category/:categoryId') as http.route
+    // on the active DT server span. Uses the route path, never the concrete URL, so
+    // no path parameters / query string leak into the attribute.
+    if (route?.path) {
+        setActiveSpanAttribute('http.route', route.path)
+    }
 
     // Step 2 - Get the component
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
@@ -221,16 +237,18 @@ const performRender = async (req, res, next) => {
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
-        const ret = await AppConfig.initAppState({
-            App: WrappedApp,
-            component,
-            match,
-            route,
-            req,
-            res,
-            location,
-            appJSX
-        })
+        const ret = await withChildSpan('getProps', () =>
+            AppConfig.initAppState({
+                App: WrappedApp,
+                component,
+                match,
+                route,
+                req,
+                res,
+                location,
+                appJSX
+            })
+        )
         appState = {
             ...ret.appState,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
@@ -244,20 +262,22 @@ const performRender = async (req, res, next) => {
     // Step 4 - Render the App
     let renderResult
     try {
-        renderResult = renderApp({
-            App: WrappedApp,
-            appState,
-            appStateError: appStateError && logAndFormatError(appStateError),
-            routes,
-            req,
-            res,
-            location,
-            config,
-            appJSX,
-            customSitePreferences,
-            customGlobalPreferences,
-            mrtDataStoreEnabled
-        })
+        renderResult = await withChildSpan('render-to-string', () =>
+            renderApp({
+                App: WrappedApp,
+                appState,
+                appStateError: appStateError && logAndFormatError(appStateError),
+                routes,
+                req,
+                res,
+                location,
+                config,
+                appJSX,
+                customSitePreferences,
+                customGlobalPreferences,
+                mrtDataStoreEnabled
+            })
+        )
     } catch (e) {
         // This is an unrecoverable error.
         // (errors handled by the AppErrorBoundary are considered recoverable)
@@ -299,11 +319,29 @@ const performRender = async (req, res, next) => {
 
 export const render = (req, res, next) => {
     res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance(req)})
-    if (shouldTrackPerformance(req)) {
-        return tracePerformance('ssr.render', () => performRender(req, res, next), res, req)
-    } else {
+
+    // Existing server_timing behavior (unchanged), wrapped so it can run inside
+    // a distributed-tracing server span when DT is enabled.
+    const runRender = () => {
+        if (shouldTrackPerformance(req)) {
+            return tracePerformance('ssr.render', () => performRender(req, res, next), res, req)
+        }
         return performRender(req, res, next)
     }
+
+    // Distributed tracing: independent of the ?__server_timing switch.
+    // Extract the incoming W3C traceparent and parent an ssr.render server span
+    // onto it. Falls through to existing behavior when disabled or unparented.
+    if (isDistributedTracingEnabled()) {
+        const ctx = extractContext(req.headers)
+        // Expose the child-span helper to the universal with-react-query layer
+        // (via res.locals) so each SSR query fetch becomes its own span under
+        // `getProps`, without that universal module importing this server-only
+        // OTel code.
+        res.locals.__withChildSpan = withChildSpan
+        return withServerSpan(req, res, ctx, runRender)
+    }
+    return runRender()
 }
 
 const OuterApp = ({

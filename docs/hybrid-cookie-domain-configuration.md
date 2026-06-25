@@ -1,14 +1,14 @@
 # Hybrid Cookie Domain Configuration
 
 > **WIP: HttpOnly session cookies are in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
-
-Maintain shopper sessions across subdomains in hybrid PWA Kit and SFRA storefronts by configuring a shared parent cookie domain. Without this configuration, browsers isolate cookies to individual hosts, causing shoppers to appear logged out and lose their baskets when crossing subdomain boundaries. This guide shows how to align the cookie domain settings on both PWA Kit and B2C Commerce to enable seamless cross-subdomain navigation.
+ 
+Maintain shopper sessions across subdomains by configuring a shared parent cookie domain. Without this configuration, browsers isolate cookies to individual hosts, causing shoppers to appear logged out and lose their baskets when crossing subdomain boundaries. The domain-level cookie applies to storefronts that use multiple subdomains, such as `www.` and `shop.` on the `example.com` domain. It also applies to hybrid PWA Kit and SFRA storefronts that serve different paths under one parent domain. This guide shows how to align the cookie domain settings on both PWA Kit and B2C Commerce to enable seamless cross-subdomain navigation.
 
 ## Overview
 
 A hybrid deployment runs PWA Kit and SFRA together, typically behind a single CDN that presents a unified top-level domain to shoppers. Even with that unified front, individual sites within the storefront may live on distinct subdomains—for example `siteA.example.com` and `siteB.example.com`, or a marketing host on `www.example.com` alongside a PWA-served catalog on `shop.example.com`.
 
-Browsers default each `Set-Cookie` response to the **exact host** that issued it. So a cookie set by `siteA.example.com` is not sent on a request to `siteB.example.com` unless the issuer explicitly attaches `Domain=.example.com`. In a hybrid storefront where shoppers cross subdomains—or where PWA Kit and SFRA each serve a different subdomain of the same parent—that default scoping breaks the session: the shopper appears logged out, the basket is empty, hybrid auth fails.
+Browsers default each `Set-Cookie` response to the **exact host** that issued it. So browsers don't send a cookie set by `siteA.example.com` on a request to `siteB.example.com` unless the issuer explicitly attaches `Domain=.example.com`. In a hybrid storefront where shoppers cross subdomains—or where PWA Kit and SFRA each serve a different subdomain of the same parent—that default scoping breaks the session: the shopper appears logged out, the basket is empty, hybrid auth fails.
 
 The fix is to set `Domain=` on both sides to a shared parent domain (for example `.example.com`) so the same cookies are sent on every request under that domain. PWA Kit and SFRA configure this in different places—that's why this doc exists: to capture both sides of the configuration in one spot, plus a verification checklist for the seam between them.
 
@@ -29,7 +29,7 @@ module.exports = {
 }
 ```
 
-This setting applies to all auth cookies set by PWA Kit—both the client-side cookies set by `commerce-sdk-react` and the server-side HttpOnly cookies set by the SLAS proxy when `enableHttpOnlySessionCookies` is on. See the [storage mapping reference](./httponly-storage-mapping.md) for the full cookie inventory.
+This setting applies to all auth cookies PWA Kit sets—both the client-side cookies `commerce-sdk-react` sets and the server-side HttpOnly cookies the SLAS proxy sets when `enableHttpOnlySessionCookies` is on. See the [storage mapping reference](./httponly-storage-mapping.md) for the full cookie inventory.
 
 When you first turn `cookieDomain` on for an existing site, both PWA Kit and the SLAS proxy emit an additional expiring `Set-Cookie` for any pre-existing host-scoped cookie of the same name. This prevents the browser from holding both a host-scoped and a domain-scoped cookie for the same key (which causes non-deterministic reads).
 
@@ -40,13 +40,13 @@ When you first turn `cookieDomain` on for an existing site, both PWA Kit and the
 - be a plain hostname or a leading-dot domain (e.g. `.example.com`).
 - not contain wildcards or whitespace, and not contain any of `* , ; =`.
 
-If the value contains any of those characters, both `commerce-sdk-react` and the SLAS proxy log a warning and fall back to host-scoped cookies. The browser would silently reject the value otherwise—the warning makes the misconfiguration visible.
+If the value contains any of those characters, both `commerce-sdk-react` and the SLAS proxy log a warning and fall back to host-scoped cookies. Otherwise, the browser would silently reject the value—the warning makes the misconfiguration visible.
 
 The browser will **silently drop** a `Domain=` attribute that doesn't match the request hostname. For example, on the default `*.mobify-storefront.com` MRT host, a `Domain=.example.com` Set-Cookie header has no effect. You must serve PWA Kit from a custom domain that falls under `cookieDomain` (attach the domain to your MRT environment via the existing CNAME/Certificate flow).
 
 ## 2. Configure the cookie domain on B2C Commerce
 
-The cookie domain in B2C Commerce for hybrid sessions is configured in Business Manager under:
+Configure the cookie domain in B2C Commerce for hybrid sessions in Business Manager under:
 
 **Merchant Tools → Site Preferences → Hybrid Auth Settings**
 
@@ -54,12 +54,12 @@ The cookie-domain setting accepts a numeric level that controls how broadly B2C 
 
 | Value | Resulting scope | Example | When to use |
 | --- | --- | --- | --- |
-| `0` (default) | Host name only | `www.example.com` cookies are not sent on `api.example.com` | Single-host deployments where PWA Kit and SFRA share the exact same hostname. |
-| `2` | First-level (parent) domain | `.example.com`—sent on `www.example.com`, `api.example.com`, `pwa.example.com`, etc. | Hybrid deployments where PWA Kit and SFRA live on different subdomains of the same parent domain. **Use this value to match `commerceAPI.cookieDomain: '.example.com'` on the PWA Kit side.** |
+| `0` (default) | Host name only | Browsers don't send `www.example.com` cookies on `api.example.com` | Single-host deployments where PWA Kit and SFRA share the exact same hostname. |
+| `2` | First-level (parent) domain | `.example.com`—browsers send these on `www.example.com`, `api.example.com`, `pwa.example.com`, etc. | Hybrid deployments where PWA Kit and SFRA live on different subdomains of the same parent domain. **Use this value to match `commerceAPI.cookieDomain: '.example.com'` on the PWA Kit side.** |
 
-> **Do not set the value to `1`.** Level `1` would scope the cookie to the top-level domain (e.g. `.com`) and is rejected for security reasons—a cookie scoped that broadly would leak across unrelated sites. No values other than `0` and `2` are accepted.
+> **Do not set the value to `1`.** Level `1` would scope the cookie to the top-level domain (e.g. `.com`), which B2C Commerce rejects for security reasons—a cookie scoped that broadly would leak across unrelated sites. No values other than `0` and `2` are accepted.
 
-The **HttpOnly True** toggle on the same Hybrid Auth Settings page should be left at its default (disabled) value. For broader Hybrid Auth setup see <!-- TODO: link to Hybrid Auth documentation --> [Hybrid Auth documentation (TBD)]().
+Leave the **HttpOnly True** toggle on the same Hybrid Auth Settings page at its default (disabled) value. For broader Hybrid Auth setup see <!-- TODO: link to Hybrid Auth documentation --> [Hybrid Auth documentation (TBD)]().
 
 ### Matching the two sides
 
