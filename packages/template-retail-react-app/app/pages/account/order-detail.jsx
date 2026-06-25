@@ -218,6 +218,10 @@ const AccountOrderDetail = () => {
     const ownsOrder = order?.customerInfo?.customerId === customerId
     const showStartReturn = isRegistered && ownsOrder && returnableItems.length > 0
 
+    const isCancelled =
+        cancelFeedback?.status === 'success' ||
+        getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
+
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
     const handleCloseReturnModal = useCallback(() => {
@@ -532,27 +536,21 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
-                        {!isLoading &&
-                            (() => {
-                                const isCancelled =
-                                    cancelFeedback?.status === 'success' ||
-                                    getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
-                                return (
-                                    <Badge colorScheme={isCancelled ? 'red' : 'green'}>
-                                        {isCancelled ? (
-                                            <Flex display="inline-flex" alignItems="center" gap={1}>
-                                                <CloseIcon boxSize={2} aria-hidden />
-                                                {formatMessage({
-                                                    defaultMessage: 'Cancelled',
-                                                    id: 'account_order_detail.badge.cancelled'
-                                                })}
-                                            </Flex>
-                                        ) : (
-                                            order.status || order.omsData?.status
-                                        )}
-                                    </Badge>
-                                )
-                            })()}
+                        {!isLoading && (
+                            <Badge colorScheme={isCancelled ? 'red' : 'green'}>
+                                {isCancelled ? (
+                                    <Flex display="inline-flex" alignItems="center" gap={1}>
+                                        <CloseIcon boxSize={2} aria-hidden />
+                                        {formatMessage({
+                                            defaultMessage: 'Cancelled',
+                                            id: 'account_order_detail.badge.cancelled'
+                                        })}
+                                    </Flex>
+                                ) : (
+                                    order.status || order.omsData?.status
+                                )}
+                            </Badge>
+                        )}
                     </Flex>
 
                     {!isLoading ? (

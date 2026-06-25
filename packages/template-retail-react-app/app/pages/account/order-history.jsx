@@ -147,6 +147,8 @@ const AccountOrderHistory = () => {
             ) : (
                 <Stack spacing={4}>
                     {orders?.map((order) => {
+                        const isCancelled =
+                            getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
@@ -189,30 +191,23 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        {(() => {
-                                            const isCancelled =
-                                                getOrderDisplayStatus(order) ===
-                                                ORDER_DISPLAY_STATUS.CANCELLED
-                                            return (
-                                                <Badge colorScheme={isCancelled ? 'red' : 'green'}>
-                                                    {isCancelled ? (
-                                                        <Flex
-                                                            display="inline-flex"
-                                                            alignItems="center"
-                                                            gap={1}
-                                                        >
-                                                            <CloseIcon boxSize={2} aria-hidden />
-                                                            <FormattedMessage
-                                                                defaultMessage="Cancelled"
-                                                                id="account_order_history.badge.cancelled"
-                                                            />
-                                                        </Flex>
-                                                    ) : (
-                                                        order.status || order.omsData?.status
-                                                    )}
-                                                </Badge>
-                                            )
-                                        })()}
+                                        <Badge colorScheme={isCancelled ? 'red' : 'green'}>
+                                            {isCancelled ? (
+                                                <Flex
+                                                    display="inline-flex"
+                                                    alignItems="center"
+                                                    gap={1}
+                                                >
+                                                    <CloseIcon boxSize={2} aria-hidden />
+                                                    <FormattedMessage
+                                                        defaultMessage="Cancelled"
+                                                        id="account_order_history.badge.cancelled"
+                                                    />
+                                                </Flex>
+                                            ) : (
+                                                order.status || order.omsData?.status
+                                            )}
+                                        </Badge>
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
