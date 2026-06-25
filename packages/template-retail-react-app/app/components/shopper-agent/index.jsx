@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef} from 'react'
+
+import React, {useEffect, useRef, useMemo} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
@@ -17,11 +18,15 @@ import {
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {DEFAULT_COMMERCE_CLIENT_ELEMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {resetEmbeddedMessagingForCommerceSessionChange} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {resetEmbeddedMessagingForCommerceSessionChange, validateCommerceClientAgentSettings} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
+
 
 const onClient = typeof window !== 'undefined'
 
@@ -544,6 +549,144 @@ ShopperAgentWindow.propTypes = {
 }
 
 /**
+ * Class name added to the Commerce Client widget elements via the widget's
+ * `globalClassName` option. Provides a stable hook for targeting the widget
+ * (e.g. analytics or optional consumer CSS).
+ */
+const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
+
+/**
+ * Default width of the Commerce Client side panel. Applied through the widget's
+ * `componentConfig.options.dialogWidth` option when in 'panel' display mode.
+ */
+const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
+
+/**
+ * Internal component that renders the Commerce Client messaging widget.
+ *
+ * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
+ * Messaging iframe), this component loads the Commerce Client messaging UMD bundle and
+ * injects the widget into a container element via
+ * `window.CimulateMessaging.injectMessagingWidget`. The two providers are
+ * mutually exclusive and selected by `commerceAgent.provider`.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
+ * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
+ * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
+ * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
+ * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [props.commerceAgentConfiguration.commerceClientSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
+ * @param {string} [props.commerceAgentConfiguration.commerceClientPanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientComponentType] - Widget type when display mode is 'dialog': 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.commerceClientDialogPosition] - Dialog position when display mode is 'dialog'
+ * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
+ * @param {Object} [props.commerceAgentConfiguration.commerceClientTheme] - Partial theme overrides for the widget
+ * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
+ * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
+ */
+const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
+    const {
+        scrt2Url,
+        salesforceOrgId,
+        esDeveloperName,
+        embeddedServiceName,
+        commerceClientScriptSourceUrl,
+        commerceClientMode = 'messaging',
+        commerceClientLogoUrl,
+        headerText,
+        disclaimerMarkdown,
+        commerceClientElementId = DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+        commerceClientDisplayMode = 'panel',
+        commerceClientPanelWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
+        commerceClientComponentType = 'dialog',
+        commerceClientDialogPosition = 'bottom-right',
+        isDevelopment = 'false',
+        commerceClientTheme,
+        commerceClientSearchConfig,
+        routingAttributes
+    } = commerceAgentConfiguration
+
+    // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
+    const scriptLoadStatus = useScript(commerceClientScriptSourceUrl)
+
+    // In 'panel' mode we render the widget as a 'dialog' docked to the right and
+    // use the widget's built-in full-height + width options to turn it
+    // into a full-height side panel.
+    const isPanel = commerceClientDisplayMode === 'panel'
+
+    const widgetOptions = useMemo(
+        () => ({
+            elementId: commerceClientElementId,
+            scrt2Url,
+            orgId: salesforceOrgId,
+            esDeveloperName: esDeveloperName || embeddedServiceName,
+            routingAttributes,
+            mode: commerceClientMode,
+            logoUrl: commerceClientLogoUrl,
+            headerText,
+            disclaimerMarkdown,
+            searchConfig: commerceClientSearchConfig,
+            globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
+            isDevelopment: isDevelopment === 'true',
+            componentConfig: {
+                isOpen: false,
+                type: isPanel ? 'dialog' : commerceClientComponentType,
+                options: {
+                    dialogPosition: isPanel ? 'bottom-right' : commerceClientDialogPosition,
+                    ...(isPanel && {
+                        dialogFullHeight: true,
+                        dialogWidth: commerceClientPanelWidth
+                    })
+                }
+            },
+            theme: commerceClientTheme
+        }),
+        [
+            commerceClientElementId,
+            scrt2Url,
+            salesforceOrgId,
+            esDeveloperName,
+            embeddedServiceName,
+            routingAttributes,
+            commerceClientMode,
+            commerceClientLogoUrl,
+            headerText,
+            disclaimerMarkdown,
+            commerceClientSearchConfig,
+            isDevelopment,
+            isPanel,
+            commerceClientComponentType,
+            commerceClientDialogPosition,
+            commerceClientPanelWidth,
+            commerceClientTheme
+        ]
+    )
+
+    // Inject the widget into the container once the bundle is loaded
+    useCommerceClientMessaging(scriptLoadStatus, widgetOptions)
+
+    return <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
+}
+
+CommerceClientAgentWindow.propTypes = {
+    /**
+     * Commerce agent configuration object containing the Commerce Client widget settings.
+     *
+     * @type {Object}
+     * @required
+     */
+    commerceAgentConfiguration: PropTypes.object.isRequired
+}
+
+/**
  * Main ShopperAgent component that initializes and manages the embedded messaging service.
  * This component acts as a conditional wrapper that only renders the messaging service
  * when all required conditions are met (enabled, basket loaded, valid configuration).
@@ -576,8 +719,10 @@ ShopperAgentWindow.propTypes = {
  * @see {@link isEnabled} - Enabled state checker
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
-    // Extract enabled state from configuration
-    const {enabled} = commerceAgentConfiguration
+    // Extract enabled state and provider from configuration.
+    // `provider` defaults to 'miaw' to preserve backwards compatibility with the
+    // existing Salesforce Embedded Messaging (MIAW) integration.
+    const {enabled, provider = 'miaw'} = commerceAgentConfiguration
 
     // Get current location and app origin for domain URL
     const appOrigin = useAppOrigin()
@@ -589,13 +734,24 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Build the current domain URL
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
-    // Conditional rendering: only render when all conditions are met
-    // 1. Agent is enabled and running on client
-    // 2. Basket has finished loading
-    // 3. Configuration is valid
-    return isShopperAgentEnabled &&
-        basketDoneLoading &&
-        validateCommerceAgentSettings(commerceAgentConfiguration) ? (
+    // Only render when the agent is enabled (client-side) and the basket has loaded.
+    if (!isShopperAgentEnabled || !basketDoneLoading) {
+        return null
+    }
+
+    // Commerce Client widget provider
+    if (provider === 'commerce-client') {
+        return validateCommerceClientAgentSettings(commerceAgentConfiguration) ? (
+            <div data-testid="shopper-agent">
+                <CommerceClientAgentWindow
+                    commerceAgentConfiguration={commerceAgentConfiguration}
+                />
+            </div>
+        ) : null
+    }
+
+    // Default: Salesforce Embedded Messaging (MIAW) provider
+    return validateCommerceAgentSettings(commerceAgentConfiguration) ? (
         <div data-testid="shopper-agent">
             <ShopperAgentWindow
                 commerceAgentConfiguration={commerceAgentConfiguration}

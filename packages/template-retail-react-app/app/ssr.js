@@ -364,9 +364,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.demandware.net',
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
-                        'www.gstatic.com' // optional, if icon is on gstatic
+                        'www.gstatic.com', // optional, if icon is on gstatic
+                        // Commerce Client messaging widget images
+                        'cimulate.ai',
+                        '*.cimulate.ai'
                     ],
                     'script-src': [
+                        // Commerce Client messaging widget bundle (messaging.umd.js)
+                        '*.cimulate.ai',
+                        // Commerce Client bundle served from the SFCC static CDN
+                        '*.sfcc-store-internal.net',
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -382,6 +389,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
+                        // Connect to Commerce Client widget APIs
+                        '*.cimulate.ai',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
                         'maps.googleapis.com',

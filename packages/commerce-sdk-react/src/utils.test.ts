@@ -225,3 +225,30 @@ describe('Utils', () => {
         })
     })
 })
+
+describe('parseResponseBodyClone', () => {
+    test('parses the JSON body from a clone, leaving the original body unread', async () => {
+        const body = {message: 'access_token_cookie_missing'}
+        const originalJson = jest.fn()
+        const cloneJson = jest.fn().mockResolvedValue(body)
+        const clone = jest.fn(() => ({json: cloneJson}))
+        const response = {json: originalJson, clone} as unknown as Response
+
+        await expect(utils.parseResponseBodyClone(response)).resolves.toEqual(body)
+        expect(clone).toHaveBeenCalledTimes(1)
+        // The original stream is never touched, so the caller can still read it.
+        expect(originalJson).not.toHaveBeenCalled()
+    })
+
+    test('returns undefined when the response is undefined', async () => {
+        await expect(utils.parseResponseBodyClone(undefined)).resolves.toBeUndefined()
+    })
+
+    test('returns undefined when the response has no clone method', async () => {
+        const json = jest.fn()
+        const response = {json} as unknown as Response
+
+        await expect(utils.parseResponseBodyClone(response)).resolves.toBeUndefined()
+        expect(json).not.toHaveBeenCalled()
+    })
+})
