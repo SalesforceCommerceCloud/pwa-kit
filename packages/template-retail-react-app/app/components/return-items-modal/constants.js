@@ -115,7 +115,7 @@ export const messages = defineMessages({
         id: 'return_items_modal.text.submit_error_network'
     },
     // Terminal errors (404/409): retrying the same payload can't succeed, so the
-    // banner offers a recovery path (navigate away) instead of a Retry button.
+    // banner is informational and Submit is disabled — the shopper closes the modal.
     terminalErrorTitle: {
         defaultMessage: 'Unable to submit return',
         id: 'return_items_modal.text.terminal_error_title'
@@ -128,9 +128,5 @@ export const messages = defineMessages({
         defaultMessage:
             "This order can't be returned at this time. Please reach out to the merchant.",
         id: 'return_items_modal.text.terminal_error_conflict'
-    },
-    terminalLinkOrders: {
-        defaultMessage: 'Back to order history',
-        id: 'return_items_modal.link.terminal_orders'
     }
 })

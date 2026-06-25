@@ -41,7 +41,6 @@ import {
     VisuallyHidden,
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
@@ -337,9 +336,10 @@ const ReturnItemsModal = ({
     //    require editing the selection, so the modal drops to the select view and
     //    shows a banner there.
     //  - terminal kinds (404 not found / 409 conflict) can't be retried with the
-    //    same payload, so the modal shows a no-retry banner with a recovery link.
-    // Everything else (network / unknown) is a same-payload retry shown inline on
-    // the review view.
+    //    same payload, so the modal shows a banner and disables Submit; the
+    //    shopper closes the modal to dismiss it.
+    // Everything else (network / unknown) shows an inline banner on the review
+    // view while leaving Submit enabled, so the shopper can resubmit or close.
     const errorKind = submitError?.kind || null
     const isSelectViewError =
         errorKind === ReturnErrorKind.INVALID_REASON ||
@@ -519,12 +519,10 @@ const ReturnItemsModal = ({
     )
 
     // Terminal error banner (404/409): the order can't be returned, so there's no
-    // Retry. The 404 ("order not found") offers a recovery link back to order
-    // history (a real route). The 409 ("can't be returned right now") has no valid
-    // self-service destination, so — mirroring the cancel flow — it points shoppers
-    // to the merchant in text only, rather than linking to a route that doesn't
-    // exist. Submitted from the review view, so it renders there. role="alert"
-    // announces it like the other banners.
+    // Retry and no recovery link — the shopper closes the modal to dismiss it.
+    // The 404 ("order not found") and 409 ("can't be returned right now") differ
+    // only in their message text. Submitted from the review view, so it renders
+    // there. role="alert" announces it like the other banners.
     const isNotFound = errorKind === ReturnErrorKind.NOT_FOUND
     const terminalErrorBanner = isTerminalError ? (
         <Alert status="error" role="alert" data-testid="return-items-modal-terminal-error">
@@ -540,25 +538,16 @@ const ReturnItemsModal = ({
                         <FormattedMessage {...messages.terminalErrorConflict} />
                     )}
                 </AlertDescription>
-                {isNotFound && (
-                    <Button
-                        as={Link}
-                        to="/account/orders"
-                        variant="link"
-                        size="sm"
-                        data-testid="return-items-modal-terminal-link"
-                    >
-                        <FormattedMessage {...messages.terminalLinkOrders} />
-                    </Button>
-                )}
             </Stack>
         </Alert>
     ) : null
 
-    // Inline review-view error: only the same-payload-retry kinds (network /
-    // unknown) render here. The select-view kinds switch views (see the effect
-    // above) and render their banner on the select view; terminal kinds render
-    // their own no-retry banner (above) instead.
+    // Inline review-view error: only the network / unknown kinds render here.
+    // The select-view kinds switch views (see the effect above) and render their
+    // banner on the select view; terminal kinds render their own banner (above)
+    // instead. The Submit button stays enabled for these kinds, so the shopper
+    // resubmits from the footer — the banner is informational only, no Retry
+    // button (they can also just close the modal).
     const showInlineReviewError = !!errorKind && !isSelectViewError && !isTerminalError
     const inlineErrorMessage =
         errorKind === ReturnErrorKind.NETWORK ? messages.submitErrorNetwork : messages.submitError
@@ -569,20 +558,9 @@ const ReturnItemsModal = ({
             {showInlineReviewError && (
                 <Alert status="error" role="alert" data-testid="return-items-modal-submit-error">
                     <AlertIcon />
-                    <Stack spacing={2}>
-                        <AlertDescription>
-                            <FormattedMessage {...inlineErrorMessage} />
-                        </AlertDescription>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleSubmit}
-                            isDisabled={isSubmitting}
-                            data-testid="return-items-modal-submit-retry"
-                        >
-                            <FormattedMessage {...messages.retryButton} />
-                        </Button>
-                    </Stack>
+                    <AlertDescription>
+                        <FormattedMessage {...inlineErrorMessage} />
+                    </AlertDescription>
                 </Alert>
             )}
             {reviewRows.map((row) => (
@@ -708,7 +686,7 @@ const ReturnItemsModal = ({
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
                 // A terminal error (404/409) can't be resolved by resubmitting, so
-                // disable Submit and let the banner's recovery link be the only path.
+                // disable Submit; the shopper closes the modal to dismiss the banner.
                 isDisabled={isSubmitting || isTerminalError}
                 aria-busy={isSubmitting}
                 width={{base: 'full', md: 'auto'}}

@@ -310,7 +310,7 @@ test('Submit fires only once even on a rapid double-click', async () => {
     )
 })
 
-test('submitError renders an inline alert + Retry that re-fires submit', async () => {
+test('submitError renders an inline alert and the footer Submit re-fires submit', async () => {
     const user = userEvent.setup()
     const onSubmit = jest.fn()
     renderWithProviders(
@@ -322,14 +322,17 @@ test('submitError renders an inline alert + Retry that re-fires submit', async (
     )
     await user.click(screen.getByTestId('return-items-modal-review'))
 
+    // The inline banner is informational only — no Retry button. The shopper
+    // resubmits from the footer Submit (left enabled for this kind) or closes.
     expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
-    await user.click(screen.getByTestId('return-items-modal-submit-retry'))
+    expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('return-items-modal-submit'))
     expect(onSubmit).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
 })
 
 // --- WI-5 (W-22821839): error-code-specific rendering ---
 
-test('network error renders the inline review-view retry with network copy', async () => {
+test('network error renders the inline review-view banner with network copy', async () => {
     const user = userEvent.setup()
     renderWithProviders(
         <Harness
@@ -342,8 +345,10 @@ test('network error renders the inline review-view retry with network copy', asy
     expect(alert).toBeInTheDocument()
     expect(alert).toHaveAttribute('role', 'alert')
     expect(screen.getByText(/unable to process your request right now/i)).toBeInTheDocument()
-    // Retry is available (same-payload retry kind).
-    expect(screen.getByTestId('return-items-modal-submit-retry')).toBeInTheDocument()
+    // Informational banner only — no Retry button; Submit stays enabled so the
+    // shopper can resubmit from the footer (or close the modal).
+    expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
+    expect(screen.getByTestId('return-items-modal-submit')).toBeEnabled()
 })
 
 test('unknown error renders the generic inline retry message', async () => {
@@ -357,6 +362,38 @@ test('unknown error renders the generic inline retry message', async () => {
     await user.click(screen.getByTestId('return-items-modal-review'))
     expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
     expect(screen.getByText(/something went wrong submitting your return/i)).toBeInTheDocument()
+})
+
+test('notFound terminal error shows a no-link banner and disables Submit', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+        <Harness
+            submitError={{kind: ReturnErrorKind.NOT_FOUND}}
+            initialSelection={{'item-2': {checked: true, quantity: 1, reasonCode: 'Defect'}}}
+        />
+    )
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    const banner = await screen.findByTestId('return-items-modal-terminal-error')
+    expect(banner).toHaveAttribute('role', 'alert')
+    expect(within(banner).getByText(/could not find this order/i)).toBeInTheDocument()
+    // No recovery link — the shopper closes the modal — and Submit is disabled.
+    expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
+    expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
+})
+
+test('conflict terminal error shows the merchant-contact banner and disables Submit', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+        <Harness
+            submitError={{kind: ReturnErrorKind.CONFLICT}}
+            initialSelection={{'item-2': {checked: true, quantity: 1, reasonCode: 'Defect'}}}
+        />
+    )
+    await user.click(screen.getByTestId('return-items-modal-review'))
+    const banner = await screen.findByTestId('return-items-modal-terminal-error')
+    expect(within(banner).getByText(/reach out to the merchant/i)).toBeInTheDocument()
+    expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
+    expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
 })
 
 test('quantityExceeded error drops to the select view and shows the quantity-changed banner', async () => {

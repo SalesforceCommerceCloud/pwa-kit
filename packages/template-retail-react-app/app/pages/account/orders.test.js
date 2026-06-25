@@ -684,7 +684,7 @@ describe('Return submission (W-22821838)', () => {
         await waitFor(() => expect(heading).toHaveFocus())
     })
 
-    test('error keeps the modal open with an inline alert + Retry that re-fires', async () => {
+    test('error keeps the modal open with an inline alert; footer Submit re-fires', async () => {
         mockReturnMutateAsync.mockRejectedValueOnce({response: {status: 500}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -696,9 +696,10 @@ describe('Return submission (W-22821838)', () => {
         expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
         expect(screen.getByText(/review your return/i)).toBeInTheDocument()
 
-        // Retry re-invokes the mutation.
+        // No inline Retry button; the footer Submit (left enabled) re-invokes the mutation.
+        expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
         mockReturnMutateAsync.mockResolvedValueOnce({})
-        await user.click(screen.getByTestId('return-items-modal-submit-retry'))
+        await user.click(screen.getByTestId('return-items-modal-submit'))
         await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(2))
     })
 
@@ -719,7 +720,7 @@ describe('Return submission (W-22821838)', () => {
             expect(screen.getByText(/review your return/i)).toBeInTheDocument()
             // ... with no inline Retry (resubmitting the same payload can't succeed) ...
             expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
-            // ... and Submit is disabled, leaving the recovery link as the only path.
+            // ... and Submit is disabled, so the shopper closes the modal to dismiss it.
             expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
             // The order-detail page behind the modal is NOT mutated: the Return Items
             // trigger stays enabled and no page-level terminal hint appears.
@@ -879,7 +880,7 @@ describe('Item-level return error states (W-22821839)', () => {
         )
     })
 
-    test('a network error (no response) keeps the modal open with an inline retry', async () => {
+    test('a network error (no response) keeps the modal open with an inline banner', async () => {
         mockReturnMutateAsync.mockRejectedValueOnce(new TypeError('Failed to fetch'))
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -887,14 +888,14 @@ describe('Item-level return error states (W-22821839)', () => {
         const submit = await openModalAndReview(user)
         await user.click(submit)
 
-        // Inline error on the review view (retry available), not the terminal banner.
+        // Inline error on the review view (informational only), not the terminal banner.
         expect(await screen.findByTestId('return-items-modal-submit-error')).toHaveTextContent(
             /try again in a few minutes/i
         )
         expect(screen.getByText(/review your return/i)).toBeInTheDocument()
     })
 
-    test('a terminal 404 surfaces an in-modal "back to order history" recovery link', async () => {
+    test('a terminal 404 surfaces an in-modal text-only banner (no recovery link)', async () => {
         rejectWith({status: 404, body: {}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -904,8 +905,8 @@ describe('Item-level return error states (W-22821839)', () => {
 
         const banner = await screen.findByTestId('return-items-modal-terminal-error')
         expect(banner).toHaveTextContent(/we could not find this order/i)
-        const link = await screen.findByTestId('return-items-modal-terminal-link')
-        expect(link).toHaveTextContent(/back to order history/i)
+        // No recovery link — the shopper closes the modal to dismiss the banner.
+        expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
     })
 
     test('a terminal 409 surfaces an in-modal text-only merchant-contact message (no dead link)', async () => {
