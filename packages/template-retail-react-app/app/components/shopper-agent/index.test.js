@@ -445,7 +445,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-1'}
+                })
+            )
         })
 
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
@@ -479,7 +483,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-2'}
+                })
+            )
         })
 
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
@@ -501,7 +509,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-3'}
+                })
+            )
         })
 
         await waitFor(() =>
@@ -525,7 +537,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-4'}
+                })
+            )
         })
 
         await waitFor(() =>
@@ -544,7 +560,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-5'}
+                })
+            )
         })
 
         await waitFor(() => expect(errorSpy).toHaveBeenCalled())
@@ -567,7 +587,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-6'}
+                })
+            )
         })
 
         expect(errorSpy).toHaveBeenCalledWith('Shopper Agent: getAuthLinkKey is not available')
@@ -585,7 +609,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-7'}
+                })
+            )
         })
 
         await waitFor(() =>
@@ -610,7 +638,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-8'}
+                })
+            )
         })
 
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
@@ -627,7 +659,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-9'}
+                })
+            )
         })
 
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
@@ -650,7 +686,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-10'}
+                })
+            )
         })
 
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
@@ -665,7 +705,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-11'}
+                })
+            )
         })
 
         expect(mockCallTokenBridge).not.toHaveBeenCalled()
@@ -678,7 +722,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-12'}
+                })
+            )
         })
 
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
@@ -702,7 +750,11 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            window.dispatchEvent(
+                new CustomEvent('onEmbeddedMessagingConversationStarted', {
+                    detail: {conversationId: 'conv-13'}
+                })
+            )
         })
 
         await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
