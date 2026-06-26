@@ -44,6 +44,7 @@ import {
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import {ReturnErrorKind} from '@salesforce/retail-react-app/app/utils/return-error-utils'
 import {messages} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -245,22 +246,31 @@ const ReturnItemsModal = ({
     const reasons = reviewQuery.data?.returnReasonCodes || []
     const defaultReasonCode = useMemo(() => findDefaultReasonCode(reasons), [reasons])
 
+    // Clear a stale submit error the moment the shopper edits their selection,
+    // so a now-irrelevant error banner doesn't linger over changed inputs.
+    // Called from every edit handler below (not just Back).
+    const clearStaleSubmitError = useCallback(() => {
+        if (submitError) onClearSubmitError?.()
+    }, [submitError, onClearSubmitError])
+
     // Functional updater so two toggles dispatched in the same React batch
     // both observe the latest selection. Closing over `selection` would cause
     // the second update to spread a stale object and clobber the first.
     const updateRow = useCallback(
         (itemId, patch) => {
+            clearStaleSubmitError()
             onSelectionChange((prev) => ({
                 ...(prev || {}),
                 [itemId]: {...((prev || {})[itemId] || {}), ...patch}
             }))
         },
-        [onSelectionChange]
+        [onSelectionChange, clearStaleSubmitError]
     )
 
     const handleToggle = useCallback(
         (item, checked) => {
             const itemId = item.itemId
+            clearStaleSubmitError()
             onSelectionChange((prev) => {
                 const existing = (prev || {})[itemId]
                 return {
@@ -274,7 +284,7 @@ const ReturnItemsModal = ({
                 }
             })
         },
-        [onSelectionChange, defaultReasonCode]
+        [onSelectionChange, defaultReasonCode, clearStaleSubmitError]
     )
 
     const handleQuantityChange = useCallback(
@@ -319,6 +329,63 @@ const ReturnItemsModal = ({
         () => isSelectionValid(selection, returnableItems),
         [selection, returnableItems]
     )
+
+    // The parent (WI-5) always supplies a classified `{kind, ...}` submit error,
+    // or null. Derive the kind once and the two behavioral buckets from it:
+    //  - select-view kinds (invalid reason / unknown items / quantity exceeded)
+    //    require editing the selection, so the modal drops to the select view and
+    //    shows a banner there.
+    //  - terminal kinds (404 not found / 409 conflict) can't be retried with the
+    //    same payload, so the modal shows a banner and disables Submit; the
+    //    shopper closes the modal to dismiss it.
+    // Everything else (network / unknown) shows an inline banner on the review
+    // view while leaving Submit enabled, so the shopper can resubmit or close.
+    const errorKind = submitError?.kind || null
+    const isSelectViewError =
+        errorKind === ReturnErrorKind.INVALID_REASON ||
+        errorKind === ReturnErrorKind.UNKNOWN_ITEMS ||
+        errorKind === ReturnErrorKind.QUANTITY_EXCEEDED
+    const isTerminalError =
+        errorKind === ReturnErrorKind.NOT_FOUND || errorKind === ReturnErrorKind.CONFLICT
+
+    // Recovery side effects driven by the error kind:
+    //  - select-view kinds drop back to the select view where the rows (and the
+    //    new banner) live.
+    //  - invalid reason additionally repopulates the reason dropdowns from OMS.
+    // Guarded on the error identity so it fires once per new error, not every render.
+    const handledErrorRef = useRef(null)
+    useEffect(() => {
+        if (!submitError || handledErrorRef.current === submitError) return
+        handledErrorRef.current = submitError
+        if (isSelectViewError) {
+            setView('select')
+        }
+        if (errorKind === ReturnErrorKind.INVALID_REASON) {
+            // The picked reason is no longer valid. Refetch the reason list AND
+            // clear the stale reasonCode on every checked row, so the shopper
+            // can't simply re-review/resubmit the same rejected reason (the
+            // Review button stays disabled until a fresh reason is chosen).
+            reviewQuery.refetch?.()
+            onSelectionChange((prev) => {
+                if (!prev) return prev
+                let next = prev
+                let changed = false
+                Object.entries(prev).forEach(([itemId, row]) => {
+                    if (row?.checked && row.reasonCode) {
+                        if (!changed) {
+                            next = {...prev}
+                            changed = true
+                        }
+                        next[itemId] = {...row, reasonCode: undefined}
+                    }
+                })
+                return changed ? next : prev
+            })
+        }
+    }, [submitError, isSelectViewError, errorKind, reviewQuery, onSelectionChange])
+    useEffect(() => {
+        if (!submitError) handledErrorRef.current = null
+    }, [submitError])
 
     // No-op when the selection is invalid: the Review button stays in the tab
     // order via aria-disabled (so keyboard/SR users can focus it and hear the
@@ -391,6 +458,24 @@ const ReturnItemsModal = ({
             })
     }, [view, selection, returnableItems, reasons])
 
+    // Select-view error banner: rendered above the rows when the error kind
+    // requires editing the selection (invalid reason / unknown items / quantity
+    // exceeded). role="alert" matches the inline review-view alert convention.
+    const selectErrorBanner = isSelectViewError ? (
+        <Alert status="error" role="alert" data-testid="return-items-modal-select-error">
+            <AlertIcon />
+            <AlertDescription>
+                {errorKind === ReturnErrorKind.INVALID_REASON ? (
+                    <FormattedMessage {...messages.submitErrorInvalidReason} />
+                ) : errorKind === ReturnErrorKind.UNKNOWN_ITEMS ? (
+                    <FormattedMessage {...messages.submitErrorUnknownItems} />
+                ) : (
+                    <FormattedMessage {...messages.quantityExceededAffectedGeneric} />
+                )}
+            </AlertDescription>
+        </Alert>
+    ) : null
+
     const selectBody = reviewQuery.isLoading ? (
         <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
             <VisuallyHidden>
@@ -418,6 +503,7 @@ const ReturnItemsModal = ({
         </Alert>
     ) : (
         <Stack spacing={3}>
+            {selectErrorBanner}
             {returnableItems.map((item) => (
                 <ReturnableItemRow
                     key={item.itemId}
@@ -432,25 +518,49 @@ const ReturnItemsModal = ({
         </Stack>
     )
 
+    // Terminal error banner (404/409): the order can't be returned, so there's no
+    // Retry and no recovery link — the shopper closes the modal to dismiss it.
+    // The 404 ("order not found") and 409 ("can't be returned right now") differ
+    // only in their message text. Submitted from the review view, so it renders
+    // there. role="alert" announces it like the other banners.
+    const isNotFound = errorKind === ReturnErrorKind.NOT_FOUND
+    const terminalErrorBanner = isTerminalError ? (
+        <Alert status="error" role="alert" data-testid="return-items-modal-terminal-error">
+            <AlertIcon />
+            <Stack spacing={2}>
+                <AlertDescription fontWeight="semibold">
+                    <FormattedMessage {...messages.terminalErrorTitle} />
+                </AlertDescription>
+                <AlertDescription>
+                    {isNotFound ? (
+                        <FormattedMessage {...messages.terminalErrorNotFound} />
+                    ) : (
+                        <FormattedMessage {...messages.terminalErrorConflict} />
+                    )}
+                </AlertDescription>
+            </Stack>
+        </Alert>
+    ) : null
+
+    // Inline review-view error: only the network / unknown kinds render here.
+    // The select-view kinds switch views (see the effect above) and render their
+    // banner on the select view; terminal kinds render their own banner (above)
+    // instead. The Submit button stays enabled for these kinds, so the shopper
+    // resubmits from the footer — the banner is informational only, no Retry
+    // button (they can also just close the modal).
+    const showInlineReviewError = !!errorKind && !isSelectViewError && !isTerminalError
+    const inlineErrorMessage =
+        errorKind === ReturnErrorKind.NETWORK ? messages.submitErrorNetwork : messages.submitError
+
     const reviewBody = (
         <Stack spacing={3}>
-            {submitError && (
+            {terminalErrorBanner}
+            {showInlineReviewError && (
                 <Alert status="error" role="alert" data-testid="return-items-modal-submit-error">
                     <AlertIcon />
-                    <Stack spacing={2}>
-                        <AlertDescription>
-                            <FormattedMessage {...messages.submitError} />
-                        </AlertDescription>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleSubmit}
-                            isDisabled={isSubmitting}
-                            data-testid="return-items-modal-submit-retry"
-                        >
-                            <FormattedMessage {...messages.retryButton} />
-                        </Button>
-                    </Stack>
+                    <AlertDescription>
+                        <FormattedMessage {...inlineErrorMessage} />
+                    </AlertDescription>
                 </Alert>
             )}
             {reviewRows.map((row) => (
@@ -575,7 +685,9 @@ const ReturnItemsModal = ({
                 colorScheme="blue"
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
-                isDisabled={isSubmitting}
+                // A terminal error (404/409) can't be resolved by resubmitting, so
+                // disable Submit; the shopper closes the modal to dismiss the banner.
+                isDisabled={isSubmitting || isTerminalError}
                 aria-busy={isSubmitting}
                 width={{base: 'full', md: 'auto'}}
                 data-testid="return-items-modal-submit"
@@ -603,9 +715,11 @@ const ReturnItemsModal = ({
                 <DrawerContent data-testid="return-items-modal-drawer">
                     <DrawerHeader pb={1}>{header}</DrawerHeader>
                     <DrawerCloseButton />
-                    <DrawerBody pt={2} aria-live="polite">
-                        {body}
-                    </DrawerBody>
+                    {/* No body-level aria-live: view swaps are announced by moving
+                        focus to the new heading, and errors carry their own
+                        role="alert", so a polite region here would only add a
+                        redundant whole-body re-announcement. */}
+                    <DrawerBody pt={2}>{body}</DrawerBody>
                     <DrawerFooter>{footer}</DrawerFooter>
                 </DrawerContent>
             </Drawer>
@@ -625,9 +739,11 @@ const ReturnItemsModal = ({
             <ModalContent data-testid="return-items-modal">
                 <ModalHeader pb={1}>{header}</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody pt={2} aria-live="polite">
-                    {body}
-                </ModalBody>
+                {/* No body-level aria-live: view swaps are announced by moving
+                    focus to the new heading, and errors carry their own
+                    role="alert", so a polite region here would only add a
+                    redundant whole-body re-announcement. */}
+                <ModalBody pt={2}>{body}</ModalBody>
                 <ModalFooter>{footer}</ModalFooter>
             </ModalContent>
         </Modal>
@@ -647,8 +763,15 @@ ReturnItemsModal.propTypes = {
     onClearSubmitError: PropTypes.func,
     /** True while the parent's `returnOmsOrder` mutation is in flight. */
     isSubmitting: PropTypes.bool,
-    /** Truthy when the submit failed; renders an inline error + Retry on the review view. */
-    submitError: PropTypes.any,
+    /**
+     * Truthy when the submit failed: the classified `{kind}` object from
+     * `classifyReturnError`. Drives the inline review-view retry (network/unknown)
+     * or the select-view banner (invalid reason / unknown items / quantity
+     * exceeded) or the terminal no-retry banner (404/409).
+     */
+    submitError: PropTypes.shape({
+        kind: PropTypes.string
+    }),
     /** Element to receive focus when the modal closes (stable across the post-success refetch). */
     finalFocusRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }

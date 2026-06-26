@@ -92,5 +92,41 @@ export const messages = defineMessages({
     submitError: {
         defaultMessage: 'Something went wrong submitting your return. Please try again.',
         id: 'return_items_modal.text.submit_error'
+    },
+    // --- WI-5 (W-22821839) error-code-specific inline messages ---
+    submitErrorInvalidReason: {
+        defaultMessage: 'The selected reason is no longer available. Please choose another.',
+        id: 'return_items_modal.text.submit_error_invalid_reason'
+    },
+    submitErrorUnknownItems: {
+        defaultMessage:
+            "One or more items couldn't be found on this order. Please refresh and try again.",
+        id: 'return_items_modal.text.submit_error_unknown_items'
+    },
+    // Shown on the select view above the rows after a quantity-exceeded error.
+    quantityExceededAffectedGeneric: {
+        defaultMessage:
+            "Some items' available return quantities changed. Please review the updated limits below.",
+        id: 'return_items_modal.text.quantity_exceeded_affected_generic'
+    },
+    submitErrorNetwork: {
+        defaultMessage:
+            "We're unable to process your request right now. Please try again in a few minutes.",
+        id: 'return_items_modal.text.submit_error_network'
+    },
+    // Terminal errors (404/409): retrying the same payload can't succeed, so the
+    // banner is informational and Submit is disabled — the shopper closes the modal.
+    terminalErrorTitle: {
+        defaultMessage: 'Unable to submit return',
+        id: 'return_items_modal.text.terminal_error_title'
+    },
+    terminalErrorNotFound: {
+        defaultMessage: 'We could not find this order.',
+        id: 'return_items_modal.text.terminal_error_not_found'
+    },
+    terminalErrorConflict: {
+        defaultMessage:
+            "This order can't be returned at this time. Please reach out to the merchant.",
+        id: 'return_items_modal.text.terminal_error_conflict'
     }
 })
