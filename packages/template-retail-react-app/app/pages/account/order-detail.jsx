@@ -606,7 +606,11 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {!isLoading && (
-                            <OrderStatusBadge order={order} cancelFeedback={cancelFeedback} />
+                            <OrderStatusBadge
+                                order={order}
+                                cancelFeedback={cancelFeedback}
+                                returnFeedback={returnFeedback}
+                            />
                         )}
                     </Flex>
 

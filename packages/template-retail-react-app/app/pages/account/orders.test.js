@@ -511,6 +511,112 @@ describe('OMS/SOM Integration - Order Details', () => {
         expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
     })
 
+    test('should show Return Initiated badge when all items are return initiated', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Initiated badge when only some items are return initiated', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Return Complete badge when all items are returned', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Complete badge when some returned and some delivered', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'delivered', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show a return badge (not Cancelled) when items are a mix of cancelled and returned', async () => {
+        // Cancelled items are filtered out of the active set, so an order is only "Cancelled" when
+        // EVERY item is cancelled. A cancelled + returned mix is a return, not a cancellation.
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+    })
+
     test('should display fullName for OMS shipping address', async () => {
         setupOrderDetailsPage(createMockOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
@@ -707,6 +813,8 @@ describe('Return submission (W-22821838)', () => {
         )
         // A return success must NOT flip the order status Badge to "Cancelled".
         expect(screen.queryByText(/^cancelled$/i)).not.toBeInTheDocument()
+        // Optimistically, the order status Badge flips to "Return Initiated".
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
     })
 
     test('success returns focus to the Order Details heading', async () => {
@@ -1051,6 +1159,98 @@ describe('OMS/SOM Integration - Order History', () => {
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
         expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+    })
+
+    test('should show Return Initiated badge when all items are return initiated', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Initiated badge when only some items are return initiated', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Return Complete badge when all items are returned', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Complete badge when some returned and some delivered', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'delivered', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Complete')).toBeInTheDocument()
     })
 
     test('should display fullName for OMS shipping address', async () => {

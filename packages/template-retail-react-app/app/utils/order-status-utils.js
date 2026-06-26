@@ -32,6 +32,27 @@ export const ORDER_DISPLAY_STATUS = {
     PARTIAL_RETURN_COMPLETE: 'PARTIAL_RETURN_COMPLETE'
 }
 
+/**
+ * The subset of {@link ORDER_DISPLAY_STATUS} values that represent a return in some stage. The order
+ * status badge treats these as a single "is this a return?" group so the cancelled branch (red) and
+ * the raw fallback (green) stay untouched; return states render in a neutral badge with their own
+ * localized label. Kept as a Set for O(1) membership checks in the badge components.
+ */
+export const RETURN_DISPLAY_STATUSES = new Set([
+    ORDER_DISPLAY_STATUS.RETURN_INITIATED,
+    ORDER_DISPLAY_STATUS.PARTIAL_RETURN_INITIATED,
+    ORDER_DISPLAY_STATUS.RETURN_COMPLETE,
+    ORDER_DISPLAY_STATUS.PARTIAL_RETURN_COMPLETE
+])
+
+/**
+ * @param {string|null} displayStatus a value returned by {@link getOrderDisplayStatus}
+ * @returns {boolean} true when the status is one of the four return states
+ */
+export function isReturnDisplayStatus(displayStatus) {
+    return RETURN_DISPLAY_STATUSES.has(displayStatus)
+}
+
 /** Canonical item-level buckets that raw SOM item statuses normalize into. */
 const ITEM_BUCKET = {
     ORDERED: 'ordered',
