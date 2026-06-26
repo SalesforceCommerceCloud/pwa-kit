@@ -524,7 +524,10 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         expect(cta).toHaveAccessibleName('Return Items')
     })
 
-    test('does NOT render the CTA when no item has quantityAvailableToReturn > 0', async () => {
+    test('renders the CTA disabled (with an SR reason) when no item has quantityAvailableToReturn > 0', async () => {
+        // W-22821839: the button always renders for the order owner (mirroring the
+        // always-rendered Cancel order button); having nothing to return disables
+        // it via aria-disabled rather than hiding it, and exposes a hidden reason.
         setupOrderDetailsPage(
             createReturnEligibleOmsOrder({
                 productItems: [
@@ -537,8 +540,32 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
                 ]
             })
         )
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        expect(cta).toBeInTheDocument()
+        // aria-disabled (not native disabled) keeps it focusable so the SR hint is heard.
+        expect(cta).toHaveAttribute('aria-disabled', 'true')
+        expect(
+            screen.getByText(/no items on this order are available to return/i)
+        ).toBeInTheDocument()
+    })
+
+    test('clicking the disabled CTA does not open the modal', async () => {
+        const user = userEvent.setup()
+        setupOrderDetailsPage(
+            createReturnEligibleOmsOrder({
+                productItems: [
+                    {
+                        productId: 'no-return-1',
+                        productName: 'Already Returned',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        const cta = await screen.findByTestId('account-order-detail-start-return')
+        await user.click(cta)
+        expect(screen.queryByText(/return items from order #/i)).not.toBeInTheDocument()
     })
 
     test('does NOT render the CTA for an ECOM-only order (no omsData envelope)', async () => {
@@ -657,7 +684,7 @@ describe('Return submission (W-22821838)', () => {
         await waitFor(() => expect(heading).toHaveFocus())
     })
 
-    test('error keeps the modal open with an inline alert + Retry that re-fires', async () => {
+    test('error keeps the modal open with an inline alert; footer Submit re-fires', async () => {
         mockReturnMutateAsync.mockRejectedValueOnce({response: {status: 500}})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
@@ -669,14 +696,15 @@ describe('Return submission (W-22821838)', () => {
         expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
         expect(screen.getByText(/review your return/i)).toBeInTheDocument()
 
-        // Retry re-invokes the mutation.
+        // No inline Retry button; the footer Submit (left enabled) re-invokes the mutation.
+        expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
         mockReturnMutateAsync.mockResolvedValueOnce({})
-        await user.click(screen.getByTestId('return-items-modal-submit-retry'))
+        await user.click(screen.getByTestId('return-items-modal-submit'))
         await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(2))
     })
 
     test.each([404, 409])(
-        'a terminal %i closes the modal, shows a terminal banner, and disables Return Items',
+        'a terminal %i keeps the modal open and shows an in-modal terminal banner (no page banner)',
         async (status) => {
             mockReturnMutateAsync.mockRejectedValueOnce({response: {status}})
             setupOrderDetailsPage(createReturnEligibleOmsOrder())
@@ -685,18 +713,217 @@ describe('Return submission (W-22821838)', () => {
             const submit = await openModalAndReview(user)
             await user.click(submit)
 
-            // Terminal failures close the modal (no inline Retry) ...
-            await waitFor(() =>
-                expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
+            // The terminal banner renders INSIDE the still-open modal (review view) ...
+            expect(
+                await screen.findByTestId('return-items-modal-terminal-error')
+            ).toBeInTheDocument()
+            expect(screen.getByText(/review your return/i)).toBeInTheDocument()
+            // ... with no inline Retry (resubmitting the same payload can't succeed) ...
+            expect(screen.queryByTestId('return-items-modal-submit-retry')).not.toBeInTheDocument()
+            // ... and Submit is disabled, so the shopper closes the modal to dismiss it.
+            expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
+            // The order-detail page behind the modal is NOT mutated: the Return Items
+            // trigger stays enabled and no page-level terminal hint appears.
+            expect(screen.getByTestId('account-order-detail-start-return')).toHaveAttribute(
+                'aria-disabled',
+                'false'
             )
-            // ... surface the post-close terminal banner ...
-            expect(await screen.findByText(/unable to submit return/i)).toBeInTheDocument()
-            // ... and disable the Return Items trigger so the dead-end isn't retried.
-            await waitFor(() =>
-                expect(screen.getByTestId('account-order-detail-start-return')).toBeDisabled()
-            )
+            expect(
+                screen.queryByText(/this order can no longer be returned/i)
+            ).not.toBeInTheDocument()
         }
     )
+})
+
+describe('Item-level return error states (W-22821839)', () => {
+    const createReturnEligibleOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            customerInfo: {customerId: 'testCustomerId'},
+            productItems: [
+                {
+                    itemId: 'returnable-item-1',
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 2
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    // Build a rejection whose response body carries the 400 errorCode discriminator,
+    // mirroring the SCAPI shape the classifier reads (response.status + response.json()).
+    const rejectWith = ({status, body}) => {
+        let bodyUsed = false
+        mockReturnMutateAsync.mockRejectedValueOnce({
+            response: {
+                status,
+                get bodyUsed() {
+                    return bodyUsed
+                },
+                json: async () => {
+                    bodyUsed = true
+                    return body
+                }
+            }
+        })
+    }
+
+    const openModalAndReview = async (user) => {
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+        await user.click(screen.getAllByRole('checkbox')[0])
+        await user.click(screen.getByTestId('return-items-modal-review'))
+        return screen.findByTestId('return-items-modal-submit')
+    }
+
+    beforeEach(() => {
+        mockReturnMutateAsync.mockReset()
+        mockReturnIsLoading = false
+    })
+
+    test('a 400 QuantityExceeded keeps the modal open and drops to the select view with the quantity-changed banner', async () => {
+        rejectWith({
+            status: 400,
+            body: {
+                errorCode: 'ReturnQuantityExceeded',
+                productItems: [{itemId: 'returnable-item-1'}]
+            }
+        })
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        // Modal stays open and falls back to the select view with the banner.
+        const banner = await screen.findByTestId('return-items-modal-select-error')
+        expect(banner).toBeInTheDocument()
+        // Generic "quantities changed" copy (the API does not name specific items).
+        expect(banner).toHaveTextContent(/available return quantities changed/i)
+        // Still on the select view (item checkboxes visible), not the terminal banner.
+        expect(screen.queryByText(/unable to submit return/i)).not.toBeInTheDocument()
+    })
+
+    test('prunes a checked row that is no longer returnable after the post-error refetch', async () => {
+        // quantityExceeded keeps the modal open and refetches the order. If the
+        // refetched order no longer lists the item as returnable, the now-hidden
+        // checked row must be dropped from the selection — otherwise it would keep
+        // the selection invalid with no on-screen control to fix it.
+        rejectWith({
+            status: 400,
+            body: {
+                errorCode: 'ReturnQuantityExceeded',
+                productItems: [{itemId: 'returnable-item-1'}]
+            }
+        })
+        const returnable = createReturnEligibleOmsOrder()
+        // Second GET (the refetch) returns the same order with nothing returnable.
+        const exhausted = createReturnEligibleOmsOrder({
+            productItems: [
+                {
+                    itemId: 'returnable-item-1',
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                }
+            ]
+        })
+        let call = 0
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                call += 1
+                return res(ctx.delay(0), ctx.json(call === 1 ? returnable : exhausted))
+            })
+        )
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults(`/account/orders/${returnable.orderNo}`)
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        // The banner drops us to the select view; after the refetch the row for the
+        // now-exhausted item is gone, leaving no returnable item rows in the modal.
+        await screen.findByTestId('return-items-modal-select-error')
+        await waitFor(() =>
+            expect(screen.queryAllByTestId('return-items-modal-item-row')).toHaveLength(0)
+        )
+        // With nothing selectable, Review stays disabled.
+        expect(screen.getByTestId('return-items-modal-review')).toHaveAttribute(
+            'aria-disabled',
+            'true'
+        )
+    })
+
+    test('a 400 InvalidReasonCode keeps the modal open with the invalid-reason banner', async () => {
+        rejectWith({status: 400, body: {errorCode: 'InvalidReasonCode'}})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        expect(await screen.findByTestId('return-items-modal-select-error')).toHaveTextContent(
+            /reason is no longer available/i
+        )
+    })
+
+    test('a network error (no response) keeps the modal open with an inline banner', async () => {
+        mockReturnMutateAsync.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        // Inline error on the review view (informational only), not the terminal banner.
+        expect(await screen.findByTestId('return-items-modal-submit-error')).toHaveTextContent(
+            /try again in a few minutes/i
+        )
+        expect(screen.getByText(/review your return/i)).toBeInTheDocument()
+    })
+
+    test('a terminal 404 surfaces an in-modal text-only banner (no recovery link)', async () => {
+        rejectWith({status: 404, body: {}})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        const banner = await screen.findByTestId('return-items-modal-terminal-error')
+        expect(banner).toHaveTextContent(/we could not find this order/i)
+        // No recovery link — the shopper closes the modal to dismiss the banner.
+        expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
+    })
+
+    test('a terminal 409 surfaces an in-modal text-only merchant-contact message (no dead link)', async () => {
+        rejectWith({status: 409, body: {}})
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const submit = await openModalAndReview(user)
+        await user.click(submit)
+
+        const banner = await screen.findByTestId('return-items-modal-terminal-error')
+        expect(banner).toHaveTextContent(/can't be returned at this time/i)
+        // Mirrors the cancel flow: merchant guidance is text only — there's no valid
+        // self-service route, so we don't render a link that would 404.
+        expect(banner).toHaveTextContent(/reach out to the merchant/i)
+        expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
+    })
 })
 
 describe('OMS/SOM Integration - Order History', () => {
@@ -1914,14 +2141,16 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         setupOrderDetailsPage(omsCancelledOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        // aria-disabled (not native disabled) so the button stays focusable and
+        // its screen-reader hint is reachable. Mirrors the Return Items button.
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('disables cancel button when any item is not fully cancellable', async () => {
         setupOrderDetailsPage(omsPartiallyShippedOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('does not show ORDER ACTIONS for non-OMS order', async () => {
@@ -1950,7 +2179,7 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         setupOrderDetailsPage(otherCustomerOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         const cancelButton = await screen.findByRole('button', {name: /cancel order/i})
-        expect(cancelButton).toBeDisabled()
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('cancel happy path: modal opens, submit succeeds, feedback shows', async () => {
@@ -2023,8 +2252,8 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
             expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
         })
 
-        // Button should now be disabled
-        expect(cancelButton).toBeDisabled()
+        // Button should now be disabled (aria-disabled, stays focusable)
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('cancel button stays enabled after transient error (500)', async () => {
@@ -2060,7 +2289,8 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         })
 
         // Button should be disabled — terminal error, retrying won't help
-        expect(cancelButton).toBeDisabled()
+        // (aria-disabled, stays focusable)
+        expect(cancelButton).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('keep order closes modal without calling API', async () => {

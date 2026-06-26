@@ -557,48 +557,6 @@
       "value": "]"
     }
   ],
-  "account_order_detail.alert.return_error_conflict": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şǿǿḿḗḗ ǿǿƒ ŧħḗḗşḗḗ īŧḗḗḿş ƈȧȧƞ ƞǿǿ ŀǿǿƞɠḗḗř ƀḗḗ řḗḗŧŭŭřƞḗḗḓ. Ẇḗḗ ħȧȧṽḗḗ řḗḗƒřḗḗşħḗḗḓ ŧħḗḗ ǿǿřḓḗḗř — ƥŀḗḗȧȧşḗḗ řḗḗṽīḗḗẇ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.alert.return_error_not_found": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƒīƞḓ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ řḗḗƒřḗḗşħ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.alert.return_error_title": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şŭŭƀḿīŧ řḗḗŧŭŭřƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account_order_detail.alert.return_success_description": [
     {
       "type": 0,
@@ -861,6 +819,62 @@
     {
       "type": 1,
       "value": "number"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.cancel_unavailable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş ǿǿřḓḗḗř ƈȧȧƞ ƞǿǿ ŀǿǿƞɠḗḗř ƀḗḗ ƈȧȧƞƈḗḗŀŀḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.no_returnable_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ īŧḗḗḿş ǿǿƞ ŧħīş ǿǿřḓḗḗř ȧȧřḗḗ ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ řḗḗŧŭŭřƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.not_cancellable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş ǿǿřḓḗḗř īş ƞǿǿŧ ḗḗŀīɠīƀŀḗḗ ƒǿǿř ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.return_unavailable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş ǿǿřḓḗḗř ƈȧȧƞ ƞǿǿ ŀǿǿƞɠḗḗř ƀḗḗ řḗḗŧŭŭřƞḗḗḓ."
     },
     {
       "type": 0,
@@ -9435,6 +9449,20 @@
       "value": "]"
     }
   ],
+  "return_items_modal.text.quantity_exceeded_affected_generic": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗ īŧḗḗḿş' ȧȧṽȧȧīŀȧȧƀŀḗḗ řḗḗŧŭŭřƞ ɋŭŭȧȧƞŧīŧīḗḗş ƈħȧȧƞɠḗḗḓ. Ƥŀḗḗȧȧşḗḗ řḗḗṽīḗḗẇ ŧħḗḗ ŭŭƥḓȧȧŧḗḗḓ ŀīḿīŧş ƀḗḗŀǿǿẇ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "return_items_modal.text.reasons_error": [
     {
       "type": 0,
@@ -9521,6 +9549,90 @@
     {
       "type": 0,
       "value": "Şǿǿḿḗḗŧħīƞɠ ẇḗḗƞŧ ẇřǿǿƞɠ şŭŭƀḿīŧŧīƞɠ ẏǿǿŭŭř řḗḗŧŭŭřƞ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.submit_error_invalid_reason": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħḗḗ şḗḗŀḗḗƈŧḗḗḓ řḗḗȧȧşǿǿƞ īş ƞǿǿ ŀǿǿƞɠḗḗř ȧȧṽȧȧīŀȧȧƀŀḗḗ. Ƥŀḗḗȧȧşḗḗ ƈħǿǿǿǿşḗḗ ȧȧƞǿǿŧħḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.submit_error_network": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ'řḗḗ ŭŭƞȧȧƀŀḗḗ ŧǿǿ ƥřǿǿƈḗḗşş ẏǿǿŭŭř řḗḗɋŭŭḗḗşŧ řīɠħŧ ƞǿǿẇ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ īƞ ȧȧ ƒḗḗẇ ḿīƞŭŭŧḗḗş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.submit_error_unknown_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƞḗḗ ǿǿř ḿǿǿřḗḗ īŧḗḗḿş ƈǿǿŭŭŀḓƞ'ŧ ƀḗḗ ƒǿǿŭŭƞḓ ǿǿƞ ŧħīş ǿǿřḓḗḗř. Ƥŀḗḗȧȧşḗḗ řḗḗƒřḗḗşħ ȧȧƞḓ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.terminal_error_conflict": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş ǿǿřḓḗḗř ƈȧȧƞ'ŧ ƀḗḗ řḗḗŧŭŭřƞḗḗḓ ȧȧŧ ŧħīş ŧīḿḗḗ. Ƥŀḗḗȧȧşḗḗ řḗḗȧȧƈħ ǿǿŭŭŧ ŧǿǿ ŧħḗḗ ḿḗḗřƈħȧȧƞŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.terminal_error_not_found": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ƒīƞḓ ŧħīş ǿǿřḓḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "return_items_modal.text.terminal_error_title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şŭŭƀḿīŧ řḗḗŧŭŭřƞ"
     },
     {
       "type": 0,
