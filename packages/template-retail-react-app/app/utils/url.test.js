@@ -547,6 +547,19 @@ describe('ensureExternalUrl', () => {
         expect(ensureExternalUrl('\\\\evil.com')).toBeUndefined()
         // control char between slashes must NOT collapse a relative path into //host
         expect(ensureExternalUrl('/\x00/evil.com')).toBeUndefined()
+        // dotted-"protocol" WITH an authority (`label.tld://host`) — parses to a dotted
+        // protocol so it skips the dot-less validation, and the real host is the part after
+        // `//` (`ups.com`/`evil.com`), not the leading label. Must NOT fall through to be
+        // re-prepended into `https://attacker.com//ups.com/...`.
+        expect(ensureExternalUrl('attacker.com://ups.com/track/12345')).toBeUndefined()
+        expect(ensureExternalUrl('foo.bar://evil.com')).toBeUndefined()
+    })
+
+    test('still externalizes a genuine scheme-less host:port (no // authority — must not be over-rejected)', () => {
+        // The dotted-protocol-authority guard must NOT catch a real `host:port`, whose parse
+        // has an EMPTY host (the part after `:` is the port), unlike the `label.tld://…` spoof.
+        expect(ensureExternalUrl('carrier.com:8080')).toBe('https://carrier.com:8080/')
+        expect(ensureExternalUrl('carrier.com:8080/track')).toBe('https://carrier.com:8080/track')
     })
 
     test('rejects junk / non-host values that would become dead external links', () => {

@@ -379,6 +379,12 @@ export const ensureExternalUrl = (input) => {
         if (!parsed.protocol.replace(/:$/, '').includes('.')) {
             return isSafeExternalUrl(parsed) ? parsed.toString() : undefined
         }
+        // Dotted protocol WITH an authority (`attacker.com://ups.com/t`) is a host-confusion
+        // spoof — the real host is `ups.com` but it reads like `attacker.com`. It must NOT fall
+        // through to be re-prepended (which would yield `https://attacker.com//ups.com/t`). A
+        // genuine scheme-less `host:port` has an EMPTY host on this parse (`carrier.com:8080` →
+        // host ``), so only the empty-host form is allowed through to the prepend path.
+        if (parsed.host) return undefined
     } catch {
         // no scheme — fall through to prepend
     }
