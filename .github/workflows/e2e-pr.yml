@@ -61,7 +61,7 @@ jobs:
         # The image is built from Apache-2.0 source (github.com/microsoft/playwright);
         # tag must match the @playwright/test version resolved in package-lock.json.
         container:
-            image: mcr.microsoft.com/playwright:v1.57.0-noble
+            image: mcr.microsoft.com/playwright:v1.61.1-noble
         env:
             AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
             AWS_REGION: ${{ vars.AWS_REGION }}
