@@ -1,3 +1,4 @@
+## v3.19.0-nightly-20260626090142 (Jun 26, 2026)
 ## v3.19.0-dev
 - Fix babel-loader exclude regex on Windows where unescaped backslashes created broken escape sequences [#3840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3840)
 
