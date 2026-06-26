@@ -134,12 +134,6 @@ jobs:
           FLAGS: --wait
 
       - name: Install Playwright Browsers
-        # Defense-in-depth: bound the install so a future browser-download/extraction
-        # hang fails this step fast instead of burning the job's 6h ceiling.
-        # See nodejs/node#62557 (Node 24.16.0 stream regression that deadlocked
-        # Playwright's zip extraction). The real fix is the Playwright >=1.60 bump;
-        # this timeout is a backstop in case a similar regression recurs.
-        timeout-minutes: 15
         run: npx playwright install --with-deps
 
       # this will not include a11y tests
@@ -252,12 +246,6 @@ jobs:
           FLAGS: --wait
 
       - name: Install Playwright Browsers
-        # Defense-in-depth: bound the install so a future browser-download/extraction
-        # hang fails this step fast instead of burning the job's 6h ceiling.
-        # See nodejs/node#62557 (Node 24.16.0 stream regression that deadlocked
-        # Playwright's zip extraction). The real fix is the Playwright >=1.60 bump;
-        # this timeout is a backstop in case a similar regression recurs.
-        timeout-minutes: 15
         run: npx playwright install --with-deps
 
       # this will not include a11y tests
@@ -375,12 +363,6 @@ jobs:
         run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
 
       - name: Install Playwright Browsers
-        # Defense-in-depth: bound the install so a future browser-download/extraction
-        # hang fails this step fast instead of burning the job's 6h ceiling.
-        # See nodejs/node#62557 (Node 24.16.0 stream regression that deadlocked
-        # Playwright's zip extraction). The real fix is the Playwright >=1.60 bump;
-        # this timeout is a backstop in case a similar regression recurs.
-        timeout-minutes: 15
         run: npx playwright install --with-deps
 
       # this will not include a11y tests
@@ -432,12 +414,6 @@ jobs:
       - name: Install Monorepo Dependencies
         run: node ./scripts/gtime.js monorepo_install npm ci
       - name: Install Playwright Browsers
-        # Defense-in-depth: bound the install so a future browser-download/extraction
-        # hang fails this step fast instead of burning the job's 6h ceiling.
-        # See nodejs/node#62557 (Node 24.16.0 stream regression that deadlocked
-        # Playwright's zip extraction). The real fix is the Playwright >=1.60 bump;
-        # this timeout is a backstop in case a similar regression recurs.
-        timeout-minutes: 15
         run: npx playwright install --with-deps
       - name: Set PWA Kit E2E Test User
         run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
