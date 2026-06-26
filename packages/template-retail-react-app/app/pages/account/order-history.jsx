@@ -147,6 +147,8 @@ const AccountOrderHistory = () => {
             ) : (
                 <Stack spacing={4}>
                     {orders?.map((order) => {
+                        // OMS-only: derives from item-level omsData.status.
+                        // Pure ECOM cancellations fall through to the raw status string.
                         const isCancelled =
                             getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
                         return (

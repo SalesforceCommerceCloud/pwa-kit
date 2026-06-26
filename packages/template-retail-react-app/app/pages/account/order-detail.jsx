@@ -51,6 +51,7 @@ import {
     getOrderDisplayStatus,
     ORDER_DISPLAY_STATUS
 } from '@salesforce/retail-react-app/app/utils/order-status-utils'
+import {
     classifyReturnError,
     ReturnErrorKind
 } from '@salesforce/retail-react-app/app/utils/return-error-utils'
@@ -259,9 +260,14 @@ const AccountOrderDetail = () => {
           })
         : null
 
-    const isCancelled =
-        cancelFeedback?.status === 'success' ||
-        getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
+    // OMS-only: getOrderDisplayStatus derives from item-level omsData.status.
+    // Pure ECOM cancellations (no OMS) fall through to the raw status string in the badge.
+    const isCancelled = useMemo(
+        () =>
+            cancelFeedback?.status === 'success' ||
+            getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED,
+        [cancelFeedback?.status, order]
+    )
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
