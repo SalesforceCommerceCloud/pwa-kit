@@ -257,12 +257,6 @@
       "value": "Return submitted"
     }
   ],
-  "account_order_detail.badge.cancelled": [
-    {
-      "type": 0,
-      "value": "Cancelled"
-    }
-  ],
   "account_order_detail.button.cancel_order": [
     {
       "type": 0,
@@ -469,12 +463,6 @@
     {
       "type": 0,
       "value": "Order Details"
-    }
-  ],
-  "account_order_history.badge.cancelled": [
-    {
-      "type": 0,
-      "value": "Cancelled"
     }
   ],
   "account_order_history.button.continue_shopping": [
@@ -3275,6 +3263,12 @@
     {
       "type": 0,
       "value": "You're currently browsing in offline mode"
+    }
+  ],
+  "order_status_badge.label.cancelled": [
+    {
+      "type": 0,
+      "value": "Cancelled"
     }
   ],
   "order_summary.action.remove_promo": [

@@ -585,20 +585,6 @@
       "value": "]"
     }
   ],
-  "account_order_detail.badge.cancelled": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈȧȧƞƈḗḗŀŀḗḗḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account_order_detail.button.cancel_order": [
     {
       "type": 0,
@@ -1041,20 +1027,6 @@
     {
       "type": 0,
       "value": "Ǿřḓḗḗř Ḓḗḗŧȧȧīŀş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_history.badge.cancelled": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈȧȧƞƈḗḗŀŀḗḗḓ"
     },
     {
       "type": 0,
@@ -6959,6 +6931,20 @@
     {
       "type": 0,
       "value": "Ẏǿǿŭŭ'řḗḗ ƈŭŭřřḗḗƞŧŀẏ ƀřǿǿẇşīƞɠ īƞ ǿǿƒƒŀīƞḗḗ ḿǿǿḓḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order_status_badge.label.cancelled": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧƞƈḗḗŀŀḗḗḓ"
     },
     {
       "type": 0,

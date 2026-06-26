@@ -13,7 +13,6 @@ import {
     Heading,
     Text,
     Stack,
-    Badge,
     Flex,
     Button,
     Divider,
@@ -28,18 +27,11 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {usePageUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {
-    ChevronRightIcon,
-    CloseIcon,
-    ReceiptIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronRightIcon, ReceiptIcon} from '@salesforce/retail-react-app/app/components/icons'
 import Pagination from '@salesforce/retail-react-app/app/components/pagination'
 import PropTypes from 'prop-types'
 import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
-import {
-    getOrderDisplayStatus,
-    ORDER_DISPLAY_STATUS
-} from '@salesforce/retail-react-app/app/utils/order-status-utils'
+import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
@@ -147,10 +139,6 @@ const AccountOrderHistory = () => {
             ) : (
                 <Stack spacing={4}>
                     {orders?.map((order) => {
-                        // OMS-only: derives from item-level omsData.status.
-                        // Pure ECOM cancellations fall through to the raw status string.
-                        const isCancelled =
-                            getOrderDisplayStatus(order) === ORDER_DISPLAY_STATUS.CANCELLED
                         return (
                             <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
                                 <Box>
@@ -193,23 +181,7 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme={isCancelled ? 'red' : 'green'}>
-                                            {isCancelled ? (
-                                                <Flex
-                                                    display="inline-flex"
-                                                    alignItems="center"
-                                                    gap={1}
-                                                >
-                                                    <CloseIcon boxSize={2} aria-hidden />
-                                                    <FormattedMessage
-                                                        defaultMessage="Cancelled"
-                                                        id="account_order_history.badge.cancelled"
-                                                    />
-                                                </Flex>
-                                            ) : (
-                                                order.status || order.omsData?.status
-                                            )}
-                                        </Badge>
+                                        <OrderStatusBadge order={order} />
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
