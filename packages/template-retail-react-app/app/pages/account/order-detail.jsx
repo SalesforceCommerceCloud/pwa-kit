@@ -13,7 +13,6 @@ import {
     Heading,
     Text,
     Stack,
-    Badge,
     Flex,
     Button,
     Divider,
@@ -35,7 +34,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon, CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
@@ -47,6 +46,7 @@ import OrderTracking from '@salesforce/retail-react-app/app/components/order-tra
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 import {
     classifyReturnError,
     ReturnErrorKind
@@ -606,21 +606,7 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {!isLoading && (
-                            <Badge
-                                colorScheme={cancelFeedback?.status === 'success' ? 'red' : 'green'}
-                            >
-                                {cancelFeedback?.status === 'success' ? (
-                                    <Flex display="inline-flex" alignItems="center" gap={1}>
-                                        <CloseIcon boxSize={2} aria-hidden />
-                                        {formatMessage({
-                                            defaultMessage: 'Cancelled',
-                                            id: 'account_order_detail.badge.cancelled'
-                                        })}
-                                    </Flex>
-                                ) : (
-                                    order.status || order.omsData?.status
-                                )}
-                            </Badge>
+                            <OrderStatusBadge order={order} cancelFeedback={cancelFeedback} />
                         )}
                     </Flex>
 

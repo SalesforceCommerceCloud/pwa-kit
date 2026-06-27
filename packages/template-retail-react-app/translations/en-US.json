@@ -122,9 +122,6 @@
   "account_order_detail.alert.return_success_title": {
     "defaultMessage": "Return submitted"
   },
-  "account_order_detail.badge.cancelled": {
-    "defaultMessage": "Cancelled"
-  },
   "account_order_detail.button.cancel_order": {
     "defaultMessage": "Cancel order"
   },
@@ -1385,6 +1382,9 @@
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
+  },
+  "order_status_badge.label.cancelled": {
+    "defaultMessage": "Cancelled"
   },
   "order_summary.action.remove_promo": {
     "defaultMessage": "Remove"

@@ -473,6 +473,44 @@ describe('OMS/SOM Integration - Order Details', () => {
         expect(await screen.findByText('Created')).toBeInTheDocument()
     })
 
+    test('should show Cancelled badge when all items have cancelled status', async () => {
+        const cancelledOrder = createMockOmsOrder({
+            productItems: [
+                {
+                    productId: '640188017003M',
+                    productName: 'Test Product',
+                    quantity: 1,
+                    omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                }
+            ]
+        })
+        setupOrderDetailsPage(cancelledOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Cancelled')).toBeInTheDocument()
+    })
+
+    test('should NOT show Cancelled badge when only some items are cancelled', async () => {
+        const partialOrder = createMockOmsOrder({
+            productItems: [
+                {
+                    productId: '640188017003M',
+                    productName: 'Product A',
+                    quantity: 1,
+                    omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                },
+                {
+                    productId: '640188017004M',
+                    productName: 'Product B',
+                    quantity: 1,
+                    omsData: {status: 'shipped', quantityAvailableToCancel: 0}
+                }
+            ]
+        })
+        setupOrderDetailsPage(partialOrder)
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+    })
+
     test('should display fullName for OMS shipping address', async () => {
         setupOrderDetailsPage(createMockOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
@@ -969,6 +1007,50 @@ describe('OMS/SOM Integration - Order History', () => {
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
         expect(await screen.findByText('Created')).toBeInTheDocument()
+    })
+
+    test('should show Cancelled badge when all items have cancelled status', async () => {
+        const cancelledOrder = createMockOmsOrder({
+            productItems: [
+                {
+                    productId: '640188017003M',
+                    productName: 'Test Product',
+                    quantity: 1,
+                    omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                }
+            ]
+        })
+        setupOrderHistoryMock(cancelledOrder)
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Cancelled')).toBeInTheDocument()
+    })
+
+    test('should NOT show Cancelled badge when only some items are cancelled', async () => {
+        const partialOrder = createMockOmsOrder({
+            productItems: [
+                {
+                    productId: '640188017003M',
+                    productName: 'Product A',
+                    quantity: 1,
+                    omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                },
+                {
+                    productId: '640188017004M',
+                    productName: 'Product B',
+                    quantity: 1,
+                    omsData: {status: 'shipped', quantityAvailableToCancel: 0}
+                }
+            ]
+        })
+        setupOrderHistoryMock(partialOrder)
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
     })
 
     test('should display fullName for OMS shipping address', async () => {
