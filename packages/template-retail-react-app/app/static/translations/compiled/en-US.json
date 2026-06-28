@@ -239,6 +239,24 @@
       "value": "Cancel order"
     }
   ],
+  "account_order_detail.error.back_to_history": [
+    {
+      "type": 0,
+      "value": "Back to Order History"
+    }
+  ],
+  "account_order_detail.error.description": [
+    {
+      "type": 0,
+      "value": "We couldn't find the order you're looking for."
+    }
+  ],
+  "account_order_detail.error.title": [
+    {
+      "type": 0,
+      "value": "Order Not Found"
+    }
+  ],
   "account_order_detail.heading.billing_address": [
     {
       "type": 0,
@@ -313,6 +331,18 @@
     {
       "type": 1,
       "value": "number"
+    }
+  ],
+  "account_order_detail.label.delivered_on": [
+    {
+      "type": 0,
+      "value": "Delivered"
+    }
+  ],
+  "account_order_detail.label.expected_delivery": [
+    {
+      "type": 0,
+      "value": "Expected delivery"
     }
   ],
   "account_order_detail.label.order_number": [

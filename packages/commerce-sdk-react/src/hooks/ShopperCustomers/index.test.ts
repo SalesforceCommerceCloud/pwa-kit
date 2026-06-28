@@ -20,8 +20,7 @@ describe('Shopper Customers hooks', () => {
             'deleteCustomerPaymentMethodReference', // TODO: Implement when the endpoint exits closed beta
             'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
             'getPublicProductListItems', // TODO: Implement when the endpoint exits closed beta
-            'registerExternalProfile', // TODO: Implement when the endpoint exits closed beta
-            'setupCustomerPaymentMethodReference' // TODO: Implement when the endpoint exits closed beta
+            'registerExternalProfile' // TODO: Implement when the endpoint exits closed beta
         ])
     })
     test('all mutations have cache update logic', () => {

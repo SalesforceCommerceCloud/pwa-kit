@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {CLIENT_KEYS} from '../../constant'
-import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
+import {getCustomerBaskets, getCustomerOrders} from '../ShopperCustomers/queryKeyHelpers'
 import {
     ApiClients,
     Argument,
@@ -60,6 +60,24 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         if (reopenBasket && customerId) {
             invalidate.push({
                 queryKey: getCustomerBaskets.queryKey({...orderParams, customerId})
+            })
+        }
+        return {invalidate}
+    },
+    cancelOmsOrder(customerId, {parameters}) {
+        const invalidate: CacheUpdateInvalidate[] = [{queryKey: getOrder.queryKey(parameters)}]
+        if (customerId) {
+            invalidate.push({
+                queryKey: getCustomerOrders.queryKey({...parameters, customerId})
+            })
+        }
+        return {invalidate}
+    },
+    returnOmsOrder(customerId, {parameters}) {
+        const invalidate: CacheUpdateInvalidate[] = [{queryKey: getOrder.queryKey(parameters)}]
+        if (customerId) {
+            invalidate.push({
+                queryKey: getCustomerOrders.queryKey({...parameters, customerId})
             })
         }
         return {invalidate}

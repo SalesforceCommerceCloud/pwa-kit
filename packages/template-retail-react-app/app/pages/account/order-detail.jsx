@@ -18,7 +18,6 @@ import {
     Button,
     Divider,
     Grid,
-    Link as ChakraLink,
     SimpleGrid,
     Skeleton,
     useDisclosure
@@ -40,6 +39,8 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
+import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
+import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -141,7 +142,11 @@ const AccountOrderDetail = () => {
     // expand: 'oms' returns order data from OMS if the order is successfully
     // ingested to OMS, otherwise returns data from ECOM
     // For regular non-oms orders, the order data is returned from ECOM
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {
+        data: order,
+        isLoading: isOrderLoading,
+        isError
+    } = useOrder(
         {
             parameters: {
                 orderNo: params.orderNo,
@@ -152,6 +157,11 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
+    // Note: keep `|| !order` so the skeleton shows until the order resolves, but a
+    // failed fetch is caught by `isError` below and routed to the error card — so it
+    // no longer hangs on the skeleton forever (the AC6 bug). `isError` is the
+    // TanStack Query failure flag; it is NOT set merely because the query is
+    // disabled/not-yet-fetched (e.g. during SSR), so the SSR skeleton is unaffected.
     const isLoading = isOrderLoading || !order
 
     // Check if order has OMS data
@@ -249,67 +259,6 @@ const AccountOrderDetail = () => {
         [storeData?.data]
     )
 
-    const renderShippingMethod = (
-        shippingMethodName,
-        shippingStatus,
-        trackingNumber,
-        trackingUrl,
-        shipmentsLength,
-        index
-    ) => (
-        <Stack spacing={1}>
-            <Heading as="h2" fontSize="sm" pt={1}>
-                {shipmentsLength > 1 ? (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method {number}"
-                        id="account_order_detail.heading.shipping_method_number"
-                        values={{number: index + 1}}
-                    />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method"
-                        id="account_order_detail.heading.shipping_method"
-                    />
-                )}
-            </Heading>
-            <Box>
-                <Text fontSize="sm" textTransform="titlecase">
-                    {{
-                        not_shipped: formatMessage({
-                            defaultMessage: 'Not shipped',
-                            id: 'account_order_detail.shipping_status.not_shipped'
-                        }),
-                        part_shipped: formatMessage({
-                            defaultMessage: 'Partially shipped',
-                            id: 'account_order_detail.shipping_status.part_shipped'
-                        }),
-                        shipped: formatMessage({
-                            defaultMessage: 'Shipped',
-                            id: 'account_order_detail.shipping_status.shipped'
-                        })
-                    }[shippingStatus] || shippingStatus}
-                </Text>
-                <Text fontSize="sm">{shippingMethodName}</Text>
-                {trackingNumber && (
-                    <Text fontSize="sm">
-                        <FormattedMessage
-                            defaultMessage="Tracking Number"
-                            id="account_order_detail.label.tracking_number"
-                        />
-                        :{' '}
-                        {trackingUrl ? (
-                            <ChakraLink href={trackingUrl} isExternal color="blue.600">
-                                {trackingNumber}
-                            </ChakraLink>
-                        ) : (
-                            trackingNumber
-                        )}
-                    </Text>
-                )}
-            </Box>
-        </Stack>
-    )
-
     const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
@@ -319,6 +268,14 @@ const AccountOrderDetail = () => {
         // Focus the 'Order Details' header when the component mounts for accessibility
         headingRef?.current?.focus()
     }, [])
+
+    // A failed order fetch shows a full-card error with a path back to order history,
+    // instead of hanging on the loading skeleton forever (AC6). The success-with-no-
+    // omsData case is NOT an error — it has `order` and falls through to the normal
+    // render (ECOM fallback), so only the TanStack Query `isError` flag triggers this.
+    if (isError) {
+        return <OrderLoadError />
+    }
 
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
@@ -553,17 +510,22 @@ const AccountOrderDetail = () => {
                                         const trackingNumber =
                                             omsShipment?.trackingNumber || shipment.trackingNumber
                                         const trackingUrl = omsShipment?.trackingUrl
+                                        const expectedDeliveryDate =
+                                            omsShipment?.expectedDeliveryDate
+                                        const actualDeliveryDate = omsShipment?.actualDeliveryDate
 
                                         return (
                                             <React.Fragment key={`delivery-${index}`}>
-                                                {renderShippingMethod(
-                                                    shippingMethodName,
-                                                    shippingStatus,
-                                                    trackingNumber,
-                                                    trackingUrl,
-                                                    deliveryShipments.length,
-                                                    index
-                                                )}
+                                                <OrderTracking
+                                                    shippingMethodName={shippingMethodName}
+                                                    shippingStatus={shippingStatus}
+                                                    trackingNumber={trackingNumber}
+                                                    trackingUrl={trackingUrl}
+                                                    expectedDeliveryDate={expectedDeliveryDate}
+                                                    actualDeliveryDate={actualDeliveryDate}
+                                                    shipmentsLength={deliveryShipments.length}
+                                                    index={index}
+                                                />
                                                 <Stack spacing={1}>
                                                     <Heading as="h2" fontSize="sm" pt={1}>
                                                         {deliveryShipments.length > 1 ? (
@@ -603,16 +565,17 @@ const AccountOrderDetail = () => {
                                 {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
                                 {showMultiShipmentsFromOmsOnly &&
                                     order?.omsData?.shipments?.map((shipment, index) => (
-                                        <React.Fragment key={`oms-shipment-${index}`}>
-                                            {renderShippingMethod(
-                                                shipment.provider,
-                                                shipment.status,
-                                                shipment.trackingNumber,
-                                                shipment.trackingUrl,
-                                                omsShipmentCount,
-                                                index
-                                            )}
-                                        </React.Fragment>
+                                        <OrderTracking
+                                            key={`oms-shipment-${index}`}
+                                            shippingMethodName={shipment.provider}
+                                            shippingStatus={shipment.status}
+                                            trackingNumber={shipment.trackingNumber}
+                                            trackingUrl={shipment.trackingUrl}
+                                            expectedDeliveryDate={shipment.expectedDeliveryDate}
+                                            actualDeliveryDate={shipment.actualDeliveryDate}
+                                            shipmentsLength={omsShipmentCount}
+                                            index={index}
+                                        />
                                     ))}
 
                                 {/* Payment Method */}

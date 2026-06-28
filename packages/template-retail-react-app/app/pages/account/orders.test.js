@@ -365,6 +365,49 @@ describe('Order without payment data', () => {
     })
 })
 
+describe('Order detail error/fallback state (AC6)', () => {
+    // Set up the detail route, but make the order fetch fail (HTTP 500). With the
+    // global QueryClient retry disabled, useOrder reports isError immediately.
+    const setupFailedOrderFetch = () => {
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => res(ctx.delay(0), ctx.status(500)))
+        )
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults('/account/orders/FAILED-ORDER')
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+    }
+
+    test('shows the full-card error (not a perpetual skeleton) when the order fetch fails', async () => {
+        setupFailedOrderFetch()
+        // The error card renders...
+        expect(await screen.findByTestId('account-order-details-error')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /Order Not Found/i})).toBeInTheDocument()
+        // ...and the normal order-details page does NOT (no perpetual skeleton).
+        expect(screen.queryByTestId('account-order-details-page')).not.toBeInTheDocument()
+    })
+
+    test('offers a path back to order history from the error card', async () => {
+        setupFailedOrderFetch()
+        const backLink = await screen.findByRole('link', {name: /Back to Order History/i})
+        expect(backLink.getAttribute('href')).toMatch(/\/account\/orders$/)
+    })
+
+    test('does NOT show the error card for a successful order with no OMS data (ECOM fallback, not an error)', async () => {
+        // 200 OK with no omsData (org not SOM-connected / order not ingested) is NOT an
+        // error — the page should render normally via the ECOM fallback, never the card.
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-details-error')).not.toBeInTheDocument()
+        // ECOM fields still render (proves the fallback path, not the error path).
+        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
+    })
+})
+
 describe('OMS/SOM Integration - Order Details', () => {
     // ECOM order tests - uses order.status, firstName/lastName, and has payment data
     test('should display ECOM order status from order.status', async () => {
@@ -383,6 +426,13 @@ describe('OMS/SOM Integration - Order Details', () => {
         setupOrderDetailsPage(createMockOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(await screen.findByRole('heading', {name: /payment method/i})).toBeInTheDocument()
+    })
+
+    test('should NOT display an expected delivery line for an ECOM-fallback order (AC3)', async () => {
+        // ECOM orders have no omsData → no expectedDeliveryDate → the ETA line is omitted.
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByText(/Expected delivery/i)).not.toBeInTheDocument()
     })
 
     // OMS order tests - uses omsData.status, fullName, and has no payment data
@@ -562,13 +612,15 @@ describe('OMS Multi-shipment - Shipping address hidden', () => {
                     status: 'SHIPPED',
                     trackingNumber: 'OMS-001',
                     trackingUrl: 'https://track.example.com/OMS-001',
-                    provider: 'FedEx'
+                    provider: 'FedEx',
+                    expectedDeliveryDate: '2026-06-12T00:00:00.000Z'
                 },
                 {
                     status: 'PENDING',
                     trackingNumber: 'OMS-002',
                     trackingUrl: 'https://track.example.com/OMS-002',
-                    provider: 'UPS'
+                    provider: 'UPS',
+                    expectedDeliveryDate: '2026-07-20T00:00:00.000Z'
                 }
             ]
         }
@@ -608,6 +660,15 @@ describe('OMS Multi-shipment - Shipping address hidden', () => {
 
         const trackingLink2 = await screen.findByRole('link', {name: /OMS-002/i})
         expect(trackingLink2).toHaveAttribute('href', 'https://track.example.com/OMS-002')
+    })
+
+    test('should display the expected delivery date per shipment (AC3, OMS-multi call site)', async () => {
+        // Exercises the OMS-multi call site: each shipment renders its own ETA line.
+        // findAllByText waits for the async order render to resolve.
+        const etaLabels = await screen.findAllByText(/Expected delivery/i)
+        expect(etaLabels).toHaveLength(2)
+        expect(etaLabels[0].closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
+        expect(etaLabels[1].closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
     })
 })
 
@@ -701,7 +762,8 @@ describe('OMS Single shipment with tracking URL', () => {
                     status: 'DELIVERED',
                     trackingNumber: 'TRACK-12345',
                     trackingUrl: 'https://tracking.fedex.com/TRACK-12345',
-                    provider: 'FedEx Ground'
+                    provider: 'FedEx Ground',
+                    expectedDeliveryDate: '2026-06-12T00:00:00.000Z'
                 }
             ]
         }
@@ -729,6 +791,17 @@ describe('OMS Single shipment with tracking URL', () => {
 
     test('should display OMS shipment status (fallback to raw value)', async () => {
         expect(await screen.findByText(/DELIVERED/i)).toBeInTheDocument()
+    })
+
+    test('should display the expected delivery date from OMS data (AC3, page call site)', async () => {
+        // Verifies the ETA renders at the real delivery call site, not just in the
+        // isolated component test. The label and the formatted date share one line;
+        // scope the date assertion to that line so it doesn't collide with the
+        // order's creation date elsewhere on the page.
+        const etaLabel = await screen.findByText(/Expected delivery/i)
+        expect(etaLabel).toBeInTheDocument()
+        // The <Text> line reads "Expected delivery: <formatted date>" and includes the year.
+        expect(etaLabel.closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
     })
 })
 
