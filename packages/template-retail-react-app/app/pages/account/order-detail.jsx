@@ -987,23 +987,6 @@ const AccountOrderDetail = () => {
                 </Grid>
             </Box>
 
-            {/* Tracking — its own section (mirrors storefront-next), separate from the
-                summary card above. A flat list of per-shipment tracking cards; each card
-                carries carrier/status/tracking-number-link/dates and NO address. */}
-            {!isLoading && trackingEntries.length > 0 && (
-                <Stack spacing={3} data-testid="account-order-detail-tracking">
-                    <Heading as="h2" fontSize="lg">
-                        <FormattedMessage
-                            defaultMessage="Tracking"
-                            id="account_order_detail.heading.tracking"
-                        />
-                    </Heading>
-                    {trackingEntries.map(({key, ...entry}) => (
-                        <OrderTracking key={key} {...entry} />
-                    ))}
-                </Stack>
-            )}
-
             <Stack spacing={4}>
                 {!isLoading && (
                     <Text>
@@ -1037,24 +1020,43 @@ const AccountOrderDetail = () => {
                               </Box>
                           ))
                         : (() => {
-                              // Per-shipment boxes (mirrors storefront-next): iterate the ECOM
-                              // shipments, render each as a bordered box with a "Shipment N"
-                              // header + that shipment's status, its items (grouped by
-                              // shipmentId), and the shipment's own native shipping address.
-                              // No OMS↔ECOM join — OMS tracking stays in the separate flat
-                              // Tracking section below.
+                              // Per-shipment boxes (mirrors the storefront-next design branch):
+                              // iterate the ECOM shipments, render each as a bordered box with a
+                              // "Shipment N" header + status, its items (grouped by shipmentId),
+                              // and the shipment's own native shipping address. The flat tracking
+                              // list lives inside the FIRST box (after items, before address) —
+                              // it is the whole flat list, not a per-shipment split, so there is
+                              // no positional OMS↔ECOM index-join.
                               const itemsByShipmentId = groupProductItemsByShipmentId(
                                   order.productItems
                               )
                               // No delivery shipment to box the items under (e.g. BOPIS
-                              // pickup-only orders) → render the items as one flat list so
-                              // they always show.
+                              // pickup-only orders) → render the items as one flat list, then the
+                              // flat tracking list below them so tracking is never lost.
                               if (deliveryShipments.length === 0) {
                                   return (
-                                      <OrderProducts
-                                          productItems={order.productItems}
-                                          currency={order.currency}
-                                      />
+                                      <>
+                                          <OrderProducts
+                                              productItems={order.productItems}
+                                              currency={order.currency}
+                                          />
+                                          {trackingEntries.length > 0 && (
+                                              <Stack
+                                                  spacing={3}
+                                                  data-testid="account-order-detail-tracking"
+                                              >
+                                                  <Heading as="h3" fontSize="sm">
+                                                      <FormattedMessage
+                                                          defaultMessage="Tracking"
+                                                          id="account_order_detail.heading.tracking"
+                                                      />
+                                                  </Heading>
+                                                  {trackingEntries.map(({key, ...entry}) => (
+                                                      <OrderTracking key={key} {...entry} />
+                                                  ))}
+                                              </Stack>
+                                          )}
+                                      </>
                                   )
                               }
                               const isSingleShipment = deliveryShipments.length === 1
@@ -1121,6 +1123,32 @@ const AccountOrderDetail = () => {
                                                   productItems={items}
                                                   currency={order.currency}
                                               />
+                                              {/* Tracking lives INSIDE the first shipment box, after its
+                                                  items and before its address (mirrors the storefront-next
+                                                  design branch: `idx === 0 ? <TrackingList/> : null`). It is
+                                                  the WHOLE flat list of tracking cards (OMS-preferred, ECOM
+                                                  fallback), placed only in box 1 — NOT split per-shipment —
+                                                  so there is still no positional OMS↔ECOM index-join. Other
+                                                  shipment boxes render no tracking block. */}
+                                              {index === 0 && trackingEntries.length > 0 && (
+                                                  <Stack
+                                                      spacing={3}
+                                                      borderTop="1px solid"
+                                                      borderColor="gray.100"
+                                                      pt={4}
+                                                      data-testid="account-order-detail-tracking"
+                                                  >
+                                                      <Heading as="h3" fontSize="sm">
+                                                          <FormattedMessage
+                                                              defaultMessage="Tracking"
+                                                              id="account_order_detail.heading.tracking"
+                                                          />
+                                                      </Heading>
+                                                      {trackingEntries.map(({key, ...entry}) => (
+                                                          <OrderTracking key={key} {...entry} />
+                                                      ))}
+                                                  </Stack>
+                                              )}
                                               {address && (
                                                   <Stack
                                                       spacing={1}

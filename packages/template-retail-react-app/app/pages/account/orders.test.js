@@ -1444,17 +1444,21 @@ describe('OMS Single shipment with tracking URL', () => {
         expect(etaLabel.closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
     })
 
-    test('renders Tracking as its own section, separate from the summary card', async () => {
-        // Regression lock: the tracking cards must live in a dedicated Tracking section,
-        // NOT nested inside the top order-summary card (which holds shipping address /
-        // payment / billing). Mirrors storefront-next's separate tracking block.
+    test('renders Tracking INSIDE the first shipment box, not in the summary card', async () => {
+        // Regression lock: per the storefront-next design branch, the flat tracking list
+        // lives inside the FIRST shipment box (after its items, before its address) — NOT
+        // as a top-level section above the items and NOT inside the top order-summary card.
         const trackingSection = await screen.findByTestId('account-order-detail-tracking')
         expect(trackingSection).toBeInTheDocument()
+        // The tracking section sits inside the (first) shipment box.
+        const shipmentBox = document.querySelector('[data-shipment-id]')
+        expect(shipmentBox).toBeInTheDocument()
+        expect(shipmentBox).toContainElement(trackingSection)
         // The tracking card is inside the tracking section...
         const card = await screen.findByTestId('order-tracking-card')
         expect(trackingSection).toContainElement(card)
-        // ...and the Shipping Address (a summary-card field) is NOT inside the tracking
-        // section — proving tracking is a sibling section, not jammed into the summary card.
+        // ...and the Shipping Address is a SIBLING block inside the box, NOT inside the
+        // tracking section (no address jammed into a tracking card → no OMS↔ECOM join).
         expect(trackingSection).not.toHaveTextContent(/Shipping Address/i)
         expect(trackingSection).not.toHaveTextContent(/Payment Method/i)
     })
