@@ -761,6 +761,38 @@
       "value": "]"
     }
   ],
+  "account_order_detail.heading.shipment": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.heading.shipment_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥḿḗḗƞŧ "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,

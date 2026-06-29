@@ -68,8 +68,21 @@ const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
 // hint (only one such button exists per page, so a constant is safe).
 const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
 
+// Group productItems by their shipmentId (mirrors storefront-next's
+// groupProductItemsByShipmentId). Items with no shipmentId fall under 'default'.
+const groupProductItemsByShipmentId = (productItems) =>
+    (productItems || []).reduce((itemsByShipmentId, item) => {
+        const shipmentId = item.shipmentId ?? 'default'
+        if (!itemsByShipmentId[shipmentId]) itemsByShipmentId[shipmentId] = []
+        itemsByShipmentId[shipmentId].push(item)
+        return itemsByShipmentId
+    }, {})
+
 const OrderProducts = ({productItems, currency}) => {
-    const orderProductIds = productItems.map((product) => product.productId)
+    // Guard the map: a per-shipment box can pass an empty/undefined items list, and
+    // the consolidate call below is already `|| []`-guarded — keep this symmetric so
+    // a missing list never throws before that.
+    const orderProductIds = (productItems || []).map((product) => product.productId)
     const {data: products, isLoading} = useProducts(
         {
             parameters: {
@@ -209,14 +222,6 @@ const AccountOrderDetail = () => {
 
     // Check if order has OMS data
     const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
-
-    const omsShipmentCount = order?.omsData?.shipments?.length ?? 0
-    const ecomShipmentCount = order?.shipments?.length ?? 0
-
-    const isMultiShipmentOrder = useMemo(
-        () => omsShipmentCount > 1 || ecomShipmentCount > 1,
-        [omsShipmentCount, ecomShipmentCount]
-    )
 
     // The order-level "Track Shipment" action links to the FIRST shipment that
     // carries a carrier tracking URL, matching storefront-next's getTrackShipmentHref
@@ -500,6 +505,43 @@ const AccountOrderDetail = () => {
             ? groupShipmentsByDeliveryOption(order)
             : {pickupShipments: [], deliveryShipments: order?.shipments || []}
     }, [order?.shipments, storeLocatorEnabled])
+
+    // Tracking entries for the dedicated Tracking section (rendered as its own block,
+    // not inside the top summary card). Flat list: OMS-preferred (omsData.shipments[])
+    // when present, else ECOM fallback (order.shipments[]). One source XOR the other,
+    // NEVER a positional OMS↔ECOM index-join across a multi-shipment order. Entries carry
+    // no shipping address (epic a3QEE000002QvBB2A0: "flat list, NO address association";
+    // per-shipment address association is the deferred TD-0326366).
+    const trackingEntries = useMemo(() => {
+        const omsShipments = order?.omsData?.shipments ?? []
+        const ecomShipments = order?.shipments ?? []
+        // Single-shipment carrier-name fallback only: when there is exactly one OMS
+        // shipment and one delivery shipment, an OMS shipment with no `provider` can
+        // borrow the lone delivery shipment's method name — unambiguous (one ↔ one), so
+        // it is NOT the forbidden multi-shipment index-join. For multi-shipment we never
+        // join, so a provider-less OMS shipment simply shows no carrier name.
+        const singleMethodFallback =
+            omsShipments.length === 1 && deliveryShipments.length === 1
+                ? deliveryShipments[0].shippingMethod?.name
+                : undefined
+        return omsShipments.length > 0
+            ? omsShipments.map((s, index) => ({
+                  key: s.id ?? `oms-${index}`,
+                  shippingMethodName: s.provider || singleMethodFallback,
+                  shippingStatus: s.status,
+                  trackingNumber: s.trackingNumber,
+                  trackingUrl: s.trackingUrl,
+                  expectedDeliveryDate: s.expectedDeliveryDate,
+                  actualDeliveryDate: s.actualDeliveryDate
+              }))
+            : ecomShipments.map((s, index) => ({
+                  key: s.shipmentId ?? `ecom-${index}`,
+                  shippingMethodName: s.shippingMethod?.name,
+                  shippingStatus: s.shippingStatus,
+                  trackingNumber: s.trackingNumber
+                  // provider / trackingUrl / dates are OMS-only → undefined here
+              }))
+    }, [order?.omsData?.shipments, order?.shipments, deliveryShipments])
 
     const storeIds = useMemo(
         () => pickupShipments.map((shipment) => shipment.c_fromStoreId).filter(Boolean),
@@ -871,93 +913,9 @@ const AccountOrderDetail = () => {
                                         </Stack>
                                     )
                                 })}
-                                {/* Tracking cards — flat list. OMS-preferred: use omsData.shipments[]
-                                    when present, else fall back to ECOM order.shipments[]. One source
-                                    XOR the other, NEVER a positional OMS↔ECOM index-join across a
-                                    multi-shipment order. Each card carries no address — addresses are
-                                    rendered once at order level below (epic a3QEE000002QvBB2A0: "flat
-                                    list, NO address association"; per-shipment address association is
-                                    the deferred TD-0326366). */}
-                                {(() => {
-                                    const omsShipments = order.omsData?.shipments ?? []
-                                    const ecomShipments = order.shipments ?? []
-                                    // Single-shipment carrier-name fallback only: when there is exactly
-                                    // one OMS shipment and one delivery shipment, an OMS shipment with no
-                                    // `provider` can borrow the lone delivery shipment's method name —
-                                    // unambiguous (one ↔ one), so it is NOT the forbidden multi-shipment
-                                    // index-join. For multi-shipment we never join, so a provider-less
-                                    // OMS shipment simply shows no carrier name.
-                                    const singleMethodFallback =
-                                        omsShipments.length === 1 && deliveryShipments.length === 1
-                                            ? deliveryShipments[0].shippingMethod?.name
-                                            : undefined
-                                    const trackingEntries =
-                                        omsShipments.length > 0
-                                            ? omsShipments.map((s, index) => ({
-                                                  key: s.id ?? `oms-${index}`,
-                                                  shippingMethodName:
-                                                      s.provider || singleMethodFallback,
-                                                  shippingStatus: s.status,
-                                                  trackingNumber: s.trackingNumber,
-                                                  trackingUrl: s.trackingUrl,
-                                                  expectedDeliveryDate: s.expectedDeliveryDate,
-                                                  actualDeliveryDate: s.actualDeliveryDate
-                                              }))
-                                            : ecomShipments.map((s, index) => ({
-                                                  key: s.shipmentId ?? `ecom-${index}`,
-                                                  shippingMethodName: s.shippingMethod?.name,
-                                                  shippingStatus: s.shippingStatus,
-                                                  trackingNumber: s.trackingNumber
-                                                  // provider / trackingUrl / dates are OMS-only → undefined here
-                                              }))
-
-                                    return trackingEntries.length > 0 ? (
-                                        <Stack spacing={2} gridColumn={{sm: 'span 2'}}>
-                                            <Heading as="h2" fontSize="sm" pt={1}>
-                                                <FormattedMessage
-                                                    defaultMessage="Tracking"
-                                                    id="account_order_detail.heading.tracking"
-                                                />
-                                            </Heading>
-                                            <Stack spacing={3}>
-                                                {trackingEntries.map(({key, ...entry}) => (
-                                                    <OrderTracking key={key} {...entry} />
-                                                ))}
-                                            </Stack>
-                                        </Stack>
-                                    ) : null
-                                })()}
-
-                                {/* Order-level Shipping Address — single-shipment delivery orders only.
-                                    Multi-shipment orders (OMS or ECOM) hide the address per the epic
-                                    (no per-shipment address association). BOPIS-only orders have no
-                                    delivery shipment, so this does not render for them. */}
-                                {!isMultiShipmentOrder && deliveryShipments.length > 0 && (
-                                    <Stack spacing={1}>
-                                        <Heading as="h2" fontSize="sm" pt={1}>
-                                            <FormattedMessage
-                                                defaultMessage="Shipping Address"
-                                                id="account_order_detail.heading.shipping_address"
-                                            />
-                                        </Heading>
-                                        <Box>
-                                            <Text fontSize="sm">
-                                                {deliveryShipments[0].shippingAddress.firstName &&
-                                                deliveryShipments[0].shippingAddress.lastName
-                                                    ? `${deliveryShipments[0].shippingAddress.firstName} ${deliveryShipments[0].shippingAddress.lastName}`
-                                                    : deliveryShipments[0].shippingAddress.fullName}
-                                            </Text>
-                                            <Text fontSize="sm">
-                                                {deliveryShipments[0].shippingAddress.address1}
-                                            </Text>
-                                            <Text fontSize="sm">
-                                                {deliveryShipments[0].shippingAddress.city},{' '}
-                                                {deliveryShipments[0].shippingAddress.stateCode}{' '}
-                                                {deliveryShipments[0].shippingAddress.postalCode}
-                                            </Text>
-                                        </Box>
-                                    </Stack>
-                                )}
+                                {/* Shipping Address now renders inside each per-shipment box in the
+                                    Items Ordered section (mirrors storefront-next), so it is not
+                                    repeated here. */}
 
                                 {/* Payment Method */}
                                 {paymentCard && (
@@ -1029,6 +987,23 @@ const AccountOrderDetail = () => {
                 </Grid>
             </Box>
 
+            {/* Tracking — its own section (mirrors storefront-next), separate from the
+                summary card above. A flat list of per-shipment tracking cards; each card
+                carries carrier/status/tracking-number-link/dates and NO address. */}
+            {!isLoading && trackingEntries.length > 0 && (
+                <Stack spacing={3} data-testid="account-order-detail-tracking">
+                    <Heading as="h2" fontSize="lg">
+                        <FormattedMessage
+                            defaultMessage="Tracking"
+                            id="account_order_detail.heading.tracking"
+                        />
+                    </Heading>
+                    {trackingEntries.map(({key, ...entry}) => (
+                        <OrderTracking key={key} {...entry} />
+                    ))}
+                </Stack>
+            )}
+
             <Stack spacing={4}>
                 {!isLoading && (
                     <Text>
@@ -1041,32 +1016,150 @@ const AccountOrderDetail = () => {
                 )}
 
                 <Stack spacing={4}>
-                    {isLoading ? (
-                        [1, 2, 3].map((i) => (
-                            <Box
-                                key={i}
-                                p={[4, 6]}
-                                border="1px solid"
-                                borderColor="gray.100"
-                                borderRadius="base"
-                            >
-                                <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr={4} />
+                    {isLoading
+                        ? [1, 2, 3].map((i) => (
+                              <Box
+                                  key={i}
+                                  p={[4, 6]}
+                                  border="1px solid"
+                                  borderColor="gray.100"
+                                  borderRadius="base"
+                              >
+                                  <Flex width="full" align="flex-start">
+                                      <Skeleton boxSize={['88px', 36]} mr={4} />
 
-                                    <Stack spacing={2}>
-                                        <Skeleton h="20px" w="112px" />
-                                        <Skeleton h="20px" w="84px" />
-                                        <Skeleton h="20px" w="140px" />
-                                    </Stack>
-                                </Flex>
-                            </Box>
-                        ))
-                    ) : (
-                        <OrderProducts
-                            productItems={order.productItems}
-                            currency={order.currency}
-                        />
-                    )}
+                                      <Stack spacing={2}>
+                                          <Skeleton h="20px" w="112px" />
+                                          <Skeleton h="20px" w="84px" />
+                                          <Skeleton h="20px" w="140px" />
+                                      </Stack>
+                                  </Flex>
+                              </Box>
+                          ))
+                        : (() => {
+                              // Per-shipment boxes (mirrors storefront-next): iterate the ECOM
+                              // shipments, render each as a bordered box with a "Shipment N"
+                              // header + that shipment's status, its items (grouped by
+                              // shipmentId), and the shipment's own native shipping address.
+                              // No OMS↔ECOM join — OMS tracking stays in the separate flat
+                              // Tracking section below.
+                              const itemsByShipmentId = groupProductItemsByShipmentId(
+                                  order.productItems
+                              )
+                              // No delivery shipment to box the items under (e.g. BOPIS
+                              // pickup-only orders) → render the items as one flat list so
+                              // they always show.
+                              if (deliveryShipments.length === 0) {
+                                  return (
+                                      <OrderProducts
+                                          productItems={order.productItems}
+                                          currency={order.currency}
+                                      />
+                                  )
+                              }
+                              const isSingleShipment = deliveryShipments.length === 1
+                              return deliveryShipments.map((shipment, index) => {
+                                  const sid = shipment.shipmentId ?? `ship-${index}`
+                                  // For a single shipment, all items belong to it (cover the
+                                  // common case where productItems carry no shipmentId → they
+                                  // land under 'default'). For multiple shipments, match strictly
+                                  // by shipmentId so items never duplicate across boxes.
+                                  const items = isSingleShipment
+                                      ? order.productItems
+                                      : itemsByShipmentId[sid] ?? []
+                                  const address = shipment.shippingAddress
+                                  return (
+                                      <Box
+                                          key={sid}
+                                          data-shipment-id={sid}
+                                          border="1px solid"
+                                          borderColor="gray.100"
+                                          borderRadius="base"
+                                          overflow="hidden"
+                                      >
+                                          <Flex
+                                              bg="gray.50"
+                                              px={4}
+                                              py={3}
+                                              justify="space-between"
+                                              align="center"
+                                              gap={2}
+                                          >
+                                              <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                                  {deliveryShipments.length > 1 ? (
+                                                      <FormattedMessage
+                                                          defaultMessage="Shipment {number}"
+                                                          id="account_order_detail.heading.shipment_number"
+                                                          values={{number: index + 1}}
+                                                      />
+                                                  ) : (
+                                                      <FormattedMessage
+                                                          defaultMessage="Shipment"
+                                                          id="account_order_detail.heading.shipment"
+                                                      />
+                                                  )}
+                                              </Heading>
+                                              {shipment.shippingStatus && (
+                                                  <Text
+                                                      as="span"
+                                                      px={2}
+                                                      py={1}
+                                                      bg="gray.200"
+                                                      color="gray.700"
+                                                      fontSize="xs"
+                                                      fontWeight="semibold"
+                                                      borderRadius="sm"
+                                                      textTransform="capitalize"
+                                                      whiteSpace="nowrap"
+                                                  >
+                                                      {shipment.shippingStatus.replace(/_/g, ' ')}
+                                                  </Text>
+                                              )}
+                                          </Flex>
+                                          <Stack spacing={4} p={[4, 6]}>
+                                              <OrderProducts
+                                                  productItems={items}
+                                                  currency={order.currency}
+                                              />
+                                              {address && (
+                                                  <Stack
+                                                      spacing={1}
+                                                      borderTop="1px solid"
+                                                      borderColor="gray.100"
+                                                      pt={4}
+                                                  >
+                                                      <Heading as="h3" fontSize="sm">
+                                                          <FormattedMessage
+                                                              defaultMessage="Shipping Address"
+                                                              id="account_order_detail.heading.shipping_address"
+                                                          />
+                                                      </Heading>
+                                                      <Box>
+                                                          <Text fontSize="sm">
+                                                              {address.firstName && address.lastName
+                                                                  ? `${address.firstName} ${address.lastName}`
+                                                                  : address.fullName}
+                                                          </Text>
+                                                          <Text fontSize="sm">
+                                                              {address.address1}
+                                                          </Text>
+                                                          <Text fontSize="sm">
+                                                              {address.city}, {address.stateCode}{' '}
+                                                              {address.postalCode}
+                                                          </Text>
+                                                          {shipment.shippingMethod?.name && (
+                                                              <Text fontSize="sm" color="gray.600">
+                                                                  {shipment.shippingMethod.name}
+                                                              </Text>
+                                                          )}
+                                                      </Box>
+                                                  </Stack>
+                                              )}
+                                          </Stack>
+                                      </Box>
+                                  )
+                              })
+                          })()}
                 </Stack>
             </Stack>
 

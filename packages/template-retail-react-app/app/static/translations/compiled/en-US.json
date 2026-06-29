@@ -337,6 +337,22 @@
       "value": "number"
     }
   ],
+  "account_order_detail.heading.shipment": [
+    {
+      "type": 0,
+      "value": "Shipment"
+    }
+  ],
+  "account_order_detail.heading.shipment_number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,

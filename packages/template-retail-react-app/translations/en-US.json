@@ -158,6 +158,12 @@
   "account_order_detail.heading.pickup_address_number": {
     "defaultMessage": "Pickup Address {number}"
   },
+  "account_order_detail.heading.shipment": {
+    "defaultMessage": "Shipment"
+  },
+  "account_order_detail.heading.shipment_number": {
+    "defaultMessage": "Shipment {number}"
+  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
