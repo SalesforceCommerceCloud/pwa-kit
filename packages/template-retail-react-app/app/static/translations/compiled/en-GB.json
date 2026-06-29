@@ -3293,6 +3293,30 @@
       "value": "Cancelled"
     }
   ],
+  "order_status_badge.label.partial_return_complete": [
+    {
+      "type": 0,
+      "value": "Partial Return Complete"
+    }
+  ],
+  "order_status_badge.label.partial_return_initiated": [
+    {
+      "type": 0,
+      "value": "Partial Return Initiated"
+    }
+  ],
+  "order_status_badge.label.return_complete": [
+    {
+      "type": 0,
+      "value": "Return Complete"
+    }
+  ],
+  "order_status_badge.label.return_initiated": [
+    {
+      "type": 0,
+      "value": "Return Initiated"
+    }
+  ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,

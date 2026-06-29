@@ -51,6 +51,7 @@ import OrderTracking from '@salesforce/retail-react-app/app/components/order-tra
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import {ensureExternalUrl} from '@salesforce/retail-react-app/app/utils/url'
 import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 import {
     classifyReturnError,
@@ -227,44 +228,31 @@ const AccountOrderDetail = () => {
     // Check if order has OMS data
     const isOmsOrder = useMemo(() => !!order?.omsData, [order?.omsData])
 
-    // The order-level "Track Shipment" action links to the FIRST shipment that
-    // carries a carrier tracking URL, matching storefront-next's getTrackShipmentHref
-    // (a single order action, not one button per shipment). The per-shipment tracking
-    // links live inside the per-shipment cards below; this single button is a
-    // convenience entry point to the first trackable shipment. When no shipment has a
-    // URL, the button is shown disabled so the action stays visible (tracking info
-    // simply isn't available yet). Reads the same `omsData.shipments[].trackingUrl`
-    // the cards use, so the button and the links can never point to different places.
-    const firstTrackingUrl = useMemo(
-        () =>
-            (order?.omsData?.shipments ?? []).find(
-                (shipment) =>
-                    typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
-            )?.trackingUrl,
-        [order?.omsData?.shipments]
-    )
-
-    // All shipments that carry a usable carrier tracking URL, with a label for each
-    // (the tracking number, falling back to a "Shipment N" label). Multi-shipment
-    // orders can have several — the Track Shipment action turns into a dropdown of
-    // these so the shopper can pick which carrier link to open. (We still cannot say
-    // which tracking maps to which set of items — deferred TD-0326366 — so the options
-    // are labeled by tracking number, not by shipment contents.)
+    // Every shipment with a SAFE, externalizable carrier tracking URL, labeled for the
+    // dropdown. Each raw `omsData.shipments[].trackingUrl` is run through
+    // `ensureExternalUrl` (the same hardening the tracking-number card links use): it
+    // prepends https:// to a scheme-less host (e.g. `www.carrier.com/x` →
+    // `https://www.carrier.com/x`) and rejects relative/unsafe values. Without it, a
+    // scheme-less URL would resolve relative to the current route and navigate the
+    // shopper INSIDE the app instead of to the carrier. Entries whose URL doesn't
+    // externalize are dropped so the dropdown never shows a broken link.
     const trackingUrlOptions = useMemo(
         () =>
             (order?.omsData?.shipments ?? [])
-                .filter(
-                    (shipment) =>
-                        typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
-                )
                 .map((shipment, index) => ({
                     key: shipment.id ?? `track-${index}`,
-                    url: shipment.trackingUrl,
-                    trackingNumber: shipment.trackingNumber,
+                    url: ensureExternalUrl(shipment?.trackingUrl),
+                    trackingNumber: shipment?.trackingNumber,
                     index
-                })),
+                }))
+                .filter((option) => !!option.url),
         [order?.omsData?.shipments]
     )
+
+    // The single-button path (one trackable shipment) links to the first externalizable
+    // URL — the same source as the dropdown options, so they can never diverge. When
+    // none externalize, the button is shown disabled so the action stays visible.
+    const firstTrackingUrl = trackingUrlOptions[0]?.url
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
     const ownsOrder = order?.customerInfo?.customerId === customerId
@@ -688,7 +676,11 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {!isLoading && (
-                            <OrderStatusBadge order={order} cancelFeedback={cancelFeedback} />
+                            <OrderStatusBadge
+                                order={order}
+                                cancelFeedback={cancelFeedback}
+                                returnFeedback={returnFeedback}
+                            />
                         )}
                     </Flex>
 

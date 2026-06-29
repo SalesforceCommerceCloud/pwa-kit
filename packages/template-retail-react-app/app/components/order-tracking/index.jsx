@@ -14,6 +14,7 @@ import {
     Text,
     Link as ChakraLink
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {ensureExternalUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
  * Presentational per-shipment tracking card on the Order Details page.
@@ -56,6 +57,9 @@ const OrderTracking = ({
     const expectedDeliveryLabel = formatTrackingDate(expectedDeliveryDate)
     const actualDeliveryLabel = formatTrackingDate(actualDeliveryDate)
 
+    // External href, else plain text: "www.carrier.com" -> "https://www.carrier.com/" (unsafe/relative -> undefined)
+    const trackingHref = ensureExternalUrl(trackingUrl)
+
     return (
         <Box
             border="1px solid"
@@ -95,8 +99,8 @@ const OrderTracking = ({
                             id="account_order_detail.label.tracking_number"
                         />
                         :{' '}
-                        {trackingUrl ? (
-                            <ChakraLink href={trackingUrl} isExternal color="blue.600">
+                        {trackingHref ? (
+                            <ChakraLink href={trackingHref} isExternal color="blue.600">
                                 {trackingNumber}
                             </ChakraLink>
                         ) : (
