@@ -111,8 +111,9 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-server', () => ({
     isMrtDataStoreEnabled: () => false
 }))
 
+const mockGetConfig = jest.fn(() => ({app: {}}))
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
-    getConfig: () => ({app: {}})
+    getConfig: (...args) => mockGetConfig(...args)
 }))
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-shared', () => ({
@@ -128,6 +129,7 @@ import {render} from './react-rendering'
 describe('react-rendering distributed-tracing wiring', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        mockGetConfig.mockReturnValue({app: {}})
         mockIsDistributedTracingEnabled.mockReturnValue(false)
         mockExtractContext.mockReturnValue({})
         // By default, withServerSpan does NOT call fn() — prevents performRender from running.
@@ -186,6 +188,49 @@ describe('react-rendering distributed-tracing wiring', () => {
         expect(typeof res.locals.__withChildSpan).toBe('function')
         res.locals.__withChildSpan('scapi:test', () => 'ran')
         expect(mockWithChildSpan).toHaveBeenCalledWith('scapi:test', expect.any(Function))
+    })
+
+    test('OTEL_TRACING_ENABLED=true → organizationId from config injected on res.locals', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(true)
+        mockGetConfig.mockReturnValue({
+            app: {commerceAPI: {parameters: {organizationId: 'f_ecom_bjnl_prd'}}}
+        })
+
+        const req = {
+            headers: {traceparent: '00-abc-def-01'},
+            method: 'GET',
+            originalUrl: '/',
+            url: '/',
+            query: {},
+            path: '/'
+        }
+        const res = {locals: {requestId: 'test-id'}}
+        const next = jest.fn()
+
+        await render(req, res, next)
+
+        // withServerSpan derives realm / instance type from res.locals.organizationId.
+        expect(res.locals.organizationId).toBe('f_ecom_bjnl_prd')
+    })
+
+    test('OTEL_TRACING_ENABLED=true + no organizationId in config → res.locals.organizationId unset', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(true)
+        mockGetConfig.mockReturnValue({app: {commerceAPI: {parameters: {}}}})
+
+        const req = {
+            headers: {traceparent: '00-abc-def-01'},
+            method: 'GET',
+            originalUrl: '/',
+            url: '/',
+            query: {},
+            path: '/'
+        }
+        const res = {locals: {requestId: 'test-id'}}
+        const next = jest.fn()
+
+        await render(req, res, next)
+
+        expect(res.locals.organizationId).toBeUndefined()
     })
 
     test('OTEL_TRACING_ENABLED unset → no withChildSpan injected on res.locals', async () => {

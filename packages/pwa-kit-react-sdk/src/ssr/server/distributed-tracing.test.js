@@ -347,16 +347,14 @@ describe('distributed-tracing', () => {
             expect(spans[0].attributes['server.address']).toBe('www.example.com')
         })
 
-        test('custom attributes from res.locals: site_name, client_id, realm, instance_type', async () => {
+        test('custom attributes from res.locals: site_name, and realm/instance_type derived from organizationId', async () => {
             const headers = {traceparent: `00-${TRACE_ID}-b7ad6b7169203331-01`}
             const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
             const res = {
                 setHeader: jest.fn(),
                 locals: {
                     site: {id: 'RefArch'},
-                    clientId: 'test-client-id',
-                    realm: 'test-realm',
-                    instanceType: 'sandbox'
+                    organizationId: 'f_ecom_bjnl_prd'
                 },
                 on: jest.fn()
             }
@@ -374,9 +372,33 @@ describe('distributed-tracing', () => {
                 .filter((s) => s && s.name && s.name.includes('ssr.render'))
 
             expect(spans[0].attributes['site_name']).toBe('RefArch')
-            expect(spans[0].attributes['client_id']).toBe('test-client-id')
-            expect(spans[0].attributes['realm']).toBe('test-realm')
-            expect(spans[0].attributes['instance_type']).toBe('sandbox')
+            expect(spans[0].attributes['realm']).toBe('bjnl')
+            expect(spans[0].attributes['instance_type']).toBe('prd')
+        })
+
+        test('realm and instance_type are omitted when organizationId is absent', async () => {
+            const headers = {traceparent: `00-${TRACE_ID}-b7ad6b7169203331-01`}
+            const req = {headers, method: 'GET', originalUrl: '/', url: '/'}
+            const res = {
+                setHeader: jest.fn(),
+                locals: {site: {id: 'RefArch'}},
+                on: jest.fn()
+            }
+            const ctx = extractContext(headers)
+            await withServerSpan(req, res, ctx, async () => {})
+
+            const spans = infoSpy.mock.calls
+                .map(([line]) => {
+                    try {
+                        return JSON.parse(line)
+                    } catch {
+                        return null
+                    }
+                })
+                .filter((s) => s && s.name && s.name.includes('ssr.render'))
+
+            expect(spans[0].attributes).not.toHaveProperty('realm')
+            expect(spans[0].attributes).not.toHaveProperty('instance_type')
         })
 
         test('http.route set via setActiveSpanAttribute reaches the server span', async () => {

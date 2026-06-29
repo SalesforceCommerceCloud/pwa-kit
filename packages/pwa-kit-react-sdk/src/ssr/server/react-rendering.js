@@ -339,6 +339,14 @@ export const render = (req, res, next) => {
         // `getProps`, without that universal module importing this server-only
         // OTel code.
         res.locals.__withChildSpan = withChildSpan
+        // Expose the configured Commerce API organizationId on res.locals so the
+        // server span can derive realm / instance type from it. Read from config
+        // here (where getConfig() already lives) so the tracing module stays
+        // req/res-driven, matching the site_name custom-attribute pattern.
+        const organizationId = getConfig()?.app?.commerceAPI?.parameters?.organizationId
+        if (organizationId) {
+            res.locals.organizationId = organizationId
+        }
         return withServerSpan(req, res, ctx, runRender)
     }
     return runRender()

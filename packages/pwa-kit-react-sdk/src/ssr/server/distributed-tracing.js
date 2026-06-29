@@ -29,6 +29,7 @@ import {W3CTraceContextPropagator} from '@opentelemetry/core'
 import {AsyncHooksContextManager} from '@opentelemetry/context-async-hooks'
 import {MrtConsoleSpanExporter} from './mrt-console-span-exporter'
 import {getOTELConfig} from '../../utils/opentelemetry-config'
+import {parseOrganizationId} from '../../utils/organization-id'
 import logger from '../../utils/logger-instance'
 
 const SERVICE_NAME = 'pwa-kit-react-sdk'
@@ -111,14 +112,15 @@ export const withServerSpan = async (req, res, parentCtx, fn) => {
     if (res.locals?.site?.id) {
         attributes['site_name'] = res.locals.site.id
     }
-    if (res.locals?.clientId) {
-        attributes['client_id'] = res.locals.clientId
+    // realm and instance type are derived from the configured organizationId
+    // (shape f_ecom_<realm>_<instanceType>), which react-rendering exposes on
+    // res.locals. Downstream (MRT) composes service.instance.id from these.
+    const {realm, instanceType} = parseOrganizationId(res.locals?.organizationId)
+    if (realm) {
+        attributes['realm'] = realm
     }
-    if (res.locals?.realm) {
-        attributes['realm'] = res.locals.realm
-    }
-    if (res.locals?.instanceType) {
-        attributes['instance_type'] = res.locals.instanceType
+    if (instanceType) {
+        attributes['instance_type'] = instanceType
     }
 
     // Name on method only; the concrete path stays in url.path and the route
