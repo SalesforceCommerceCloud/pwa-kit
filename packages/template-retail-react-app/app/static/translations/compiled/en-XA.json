@@ -613,6 +613,24 @@
       "value": "]"
     }
   ],
+  "account_order_detail.button.track_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.button.track_shipment": [
     {
       "type": 0,
@@ -621,6 +639,24 @@
     {
       "type": 0,
       "value": "Ŧřȧȧƈķ Şħīƥḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.button.track_shipment_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ şħīƥḿḗḗƞŧ "
+    },
+    {
+      "type": 1,
+      "value": "number"
     },
     {
       "type": 0,

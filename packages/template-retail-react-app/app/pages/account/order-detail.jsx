@@ -21,6 +21,10 @@ import {
     Skeleton,
     VisuallyHidden,
     Link as ChakraLink,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverBody,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
@@ -35,7 +39,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
@@ -237,6 +241,28 @@ const AccountOrderDetail = () => {
                 (shipment) =>
                     typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
             )?.trackingUrl,
+        [order?.omsData?.shipments]
+    )
+
+    // All shipments that carry a usable carrier tracking URL, with a label for each
+    // (the tracking number, falling back to a "Shipment N" label). Multi-shipment
+    // orders can have several — the Track Shipment action turns into a dropdown of
+    // these so the shopper can pick which carrier link to open. (We still cannot say
+    // which tracking maps to which set of items — deferred TD-0326366 — so the options
+    // are labeled by tracking number, not by shipment contents.)
+    const trackingUrlOptions = useMemo(
+        () =>
+            (order?.omsData?.shipments ?? [])
+                .filter(
+                    (shipment) =>
+                        typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
+                )
+                .map((shipment, index) => ({
+                    key: shipment.id ?? `track-${index}`,
+                    url: shipment.trackingUrl,
+                    trackingNumber: shipment.trackingNumber,
+                    index
+                })),
         [order?.omsData?.shipments]
     )
 
@@ -725,11 +751,69 @@ const AccountOrderDetail = () => {
                         up. This keeps the row from overflowing horizontally once a third (and
                         a per-shipment fourth, fifth, …) button is present on narrow screens. */}
                     <Flex gap={2} direction={{base: 'column', sm: 'row'}} wrap="wrap">
-                        {/* Single order-level Track Shipment action → the first shipment with a
-                            carrier tracking URL, opening the carrier site in a new tab. Mirrors
-                            storefront-next's getTrackShipmentHref. When no shipment has a URL, the
-                            button is shown disabled so the action stays visible. */}
-                        {firstTrackingUrl ? (
+                        {/* Track Shipment action. ZERO tracking URLs → disabled button (action
+                            stays visible). ONE URL → a simple external link button (the common
+                            single-shipment case). MULTIPLE URLs (multi-shipment) → a dropdown so
+                            the shopper can pick which carrier link to open, since we can't say
+                            which tracking maps to which shipment (deferred TD-0326366). Built on
+                            Popover (shared/ui exposes no Chakra Menu); each option is an external
+                            ChakraLink so the raw carrier URL opens the carrier site in a new tab. */}
+                        {trackingUrlOptions.length > 1 ? (
+                            <Popover placement="bottom-start" gutter={2}>
+                                <PopoverTrigger>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        width={{base: 'full', sm: 'auto'}}
+                                        rightIcon={<ChevronDownIcon />}
+                                        data-testid="account-order-detail-track-shipment"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Track Shipment"
+                                            id="account_order_detail.button.track_shipment"
+                                        />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent width="auto" minW="3xs">
+                                    <PopoverBody p={1}>
+                                        <Stack spacing={0} data-testid="track-shipment-options">
+                                            {trackingUrlOptions.map((option) => (
+                                                <ChakraLink
+                                                    key={option.key}
+                                                    href={option.url}
+                                                    isExternal
+                                                    px={3}
+                                                    py={2}
+                                                    fontSize="sm"
+                                                    borderRadius="base"
+                                                    _hover={{
+                                                        bg: 'gray.100',
+                                                        textDecoration: 'none'
+                                                    }}
+                                                >
+                                                    {option.trackingNumber ? (
+                                                        <FormattedMessage
+                                                            defaultMessage="Track {trackingNumber}"
+                                                            id="account_order_detail.button.track_number"
+                                                            values={{
+                                                                trackingNumber:
+                                                                    option.trackingNumber
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <FormattedMessage
+                                                            defaultMessage="Track shipment {number}"
+                                                            id="account_order_detail.button.track_shipment_number"
+                                                            values={{number: option.index + 1}}
+                                                        />
+                                                    )}
+                                                </ChakraLink>
+                                            ))}
+                                        </Stack>
+                                    </PopoverBody>
+                                </PopoverContent>
+                            </Popover>
+                        ) : firstTrackingUrl ? (
                             <Button
                                 // ChakraLink (not the SPA Link) + href + isExternal so the raw
                                 // carrier URL opens the carrier site in a new tab. The SPA Link

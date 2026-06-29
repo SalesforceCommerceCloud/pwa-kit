@@ -269,10 +269,30 @@
       "value": "Return Items"
     }
   ],
+  "account_order_detail.button.track_number": [
+    {
+      "type": 0,
+      "value": "Track "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    }
+  ],
   "account_order_detail.button.track_shipment": [
     {
       "type": 0,
       "value": "Track Shipment"
+    }
+  ],
+  "account_order_detail.button.track_shipment_number": [
+    {
+      "type": 0,
+      "value": "Track shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
     }
   ],
   "account_order_detail.error.back_to_history": [

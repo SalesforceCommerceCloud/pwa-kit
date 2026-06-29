@@ -2584,19 +2584,41 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
 })
 
 describe('Track Shipment button (W-23091033)', () => {
-    // The Track Shipment action is a SINGLE order-level button (mirrors
-    // storefront-next getTrackShipmentHref): it links to the FIRST shipment that
-    // has a carrier tracking URL, opening the carrier site in a new tab. When no
-    // shipment has a URL, a single disabled button is shown so the action stays
-    // visible. The per-shipment tracking links live inside the tracking cards.
+    // Track Shipment action behavior by number of shipments that have a carrier URL:
+    //   0 URLs       → a single disabled (href-less) button (action stays visible).
+    //   1 URL        → a single external-link button to that URL (the common case).
+    //   2+ URLs      → a DROPDOWN (Popover) of per-tracking-number external links, since
+    //                  we can't say which tracking maps to which shipment (TD-0326366).
+    // The per-shipment tracking links also live in the flat Tracking section below.
     const omsOrderWithShipments = (shipments) =>
         createMockOmsOrder({
             customerInfo: {customerId: 'testCustomerId'},
             omsData: {status: 'Approved', shipments}
         })
 
-    test('renders a single enabled new-tab button to the first shipment with a tracking URL', async () => {
-        // First shipment has no URL, second + third do → one button, to the FIRST URL found.
+    test('single tracking URL → one enabled new-tab link button to that URL', async () => {
+        // First shipment has no URL, only the second does → one link button to that URL.
+        setupOrderDetailsPage(
+            omsOrderWithShipments([
+                {id: 'a', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, // skipped (no URL)
+                {
+                    id: 'b',
+                    status: 'SHIPPED',
+                    trackingNumber: 'BBB',
+                    trackingUrl: 'https://carrier.example.com/BBB'
+                }
+            ])
+        )
+        const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
+        expect(buttons).toHaveLength(1)
+        expect(buttons[0]).toHaveTextContent(/^Track Shipment$/)
+        expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
+        expect(buttons[0]).toHaveAttribute('target', '_blank')
+        expect(buttons[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
+        expect(buttons[0]).toBeEnabled()
+    })
+
+    test('multiple tracking URLs → a dropdown of per-tracking-number external links', async () => {
         setupOrderDetailsPage(
             omsOrderWithShipments([
                 {id: 'a', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, // skipped (no URL)
@@ -2614,15 +2636,23 @@ describe('Track Shipment button (W-23091033)', () => {
                 }
             ])
         )
-        const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
-        // ONE order-level button, not one-per-shipment.
-        expect(buttons).toHaveLength(1)
-        expect(buttons[0]).toHaveTextContent(/^Track Shipment$/)
-        // Links to the FIRST shipment that has a URL (the no-URL first shipment is skipped).
-        expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
-        expect(buttons[0]).toHaveAttribute('target', '_blank')
-        expect(buttons[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
-        expect(buttons[0]).toBeEnabled()
+        const user = userEvent.setup()
+        // The trigger is a button (NOT a link — no href on the trigger itself).
+        const trigger = await screen.findByTestId('account-order-detail-track-shipment')
+        expect(trigger).toHaveTextContent(/^Track Shipment$/)
+        expect(trigger).not.toHaveAttribute('href')
+        expect(trigger).toBeEnabled()
+        // Opening the dropdown reveals one external link per tracking URL.
+        await user.click(trigger)
+        const options = await screen.findByTestId('track-shipment-options')
+        const links = within(options).getAllByRole('link')
+        expect(links).toHaveLength(2) // only the two shipments WITH a URL
+        expect(links[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
+        expect(links[0]).toHaveTextContent(/BBB/)
+        expect(links[0]).toHaveAttribute('target', '_blank')
+        expect(links[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
+        expect(links[1]).toHaveAttribute('href', 'https://carrier.example.com/CCC')
+        expect(links[1]).toHaveTextContent(/CCC/)
     })
 
     // No shipment has a usable URL — whether shipments exist without URLs, or omsData
