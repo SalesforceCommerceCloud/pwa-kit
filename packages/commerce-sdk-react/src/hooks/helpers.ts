@@ -8,7 +8,7 @@ import Auth from '../auth'
 import {CommerceApiProviderProps} from '../provider'
 import {Logger} from '../types'
 import {CustomEndpointArg, OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
-import {onClient} from '../utils'
+import {onClient, parseResponseBodyClone} from '../utils'
 
 /**
  * Handles a bad response from SCAPI caused by an invalid/expired access token, returning a
@@ -32,7 +32,10 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
     // valid, causing isAccessTokenExpired() to incorrectly report the token as not expired.
     // Clear the stale expiry cookie and trigger a token refresh.
     if (error?.response?.status === 400) {
-        const response = await error?.response?.json()
+        // Read a clone so the original body stream stays intact for the caller. When this is
+        // not a recognized token error, the original `error` is re-thrown below and the caller
+        // (e.g. a mutation's .catch) must still be able to read the response body for details.
+        const response = await parseResponseBodyClone(error?.response)
         if (response?.message === 'access_token_cookie_missing') {
             logger.warn('Access token cookie missing. Clearing expiry and refreshing token.')
             auth.clearAccessTokenExpiry()
@@ -44,7 +47,7 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
         throw error
     }
 
-    const response = await error?.response?.json()
+    const response = await parseResponseBodyClone(error?.response)
     if (response?.detail === 'Customer credentials changed after token was issued.') {
         logger.info('Login was invalidated. Clearing login state.')
         return await auth.logout()

@@ -97,6 +97,46 @@ export const transformAddressDetails = (billingDetails, shippingDetails) => {
 }
 
 /**
+ * Transform a PayPal paymentReference (from getBasket?expand=payment_references) into a
+ * basket address body. PayPal/Venmo only supplies a shipping address on the PayPal/Venmo order, so the
+ * same address is used for both shipping and billing.
+ * @param {Object} paypalOrder - paymentReference.gatewayProperties.paypal
+ * @returns {Object|null} Address body suitable for updateShippingAddressForShipment /
+ *   updateBillingAddressForBasket, or null when no shipping payload is present.
+ *   Field-level validation is left to SCAPI so it can surface a precise error.
+ */
+export const transformPayPalAddressFromPaymentReference = (paypalOrder) => {
+    const shipping = paypalOrder?.shipping
+    if (!shipping) {
+        return null
+    }
+    const payer = paypalOrder?.payer || {}
+    return {
+        firstName: payer.givenName || null,
+        lastName: payer.surname || null,
+        address1: shipping.addressLine1 || null,
+        address2: shipping.addressLine2 || null,
+        city: shipping.adminArea2 || null,
+        stateCode: shipping.adminArea1 || null,
+        postalCode: shipping.postalCode || null,
+        countryCode: shipping.countryCode || null,
+        phone: null
+    }
+}
+
+/**
+ * Returns the first paymentReference whose gateway matches the given gateway from a basket or order
+ * fetched with `expand=payment_references`.
+ * @param {Object} basketOrOrder - Basket or order containing paymentInstruments
+ * @param {string} gateway - Gateway to match (e.g., 'paypal', 'stripe') default is 'paypal'
+ * @returns {Object|undefined} Matching paymentReference, or undefined if none exist
+ */
+export const getPaymentReference = (basketOrOrder, gateway = 'paypal') => {
+    return basketOrOrder?.paymentInstruments?.find((pi) => pi.paymentReference?.gateway === gateway)
+        ?.paymentReference
+}
+
+/**
  * Transform shipping methods from API format to express payment format.
  * @param {Array} shippingMethods - Array of shipping methods from API
  * @param {Object} basket - Basket object containing currency
@@ -301,6 +341,63 @@ export const createPaymentInstrumentBody = ({
         paymentMethodId: 'Salesforce Payments',
         amount: amount,
         paymentReferenceRequest: paymentReferenceRequest
+    }
+}
+
+/**
+ * Builds the PATCH body for updating a basket payment instrument so the upstream PayPal
+ * Order reflects the new basket amount, currency, and (optionally) the latest applicable
+ * shipping options.
+ *
+ * Pass `shippingMethods` on shipping-address change to push a refreshed option list.
+ * Omit it on shipping-method change so `shippingOptions` is left off the body — signaling
+ * to PayPal that the client is not trying to mutate the option list, only the amount.
+ * @param {Object} params
+ * @param {Object} params.basket - Updated basket (carries currency and orderTotal)
+ * @param {Object} [params.shippingMethods] - Shipping methods response with applicableShippingMethods.
+ *   When omitted, `shippingOptions` is omitted from the body.
+ * @param {string} [params.selectedShippingMethodId] - Currently selected shipping method id
+ * @param {string} params.paymentMethodType - 'paypal' or 'venmo'
+ * @param {string} [params.zoneId] - Zone ID for payment processing
+ * @returns {Object} PATCH /baskets/{basketId}/payment-instruments/{paymentInstrumentId} body
+ */
+export const createPayPalShippingPatchBody = ({
+    basket,
+    shippingMethods,
+    selectedShippingMethodId,
+    paymentMethodType,
+    zoneId
+} = {}) => {
+    const currencyCode = basket?.currency
+    const amount = basket?.orderTotal
+
+    const paypal = {
+        amount: amount?.toString(),
+        currencyCode
+    }
+
+    if (shippingMethods) {
+        paypal.shippingOptions = (shippingMethods.applicableShippingMethods || []).map(
+            (method) => ({
+                id: method.id,
+                label: method.name,
+                amount: method.price?.toString(),
+                currencyCode,
+                selected: method.id === selectedShippingMethodId
+            })
+        )
+    }
+
+    return {
+        amount,
+        paymentMethodId: 'Salesforce Payments',
+        paymentReferenceRequest: {
+            paymentMethodType,
+            zoneId: zoneId ?? 'default',
+            gatewayProperties: {
+                paypal
+            }
+        }
     }
 }
 

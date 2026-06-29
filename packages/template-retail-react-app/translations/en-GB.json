@@ -116,8 +116,11 @@
   "account_order_detail.alert.cancellation_success_title": {
     "defaultMessage": "Order cancelled"
   },
-  "account_order_detail.badge.cancelled": {
-    "defaultMessage": "Cancelled"
+  "account_order_detail.alert.return_success_description": {
+    "defaultMessage": "We'll email a return label shortly."
+  },
+  "account_order_detail.alert.return_success_title": {
+    "defaultMessage": "Return submitted"
   },
   "account_order_detail.button.cancel_order": {
     "defaultMessage": "Cancel order"
@@ -163,6 +166,18 @@
   },
   "account_order_detail.heading.shipping_method_number": {
     "defaultMessage": "Shipping Method {number}"
+  },
+  "account_order_detail.hint.cancel_unavailable": {
+    "defaultMessage": "This order can no longer be cancelled."
+  },
+  "account_order_detail.hint.no_returnable_items": {
+    "defaultMessage": "No items on this order are available to return."
+  },
+  "account_order_detail.hint.not_cancellable": {
+    "defaultMessage": "This order is not eligible for cancellation."
+  },
+  "account_order_detail.hint.return_unavailable": {
+    "defaultMessage": "This order can no longer be returned."
   },
   "account_order_detail.label.delivered_on": {
     "defaultMessage": "Delivered"
@@ -1368,6 +1383,21 @@
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
+  "order_status_badge.label.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
+  "order_status_badge.label.partial_return_complete": {
+    "defaultMessage": "Partial Return Complete"
+  },
+  "order_status_badge.label.partial_return_initiated": {
+    "defaultMessage": "Partial Return Initiated"
+  },
+  "order_status_badge.label.return_complete": {
+    "defaultMessage": "Return Complete"
+  },
+  "order_status_badge.label.return_initiated": {
+    "defaultMessage": "Return Initiated"
+  },
   "order_summary.action.remove_promo": {
     "defaultMessage": "Remove"
   },
@@ -1805,6 +1835,9 @@
   "reset_password_form.title.reset_password": {
     "defaultMessage": "Reset Password"
   },
+  "return_items_modal.button.back": {
+    "defaultMessage": "Back"
+  },
   "return_items_modal.button.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -1814,8 +1847,14 @@
   "return_items_modal.button.review_return": {
     "defaultMessage": "Review return"
   },
+  "return_items_modal.button.submit_return": {
+    "defaultMessage": "Submit return"
+  },
   "return_items_modal.heading.return_items": {
     "defaultMessage": "Return items from order #{orderNo}"
+  },
+  "return_items_modal.heading.review_return": {
+    "defaultMessage": "Review your return"
   },
   "return_items_modal.hint.review_disabled": {
     "defaultMessage": "Select at least one item and choose a reason to continue."
@@ -1841,11 +1880,44 @@
   "return_items_modal.text.loading_reasons": {
     "defaultMessage": "Loading return reasons…"
   },
+  "return_items_modal.text.quantity_exceeded_affected_generic": {
+    "defaultMessage": "Some items' available return quantities changed. Please review the updated limits below."
+  },
   "return_items_modal.text.reasons_error": {
     "defaultMessage": "We could not load the return reasons. Please try again."
   },
+  "return_items_modal.text.review_description": {
+    "defaultMessage": "Confirm the items below. We'll email a return label once your request is submitted."
+  },
+  "return_items_modal.text.review_quantity": {
+    "defaultMessage": "Quantity: {count}"
+  },
+  "return_items_modal.text.review_reason": {
+    "defaultMessage": "Reason: {reason}"
+  },
   "return_items_modal.text.select_items_description": {
     "defaultMessage": "Select the items you want to return and tell us why."
+  },
+  "return_items_modal.text.submit_error": {
+    "defaultMessage": "Something went wrong submitting your return. Please try again."
+  },
+  "return_items_modal.text.submit_error_invalid_reason": {
+    "defaultMessage": "The selected reason is no longer available. Please choose another."
+  },
+  "return_items_modal.text.submit_error_network": {
+    "defaultMessage": "We're unable to process your request right now. Please try again in a few minutes."
+  },
+  "return_items_modal.text.submit_error_unknown_items": {
+    "defaultMessage": "One or more items couldn't be found on this order. Please refresh and try again."
+  },
+  "return_items_modal.text.terminal_error_conflict": {
+    "defaultMessage": "This order can't be returned at this time. Please reach out to the merchant."
+  },
+  "return_items_modal.text.terminal_error_not_found": {
+    "defaultMessage": "We could not find this order."
+  },
+  "return_items_modal.text.terminal_error_title": {
+    "defaultMessage": "Unable to submit return"
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"

@@ -13,13 +13,13 @@ import {
     Heading,
     Text,
     Stack,
-    Badge,
     Flex,
     Button,
     Divider,
     Grid,
     SimpleGrid,
     Skeleton,
+    VisuallyHidden,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
@@ -34,7 +34,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon, CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
@@ -46,6 +46,11 @@ import OrderTracking from '@salesforce/retail-react-app/app/components/order-tra
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
+import {
+    classifyReturnError,
+    ReturnErrorKind
+} from '@salesforce/retail-react-app/app/utils/return-error-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -53,6 +58,14 @@ import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
+
+// Static id linking the Return Items button to its VisuallyHidden disabled-reason
+// hint (only one such button exists per page, so a constant is safe).
+const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
+
+// Static id linking the Cancel order button to its VisuallyHidden disabled-reason
+// hint (only one such button exists per page, so a constant is safe).
+const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
 
 const OrderProducts = ({productItems, currency}) => {
     const orderProductIds = productItems.map((product) => product.productId)
@@ -147,6 +160,21 @@ const AccountOrderDetail = () => {
     // Terminal errors (404/409) mean retrying won't help — disable the button
     const [cancelTerminal, setCancelTerminal] = useState(false)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
+    const returnMutation = useShopperOrdersMutation(ShopperOrdersMutations.ReturnOmsOrder)
+    // Return feedback is kept separate from cancelFeedback so the "Cancelled"
+    // badge (which keys off cancelFeedback) never fires on a return success.
+    const [returnFeedback, setReturnFeedback] = useState(null)
+    const [returnSubmitError, setReturnSubmitError] = useState(null)
+    // Monotonic token: a submit's async result is only applied if it's still the
+    // latest submit AND the modal hasn't been closed/reopened since it started.
+    // Guards against a stale success closing a freshly-reopened modal or a stale
+    // failure setting an error after close.
+    const returnSubmitTokenRef = useRef(0)
+    // setTimeout ids for the SR-announce-delayed feedback alerts, cleared on
+    // unmount and before scheduling a new one so a late timer can't fire after
+    // the component is gone or after feedback was intentionally cleared.
+    const returnFeedbackTimerRef = useRef(null)
+    const cancelFeedbackTimerRef = useRef(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
     // viewport resize doesn't lose the shopper's progress, and so W-22821838's
     // review step can read the same payload without prop-drilling.
@@ -158,7 +186,8 @@ const AccountOrderDetail = () => {
     const {
         data: order,
         isLoading: isOrderLoading,
-        isError
+        isError,
+        refetch: refetchOrder
     } = useOrder(
         {
             parameters: {
@@ -194,21 +223,146 @@ const AccountOrderDetail = () => {
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
     const ownsOrder = order?.customerInfo?.customerId === customerId
-    const showStartReturn = isRegistered && ownsOrder && returnableItems.length > 0
+    // Render gate is identity-only (registered + owns the order); whether there
+    // are actually returnable items drives the button's *disabled* state, not
+    // whether it renders — mirroring the always-rendered Cancel order button.
+    // (Guest enablement is a future WI; the gate stays registered-only here.)
+    const showStartReturn = isRegistered && ownsOrder
+    const hasReturnableItems = returnableItems.length > 0
+    // The button renders whenever the shopper owns the order, but is disabled when
+    // there's nothing to return, a cancellation just succeeded / is in flight, or a
+    // terminal cancel error has made the order un-actionable. A terminal *return*
+    // error (404/409) is surfaced inside the modal (no-retry banner + recovery
+    // link), so it no longer disables the page-level trigger.
+    const returnDisabled =
+        !hasReturnableItems ||
+        cancelFeedback?.status === 'success' ||
+        cancelMutation.isLoading ||
+        cancelTerminal
+    // SR hint explaining *why* the focusable-but-disabled button is unavailable.
+    // The two persistent reasons get explicit copy: nothing to return, or the
+    // order has reached a terminal cancel state. The transient reasons (cancel
+    // success / in-flight) are self-evident from the adjacent feedback banner and
+    // the Cancelled badge, so they intentionally carry no hint.
+    const returnDisabledHint = !hasReturnableItems
+        ? formatMessage({
+              defaultMessage: 'No items on this order are available to return.',
+              id: 'account_order_detail.hint.no_returnable_items'
+          })
+        : cancelTerminal
+        ? formatMessage({
+              defaultMessage: 'This order can no longer be returned.',
+              id: 'account_order_detail.hint.return_unavailable'
+          })
+        : null
 
     const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
 
     const handleCloseReturnModal = useCallback(() => {
+        // Invalidate any in-flight submit so its async result is ignored.
+        returnSubmitTokenRef.current += 1
         closeReturnModal()
         setReturnSelection({})
+        setReturnSubmitError(null)
     }, [closeReturnModal])
 
-    const handleReviewReturn = useCallback(
-        (/* payload */) => {
-            // W-22821838 picks up here: swap the modal to its review view and use
-            // `returnSelection` (held above) to render the confirmation rows.
+    // After a recoverable error (quantityExceeded / unknownItems) the parent
+    // refetches the order, so `returnableItems` may shrink (an item is now fully
+    // returned/ineligible) or its max may drop. Reconcile the open selection to
+    // that fresh state: drop checked rows whose item disappeared, and clamp any
+    // quantity above the new max. Otherwise a now-hidden/over-max row would keep
+    // `isSelectionValid` false with no on-screen control for the shopper to fix.
+    useEffect(() => {
+        // Gate on `order` being loaded: returnableItems is [] while the order
+        // fetch is in flight, and pruning then would wipe a valid selection
+        // before the real items arrive.
+        if (!isReturnModalOpen || !order) return
+        setReturnSelection((prev) => {
+            if (!prev || !Object.keys(prev).length) return prev
+            let next = prev
+            let changed = false
+            Object.entries(prev).forEach(([itemId, row]) => {
+                if (!row?.checked) return
+                const item = returnableItems.find((i) => i.itemId === itemId)
+                const max = item?.omsData?.quantityAvailableToReturn ?? 0
+                if (!item || max <= 0) {
+                    // Item no longer returnable — drop the row entirely.
+                    if (!changed) {
+                        next = {...prev}
+                        changed = true
+                    }
+                    delete next[itemId]
+                } else if (Number(row.quantity) > max) {
+                    // Max shrank — clamp so the row stays valid.
+                    if (!changed) {
+                        next = {...prev}
+                        changed = true
+                    }
+                    next[itemId] = {...row, quantity: max}
+                }
+            })
+            return changed ? next : prev
+        })
+    }, [returnableItems, isReturnModalOpen, order])
+
+    const showReturnSuccess = useCallback(() => {
+        setReturnFeedback({
+            status: 'success',
+            title: formatMessage({
+                defaultMessage: 'Return submitted',
+                id: 'account_order_detail.alert.return_success_title'
+            }),
+            description: formatMessage({
+                defaultMessage: "We'll email a return label shortly.",
+                id: 'account_order_detail.alert.return_success_description'
+            })
+        })
+    }, [formatMessage])
+
+    const handleSubmitReturn = useCallback(
+        async (productItems) => {
+            // Guard against `order` going null between modal open and submit
+            // (e.g. a background refetch error) — the body dereferences
+            // order.orderNo unconditionally below.
+            if (!order) return
+            setReturnSubmitError(null)
+            // Snapshot the token for this submit. If the modal is closed/reopened
+            // (token bumps) before the request settles, this result is stale.
+            const token = returnSubmitTokenRef.current
+            try {
+                await returnMutation.mutateAsync({
+                    parameters: {orderNo: order.orderNo},
+                    body: {productItems}
+                })
+                if (token !== returnSubmitTokenRef.current) return
+                handleCloseReturnModal()
+                // Delay lets screen readers finish announcing modal close before the alert
+                if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
+                returnFeedbackTimerRef.current = setTimeout(showReturnSuccess, 300)
+            } catch (e) {
+                // Classifying reads the response body (async, once) for the 400
+                // errorCode discriminator, so re-check the token AFTER the await:
+                // the modal may have been closed/reopened while we were reading.
+                const classified = await classifyReturnError(e)
+                if (token !== returnSubmitTokenRef.current) return
+                // Recoverable-but-stale errors (quantityExceeded / unknownItems) need
+                // fresh server state, so refetch the order — returnableItems/maxes
+                // update and the open modal's reconciliation effect clamps the
+                // selection. All other kinds keep the current order on screen: terminal
+                // 404/409 must NOT refetch (the same error would flip useOrder's isError
+                // and collapse the page to <OrderLoadError />, modal included), and
+                // invalidReason / network / unknown just need an inline retry. In every
+                // case we keep the modal open and hand it the classified error to render.
+                if (
+                    classified.kind === ReturnErrorKind.QUANTITY_EXCEEDED ||
+                    classified.kind === ReturnErrorKind.UNKNOWN_ITEMS
+                ) {
+                    refetchOrder?.()
+                }
+                setReturnSubmitError(classified)
+            }
         },
-        []
+        [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess, refetchOrder]
     )
 
     const canCancel = useMemo(() => {
@@ -224,6 +378,26 @@ const AccountOrderDetail = () => {
             ) ?? false
         )
     }, [isRegistered, order, customerId])
+
+    // The Cancel order button renders unconditionally but is disabled when the
+    // order can't be cancelled, a cancellation just succeeded, or a terminal
+    // cancel error has made the order un-actionable. Mirrors returnDisabled.
+    const cancelDisabled = !canCancel || cancelFeedback?.status === 'success' || cancelTerminal
+    // SR hint explaining *why* the focusable-but-disabled button is unavailable.
+    // Only the persistent reasons get copy: the order isn't cancellable, or it has
+    // reached a terminal cancel state. The transient success case is self-evident
+    // from the adjacent Cancelled badge, so it intentionally carries no hint.
+    const cancelDisabledHint = cancelTerminal
+        ? formatMessage({
+              defaultMessage: 'This order can no longer be cancelled.',
+              id: 'account_order_detail.hint.cancel_unavailable'
+          })
+        : !canCancel
+        ? formatMessage({
+              defaultMessage: 'This order is not eligible for cancellation.',
+              id: 'account_order_detail.hint.not_cancellable'
+          })
+        : null
 
     const showCancelSuccess = useCallback(() => {
         setCancelFeedback({
@@ -287,14 +461,25 @@ const AccountOrderDetail = () => {
                 })
                 closeCancelModal()
                 // Delay allows screen readers to finish announcing modal close before the alert
-                setTimeout(showCancelSuccess, 300)
+                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+                cancelFeedbackTimerRef.current = setTimeout(showCancelSuccess, 300)
             } catch (e) {
                 closeCancelModal()
-                setTimeout(() => showCancelError(e), 300)
+                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+                cancelFeedbackTimerRef.current = setTimeout(() => showCancelError(e), 300)
             }
         },
         [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
     )
+
+    // Clear any pending feedback timers on unmount so they can't fire after the
+    // component is gone (e.g. shopper navigates away during the 300ms delay).
+    useEffect(() => {
+        return () => {
+            if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
+            if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
+        }
+    }, [])
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
@@ -369,23 +554,47 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 <Box role="alert" aria-live="assertive" aria-atomic="true">
-                    {cancelFeedback && (
-                        <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="base">
-                            <Text
-                                fontWeight="semibold"
-                                fontSize="sm"
-                                color={cancelFeedback.status === 'error' ? 'red.700' : undefined}
-                            >
-                                {cancelFeedback.title}
-                            </Text>
-                            <Text
-                                fontSize="sm"
-                                color={cancelFeedback.status === 'error' ? 'red.700' : 'gray.600'}
-                            >
-                                {cancelFeedback.description}
-                            </Text>
-                        </Box>
-                    )}
+                    {/* Cancel and return each clear the other's feedback before they run,
+                        so at most one is set; render whichever is present. */}
+                    {(returnFeedback || cancelFeedback) &&
+                        (() => {
+                            const feedback = returnFeedback || cancelFeedback
+                            return (
+                                <Box
+                                    p={4}
+                                    border="1px solid"
+                                    borderColor="gray.200"
+                                    borderRadius="base"
+                                >
+                                    <Text
+                                        fontWeight="semibold"
+                                        fontSize="sm"
+                                        color={feedback.status === 'error' ? 'red.700' : undefined}
+                                    >
+                                        {feedback.title}
+                                    </Text>
+                                    <Text
+                                        fontSize="sm"
+                                        color={feedback.status === 'error' ? 'red.700' : 'gray.600'}
+                                    >
+                                        {feedback.description}
+                                    </Text>
+                                    {feedback.link && (
+                                        <Box mt={2}>
+                                            <Button
+                                                as={Link}
+                                                to={feedback.link.to}
+                                                variant="link"
+                                                size="sm"
+                                                data-testid="return-feedback-link"
+                                            >
+                                                {feedback.link.label}
+                                            </Button>
+                                        </Box>
+                                    )}
+                                </Box>
+                            )
+                        })()}
                 </Box>
 
                 <Stack spacing={[1, 2]}>
@@ -397,21 +606,11 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {!isLoading && (
-                            <Badge
-                                colorScheme={cancelFeedback?.status === 'success' ? 'red' : 'green'}
-                            >
-                                {cancelFeedback?.status === 'success' ? (
-                                    <Flex display="inline-flex" alignItems="center" gap={1}>
-                                        <CloseIcon boxSize={2} aria-hidden />
-                                        {formatMessage({
-                                            defaultMessage: 'Cancelled',
-                                            id: 'account_order_detail.badge.cancelled'
-                                        })}
-                                    </Flex>
-                                ) : (
-                                    order.status || order.omsData?.status
-                                )}
-                            </Badge>
+                            <OrderStatusBadge
+                                order={order}
+                                cancelFeedback={cancelFeedback}
+                                returnFeedback={returnFeedback}
+                            />
                         )}
                     </Flex>
 
@@ -475,11 +674,20 @@ const AccountOrderDetail = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => {
+                                // No-op while disabled — see aria-disabled note below.
+                                if (cancelDisabled) return
                                 setCancelFeedback(null)
+                                setReturnFeedback(null)
                                 openCancelModal()
                             }}
-                            isDisabled={
-                                !canCancel || cancelFeedback?.status === 'success' || cancelTerminal
+                            // Use aria-disabled (not isDisabled) so the button stays
+                            // focusable while disabled — a native disabled button can't be
+                            // focused, so a keyboard/SR user would never hear the hint
+                            // explaining why it's unavailable. Mirrors the Return Items
+                            // button. The hint is wired only for the persistent reasons.
+                            aria-disabled={cancelDisabled}
+                            aria-describedby={
+                                cancelDisabledHint ? CANCEL_DISABLED_HINT_ID : undefined
                             }
                         >
                             <FormattedMessage
@@ -487,18 +695,51 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.button.cancel_order"
                             />
                         </Button>
+                        {cancelDisabledHint && (
+                            <VisuallyHidden id={CANCEL_DISABLED_HINT_ID}>
+                                {cancelDisabledHint}
+                            </VisuallyHidden>
+                        )}
                         {showStartReturn && (
-                            <Button
-                                data-testid="account-order-detail-start-return"
-                                variant="outline"
-                                size="sm"
-                                onClick={openReturnModal}
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Return Items"
-                                    id="account_order_detail.button.start_return"
-                                />
-                            </Button>
+                            <>
+                                <Button
+                                    data-testid="account-order-detail-start-return"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        // No-op while disabled — see aria-disabled note below.
+                                        if (returnDisabled) return
+                                        // Don't wipe a *successful* cancellation — that's the
+                                        // source of the "Cancelled" badge. Only clear a stale
+                                        // cancel error/in-progress feedback.
+                                        if (cancelFeedback?.status !== 'success') {
+                                            setCancelFeedback(null)
+                                        }
+                                        setReturnFeedback(null)
+                                        openReturnModal()
+                                    }}
+                                    // Use aria-disabled (not isDisabled) so the button stays
+                                    // focusable while disabled — a native disabled button
+                                    // can't be focused, so a keyboard/SR user would never
+                                    // hear the hint explaining why it's unavailable. Mirrors
+                                    // the modal's "Review return" button. The hint is wired
+                                    // only for the persistent reasons (see returnDisabledHint).
+                                    aria-disabled={returnDisabled}
+                                    aria-describedby={
+                                        returnDisabledHint ? RETURN_DISABLED_HINT_ID : undefined
+                                    }
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Return Items"
+                                        id="account_order_detail.button.start_return"
+                                    />
+                                </Button>
+                                {returnDisabledHint && (
+                                    <VisuallyHidden id={RETURN_DISABLED_HINT_ID}>
+                                        {returnDisabledHint}
+                                    </VisuallyHidden>
+                                )}
+                            </>
                         )}
                     </Flex>
                 </Box>
@@ -789,7 +1030,11 @@ const AccountOrderDetail = () => {
                     returnableItems={returnableItems}
                     selection={returnSelection}
                     onSelectionChange={setReturnSelection}
-                    onReview={handleReviewReturn}
+                    onSubmit={handleSubmitReturn}
+                    onClearSubmitError={() => setReturnSubmitError(null)}
+                    isSubmitting={returnMutation.isLoading}
+                    submitError={returnSubmitError}
+                    finalFocusRef={headingRef}
                 />
             )}
         </Stack>
