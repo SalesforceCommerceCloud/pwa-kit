@@ -13,9 +13,7 @@ const baseProps = {
     shippingMethodName: 'FedEx Ground',
     shippingStatus: 'shipped',
     trackingNumber: 'TRACK-12345',
-    trackingUrl: 'https://tracking.fedex.com/TRACK-12345',
-    shipmentsLength: 1,
-    index: 0
+    trackingUrl: 'https://tracking.fedex.com/TRACK-12345'
 }
 
 describe('OrderTracking component', () => {
@@ -57,15 +55,12 @@ describe('OrderTracking component', () => {
         expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
     })
 
-    test('renders the unnumbered heading for a single shipment', () => {
-        renderWithProviders(<OrderTracking {...baseProps} shipmentsLength={1} index={0} />)
-        expect(screen.getByRole('heading', {name: /^Shipping Method$/i})).toBeInTheDocument()
-    })
-
-    test('renders a numbered heading when multiple shipments are present', () => {
-        renderWithProviders(<OrderTracking {...baseProps} shipmentsLength={2} index={1} />)
-        // index is zero-based; heading shows index + 1
-        expect(screen.getByRole('heading', {name: /Shipping Method 2/i})).toBeInTheDocument()
+    test('renders as a heading-less card (no Shipping Method heading)', () => {
+        renderWithProviders(<OrderTracking {...baseProps} />)
+        expect(screen.queryByRole('heading', {name: /Shipping Method/i})).not.toBeInTheDocument()
+        // The card content still renders
+        expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
+        expect(screen.getByTestId('order-tracking-card')).toBeInTheDocument()
     })
 
     // The date is formatted by locale + timezone (the test IntlProvider is en-GB),

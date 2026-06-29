@@ -1105,17 +1105,13 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
         expect(await screen.findByText(/Downtown Store/i)).toBeInTheDocument()
     })
 
-    test('should display shipping method and address sections', async () => {
-        expect(await screen.findByRole('heading', {name: /^shipping method$/i})).toBeInTheDocument()
-        expect(
-            await screen.findByRole('heading', {name: /^shipping address$/i})
-        ).toBeInTheDocument()
-    })
-
-    test('should display delivery address details', async () => {
-        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
-        expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
-        expect(await screen.findByText(/Boston/i)).toBeInTheDocument()
+    test('should display Tracking heading and no shipping address for multi-shipment', async () => {
+        expect(await screen.findByRole('heading', {name: /^tracking$/i})).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /^shipping address$/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /^shipping method$/i})).not.toBeInTheDocument()
+        // Address details should not be present for multi-shipment
+        expect(screen.queryByText(/John Doe/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/123 Main St/i)).not.toBeInTheDocument()
     })
 
     test('should display shipping method name', async () => {
@@ -1187,9 +1183,10 @@ describe('OMS Multi-shipment - Shipping address hidden', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     })
 
-    test('should display numbered shipping method headings', async () => {
-        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    test('should display two tracking cards with Tracking heading', async () => {
+        const cards = await screen.findAllByTestId('order-tracking-card')
+        expect(cards).toHaveLength(2)
+        expect(await screen.findByRole('heading', {name: /^tracking$/i})).toBeInTheDocument()
     })
 
     test('should NOT display shipping address headings for OMS multi-shipment', async () => {
@@ -1223,10 +1220,17 @@ describe('OMS Multi-shipment - Shipping address hidden', () => {
         expect(etaLabels[0].closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
         expect(etaLabels[1].closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
     })
+
+    test('renders one tracking card per OMS shipment with no shipping address (flat list, no address association)', async () => {
+        await screen.findByTestId('account-order-details-page')
+        const cards = await screen.findAllByTestId('order-tracking-card')
+        expect(cards).toHaveLength(2)
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+    })
 })
 
-describe('ECOM Multi-shipment - Shipping address shown', () => {
-    // When ECOM has multiple shipments but NO OMS data, shipping address should be shown
+describe('ECOM Multi-shipment - Shipping address hidden', () => {
+    // When ECOM has multiple shipments but NO OMS data, addresses are hidden for multi-shipment
     const ecomMultiShipmentOrder = createMockOrder({
         shipments: [
             {
@@ -1265,25 +1269,21 @@ describe('ECOM Multi-shipment - Shipping address shown', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     })
 
-    test('should display numbered shipping method headings', async () => {
-        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
+    test('should display two tracking cards with Tracking heading', async () => {
+        const cards = await screen.findAllByTestId('order-tracking-card')
+        expect(cards).toHaveLength(2)
+        expect(await screen.findByRole('heading', {name: /^tracking$/i})).toBeInTheDocument()
     })
 
-    test('should display numbered shipping address headings for ECOM multi-shipment', async () => {
-        expect(
-            await screen.findByRole('heading', {name: /shipping address 1/i})
-        ).toBeInTheDocument()
-        expect(
-            await screen.findByRole('heading', {name: /shipping address 2/i})
-        ).toBeInTheDocument()
+    test('should NOT display shipping address heading for ECOM multi-shipment', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
     })
 
-    test('should display both shipping addresses', async () => {
-        expect(await screen.findByText(/John Doe/i)).toBeInTheDocument()
-        // Jane Smith appears in both shipping and billing address
-        const janeSmithElements = await screen.findAllByText(/Jane Smith/i)
-        expect(janeSmithElements).toHaveLength(2)
+    test('should NOT display shipping addresses for multi-shipment', async () => {
+        await screen.findByTestId('account-order-details-page')
+        expect(screen.queryByText(/John Doe/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Jane Smith/i)).not.toBeInTheDocument()
     })
 
     test('should display ECOM shipping statuses', async () => {
@@ -1395,6 +1395,7 @@ describe('OMS Single shipment with partial data (missing provider, trackingUrl)'
     })
 
     test('should fallback to ECOM shipping method name when OMS provider is missing', async () => {
+        // Provider name is displayed inside the tracking card
         expect(await screen.findByText(/Ground Shipping/i)).toBeInTheDocument()
     })
 
@@ -1508,8 +1509,7 @@ describe('BOPIS Order with OMS Single Pickup and Single Delivery', () => {
     test('should display OMS provider for delivery shipment in BOPIS order', async () => {
         setupOrderDetailsPage(createBopisOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /^shipping method$/i})).toBeInTheDocument()
-        expect(await screen.findByText('Shipping Method')).toBeInTheDocument()
+        expect(await screen.findByRole('heading', {name: /^tracking$/i})).toBeInTheDocument()
         expect(await screen.findByText(/FedEx/i)).toBeInTheDocument()
         expect(screen.queryByText(/Ground/i)).not.toBeInTheDocument()
         const trackingLink = await screen.findByRole('link', {name: /BOPIS-TRACK-123/i})
@@ -2049,22 +2049,16 @@ describe('OMS order with no OMS shipments - default to ECOM shipment display (mu
         ]
     })
 
-    test('should display multi-shipment Shipping Method and Shipping Address from ECOM when OMS has no shipments', async () => {
+    test('should display two tracking cards with no shipping address when OMS has no shipments', async () => {
         setupOrderDetailsPage(omsOrderMultiShipNoOmsShipments)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         // Default to ECOM delivery block (multi-shipment) when OMS has no shipments.
-        expect(await screen.findByRole('heading', {name: /shipping method 1/i})).toBeInTheDocument()
-        expect(await screen.findByRole('heading', {name: /shipping method 2/i})).toBeInTheDocument()
-        expect(
-            await screen.findByRole('heading', {name: /shipping address 1/i})
-        ).toBeInTheDocument()
-        expect(
-            await screen.findByRole('heading', {name: /shipping address 2/i})
-        ).toBeInTheDocument()
-        expect(await screen.findByText(/Alex Johnson/i)).toBeInTheDocument()
-        expect(await screen.findByText(/Bob Smith/i)).toBeInTheDocument()
-        expect(await screen.findByText(/876 NE 8th st/i)).toBeInTheDocument()
-        expect(await screen.findByText(/456 Second St/i)).toBeInTheDocument()
+        const cards = await screen.findAllByTestId('order-tracking-card')
+        expect(cards).toHaveLength(2)
+        expect(await screen.findByRole('heading', {name: /^tracking$/i})).toBeInTheDocument()
+        expect(screen.queryByRole('heading', {name: /shipping address/i})).not.toBeInTheDocument()
+        expect(screen.queryByText(/Alex Johnson/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Bob Smith/i)).not.toBeInTheDocument()
         expect(await screen.findByText(/Ground/i)).toBeInTheDocument()
         expect(await screen.findByText(/Express/i)).toBeInTheDocument()
     })
@@ -2407,29 +2401,28 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
 })
 
 describe('Track Shipment button (W-23091033)', () => {
-    // The Track Shipment action renders ONE button per OMS shipment that has a
-    // tracking URL. The buttons are identical ("Track Shipment", no numeric
-    // suffix) — only the destination href differs per shipment, opening the
-    // carrier site in a new tab (the same destination as the per-shipment
-    // tracking-number link). When no shipment has a URL, a single disabled
-    // button is shown so the action stays visible.
+    // The Track Shipment action is a SINGLE order-level button (mirrors
+    // storefront-next getTrackShipmentHref): it links to the FIRST shipment that
+    // has a carrier tracking URL, opening the carrier site in a new tab. When no
+    // shipment has a URL, a single disabled button is shown so the action stays
+    // visible. The per-shipment tracking links live inside the tracking cards.
     const omsOrderWithShipments = (shipments) =>
         createMockOmsOrder({
             customerInfo: {customerId: 'testCustomerId'},
             omsData: {status: 'Approved', shipments}
         })
 
-    test('renders one enabled new-tab button per tracked shipment (own href, identical un-numbered label) and skips URL-less shipments', async () => {
-        // Two shipments have URLs, one does not → exactly two buttons, in shipment order.
+    test('renders a single enabled new-tab button to the first shipment with a tracking URL', async () => {
+        // First shipment has no URL, second + third do → one button, to the FIRST URL found.
         setupOrderDetailsPage(
             omsOrderWithShipments([
+                {id: 'a', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, // skipped (no URL)
                 {
-                    id: 'a',
+                    id: 'b',
                     status: 'SHIPPED',
-                    trackingNumber: 'AAA',
-                    trackingUrl: 'https://carrier.example.com/AAA'
+                    trackingNumber: 'BBB',
+                    trackingUrl: 'https://carrier.example.com/BBB'
                 },
-                {id: 'b', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, // no trackingUrl → no button
                 {
                     id: 'c',
                     status: 'SHIPPED',
@@ -2439,19 +2432,14 @@ describe('Track Shipment button (W-23091033)', () => {
             ])
         )
         const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
-        expect(buttons).toHaveLength(2)
-        // Each button deep-links to its OWN shipment's URL, opens in a new tab with a safe rel,
-        // and is enabled.
-        expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/AAA')
-        expect(buttons[1]).toHaveAttribute('href', 'https://carrier.example.com/CCC')
-        buttons.forEach((btn) => {
-            // Labels are identical — NO "Track Shipment 1 / 2" numbering.
-            expect(btn).toHaveTextContent(/^Track Shipment$/)
-            expect(btn).toHaveAttribute('target', '_blank')
-            expect(btn).toHaveAttribute('rel', expect.stringContaining('noopener'))
-            expect(btn).toBeEnabled()
-        })
-        expect(screen.queryByText(/Track Shipment \d/)).not.toBeInTheDocument()
+        // ONE order-level button, not one-per-shipment.
+        expect(buttons).toHaveLength(1)
+        expect(buttons[0]).toHaveTextContent(/^Track Shipment$/)
+        // Links to the FIRST shipment that has a URL (the no-URL first shipment is skipped).
+        expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
+        expect(buttons[0]).toHaveAttribute('target', '_blank')
+        expect(buttons[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
+        expect(buttons[0]).toBeEnabled()
     })
 
     // No shipment has a usable URL — whether shipments exist without URLs, or omsData

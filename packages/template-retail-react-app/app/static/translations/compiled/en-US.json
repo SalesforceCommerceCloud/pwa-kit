@@ -343,30 +343,10 @@
       "value": "Shipping Address"
     }
   ],
-  "account_order_detail.heading.shipping_address_number": [
+  "account_order_detail.heading.tracking": [
     {
       "type": 0,
-      "value": "Shipping Address "
-    },
-    {
-      "type": 1,
-      "value": "number"
-    }
-  ],
-  "account_order_detail.heading.shipping_method": [
-    {
-      "type": 0,
-      "value": "Shipping Method"
-    }
-  ],
-  "account_order_detail.heading.shipping_method_number": [
-    {
-      "type": 0,
-      "value": "Shipping Method "
-    },
-    {
-      "type": 1,
-      "value": "number"
+      "value": "Tracking"
     }
   ],
   "account_order_detail.hint.cancel_unavailable": [

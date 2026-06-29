@@ -775,50 +775,14 @@
       "value": "]"
     }
   ],
-  "account_order_detail.heading.shipping_address_number": [
+  "account_order_detail.heading.tracking": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şħīƥƥīƞɠ Ȧḓḓřḗḗşş "
-    },
-    {
-      "type": 1,
-      "value": "number"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.heading.shipping_method": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.heading.shipping_method_number": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ "
-    },
-    {
-      "type": 1,
-      "value": "number"
+      "value": "Ŧřȧȧƈķīƞɠ"
     },
     {
       "type": 0,

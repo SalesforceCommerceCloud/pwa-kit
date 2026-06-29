@@ -161,14 +161,8 @@
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
-  "account_order_detail.heading.shipping_address_number": {
-    "defaultMessage": "Shipping Address {number}"
-  },
-  "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
-  },
-  "account_order_detail.heading.shipping_method_number": {
-    "defaultMessage": "Shipping Method {number}"
+  "account_order_detail.heading.tracking": {
+    "defaultMessage": "Tracking"
   },
   "account_order_detail.hint.cancel_unavailable": {
     "defaultMessage": "This order can no longer be cancelled."

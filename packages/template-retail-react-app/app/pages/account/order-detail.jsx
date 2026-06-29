@@ -213,31 +213,27 @@ const AccountOrderDetail = () => {
     const omsShipmentCount = order?.omsData?.shipments?.length ?? 0
     const ecomShipmentCount = order?.shipments?.length ?? 0
 
-    const hasOmsShipment = useMemo(() => omsShipmentCount > 0, [omsShipmentCount])
-
     const isMultiShipmentOrder = useMemo(
         () => omsShipmentCount > 1 || ecomShipmentCount > 1,
         [omsShipmentCount, ecomShipmentCount]
     )
 
-    const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
-
-    // OMS shipments that carry a carrier tracking URL. Each one gets its own
-    // "Track Shipment" button in the Order Actions row (no numbered suffix — the
-    // buttons are identical, only the destination URL differs per shipment). The
-    // URL is the same `omsData.shipments[].trackingUrl` the per-shipment tracking
-    // link uses below, so the button and the link can never point to different
-    // places. A shipment with no tracking URL contributes no button; when none do,
-    // a single disabled Track Shipment button is shown (see the actions row).
-    const trackableShipments = useMemo(
+    // The order-level "Track Shipment" action links to the FIRST shipment that
+    // carries a carrier tracking URL, matching storefront-next's getTrackShipmentHref
+    // (a single order action, not one button per shipment). The per-shipment tracking
+    // links live inside the per-shipment cards below; this single button is a
+    // convenience entry point to the first trackable shipment. When no shipment has a
+    // URL, the button is shown disabled so the action stays visible (tracking info
+    // simply isn't available yet). Reads the same `omsData.shipments[].trackingUrl`
+    // the cards use, so the button and the links can never point to different places.
+    const firstTrackingUrl = useMemo(
         () =>
-            (order?.omsData?.shipments ?? []).filter(
+            (order?.omsData?.shipments ?? []).find(
                 (shipment) =>
                     typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
-            ),
+            )?.trackingUrl,
         [order?.omsData?.shipments]
     )
-    const hasTrackableShipment = trackableShipments.length > 0
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
     const ownsOrder = order?.customerInfo?.customerId === customerId
@@ -687,34 +683,29 @@ const AccountOrderDetail = () => {
                         up. This keeps the row from overflowing horizontally once a third (and
                         a per-shipment fourth, fifth, …) button is present on narrow screens. */}
                     <Flex gap={2} direction={{base: 'column', sm: 'row'}} wrap="wrap">
-                        {/* Track Shipment: one button per shipment that has a carrier tracking
-                            URL (identical label, per-shipment href), opening the carrier site in
-                            a new tab — the same destination as the per-shipment tracking link.
-                            When no shipment has a URL yet, a single disabled button is shown so
-                            the action stays visible (tracking info simply isn't available yet). */}
-                        {hasTrackableShipment ? (
-                            trackableShipments.map((shipment, index) => (
-                                <Button
-                                    key={`track-shipment-${shipment.id ?? index}`}
-                                    // ChakraLink (not the SPA Link) + href + isExternal so the
-                                    // raw carrier URL opens the carrier site in a new tab. The
-                                    // SPA Link would run the URL through the multi-site builder
-                                    // and treat it as an internal route. Mirrors the per-shipment
-                                    // tracking-number link in <OrderTracking>.
-                                    as={ChakraLink}
-                                    href={shipment.trackingUrl}
-                                    isExternal
-                                    variant="outline"
-                                    size="sm"
-                                    width={{base: 'full', sm: 'auto'}}
-                                    data-testid="account-order-detail-track-shipment"
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Track Shipment"
-                                        id="account_order_detail.button.track_shipment"
-                                    />
-                                </Button>
-                            ))
+                        {/* Single order-level Track Shipment action → the first shipment with a
+                            carrier tracking URL, opening the carrier site in a new tab. Mirrors
+                            storefront-next's getTrackShipmentHref. When no shipment has a URL, the
+                            button is shown disabled so the action stays visible. */}
+                        {firstTrackingUrl ? (
+                            <Button
+                                // ChakraLink (not the SPA Link) + href + isExternal so the raw
+                                // carrier URL opens the carrier site in a new tab. The SPA Link
+                                // would run the URL through the multi-site builder and treat it as
+                                // an internal route. Mirrors the tracking-number links in the cards.
+                                as={ChakraLink}
+                                href={firstTrackingUrl}
+                                isExternal
+                                variant="outline"
+                                size="sm"
+                                width={{base: 'full', sm: 'auto'}}
+                                data-testid="account-order-detail-track-shipment"
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Track Shipment"
+                                    id="account_order_detail.button.track_shipment"
+                                />
+                            </Button>
                         ) : (
                             <Button
                                 variant="outline"
@@ -880,87 +871,93 @@ const AccountOrderDetail = () => {
                                         </Stack>
                                     )
                                 })}
-                                {/* Any type of Non-OMS or any type of single shipment order: show DeliveryMethods and Shipments info*/}
-                                {!showMultiShipmentsFromOmsOnly &&
-                                    deliveryShipments.map((shipment, index) => {
-                                        const omsShipment = isOmsOrder
-                                            ? order.omsData.shipments?.[index]
-                                            : null
+                                {/* Tracking cards — flat list. OMS-preferred: use omsData.shipments[]
+                                    when present, else fall back to ECOM order.shipments[]. One source
+                                    XOR the other, NEVER a positional OMS↔ECOM index-join across a
+                                    multi-shipment order. Each card carries no address — addresses are
+                                    rendered once at order level below (epic a3QEE000002QvBB2A0: "flat
+                                    list, NO address association"; per-shipment address association is
+                                    the deferred TD-0326366). */}
+                                {(() => {
+                                    const omsShipments = order.omsData?.shipments ?? []
+                                    const ecomShipments = order.shipments ?? []
+                                    // Single-shipment carrier-name fallback only: when there is exactly
+                                    // one OMS shipment and one delivery shipment, an OMS shipment with no
+                                    // `provider` can borrow the lone delivery shipment's method name —
+                                    // unambiguous (one ↔ one), so it is NOT the forbidden multi-shipment
+                                    // index-join. For multi-shipment we never join, so a provider-less
+                                    // OMS shipment simply shows no carrier name.
+                                    const singleMethodFallback =
+                                        omsShipments.length === 1 && deliveryShipments.length === 1
+                                            ? deliveryShipments[0].shippingMethod?.name
+                                            : undefined
+                                    const trackingEntries =
+                                        omsShipments.length > 0
+                                            ? omsShipments.map((s, index) => ({
+                                                  key: s.id ?? `oms-${index}`,
+                                                  shippingMethodName:
+                                                      s.provider || singleMethodFallback,
+                                                  shippingStatus: s.status,
+                                                  trackingNumber: s.trackingNumber,
+                                                  trackingUrl: s.trackingUrl,
+                                                  expectedDeliveryDate: s.expectedDeliveryDate,
+                                                  actualDeliveryDate: s.actualDeliveryDate
+                                              }))
+                                            : ecomShipments.map((s, index) => ({
+                                                  key: s.shipmentId ?? `ecom-${index}`,
+                                                  shippingMethodName: s.shippingMethod?.name,
+                                                  shippingStatus: s.shippingStatus,
+                                                  trackingNumber: s.trackingNumber
+                                                  // provider / trackingUrl / dates are OMS-only → undefined here
+                                              }))
 
-                                        const shippingMethodName =
-                                            omsShipment?.provider || shipment.shippingMethod?.name
-                                        const shippingStatus =
-                                            omsShipment?.status || shipment.shippingStatus
-                                        const trackingNumber =
-                                            omsShipment?.trackingNumber || shipment.trackingNumber
-                                        const trackingUrl = omsShipment?.trackingUrl
-                                        const expectedDeliveryDate =
-                                            omsShipment?.expectedDeliveryDate
-                                        const actualDeliveryDate = omsShipment?.actualDeliveryDate
-
-                                        return (
-                                            <React.Fragment key={`delivery-${index}`}>
-                                                <OrderTracking
-                                                    shippingMethodName={shippingMethodName}
-                                                    shippingStatus={shippingStatus}
-                                                    trackingNumber={trackingNumber}
-                                                    trackingUrl={trackingUrl}
-                                                    expectedDeliveryDate={expectedDeliveryDate}
-                                                    actualDeliveryDate={actualDeliveryDate}
-                                                    shipmentsLength={deliveryShipments.length}
-                                                    index={index}
+                                    return trackingEntries.length > 0 ? (
+                                        <Stack spacing={2} gridColumn={{sm: 'span 2'}}>
+                                            <Heading as="h2" fontSize="sm" pt={1}>
+                                                <FormattedMessage
+                                                    defaultMessage="Tracking"
+                                                    id="account_order_detail.heading.tracking"
                                                 />
-                                                <Stack spacing={1}>
-                                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                                        {deliveryShipments.length > 1 ? (
-                                                            <FormattedMessage
-                                                                defaultMessage="Shipping Address {number}"
-                                                                id="account_order_detail.heading.shipping_address_number"
-                                                                values={{number: index + 1}}
-                                                            />
-                                                        ) : (
-                                                            <FormattedMessage
-                                                                defaultMessage="Shipping Address"
-                                                                id="account_order_detail.heading.shipping_address"
-                                                            />
-                                                        )}
-                                                    </Heading>
-                                                    <Box>
-                                                        <Text fontSize="sm">
-                                                            {shipment.shippingAddress.firstName &&
-                                                            shipment.shippingAddress.lastName
-                                                                ? `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
-                                                                : shipment.shippingAddress.fullName}
-                                                        </Text>
-                                                        <Text fontSize="sm">
-                                                            {shipment.shippingAddress.address1}
-                                                        </Text>
-                                                        <Text fontSize="sm">
-                                                            {shipment.shippingAddress.city},{' '}
-                                                            {shipment.shippingAddress.stateCode}{' '}
-                                                            {shipment.shippingAddress.postalCode}
-                                                        </Text>
-                                                    </Box>
-                                                </Stack>
-                                            </React.Fragment>
-                                        )
-                                    })}
+                                            </Heading>
+                                            <Stack spacing={3}>
+                                                {trackingEntries.map(({key, ...entry}) => (
+                                                    <OrderTracking key={key} {...entry} />
+                                                ))}
+                                            </Stack>
+                                        </Stack>
+                                    ) : null
+                                })()}
 
-                                {/* Any OMS multi-shipment: Only show OMS Shipments info;*/}
-                                {showMultiShipmentsFromOmsOnly &&
-                                    order?.omsData?.shipments?.map((shipment, index) => (
-                                        <OrderTracking
-                                            key={`oms-shipment-${index}`}
-                                            shippingMethodName={shipment.provider}
-                                            shippingStatus={shipment.status}
-                                            trackingNumber={shipment.trackingNumber}
-                                            trackingUrl={shipment.trackingUrl}
-                                            expectedDeliveryDate={shipment.expectedDeliveryDate}
-                                            actualDeliveryDate={shipment.actualDeliveryDate}
-                                            shipmentsLength={omsShipmentCount}
-                                            index={index}
-                                        />
-                                    ))}
+                                {/* Order-level Shipping Address — single-shipment delivery orders only.
+                                    Multi-shipment orders (OMS or ECOM) hide the address per the epic
+                                    (no per-shipment address association). BOPIS-only orders have no
+                                    delivery shipment, so this does not render for them. */}
+                                {!isMultiShipmentOrder && deliveryShipments.length > 0 && (
+                                    <Stack spacing={1}>
+                                        <Heading as="h2" fontSize="sm" pt={1}>
+                                            <FormattedMessage
+                                                defaultMessage="Shipping Address"
+                                                id="account_order_detail.heading.shipping_address"
+                                            />
+                                        </Heading>
+                                        <Box>
+                                            <Text fontSize="sm">
+                                                {deliveryShipments[0].shippingAddress.firstName &&
+                                                deliveryShipments[0].shippingAddress.lastName
+                                                    ? `${deliveryShipments[0].shippingAddress.firstName} ${deliveryShipments[0].shippingAddress.lastName}`
+                                                    : deliveryShipments[0].shippingAddress.fullName}
+                                            </Text>
+                                            <Text fontSize="sm">
+                                                {deliveryShipments[0].shippingAddress.address1}
+                                            </Text>
+                                            <Text fontSize="sm">
+                                                {deliveryShipments[0].shippingAddress.city},{' '}
+                                                {deliveryShipments[0].shippingAddress.stateCode}{' '}
+                                                {deliveryShipments[0].shippingAddress.postalCode}
+                                            </Text>
+                                        </Box>
+                                    </Stack>
+                                )}
 
                                 {/* Payment Method */}
                                 {paymentCard && (
