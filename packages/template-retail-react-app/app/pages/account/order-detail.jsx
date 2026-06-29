@@ -176,7 +176,7 @@ const AccountOrderDetail = () => {
     const returnFeedbackTimerRef = useRef(null)
     const cancelFeedbackTimerRef = useRef(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
-    // viewport resize doesn't lose the shopper's progress, and so W-22821838's
+    // viewport resize doesn't lose the shopper's progress, and so the
     // review step can read the same payload without prop-drilling.
     const [returnSelection, setReturnSelection] = useState({})
 

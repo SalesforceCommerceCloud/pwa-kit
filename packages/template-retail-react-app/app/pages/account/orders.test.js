@@ -630,7 +630,7 @@ describe('OMS/SOM Integration - Order Details', () => {
     })
 })
 
-describe('Return Items CTA (W-22821836 / W-22821837)', () => {
+describe('Return Items CTA', () => {
     // Eligibility is OMS-driven: the CTA renders when at least one productItem has
     // omsData.quantityAvailableToReturn > 0. OMS computes that field per item; the
     // server returns 409 if the order is no longer in a returnable state, so there
@@ -662,14 +662,14 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         const cta = await screen.findByTestId('account-order-detail-start-return')
         expect(cta).toBeInTheDocument()
         expect(cta).toBeEnabled()
-        // The label was renamed from "Start return" to "Return Items" in
-        // W-22821837 to match the storefront-next designs; the underlying
-        // message id stays stable so downstream extenders aren't broken.
+        // The label was renamed from "Start return" to "Return Items" to match
+        // the storefront-next designs; the underlying message id stays stable so
+        // downstream extenders aren't broken.
         expect(cta).toHaveAccessibleName('Return Items')
     })
 
     test('renders the CTA disabled (with an SR reason) when no item has quantityAvailableToReturn > 0', async () => {
-        // W-22821839: the button always renders for the order owner (mirroring the
+        // The button always renders for the order owner (mirroring the
         // always-rendered Cancel order button); having nothing to return disables
         // it via aria-disabled rather than hiding it, and exposes a hidden reason.
         setupOrderDetailsPage(
@@ -720,7 +720,7 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
         expect(screen.queryByTestId('account-order-detail-start-return')).not.toBeInTheDocument()
     })
 
-    test('clicking Return Items opens the return-items modal (W-22821837)', async () => {
+    test('clicking Return Items opens the return-items modal', async () => {
         const user = userEvent.setup()
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const cta = await screen.findByTestId('account-order-detail-start-return')
@@ -742,7 +742,7 @@ describe('Return Items CTA (W-22821836 / W-22821837)', () => {
     })
 })
 
-describe('Return submission (W-22821838)', () => {
+describe('Return submission', () => {
     const createReturnEligibleOmsOrder = (overrides = {}) =>
         createMockOmsOrder({
             customerInfo: {customerId: 'testCustomerId'},
@@ -881,7 +881,7 @@ describe('Return submission (W-22821838)', () => {
     )
 })
 
-describe('Item-level return error states (W-22821839)', () => {
+describe('Item-level return error states', () => {
     const createReturnEligibleOmsOrder = (overrides = {}) =>
         createMockOmsOrder({
             customerInfo: {customerId: 'testCustomerId'},
@@ -2345,7 +2345,7 @@ describe('Cancel order error scenarios', () => {
     })
 })
 
-describe('Cancel order — eligibility and full flow (W-22806929)', () => {
+describe('Cancel order — eligibility and full flow', () => {
     const omsEligibleOrder = createMockOmsOrder({
         omsData: {status: 'Created'},
         productItems: [
@@ -2606,18 +2606,17 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
     })
 })
 
-describe('Item-level return — full journey (W-22821845)', () => {
-    // Phase-3 finalization (W-22821845). The earlier WIs each covered a slice of
-    // the return flow (CTA eligibility in W-22821836/837, submission in W-22821838,
-    // error states in W-22821839). This block adds the cross-cutting integration
-    // scenarios those slices left open: a multi-item partial return that proves
-    // only the selected row is sent, the modal-close selection reset, and a single
-    // end-to-end click-through that exercises a non-default reason all the way to
-    // the success feedback. We deliberately do NOT add a live Playwright E2E:
-    // mirroring the cancel-order finalization (W-22806929 / PR #3896), the
-    // OMS-enabled sandbox isn't wired to CI and order state is non-deterministic
-    // (an order can only be returned once), so deterministic mocked integration
-    // tests provide the repeatable coverage instead.
+describe('Item-level return — full journey', () => {
+    // The earlier test blocks each cover a slice of the return flow (CTA
+    // eligibility, submission, error states). This block adds the cross-cutting
+    // integration scenarios those slices left open: a multi-item partial return
+    // that proves only the selected row is sent, the modal-close selection reset,
+    // and a single end-to-end click-through that exercises a non-default reason
+    // all the way to the success feedback. We deliberately do NOT add a live
+    // Playwright E2E: mirroring the cancel-order finalization, the OMS-enabled
+    // sandbox isn't wired to CI and order state is non-deterministic (an order can
+    // only be returned once), so deterministic mocked integration tests provide
+    // the repeatable coverage instead.
 
     // Both rows returnable (with different ceilings) so the "submit only the
     // checked row" assertion is meaningful — a non-returnable item would be
