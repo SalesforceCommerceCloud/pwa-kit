@@ -613,6 +613,20 @@
       "value": "]"
     }
   ],
+  "account_order_detail.button.track_shipment": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ Şħīƥḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,

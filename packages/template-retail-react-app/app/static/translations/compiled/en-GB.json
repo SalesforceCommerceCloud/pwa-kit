@@ -269,6 +269,12 @@
       "value": "Return Items"
     }
   ],
+  "account_order_detail.button.track_shipment": [
+    {
+      "type": 0,
+      "value": "Track Shipment"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,

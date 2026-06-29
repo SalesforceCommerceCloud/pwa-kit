@@ -20,6 +20,7 @@ import {
     SimpleGrid,
     Skeleton,
     VisuallyHidden,
+    Link as ChakraLink,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
@@ -220,6 +221,23 @@ const AccountOrderDetail = () => {
     )
 
     const showMultiShipmentsFromOmsOnly = isOmsOrder && hasOmsShipment && isMultiShipmentOrder
+
+    // OMS shipments that carry a carrier tracking URL. Each one gets its own
+    // "Track Shipment" button in the Order Actions row (no numbered suffix — the
+    // buttons are identical, only the destination URL differs per shipment). The
+    // URL is the same `omsData.shipments[].trackingUrl` the per-shipment tracking
+    // link uses below, so the button and the link can never point to different
+    // places. A shipment with no tracking URL contributes no button; when none do,
+    // a single disabled Track Shipment button is shown (see the actions row).
+    const trackableShipments = useMemo(
+        () =>
+            (order?.omsData?.shipments ?? []).filter(
+                (shipment) =>
+                    typeof shipment?.trackingUrl === 'string' && shipment.trackingUrl.length > 0
+            ),
+        [order?.omsData?.shipments]
+    )
+    const hasTrackableShipment = trackableShipments.length > 0
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
     const ownsOrder = order?.customerInfo?.customerId === customerId
@@ -665,10 +683,56 @@ const AccountOrderDetail = () => {
                             id="account_order_detail.heading.order_actions"
                         />
                     </Text>
-                    <Flex gap={2} wrap="wrap">
+                    {/* Buttons are full-width and stack on mobile, then sit inline from `sm`
+                        up. This keeps the row from overflowing horizontally once a third (and
+                        a per-shipment fourth, fifth, …) button is present on narrow screens. */}
+                    <Flex gap={2} direction={{base: 'column', sm: 'row'}} wrap="wrap">
+                        {/* Track Shipment: one button per shipment that has a carrier tracking
+                            URL (identical label, per-shipment href), opening the carrier site in
+                            a new tab — the same destination as the per-shipment tracking link.
+                            When no shipment has a URL yet, a single disabled button is shown so
+                            the action stays visible (tracking info simply isn't available yet). */}
+                        {hasTrackableShipment ? (
+                            trackableShipments.map((shipment, index) => (
+                                <Button
+                                    key={`track-shipment-${shipment.id ?? index}`}
+                                    // ChakraLink (not the SPA Link) + href + isExternal so the
+                                    // raw carrier URL opens the carrier site in a new tab. The
+                                    // SPA Link would run the URL through the multi-site builder
+                                    // and treat it as an internal route. Mirrors the per-shipment
+                                    // tracking-number link in <OrderTracking>.
+                                    as={ChakraLink}
+                                    href={shipment.trackingUrl}
+                                    isExternal
+                                    variant="outline"
+                                    size="sm"
+                                    width={{base: 'full', sm: 'auto'}}
+                                    data-testid="account-order-detail-track-shipment"
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Track Shipment"
+                                        id="account_order_detail.button.track_shipment"
+                                    />
+                                </Button>
+                            ))
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                width={{base: 'full', sm: 'auto'}}
+                                isDisabled
+                                data-testid="account-order-detail-track-shipment"
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Track Shipment"
+                                    id="account_order_detail.button.track_shipment"
+                                />
+                            </Button>
+                        )}
                         <Button
                             variant="outline"
                             size="sm"
+                            width={{base: 'full', sm: 'auto'}}
                             onClick={() => {
                                 // No-op while disabled — see aria-disabled note below.
                                 if (cancelDisabled) return
@@ -702,6 +766,7 @@ const AccountOrderDetail = () => {
                                     data-testid="account-order-detail-start-return"
                                     variant="outline"
                                     size="sm"
+                                    width={{base: 'full', sm: 'auto'}}
                                     onClick={() => {
                                         // No-op while disabled — see aria-disabled note below.
                                         if (returnDisabled) return

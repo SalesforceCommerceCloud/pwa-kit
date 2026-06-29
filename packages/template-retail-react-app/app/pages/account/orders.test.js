@@ -2405,3 +2405,82 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         expect(screen.getByText(/confirm cancellation below/i)).toBeInTheDocument()
     })
 })
+
+describe('Track Shipment button (W-23091033)', () => {
+    // The Track Shipment action renders ONE button per OMS shipment that has a
+    // tracking URL. The buttons are identical ("Track Shipment", no numeric
+    // suffix) — only the destination href differs per shipment, opening the
+    // carrier site in a new tab (the same destination as the per-shipment
+    // tracking-number link). When no shipment has a URL, a single disabled
+    // button is shown so the action stays visible.
+    const omsOrderWithShipments = (shipments) =>
+        createMockOmsOrder({
+            customerInfo: {customerId: 'testCustomerId'},
+            omsData: {status: 'Approved', shipments}
+        })
+
+    test('renders one enabled new-tab button per tracked shipment (own href, identical un-numbered label) and skips URL-less shipments', async () => {
+        // Two shipments have URLs, one does not → exactly two buttons, in shipment order.
+        setupOrderDetailsPage(
+            omsOrderWithShipments([
+                {
+                    id: 'a',
+                    status: 'SHIPPED',
+                    trackingNumber: 'AAA',
+                    trackingUrl: 'https://carrier.example.com/AAA'
+                },
+                {id: 'b', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, // no trackingUrl → no button
+                {
+                    id: 'c',
+                    status: 'SHIPPED',
+                    trackingNumber: 'CCC',
+                    trackingUrl: 'https://carrier.example.com/CCC'
+                }
+            ])
+        )
+        const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
+        expect(buttons).toHaveLength(2)
+        // Each button deep-links to its OWN shipment's URL, opens in a new tab with a safe rel,
+        // and is enabled.
+        expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/AAA')
+        expect(buttons[1]).toHaveAttribute('href', 'https://carrier.example.com/CCC')
+        buttons.forEach((btn) => {
+            // Labels are identical — NO "Track Shipment 1 / 2" numbering.
+            expect(btn).toHaveTextContent(/^Track Shipment$/)
+            expect(btn).toHaveAttribute('target', '_blank')
+            expect(btn).toHaveAttribute('rel', expect.stringContaining('noopener'))
+            expect(btn).toBeEnabled()
+        })
+        expect(screen.queryByText(/Track Shipment \d/)).not.toBeInTheDocument()
+    })
+
+    // No shipment has a usable URL — whether shipments exist without URLs, or omsData
+    // has no shipments at all — collapses to one disabled, href-less button (Jie D3).
+    test.each([
+        [
+            'shipments exist but none carry a URL',
+            [{id: 'a', status: 'ALLOCATED', trackingNumber: 'NO-URL'}, {id: 'b'}]
+        ],
+        ['omsData has no shipments at all', undefined]
+    ])(
+        'shows a single disabled (href-less) Track Shipment button when %s',
+        async (_label, shipments) => {
+            setupOrderDetailsPage(
+                shipments
+                    ? omsOrderWithShipments(shipments)
+                    : createMockOmsOrder({omsData: {status: 'Created'}})
+            )
+            const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
+            expect(buttons).toHaveLength(1)
+            expect(buttons[0]).toHaveTextContent('Track Shipment')
+            expect(buttons[0]).toBeDisabled()
+            expect(buttons[0]).not.toHaveAttribute('href') // disabled → not a link
+        }
+    )
+
+    test('does NOT render the Track Shipment button for a non-OMS order (no Order Actions row)', async () => {
+        setupOrderDetailsPage(createMockOrder())
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('account-order-detail-track-shipment')).not.toBeInTheDocument()
+    })
+})

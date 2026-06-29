@@ -128,6 +128,9 @@
   "account_order_detail.button.start_return": {
     "defaultMessage": "Return Items"
   },
+  "account_order_detail.button.track_shipment": {
+    "defaultMessage": "Track Shipment"
+  },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
