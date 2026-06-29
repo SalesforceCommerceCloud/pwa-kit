@@ -330,7 +330,7 @@ test('submitError renders an inline alert and the footer Submit re-fires submit'
     expect(onSubmit).toHaveBeenCalledWith([{itemId: 'item-2', quantity: 1, reason: 'Defect'}])
 })
 
-// --- WI-5 (W-22821839): error-code-specific rendering ---
+// --- error-code-specific rendering ---
 
 test('network error renders the inline review-view banner with network copy', async () => {
     const user = userEvent.setup()

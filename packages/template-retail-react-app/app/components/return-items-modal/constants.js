@@ -93,7 +93,7 @@ export const messages = defineMessages({
         defaultMessage: 'Something went wrong submitting your return. Please try again.',
         id: 'return_items_modal.text.submit_error'
     },
-    // --- WI-5 (W-22821839) error-code-specific inline messages ---
+    // --- error-code-specific inline messages ---
     submitErrorInvalidReason: {
         defaultMessage: 'The selected reason is no longer available. Please choose another.',
         id: 'return_items_modal.text.submit_error_invalid_reason'

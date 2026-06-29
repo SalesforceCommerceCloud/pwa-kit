@@ -201,7 +201,7 @@ const isSelectionValid = (selection, returnableItems) => {
  * parent (`order-detail.jsx`) so the wrapper swap on viewport resize doesn't
  * reset what the shopper has chosen.
  *
- * The review step (W-22821838) is a second view *inside the same* Modal/Drawer
+ * The review step is a second view *inside the same* Modal/Drawer
  * shell, swapped via local `view` state so the Chakra dialog never remounts and
  * the focus trap survives the transition. **Review return** advances to the
  * review view; **Back** returns to selection with all state preserved; **Submit
@@ -330,7 +330,7 @@ const ReturnItemsModal = ({
         [selection, returnableItems]
     )
 
-    // The parent (WI-5) always supplies a classified `{kind, ...}` submit error,
+    // The parent always supplies a classified `{kind, ...}` submit error,
     // or null. Derive the kind once and the two behavioral buckets from it:
     //  - select-view kinds (invalid reason / unknown items / quantity exceeded)
     //    require editing the selection, so the modal drops to the select view and

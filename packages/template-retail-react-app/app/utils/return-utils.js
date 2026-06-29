@@ -39,7 +39,7 @@ export const getReturnableItems = (order) => {
  *
  * Rows without a positive numeric quantity are dropped — the upstream UI is
  * already gated by `isSelectionValid`, but this hardens reuse from elsewhere
- * (e.g. step 2's review modal in W-22821838) against malformed state.
+ * (e.g. the review step) against malformed state.
  */
 export const buildReturnProductItems = (selection, defaultReasonCode) =>
     Object.entries(selection || {})
