@@ -1444,21 +1444,21 @@ describe('OMS Single shipment with tracking URL', () => {
         expect(etaLabel.closest('p')).toHaveTextContent(/Expected delivery:.*2026/)
     })
 
-    test('renders Tracking INSIDE the first shipment box, not in the summary card', async () => {
-        // Regression lock: per the storefront-next design branch, the flat tracking list
-        // lives inside the FIRST shipment box (after its items, before its address) — NOT
-        // as a top-level section above the items and NOT inside the top order-summary card.
+    test('renders Tracking as a flat section OUTSIDE (below) the shipment boxes', async () => {
+        // Regression lock: OMS tracking has no join key back to a specific ECOM shipment
+        // (deferred TD-0326366), so the tracking list must NOT live inside a shipment box
+        // (that would imply a false tracking↔shipment link) and NOT inside the top
+        // order-summary card. It is a flat section that is a SIBLING of the boxes.
         const trackingSection = await screen.findByTestId('account-order-detail-tracking')
         expect(trackingSection).toBeInTheDocument()
-        // The tracking section sits inside the (first) shipment box.
+        // The tracking section is NOT nested inside any shipment box.
         const shipmentBox = document.querySelector('[data-shipment-id]')
         expect(shipmentBox).toBeInTheDocument()
-        expect(shipmentBox).toContainElement(trackingSection)
+        expect(shipmentBox).not.toContainElement(trackingSection)
         // The tracking card is inside the tracking section...
         const card = await screen.findByTestId('order-tracking-card')
         expect(trackingSection).toContainElement(card)
-        // ...and the Shipping Address is a SIBLING block inside the box, NOT inside the
-        // tracking section (no address jammed into a tracking card → no OMS↔ECOM join).
+        // ...and the section carries no address / payment fields (no OMS↔ECOM join).
         expect(trackingSection).not.toHaveTextContent(/Shipping Address/i)
         expect(trackingSection).not.toHaveTextContent(/Payment Method/i)
     })
