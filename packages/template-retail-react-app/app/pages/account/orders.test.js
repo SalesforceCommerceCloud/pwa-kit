@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 import {
@@ -511,6 +511,112 @@ describe('OMS/SOM Integration - Order Details', () => {
         expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
     })
 
+    test('should show Return Initiated badge when all items are return initiated', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Initiated badge when only some items are return initiated', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Return Complete badge when all items are returned', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Complete badge when some returned and some delivered', async () => {
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'delivered', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show a return badge (not Cancelled) when items are a mix of cancelled and returned', async () => {
+        // Cancelled items are filtered out of the active set, so an order is only "Cancelled" when
+        // EVERY item is cancelled. A cancelled + returned mix is a return, not a cancellation.
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'canceled', quantityAvailableToCancel: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+    })
+
     test('should display fullName for OMS shipping address', async () => {
         setupOrderDetailsPage(createMockOmsOrder())
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
@@ -707,6 +813,8 @@ describe('Return submission (W-22821838)', () => {
         )
         // A return success must NOT flip the order status Badge to "Cancelled".
         expect(screen.queryByText(/^cancelled$/i)).not.toBeInTheDocument()
+        // Optimistically, the order status Badge flips to "Return Initiated".
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
     })
 
     test('success returns focus to the Order Details heading', async () => {
@@ -1051,6 +1159,98 @@ describe('OMS/SOM Integration - Order History', () => {
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
         expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+    })
+
+    test('should show Return Initiated badge when all items are return initiated', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Initiated badge when only some items are return initiated', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'return initiated', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Initiated')).toBeInTheDocument()
+    })
+
+    test('should show Return Complete badge when all items are returned', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Test Product',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Return Complete')).toBeInTheDocument()
+    })
+
+    test('should show Partial Return Complete badge when some returned and some delivered', async () => {
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '640188017003M',
+                        productName: 'Product A',
+                        quantity: 1,
+                        omsData: {status: 'returned', quantityAvailableToReturn: 0}
+                    },
+                    {
+                        productId: '640188017004M',
+                        productName: 'Product B',
+                        quantity: 1,
+                        omsData: {status: 'delivered', quantityAvailableToReturn: 0}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('Partial Return Complete')).toBeInTheDocument()
     })
 
     test('should display fullName for OMS shipping address', async () => {
@@ -2403,5 +2603,172 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
         // The mock returns cancelReasonCodes: [] — dropdown should be hidden
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
         expect(screen.getByText(/confirm cancellation below/i)).toBeInTheDocument()
+    })
+})
+
+describe('Item-level return — full journey (W-22821845)', () => {
+    // Phase-3 finalization (W-22821845). The earlier WIs each covered a slice of
+    // the return flow (CTA eligibility in W-22821836/837, submission in W-22821838,
+    // error states in W-22821839). This block adds the cross-cutting integration
+    // scenarios those slices left open: a multi-item partial return that proves
+    // only the selected row is sent, the modal-close selection reset, and a single
+    // end-to-end click-through that exercises a non-default reason all the way to
+    // the success feedback. We deliberately do NOT add a live Playwright E2E:
+    // mirroring the cancel-order finalization (W-22806929 / PR #3896), the
+    // OMS-enabled sandbox isn't wired to CI and order state is non-deterministic
+    // (an order can only be returned once), so deterministic mocked integration
+    // tests provide the repeatable coverage instead.
+
+    // Both rows returnable (with different ceilings) so the "submit only the
+    // checked row" assertion is meaningful — a non-returnable item would be
+    // filtered out by getReturnableItems before the modal renders and couldn't
+    // prove anything.
+    const createMultiReturnableOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            customerInfo: {customerId: 'testCustomerId'},
+            productItems: [
+                {
+                    itemId: 'returnable-item-1',
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 3,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 3
+                    }
+                },
+                {
+                    itemId: 'returnable-item-2',
+                    productId: 'returnable-2',
+                    productName: 'Returnable B',
+                    quantity: 1,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 1
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    const createSingleReturnableOmsOrder = (overrides = {}) =>
+        createMockOmsOrder({
+            customerInfo: {customerId: 'testCustomerId'},
+            productItems: [
+                {
+                    itemId: 'returnable-item-1',
+                    productId: 'returnable-1',
+                    productName: 'Returnable A',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityAvailableToCancel: 0,
+                        quantityAvailableToReturn: 2
+                    }
+                }
+            ],
+            ...overrides
+        })
+
+    beforeEach(() => {
+        mockReturnMutateAsync.mockReset()
+        mockReturnIsLoading = false
+    })
+    afterEach(() => {
+        mockReturnIsLoading = false
+    })
+
+    test('multi-item order submits only the checked row with its chosen quantity', async () => {
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        const order = createMultiReturnableOmsOrder()
+        setupOrderDetailsPage(order)
+        const user = userEvent.setup()
+
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+
+        // Two returnable rows are offered; check only the first and lower its
+        // quantity from the available ceiling (3) to a partial 2.
+        const rows = screen.getAllByTestId('return-items-modal-item-row')
+        expect(rows).toHaveLength(2)
+        await user.click(within(rows[0]).getByRole('checkbox'))
+        const qty = within(rows[0]).getByLabelText(/^quantity$/i, {selector: 'input'})
+        fireEvent.change(qty, {target: {value: '2'}})
+        fireEvent.blur(qty)
+
+        await user.click(screen.getByTestId('return-items-modal-review'))
+        await user.click(await screen.findByTestId('return-items-modal-submit'))
+
+        await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(1))
+        // Only the checked row is in the payload. The default reason ("Wrong size")
+        // was kept, so buildReturnProductItems omits `reason` per the API contract.
+        expect(mockReturnMutateAsync).toHaveBeenCalledWith({
+            parameters: {orderNo: order.orderNo},
+            body: {productItems: [{itemId: 'returnable-item-1', quantity: 2}]}
+        })
+        expect(mockMutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('closing the modal resets the selection so a reopen starts clean', async () => {
+        const order = createSingleReturnableOmsOrder()
+        setupOrderDetailsPage(order)
+        const user = userEvent.setup()
+
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+        // Check the row, then dismiss with Cancel (not a submit).
+        await user.click(screen.getAllByRole('checkbox')[0])
+        expect(screen.getAllByRole('checkbox')[0]).toBeChecked()
+        await user.click(screen.getByTestId('return-items-modal-cancel'))
+
+        // No mutation fired — the shopper backed out.
+        expect(mockReturnMutateAsync).not.toHaveBeenCalled()
+
+        // Reopen: the parent cleared returnSelection on close, so the row is
+        // unchecked again and Review is disabled until something is selected.
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+        await waitFor(() => expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked())
+        expect(screen.getByTestId('return-items-modal-review')).toHaveAttribute(
+            'aria-disabled',
+            'true'
+        )
+    })
+
+    test('end-to-end: select item, pick a non-default reason, review, submit, see success', async () => {
+        mockReturnMutateAsync.mockResolvedValueOnce({})
+        const order = createSingleReturnableOmsOrder()
+        setupOrderDetailsPage(order)
+        const user = userEvent.setup()
+
+        // Open and select the (only) returnable item.
+        await user.click(await screen.findByTestId('account-order-detail-start-return'))
+        await screen.findByText(/return items from order #/i)
+        const row = (await screen.findAllByTestId('return-items-modal-item-row'))[0]
+        await user.click(within(row).getByRole('checkbox'))
+
+        // Swap the default ("Wrong size") for a non-default reason so it gets
+        // serialized into the payload.
+        const reason = within(row).getByLabelText(/reason for /i, {selector: 'select'})
+        await user.selectOptions(reason, 'Defect')
+
+        await user.click(screen.getByTestId('return-items-modal-review'))
+        await user.click(await screen.findByTestId('return-items-modal-submit'))
+
+        await waitFor(() => expect(mockReturnMutateAsync).toHaveBeenCalledTimes(1))
+        expect(mockReturnMutateAsync).toHaveBeenCalledWith({
+            parameters: {orderNo: order.orderNo},
+            body: {productItems: [{itemId: 'returnable-item-1', quantity: 1, reason: 'Defect'}]}
+        })
+
+        // Success feedback (announced after the a11y delay) appears on the page.
+        expect(await screen.findByText(/return submitted/i)).toBeInTheDocument()
+        expect(screen.getByText(/email a return label shortly/i)).toBeInTheDocument()
+        // The modal has closed.
+        await waitFor(() =>
+            expect(screen.queryByText(/review your return/i)).not.toBeInTheDocument()
+        )
     })
 })

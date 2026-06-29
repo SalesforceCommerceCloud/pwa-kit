@@ -205,6 +205,159 @@ describe('getOrderDisplayStatus - partial / missing item statuses', () => {
     })
 })
 
+describe('getOrderDisplayStatus - per-unit quantity breakdown', () => {
+    // A line item with quantityOrdered > 1 can straddle several states at once. The display status
+    // must reflect every unit's state, not just the line's `status` string (which only describes the
+    // units not in a cancel/return flow). OMS sends quantities as JSON doubles (e.g. 2.0).
+
+    test('the reported bug: 1 of 2 units returned, 1 still fulfilled -> PARTIAL_RETURN_COMPLETE', () => {
+        // Real order 00002102: the line status is "fulfilled" and the old logic badged the whole
+        // order IN_PROGRESS, ignoring that 1 unit was already returned.
+        const order = {
+            orderNo: '00002102',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 0.0,
+                        quantityReturned: 1.0,
+                        quantityReturnInitiated: 1.0,
+                        quantityAvailableToReturn: 1.0,
+                        quantityAvailableToCancel: 0.0
+                    }
+                }
+            ]
+        }
+        // 1 unit RETURNED + 1 unit IN_PROGRESS (fulfilled) -> a partial-complete return.
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.PARTIAL_RETURN_COMPLETE)
+    })
+
+    test('1 of 2 units return-initiated (in flight), 1 still fulfilled -> PARTIAL_RETURN_INITIATED', () => {
+        // quantityReturnInitiated is cumulative; with returned=0 the initiated unit is still in flight.
+        const order = {
+            orderNo: 'p',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 0.0,
+                        quantityReturned: 0.0,
+                        quantityReturnInitiated: 1.0
+                    }
+                }
+            ]
+        }
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.PARTIAL_RETURN_INITIATED)
+    })
+
+    test('both units of a single line fully returned -> RETURN_COMPLETE', () => {
+        const order = {
+            orderNo: 'p',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 0.0,
+                        quantityReturned: 2.0,
+                        quantityReturnInitiated: 2.0
+                    }
+                }
+            ]
+        }
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.RETURN_COMPLETE)
+    })
+
+    test('1 of 2 units cancelled, 1 still fulfilled -> IN_PROGRESS (cancelled unit excluded)', () => {
+        const order = {
+            orderNo: 'p',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 1.0,
+                        quantityReturned: 0.0,
+                        quantityReturnInitiated: 0.0
+                    }
+                }
+            ]
+        }
+        // The cancelled unit is terminally removed; the remaining fulfilled unit drives the status.
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.IN_PROGRESS)
+    })
+
+    test('all units across the line cancelled -> CANCELLED', () => {
+        const order = {
+            orderNo: 'p',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 2.0,
+                        quantityReturned: 0.0,
+                        quantityReturnInitiated: 0.0
+                    }
+                }
+            ]
+        }
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.CANCELLED)
+    })
+
+    test('units split across two lines: one delivered, one partially returned -> PARTIAL_RETURN_COMPLETE', () => {
+        const order = {
+            orderNo: 'p',
+            productItems: [
+                {
+                    productId: 'p1',
+                    quantity: 1,
+                    omsData: {
+                        status: 'delivered',
+                        quantityOrdered: 1.0,
+                        quantityCanceled: 0.0,
+                        quantityReturned: 0.0,
+                        quantityReturnInitiated: 0.0
+                    }
+                },
+                {
+                    productId: 'p2',
+                    quantity: 2,
+                    omsData: {
+                        status: 'fulfilled',
+                        quantityOrdered: 2.0,
+                        quantityCanceled: 0.0,
+                        quantityReturned: 1.0,
+                        quantityReturnInitiated: 1.0
+                    }
+                }
+            ]
+        }
+        // Units: [delivered] + [returned, in_progress]. A returned unit mixed with non-returned
+        // units that are not in flight -> partial return complete.
+        expect(getOrderDisplayStatus(order)).toBe(ORDER_DISPLAY_STATUS.PARTIAL_RETURN_COMPLETE)
+    })
+
+    test('falls back to one bucket per line when no quantity breakdown is present', () => {
+        // Status-only items (no quantityOrdered) must keep the original line-level behavior.
+        expect(getOrderDisplayStatus(orderWithItemStatuses(['SHIPPED', 'Delivered']))).toBe(
+            ORDER_DISPLAY_STATUS.PART_ORDER_DELIVERED
+        )
+    })
+})
+
 describe('getOrderDisplayStatus - fallback', () => {
     test('returns null when no productItems', () => {
         expect(getOrderDisplayStatus({orderNo: 'x'})).toBeNull()
