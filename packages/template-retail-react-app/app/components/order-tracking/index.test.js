@@ -42,8 +42,25 @@ describe('OrderTracking component', () => {
         expect(link).toHaveAttribute('target', '_blank')
     })
 
+    test('normalizes a scheme-less trackingUrl to an absolute external href (not a relative path)', () => {
+        // Without normalization the browser resolves "www.carrier.com/t" relative to the
+        // current page; ensureExternalUrl prepends https:// so it points at the carrier.
+        renderWithProviders(<OrderTracking {...baseProps} trackingUrl="www.carrier.test/t" />)
+        const link = screen.getByRole('link', {name: /TRACK-12345/i})
+        expect(link).toHaveAttribute('href', 'https://www.carrier.test/t')
+    })
+
     test('renders the tracking number as plain text (no link) when trackingUrl is absent', () => {
         renderWithProviders(<OrderTracking {...baseProps} trackingUrl={undefined} />)
+        expect(screen.queryByRole('link', {name: /TRACK-12345/i})).not.toBeInTheDocument()
+        expect(screen.getByText(/TRACK-12345/)).toBeInTheDocument()
+    })
+
+    test('renders the tracking number as plain text (no link) when trackingUrl is unsafe', () => {
+        // ensureExternalUrl rejects the userinfo spoof -> no href -> plain text, not a link to evil.com
+        renderWithProviders(
+            <OrderTracking {...baseProps} trackingUrl="https://www.ups.com@evil.com" />
+        )
         expect(screen.queryByRole('link', {name: /TRACK-12345/i})).not.toBeInTheDocument()
         expect(screen.getByText(/TRACK-12345/)).toBeInTheDocument()
     })
