@@ -592,7 +592,7 @@
     },
     {
       "type": 0,
-      "value": "Ƈȧȧƞƈḗḗŀ ǿǿřḓḗḗř"
+      "value": "Ƈȧȧƞƈḗḗŀ Ǿřḓḗḗř"
     },
     {
       "type": 0,
@@ -725,12 +725,34 @@
       "value": "["
     },
     {
-      "type": 1,
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " īŧḗḗḿ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " īŧḗḗḿş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
       "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " īŧḗḗḿş"
     },
     {
       "type": 0,
@@ -1155,12 +1177,34 @@
       "value": "["
     },
     {
-      "type": 1,
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " īŧḗḗḿ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " īŧḗḗḿş"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
       "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " īŧḗḗḿş"
     },
     {
       "type": 0,
@@ -1228,7 +1272,7 @@
     },
     {
       "type": 0,
-      "value": "Ṽīḗḗẇ ḓḗḗŧȧȧīŀş"
+      "value": "Ṽīḗḗẇ Ḓḗḗŧȧȧīŀş"
     },
     {
       "type": 0,
@@ -7018,7 +7062,7 @@
     },
     {
       "type": 0,
-      "value": "Ƈȧȧƞƈḗḗŀŀḗḗḓ"
+      "value": "Ƈȧȧƞƈḗḗŀḗḗḓ"
     },
     {
       "type": 0,
