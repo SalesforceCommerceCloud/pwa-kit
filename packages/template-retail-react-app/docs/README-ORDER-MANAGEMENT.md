@@ -3,9 +3,9 @@
 The order detail page surfaces three [Salesforce Order Management
 (OMS/SOM)](https://help.salesforce.com/s/articleView?id=commerce.om_order_management.htm&type=5)
 shopper actions: **returning** eligible items, **cancelling** an order, and
-**tracking** shipments. All three are driven by the OMS data attached to the order —
+**tracking** shipments. All three are driven by the OMS data attached to the order—
 eligibility, returnable/cancellable quantities, statuses, and tracking details come
-from OMS — and the authoritative accept/reject for the mutating actions happens
+from OMS—and the authoritative accept/reject for the mutating actions happens
 server-side via the corresponding order action.
 
 There is **no feature flag**. Each action is gated entirely on data and shopper
@@ -17,7 +17,7 @@ order/shipment status everywhere.
 
 These features require a **Salesforce Order Management (SOM) core org connected to
 the storefront's B2C Commerce instance**. SOM is what enriches orders with the
-`omsData` this UI depends on — order- and item-level OMS data (returnable/cancellable
+`omsData` this UI depends on—order- and item-level OMS data (returnable/cancellable
 quantities, item statuses, shipment tracking) and the order actions
 `POST .../orders/{orderNo}/actions/oms-return-order` (`returnOmsOrder`) and
 `POST .../orders/{orderNo}/actions/oms-cancel-order` (`cancelOmsOrder`) on the
@@ -77,7 +77,7 @@ partially-returned multi-unit lines.
 
 ### Return Reason Codes
 
-Reasons are not hard-coded — they come from OMS via
+Reasons are not hard-coded—they come from OMS via
 `useOmsMetaData().data.returnReasonCodes`, where each entry is `{reason, default}`. The
 entry flagged `default: true` is pre-selected and omitted from the request body so
 the server applies it. Change the available reasons in Order Management; no
@@ -121,7 +121,7 @@ a cancellation just succeeded, or a terminal error made the order un-actionable.
 | Every item fully cancellable | `item.omsData.quantityAvailableToCancel === item.omsData.quantityOrdered` for **all** `productItems` |
 
 Cancellation is all-or-nothing: it's offered only when every line can still be
-cancelled in full. Once any unit has shipped, the order is no longer cancellable.
+cancelled in full. Once any unit has shipped, the order is no longer cancelable.
 
 ### How It Works
 
@@ -133,11 +133,11 @@ cancelled in full. Once any unit has shipped, the order is no longer cancellable
    (`POST .../actions/oms-cancel-order`); the `reason` is sent only when provided.
 3. On success an "Order cancelled" alert is shown (after a short delay so screen
    readers finish announcing the modal close) and the order status badge flips to
-   **Cancelled**.
+   **Canceled**.
 4. On failure, cancellation follows the same convention as returns (see
-   [Error Handling](#error-handling) above): a `404` or `409` is **terminal** — the
-   order can no longer be cancelled, so the button is permanently disabled with an
-   explanatory hint — while any other error shows a generic, retryable message. Unlike
+   [Error Handling](#error-handling) above): a `404` or `409` is **terminal**—the
+   order can no longer be canceled, so the button is permanently disabled with an
+   explanatory hint—while any other error shows a generic, retryable message. Unlike
    returns, cancellation has no per-`errorCode` classifier; it keys off the HTTP
    status alone.
 
@@ -147,15 +147,15 @@ Return feedback is kept separate from cancel feedback so the **Cancelled** badge
 ## Order Tracking
 
 [`OrderTracking`](../app/components/order-tracking) is a presentational, bordered
-**tracking card** — one per shipment — rendered in a single flat **Tracking** section
+**tracking card**—one per shipment—rendered in a single flat **Tracking** section
 on the order detail page. Each card shows the carrier / shipping-method name, the
-localized shipping status, the tracking number, and — when present — the expected and
+localized shipping status, the tracking number, and—when present—the expected and
 actual delivery dates. A card carries **no shipping address** (addresses live with the
 items; see [Shipments and addresses](#shipments-and-addresses) below).
 
 The cards are built from `trackingEntries` (`order-detail.jsx`): one entry per
-`order.omsData.shipments[]`, falling back to `order.shipments[]` (ECOM) only when there
-are no OMS shipments. ECOM-fallback cards have no provider, tracking URL, or dates
+`order.omsData.shipments[]`, falling back to `order.shipments[]` (B2C Commerce) only when there
+are no OMS shipments. B2C Commerce-fallback cards have no provider, tracking URL, or dates
 (those are OMS-only).
 
 Key behaviors:
@@ -163,15 +163,15 @@ Key behaviors:
 - **Carrier link safety.** When a tracking URL is available, the tracking number is
   hyperlinked through [`ensureExternalUrl`](../app/utils/url.js), which normalizes the
   scheme and rejects unsafe inputs (`javascript:` URLs, host-spoofing like
-  `https://www.ups.com@evil.com`, and relative paths) — returning `undefined` so the
+  `https://www.ups.com@evil.com`, and relative paths)—returning `undefined` so the
   number renders as plain text instead. Otherwise the tracking number is shown
   unlinked.
 - **Date guarding.** Missing, null, or unparseable delivery dates render nothing
   rather than a misleading value. The `!value` guard is load-bearing: `new Date(null)`
   returns the epoch (1970-01-01), not an Invalid Date, so without it a null delivery
   date would display "31 Dec 1969".
-- **OMS-over-ECOM fallback.** The component receives already-resolved scalar props;
-  the fallback that prefers OMS shipment fields over ECOM ones lives at the call site
+- **OMS-over-B2C Commerce fallback.** The component receives already-resolved scalar props;
+  the fallback that prefers OMS shipment fields over B2C Commerce ones lives at the call site
   in `order-detail.jsx`. A provider-less OMS shipment borrows the delivery shipment's
   method name **only** in the unambiguous one-OMS-↔-one-delivery case; multi-shipment
   never joins, so a provider-less card simply shows no carrier name.
@@ -179,8 +179,8 @@ Key behaviors:
 ### Track Shipment action
 
 A single **Track Shipment** order action sits in the actions row alongside Return
-Items / Cancel Order. Its source is `trackingUrlOptions` — the externalizable
-(`ensureExternalUrl`'d) carrier URLs from `order.omsData.shipments` — so it can never
+Items / Cancel Order. Its source is `trackingUrlOptions`—the externalizable
+(`ensureExternalUrl`'d) carrier URLs from `order.omsData.shipments`—so it can never
 diverge from the tracking-number links in the cards. It has three states:
 
 - **No externalizable URL** → the button renders **disabled** (kept visible, focusable
@@ -195,8 +195,8 @@ diverge from the tracking-number links in the cards. It has three states:
 
 Shipment data arrives on the order in two lists with no correlation key between them:
 tracking info (status, tracking number/URL, dates) in `order.omsData.shipments`, and
-shipping addresses in `order.shipments` (ECOM delivery groups). They can't be reliably
-paired — ECOM models a *delivery group* (the shopper's intent: which items go to which
+shipping addresses in `order.shipments` (B2C Commerce delivery groups). They can't be reliably
+paired—B2C Commerce models a *delivery group* (the shopper's intent: which items go to which
 address) while OMS models a fulfillment *shipment* (a physical package), and a single
 delivery group can fan out into several OMS shipments (e.g. units of one line shipped
 from different warehouses). Pairing by index would risk showing the wrong address
@@ -207,12 +207,12 @@ one it can't:
 
 - **Items ↔ address (supported).** In the Items Ordered section, products are grouped
   into a box per delivery shipment, and each box shows that delivery group's
-  **Shipping Address**. This is an ECOM-internal grouping (`shipmentId`), so it's
+  **Shipping Address**. This is a B2C Commerce-internal grouping (`shipmentId`), so it's
   reliable. A single-shipment order is one box; BOPIS pickup-only orders (no delivery
   shipment) fall back to one flat product list.
 - **Tracking ↔ shipment (not associated).** The Tracking section is a flat list of
   cards rendered as peers *below* the shipment boxes, with **no address** and **no
-  positional OMS↔ECOM index-join** — the layout is honest that neither the shopper nor
+  positional OMS↔B2C Commerce index-join**—the layout is honest that neither the shopper nor
   the storefront can say which tracking entry belongs to which box.
 
 Multi-shipment tracking **grouped by address** remains out of scope, deferred to a TD
@@ -225,7 +225,7 @@ place. [`getOrderDisplayStatus(order)`](../app/utils/order-status-utils.js) aggr
 item-level SOM statuses into a single order-level display status, because SOM exposes
 status per line item rather than a reliable order-level status.
 
-> **Status is computed from item-level OMS data — by design, not preference.**
+> **Status is computed from item-level OMS data—by design, not preference.**
 > The order-level `omsData.status` is known to be unreliable: in SOM it can stay
 > `Approved` even after every item has been cancelled or returned, because the
 > order-level rollup lags behind (or never reflects) the item-level state. The
@@ -244,7 +244,7 @@ from the quantity fields (`quantityCanceled`, `quantityReturned`,
 partially-cancelled multi-unit line reads correctly instead of masquerading as merely
 "in progress".
 
-The return-related display statuses —
+The return-related display statuses—
 
 - `RETURN_INITIATED`
 - `PARTIAL_RETURN_INITIATED`
@@ -261,20 +261,20 @@ status, fall back to the raw `order.status || order.omsData?.status`.
 
 The pieces a project most commonly overrides:
 
-- **Eligibility** — adjust the gating (`showStartReturn` / `canCancel`) in
+- **Eligibility**—adjust the gating (`showStartReturn` / `canCancel`) in
   [`order-detail.jsx`](../app/pages/account/order-detail.jsx), or the predicate in
   [`getReturnableItems`](../app/utils/return-utils.js), if your business rules differ.
-- **Messages** — return modal copy lives in
+- **Messages**—return modal copy lives in
   [`return-items-modal/constants.js`](../app/components/return-items-modal/constants.js);
   cancel and tracking copy are inline `react-intl` messages. Localize or reword via
   translation files.
-- **Error mapping** — extend `ERROR_CODE_TO_KIND` in
+- **Error mapping**—extend `ERROR_CODE_TO_KIND` in
   [`return-error-utils.js`](../app/utils/return-error-utils.js) to give a new return
   `errorCode` its own inline message instead of the generic fallback.
-- **Status labels and colors** — override the labels and badge styling in
+- **Status labels and colors**—override the labels and badge styling in
   [`OrderStatusBadge`](../app/components/order-status-badge/index.jsx); the pure
   aggregation in [`order-status-utils.js`](../app/utils/order-status-utils.js) stays
   presentation-free.
-- **Tracking links** — the external-URL hardening lives in
+- **Tracking links**—the external-URL hardening lives in
   [`ensureExternalUrl`](../app/utils/url.js); tighten or relax the allowed schemes
   there.
