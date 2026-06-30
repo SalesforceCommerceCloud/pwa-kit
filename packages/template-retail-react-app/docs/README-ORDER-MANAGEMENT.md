@@ -1,7 +1,7 @@
 # Order Management
 
 The order detail page surfaces three [Salesforce Order Management
-(OMS/SOM)](https://help.salesforce.com/s/articleView?id=commerce.order_management.htm)
+(OMS/SOM)](https://help.salesforce.com/s/articleView?id=commerce.om_order_management.htm&type=5)
 shopper actions: **returning** eligible items, **cancelling** an order, and
 **tracking** shipments. All three are driven by the OMS data attached to the order —
 eligibility, returnable/cancellable quantities, statuses, and tracking details come
@@ -9,7 +9,7 @@ from OMS — and the authoritative accept/reject for the mutating actions happen
 server-side via the corresponding order action.
 
 There is **no feature flag**. Each action is gated entirely on data and shopper
-identity in [`order-detail.jsx`](../app/pages/account/order-detail.jsx). ECOM-only
+identity in [`order-detail.jsx`](../app/pages/account/order-detail.jsx). B2C Commerce-only
 orders (no `omsData`) never expose the return or cancel flows, and fall back to raw
 order/shipment status everywhere.
 
@@ -19,13 +19,13 @@ These features require a **Salesforce Order Management (SOM) core org connected 
 the storefront's B2C Commerce instance**. SOM is what enriches orders with the
 `omsData` this UI depends on — order- and item-level OMS data (returnable/cancellable
 quantities, item statuses, shipment tracking) and the `oms-return-order` /
-`oms-cancel-order` SCAPI order actions. See the [Order Management
-setup](https://help.salesforce.com/s/articleView?id=commerce.order_management.htm)
+`oms-cancel-order` B2C Commerce API (SCAPI) order actions. See the [Integrate Order
+Management with B2C Commerce](https://help.salesforce.com/s/articleView?id=commerce.om_impl_storefront_integration.htm&type=5)
 docs for connecting and provisioning the org.
 
-Without a connected SOM org, orders carry no `omsData`: they are treated as ECOM-only,
+Without a connected SOM org, orders carry no `omsData`: they are treated as B2C Commerce-only,
 the return and cancel actions never render, return reasons can't load, and the status
-badge falls back to the raw `order.status || order.omsData?.status`. Nothing errors — the features simply stay
+badge falls back to the raw `order.status || order.omsData?.status`. Nothing errors—the features simply stay
 hidden. There is no storefront flag to turn them on; presence of OMS data on the order
 is the switch.
 
@@ -42,7 +42,7 @@ partially-returned multi-unit lines.
 | --- | --- | --- |
 | Registered shopper | `useCustomerType().isRegistered` | Guests never see the return UI. |
 | Owns the order | `order.customerInfo.customerId === customerId` | A shopper can only return their own orders. |
-| OMS-managed order | `!!order.omsData` | ECOM-only orders carry no OMS data. |
+| OMS-managed order | `!!order.omsData` | B2C Commerce-only orders carry no OMS data. |
 | Has returnable items | `getReturnableItems(order).length > 0` | At least one line has `omsData.quantityAvailableToReturn > 0`. |
 
 ### How It Works
@@ -103,8 +103,8 @@ refreshed by the SDK auth layer before the classifier ever sees it.
 ## Order Cancellation
 
 Registered shoppers can cancel an order that hasn't started fulfillment. The
-**Cancel order** button renders unconditionally (so its position is stable) but is
-disabled — with a screen-reader hint explaining why — when the order isn't eligible,
+**Cancel Order** button renders unconditionally (so its position is stable) but is
+disabled—with a screen-reader hint explaining why—when the order isn't eligible,
 a cancellation just succeeded, or a terminal error made the order un-actionable.
 
 ### Eligibility
@@ -177,7 +177,7 @@ Key behaviors:
 ### Track Shipment action
 
 A single **Track Shipment** order action sits in the actions row alongside Return
-Items / Cancel order. Its source is `trackingUrlOptions` — the externalizable
+Items / Cancel Order. Its source is `trackingUrlOptions` — the externalizable
 (`ensureExternalUrl`'d) carrier URLs from `order.omsData.shipments` — so it can never
 diverge from the tracking-number links in the cards. It has three states:
 
@@ -252,7 +252,7 @@ The return-related display statuses —
 are grouped by `isReturnDisplayStatus`. The
 [`OrderStatusBadge`](../app/components/order-status-badge/index.jsx) renders these in a
 neutral badge with their own localized labels, leaving the cancelled (red) and
-raw-status (green) branches untouched. ECOM-only orders, which carry no item-level OMS
+raw-status (green) branches untouched. B2C Commerce-only orders, which carry no item-level OMS
 status, fall back to the raw `order.status || order.omsData?.status`.
 
 ## Customization
