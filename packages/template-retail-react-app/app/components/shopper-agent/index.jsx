@@ -255,7 +255,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         sfLanguage,
         domainUrl,
         organizationId,
-        configSiteId
+        configSiteId,
+        myDomain
     }
 
     const lastConversationSessionInitRef = useRef(null)
@@ -400,11 +401,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
 
         const handleEmbeddedMessagingConversationStarted = (event) => {
-            const {organizationId: orgId, configSiteId: sid} = embeddedLifecycleRef.current
+            const {organizationId: orgId, configSiteId: sid, myDomain: domain} = embeddedLifecycleRef.current
 
             if (!orgId || !sid) return
 
-            if (!myDomain) return
+            if (!domain) return
 
             // Prevents refiring of the event if already call has been done
             const conversationId = event?.detail?.conversationId
