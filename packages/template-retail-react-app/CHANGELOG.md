@@ -1,4 +1,5 @@
 ## v10.1.0-dev (May 07, 2026)
+- Stabilize the Lighthouse CI job: track the environment-sensitive `performance` and `pwa` category scores as warnings (rather than hard errors) since GitHub-hosted runners produce noisy runtime metrics, keep `seo` and `accessibility` as hard gates, run each URL 5 times for a steadier median, and pause after load so the web app manifest is fetched before gathering ends (fixing a spurious PWA `service-worker` audit failure).
 
 ## v10.0.0 (May 07, 2026)
 - Update MRT Data Store configuration comments and README to use the unprefixed environment variable names actually consumed by `@salesforce/mrt-utilities` (`MRT_DATA_STORE_DEFAULTS`, `MRT_DATA_STORE_WARN_ON_MISSING`). [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
