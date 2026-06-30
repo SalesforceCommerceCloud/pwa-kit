@@ -18,9 +18,11 @@ order/shipment status everywhere.
 These features require a **Salesforce Order Management (SOM) core org connected to
 the storefront's B2C Commerce instance**. SOM is what enriches orders with the
 `omsData` this UI depends on — order- and item-level OMS data (returnable/cancellable
-quantities, item statuses, shipment tracking) and the `oms-return-order` /
-`oms-cancel-order` B2C Commerce API (SCAPI) order actions. See the [Integrate Order
-Management with B2C Commerce](https://help.salesforce.com/s/articleView?id=commerce.om_impl_storefront_integration.htm&type=5)
+quantities, item statuses, shipment tracking) and the order actions
+`POST .../orders/{orderNo}/actions/oms-return-order` (`returnOmsOrder`) and
+`POST .../orders/{orderNo}/actions/oms-cancel-order` (`cancelOmsOrder`) on the
+[Shopper Orders B2C Commerce API (SCAPI)](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-orders:Summary).
+See the [Integrate Order Management with B2C Commerce](https://help.salesforce.com/s/articleView?id=commerce.om_impl_storefront_integration.htm&type=5)
 docs for connecting and provisioning the org.
 
 Without a connected SOM org, orders carry no `omsData`: they are treated as B2C Commerce-only,
