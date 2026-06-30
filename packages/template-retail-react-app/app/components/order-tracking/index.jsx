@@ -10,25 +10,28 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
-    Heading,
     Stack,
     Text,
     Link as ChakraLink
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {ensureExternalUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {formatShipmentStatus} from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
 
 /**
- * Presentational tracking block for a single shipment on the Order Details page.
+ * Presentational per-shipment tracking card on the Order Details page.
  *
- * Renders the shipping method heading, the (localized) shipping status, the
- * shipping method / provider name, the tracking number (hyperlinked to the
- * carrier site when a tracking URL is available, otherwise plain text), and —
- * when present — the expected and actual delivery dates.
+ * Renders one bordered card containing the carrier / shipping-method name, the
+ * localized shipping status, the tracking number (hyperlinked to the carrier
+ * site when a tracking URL is available, otherwise plain text), and — when
+ * present — the expected and actual delivery dates. The card carries NO shipping
+ * address: addresses are rendered separately at order level, because a tracking
+ * entry cannot be reliably tied to a specific shipment (the multi-shipment view is
+ * a flat list with no address association).
  *
  * Note: the OMS-over-ECOM fallback for the shipment fields lives at the call
- * sites in `order-detail.jsx` (the component receives already-resolved scalar
- * props). A future WI may centralize that fallback into a normalized-shipment
- * helper if more call sites are added.
+ * site in `order-detail.jsx` (the component receives already-resolved scalar
+ * props), and the caller renders one card per entry of a single flat list — never
+ * a positional OMS↔ECOM index-join.
  */
 const OrderTracking = ({
     shippingMethodName,
@@ -36,9 +39,7 @@ const OrderTracking = ({
     trackingNumber,
     trackingUrl,
     expectedDeliveryDate,
-    actualDeliveryDate,
-    shipmentsLength,
-    index
+    actualDeliveryDate
 }) => {
     const {formatMessage, formatDate} = useIntl()
 
@@ -62,41 +63,22 @@ const OrderTracking = ({
     const trackingHref = ensureExternalUrl(trackingUrl)
 
     return (
-        <Stack spacing={1}>
-            <Heading as="h2" fontSize="sm" pt={1}>
-                {shipmentsLength > 1 ? (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method {number}"
-                        id="account_order_detail.heading.shipping_method_number"
-                        values={{number: index + 1}}
-                    />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Shipping Method"
-                        id="account_order_detail.heading.shipping_method"
-                    />
-                )}
-            </Heading>
-            <Box>
-                <Text fontSize="sm" textTransform="titlecase">
-                    {/* Inline literal descriptors so babel-plugin-formatjs can statically
-                        extract these ids (a hoisted/variable descriptor is NOT extracted). */}
-                    {{
-                        not_shipped: formatMessage({
-                            defaultMessage: 'Not shipped',
-                            id: 'account_order_detail.shipping_status.not_shipped'
-                        }),
-                        part_shipped: formatMessage({
-                            defaultMessage: 'Partially shipped',
-                            id: 'account_order_detail.shipping_status.part_shipped'
-                        }),
-                        shipped: formatMessage({
-                            defaultMessage: 'Shipped',
-                            id: 'account_order_detail.shipping_status.shipped'
-                        })
-                    }[shippingStatus] || shippingStatus}
+        <Box
+            border="1px solid"
+            borderColor="gray.100"
+            borderRadius="base"
+            p={4}
+            data-testid="order-tracking-card"
+        >
+            <Stack spacing={1}>
+                <Text fontSize="sm" textTransform="capitalize">
+                    {formatShipmentStatus(shippingStatus, formatMessage)}
                 </Text>
-                <Text fontSize="sm">{shippingMethodName}</Text>
+                {shippingMethodName && (
+                    <Text fontSize="sm" fontWeight="medium">
+                        {shippingMethodName}
+                    </Text>
+                )}
                 {trackingNumber && (
                     <Text fontSize="sm">
                         <FormattedMessage
@@ -133,8 +115,8 @@ const OrderTracking = ({
                         : {actualDeliveryLabel}
                     </Text>
                 )}
-            </Box>
-        </Stack>
+            </Stack>
+        </Box>
     )
 }
 
@@ -150,11 +132,7 @@ OrderTracking.propTypes = {
     /** Expected delivery date (ISO string); when present, renders an "Expected delivery: <date>" line. */
     expectedDeliveryDate: PropTypes.string,
     /** Actual delivery date (ISO string); when present, renders a "Delivered: <date>" line. */
-    actualDeliveryDate: PropTypes.string,
-    /** Total number of shipments being rendered (drives the numbered heading). */
-    shipmentsLength: PropTypes.number,
-    /** Zero-based index of this shipment (drives the numbered heading). */
-    index: PropTypes.number
+    actualDeliveryDate: PropTypes.string
 }
 
 export default OrderTracking

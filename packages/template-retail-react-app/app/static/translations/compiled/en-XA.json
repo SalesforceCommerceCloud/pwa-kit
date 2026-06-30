@@ -613,6 +613,56 @@
       "value": "]"
     }
   ],
+  "account_order_detail.button.track_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.button.track_shipment": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ Şħīƥḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.button.track_shipment_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķ şħīƥḿḗḗƞŧ "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,
@@ -701,6 +751,20 @@
       "value": "]"
     }
   ],
+  "account_order_detail.heading.other_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŧħḗḗř īŧḗḗḿş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.heading.payment_method": [
     {
       "type": 0,
@@ -747,6 +811,38 @@
       "value": "]"
     }
   ],
+  "account_order_detail.heading.shipment": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥḿḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.heading.shipment_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥḿḗḗƞŧ "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,
@@ -761,50 +857,14 @@
       "value": "]"
     }
   ],
-  "account_order_detail.heading.shipping_address_number": [
+  "account_order_detail.heading.tracking": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şħīƥƥīƞɠ Ȧḓḓřḗḗşş "
-    },
-    {
-      "type": 1,
-      "value": "number"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.heading.shipping_method": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "account_order_detail.heading.shipping_method_number": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ "
-    },
-    {
-      "type": 1,
-      "value": "number"
+      "value": "Ŧřȧȧƈķīƞɠ"
     },
     {
       "type": 0,
@@ -833,6 +893,20 @@
     {
       "type": 0,
       "value": "Ƞǿǿ īŧḗḗḿş ǿǿƞ ŧħīş ǿǿřḓḗḗř ȧȧřḗḗ ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ řḗḗŧŭŭřƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.no_tracking": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķīƞɠ īş ƞǿǿŧ ȧȧṽȧȧīŀȧȧƀŀḗḗ ƒǿǿř ŧħīş ǿǿřḓḗḗř ẏḗḗŧ."
     },
     {
       "type": 0,

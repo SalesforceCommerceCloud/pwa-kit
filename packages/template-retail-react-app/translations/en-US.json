@@ -128,6 +128,15 @@
   "account_order_detail.button.start_return": {
     "defaultMessage": "Return Items"
   },
+  "account_order_detail.button.track_number": {
+    "defaultMessage": "Track {trackingNumber}"
+  },
+  "account_order_detail.button.track_shipment": {
+    "defaultMessage": "Track Shipment"
+  },
+  "account_order_detail.button.track_shipment_number": {
+    "defaultMessage": "Track shipment {number}"
+  },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
   },
@@ -146,6 +155,9 @@
   "account_order_detail.heading.order_actions": {
     "defaultMessage": "Order Actions"
   },
+  "account_order_detail.heading.other_items": {
+    "defaultMessage": "Other items"
+  },
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
   },
@@ -155,23 +167,26 @@
   "account_order_detail.heading.pickup_address_number": {
     "defaultMessage": "Pickup Address {number}"
   },
+  "account_order_detail.heading.shipment": {
+    "defaultMessage": "Shipment"
+  },
+  "account_order_detail.heading.shipment_number": {
+    "defaultMessage": "Shipment {number}"
+  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
-  "account_order_detail.heading.shipping_address_number": {
-    "defaultMessage": "Shipping Address {number}"
-  },
-  "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
-  },
-  "account_order_detail.heading.shipping_method_number": {
-    "defaultMessage": "Shipping Method {number}"
+  "account_order_detail.heading.tracking": {
+    "defaultMessage": "Tracking"
   },
   "account_order_detail.hint.cancel_unavailable": {
     "defaultMessage": "This order can no longer be cancelled."
   },
   "account_order_detail.hint.no_returnable_items": {
     "defaultMessage": "No items on this order are available to return."
+  },
+  "account_order_detail.hint.no_tracking": {
+    "defaultMessage": "Tracking is not available for this order yet."
   },
   "account_order_detail.hint.not_cancellable": {
     "defaultMessage": "This order is not eligible for cancellation."
