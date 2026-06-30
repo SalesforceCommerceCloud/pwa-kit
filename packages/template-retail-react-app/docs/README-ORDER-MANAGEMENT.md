@@ -188,7 +188,7 @@ The agreed scope is therefore **a flat list with no address association**:
   orders; multi-shipment orders omit it. The address is reachable through the carrier
   tracking link anyway, so nothing is lost and nothing is mispaired.
 - A single order-level **Track Shipment** action links to the first shipment with a
-  carrier URL (disabled when none).
+  carrier URL (disabled when none). _(Arriving via PR #3906; not yet on this branch.)_
 
 Multi-shipment **grouped by address** is out of scope, deferred to a TD pending SCAPI
 returning correlated address data on `order.omsData.shipments`.
