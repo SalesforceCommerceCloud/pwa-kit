@@ -335,6 +335,12 @@
       "value": "Order Actions"
     }
   ],
+  "account_order_detail.heading.other_items": [
+    {
+      "type": 0,
+      "value": "Other items"
+    }
+  ],
   "account_order_detail.heading.payment_method": [
     {
       "type": 0,
@@ -395,6 +401,12 @@
     {
       "type": 0,
       "value": "No items on this order are available to return."
+    }
+  ],
+  "account_order_detail.hint.no_tracking": [
+    {
+      "type": 0,
+      "value": "Tracking is not available for this order yet."
     }
   ],
   "account_order_detail.hint.not_cancellable": [

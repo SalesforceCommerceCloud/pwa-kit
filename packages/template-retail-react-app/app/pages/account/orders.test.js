@@ -1414,9 +1414,14 @@ describe('OMS Multi-shipment - per-shipment boxes', () => {
             )
         )
         await screen.findByTestId('account-order-details-page')
+        // Two delivery-shipment boxes (Alice/Bob), each with its native address. This
+        // fixture's shipments and items carry NO shipmentId, so the items can't be placed
+        // in a shipment box and surface in an "Other items" box → 3 boxes total. (Before the
+        // leftover fallback, those items rendered in no box at all — the silent-drop bug.)
         await waitFor(() => {
-            expect(document.querySelectorAll('[data-shipment-id]')).toHaveLength(2)
+            expect(document.querySelectorAll('[data-shipment-id]').length).toBeGreaterThanOrEqual(2)
         })
+        expect(document.querySelector('[data-shipment-id="other-items"]')).toBeInTheDocument()
         const shippingAddressHeadings = await screen.findAllByRole('heading', {
             name: /shipping address/i
         })
@@ -1573,10 +1578,78 @@ describe('ECOM Multi-shipment - per-shipment boxes', () => {
         expect(within(box2).queryByText('Ship1 Item')).not.toBeInTheDocument()
     })
 
-    test('should display ECOM shipping statuses', async () => {
-        // Use exact match to avoid "Not shipped" matching "Shipped"
-        expect(await screen.findByText('Shipped')).toBeInTheDocument()
-        expect(await screen.findByText('Not shipped')).toBeInTheDocument()
+    test('should display ECOM shipping statuses (localized, in box header + tracking card)', async () => {
+        // The status now renders localized in BOTH the per-shipment box header and the
+        // tracking card (shared formatter), so each label can appear more than once.
+        // Exact match avoids "Not shipped" matching "Shipped".
+        expect((await screen.findAllByText('Shipped')).length).toBeGreaterThanOrEqual(1)
+        expect((await screen.findAllByText('Not shipped')).length).toBeGreaterThanOrEqual(1)
+    })
+})
+
+describe('Multi-shipment - items matching no box surface in an "Other items" box', () => {
+    // Multi-shipment order where some items can't be placed in a shipment box: one item
+    // has no shipmentId, another names a shipmentId that no delivery shipment has. Without
+    // a fallback these would render in NO box while the "{count} items" header still counts
+    // them — silent data loss. They must appear in a final "Other items" box instead.
+    const orphanItemOrder = createMockOrder({
+        productItems: [
+            {productId: 'p-ship1', productName: 'Ship1 Item', quantity: 1, shipmentId: 'ship1'},
+            {productId: 'p-ship2', productName: 'Ship2 Item', quantity: 1, shipmentId: 'ship2'},
+            // No shipmentId → 'default' bucket, which no box reads.
+            {productId: 'p-untagged', productName: 'Untagged Item', quantity: 1},
+            // shipmentId names no delivery shipment → matches no box.
+            {productId: 'p-ghost', productName: 'Ghost Item', quantity: 1, shipmentId: 'ship-gone'}
+        ],
+        shipments: [
+            {shipmentId: 'ship1', shippingMethod: {name: 'Ground'}, shippingStatus: 'shipped'},
+            {shipmentId: 'ship2', shippingMethod: {name: 'Express'}, shippingStatus: 'not_shipped'}
+        ]
+    })
+
+    const productsForOrphans = {
+        data: [
+            {id: 'p-ship1', name: 'Ship1 Item', currency: 'USD', imageGroups: []},
+            {id: 'p-ship2', name: 'Ship2 Item', currency: 'USD', imageGroups: []},
+            {id: 'p-untagged', name: 'Untagged Item', currency: 'USD', imageGroups: []},
+            {id: 'p-ghost', name: 'Ghost Item', currency: 'USD', imageGroups: []}
+        ],
+        total: 4
+    }
+
+    beforeEach(async () => {
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) =>
+                res(ctx.delay(0), ctx.json(productsForOrphans))
+            )
+        )
+        setupOrderDetailsPage(orphanItemOrder)
+    })
+
+    test('renders an "Other items" box containing the unmatched items', async () => {
+        await screen.findByTestId('account-order-details-page')
+        // findByText waits for the async products fetch that drives the item tiles.
+        await screen.findByText('Untagged Item')
+        const otherBox = document.querySelector('[data-shipment-id="other-items"]')
+        expect(otherBox).toBeInTheDocument()
+        expect(within(otherBox).getByRole('heading', {name: /other items/i})).toBeInTheDocument()
+        // Both unplaceable items live in the Other items box...
+        expect(within(otherBox).getByText('Untagged Item')).toBeInTheDocument()
+        expect(within(otherBox).getByText('Ghost Item')).toBeInTheDocument()
+        // ...and the matched items stay in their own boxes (not duplicated into Other items).
+        expect(within(otherBox).queryByText('Ship1 Item')).not.toBeInTheDocument()
+        expect(within(otherBox).queryByText('Ship2 Item')).not.toBeInTheDocument()
+    })
+
+    test('every purchased item is rendered exactly once across all boxes', async () => {
+        await screen.findByTestId('account-order-details-page')
+        // Wait for the tiles to resolve before counting.
+        await screen.findByText('Ship1 Item')
+        await screen.findByText('Untagged Item')
+        // No item silently vanishes: each of the 4 product names appears exactly once.
+        for (const name of ['Ship1 Item', 'Ship2 Item', 'Untagged Item', 'Ghost Item']) {
+            expect(screen.getAllByText(name)).toHaveLength(1)
+        }
     })
 })
 
@@ -2856,7 +2929,9 @@ describe('Track Shipment button', () => {
     })
 
     // No shipment has a usable URL — whether shipments exist without URLs, or omsData
-    // has no shipments at all — collapses to one disabled, href-less button (Jie D3).
+    // has no shipments at all — collapses to one href-less, aria-disabled button. It uses
+    // aria-disabled (not native disabled) so it stays keyboard/SR-focusable and announces
+    // why it's unavailable, matching the Cancel/Return buttons in the same row.
     test.each([
         [
             'shipments exist but none carry a URL',
@@ -2864,7 +2939,7 @@ describe('Track Shipment button', () => {
         ],
         ['omsData has no shipments at all', undefined]
     ])(
-        'shows a single disabled (href-less) Track Shipment button when %s',
+        'shows a single aria-disabled (href-less) Track Shipment button when %s',
         async (_label, shipments) => {
             setupOrderDetailsPage(
                 shipments
@@ -2874,8 +2949,12 @@ describe('Track Shipment button', () => {
             const buttons = await screen.findAllByTestId('account-order-detail-track-shipment')
             expect(buttons).toHaveLength(1)
             expect(buttons[0]).toHaveTextContent('Track Shipment')
-            expect(buttons[0]).toBeDisabled()
-            expect(buttons[0]).not.toHaveAttribute('href') // disabled → not a link
+            expect(buttons[0]).toHaveAttribute('aria-disabled', 'true')
+            expect(buttons[0]).not.toHaveAttribute('href') // not a link when no URL
+            // The disabled reason is wired for screen readers.
+            const hintId = buttons[0].getAttribute('aria-describedby')
+            expect(hintId).toBeTruthy()
+            expect(document.getElementById(hintId)).toHaveTextContent(/tracking is not available/i)
         }
     )
 

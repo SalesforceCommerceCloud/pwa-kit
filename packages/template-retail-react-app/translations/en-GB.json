@@ -155,6 +155,9 @@
   "account_order_detail.heading.order_actions": {
     "defaultMessage": "Order Actions"
   },
+  "account_order_detail.heading.other_items": {
+    "defaultMessage": "Other items"
+  },
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
   },
@@ -181,6 +184,9 @@
   },
   "account_order_detail.hint.no_returnable_items": {
     "defaultMessage": "No items on this order are available to return."
+  },
+  "account_order_detail.hint.no_tracking": {
+    "defaultMessage": "Tracking is not available for this order yet."
   },
   "account_order_detail.hint.not_cancellable": {
     "defaultMessage": "This order is not eligible for cancellation."

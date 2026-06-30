@@ -751,6 +751,20 @@
       "value": "]"
     }
   ],
+  "account_order_detail.heading.other_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŧħḗḗř īŧḗḗḿş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.heading.payment_method": [
     {
       "type": 0,
@@ -879,6 +893,20 @@
     {
       "type": 0,
       "value": "Ƞǿǿ īŧḗḗḿş ǿǿƞ ŧħīş ǿǿřḓḗḗř ȧȧřḗḗ ȧȧṽȧȧīŀȧȧƀŀḗḗ ŧǿǿ řḗḗŧŭŭřƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.hint.no_tracking": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķīƞɠ īş ƞǿǿŧ ȧȧṽȧȧīŀȧȧƀŀḗḗ ƒǿǿř ŧħīş ǿǿřḓḗḗř ẏḗḗŧ."
     },
     {
       "type": 0,

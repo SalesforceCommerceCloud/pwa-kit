@@ -48,6 +48,7 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
+import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
 import OrderLoadError from '@salesforce/retail-react-app/app/components/order-load-error'
 import {groupShipmentsByDeliveryOption} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
@@ -72,6 +73,10 @@ const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
 // Static id linking the Cancel order button to its VisuallyHidden disabled-reason
 // hint (only one such button exists per page, so a constant is safe).
 const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
+
+// Static id linking the disabled Track Shipment button to its VisuallyHidden
+// disabled-reason hint (only one such button exists per page, so a constant is safe).
+const TRACK_DISABLED_HINT_ID = 'track-shipment-disabled-hint'
 
 // Group productItems by their shipmentId so each shipment box can render its own
 // items. Items with no shipmentId fall under 'default'.
@@ -827,18 +832,32 @@ const AccountOrderDetail = () => {
                                 />
                             </Button>
                         ) : (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                width={{base: 'full', sm: 'auto'}}
-                                isDisabled
-                                data-testid="account-order-detail-track-shipment"
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Track Shipment"
-                                    id="account_order_detail.button.track_shipment"
-                                />
-                            </Button>
+                            <>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    width={{base: 'full', sm: 'auto'}}
+                                    // Use aria-disabled (not isDisabled) so the button stays
+                                    // focusable while disabled — a native disabled button can't be
+                                    // focused, so a keyboard/SR user would never hear the hint
+                                    // explaining why it's unavailable. Mirrors the Cancel/Return
+                                    // buttons in this same row.
+                                    aria-disabled={true}
+                                    aria-describedby={TRACK_DISABLED_HINT_ID}
+                                    data-testid="account-order-detail-track-shipment"
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Track Shipment"
+                                        id="account_order_detail.button.track_shipment"
+                                    />
+                                </Button>
+                                <VisuallyHidden id={TRACK_DISABLED_HINT_ID}>
+                                    <FormattedMessage
+                                        defaultMessage="Tracking is not available for this order yet."
+                                        id="account_order_detail.hint.no_tracking"
+                                    />
+                                </VisuallyHidden>
+                            </>
                         )}
                         <Button
                             variant="outline"
@@ -1120,7 +1139,14 @@ const AccountOrderDetail = () => {
                                   )
                               }
                               const isSingleShipment = deliveryShipments.length === 1
-                              return deliveryShipments.map((shipment, index) => {
+                              // Track which item buckets a box actually renders, so any item that
+                              // matches no box (no shipmentId → 'default' bucket, or a shipmentId
+                              // that names no delivery shipment) can be surfaced in a fallback box
+                              // below instead of silently disappearing. The "{count} items" header
+                              // counts every productItem, so an unrendered item would otherwise be a
+                              // visible count/contents mismatch.
+                              const renderedBucketIds = new Set()
+                              const shipmentBoxes = deliveryShipments.map((shipment, index) => {
                                   const sid = shipment.shipmentId ?? `ship-${index}`
                                   // For a single shipment, all items belong to it (cover the
                                   // common case where productItems carry no shipmentId → they
@@ -1129,6 +1155,14 @@ const AccountOrderDetail = () => {
                                   const items = isSingleShipment
                                       ? order.productItems
                                       : itemsByShipmentId[sid] ?? []
+                                  if (isSingleShipment) {
+                                      // Single box owns every bucket.
+                                      Object.keys(itemsByShipmentId).forEach((k) =>
+                                          renderedBucketIds.add(k)
+                                      )
+                                  } else if (itemsByShipmentId[sid]) {
+                                      renderedBucketIds.add(sid)
+                                  }
                                   const address = shipment.shippingAddress
                                   return (
                                       <Box
@@ -1174,7 +1208,9 @@ const AccountOrderDetail = () => {
                                                       textTransform="capitalize"
                                                       whiteSpace="nowrap"
                                                   >
-                                                      {shipment.shippingStatus.replace(/_/g, ' ')}
+                                                      <ShipmentStatusLabel
+                                                          status={shipment.shippingStatus}
+                                                      />
                                                   </Text>
                                               )}
                                           </Flex>
@@ -1221,6 +1257,40 @@ const AccountOrderDetail = () => {
                                       </Box>
                                   )
                               })
+                              // Any items that landed in no rendered box (untagged → 'default', or a
+                              // shipmentId naming no delivery shipment) are shown in a final "Other
+                              // items" box so nothing the shopper paid for silently disappears.
+                              const leftoverItems = Object.entries(itemsByShipmentId)
+                                  .filter(([bucketId]) => !renderedBucketIds.has(bucketId))
+                                  .flatMap(([, items]) => items)
+                              if (leftoverItems.length > 0) {
+                                  shipmentBoxes.push(
+                                      <Box
+                                          key="other-items"
+                                          data-shipment-id="other-items"
+                                          border="1px solid"
+                                          borderColor="gray.100"
+                                          borderRadius="base"
+                                          overflow="hidden"
+                                      >
+                                          <Flex bg="gray.50" px={4} py={3} align="center">
+                                              <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                                  <FormattedMessage
+                                                      defaultMessage="Other items"
+                                                      id="account_order_detail.heading.other_items"
+                                                  />
+                                              </Heading>
+                                          </Flex>
+                                          <Stack spacing={4} p={[4, 6]}>
+                                              <OrderProducts
+                                                  productItems={leftoverItems}
+                                                  currency={order.currency}
+                                              />
+                                          </Stack>
+                                      </Box>
+                                  )
+                              }
+                              return shipmentBoxes
                           })()}
                 </Stack>
             </Stack>

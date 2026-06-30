@@ -15,6 +15,7 @@ import {
     Link as ChakraLink
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {ensureExternalUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {formatShipmentStatus} from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
 
 /**
  * Presentational per-shipment tracking card on the Order Details page.
@@ -23,8 +24,9 @@ import {ensureExternalUrl} from '@salesforce/retail-react-app/app/utils/url'
  * localized shipping status, the tracking number (hyperlinked to the carrier
  * site when a tracking URL is available, otherwise plain text), and — when
  * present — the expected and actual delivery dates. The card carries NO shipping
- * address: addresses are rendered separately at order level (epic
- * a3QEE000002QvBB2A0: "flat list for multiple shipments, NO address association").
+ * address: addresses are rendered separately at order level, because a tracking
+ * entry cannot be reliably tied to a specific shipment (the multi-shipment view is
+ * a flat list with no address association).
  *
  * Note: the OMS-over-ECOM fallback for the shipment fields lives at the call
  * site in `order-detail.jsx` (the component receives already-resolved scalar
@@ -70,22 +72,7 @@ const OrderTracking = ({
         >
             <Stack spacing={1}>
                 <Text fontSize="sm" textTransform="capitalize">
-                    {/* Inline literal descriptors so babel-plugin-formatjs can statically
-                        extract these ids (a hoisted/variable descriptor is NOT extracted). */}
-                    {{
-                        not_shipped: formatMessage({
-                            defaultMessage: 'Not shipped',
-                            id: 'account_order_detail.shipping_status.not_shipped'
-                        }),
-                        part_shipped: formatMessage({
-                            defaultMessage: 'Partially shipped',
-                            id: 'account_order_detail.shipping_status.part_shipped'
-                        }),
-                        shipped: formatMessage({
-                            defaultMessage: 'Shipped',
-                            id: 'account_order_detail.shipping_status.shipped'
-                        })
-                    }[shippingStatus] || shippingStatus}
+                    {formatShipmentStatus(shippingStatus, formatMessage)}
                 </Text>
                 {shippingMethodName && (
                     <Text fontSize="sm" fontWeight="medium">
