@@ -486,7 +486,7 @@ describe('OMS/SOM Integration - Order Details', () => {
         })
         setupOrderDetailsPage(cancelledOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(await screen.findByText('Cancelled')).toBeInTheDocument()
+        expect(await screen.findByText('Canceled')).toBeInTheDocument()
     })
 
     test('should NOT show Cancelled badge when only some items are cancelled', async () => {
@@ -508,7 +508,7 @@ describe('OMS/SOM Integration - Order Details', () => {
         })
         setupOrderDetailsPage(partialOrder)
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+        expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
     })
 
     test('should show Return Initiated badge when all items are return initiated', async () => {
@@ -614,7 +614,7 @@ describe('OMS/SOM Integration - Order Details', () => {
         )
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(await screen.findByText('Return Complete')).toBeInTheDocument()
-        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+        expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
     })
 
     test('should display fullName for OMS shipping address', async () => {
@@ -1133,7 +1133,7 @@ describe('OMS/SOM Integration - Order History', () => {
             wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
-        expect(await screen.findByText('Cancelled')).toBeInTheDocument()
+        expect(await screen.findByText('Canceled')).toBeInTheDocument()
     })
 
     test('should NOT show Cancelled badge when only some items are cancelled', async () => {
@@ -1158,7 +1158,7 @@ describe('OMS/SOM Integration - Order History', () => {
             wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
-        expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+        expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
     })
 
     test('should show Return Initiated badge when all items are return initiated', async () => {

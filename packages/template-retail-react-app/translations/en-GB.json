@@ -123,7 +123,7 @@
     "defaultMessage": "Return submitted"
   },
   "account_order_detail.button.cancel_order": {
-    "defaultMessage": "Cancel order"
+    "defaultMessage": "Cancel Order"
   },
   "account_order_detail.button.start_return": {
     "defaultMessage": "Return Items"
@@ -150,7 +150,7 @@
     "defaultMessage": "Billing Address"
   },
   "account_order_detail.heading.num_of_items": {
-    "defaultMessage": "{count} items"
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
   "account_order_detail.heading.order_actions": {
     "defaultMessage": "Order Actions"
@@ -237,7 +237,7 @@
     "defaultMessage": "You haven't placed an order yet."
   },
   "account_order_history.label.num_of_items": {
-    "defaultMessage": "{count} items",
+    "defaultMessage": "{count, plural, one {# item} other {# items}}",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
@@ -250,7 +250,7 @@
     "defaultMessage": "Shipped to: {name}"
   },
   "account_order_history.link.view_details": {
-    "defaultMessage": "View details"
+    "defaultMessage": "View Details"
   },
   "account_order_history.title.order_history": {
     "defaultMessage": "Order History"
@@ -1399,7 +1399,7 @@
     "defaultMessage": "You're currently browsing in offline mode"
   },
   "order_status_badge.label.cancelled": {
-    "defaultMessage": "Cancelled"
+    "defaultMessage": "Canceled"
   },
   "order_status_badge.label.partial_return_complete": {
     "defaultMessage": "Partial Return Complete"

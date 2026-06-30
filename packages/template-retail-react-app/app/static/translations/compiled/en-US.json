@@ -260,7 +260,7 @@
   "account_order_detail.button.cancel_order": [
     {
       "type": 0,
-      "value": "Cancel order"
+      "value": "Cancel Order"
     }
   ],
   "account_order_detail.button.start_return": [
@@ -321,12 +321,34 @@
   ],
   "account_order_detail.heading.num_of_items": [
     {
-      "type": 1,
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
       "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " items"
     }
   ],
   "account_order_detail.heading.order_actions": [
@@ -519,12 +541,34 @@
   ],
   "account_order_history.label.num_of_items": [
     {
-      "type": 1,
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
       "value": "count"
-    },
-    {
-      "type": 0,
-      "value": " items"
     }
   ],
   "account_order_history.label.order_number": [
@@ -560,7 +604,7 @@
   "account_order_history.link.view_details": [
     {
       "type": 0,
-      "value": "View details"
+      "value": "View Details"
     }
   ],
   "account_order_history.title.order_history": [
@@ -3302,7 +3346,7 @@
   "order_status_badge.label.cancelled": [
     {
       "type": 0,
-      "value": "Cancelled"
+      "value": "Canceled"
     }
   ],
   "order_status_badge.label.partial_return_complete": [
