@@ -25,7 +25,7 @@ jest.mock('@opentelemetry/propagator-b3', () => ({
 }))
 
 jest.mock('@opentelemetry/resources', () => ({
-    Resource: jest.fn()
+    resourceFromAttributes: jest.fn()
 }))
 
 jest.mock('@opentelemetry/api', () => ({
@@ -102,7 +102,7 @@ describe('OpenTelemetry Server Tracing', () => {
         const {NodeTracerProvider} = require('@opentelemetry/sdk-trace-node')
         const {SimpleSpanProcessor} = require('@opentelemetry/sdk-trace-base')
         const {B3Propagator} = require('@opentelemetry/propagator-b3')
-        const {Resource} = require('@opentelemetry/resources')
+        const {resourceFromAttributes} = require('@opentelemetry/resources')
         const {propagation} = require('@opentelemetry/api')
         const logger = require('../../utils/logger-instance')
 
@@ -112,7 +112,7 @@ describe('OpenTelemetry Server Tracing', () => {
         mockNodeTracerProvider = NodeTracerProvider
         mockSimpleSpanProcessor = SimpleSpanProcessor
         mockB3Propagator = B3Propagator
-        mockResource = Resource
+        mockResource = resourceFromAttributes
         mockPropagation = propagation
         mockLogger = logger
         defaultOptions = {enabled: true}
@@ -153,10 +153,10 @@ describe('OpenTelemetry Server Tracing', () => {
         test('should successfully initialize OpenTelemetry tracing with default options', () => {
             const result = initializeServerTracing(defaultOptions)
 
-            // Verify NodeTracerProvider was called with correct resource and span processor
+            // Verify NodeTracerProvider was called with correct resource and spanProcessors array (v2.x API)
             expect(mockNodeTracerProvider).toHaveBeenCalledWith({
                 resource: expect.any(Object),
-                spanProcessor: expect.any(Object)
+                spanProcessors: expect.any(Array)
             })
 
             // Verify Resource was created with correct service name only (no version by default)
