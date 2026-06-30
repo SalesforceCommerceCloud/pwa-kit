@@ -401,7 +401,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
 
         const handleEmbeddedMessagingConversationStarted = (event) => {
-            const {organizationId: orgId, configSiteId: sid, myDomain: domain} = embeddedLifecycleRef.current
+            const {
+                organizationId: orgId,
+                configSiteId: sid,
+                myDomain: domain
+            } = embeddedLifecycleRef.current
 
             if (!orgId || !sid) return
 
