@@ -6,8 +6,8 @@
  */
 
 /**
- * The distinct outcomes WI-5 must drive UI off of. Each maps to a specific
- * message + recovery affordance in the return flow.
+ * The distinct outcomes the return flow drives its UI off of. Each maps to a
+ * specific message + recovery affordance.
  *
  * NOTE there is intentionally no `authExpired` kind: a mid-flow 401 is
  * intercepted and consumed by the SDK auth layer (`useAuthorizationHeader` ->
@@ -26,8 +26,8 @@ export const ReturnErrorKind = Object.freeze({
 
 /**
  * The `errorCode` discriminators the OMS return API returns in a 400 body.
- * These are the contract values per the return OAS (W-22059580); treat any
- * other / missing code as a generic 400 (`unknown`).
+ * These are the contract values per the return OAS; treat any other / missing
+ * code as a generic 400 (`unknown`).
  */
 const ERROR_CODE_TO_KIND = {
     InvalidReasonCode: ReturnErrorKind.INVALID_REASON,

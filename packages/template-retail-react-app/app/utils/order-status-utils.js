@@ -13,8 +13,8 @@
  * Matrix.
  *
  * This module is the pure aggregation logic only. Presenting the result in the order status badge
- * (localized labels, badge color, cancel-CTA gating) is handled separately in the badge-update work
- * (W-23093717) so the two efforts do not overlap.
+ * (localized labels, badge color, cancel-CTA gating) is handled separately in the
+ * `OrderStatusBadge` component.
  */
 
 /** Canonical order-level display status keys produced by {@link getOrderDisplayStatus}. */

@@ -200,7 +200,7 @@ const AccountOrderDetail = () => {
     const returnFeedbackTimerRef = useRef(null)
     const cancelFeedbackTimerRef = useRef(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
-    // viewport resize doesn't lose the shopper's progress, and so W-22821838's
+    // viewport resize doesn't lose the shopper's progress, and so the
     // review step can read the same payload without prop-drilling.
     const [returnSelection, setReturnSelection] = useState({})
 
@@ -264,7 +264,7 @@ const AccountOrderDetail = () => {
     // Render gate is identity-only (registered + owns the order); whether there
     // are actually returnable items drives the button's *disabled* state, not
     // whether it renders — mirroring the always-rendered Cancel order button.
-    // (Guest enablement is a future WI; the gate stays registered-only here.)
+    // (Guest enablement is future work; the gate stays registered-only here.)
     const showStartReturn = isRegistered && ownsOrder
     const hasReturnableItems = returnableItems.length > 0
     // The button renders whenever the shopper owns the order, but is disabled when
