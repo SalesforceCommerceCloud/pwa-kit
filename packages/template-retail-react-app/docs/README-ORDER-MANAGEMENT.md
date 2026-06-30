@@ -144,10 +144,17 @@ Return feedback is kept separate from cancel feedback so the **Cancelled** badge
 
 ## Order Tracking
 
-[`OrderTracking`](../app/components/order-tracking) is a presentational block
-rendered once per shipment on the order detail page. It shows the shipping method
-heading, the localized shipping status, the provider name, the tracking number, and —
-when present — the expected and actual delivery dates.
+[`OrderTracking`](../app/components/order-tracking) is a presentational, bordered
+**tracking card** — one per shipment — rendered in a single flat **Tracking** section
+on the order detail page. Each card shows the carrier / shipping-method name, the
+localized shipping status, the tracking number, and — when present — the expected and
+actual delivery dates. A card carries **no shipping address** (addresses live with the
+items; see [Shipments and addresses](#shipments-and-addresses) below).
+
+The cards are built from `trackingEntries` (`order-detail.jsx`): one entry per
+`order.omsData.shipments[]`, falling back to `order.shipments[]` (ECOM) only when there
+are no OMS shipments. ECOM-fallback cards have no provider, tracking URL, or dates
+(those are OMS-only).
 
 Key behaviors:
 
@@ -162,36 +169,52 @@ Key behaviors:
   returns the epoch (1970-01-01), not an Invalid Date, so without it a null delivery
   date would display "31 Dec 1969".
 - **OMS-over-ECOM fallback.** The component receives already-resolved scalar props;
-  the fallback that prefers OMS shipment fields over ECOM ones lives at the call sites
-  in `order-detail.jsx`.
+  the fallback that prefers OMS shipment fields over ECOM ones lives at the call site
+  in `order-detail.jsx`. A provider-less OMS shipment borrows the delivery shipment's
+  method name **only** in the unambiguous one-OMS-↔-one-delivery case; multi-shipment
+  never joins, so a provider-less card simply shows no carrier name.
 
-### Multi-shipment (limited support)
+### Track Shipment action
 
-Shipment data arrives on the order in two separate lists with no correlation key
-between them: tracking info (status, tracking number/URL, dates) in
-`order.omsData.shipments`, and shipping addresses in `order.shipments` (ECOM
-delivery groups). The two lists can't be reliably paired — ECOM models a *delivery
-group* (the shopper's intent: which items go to which address) while OMS models a
-fulfillment *shipment* (a physical package), and a single delivery group can fan out
-into several OMS shipments (e.g. units of one line shipped from different
-warehouses). Pairing by index would risk showing the wrong address against a
-tracking number.
+A single **Track Shipment** order action sits in the actions row alongside Return
+Items / Cancel order. Its source is `trackingUrlOptions` — the externalizable
+(`ensureExternalUrl`'d) carrier URLs from `order.omsData.shipments` — so it can never
+diverge from the tracking-number links in the cards. It has three states:
 
-The agreed scope is therefore **a flat list with no address association**:
+- **No externalizable URL** → the button renders **disabled** (kept visible, focusable
+  via `aria-disabled` with a screen-reader hint "Tracking is not available for this
+  order yet.").
+- **Exactly one URL** → a single external-link button opening the carrier site in a new
+  tab (the common single-shipment case).
+- **Multiple URLs** → a dropdown (Popover) listing one carrier link per shipment, since
+  a tracking entry can't be reliably tied to a specific shipment.
 
-- Tracking renders as a flat list of cards, one per `order.omsData.shipments[]` entry
-  (falling back to `order.shipments[]` when there are no OMS shipments). Each card
-  shows the carrier/provider, status, the tracking number as a carrier link, and the
-  expected/delivered dates.
-- **No per-shipment shipping address and no positional OMS↔ECOM index-join.** A single
-  order-level Shipping Address block is shown only for single-shipment delivery
-  orders; multi-shipment orders omit it. The address is reachable through the carrier
-  tracking link anyway, so nothing is lost and nothing is mispaired.
-- A single order-level **Track Shipment** action links to the first shipment with a
-  carrier URL (disabled when none). _(Arriving via PR #3906; not yet on this branch.)_
+### Shipments and addresses
 
-Multi-shipment **grouped by address** is out of scope, deferred to a TD pending SCAPI
-returning correlated address data on `order.omsData.shipments`.
+Shipment data arrives on the order in two lists with no correlation key between them:
+tracking info (status, tracking number/URL, dates) in `order.omsData.shipments`, and
+shipping addresses in `order.shipments` (ECOM delivery groups). They can't be reliably
+paired — ECOM models a *delivery group* (the shopper's intent: which items go to which
+address) while OMS models a fulfillment *shipment* (a physical package), and a single
+delivery group can fan out into several OMS shipments (e.g. units of one line shipped
+from different warehouses). Pairing by index would risk showing the wrong address
+against a tracking number.
+
+The resulting layout keeps the two associations the data *can* support and avoids the
+one it can't:
+
+- **Items ↔ address (supported).** In the Items Ordered section, products are grouped
+  into a box per delivery shipment, and each box shows that delivery group's
+  **Shipping Address**. This is an ECOM-internal grouping (`shipmentId`), so it's
+  reliable. A single-shipment order is one box; BOPIS pickup-only orders (no delivery
+  shipment) fall back to one flat product list.
+- **Tracking ↔ shipment (not associated).** The Tracking section is a flat list of
+  cards rendered as peers *below* the shipment boxes, with **no address** and **no
+  positional OMS↔ECOM index-join** — the layout is honest that neither the shopper nor
+  the storefront can say which tracking entry belongs to which box.
+
+Multi-shipment tracking **grouped by address** remains out of scope, deferred to a TD
+pending SCAPI returning correlated address data on `order.omsData.shipments`.
 
 ## Status Badge
 
