@@ -817,17 +817,53 @@ describe('Return submission (W-22821838)', () => {
         expect(await screen.findByText('Return Initiated')).toBeInTheDocument()
     })
 
-    test('success returns focus to the Order Details heading', async () => {
+    // The modal passes no finalFocusRef, so Chakra's default returnFocusOnClose
+    // restores focus to the control that opened it — the "Return Items" trigger —
+    // on every close path. The success "Return submitted" message is announced via
+    // its own role="alert" region, so no separate focus move is needed to announce
+    // it. Mirrors the cancel-order modal, which relies on the same default.
+    test('success returns focus to the Return Items trigger', async () => {
         mockReturnMutateAsync.mockResolvedValueOnce({})
         setupOrderDetailsPage(createReturnEligibleOmsOrder())
         const user = userEvent.setup()
 
-        const submit = await openModalAndReview(user)
-        await user.click(submit)
+        const trigger = await screen.findByTestId('account-order-detail-start-return')
+        await user.click(trigger)
+        await screen.findByText(/return items from order #/i)
+        await user.click(screen.getAllByRole('checkbox')[0])
+        await user.click(screen.getByTestId('return-items-modal-review'))
+        await user.click(await screen.findByTestId('return-items-modal-submit'))
 
         await screen.findByText(/return submitted/i)
-        const heading = screen.getByRole('heading', {level: 1, name: /order details/i})
-        await waitFor(() => expect(heading).toHaveFocus())
+        await waitFor(() => expect(trigger).toHaveFocus())
+    })
+
+    test('dismissing the modal (Cancel) returns focus to the Return Items trigger', async () => {
+        // WAI-ARIA: closing a dialog returns focus to the control that opened it,
+        // not the page heading. Regression test for focus landing on the H1.
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const trigger = await screen.findByTestId('account-order-detail-start-return')
+        await user.click(trigger)
+        await screen.findByText(/return items from order #/i)
+
+        await user.click(screen.getByTestId('return-items-modal-cancel'))
+
+        await waitFor(() => expect(trigger).toHaveFocus())
+    })
+
+    test('dismissing the modal (Escape) returns focus to the Return Items trigger', async () => {
+        setupOrderDetailsPage(createReturnEligibleOmsOrder())
+        const user = userEvent.setup()
+
+        const trigger = await screen.findByTestId('account-order-detail-start-return')
+        await user.click(trigger)
+        await screen.findByText(/return items from order #/i)
+
+        await user.keyboard('{Escape}')
+
+        await waitFor(() => expect(trigger).toHaveFocus())
     })
 
     test('error keeps the modal open with an inline alert; footer Submit re-fires', async () => {
