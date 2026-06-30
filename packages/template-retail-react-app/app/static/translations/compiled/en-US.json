@@ -269,6 +269,32 @@
       "value": "Return Items"
     }
   ],
+  "account_order_detail.button.track_number": [
+    {
+      "type": 0,
+      "value": "Track "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    }
+  ],
+  "account_order_detail.button.track_shipment": [
+    {
+      "type": 0,
+      "value": "Track Shipment"
+    }
+  ],
+  "account_order_detail.button.track_shipment_number": [
+    {
+      "type": 0,
+      "value": "Track shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.error.back_to_history": [
     {
       "type": 0,
@@ -309,6 +335,12 @@
       "value": "Order Actions"
     }
   ],
+  "account_order_detail.heading.other_items": [
+    {
+      "type": 0,
+      "value": "Other items"
+    }
+  ],
   "account_order_detail.heading.payment_method": [
     {
       "type": 0,
@@ -331,36 +363,32 @@
       "value": "number"
     }
   ],
+  "account_order_detail.heading.shipment": [
+    {
+      "type": 0,
+      "value": "Shipment"
+    }
+  ],
+  "account_order_detail.heading.shipment_number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,
       "value": "Shipping Address"
     }
   ],
-  "account_order_detail.heading.shipping_address_number": [
+  "account_order_detail.heading.tracking": [
     {
       "type": 0,
-      "value": "Shipping Address "
-    },
-    {
-      "type": 1,
-      "value": "number"
-    }
-  ],
-  "account_order_detail.heading.shipping_method": [
-    {
-      "type": 0,
-      "value": "Shipping Method"
-    }
-  ],
-  "account_order_detail.heading.shipping_method_number": [
-    {
-      "type": 0,
-      "value": "Shipping Method "
-    },
-    {
-      "type": 1,
-      "value": "number"
+      "value": "Tracking"
     }
   ],
   "account_order_detail.hint.cancel_unavailable": [
@@ -373,6 +401,12 @@
     {
       "type": 0,
       "value": "No items on this order are available to return."
+    }
+  ],
+  "account_order_detail.hint.no_tracking": [
+    {
+      "type": 0,
+      "value": "Tracking is not available for this order yet."
     }
   ],
   "account_order_detail.hint.not_cancellable": [
