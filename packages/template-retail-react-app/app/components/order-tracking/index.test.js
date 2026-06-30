@@ -143,7 +143,7 @@ describe('OrderTracking component', () => {
     test('omits the date line when the delivery date is explicitly null (no "31 Dec 1969")', () => {
         // Regression guard: new Date(null) is the epoch (1970-01-01), NOT Invalid Date,
         // so a null delivery date must be caught by the falsy check — otherwise it would
-        // render "31 Dec 1969" to the shopper. (Found in QA on W-22918455.)
+        // render "31 Dec 1969" to the shopper. (Found in QA.)
         renderWithProviders(
             <OrderTracking {...baseProps} expectedDeliveryDate={null} actualDeliveryDate={null} />
         )

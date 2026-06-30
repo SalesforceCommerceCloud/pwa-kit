@@ -25,13 +25,13 @@ docs for connecting and provisioning the org.
 
 Without a connected SOM org, orders carry no `omsData`: they are treated as ECOM-only,
 the return and cancel actions never render, return reasons can't load, and the status
-badge falls back to the raw `order.status`. Nothing errors — the features simply stay
+badge falls back to the raw `order.status || order.omsData?.status`. Nothing errors — the features simply stay
 hidden. There is no storefront flag to turn them on; presence of OMS data on the order
 is the switch.
 
 ## Order Returns
 
-Registered shoppers can return eligible items. A shopper opens the **Start a return**
+Registered shoppers can return eligible items. A shopper opens the **Return Items**
 modal, picks items and per-item quantities, chooses a reason, reviews, and submits.
 The order status badge then reflects the return's progress, including
 partially-returned multi-unit lines.
@@ -76,7 +76,7 @@ partially-returned multi-unit lines.
 ### Return Reason Codes
 
 Reasons are not hard-coded — they come from OMS via
-`useOmsMetaData().returnReasonCodes`, where each entry is `{reason, default}`. The
+`useOmsMetaData().data.returnReasonCodes`, where each entry is `{reason, default}`. The
 entry flagged `default: true` is pre-selected and omitted from the request body so
 the server applies it. Change the available reasons in Order Management; no
 storefront change is needed.
@@ -227,9 +227,10 @@ status per line item rather than a reliable order-level status.
 > The order-level `omsData.status` is known to be unreliable: in SOM it can stay
 > `Approved` even after every item has been cancelled or returned, because the
 > order-level rollup lags behind (or never reflects) the item-level state. The
-> item-level `omsData` *is* updated correctly, so this storefront derives the
-> displayed status entirely from the per-item (and per-unit) data and never trusts
-> the order-level status field. This is a known SOM limitation outside the
+> item-level `omsData` *is* updated correctly, so `getOrderDisplayStatus` derives the
+> aggregated status entirely from the per-item (and per-unit) data and never reads
+> the order-level `omsData.status` in that path (the raw order-level status is used
+> only as the green-badge fallback when no item carries OMS status). This is a known SOM limitation outside the
 > storefront's control; if the badge looks "wrong" versus the SOM order record, the
 > SOM order-level status is the stale side, not the badge.
 
@@ -252,7 +253,7 @@ are grouped by `isReturnDisplayStatus`. The
 [`OrderStatusBadge`](../app/components/order-status-badge/index.jsx) renders these in a
 neutral badge with their own localized labels, leaving the cancelled (red) and
 raw-status (green) branches untouched. ECOM-only orders, which carry no item-level OMS
-status, fall back to the raw `order.status`.
+status, fall back to the raw `order.status || order.omsData?.status`.
 
 ## Customization
 
