@@ -1335,7 +1335,7 @@ describe('Order with multiple shipments (pickup and delivery)', () => {
 
 describe('OMS Multi-shipment - per-shipment boxes', () => {
     // When OMS has multiple delivery shipments, each renders in its own per-shipment box
-    // with the box's native shipping address (mirrors storefront-next).
+    // with the box's native shipping address.
     const omsMultiShipmentOrder = createMockOmsOrder({
         shipments: [
             {
@@ -1467,11 +1467,11 @@ describe('OMS Multi-shipment - per-shipment boxes', () => {
 
 describe('ECOM Multi-shipment - per-shipment boxes', () => {
     // ECOM order (no OMS data) with two delivery shipments. The Items Ordered area
-    // renders one bordered box per shipment (mirrors storefront-next): each box shows
-    // a "Shipment N" header, that shipment's status, its items, and its OWN native
-    // shipping address. The Tracking cards render in a separate flat section and carry
-    // no address. (Showing each shipment's own native address is NOT the forbidden
-    // OMS↔ECOM positional index-join — that join is the deferred TD-0326366.)
+    // renders one bordered box per shipment: each box shows a "Shipment N" header, that
+    // shipment's status, its items, and its OWN native shipping address. The Tracking
+    // cards render in a separate flat section and carry no address. Showing each
+    // shipment's own native address is NOT a positional OMS↔ECOM index-join — it is the
+    // shipment's own data; tracking-to-shipment association is the part that isn't supported.
     const ecomMultiShipmentOrder = createMockOrder({
         productItems: [
             {productId: 'prod-ship1', productName: 'Ship1 Item', quantity: 1, shipmentId: 'ship1'},
@@ -1548,9 +1548,9 @@ describe('ECOM Multi-shipment - per-shipment boxes', () => {
         await waitFor(() => {
             expect(document.querySelectorAll('[data-shipment-id]')).toHaveLength(2)
         })
-        // Per-shipment boxes now SHOW the address (mirrors storefront-next). Scope each
-        // name to its own box: 'Jane Smith' is also the billing-address name, so an
-        // unscoped query would match twice (box + billing) and throw.
+        // Per-shipment boxes now SHOW the address. Scope each name to its own box:
+        // 'Jane Smith' is also the billing-address name, so an unscoped query would match
+        // twice (box + billing) and throw.
         const box1 = document.querySelector('[data-shipment-id="ship1"]')
         const box2 = document.querySelector('[data-shipment-id="ship2"]')
         expect(within(box1).getByRole('heading', {name: /shipping address/i})).toBeInTheDocument()
@@ -1645,10 +1645,10 @@ describe('OMS Single shipment with tracking URL', () => {
     })
 
     test('renders Tracking as a flat section OUTSIDE (below) the shipment boxes', async () => {
-        // Regression lock: OMS tracking has no join key back to a specific ECOM shipment
-        // (deferred TD-0326366), so the tracking list must NOT live inside a shipment box
-        // (that would imply a false tracking↔shipment link) and NOT inside the top
-        // order-summary card. It is a flat section that is a SIBLING of the boxes.
+        // Regression lock: OMS tracking has no join key back to a specific ECOM shipment,
+        // so the tracking list must NOT live inside a shipment box (that would imply a
+        // false tracking↔shipment link) and NOT inside the top order-summary card. It is a
+        // flat section that is a SIBLING of the boxes.
         const trackingSection = await screen.findByTestId('account-order-detail-tracking')
         expect(trackingSection).toBeInTheDocument()
         // The tracking section is NOT nested inside any shipment box.
@@ -2783,12 +2783,12 @@ describe('Cancel order — eligibility and full flow (W-22806929)', () => {
     })
 })
 
-describe('Track Shipment button (W-23091033)', () => {
+describe('Track Shipment button', () => {
     // Track Shipment action behavior by number of shipments that have a carrier URL:
     //   0 URLs       → a single disabled (href-less) button (action stays visible).
     //   1 URL        → a single external-link button to that URL (the common case).
     //   2+ URLs      → a DROPDOWN (Popover) of per-tracking-number external links, since
-    //                  we can't say which tracking maps to which shipment (TD-0326366).
+    //                  a tracking entry can't be reliably tied to a specific shipment.
     // The per-shipment tracking links also live in the flat Tracking section below.
     const omsOrderWithShipments = (shipments) =>
         createMockOmsOrder({

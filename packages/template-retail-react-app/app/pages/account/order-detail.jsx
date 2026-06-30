@@ -73,8 +73,8 @@ const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
 // hint (only one such button exists per page, so a constant is safe).
 const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
 
-// Group productItems by their shipmentId (mirrors storefront-next's
-// groupProductItemsByShipmentId). Items with no shipmentId fall under 'default'.
+// Group productItems by their shipmentId so each shipment box can render its own
+// items. Items with no shipmentId fall under 'default'.
 const groupProductItemsByShipmentId = (productItems) =>
     (productItems || []).reduce((itemsByShipmentId, item) => {
         const shipmentId = item.shipmentId ?? 'default'
@@ -523,9 +523,10 @@ const AccountOrderDetail = () => {
     // Tracking entries for the dedicated Tracking section (rendered as its own block,
     // not inside the top summary card). Flat list: OMS-preferred (omsData.shipments[])
     // when present, else ECOM fallback (order.shipments[]). One source XOR the other,
-    // NEVER a positional OMS↔ECOM index-join across a multi-shipment order. Entries carry
-    // no shipping address (epic a3QEE000002QvBB2A0: "flat list, NO address association";
-    // per-shipment address association is the deferred TD-0326366).
+    // NEVER a positional OMS↔ECOM index-join across a multi-shipment order: the OMS and
+    // ECOM shipment arrays share no join key, so pairing them by position would attach a
+    // tracking number to the wrong shipment. Entries therefore carry no shipping address —
+    // associating a tracking entry with a specific shipment's address is not yet supported.
     const trackingEntries = useMemo(() => {
         const omsShipments = order?.omsData?.shipments ?? []
         const ecomShipments = order?.shipments ?? []
@@ -746,10 +747,11 @@ const AccountOrderDetail = () => {
                         {/* Track Shipment action. ZERO tracking URLs → disabled button (action
                             stays visible). ONE URL → a simple external link button (the common
                             single-shipment case). MULTIPLE URLs (multi-shipment) → a dropdown so
-                            the shopper can pick which carrier link to open, since we can't say
-                            which tracking maps to which shipment (deferred TD-0326366). Built on
-                            Popover (shared/ui exposes no Chakra Menu); each option is an external
-                            ChakraLink so the raw carrier URL opens the carrier site in a new tab. */}
+                            the shopper can pick which carrier link to open, since a tracking entry
+                            cannot be reliably tied to a specific shipment's items (the OMS and ECOM
+                            shipment arrays share no join key). Built on Popover (shared/ui exposes
+                            no Chakra Menu); each option is an external ChakraLink so the carrier
+                            URL opens the carrier site in a new tab. */}
                         {trackingUrlOptions.length > 1 ? (
                             <Popover placement="bottom-start" gutter={2}>
                                 <PopoverTrigger>
@@ -990,8 +992,7 @@ const AccountOrderDetail = () => {
                                     )
                                 })}
                                 {/* Shipping Address now renders inside each per-shipment box in the
-                                    Items Ordered section (mirrors storefront-next), so it is not
-                                    repeated here. */}
+                                    Items Ordered section, so it is not repeated here. */}
 
                                 {/* Payment Method */}
                                 {paymentCard && (
@@ -1096,15 +1097,14 @@ const AccountOrderDetail = () => {
                               </Box>
                           ))
                         : (() => {
-                              // Per-shipment boxes (mirrors the storefront-next design branch):
-                              // iterate the ECOM shipments, render each as a bordered box with a
-                              // "Shipment N" header + status, its items (grouped by shipmentId),
-                              // and the shipment's own native shipping address. Tracking is NOT
-                              // inside the boxes: OMS tracking has no join key back to a specific
-                              // ECOM shipment (deferred TD-0326366), so it renders as a single flat
-                              // section BELOW all the boxes (see after this Stack) — the shopper,
-                              // like us, can't tell which tracking maps to which shipment, and the
-                              // layout is honest about that rather than implying a false link.
+                              // Per-shipment boxes: iterate the ECOM shipments, render each as a
+                              // bordered box with a "Shipment N" header + status, its items
+                              // (grouped by shipmentId), and the shipment's own native shipping
+                              // address. Tracking is NOT inside the boxes: OMS tracking has no join
+                              // key back to a specific ECOM shipment, so it renders as a single flat
+                              // section BELOW all the boxes (see after this Stack). The shopper, like
+                              // the storefront, can't tell which tracking maps to which shipment, and
+                              // the flat layout is honest about that rather than implying a false link.
                               const itemsByShipmentId = groupProductItemsByShipmentId(
                                   order.productItems
                               )
@@ -1226,12 +1226,12 @@ const AccountOrderDetail = () => {
             </Stack>
 
             {/* Tracking — a single flat section BELOW all the shipment boxes. OMS tracking
-                (omsData.shipments[]) has no join key back to a specific ECOM shipment
-                (deferred TD-0326366), so we cannot say which tracking belongs to which box.
-                Rather than imply a false link by nesting tracking in a box, we list every
-                tracking entry here as peers of the boxes — the shopper, like us, can't tell
-                which is which, and the layout is honest about that. ECOM fallback applies
-                when there are no OMS shipments. */}
+                (omsData.shipments[]) has no join key back to a specific ECOM shipment, so we
+                cannot say which tracking belongs to which box. Rather than imply a false link
+                by nesting tracking in a box, we list every tracking entry here as peers of the
+                boxes — neither the shopper nor the storefront can tell which is which, and the
+                flat layout is honest about that. ECOM fallback applies when there are no OMS
+                shipments. */}
             {!isLoading && trackingEntries.length > 0 && (
                 <Stack spacing={3} data-testid="account-order-detail-tracking">
                     <Heading as="h2" fontSize="lg">
