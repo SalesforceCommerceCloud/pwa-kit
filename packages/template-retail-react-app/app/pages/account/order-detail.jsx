@@ -1201,7 +1201,10 @@ const AccountOrderDetail = () => {
                                                       px={2}
                                                       py={1}
                                                       bg="gray.200"
-                                                      color="gray.700"
+                                                      // gray.800 (not gray.700) on gray.200 → 5.88:1,
+                                                      // clears WCAG AA 4.5:1; gray.700 was 4.04:1 and
+                                                      // failed the a11y snapshot.
+                                                      color="gray.800"
                                                       fontSize="xs"
                                                       fontWeight="semibold"
                                                       borderRadius="sm"
