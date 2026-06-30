@@ -1341,7 +1341,6 @@ const AccountOrderDetail = () => {
                     onClearSubmitError={() => setReturnSubmitError(null)}
                     isSubmitting={returnMutation.isLoading}
                     submitError={returnSubmitError}
-                    finalFocusRef={headingRef}
                 />
             )}
         </Stack>
