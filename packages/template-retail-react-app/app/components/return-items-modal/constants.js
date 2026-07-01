@@ -41,7 +41,7 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.cancel'
     },
     reviewButton: {
-        defaultMessage: 'Review return',
+        defaultMessage: 'Review Return',
         id: 'return_items_modal.button.review_return'
     },
     reviewDisabledHint: {
@@ -86,7 +86,7 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.back'
     },
     submitButton: {
-        defaultMessage: 'Submit return',
+        defaultMessage: 'Submit Return',
         id: 'return_items_modal.button.submit_return'
     },
     submitError: {

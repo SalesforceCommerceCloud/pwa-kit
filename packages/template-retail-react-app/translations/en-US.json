@@ -135,7 +135,7 @@
     "defaultMessage": "Track Shipment"
   },
   "account_order_detail.button.track_shipment_number": {
-    "defaultMessage": "Track shipment {number}"
+    "defaultMessage": "Track Shipment {number}"
   },
   "account_order_detail.error.back_to_history": {
     "defaultMessage": "Back to Order History"
@@ -373,7 +373,7 @@
     "defaultMessage": "Confirm Cancellation"
   },
   "cancel_order_modal.button.keep_order": {
-    "defaultMessage": "Keep order"
+    "defaultMessage": "Keep Order"
   },
   "cancel_order_modal.dropdown.select_reason": {
     "defaultMessage": "Select a cancellation reason"
@@ -1860,10 +1860,10 @@
     "defaultMessage": "Retry"
   },
   "return_items_modal.button.review_return": {
-    "defaultMessage": "Review return"
+    "defaultMessage": "Review Return"
   },
   "return_items_modal.button.submit_return": {
-    "defaultMessage": "Submit return"
+    "defaultMessage": "Submit Return"
   },
   "return_items_modal.heading.return_items": {
     "defaultMessage": "Return items from order #{orderNo}"

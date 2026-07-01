@@ -105,7 +105,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reaso
                     <Stack direction="row" spacing={3}>
                         <Button variant="outline" onClick={onClose} isDisabled={isSubmitting}>
                             <FormattedMessage
-                                defaultMessage="Keep order"
+                                defaultMessage="Keep Order"
                                 id="cancel_order_modal.button.keep_order"
                             />
                         </Button>

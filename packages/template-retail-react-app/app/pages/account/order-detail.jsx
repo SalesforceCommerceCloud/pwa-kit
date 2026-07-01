@@ -807,7 +807,7 @@ const AccountOrderDetail = () => {
                                                         />
                                                     ) : (
                                                         <FormattedMessage
-                                                            defaultMessage="Track shipment {number}"
+                                                            defaultMessage="Track Shipment {number}"
                                                             id="account_order_detail.button.track_shipment_number"
                                                             values={{number: option.index + 1}}
                                                         />

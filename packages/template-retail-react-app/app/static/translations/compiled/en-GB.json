@@ -288,7 +288,7 @@
   "account_order_detail.button.track_shipment_number": [
     {
       "type": 0,
-      "value": "Track shipment "
+      "value": "Track Shipment "
     },
     {
       "type": 1,
@@ -1004,7 +1004,7 @@
   "cancel_order_modal.button.keep_order": [
     {
       "type": 0,
-      "value": "Keep order"
+      "value": "Keep Order"
     }
   ],
   "cancel_order_modal.dropdown.select_reason": [
@@ -4458,13 +4458,13 @@
   "return_items_modal.button.review_return": [
     {
       "type": 0,
-      "value": "Review return"
+      "value": "Review Return"
     }
   ],
   "return_items_modal.button.submit_return": [
     {
       "type": 0,
-      "value": "Submit return"
+      "value": "Submit Return"
     }
   ],
   "return_items_modal.heading.return_items": [
