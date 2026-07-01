@@ -144,3 +144,38 @@ export const useTaxesFromOrder = (
         requiredParameters
     })
 }
+/**
+ * Retrieves configuration data from Order Management (OMS) required by the storefront to render
+ * cancel and return experiences. The response contains the reason codes configured in OMS.
+ * @group ShopperOrders
+ * @category Query
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Orders `getOmsMetaData` endpoint.
+ */
+export const useOmsMetaData = (
+    apiOptions: NullableParameters<Argument<Client['getOmsMetaData']>>,
+    queryOptions: ApiQueryOptions<Client['getOmsMetaData']> = {}
+): UseQueryResult<DataType<Client['getOmsMetaData']>> => {
+    type Options = Argument<Client['getOmsMetaData']>
+    type Data = DataType<Client['getOmsMetaData']>
+    const client = useCommerceApi(CLIENT_KEY)
+    const methodName = 'getOmsMetaData'
+    const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
+
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const parameters = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    const method = async (options: Options) => await client[methodName](options)
+
+    queryOptions.meta = {
+        displayName: 'useOmsMetaData',
+        ...queryOptions.meta
+    }
+
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}

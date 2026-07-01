@@ -56,6 +56,40 @@ npm start
 
 See the comments above **`mrtDataStore`** in `config/default.js` for related env vars.
 
+## Configuring item-level returns (OMS)
+
+The order detail page (`app/pages/account/order-detail.jsx`) lets registered shoppers start an item-level return when the order is managed by an Order Management System (OMS). The storefront UI is driven entirely by data the OMS returns on the order — there is no storefront-side configuration to enable returns beyond having OMS-managed orders.
+
+### Return eligibility (OMS-driven)
+
+Returnability is decided by the OMS, not the storefront. An order carries an `omsData` envelope, and each `productItem` carries its own `omsData` with a per-item `quantityAvailableToReturn`. An item is offered for return when `quantityAvailableToReturn > 0` (see `getReturnableItems` in `app/utils/return-utils.js`).
+
+- Orders **without** an `omsData` envelope (plain ECOM orders) never show the return CTA.
+- The merchant controls which order/item states are returnable by configuring the OMS upstream; the OMS surfaces the result to the storefront as `quantityAvailableToReturn`. There is **no** storefront config key (such as a status allowlist) — the client trusts the OMS-computed quantity.
+- The authoritative refusal is server-side: `POST .../actions/oms-return-order` returns `409` when the order can no longer be returned, even if a stale quantity briefly suggested otherwise.
+
+### Return reason codes
+
+The return modal populates its per-item "reason" dropdown from the OMS metadata API, read via `useOmsMetaData().data.returnReasonCodes`. Each entry is `{reason, default}`:
+
+- Merchants define the available reasons (and mark exactly one as the default) **in the OMS**; the storefront renders them as-is.
+- When the shopper keeps the default reason, the submitted payload **omits** `reason` so the server applies its own default (see `buildReturnProductItems`). A non-default selection is sent as `reason`.
+- A reason is required to proceed: a checked item validates only once it has a reason code (see `isSelectionValid`). A newly checked row is pre-filled with the reason marked `default` when one exists, so configuring a default in the OMS lets shoppers complete a return in one click; without a default they must pick a reason manually before continuing. Configure at least one reason code in the OMS.
+
+### Error-code contract
+
+On submit failure, `classifyReturnError` (`app/utils/return-error-utils.js`) maps the response to a shopper-facing outcome. OMS returns a discriminator in the `400` body's `errorCode`:
+
+| HTTP status / `errorCode`   | Classified kind    | Shopper-facing behavior                                                        |
+| --------------------------- | ------------------ | ------------------------------------------------------------------------------ |
+| `400 InvalidReasonCode`     | `invalidReason`    | Drops to select view; reasons refetched, stale reason cleared, banner shown.   |
+| `400 UnknownProductItemIds` | `unknownItems`     | Drops to select view; order refetched and selection reconciled; banner shown.  |
+| `400 ReturnQuantityExceeded`| `quantityExceeded` | Drops to select view; order refetched and quantities clamped; banner shown.    |
+| `400` (other / missing code)| `unknown`          | Inline retry banner on the review view; Submit stays enabled.                  |
+| `404`                       | `notFound`         | Terminal in-modal banner; Submit disabled (close the modal to dismiss).        |
+| `409`                       | `conflict`         | Terminal in-modal "reach out to the merchant" banner; Submit disabled.         |
+| no HTTP response            | `network`          | Inline banner on the review view; Submit stays enabled to retry.               |
+
 ## Documentation
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
