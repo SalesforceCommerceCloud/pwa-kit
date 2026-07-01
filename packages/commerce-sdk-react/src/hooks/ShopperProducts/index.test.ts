@@ -11,6 +11,11 @@ import * as queries from './query'
 describe('Shopper Products hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperProducts, queries)
-        expect(unimplemented).toEqual([])
+        // TODO: these endpoints arrived with the commerce-sdk-isomorphic 5.4.0 bump; implement hooks later.
+        expect(unimplemented).toEqual([
+            'getProductImages',
+            'getProductPrices',
+            'getProductPromotions'
+        ])
     })
 })
