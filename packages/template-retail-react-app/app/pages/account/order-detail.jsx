@@ -260,7 +260,9 @@ const AccountOrderDetail = () => {
     const firstTrackingUrl = trackingUrlOptions[0]?.url
 
     const returnableItems = useMemo(() => getReturnableItems(order), [order])
-    const ownsOrder = order?.customerInfo?.customerId === customerId
+    // Require a concrete customerId match — `undefined === undefined` would
+    // otherwise grant ownership when both sides are missing. Mirrors canCancel.
+    const ownsOrder = !!customerId && order?.customerInfo?.customerId === customerId
     // Render gate is identity-only (registered + owns the order); whether there
     // are actually returnable items drives the button's *disabled* state, not
     // whether it renders — mirroring the always-rendered Cancel order button.

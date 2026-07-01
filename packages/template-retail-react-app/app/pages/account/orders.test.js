@@ -2923,7 +2923,7 @@ describe('Track Shipment button', () => {
         expect(buttons[0]).toHaveTextContent(/^Track Shipment$/)
         expect(buttons[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
         expect(buttons[0]).toHaveAttribute('target', '_blank')
-        expect(buttons[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
+        expect(buttons[0]).toHaveAttribute('rel', expect.stringContaining('noreferrer'))
         expect(buttons[0]).toBeEnabled()
     })
 
@@ -2959,7 +2959,7 @@ describe('Track Shipment button', () => {
         expect(links[0]).toHaveAttribute('href', 'https://carrier.example.com/BBB')
         expect(links[0]).toHaveTextContent(/BBB/)
         expect(links[0]).toHaveAttribute('target', '_blank')
-        expect(links[0]).toHaveAttribute('rel', expect.stringContaining('noopener'))
+        expect(links[0]).toHaveAttribute('rel', expect.stringContaining('noreferrer'))
         expect(links[1]).toHaveAttribute('href', 'https://carrier.example.com/CCC')
         expect(links[1]).toHaveTextContent(/CCC/)
     })
