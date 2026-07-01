@@ -27,8 +27,11 @@ describe('Shopper Login hooks', () => {
             'finishWebauthnUserRegistration',
             'getPasskeyUserByLoginId',
             'getTrustedAgentAuthorizationToken',
+            // TODO: added with the commerce-sdk-isomorphic 5.4.0 bump; implement hooks later.
+            'requestOtp',
             'startWebauthnAuthentication',
-            'startWebauthnUserRegistration'
+            'startWebauthnUserRegistration',
+            'verifyOtp'
         ])
     })
     test('all mutations have cache update logic', () => {

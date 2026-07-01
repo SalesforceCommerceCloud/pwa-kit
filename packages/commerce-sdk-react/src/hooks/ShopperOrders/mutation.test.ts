@@ -6,15 +6,18 @@
  */
 import {useQueryClient} from '@tanstack/react-query'
 import {act} from '@testing-library/react'
-import {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperCustomersTypes, ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
+    assertInvalidateQuery,
+    DEFAULT_TEST_CONFIG,
     mockMutationEndpoints,
     mockQueryEndpoint,
     renderHookWithProviders,
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
+import {useCustomerOrders} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {ShopperOrdersMutation, useShopperOrdersMutation} from './mutation'
 import * as queries from './query'
@@ -33,8 +36,21 @@ const OPTIONS: Argument<Client[ShopperOrdersMutation]> = {
     parameters: {orderNo: ''},
     body: {basketId: 'basketId'}
 }
+const customersEndpoint = '/customer/shopper-customers/'
+const CUSTOMER_ID = 'customer_id'
 const ORDER: ShopperOrdersTypes.Order = {orderNo: '123', productItems: []}
 const ORDER_NO = '123'
+const getCustomerOrdersOptions: Argument<
+    NonNullable<ApiClients['shopperCustomers']>['getCustomerOrders']
+> = {
+    parameters: {customerId: CUSTOMER_ID}
+}
+const emptyCustomerOrders: ShopperCustomersTypes.CustomerOrderResult = {
+    data: [] as ShopperCustomersTypes.CustomerOrderResult['data'],
+    total: 0,
+    limit: 0,
+    offset: 0
+}
 const PAYMENT_INSTRUMENT_ID = '123'
 const PAYMENT_INSTRUMENT_REQUEST = {
     amount: 10,
@@ -73,6 +89,11 @@ const updatePaymentOptions = createOptions<'updatePaymentInstrumentForOrder'>(
 const removePaymentOptions = createOptions<'removePaymentInstrumentFromOrder'>(undefined, {
     paymentInstrumentId: PAYMENT_INSTRUMENT_ID
 })
+const cancelOmsOrderOptions = createOptions<'cancelOmsOrder'>({reason: 'Changed my mind'}, {})
+const returnOmsOrderOptions = createOptions<'returnOmsOrder'>(
+    {productItems: [{itemId: 'item-1', quantity: 1, reason: 'damaged'}]},
+    {}
+)
 
 // --- TEST CASES --- //
 /** Every mutation modifies an existing order, except `createOrder`, which creates one. */
@@ -82,7 +103,9 @@ type TestMap = {[Mut in NonCreateMutation]?: Argument<Client[Mut]>}
 const testMap: TestMap = {
     createPaymentInstrumentForOrder: createPaymentOptions,
     updatePaymentInstrumentForOrder: updatePaymentOptions,
-    removePaymentInstrumentFromOrder: removePaymentOptions
+    removePaymentInstrumentFromOrder: removePaymentOptions,
+    cancelOmsOrder: cancelOmsOrderOptions,
+    returnOmsOrder: returnOmsOrderOptions
 }
 
 // Type assertion because the built-in type definition for `Object.entries` is limited :\
@@ -93,6 +116,15 @@ const createTestCase = ['createOrder', OPTIONS] as const
 const allTestCases = [...nonCreateTestCases, createTestCase]
 
 describe('ShopperOrders mutations', () => {
+    const storedCustomerIdKey = `customer_id_${DEFAULT_TEST_CONFIG.siteId}`
+    beforeAll(() => {
+        if (window.localStorage.length > 0) throw new Error('Unexpected data in local storage.')
+        window.localStorage.setItem(storedCustomerIdKey, CUSTOMER_ID)
+    })
+    afterAll(() => {
+        window.localStorage.removeItem(storedCustomerIdKey)
+    })
+
     beforeEach(() => nock.cleanAll())
     test.each(allTestCases)('`%s` returns data on success', async (mutationName, options) => {
         mockMutationEndpoints(ordersEndpoint, ORDER)
@@ -144,6 +176,42 @@ describe('ShopperOrders mutations', () => {
         await waitAndExpectSuccess(() => query.current)
         expect(query.current.data).toEqual(ORDER)
     })
+    test('`createOrder` invalidates `useCustomerOrders` for a registered customer on success', async () => {
+        const [mutationName, options] = createTestCase
+        mockQueryEndpoint(customersEndpoint, emptyCustomerOrders) // initial useCustomerOrders
+        mockMutationEndpoints(ordersEndpoint, ORDER) // createOrder
+        mockQueryEndpoint(customersEndpoint, emptyCustomerOrders) // refetch after invalidation
+        const {result} = renderHookWithProviders(() => ({
+            customerOrders: useCustomerOrders(getCustomerOrdersOptions),
+            mutation: useShopperOrdersMutation(mutationName)
+        }))
+        await waitAndExpectSuccess(() => result.current.customerOrders)
+        const oldData = result.current.customerOrders.data
+        act(() => result.current.mutation.mutate(options))
+        await waitAndExpectSuccess(() => result.current.mutation)
+        assertInvalidateQuery(result.current.customerOrders, oldData)
+    })
+    test('`createOrder` does not invalidate `useCustomerOrders` for a guest checkout', async () => {
+        // Simulate a guest session by clearing the customer id for this test only.
+        window.localStorage.removeItem(storedCustomerIdKey)
+        try {
+            const [mutationName, options] = createTestCase
+            mockQueryEndpoint(customersEndpoint, emptyCustomerOrders) // initial useCustomerOrders
+            mockMutationEndpoints(ordersEndpoint, ORDER) // createOrder
+            const {result} = renderHookWithProviders(() => ({
+                customerOrders: useCustomerOrders(getCustomerOrdersOptions),
+                mutation: useShopperOrdersMutation(mutationName)
+            }))
+            await waitAndExpectSuccess(() => result.current.customerOrders)
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(() => result.current.mutation)
+            // Query should not be invalidated: still has original data and not refetching.
+            expect(result.current.customerOrders.data).toEqual(emptyCustomerOrders)
+            expect(result.current.customerOrders.isRefetching).toBe(false)
+        } finally {
+            window.localStorage.setItem(storedCustomerIdKey, CUSTOMER_ID)
+        }
+    })
     test('`createOrder` does not update the cache on error', async () => {
         const [mutationName, options] = createTestCase
         mockMutationEndpoints(ordersEndpoint, {error: true}, 400) // createOrder
@@ -158,5 +226,54 @@ describe('ShopperOrders mutations', () => {
         await waitAndExpectError(() => result.current.mutation)
         // The query cache should not have changed
         expect(getQueries()).toEqual([])
+    })
+    test('`cancelOmsOrder` invalidates the order cache on success', async () => {
+        mockQueryEndpoint(ordersEndpoint, ORDER) // getOrder
+        // First, populate the order cache
+        const {result: query} = renderHookWithProviders(() =>
+            queries.useOrder({parameters: {orderNo: ORDER_NO}})
+        )
+        await waitAndExpectSuccess(() => query.current)
+        expect(query.current.data).toEqual(ORDER)
+
+        // Now cancel the order
+        mockMutationEndpoints(ordersEndpoint, {...ORDER, status: 'cancelled'})
+        mockQueryEndpoint(ordersEndpoint, {...ORDER, status: 'cancelled'}) // refetch after invalidation
+        const {result: mut} = renderHookWithProviders(() =>
+            useShopperOrdersMutation('cancelOmsOrder')
+        )
+        act(() => mut.current.mutate(cancelOmsOrderOptions))
+        await waitAndExpectSuccess(() => mut.current)
+        expect(mut.current.data).toEqual({...ORDER, status: 'cancelled'})
+    })
+    test('`returnOmsOrder` invalidates the order query on success', async () => {
+        mockQueryEndpoint(ordersEndpoint, ORDER) // initial useOrder
+        mockMutationEndpoints(ordersEndpoint, ORDER) // returnOmsOrder
+        mockQueryEndpoint(ordersEndpoint, ORDER) // refetch after invalidation
+        const {result} = renderHookWithProviders(() => ({
+            query: queries.useOrder({parameters: {orderNo: ORDER_NO}}),
+            mutation: useShopperOrdersMutation('returnOmsOrder')
+        }))
+        await waitAndExpectSuccess(() => result.current.query)
+        const oldData = result.current.query.data
+        act(() => result.current.mutation.mutate(returnOmsOrderOptions))
+        await waitAndExpectSuccess(() => result.current.mutation)
+        assertInvalidateQuery(result.current.query, oldData)
+    })
+    test('`returnOmsOrder` invalidates `useOrder` even when called with extra params (e.g. expand=oms)', async () => {
+        mockQueryEndpoint(ordersEndpoint, ORDER) // initial useOrder w/ expand
+        mockMutationEndpoints(ordersEndpoint, ORDER) // returnOmsOrder
+        mockQueryEndpoint(ordersEndpoint, ORDER) // refetch
+        const {result} = renderHookWithProviders(() => ({
+            query: queries.useOrder({
+                parameters: {orderNo: ORDER_NO, expand: ['oms', 'oms_shipments']}
+            }),
+            mutation: useShopperOrdersMutation('returnOmsOrder')
+        }))
+        await waitAndExpectSuccess(() => result.current.query)
+        const oldData = result.current.query.data
+        act(() => result.current.mutation.mutate(returnOmsOrderOptions))
+        await waitAndExpectSuccess(() => result.current.mutation)
+        assertInvalidateQuery(result.current.query, oldData)
     })
 })
