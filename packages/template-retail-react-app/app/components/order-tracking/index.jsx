@@ -87,7 +87,12 @@ const OrderTracking = ({
                         />
                         :{' '}
                         {trackingHref ? (
-                            <ChakraLink href={trackingHref} isExternal color="blue.600">
+                            <ChakraLink
+                                href={trackingHref}
+                                isExternal
+                                rel="noopener noreferrer"
+                                color="blue.600"
+                            >
                                 {trackingNumber}
                             </ChakraLink>
                         ) : (

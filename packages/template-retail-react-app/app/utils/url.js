@@ -344,7 +344,10 @@ const isSafeExternalUrl = (url) => {
  * plausible host); unsafe/non-web values (`javascript:`, `data:`, `mailto:`, userinfo
  * spoofs, internal/relative paths, bare filenames, …) and non-string input return
  * `undefined` so callers render an inactive link. Pair the link with
- * `target="_blank" rel="noopener noreferrer"` (Chakra `isExternal`).
+ * `target="_blank"` and an explicit `rel="noopener noreferrer"`. Chakra's
+ * `isExternal` alone only emits `rel="noopener"`, which still leaks the order
+ * page URL as the `Referer` to the carrier host — pass `rel` explicitly to add
+ * `noreferrer`.
  *
  * @param {*} input - The raw URL (may be scheme-less; non-strings return undefined)
  * @returns {string|undefined} An absolute http(s) URL, or `undefined` if unsafe/unusable

@@ -406,14 +406,17 @@ const AccountOrderDetail = () => {
     const canCancel = useMemo(() => {
         if (!isRegistered || !order) return false
         if (!order.omsData) return false
-        const ownsOrder = order.customerInfo?.customerId === customerId
+        // Require a concrete customerId match — `undefined === undefined` would
+        // otherwise grant ownership when both sides are missing.
+        const ownsOrder = !!customerId && order.customerInfo?.customerId === customerId
         if (!ownsOrder) return false
-        return (
-            order.productItems?.every(
-                (item) =>
-                    item.omsData != null &&
-                    item.omsData.quantityAvailableToCancel === item.omsData.quantityOrdered
-            ) ?? false
+        // An order with no items should never be cancellable; `[].every()` is
+        // vacuously true, so guard the empty case explicitly.
+        if (!(order.productItems?.length > 0)) return false
+        return order.productItems.every(
+            (item) =>
+                item.omsData != null &&
+                item.omsData.quantityAvailableToCancel === item.omsData.quantityOrdered
         )
     }, [isRegistered, order, customerId])
 
@@ -781,6 +784,7 @@ const AccountOrderDetail = () => {
                                                     key={option.key}
                                                     href={option.url}
                                                     isExternal
+                                                    rel="noopener noreferrer"
                                                     px={3}
                                                     py={2}
                                                     fontSize="sm"
@@ -821,6 +825,7 @@ const AccountOrderDetail = () => {
                                 as={ChakraLink}
                                 href={firstTrackingUrl}
                                 isExternal
+                                rel="noopener noreferrer"
                                 variant="outline"
                                 size="sm"
                                 width={{base: 'full', sm: 'auto'}}
