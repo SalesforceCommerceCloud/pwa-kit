@@ -167,7 +167,7 @@ const AccountOrderHistory = () => {
                                                 fontSize={{base: 'sm', lg: 'md'}}
                                             >
                                                 <FormattedMessage
-                                                    defaultMessage="View details"
+                                                    defaultMessage="View Details"
                                                     id="account_order_history.link.view_details"
                                                 />
                                             </Button>
@@ -202,7 +202,7 @@ const AccountOrderHistory = () => {
                                 >
                                     <Text>
                                         <FormattedMessage
-                                            defaultMessage="{count} items"
+                                            defaultMessage="{count, plural, one {# item} other {# items}}"
                                             id="account_order_history.label.num_of_items"
                                             description="Number of items in order"
                                             values={{count: order.productItems.length}}

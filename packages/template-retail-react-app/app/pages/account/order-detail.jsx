@@ -881,7 +881,7 @@ const AccountOrderDetail = () => {
                             }
                         >
                             <FormattedMessage
-                                defaultMessage="Cancel order"
+                                defaultMessage="Cancel Order"
                                 id="account_order_detail.button.cancel_order"
                             />
                         </Button>
@@ -1087,7 +1087,7 @@ const AccountOrderDetail = () => {
                 {!isLoading && (
                     <Text>
                         <FormattedMessage
-                            defaultMessage="{count} items"
+                            defaultMessage="{count, plural, one {# item} other {# items}}"
                             values={{count: itemCount}}
                             id="account_order_detail.heading.num_of_items"
                         />

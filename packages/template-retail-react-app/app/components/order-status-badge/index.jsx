@@ -71,12 +71,15 @@ const OrderStatusBadge = ({order, cancelFeedback, returnFeedback}) => {
     }, [isCancelled, order, returnFeedback?.status])
 
     return (
-        <Badge colorScheme={isCancelled ? 'red' : returnDisplayStatus ? 'gray' : 'green'}>
+        <Badge
+            colorScheme={isCancelled ? 'red' : returnDisplayStatus ? 'gray' : 'green'}
+            textTransform="capitalize"
+        >
             {isCancelled ? (
                 <Flex display="inline-flex" alignItems="center" gap={1}>
                     <CloseIcon boxSize={2} aria-hidden />
                     {formatMessage({
-                        defaultMessage: 'Cancelled',
+                        defaultMessage: 'Canceled',
                         id: 'order_status_badge.label.cancelled'
                     })}
                 </Flex>

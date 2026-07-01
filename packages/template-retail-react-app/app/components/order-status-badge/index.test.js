@@ -23,7 +23,7 @@ describe('OrderStatusBadge', () => {
     describe('cancelled (red, terminal)', () => {
         test('renders Cancelled when every item is cancelled', () => {
             renderWithProviders(<OrderStatusBadge order={orderWithItemStatuses('canceled')} />)
-            expect(screen.getByText('Cancelled')).toBeInTheDocument()
+            expect(screen.getByText('Canceled')).toBeInTheDocument()
         })
 
         test('renders Cancelled when cancelFeedback reports success (optimistic)', () => {
@@ -33,7 +33,7 @@ describe('OrderStatusBadge', () => {
                     cancelFeedback={{status: 'success'}}
                 />
             )
-            expect(screen.getByText('Cancelled')).toBeInTheDocument()
+            expect(screen.getByText('Canceled')).toBeInTheDocument()
         })
 
         test('cancelled wins over a return state', () => {
@@ -44,7 +44,7 @@ describe('OrderStatusBadge', () => {
                     cancelFeedback={{status: 'success'}}
                 />
             )
-            expect(screen.getByText('Cancelled')).toBeInTheDocument()
+            expect(screen.getByText('Canceled')).toBeInTheDocument()
             expect(screen.queryByText('Return Complete')).not.toBeInTheDocument()
         })
     })
@@ -83,7 +83,7 @@ describe('OrderStatusBadge', () => {
                 <OrderStatusBadge order={orderWithItemStatuses('canceled', 'returned')} />
             )
             expect(screen.getByText('Return Complete')).toBeInTheDocument()
-            expect(screen.queryByText('Cancelled')).not.toBeInTheDocument()
+            expect(screen.queryByText('Canceled')).not.toBeInTheDocument()
         })
     })
 
