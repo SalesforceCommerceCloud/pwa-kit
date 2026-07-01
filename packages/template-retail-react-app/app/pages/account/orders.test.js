@@ -2763,7 +2763,7 @@ describe('Cancel order — eligibility and full flow', () => {
 
         // Modal opens
         expect(screen.getByRole('dialog')).toBeInTheDocument()
-        expect(screen.getByText(/this cancels the entire order/i)).toBeInTheDocument()
+        expect(screen.getByText(/cancel the entire order/i)).toBeInTheDocument()
 
         // Submit
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))

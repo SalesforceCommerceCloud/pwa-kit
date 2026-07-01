@@ -71,7 +71,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reaso
                         </Text>
                         <Text fontSize="sm">
                             <FormattedMessage
-                                defaultMessage="This cancels the entire order."
+                                defaultMessage="Cancel the entire order."
                                 id="cancel_order_modal.text.impact"
                             />
                         </Text>
@@ -116,7 +116,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel, isSubmitting, reaso
                             isLoading={isSubmitting}
                         >
                             <FormattedMessage
-                                defaultMessage="Confirm cancellation"
+                                defaultMessage="Confirm Cancellation"
                                 id="cancel_order_modal.button.confirm_cancellation"
                             />
                         </Button>

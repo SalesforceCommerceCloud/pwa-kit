@@ -370,7 +370,7 @@
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
   "cancel_order_modal.button.confirm_cancellation": {
-    "defaultMessage": "Confirm cancellation"
+    "defaultMessage": "Confirm Cancellation"
   },
   "cancel_order_modal.button.keep_order": {
     "defaultMessage": "Keep order"
@@ -388,7 +388,7 @@
     "defaultMessage": "Confirm cancellation below."
   },
   "cancel_order_modal.text.impact": {
-    "defaultMessage": "This cancels the entire order."
+    "defaultMessage": "Cancel the entire order."
   },
   "cancel_order_modal.text.select_reason_description": {
     "defaultMessage": "Select a reason and confirm cancellation."

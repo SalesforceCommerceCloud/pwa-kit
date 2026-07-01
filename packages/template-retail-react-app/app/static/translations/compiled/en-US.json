@@ -998,7 +998,7 @@
   "cancel_order_modal.button.confirm_cancellation": [
     {
       "type": 0,
-      "value": "Confirm cancellation"
+      "value": "Confirm Cancellation"
     }
   ],
   "cancel_order_modal.button.keep_order": [
@@ -1038,7 +1038,7 @@
   "cancel_order_modal.text.impact": [
     {
       "type": 0,
-      "value": "This cancels the entire order."
+      "value": "Cancel the entire order."
     }
   ],
   "cancel_order_modal.text.select_reason_description": [

@@ -1,4 +1,5 @@
 ## v10.1.0-dev
+- Apply CX UI text guidelines to the cancel order modal: "Confirm Cancellation" button caps and "Cancel the entire order." impact copy.
 - [Bugfix] Add explicit `rel="noopener noreferrer"` to external carrier tracking links so the order page URL doesn't leak as the `Referer` (Chakra `isExternal` alone only emits `noopener`).
 - Bump `vendor.js` bundle-size budget from 397 kB to 398 kB to accommodate the `commerce-sdk-isomorphic` 5.4.0 upgrade.
 - [Feature] Add item-level order returns on the order detail page. Registered shoppers who own an OMS-managed order can return eligible items (OMS-driven via `quantityAvailableToReturn`) through a modal with per-item quantity and reason selection, inline success/error feedback, and a status badge that reflects return progress (including partially-returned multi-unit lines). [#3904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3904)
