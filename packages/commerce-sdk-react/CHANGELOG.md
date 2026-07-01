@@ -1,3 +1,6 @@
+## v5.3.0-nightly-20260701090426 (Jul 01, 2026)
+## v5.3.0-dev (Jul 01, 2026)
+## v3.19.0-nightly-20260701090426 (Jul 01, 2026)
 ## v5.3.0-dev
 - [Bugfix] Preserve SCAPI/SFRA error details on mutation and query responses. `handleInvalidToken` (and the auth error-handling paths) now read the error response body from a clone, so the original body stream stays intact and the calling code can still read error details (e.g. a `dw.system.Status.ERROR` returned from an SFRA hook on a 400). Fixes a regression introduced with HttpOnly session cookies.
 - [Bugfix] Refresh and retry on a SCAPI 401 instead of rendering a hard error page. When an access token is invalid-but-unexpired (server-revoked, tampered, or after a SLAS key rotation), `handleInvalidToken` now clears the stale `cc-at-expires` indicator and refreshes off the still-valid refresh token, retrying the request once, rather than re-throwing the 401. Applies to both HttpOnly and localStorage modes. [#3860](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3860)
