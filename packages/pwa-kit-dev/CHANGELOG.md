@@ -1,4 +1,5 @@
 ## v3.19.0-dev
+- **Security**: Add TextEncoder polyfill alongside existing TextDecoder in Jest test environment setup (setup-jest.js). Required for complete AWS SDK 3.x's @smithy/core CBOR support (both encode and decode paths) used by mrt-utilities 0.2.2+. [#XXXX](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/XXXX)
 - **Security**: Add TextDecoder polyfill to Jest test environment setup (setup-jest.js). Required for AWS SDK 3.x's @smithy/core CBOR encoding used by mrt-utilities 0.2.2+. Ensures template tests run successfully with the upgraded AWS SDK dependency. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
 - Fix babel-loader exclude regex on Windows where unescaped backslashes created broken escape sequences [#3840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3840)
 

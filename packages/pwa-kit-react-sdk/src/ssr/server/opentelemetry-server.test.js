@@ -482,7 +482,7 @@ describe('OpenTelemetry Server Tracing', () => {
                 })),
                 end: jest.fn(),
                 setStatus: jest.fn(),
-                parentSpanId: 'test-parent-span-id'
+                parentSpanContext: {spanId: 'test-parent-span-id'}
             }
 
             // Setup tracer mock

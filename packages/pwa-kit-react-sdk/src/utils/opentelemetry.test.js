@@ -70,7 +70,7 @@ describe('OpenTelemetry Utilities', () => {
                 traceId: 'test-trace-id',
                 spanId: 'test-span-id'
             })),
-            parentSpanId: 'test-parent-span-id',
+            parentSpanContext: {spanId: 'test-parent-span-id'},
             name: 'test-span',
             kind: 1,
             startTime: [1234567890, 0],

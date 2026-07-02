@@ -25,7 +25,7 @@ export class MrtConsoleSpanExporter extends ConsoleSpanExporter {
                 const ctx = span.spanContext()
                 const spanData = {
                     traceId: ctx.traceId,
-                    parentId: span.parentSpanId,
+                    parentId: span.parentSpanContext?.spanId,
                     name: span.name,
                     id: ctx.spanId,
                     kind: span.kind,
