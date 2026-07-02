@@ -167,8 +167,7 @@ describe('provider', () => {
     // array, so when only the dwsid cookie changed (e.g. guest-to-logged-in, session bridge,
     // re-auth) the memoized SCAPI clients kept sending the OLD sfdc_dwsid header.
     describe('server-affinity header (sfdc_dwsid) stays in sync with the dwsid cookie', () => {
-        const readAffinityHeader = () =>
-            screen.getByTestId('affinity-header').textContent
+        const readAffinityHeader = () => screen.getByTestId('affinity-header').textContent
 
         const AffinityProbe = () => {
             const api = useCommerceApi()
