@@ -1,3 +1,6 @@
+## v5.3.0-nightly-20260702090019 (Jul 02, 2026)
+## v5.3.0-dev (Jul 02, 2026)
+## v3.19.0-nightly-20260702090019 (Jul 02, 2026)
 ## v5.3.0-dev
 - [Feature] Add OMS order-action hooks for Shopper Orders: the `cancelOmsOrder` and `returnOmsOrder` mutations and the `getOmsMetaData` query hook (return/cancel reason codes), with cache invalidation on the mutating actions. [#3864](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3864) [#3869](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3869)
 - Bump `commerce-sdk-isomorphic` to `5.4.0`, the first stable release carrying the OMS Shopper Orders endpoints (`oms-return-order`, `oms-cancel-order`, `oms-meta-data`).
