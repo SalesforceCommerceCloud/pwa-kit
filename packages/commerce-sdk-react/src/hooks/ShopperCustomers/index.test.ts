@@ -21,7 +21,7 @@ describe('Shopper Customers hooks', () => {
             'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
             'getPublicProductListItems', // TODO: Implement when the endpoint exits closed beta
             'registerExternalProfile', // TODO: Implement when the endpoint exits closed beta
-            'setupCustomerPaymentMethodReference' // TODO: Implement when the endpoint exits closed beta
+            'setupCustomerPaymentMethodReference' // TODO: added with the commerce-sdk-isomorphic 5.4.0 bump; implement later.
         ])
     })
     test('all mutations have cache update logic', () => {
