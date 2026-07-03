@@ -1,3 +1,4 @@
+## v3.19.0-nightly-20260703090014 (Jul 03, 2026)
 ## v3.19.0-dev
 - **Security**: Upgrade `@salesforce/mrt-utilities` from `^0.1.6` to `^0.2.2` to eliminate fast-xml-parser dependency and resolve CVE-2026-26278 (Critical), CVE-2025-23333, CVE-2024-55565, CVE-2024-41818, CVE-2024-41810, CVE-2023-52426, and CVE-2023-34104. The mrt-utilities 0.2.2 uses AWS SDK 3.1049.0 which no longer depends on fast-xml-parser. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
 - HttpOnly session cookies now honor `commerceAPI.cookieDomain` from the runtime config: when set, the SLAS proxy attaches `Domain=` to every Set-Cookie header it emits and also expires the host-scoped versions for clean migration. Mirrors the existing client-side behavior in commerce-sdk-react.
