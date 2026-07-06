@@ -207,7 +207,12 @@ const performRender = async (req, res, next) => {
     // on the active DT server span. Uses the route path, never the concrete URL, so
     // no path parameters / query string leak into the attribute.
     if (route?.path) {
-        setActiveSpanAttribute('http.route', route.path)
+        // Strip inline regex constraint groups so the template stays readable and
+        // low-cardinality. Fuzzy-matched routes embed the full site/locale enumeration
+        // (e.g. '/:site(us|RefArch)/:locale(en-US|en-CA|...)/category/:categoryId'), which
+        // is noisy in http.route; reduce it to '/:site/:locale/category/:categoryId'.
+        const routeTemplate = route.path.replace(/\([^)]*\)/g, '')
+        setActiveSpanAttribute('http.route', routeTemplate)
     }
 
     // Step 2 - Get the component
