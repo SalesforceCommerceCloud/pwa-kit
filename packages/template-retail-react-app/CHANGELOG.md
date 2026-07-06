@@ -1,5 +1,4 @@
 ## v10.1.0-dev
-- OMS order-detail cleanup: extract a shared `useFeedbackState` hook for the cancel/return feedback banners, name the screen-reader announce delay (`ANNOUNCE_DELAY_MS`), and guard `formatTrackingDate` against epoch-era sentinel dates. Also documents the downstream OMS/SOM refund flow (out of PWA Kit scope).
 - [Bugfix] Add explicit `rel="noopener noreferrer"` to external carrier tracking links so the order page URL doesn't leak as the `Referer` (Chakra `isExternal` alone only emits `noopener`).
 - Bump `vendor.js` bundle-size budget from 397 kB to 398 kB to accommodate the `commerce-sdk-isomorphic` 5.4.0 upgrade.
 - [Feature] Add item-level order returns on the order detail page. Registered shoppers who own an OMS-managed order can return eligible items (OMS-driven via `quantityAvailableToReturn`) through a modal with per-item quantity and reason selection, inline success/error feedback, and a status badge that reflects return progress (including partially-returned multi-unit lines). [#3904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3904)
